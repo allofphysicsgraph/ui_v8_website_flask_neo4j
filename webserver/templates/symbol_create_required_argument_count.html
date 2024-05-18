@@ -5,30 +5,22 @@
   Return to <a href="{{ url_for('main') }}?referrer=symbol_create">main page</a>
 </P>
 
+<P>See <a href="https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html">distinguishing scalars, vectors, and matrices as operators or symbols</a></P>
+
 <fieldset>
   <legend>
-    <H2>Create symbol</H2>
+    <H2>operation requires how many arguments?</H2>
   </legend>
-
-<P>TODO: as user is entering symbol, filter the list of existing symbols
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_symbol_properties.csrf_token }}
-    <P>{{ form_symbol_properties.symbol_latex.label}} (<B>required</B>): {{ form_symbol_properties.symbol_latex(size=50, minlength=1, maxlength=1000) }}</P>
 
-    <P>{{ form_symbol_properties.symbol_requires_arguments.label }}(<B><em>required</em></B>): {{ form_symbol_properties.symbol_requires_arguments }}</p>
-    
-    <P>{{form_symbol_properties.symbol_name.label }} (optional): {{ form_symbol_properties.symbol_name(size=50, maxlength=1000) }}</p>
-    
-    <P>{{form_symbol_properties.symbol_description.label }} (optional): {{ form_symbol_properties.symbol_description(size=50, maxlength=1000) }}</p>
+    <P>{{form_symbol_properties.required_argument_count.label }} (<B>required</B>): {{ form_symbol_properties.required_argument_count() }}    
 
-    <P>{{ form_symbol_properties.symbol_reference.label }}(<small><em>optional</em></small>): {{ form_symbol_properties.symbol_reference }}</p>
-
-      <input type="submit" value="add symbol">
+    <P><input type="submit" value="specify argument count for operation">
     </P>
   </form>
 </fieldset>
-
 
 
 {% include '_table_of_symbols.html' %}
