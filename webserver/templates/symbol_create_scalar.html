@@ -5,17 +5,27 @@
   Return to <a href="{{ url_for('main') }}?referrer=symbol_create">main page</a>
 </P>
 
-<P>See <a href="https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html">distinguishing scalars, vectors, and matrices as operators or symbols</a></P>
-
-<P>Symbol dict: {{ symbol_dict }}
-
 <fieldset>
   <legend>
     <H2>Create symbol</H2>
   </legend>
 
+<P>TODO: as user is entering symbol, filter the list of existing symbols.
+  That way the user can recognize collisions.
+
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_symbol_properties.csrf_token }}
+
+
+
+    <P>{{ form_symbol_properties.symbol_latex.label}} (<B>required</B>): {{ form_symbol_properties.symbol_latex(size=50, minlength=1, maxlength=1000) }}</P>
+    
+    <P>{{form_symbol_properties.symbol_name.label }} (<small><em>optional</em></small>): {{ form_symbol_properties.symbol_name(size=50, maxlength=1000) }}</p>
+    
+    <P>{{form_symbol_properties.symbol_description.label }} (<small><em>optional</em></small>): {{ form_symbol_properties.symbol_description(size=50, maxlength=1000) }}</p>
+
+    <P>{{ form_symbol_properties.symbol_reference.label }} (<small><em>optional</em></small>): {{ form_symbol_properties.symbol_reference }}</p>
+
 
     <P>{{ form_symbol_properties.symbol_scope.label }}: {{ form_symbol_properties.symbol_scope }}</p>
 
@@ -23,9 +33,6 @@
 
     <P>{{ form_symbol_properties.symbol_radio_domain.label}}: {{ form_symbol_properties.symbol_radio_domain }}</P>
 
-
-    <!-- https://en.wikipedia.org/wiki/International_System_of_Quantities#Base_quantities -->
-    <P><a href="https://www.ldeo.columbia.edu/~martins/hydro/case_studies/units_dimensions.html">dimensions</a>: 
     <P>{{ form_symbol_properties.dimension_length.label }} (<B>required</B>): {{ form_symbol_properties.dimension_length() }}</P>
     <P>{{ form_symbol_properties.dimension_time.label }} (<B>required</B>): {{ form_symbol_properties.dimension_time() }}</P>
     <P>{{ form_symbol_properties.dimension_mass.label }} (<B>required</B>): {{ form_symbol_properties.dimension_mass() }}</P>
@@ -34,16 +41,17 @@
     <P>{{ form_symbol_properties.dimension_amount_of_substance.label }} (<B>required</B>): {{ form_symbol_properties.dimension_amount_of_substance() }}</P>
     <P>{{ form_symbol_properties.dimension_luminous_intensity.label }} (<B>required</B>): {{ form_symbol_properties.dimension_luminous_intensity() }}</P>
 
-      <P><input type="submit" value="add scalar symbol">
+
+      <input type="submit" value="add symbol">
+    </P>
   </form>
 </fieldset>
 
+
+
 <P>{% include '_table_of_symbols_requires_arguments.html' %}
 <P>{% include '_table_of_symbols_dimension0.html' %}
-<P>{% include '_table_of_symbols_dimension1and2.html' %}
-
-
-
+<P>{% include '_table_of_symbols_dimension1ormore.html' %}
 
 <script>
 function select_symbol() {
