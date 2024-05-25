@@ -101,6 +101,7 @@ from wtforms import StringField, validators, FieldList, FormField, IntegerField,
 from secure import SecureHeaders  # type: ignore
 
 import sys
+
 sys.path.append("library")
 
 import neo4j_query
