@@ -33,9 +33,7 @@ import sympy  # type: ignore
 from sympy.parsing.latex import parse_latex  # type: ignore
 
 
-def add_X_to_both_sides(
-    input_expr_sympy, feed_expr_sympy, output_expr_sympy
-) -> str:
+def add_X_to_both_sides(input_expr_sympy, feed_expr_sympy, output_expr_sympy) -> str:
     """
     https://docs.sympy.org/latest/gotchas.html#double-equals-signs
     https://stackoverflow.com/questions/37112738/sympy-comparing-expressions
@@ -54,12 +52,10 @@ def add_X_to_both_sides(
     print("[TRACE] func: sympy_validate_step/add_X_to_both_sides start " + trace_id)
 
     delta_lhs = sympy.simplify(
-        sympy.Add(input_expr_sympy.lhs, feed_expr_sympy)
-        - output_expr_sympy.lhs
+        sympy.Add(input_expr_sympy.lhs, feed_expr_sympy) - output_expr_sympy.lhs
     )
     delta_rhs = sympy.simplify(
-        sympy.Add(input_expr_sympy.rhs, feed_expr_sympy)
-        - output_expr_sympy.rhs
+        sympy.Add(input_expr_sympy.rhs, feed_expr_sympy) - output_expr_sympy.rhs
     )
     if (delta_lhs == 0) and (delta_rhs == 0):
         print("[TRACE] func: sympy_validate_step/add_X_to_both_sides end " + trace_id)
@@ -69,8 +65,9 @@ def add_X_to_both_sides(
         return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
 
 
-
-def subtract_X_from_both_sides(input_expr_sympy, feed_expr_sympy, output_expr_sympy) -> str:
+def subtract_X_from_both_sides(
+    input_expr_sympy, feed_expr_sympy, output_expr_sympy
+) -> str:
     """
     https://docs.sympy.org/latest/tutorial/manipulation.html
 
@@ -90,7 +87,9 @@ def subtract_X_from_both_sides(input_expr_sympy, feed_expr_sympy, output_expr_sy
     'valid'
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: sympy_validate_step/subtract_X_from_both_sides start " + trace_id)
+    print(
+        "[TRACE] func: sympy_validate_step/subtract_X_from_both_sides start " + trace_id
+    )
 
     delta_lhs = sympy.simplify(
         sympy.Add(input_expr_sympy.lhs, sympy.Mul(-1, feed_expr_sympy))
@@ -101,10 +100,16 @@ def subtract_X_from_both_sides(input_expr_sympy, feed_expr_sympy, output_expr_sy
         - output_expr_sympy.rhs
     )
     if (delta_lhs == 0) and (delta_rhs == 0):
-        print("[TRACE] func: sympy_validate_step/subtract_X_from_both_sides end " + trace_id)
+        print(
+            "[TRACE] func: sympy_validate_step/subtract_X_from_both_sides end "
+            + trace_id
+        )
         return "valid"
     else:
-        print("[TRACE] func: sympy_validate_step/subtract_X_from_both_sides end " + trace_id)
+        print(
+            "[TRACE] func: sympy_validate_step/subtract_X_from_both_sides end "
+            + trace_id
+        )
         return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
 
 
@@ -127,18 +132,20 @@ def multiply_both_sides_by(input_expr_sympy, feed_expr_sympy, output_expr_sympy)
     print("[TRACE] func: sympy_validate_step/multiply_both_sides_by start " + trace_id)
 
     delta_lhs = sympy.simplify(
-        sympy.Mul(input_expr_sympy.lhs, feed_expr_sympy)
-        - output_expr_sympy.rhs
+        sympy.Mul(input_expr_sympy.lhs, feed_expr_sympy) - output_expr_sympy.rhs
     )
     delta_rhs = sympy.simplify(
-        sympy.Mul(input_expr_sympy.rhs, feed_expr_sympy)
-        - output_expr_sympy.rhs
+        sympy.Mul(input_expr_sympy.rhs, feed_expr_sympy) - output_expr_sympy.rhs
     )
     if (delta_lhs == 0) and (delta_rhs == 0):
-        print("[TRACE] func: sympy_validate_step/multiply_both_sides_by end " + trace_id)
+        print(
+            "[TRACE] func: sympy_validate_step/multiply_both_sides_by end " + trace_id
+        )
         return "valid"
     else:
-        print("[TRACE] func: sympy_validate_step/multiply_both_sides_by end " + trace_id)
+        print(
+            "[TRACE] func: sympy_validate_step/multiply_both_sides_by end " + trace_id
+        )
         return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
 
 

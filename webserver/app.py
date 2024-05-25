@@ -58,7 +58,6 @@ import datetime
 # inspired by https://news.ycombinator.com/item?id=33844117
 from typing import NewType, Dict, List
 
-from flask import Flask
 
 import neo4j
 from neo4j import GraphDatabase
@@ -75,10 +74,10 @@ import os
 
 # logger = logging.getLogger(__name__)
 
-
 # https://hplgit.github.io/web4sciapps/doc/pub/._web4sa_flask004.html
 from flask import (
     Flask,
+    g,
     redirect,
     render_template,
     request,
@@ -102,7 +101,6 @@ from wtforms import StringField, validators, FieldList, FormField, IntegerField,
 from secure import SecureHeaders  # type: ignore
 
 import sys
-
 sys.path.append("library")
 
 import neo4j_query
@@ -170,6 +168,11 @@ app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
     0  # https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
 )
 app.config["DEBUG"] = True
+
+
+import pdg_api
+
+app.register_blueprint(pdg_api.bp)
 
 
 class SpecifyNewDerivationForm(FlaskForm):
