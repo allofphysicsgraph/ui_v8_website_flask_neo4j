@@ -101,6 +101,10 @@ from wtforms import StringField, validators, FieldList, FormField, IntegerField,
 
 from secure import SecureHeaders  # type: ignore
 
+import sys
+
+sys.path.append("library")
+
 import neo4j_query
 import compute
 
@@ -162,9 +166,9 @@ app.config["UPLOAD_FOLDER"] = (
     # the following folder on the host is accessible to both flask and neo4j
     "/scratch/dumping_grounds/"  # https://flask.palletsprojects.com/en/3.0.x/patterns/fileuploads/
 )
-app.config[
-    "SEND_FILE_MAX_AGE_DEFAULT"
-] = 0  # https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
+    0  # https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
+)
 app.config["DEBUG"] = True
 
 
@@ -1240,9 +1244,9 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     dict_of_symbol_dicts_not_in_expression = {}
     for this_symbol_id in dict_of_all_symbol_dicts.keys():
         if this_symbol_id not in dict_of_symbol_dicts_in_expression.keys():
-            dict_of_symbol_dicts_not_in_expression[
-                this_symbol_id
-            ] = dict_of_all_symbol_dicts[this_symbol_id]
+            dict_of_symbol_dicts_not_in_expression[this_symbol_id] = (
+                dict_of_all_symbol_dicts[this_symbol_id]
+            )
     print(
         "dict_of_symbol_dicts_not_in_expression=",
         dict_of_symbol_dicts_not_in_expression,

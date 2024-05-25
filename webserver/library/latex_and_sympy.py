@@ -17,6 +17,7 @@ import random
 import sympy  # type: ignore
 from sympy.parsing.latex import parse_latex  # type: ignore
 
+
 def cleaned_latex_str_to_sympy_expression(expr_latex: str):
     """
     see compute.remove_latex_presention_markings()
@@ -31,22 +32,28 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
     """
 
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: latex_and_sympy/cleaned_latex_str_to_sympy_expression start " + trace_id)
+    print(
+        "[TRACE] func: latex_and_sympy/cleaned_latex_str_to_sympy_expression start "
+        + trace_id
+    )
 
     print("latex to be converted to SymPy: " + expr_latex)
 
     try:
         symp_expr = parse_latex(expr_latex)
     except sympy.SympifyError as err:
-        #logger.error(err)
+        # logger.error(err)
         print(err)
         raise Exception("Sympy unable to parse latex (1): " + expr_latex)
     except sympy.parsing.latex.errors.LaTeXParsingError as err:
-        #logger.error(err)
+        # logger.error(err)
         print(err)
         raise Exception("Sympy unable to parse latex (2): " + expr_latex)
 
-    print("[TRACE] func: latex_and_sympy/cleaned_latex_str_to_sympy_expression start " + trace_id)
+    print(
+        "[TRACE] func: latex_and_sympy/cleaned_latex_str_to_sympy_expression start "
+        + trace_id
+    )
     return symp_expr
     # >>> type(symp_expr)
     # <class 'sympy.core.relational.Equality'>
@@ -59,7 +66,10 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     >>> list_of_sympy_symbols_in_sympy_expression(sympy_expr)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: latex_and_sympy/list_of_sympy_symbols_in_sympy_expression start " + trace_id)
+    print(
+        "[TRACE] func: latex_and_sympy/list_of_sympy_symbols_in_sympy_expression start "
+        + trace_id
+    )
     # list_of_symbols = []
     # for symb in sympy_expr.atoms(sympy.Symbol):
     #     list_of_symbols.append(str(symb))
@@ -72,7 +82,10 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     # >>> type(list(list_of_sympy_symbols)[0])
     # <class 'sympy.core.symbol.Symbol'>
 
-    print("[TRACE] func: latex_and_sympy/list_of_sympy_symbols_in_sympy_expression end " + trace_id)
+    print(
+        "[TRACE] func: latex_and_sympy/list_of_sympy_symbols_in_sympy_expression end "
+        + trace_id
+    )
     return list(list_of_sympy_symbols)
 
 
@@ -82,21 +95,21 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
 # https://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic.atoms
 # and
 # https://stackoverflow.com/questions/36594508/sympy-get-functions-from-expression/36629624
-# 
+#
 # def list_of_sympy_symbols_in_sympy_expression(sympy_expr) -> list:
 #     """
 #     Sometimes Sympy works as desired (for simple algebraic synatx)
 #     >>> parse_latex(r'a + k = b + k').free_symbols
 #     {b, a, k}
-# 
+#
 #     Sometimes the Sympy output does not reflect user intent
 #     #>>> parse_latex(r'\nabla \vec{x} = f(y)').free_symbols
 #     {x, nabla, y, vec}
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
 #     print("[TRACE] func: latex_and_sympy/list_of_str_symbols_from_cleaned_latex_str start " + trace_id)
-# 
+#
 #     my_sym = list(sympy_expr.free_symbols)
-# 
+#
 #     print("[TRACE] func: latex_and_sympy/list_of_str_symbols_from_cleaned_latex_str end " + trace_id)
 #     return my_sym
