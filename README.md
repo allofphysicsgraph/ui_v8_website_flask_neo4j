@@ -1,6 +1,8 @@
-- author: Ben Payne
-- project: Physics Derivation Graph
-- website: https://allofphysics.com
+This repo contains a new web UI (still using flask) and a new backend -- Neo4j. The previous version that is currently used for <https://allofphysics.com/> is <https://github.com/allofphysicsgraph/ui_v7_website_flask_json>
+
+# Status
+
+The website and back-end work locally.
 
 # Quickstart
 
@@ -38,5 +40,19 @@ where the key-value pairs are properties. The schema is effectively the labels a
 
 "Node labels, relationship types, and properties (the key part) are case sensitive." (citation)[https://neo4j.com/docs/getting-started/current/appendix/graphdb-concepts/]
 
-# Aspirational web interface:
-<http://www.apcjones.com/arrows/> and <https://arrows.app/>
+# Licensing
+
+
+[Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/)
+
+
+# Software Requirements
+
+* Docker
+* a web browser
+
+# Contributing
+
+Before submitting code via a pull request, please open an issue (feature or bug) and describe your question or intent.
+
+Python code is formatted using Black.
