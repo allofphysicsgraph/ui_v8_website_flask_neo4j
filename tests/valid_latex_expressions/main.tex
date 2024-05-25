@@ -29,126 +29,275 @@ These math expressions would be expected in mathematical physics.
 This is not meant to comprehensively represent all expression found in pure math. Also, there are mathematical physics notations not found in pure math -- e.g., Dirac notation.
 
 \section{Algebra}
-\input{expression_010}    
+
+\hrulefill
+
+\input{expression_010}
+Expected tokens: $a$, $b$, $=$.
+
+\hrulefill
 
 polynomial
 \input{expression_015}    
+Expected tokens: $x$, $y$, $z$, $=$, $n$, $+$, power.
+
+\hrulefill
 
 polynomial with subscripts
 \input{expression_016}    
+Expected tokens: $a_1$, $b_1$, $c_1$, $+$, $=$, $2$, power.
+
+\hrulefill
+
 
 \input{expression_017}    
+Expected tokens: $k_{n+1}$, $n$, $2$, $+$, $-$, $k_{n-1}$, $=$, power.
+
+\hrulefill
+
 
 \input{expression_018}    
+Expected tokens: $\cos$, power, 2, $\theta$, $\phi$, $-$, $=$
+
+\hrulefill
+
 
 \input{expression_019}    
+Expected tokens: $\sqrt{}$, $x$, $y$, $\leq$, $/$, 2, $+$
+
+\hrulefill
+
 
 function of a variable
 \input{expression_030}    
+Expected tokens: $f(x)$, $x$, $=$, $y$, power, 2.
+
+\hrulefill
+
 
 With constraint
-% https://github.com/allofphysicsgraph/proofofconcept/issues/227
 \input{expression_040}    
+Expected tokens: $K$, $G$, $+$, $1$, $=$, $<<$
+
+\hrulefill
+
 
 Equation with range:
 \input{expression_050}    
+Expected tokens: 
+
+\hrulefill
+
 
 \input{expression_051}
+Expected tokens: 
+
+\hrulefill
+
 
 \input{expression_998}
+Expected tokens: 
+
+\hrulefill
 
 %https://www.authorea.com/users/3/articles/165181-latex-mathematics-examples
 continued fractions
 \input{expression_055}    
+Expected tokens: 
+
+\hrulefill
 
 As the fractions continue, they get smaller. If you want to keep the size consistent, use the display style
 \input{expression_056}    
+Expected tokens: 
+
+\hrulefill
 
 system of equations
 \input{expression_058}
+Expected tokens: 
+
+\hrulefill
 
 Multi-line equation:
 \input{expression_060}    
+Expected tokens: 
+
+\hrulefill
 
 Multi-line equation with alignment:
 \input{expression_070}
+Expected tokens: 
+
+\hrulefill
 
 Simultaneous equations
 \input{expression_999}
+Expected tokens: 
+
+\hrulefill
 
 % https://gitmind.com/faq/formula-list.html
 fractions, nested
 \input{expression_071}
+Expected tokens: 
 
-
+\hrulefill
 
 binomial
 \input{expression_072}
+Expected tokens: 
+
+\hrulefill
 
 % https://www.authorea.com/users/3/articles/165181-latex-mathematics-examples
 The Taylor series expansion for $e^x$ is 
 \input{expression_073}
+Expected tokens: 
+
+\hrulefill
+
 
 For any non-negative integer $n$,
 \input{expression_074}
+Expected tokens: 
+
+\hrulefill
+
 
 \section{Calculus}
 limit
 \input{expression_077}
+Expected tokens: 
+
+\hrulefill
+
 
 integration
 \input{expression_075}
+Expected tokens: 
+
+\hrulefill
+
 
 % https://gitmind.com/faq/formula-list.html
 \input{expression_078}
+Expected tokens: 
+
+\hrulefill
+
 
 \input{expression_079}
+Expected tokens: 
+
+\hrulefill
+
 
 partial differential
 \input{expression_076}
+Expected tokens: 
+
+\hrulefill
+
 
 \section{Linear Algebra}
 vector and matrix notation
 \input{expression_020}    
+Expected tokens: 
+
+\hrulefill
+
 
 
 row vector:
 \input{expression_080}
+Expected tokens: $\vec{x}$, $=$, $0$, $3$, $y$
+
+\hrulefill
+
 
 column vector:
 \input{expression_090}
+Expected tokens: $\vec{x}$, $=$, $x_1$, $x_2$, $x_3$
+
+\hrulefill
+
 
 column vector, arbitrary size:
 \input{expression_100}
+Expected tokens: $\vec{x}$, $=$, $x_1$, $x_2$, $x_3$
+
+\hrulefill
+
 
 
 matrix:
 \input{expression_110}
+Expected tokens: 
+
+\hrulefill
+
 
 matrix, arbitrary size:
 \input{expression_120}
+Expected tokens: 
+
+\hrulefill
+
 
 % https://tex.stackexchange.com/a/153616/235813
 matrix math:
 \input{expression_130}
+Expected tokens: 
+
+\hrulefill
+
 
 \section{Quantum: Dirac Notation}
 
 bra
 % https://tex.stackexchange.com/a/553176/235813
 \input{expression_800}
+Expected tokens: $\psi$
+
+How to indicate using tokens that this is "bra"? Seems similar to $f(x)$
+
+\hrulefill
+
 
 ket
 % https://tex.stackexchange.com/a/553176/235813
 \input{expression_810}
+Expected tokens: $\phi$
+
+How to indicate using tokens that this is "ket"? Seems similar to $f(x)$
+
+\hrulefill
+
 
 % https://tex.stackexchange.com/a/553176/235813
 \input{expression_820}
+Expected tokens: $\psi$, $\phi$
+
+Seems similar to $f(x, y)$
+
+\hrulefill
+
 
 \input{expression_830}
+Expected tokens: 
+
+Seems similar to $f(x, y, z)$
+
+\hrulefill
+
 
 expectation
 \input{expression_840}
+Expected tokens: 
+
+\hrulefill
+
 
 \section{Einstein summation notation}
 
@@ -157,12 +306,24 @@ expectation
 \href{https://en.wikipedia.org/wiki/Einstein_notation}{Einstein notation}
 
 \input{expression_700}
+Expected tokens: $C$, $A$, $B$, $=$, $i$, $k$, $j$.
+
+\hrulefill
+
 
 The \href{https://en.wikipedia.org/wiki/Kronecker_delta}{Kronecker delta}
 \input{expression_705}
+Expected tokens: $\sum$, $j$, $\delta$, $i$, $j$, $a$, $=$.
+
+\hrulefill
+
 
 
 \input{expression_710}
+Expected tokens: 
+
+\hrulefill
+
 
 
 \end{document}

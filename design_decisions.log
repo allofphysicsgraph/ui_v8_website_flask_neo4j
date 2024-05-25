@@ -1,6 +1,7 @@
 ****************************
 2024-05-24
 
+get symbols from latex-as-string first, then send to sympy
 
 ****************************
 2024-05-24
