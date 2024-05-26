@@ -950,11 +950,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     if request.method == "POST":
         print("request.form = ", request.form)
         # delete derivation (yikes!). Here's how:
-        # 1) for each step,
-        #      * disconnect step from inference rule (remove edge)
-        #      * disconnect step from expressions (remove edge)
-        #      * disconnect step from derivation (remove edge)
-        #      * delete step node
+        # 1) for each step, delete step node
         # 2) delete derivation node
 
         list_of_step_dicts = []
@@ -969,22 +965,6 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
         print("list_of_step_dicts=", list_of_step_dicts)
 
         for this_step_dict in list_of_step_dicts:
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.disconnect_step_from_inference_rule,
-                    this_step_dict["id"],
-                )
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.disconnect_step_from_expressions, this_step_dict["id"]
-                )
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.disconnect_step_from_derivation, this_step_dict["id"]
-                )
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 session.write_transaction(
@@ -1268,7 +1248,11 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     if request.method == "POST" and web_form_new_expression.validate():
         print("with web_form, request.form = ", request.form)
 
-        expression_latex = str(web_form_new_expression.expression_latex.data).strip()
+        expression_latex = (
+            str(web_form_new_expression.expression_latex.data)
+            .strip()
+            .replace("\\", "\\\\")
+        )
         expression_name = str(web_form_new_expression.expression_name.data).strip()
         expression_description = str(
             web_form_new_expression.expression_description.data
@@ -1537,7 +1521,9 @@ def to_edit_symbol(symbol_id: unique_numeric_id_as_str) -> str:
     if request.method == "POST" and web_form_symbol_properties.validate():
         print("request.form = ", request.form)
 
-        symbol_latex = str(web_form_symbol_properties.symbol_latex.data).strip()
+        symbol_latex = str(
+            web_form_symbol_properties.symbol_latex.data
+        ).strip()  # .replace("\\","\\\\")
         symbol_name = str(web_form_symbol_properties.symbol_name.data).strip()
         symbol_description = str(
             web_form_symbol_properties.symbol_description.data

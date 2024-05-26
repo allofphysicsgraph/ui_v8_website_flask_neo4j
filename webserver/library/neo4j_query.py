@@ -652,6 +652,9 @@ def edit_derivation_metadata(
 def disconnect_step_from_inference_rule(tx, step_id: str) -> None:
     """
     called by "delete derivation"
+
+    https://stackoverflow.com/questions/57553886/neo4j-what-happens-to-a-directional-relationship-when-one-node-is-deleted
+
     as part of this sequence:
      1) for each step,
            * disconnect step from inference rule (remove edge)
@@ -673,57 +676,14 @@ def disconnect_step_from_inference_rule(tx, step_id: str) -> None:
     return
 
 
-def disconnect_step_from_expressions(tx, step_id: str) -> None:
-    """
-    called by "delete derivation"
-    as part of this sequence:
-     1) for each step,
-           * disconnect step from inference rule (remove edge)
-           * disconnect step from expressions (remove edge)
-           * disconnect step from derivation (remove edge)
-           * delete step node
-     2) delete derivation node
-
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: neo4j_query/disconnect_step_from_expressions start " + trace_id
-    )
-    # TODO
-    print("not doing anything yet")
-    print("[TRACE] func: neo4j_query/disconnect_step_from_expressions end " + trace_id)
-    return
-
-
-def disconnect_step_from_derivation(tx, step_id: str) -> None:
-    """
-    called by "delete derivation"
-    as part of this sequence:
-     1) for each step,
-           * disconnect step from inference rule (remove edge)
-           * disconnect step from expressions (remove edge)
-           * disconnect step from derivation (remove edge)
-           * delete step node
-     2) delete derivation node
-
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/disconnect_step_from_derivation start " + trace_id)
-    # TODO
-    print("not doing anything yet")
-    print("[TRACE] func: neo4j_query/disconnect_step_from_derivation end " + trace_id)
-    return
-
-
 def delete_node(tx, node_id: str, node_type) -> None:
     """
     called by "delete derivation"
+
+    https://stackoverflow.com/questions/57553886/neo4j-what-happens-to-a-directional-relationship-when-one-node-is-deleted
+
     as part of this sequence:
-     1) for each step,
-           * disconnect step from inference rule (remove edge)
-           * disconnect step from expressions (remove edge)
-           * disconnect step from derivation (remove edge)
-           * delete step node
+     1) for each step, delete step node. All associated edges disappear automatically
      2) delete derivation node
 
     """
@@ -740,10 +700,10 @@ def delete_node(tx, node_id: str, node_type) -> None:
         "step",
         "expression",
     ]
-    print("              node type:", node_type)
 
-    print("not doing anything yet")
-    # TODO
+    result = tx.run('MATCH (d:'+node_type+' {id:"'+ node_id+ '"}) DETACH DELETE n')
+    print("result.data=", result.data())
+
     print("[TRACE] func: neo4j_query/delete_node end " + trace_id)
     return
 

@@ -36,6 +36,9 @@ def generate_random_id(list_of_current_IDs: list) -> unique_numeric_id_as_str:
         new_id = str(random.randint(1000000, 9999999))
         if new_id not in list_of_current_IDs:
             found_new_ID = True
+
+    print("new_id=", str(new_id))
+    print("[TRACE] func: compute/generate_random_id end " + trace_id)
     return str(new_id)
 
 
