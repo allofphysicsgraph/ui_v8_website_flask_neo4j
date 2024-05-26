@@ -1,7 +1,20 @@
 ****************************
 2024-05-24
 
-get symbols from latex-as-string first, then send to sympy
+In v7 JSON the workflow for new expressions is
+1) user provides Latex expression
+2) user provides SymPy expression
+3) user provides symbols
+
+The reason for that order was that the symbol detection was coming from SymPy's parsing of the Latex.
+
+In v8 Neo4j the workflow is
+1) user provides Latex expression
+2) user provides symbols
+3) user provides SymPy expression
+
+The new sequence (symbols from latex-as-string first, then send to sympy) might be 
+advantageous: if the symbols are identified first, that might make SymPy's parsing more likely to be right.
 
 ****************************
 2024-05-24
