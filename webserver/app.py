@@ -647,27 +647,27 @@ class NoOptionsForm(FlaskForm):
     pass
 
 
-# @app.before_request
-# def before_request():
-#     """
-#     needed for "g.request_time()" to show page load latency
+@app.before_request
+def before_request():
+    """
+    needed for "g.request_time()" to show page load latency
 
-#     TODO: this is referenced in _footer.html but doesn't work
+    https://flask.palletsprojects.com/en/2.3.x/appcontext/
 
-#     Note: this function need to be before almost all other functions
+    Note: this function need to be before almost all other functions
 
-#     tutorial: https://pythonise.com/series/learning-flask/python-before-after-request
+    tutorial: https://pythonise.com/series/learning-flask/python-before-after-request
 
-#     https://stackoverflow.com/questions/12273889/calculate-execution-time-for-every-page-in-pythons-flask
-#     actually, https://gist.github.com/lost-theory/4521102
-#     >>> before_request():
-#     """
-#     g.start = time.time()
-#     g.request_start_time = time.time()
-#     elapsed_time = lambda: "%.5f seconds" % (time.time() - g.request_start_time)
-#     # logger.debug("created elapsed_time function")
-#     g.request_time = elapsed_time
-#     return
+    https://stackoverflow.com/questions/12273889/calculate-execution-time-for-every-page-in-pythons-flask
+    actually, https://gist.github.com/lost-theory/4521102
+    >>> before_request():
+    """
+    g.start = time.time()
+    g.request_start_time = time.time()
+    elapsed_time = lambda: "%.5f seconds" % (time.time() - g.request_start_time)
+    # logger.debug("created elapsed_time function")
+    g.request_time = elapsed_time
+    return
 
 
 @app.route("/", methods=["GET", "POST"])
