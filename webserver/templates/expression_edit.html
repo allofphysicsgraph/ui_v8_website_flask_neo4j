@@ -166,17 +166,47 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_new_expression.csrf_token }}
-    <P>
-      {{ form_new_expression.expression_latex.label}} (<B>required</B>): {{ form_new_expression.expression_latex(size=50, maxlength=1000, value=expression_dict['latex']) }} <BR/>
-      &nbsp;<BR/>
-      {{form_new_expression.expression_name.label }} (optional): {{ form_new_expression.expression_name(size=50, maxlength=1000, value=expression_dict['name']) }}<BR/>
-      &nbsp;<BR/>
-      {{form_new_expression.expression_description.label }} (optional): {{ form_new_expression.expression_description(size=50, maxlength=1000, value=expression_dict['description']) }}<BR/>
+    <P>{{ form_new_expression.expression_latex.label}} (<B>required</B>): 
+       {{ form_new_expression.expression_latex(size=50, 
+                    maxlength=1000, 
+                    value=expression_dict['latex'],
+                    id="input_latex", 
+                    onchange="onChangeFunction();") }} 
+
+    <P><input type="checkbox" 
+              id="display_input_latex" 
+              checked="" 
+              onchange="convert('input_latex',
+                                'display_input_latex', 
+                                'preview_input_latex',
+                                'output_input_latex')">
+       <small><label for="display_input_latex">Display style</label></small>
+       <input type="button" 
+              value="optional preview of TeX before submitting form" 
+              id="preview_input_latex" 
+              onclick="convert('input_latex',
+                               'display_input_latex', 
+                               'preview_input_latex',
+                               'output_input_latex')">
+              <br clear="all">
+        <div id="output_input_latex"></div>
+
+    <P>{{ form_new_expression.expression_name.label }} (optional): 
+       {{ form_new_expression.expression_name(size=50, maxlength=1000, value=expression_dict['name']) }}
+
+    <P>{{ form_new_expression.expression_description.label }} (optional): 
+       {{ form_new_expression.expression_description(size=50, maxlength=1000, value=expression_dict['description']) }}<BR/>
       &nbsp;<BR/>
       <input type="submit" value="Edit expression">
     </P>
   </form>
 </fieldset>
 
+  <fieldset>
+    <legend>
+      <H2>Delete Expression</h2>
+    </legend>
+    <input type="submit" value="Edit expression">
+</fieldset>
 
 {% endblock %}
