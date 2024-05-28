@@ -18,6 +18,7 @@
     <TH>symbols</TH>
 <!--    <TH>operations</TH> -->
     <th><a href="https://www.sympy.org/">sympy</a></th>
+    <th>dimensional consistency</th>
     <th><a href="https://github.com/leanprover/lean4">lean 4</a></th>
   </tr>
   {% for expression_dict in list_of_expression_dicts %}
@@ -52,6 +53,7 @@
       { % endfor %}
     </td> <!-- operations -->
     <td>{{ expression_dict['sympy'] }}</td>
+    <TD>TODO</TD>
     <td>{{ expression_dict['lean'] }}</td>
   </tr>
   {% endfor %}

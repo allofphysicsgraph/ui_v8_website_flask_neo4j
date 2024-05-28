@@ -106,6 +106,9 @@ sys.path.append("library")
 
 import neo4j_query
 import compute
+import latex_and_sympy
+import latex
+import sympy_validate_step
 
 # ORDERING: this has to come before the functions that use this type
 from compute import unique_numeric_id_as_str
@@ -157,23 +160,23 @@ class Config(object):
 
 # ORDERING: this has to come before using the function wrapper
 # ORDERING: this has to be after the class "Config" is specified
-app = Flask(__name__, static_folder="static")
-app.config.from_object(
+web_app = Flask(__name__, static_folder="static")
+web_app.config.from_object(
     Config
 )  # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
-app.config["UPLOAD_FOLDER"] = (
+web_app.config["UPLOAD_FOLDER"] = (
     # the following folder on the host is accessible to both flask and neo4j
     "/scratch/dumping_grounds/"  # https://flask.palletsprojects.com/en/3.0.x/patterns/fileuploads/
 )
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
+web_app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
     0  # https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
 )
-app.config["DEBUG"] = True
+web_app.config["DEBUG"] = True
 
 
 import pdg_api
 
-app.register_blueprint(pdg_api.bp)
+web_app.register_blueprint(pdg_api.bp)
 
 
 class SpecifyNewDerivationForm(FlaskForm):
@@ -647,7 +650,7 @@ class NoOptionsForm(FlaskForm):
     pass
 
 
-@app.before_request
+@web_app.before_request
 def before_request():
     """
     needed for "g.request_time()" to show page load latency
@@ -670,7 +673,7 @@ def before_request():
     return
 
 
-@app.route("/", methods=["GET", "POST"])
+@web_app.route("/", methods=["GET", "POST"])
 def main() -> str:
     """
     initial page
@@ -807,7 +810,7 @@ def main() -> str:
     )
 
 
-@app.route("/new_derivation", methods=["GET", "POST"])
+@web_app.route("/new_derivation", methods=["GET", "POST"])
 def to_add_derivation() -> str:
     """
     create new derivation
@@ -912,7 +915,7 @@ def to_add_derivation() -> str:
     )
 
 
-@app.route("/review_derivation/<derivation_id>", methods=["GET", "POST"])
+@web_app.route("/review_derivation/<derivation_id>", methods=["GET", "POST"])
 def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     """
     options from this page:
@@ -986,7 +989,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@app.route("/select_step/<derivation_id>/", methods=["GET", "POST"])
+@web_app.route("/select_step/<derivation_id>/", methods=["GET", "POST"])
 def to_select_step(derivation_id: unique_numeric_id_as_str) -> str:
     """
     User wants to delete step or edit step
@@ -1040,7 +1043,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@app.route("/edit_derivation_metadata/<derivation_id>/", methods=["GET", "POST"])
+@web_app.route("/edit_derivation_metadata/<derivation_id>/", methods=["GET", "POST"])
 def to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> str:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
@@ -1097,7 +1100,9 @@ def to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@app.route("/new_step_select_inference_rule/<derivation_id>/", methods=["GET", "POST"])
+@web_app.route(
+    "/new_step_select_inference_rule/<derivation_id>/", methods=["GET", "POST"]
+)
 def to_add_step_select_inference_rule(derivation_id: unique_numeric_id_as_str) -> str:
     """
     add new step to existing derivation
@@ -1174,7 +1179,7 @@ def to_add_step_select_inference_rule(derivation_id: unique_numeric_id_as_str) -
     # return redirect(url_for("to_review_derivation", derivation_id=derivation_id))
 
 
-@app.route("/edit_expression/<expression_id>", methods=["GET", "POST"])
+@web_app.route("/edit_expression/<expression_id>", methods=["GET", "POST"])
 def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     """
     novel expression
@@ -1355,7 +1360,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_expressions"))
 
 
-@app.route("/new_expression/", methods=["GET", "POST"])
+@web_app.route("/new_expression/", methods=["GET", "POST"])
 def to_add_expression() -> str:
     """
     novel expression
@@ -1381,7 +1386,9 @@ def to_add_expression() -> str:
 
         # request.form =  ImmutableMultiDict([('input1', 'a = b'), ('submit_button', 'Submit')])
 
-        expression_latex = str(web_form.expression_latex.data).strip()
+        expression_latex = (
+            str(web_form.expression_latex.data).strip().replace("\\", "\\\\")
+        )
         expression_name = str(web_form.expression_name.data).strip()
         expression_description = str(web_form.expression_description.data).strip()
 
@@ -1433,7 +1440,7 @@ def to_add_expression() -> str:
     )
 
 
-@app.route("/edit_operation/<operation_id>", methods=["GET", "POST"])
+@web_app.route("/edit_operation/<operation_id>", methods=["GET", "POST"])
 def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
     """
     edit operation
@@ -1492,7 +1499,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_operations"))
 
 
-@app.route("/edit_symbol/<symbol_id>", methods=["GET", "POST"])
+@web_app.route("/edit_symbol/<symbol_id>", methods=["GET", "POST"])
 def to_edit_symbol(symbol_id: unique_numeric_id_as_str) -> str:
     """
     edit symbol
@@ -1573,7 +1580,7 @@ def to_edit_symbol(symbol_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_symbols"))
 
 
-@app.route("/new_symbol_scalar/", methods=["GET", "POST"])
+@web_app.route("/new_symbol_scalar/", methods=["GET", "POST"])
 def to_add_symbol_scalar() -> str:
     """
     novel scalar symbol
@@ -1683,7 +1690,7 @@ def to_add_symbol_scalar() -> str:
     )
 
 
-@app.route("/new_symbol_vector/", methods=["GET", "POST"])
+@web_app.route("/new_symbol_vector/", methods=["GET", "POST"])
 def to_add_symbol_vector() -> str:
     """
     novel symbol
@@ -1764,7 +1771,7 @@ def to_add_symbol_vector() -> str:
     )
 
 
-@app.route("/new_symbol_matrix/", methods=["GET", "POST"])
+@web_app.route("/new_symbol_matrix/", methods=["GET", "POST"])
 def to_add_symbol_matrix() -> str:
     """
     novel symbol
@@ -1845,7 +1852,7 @@ def to_add_symbol_matrix() -> str:
     )
 
 
-@app.route("/new_symbol/", methods=["GET", "POST"])
+@web_app.route("/new_symbol/", methods=["GET", "POST"])
 def to_add_symbol() -> str:
     """
     novel symbol
@@ -1953,7 +1960,9 @@ def to_add_symbol() -> str:
     )
 
 
-@app.route("/new_symbol_required_argument_count/<symbol_id>", methods=["GET", "POST"])
+@web_app.route(
+    "/new_symbol_required_argument_count/<symbol_id>", methods=["GET", "POST"]
+)
 def to_add_symbol_required_argument_count(symbol_id: unique_numeric_id_as_str) -> str:
     """
     novel symbol: how many arguments?
@@ -2028,7 +2037,9 @@ def to_add_symbol_required_argument_count(symbol_id: unique_numeric_id_as_str) -
     )
 
 
-@app.route("/new_symbol_specify_dimension_count/<symbol_id>", methods=["GET", "POST"])
+@web_app.route(
+    "/new_symbol_specify_dimension_count/<symbol_id>", methods=["GET", "POST"]
+)
 def to_add_symbol_dimension_count(symbol_id: unique_numeric_id_as_str):
     """
     novel symbol: how many dimensions?
@@ -2120,7 +2131,7 @@ def to_add_symbol_dimension_count(symbol_id: unique_numeric_id_as_str):
     )
 
 
-@app.route("/new_symbol_dimension0_properties/<symbol_id>", methods=["GET", "POST"])
+@web_app.route("/new_symbol_dimension0_properties/<symbol_id>", methods=["GET", "POST"])
 def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
     """
     novel symbol: how many dimensions?
@@ -2316,7 +2327,7 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
     )
 
 
-@app.route("/new_symbol_dimension1_properties/<symbol_id>", methods=["GET", "POST"])
+@web_app.route("/new_symbol_dimension1_properties/<symbol_id>", methods=["GET", "POST"])
 def to_add_symbol_dimension1_properties(symbol_id: unique_numeric_id_as_str) -> str:
     """
 
@@ -2355,7 +2366,7 @@ def to_add_symbol_dimension1_properties(symbol_id: unique_numeric_id_as_str) -> 
     )
 
 
-@app.route("/new_symbol_dimension2_properties/<symbol_id>", methods=["GET", "POST"])
+@web_app.route("/new_symbol_dimension2_properties/<symbol_id>", methods=["GET", "POST"])
 def to_add_symbol_dimension2_properties(symbol_id: unique_numeric_id_as_str) -> str:
     """
 
@@ -2394,7 +2405,7 @@ def to_add_symbol_dimension2_properties(symbol_id: unique_numeric_id_as_str) -> 
     )
 
 
-@app.route("/new_operation/", methods=["GET", "POST"])
+@web_app.route("/new_operation/", methods=["GET", "POST"])
 def to_add_operation() -> str:
     """
     novel operation
@@ -2478,7 +2489,7 @@ def to_add_operation() -> str:
     )
 
 
-@app.route(
+@web_app.route(
     "/new_step_expressions/<derivation_id>/<inference_rule_id>", methods=["GET", "POST"]
 )
 def to_add_step_select_expressions(
@@ -2635,7 +2646,7 @@ def to_add_step_select_expressions(
     )
 
 
-@app.route(
+@web_app.route(
     "/symbols_count_for_expression/<expression_id>",
     methods=["GET", "POST"],
 )
@@ -2679,7 +2690,7 @@ def to_add_symbol_count_for_expression(
     )
 
 
-@app.route(
+@web_app.route(
     "/symbols_and_operations_for_expression/<expression_id>",
     methods=["GET", "POST"],
 )
@@ -2713,8 +2724,10 @@ def to_add_symbols_and_operations_for_expression(
         ] = (time.time() - query_start_time)
     print("expression_dict=", expression_dict)
 
+    # TODO: given a Latex expression, use SymPy to identify possible symbols
+
     # TODO: given a Latex expression, and given all existing symbols,
-    # sort the symbol_latex by length
+    # sort existing symbol_latex by length,
     # then search (starting with the longest symbols first) for each symbol in the expression
     # provide the user with the list of guessed symbols
     # There may be multiple matching symbol IDs for a given latex symbol, e.g., "x"
@@ -2755,9 +2768,9 @@ def to_add_symbols_and_operations_for_expression(
         expression_dict = session.read_transaction(
             neo4j_query.node_properties, "expression", expression_id
         )
-        query_time_dict[
-            "to_add_symbols_and_operations_for_expression, node_properties"
-        ] = (time.time() - query_start_time)
+        query_time_dict["symbols_and_operations_for_expression, node_properties"] = (
+            time.time() - query_start_time
+        )
     print("expression_dict=", expression_dict)
 
     print("expression_dict[latex]=", expression_dict["latex"])
@@ -2768,7 +2781,23 @@ def to_add_symbols_and_operations_for_expression(
     web_form_no_options = NoOptionsForm(request.form)
     if request.method == "POST":
         print("request.form = ", request.form)
-        # TODO
+
+        list_of_symbol_IDs_in_expression = []
+
+        # request.form =  ImmutableMultiDict([('9380276', '9380276'), ('3511322', '3511322'), ('7540000', '7540000'), ('9481642', '9481642'), ('submit_button', 'update expressions')])
+        for ke, val in request.form.items():
+            # print("key=", ke)
+            # print("value=", val)
+            if "symbol_id_to_connect_to_expression" in ke:
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    list_of_inference_rule_dicts = session.write_transaction(
+                        neo4j_query.add_symbol_to_expression, val, expression_id
+                    )
+                    query_time_dict[
+                        "to_add_symbols_and_operations_for_expression: add_symbol_to_expression"
+                    ] = (time.time() - query_start_time)
+
         print(
             "[TRACE] func: app/to_add_symbols_and_operations_for_expression end "
             + trace_id
@@ -2788,7 +2817,7 @@ def to_add_symbols_and_operations_for_expression(
     )
 
 
-@app.route("/sympy_and_latex_for_step/<expression_id>", methods=["GET", "POST"])
+@web_app.route("/sympy_and_latex_for_step/<expression_id>", methods=["GET", "POST"])
 def to_add_sympy_and_lean_for_latex_expression(
     expression_id: unique_numeric_id_as_str,
 ) -> str:
@@ -2811,9 +2840,22 @@ def to_add_sympy_and_lean_for_latex_expression(
         ] = (time.time() - query_start_time)
     print("expression_dict=", expression_dict)
 
-    # TODO: provide a guess for the SymPy based on the Latex provided
+    # provide a guess for the SymPy based on the Latex provided
 
-    # TODO: provide the symbol IDs to be used in the SymPy and Lean strings
+    cleaned_latex_str = compute.remove_latex_presention_markings(
+        expression_dict["latex"]
+    )
+    print("cleaned_latex_str=", cleaned_latex_str)
+    sympy_expr = str(
+        latex_and_sympy.cleaned_latex_str_to_sympy_expression(cleaned_latex_str)
+    )
+    print("sympy_expr=", str(sympy_expr))
+    # list_of_sympy_symbols = latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(symp_expr)
+    # print("list_of_sympy_symbols=",list_of_sympy_symbols)
+
+    # TODO? look at each sympy_symbol and compare to existing symbols
+
+    # TODO? provide the symbol IDs to be used in the SymPy and Lean strings
 
     web_form = SpecifyNewSympyLeanForm(request.form)
     if request.method == "POST":
@@ -2857,12 +2899,13 @@ def to_add_sympy_and_lean_for_latex_expression(
     return render_template(
         "expression_sympy_and_lean.html",
         query_time_dict=query_time_dict,
+        sympy_expr=sympy_expr,
         form=web_form,
         expression_dict=expression_dict,
     )
 
 
-@app.route("/new_inference_rule/", methods=["GET", "POST"])
+@web_app.route("/new_inference_rule/", methods=["GET", "POST"])
 def to_add_inference_rule() -> str:
     """
     create inference rule
@@ -2969,7 +3012,7 @@ def to_add_inference_rule() -> str:
     )
 
 
-@app.route("/edit_step/<derivation_id>/<step_id>", methods=["GET", "POST"])
+@web_app.route("/edit_step/<derivation_id>/<step_id>", methods=["GET", "POST"])
 def to_edit_step(
     derivation_id: unique_numeric_id_as_str, step_id: unique_numeric_id_as_str
 ) -> str:
@@ -3020,7 +3063,7 @@ def to_edit_step(
     )
 
 
-@app.route("/edit_inference_rule/<inference_rule_id>", methods=["GET", "POST"])
+@web_app.route("/edit_inference_rule/<inference_rule_id>", methods=["GET", "POST"])
 def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
@@ -3120,7 +3163,7 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_inference_rules"))
 
 
-# @app.route("/delete_inference_rule/<inference_rule_id>", methods=["GET", "POST"])
+# @web_app.route("/delete_inference_rule/<inference_rule_id>", methods=["GET", "POST"])
 # def to_delete_inference_rule(inference_rule_id: str):
 #     """
 #     >>> to_delete_inference_rule()
@@ -3141,7 +3184,7 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
 #     # return redirect(url_for("to_list_inference_rules"))
 
 
-# @app.route("/delete_symbol/<symbol_id>", methods=["GET", "POST"])
+# @web_app.route("/delete_symbol/<symbol_id>", methods=["GET", "POST"])
 # def to_delete_symbol(symbol_id: str):
 #     """ """
 #     print("[TRACE] func: app/to_delete_symbol")
@@ -3151,7 +3194,7 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
 #     # return redirect(url_for("to_list_symbols"))
 
 
-# @app.route("/delete_operation/<operation_id>", methods=["GET", "POST"])
+# @web_app.route("/delete_operation/<operation_id>", methods=["GET", "POST"])
 # def to_delete_operation(operation_id: str):
 #     """ """
 #     print("[TRACE] func: app/to_delete_operation")
@@ -3161,7 +3204,7 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
 #     # return redirect(url_for("to_list_operations"))
 
 
-@app.route("/query", methods=["GET", "POST"])
+@web_app.route("/query", methods=["GET", "POST"])
 def to_query() -> str:
     """
     page for submitting Cypher queries
@@ -3287,7 +3330,7 @@ def to_query() -> str:
     )
 
 
-@app.route("/list_operations", methods=["GET", "POST"])
+@web_app.route("/list_operations", methods=["GET", "POST"])
 def to_list_operations() -> str:
     """
     >>> to_list_operations()
@@ -3334,7 +3377,7 @@ def to_list_operations() -> str:
     )
 
 
-@app.route("/list_symbols", methods=["GET", "POST"])
+@web_app.route("/list_symbols", methods=["GET", "POST"])
 def to_list_symbols() -> str:
     """
     >>> to_list_symbols()
@@ -3379,7 +3422,7 @@ def to_list_symbols() -> str:
     )
 
 
-@app.route("/list_expressions", methods=["GET", "POST"])
+@web_app.route("/list_expressions", methods=["GET", "POST"])
 def to_list_expressions() -> str:
     """
     >>> to_list_expressions()
@@ -3418,7 +3461,7 @@ def to_list_expressions() -> str:
     )
 
 
-@app.route("/list_derivations", methods=["GET", "POST"])
+@web_app.route("/list_derivations", methods=["GET", "POST"])
 def to_list_derivations() -> str:
     """
     this page is a gateway for the task "which existing derivation to edit?"
@@ -3473,7 +3516,7 @@ def to_list_derivations() -> str:
     )
 
 
-@app.route("/list_inference_rules")
+@web_app.route("/list_inference_rules")
 def to_list_inference_rules() -> str:
     """
     >>> to_show_all_inference_rules()
@@ -3508,7 +3551,7 @@ def to_list_inference_rules() -> str:
     )
 
 
-@app.route("/delete_all")
+@web_app.route("/delete_all")
 def to_delete_graph_content() -> str:
     """
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
@@ -3529,7 +3572,7 @@ def to_delete_graph_content() -> str:
     return redirect(url_for("main"))
 
 
-@app.route("/export_to_json")
+@web_app.route("/export_to_json")
 def to_export_json() -> str:
     """
     TODO: export "graph to JSON" as file via web interface
@@ -3549,7 +3592,7 @@ def to_export_json() -> str:
     return redirect(url_for("static", filename="dumping_grounds/pdg.json"))
 
 
-@app.route("/export_to_cypher")
+@web_app.route("/export_to_cypher")
 def to_export_cypher() -> str:
     """
     TODO: export "graph to CYPHER" as file via web interface
@@ -3585,7 +3628,7 @@ secure_headers = SecureHeaders()
 
 
 # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
-csrf.init_app(app)
+csrf.init_app(web_app)
 
 
 # EOF

@@ -6,7 +6,11 @@
 or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_edit">list of expressions</a>
 </P>
 
-<P>Being edited: {{ expression_dict }}
+<P>\({{ expression_dict['latex'] }}\)
+
+<P>{{ expression_dict['latex'] }}
+
+<P>TODO: list derivations that use this expression. That could help provide context.
 
 <fieldset>
   <legend>
@@ -206,7 +210,11 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     <legend>
       <H2>Delete Expression</h2>
     </legend>
-    <input type="submit" value="Edit expression">
+    <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form_no_options.csrf_token }}
+
+    <input type="submit" value="Delete expression">
+    </form>
 </fieldset>
 
 {% endblock %}

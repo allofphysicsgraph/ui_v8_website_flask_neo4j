@@ -701,7 +701,9 @@ def delete_node(tx, node_id: str, node_type) -> None:
         "expression",
     ]
 
-    result = tx.run('MATCH (d:'+node_type+' {id:"'+ node_id+ '"}) DETACH DELETE n')
+    result = tx.run(
+        "MATCH (d:" + node_type + ' {id:"' + node_id + '"}) DETACH DELETE n'
+    )
     print("result.data=", result.data())
 
     print("[TRACE] func: neo4j_query/delete_node end " + trace_id)

@@ -1,4 +1,4 @@
-def FROMv7_NOT_YET_CONVERTED_make_string_safe_for_latex(unsafe_str: str) -> str:
+def make_string_safe_for_latex(unsafe_str: str) -> str:
     """
     latex characters that require an escape for printing:
     # $ % & \ ^ _ { }

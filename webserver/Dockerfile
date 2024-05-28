@@ -9,7 +9,7 @@
 FROM phusion/baseimage:focal-1.1.0
 
 WORKDIR /code
-ENV FLASK_APP app.py
+ENV FLASK_APP pdg_app.py
 ENV FLASK_RUN_HOST 0.0.0.0
 
 # since I'm not using python:3.7, I have to install Python

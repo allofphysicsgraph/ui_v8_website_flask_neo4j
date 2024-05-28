@@ -49,6 +49,9 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
         # logger.error(err)
         print(err)
         raise Exception("Sympy unable to parse latex (2): " + expr_latex)
+    except sympy.core.sympify.SympifyError as err:
+        print(err)
+        raise Exception("Sympy unable to parse latex (3): " + expr_latex)
 
     print(
         "[TRACE] func: latex_and_sympy/cleaned_latex_str_to_sympy_expression start "

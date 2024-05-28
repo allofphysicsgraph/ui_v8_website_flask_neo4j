@@ -17,17 +17,18 @@ import random
 from flask import Blueprint, flash, g, redirect, render_template, jsonify, request
 
 import sys
+
 sys.path.append("library")
 
 import neo4j_query
 
 # the following creates a circular dependency since `app.py` imports this file.
-from app import graphDB_Driver
+from pdg_app import graphDB_Driver
+
 # this works because app.py loads this file first
 
 # http://flask.palletsprojects.com/en/1.1.x/tutorial/views/
-bp = Blueprint('pdg_api', __name__, url_prefix='/api')
-
+bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 
 
 @bp.route("/v1/resources/derivation/list", methods=["GET"])
@@ -55,10 +56,13 @@ def api_list_derivations():
         list_of_dicts = session.read_transaction(
             neo4j_query.list_nodes_of_type, "derivation"
         )
-        query_time_dict["pdg_api/api_list_derivations: list_nodes_of_type, derivation"] = time.time() - query_start_time
+        query_time_dict[
+            "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
+        ] = (time.time() - query_start_time)
 
     print("[TRACE] func: pdg_api/api_list_derivations end " + trace_id)
     return jsonify(list_of_dicts)
+
 
 @bp.route("/v1/resources/inference_rule/list", methods=["GET"])
 def api_list_inference_rules():
@@ -84,10 +88,11 @@ def api_list_inference_rules():
         list_of_dicts = session.read_transaction(
             neo4j_query.list_nodes_of_type, "inference_rule"
         )
-    print("list_of_dicts=",list_of_dicts)
+    print("list_of_dicts=", list_of_dicts)
 
     print("[TRACE] func: pdg_api/api_list_inference_rules end " + trace_id)
     return jsonify(list_of_dicts)
+
 
 @bp.route("/v1/resources/symbol/list", methods=["GET"])
 def api_list_symbols():
@@ -113,7 +118,7 @@ def api_list_symbols():
         list_of_dicts = session.read_transaction(
             neo4j_query.list_nodes_of_type, "symbol"
         )
-    print("list_of_dicts=",list_of_dicts)
+    print("list_of_dicts=", list_of_dicts)
 
     print("[TRACE] func: pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
@@ -140,11 +145,10 @@ def api_list_expressions():
         list_of_dicts = session.read_transaction(
             neo4j_query.list_nodes_of_type, "expression"
         )
-    print("list_of_dicts=",list_of_dicts)
+    print("list_of_dicts=", list_of_dicts)
 
     print("[TRACE] func: pdg_api/api_list_expressions end " + trace_id)
     return jsonify(list_of_dicts)
-
 
 
 @bp.route("/v1/resources/derivation/metadata", methods=["GET"])
@@ -168,13 +172,14 @@ def api_derivation_metadata():
     else:
         return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
 
-    print("derivation_id=",derivation_id)
+    print("derivation_id=", derivation_id)
 
     # try provided derivation_id; might not be a valid ID
     with graphDB_Driver.session() as session:
         derivation_dict = session.read_transaction(
-            neo4j_query.node_properties, "derivation", derivation_id)
-    print("derivation_dict=",derivation_dict)
+            neo4j_query.node_properties, "derivation", derivation_id
+        )
+    print("derivation_dict=", derivation_dict)
 
     print("[TRACE] func: pdg_api/api_derivation_metadata end " + trace_id)
     return jsonify(derivation_dict)
@@ -203,14 +208,15 @@ def api_derivation_steps():
     else:
         return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
 
-    print("derivation_id=",derivation_id)
+    print("derivation_id=", derivation_id)
 
     # try provided derivation_id; might not be a valid ID
     with graphDB_Driver.session() as session:
         list_of_steps = session.read_transaction(
-            neo4j_query.steps_in_this_derivation, derivation_id)
+            neo4j_query.steps_in_this_derivation, derivation_id
+        )
 
-    print("list_of_steps=",list_of_steps)
+    print("list_of_steps=", list_of_steps)
 
     print("[TRACE] func: pdg_api/api_derivation_steps end " + trace_id)
     return jsonify(list_of_steps)
