@@ -60,6 +60,9 @@ from typing import NewType, Dict, List
 
 import sympy  # TEMP!
 
+# https://docs.python.org/3/library/re.html
+import re
+
 import neo4j
 from neo4j import GraphDatabase
 
@@ -280,11 +283,11 @@ class SpecifyNewSympyLeanForm(FlaskForm):
     without a clear indicator to the HTML user
     """
 
-    sympy = StringField(
+    sympy_str = StringField(
         "SymPy",
         # validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
     )
-    lean = StringField(
+    lean_str = StringField(
         "Lean",
         # validators=[validators.InputRequired(), validators.Length(min=5, max=10000)],
     )
@@ -2914,6 +2917,9 @@ def to_add_sympy_and_lean_for_latex_expression(
     )
     query_time_dict = {}  # type: Dict[str, float]
 
+    symbol_id_dict = eval(symbol_id_dict)
+    print("symbol_id_dict=", symbol_id_dict)
+
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         expression_dict = session.read_transaction(
@@ -2947,55 +2953,74 @@ def to_add_sympy_and_lean_for_latex_expression(
 
     # look at each sympy_symbol replaced with PDG symbol
 
-    print("sympy_expr.atoms()=", sympy_expr.atoms())
+    print("sympy_expr.atoms=", sympy_expr.atoms())
+    for this_atom in sympy_expr.atoms():
+        print(type(this_atom))
+
     revised_expr = sympy_expr
     for this_symb in sympy_expr.atoms():
-        print("this_symb=", this_symb)
-        my_str = str(this_symb) + " = sympy.Symbol('" + str(this_symb) + "')"
-        print("to exec:", my_str)
-        exec(my_str)
+        this_symb_as_str = str(this_symb)
+        if this_symb_as_str in symbol_id_dict.keys():
+            print("this_symb=", this_symb)
+            # register the atom as a SymPy symbol:
+            my_str = str(this_symb) + " = sympy.Symbol('" + str(this_symb) + "')"
+            print("to exec:", my_str)
+            exec(my_str)
 
-        pdg_id = symbol_id_dict[str(this_symb)]
-        print("pdg_id=", pdg_id)
-        print(sympy.Symbol(pdg_id))
-        print(type(sympy.Symbol(pdg_id)))
+            pdg_id = "pdg" + str(symbol_id_dict[str(this_symb)])
+            # print("pdg_id=", pdg_id)
+            # print(sympy.Symbol(pdg_id))
+            # print(type(sympy.Symbol(pdg_id)))
 
-        revised_expr = revised_expr.subs(this_symb, sympy.Symbol(pdg_id))
+            revised_expr = revised_expr.subs(this_symb, sympy.Symbol(pdg_id))
 
     print("revised_expr=", revised_expr)
+
+    revised_expr_with_str = re.sub(
+        r"(pdg\d\d\d\d\d\d\d)", r"sympy.Symbol('\1')", str(revised_expr)
+    )
 
     web_form = SpecifyNewSympyLeanForm(request.form)
     if request.method == "POST":
         print("request.form = ", request.form)
 
-        sympy = str(web_form.sympy.data).strip()
-        lean = str(web_form.lean.data).strip()
+        sympy_str = str(web_form.sympy_str.data).strip()
+        lean_str = str(web_form.lean_str.data).strip()
 
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_inference_rule_dicts = session.write_transaction(
-                neo4j_query.edit_node_property,
-                "expression",
-                expression_id,
-                "sympy",
-                sympy,
-            )
-            query_time_dict[
-                "to_add_sympy_and_lean_for_latex_expression: edit_node_property, expression sympy"
-            ] = (time.time() - query_start_time)
+        print("submitted sympy_str=", sympy_str)
 
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_inference_rule_dicts = session.write_transaction(
-                neo4j_query.edit_node_property,
-                "expression",
-                expression_id,
-                "lean",
-                lean,
-            )
-            query_time_dict[
-                "to_add_sympy_and_lean_for_latex_expression: edit_node_property, expression lean"
-            ] = (time.time() - query_start_time)
+        try:
+            # CAVEAT: sympy_str must use single quotes (') since neo4j query uses (")
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                list_of_inference_rule_dicts = session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "expression",
+                    expression_id,
+                    "sympy",
+                    sympy_str,
+                )
+                query_time_dict[
+                    "to_add_sympy_and_lean_for_latex_expression: edit_node_property, expression sympy"
+                ] = (time.time() - query_start_time)
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                list_of_inference_rule_dicts = session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "expression",
+                    expression_id,
+                    "lean",
+                    lean_str,
+                )
+                query_time_dict[
+                    "to_add_sympy_and_lean_for_latex_expression: edit_node_property, expression lean"
+                ] = (time.time() - query_start_time)
+        except neo4j.exceptions.CypherSyntaxError as err:
+            print("ERROR:",str(err))
+            flash("ERROR:"+str(err))
+            return redirect(url_for("to_add_symbols_and_operations_for_expression", expression_id))
+    
 
         print(
             "[TRACE] func: app/to_add_sympy_and_lean_for_latex_expression start "
@@ -3008,6 +3033,8 @@ def to_add_sympy_and_lean_for_latex_expression(
         query_time_dict=query_time_dict,
         sympy_expr=sympy_expr,
         revised_expr=revised_expr,
+        revised_expr_with_str=revised_expr_with_str,
+        symbol_id_dict=symbol_id_dict,
         form=web_form,
         expression_dict=expression_dict,
     )

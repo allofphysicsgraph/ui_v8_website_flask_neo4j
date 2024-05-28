@@ -613,7 +613,7 @@ def edit_node_property(
     elif isinstance(property_value, str):  # string needs quotes
         result = tx.run(
             "MERGE (n:" + str(node_type) + ' {id:"' + str(node_id) + '"})'
-            "SET n." + str(property_key) + " = '" + str(property_value) + "'"
+            "SET n." + str(property_key) + ' = "' + str(property_value) + '"'
         )
 
     print("[TRACE] func: neo4j_query/edit_node_property end" + trace_id)

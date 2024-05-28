@@ -10,16 +10,23 @@
     <H2>Provide <a href="https://www.sympy.org/">SymPy</a> and <a href="https://github.com/leanprover/lean4">Lean</a></H2>
   </legend>
 
-<P>\({{ expression_dict['latex'] }}\)
+<P>as Latex: \({{ expression_dict['latex'] }}\)
 
-<P>{{ expression_dict['latex'] }}
+<P>as string: {{ expression_dict['latex'] }}
 
-<P>{{ revised_expr }}
+<P>symbols substituted: {{ revised_expr }}
+
+<P>symbols lookup: {{ symbol_id_dict }}
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
-    <P>{{ form.sympy.label}}: {{ form.sympy(size=50, maxlength=1000, value=sympy_expr) }}</P>
-    <P>{{ form.lean.label}}: {{ form.lean(size=50, maxlength=1000) }}</P>
+    <P>{{ form.sympy_str.label}}: 
+       {{ form.sympy_str(size=50, 
+                         maxlength=1000, 
+                         value=revised_expr_with_str) }}</P>
+    <P>{{ form.lean_str.label}}: 
+       {{ form.lean_str(size=50, 
+                        maxlength=1000) }}</P>
 
     <P><input type="submit" name="submit_button" value="update expressions"></P>
   </form>
