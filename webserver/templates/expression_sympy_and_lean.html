@@ -21,11 +21,14 @@
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
     <P>{{ form.sympy_str.label}}: 
-       {{ form.sympy_str(size=50, 
-                         maxlength=1000, 
+       {{ form.sympy_str(cols=80, rows=5, 
+                         maxlength=1000) }}</P>
+                         <!--
+                          "TextArea doesn't have a value attribute,"
                          value=revised_expr_with_str) }}</P>
+                         -->
     <P>{{ form.lean_str.label}}: 
-       {{ form.lean_str(size=50, 
+       {{ form.lean_str(size=100, 
                         maxlength=1000) }}</P>
 
     <P><input type="submit" name="submit_button" value="update expressions"></P>

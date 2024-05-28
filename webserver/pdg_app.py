@@ -58,7 +58,6 @@ import datetime
 # inspired by https://news.ycombinator.com/item?id=33844117
 from typing import NewType, Dict, List
 
-import sympy  # TEMP!
 
 # https://docs.python.org/3/library/re.html
 import re
@@ -81,7 +80,7 @@ import os
 # https://hplgit.github.io/web4sciapps/doc/pub/._web4sa_flask004.html
 from flask import (
     Flask,
-    g,
+    g,  # request timing
     redirect,
     render_template,
     request,
@@ -100,7 +99,20 @@ from flask_wtf import FlaskForm, CSRFProtect, Form  # type: ignore
 from werkzeug.utils import secure_filename
 
 # removed "Form" from wtforms; see https://stackoverflow.com/a/20577177/1164295
-from wtforms import StringField, validators, FieldList, FormField, IntegerField, RadioField, PasswordField, SubmitField, BooleanField  # type: ignore
+# https://wtforms.readthedocs.io/en/2.3.x/fields/
+from wtforms import (
+    StringField,  # one-line text input
+    validators,
+    FormField,
+    IntegerField,
+    RadioField,
+    TextAreaField,  # multi-line tex input
+    SubmitField,  # when the only input is a "submit" button
+    BooleanField,
+)
+
+# type: ignore
+# from wtforms import PasswordField, FieldList
 
 from secure import SecureHeaders  # type: ignore
 
@@ -113,6 +125,7 @@ import compute
 import latex_and_sympy
 import latex
 import sympy_validate_step
+import sympy_validate_expression
 
 # ORDERING: this has to come before the functions that use this type
 from compute import unique_numeric_id_as_str
@@ -181,6 +194,10 @@ web_app.config["DEBUG"] = True
 import pdg_api
 
 web_app.register_blueprint(pdg_api.bp)
+
+
+class DeleteButtonForm(FlaskForm):
+    delete_button = SubmitField()
 
 
 class SpecifyNewDerivationForm(FlaskForm):
@@ -283,7 +300,7 @@ class SpecifyNewSympyLeanForm(FlaskForm):
     without a clear indicator to the HTML user
     """
 
-    sympy_str = StringField(
+    sympy_str = TextAreaField(
         "SymPy",
         # validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
     )
@@ -954,6 +971,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     )
 
     web_form = NoOptionsForm(request.form)
+    # web_form = DeleteButtonForm(request.form)
     if request.method == "POST":
         print("request.form = ", request.form)
         # delete derivation (yikes!). Here's how:
@@ -1192,7 +1210,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     print("[TRACE] func: app/to_edit_expression start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    print("expression_id: ", expression_id)
+    print("pdg_app/to_edit_expression: expression_id: ", expression_id)
 
     expression_dict = {}
     with graphDB_Driver.session() as session:
@@ -1200,14 +1218,17 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
         expression_dict = session.read_transaction(
             neo4j_query.node_properties, "expression", expression_id
         )
-    print("expression_dict:", expression_dict)
+    print("pdg_app/to_edit_expression: expression_dict:", expression_dict)
 
     # editing the expression includes modifying the symbols present.
 
     dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_symbol_dicts(
         graphDB_Driver, query_time_dict
     )
-    print("dict_of_all_symbol_dicts=", dict_of_all_symbol_dicts)
+    print(
+        "pdg_app/to_edit_expression: dict_of_all_symbol_dicts=",
+        dict_of_all_symbol_dicts,
+    )
     # dict_of_all_operation_dicts = compute.get_dict_of_operation_dicts(graphDB_Driver)
     # print("dict_of_all_operation_dicts=", dict_of_all_operation_dicts)
 
@@ -1218,7 +1239,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
             neo4j_query.symbols_in_expression, expression_id
         )
     print(
-        "expression_id=",
+        "pdg_app/to_edit_expression: expression_id=",
         expression_id,
         "list_of_symbol_IDs_in_expression=",
         list_of_symbol_IDs_in_expression,
@@ -1226,7 +1247,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
 
     dict_of_symbol_dicts_in_expression = {}
     for this_symbol_ID in list_of_symbol_IDs_in_expression:
-        print("this_symbol_ID=", this_symbol_ID)
+        print("pdg_app/to_edit_expression: this_symbol_ID=", this_symbol_ID)
         print("dict_of_all_symbol_dicts.keys()=", dict_of_all_symbol_dicts.keys())
         dict_of_symbol_dicts_in_expression[this_symbol_ID] = dict_of_all_symbol_dicts[
             this_symbol_ID
@@ -1267,9 +1288,12 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
             web_form_new_expression.expression_description.data
         ).strip()
 
-        print("expression_latex=", expression_latex)
-        print("expression_name=", expression_name)
-        print("expression_description=", expression_description)
+        print("pdg_app/to_edit_expression: expression_latex=", expression_latex)
+        print("pdg_app/to_edit_expression: expression_name=", expression_name)
+        print(
+            "pdg_app/to_edit_expression: expression_description=",
+            expression_description,
+        )
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -1290,6 +1314,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
             )
 
     web_form_no_options = NoOptionsForm(request.form)
+    # web_form_no_options = DeleteButtonForm(request.form)
     if request.method == "POST":
         print("to_edit_expression: no web_form; request.form = ", request.form)
 
@@ -2953,26 +2978,9 @@ def to_add_sympy_and_lean_for_latex_expression(
 
     # look at each sympy_symbol replaced with PDG symbol
 
-    print("sympy_expr.atoms=", sympy_expr.atoms())
-    for this_atom in sympy_expr.atoms():
-        print(type(this_atom))
-
-    revised_expr = sympy_expr
-    for this_symb in sympy_expr.atoms():
-        this_symb_as_str = str(this_symb)
-        if this_symb_as_str in symbol_id_dict.keys():
-            print("this_symb=", this_symb)
-            # register the atom as a SymPy symbol:
-            my_str = str(this_symb) + " = sympy.Symbol('" + str(this_symb) + "')"
-            print("to exec:", my_str)
-            exec(my_str)
-
-            pdg_id = "pdg" + str(symbol_id_dict[str(this_symb)])
-            # print("pdg_id=", pdg_id)
-            # print(sympy.Symbol(pdg_id))
-            # print(type(sympy.Symbol(pdg_id)))
-
-            revised_expr = revised_expr.subs(this_symb, sympy.Symbol(pdg_id))
+    revised_expr = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
+        sympy_expr, symbol_id_dict
+    )
 
     print("revised_expr=", revised_expr)
 
@@ -3017,10 +3025,11 @@ def to_add_sympy_and_lean_for_latex_expression(
                     "to_add_sympy_and_lean_for_latex_expression: edit_node_property, expression lean"
                 ] = (time.time() - query_start_time)
         except neo4j.exceptions.CypherSyntaxError as err:
-            print("ERROR:",str(err))
-            flash("ERROR:"+str(err))
-            return redirect(url_for("to_add_symbols_and_operations_for_expression", expression_id))
-    
+            print("ERROR:", str(err))
+            flash("ERROR:" + str(err))
+            return redirect(
+                url_for("to_add_symbols_and_operations_for_expression", expression_id)
+            )
 
         print(
             "[TRACE] func: app/to_add_sympy_and_lean_for_latex_expression start "
@@ -3028,6 +3037,7 @@ def to_add_sympy_and_lean_for_latex_expression(
         )
         return redirect(url_for("to_list_expressions"))
 
+    web_form.sympy_str.data = revised_expr_with_str
     return render_template(
         "expression_sympy_and_lean.html",
         query_time_dict=query_time_dict,
