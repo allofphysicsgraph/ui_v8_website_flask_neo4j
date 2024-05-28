@@ -702,7 +702,7 @@ def delete_node(tx, node_id: str, node_type) -> None:
     ]
 
     result = tx.run(
-        "MATCH (d:" + node_type + ' {id:"' + node_id + '"}) DETACH DELETE n'
+        "MATCH (d:" + node_type + ' {id:"' + node_id + '"}) DETACH DELETE d'
     )
     print("result.data=", result.data())
 

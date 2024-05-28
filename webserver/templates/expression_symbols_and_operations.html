@@ -5,6 +5,12 @@
   Return to <a href="{{ url_for('main') }}?referrer=edit_step">main page</a>
 </P>
 
+<P>list_of_potential_matching_symbols_from_sympy: {{ list_of_potential_matching_symbols_from_sympy }}
+
+<!--
+<P>potential_symbols_found_in_Latex_expression: { { potential_symbols_found_in_Latex_expression } }
+-->
+
 <fieldset>
   <legend>
     <H2>Specify Symbols and Operations for Latex expression</H2>
@@ -17,9 +23,13 @@
   <form method="post" action="">
   {{ form.csrf_token }}
 
-{% for symbol_dict in list_of_symbol_dicts %}
+<!--
+{ % for symbol_dict in list_of_symbol_dicts % }
+-->
+{% for symbol_dict in potential_symbols_found_in_Latex_expression %}
 <UL>
-  <LI><input type="checkbox" name="symbol_id_to_connect_to_expression-{{ loop.index }}" value="{{ symbol_dict['id'] }}">\({{ symbol_dict['latex'] }}\), aka {{ symbol_dict['latex'] }}<BR>{{ symbol_dict }}</LI>
+  <LI><input type="checkbox" name="symbol_id_to_connect_to_expression-{{ loop.index }}" value="{{ symbol_dict['id'] }}">\({{ symbol_dict['latex'] }}\), aka {{ symbol_dict['latex'] }}<BR>{{ symbol_dict }}<BR>
+  TODO: used in which derivations?</LI>
 </UL>
 {% endfor %}
 

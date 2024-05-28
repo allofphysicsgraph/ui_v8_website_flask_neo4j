@@ -1,5 +1,30 @@
+
+
+****************************
+2024-05-28
+
+design decision: sequence order number as property of edge or node for steps
+
+Steps in a derivation are ordered. Two options for specifying the order:
+* as a property of the edge connected "derivation" node to each "step" node
+xor
+* as a property of the "step" node
+I'm not currently clear which is correct, so I've chosen the edge property.
+
+
+Sequence order also matters for arguments of an inference rule: there may be multiple input expressions. In this case sequence order must be an edge property since order isn't a property of either the inference rule or the expressions.
+
+Sequence order matters for Abstract Syntax Trees for an expression. For example, 
+"integrate <INTEGRAND> from <LOWERBOUND> to <UPPERBOUND> over <DIFFERENTIAL>"
+requires a sequence of symbols -- they cannot be unordered. 
+Again, in this case case sequence order must be an edge property since order isn't a property of either the expression or the symbol.
+
+Based on the order number being an edge property for the two cases of inference rule and ASTs, I'm going with edge property between derivations and steps.
+
 ****************************
 2024-05-24
+
+design decision: ordering symbols versus SymPy for new expressions
 
 In v7 JSON the workflow for new expressions is
 1) user provides Latex expression
@@ -14,10 +39,20 @@ In v8 Neo4j the workflow is
 3) user provides SymPy expression
 
 The new sequence (symbols from latex-as-string first, then send to sympy) might be 
-advantageous: if the symbols are identified first, that might make SymPy's parsing more likely to be right.
+advantageous: if the symbols are identified first, that might make SymPy's parsing more likely to be right. For example, parsing
+```
+a = b
+```
+using SymPy is more likely to succeed than
+```
+a = r_{\rm Earth}
+```
+which fails in SymPy. 
 
 ****************************
 2024-05-24
+
+design decision: creating new expressions - in isolation versus part of derivation
 
 In the v7 JSON implementation, the only way to create a new expression was to have the expression be associated with a specific derivation in a (new) step. The intent of this was to ensure there were no unconnected expressions. As a positive side-effect, associating a new expression with a derivation helped with guessing the symbols.
 

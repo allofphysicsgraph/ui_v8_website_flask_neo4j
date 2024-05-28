@@ -14,6 +14,8 @@
 
 <P>{{ expression_dict['latex'] }}
 
+<P>{{ revised_expr }}
+
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
     <P>{{ form.sympy.label}}: {{ form.sympy(size=50, maxlength=1000, value=sympy_expr) }}</P>

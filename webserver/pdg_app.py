@@ -58,6 +58,7 @@ import datetime
 # inspired by https://news.ycombinator.com/item?id=33844117
 from typing import NewType, Dict, List
 
+import sympy  # TEMP!
 
 import neo4j
 from neo4j import GraphDatabase
@@ -1251,7 +1252,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
 
     web_form_new_expression = SpecifyNewExpressionForm(request.form)
     if request.method == "POST" and web_form_new_expression.validate():
-        print("with web_form, request.form = ", request.form)
+        print("to_edit_expression: with web_form, request.form = ", request.form)
 
         expression_latex = (
             str(web_form_new_expression.expression_latex.data)
@@ -1287,13 +1288,38 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
 
     web_form_no_options = NoOptionsForm(request.form)
     if request.method == "POST":
-        print("no web_form; request.form = ", request.form)
+        print("to_edit_expression: no web_form; request.form = ", request.form)
+
+        print(
+            "to_edit_expression: no web_form; request.form.keys()", request.form.keys()
+        )
+
+        print(
+            "to_edit_expression: no web_form; len(request.form.keys())",
+            len(request.form.keys()),
+        )
+
+        # the "delete" button returns a dict with only the csrf token, so len==1
+        if len(request.form.keys()) == 1:
+            # https://neo4j.com/docs/python-manual/current/session-api/
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.delete_node,
+                    expression_id,
+                    "expression",
+                )
+                query_time_dict["to_edit_expression: delete_node"] = (
+                    time.time() - query_start_time
+                )
 
         if "symbol_select_id_to_disconnect" in request.form.keys():
             symbol_id_to_disconnect = str(
                 request.form["symbol_select_id_to_disconnect"]
             )
-            print("symbol_id_to_disconnect=", symbol_id_to_disconnect)
+            print(
+                "to_edit_expression: symbol_id_to_disconnect=", symbol_id_to_disconnect
+            )
 
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
@@ -1303,10 +1329,13 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
                     symbol_id_to_disconnect,
                     expression_id,
                 )
+                query_time_dict[
+                    "to_edit_expression: disconnect_symbol_from_expression"
+                ] = (time.time() - query_start_time)
 
         if "symbol_select_id_to_add" in request.form.keys():
             symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
-            print("symbol_id_to_add=", symbol_id_to_add)
+            print("to_edit_expression: symbol_id_to_add=", symbol_id_to_add)
 
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
@@ -1315,6 +1344,9 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
                     neo4j_query.add_symbol_to_expression,
                     symbol_id_to_add,
                     expression_id,
+                )
+                query_time_dict["to_edit_expression: add_symbol_to_expression"] = (
+                    time.time() - query_start_time
                 )
 
         # if "operation_select_id_to_disconnect" in request.form.keys():
@@ -2714,6 +2746,7 @@ def to_add_symbols_and_operations_for_expression(
     )
     query_time_dict = {}  # type: Dict[str, float]
 
+    # get the Latex for this expression_id
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         expression_dict = session.read_transaction(
@@ -2723,14 +2756,6 @@ def to_add_symbols_and_operations_for_expression(
             "to_add_symbols_and_operations_for_expression, node_properties"
         ] = (time.time() - query_start_time)
     print("expression_dict=", expression_dict)
-
-    # TODO: given a Latex expression, use SymPy to identify possible symbols
-
-    # TODO: given a Latex expression, and given all existing symbols,
-    # sort existing symbol_latex by length,
-    # then search (starting with the longest symbols first) for each symbol in the expression
-    # provide the user with the list of guessed symbols
-    # There may be multiple matching symbol IDs for a given latex symbol, e.g., "x"
 
     list_of_symbol_dicts = []
     with graphDB_Driver.session() as session:
@@ -2742,6 +2767,59 @@ def to_add_symbols_and_operations_for_expression(
             "to_add_symbols_and_operations_for_expression, list_nodes_of_type"
         ] = (time.time() - query_start_time)
     print("list_of_symbols", list_of_symbol_dicts)
+
+    # The naive option would be to return to the user the complete list of
+    # symbols and then ask the user to select relevant symbols.
+    #
+    # There are multiple tactics to enact that are more clever:
+    #   * given a Latex expression, use SymPy to identify possible symbols.
+    #   and, separately
+    #   * given a Latex expression, and given all existing symbols, return a list of matching symbols
+    #
+    # The first tactic is likely to result in an undercount,
+    # the second tactic will result in an overcount.
+    #
+    # I'll use keyword SYMBOLSEARCHSYMPY for the first tactic and
+    #  SYMBOLSEARCHLATEX for the second tactic.
+    # Order doesn't matter for the two tactics since they are independent.
+
+    # SYMBOLSEARCHSYMPY
+    cleaned_latex_str = compute.remove_latex_presention_markings(
+        expression_dict["latex"]
+    )
+    print("cleaned_latex_str=", cleaned_latex_str)
+    sympy_expr = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
+        cleaned_latex_str
+    )
+    print("sympy_expr=", str(sympy_expr))
+    list_of_sympy_symbols_from_expr = (
+        latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr)
+    )
+    print("list_of_sympy_symbols_from_expr=", list_of_sympy_symbols_from_expr)
+
+    # do any of the list_of_sympy_symbols_from_expr
+    # show up in list_of_symbol_dicts?
+    list_of_potential_matching_symbols_from_sympy = []
+    for this_symbol_dict in list_of_symbol_dicts:
+        print("this_symbol_dict=", this_symbol_dict)
+        for this_symbol_from_sympy in list_of_sympy_symbols_from_expr:
+            print(str(this_symbol_from_sympy))
+            if this_symbol_dict["latex"] == str(this_symbol_from_sympy):
+                list_of_potential_matching_symbols_from_sympy.append(
+                    this_symbol_dict["id"]
+                )
+    print(
+        "list_of_potential_matching_symbols_from_sympy=",
+        list_of_potential_matching_symbols_from_sympy,
+    )
+
+    # SYMBOLSEARCHLATEX
+    # given a Latex expression, and given all existing symbols,
+    # sort existing symbol_latex by length,
+    # then search (starting with the longest symbols first) for each symbol in the expression
+    # provide the user with the list of guessed symbols
+    # There may be multiple matching symbol IDs for a given latex symbol, e.g., "x"
+    # TODO: matching the symbol "a" just because the Latex string contains "\frac" is a false positive.
 
     list_of_symbol_latex = []  # type: List[str]
     dict_of_symbol_dicts = {}
@@ -2759,30 +2837,25 @@ def to_add_symbols_and_operations_for_expression(
 
     print("list_of_symbol_dicts_sorted_by_latex=", list_of_symbol_dicts_sorted_by_latex)
 
+    # SYMBOLSEARCHLATEX, continued
     # TODO: search (starting with the longest symbols first) for each symbol in the expression
     # provide the user with the list of guessed symbols
     # There may be multiple matching symbol IDs for a given latex symbol, e.g., "x"
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        expression_dict = session.read_transaction(
-            neo4j_query.node_properties, "expression", expression_id
-        )
-        query_time_dict["symbols_and_operations_for_expression, node_properties"] = (
-            time.time() - query_start_time
-        )
-    print("expression_dict=", expression_dict)
+    potential_symbols_found_in_Latex_expression = []  # type: List[str]
 
-    print("expression_dict[latex]=", expression_dict["latex"])
+    for this_symbol_dict in list_of_symbol_dicts:
+        if this_symbol_dict["latex"] in expression_dict["latex"]:
+            potential_symbols_found_in_Latex_expression.append(this_symbol_dict)
 
-    potential_symbols_found = []  # type: List[str]
-
-    # TODO: use the right form
+    # The checkboxes are determined dynamically,
+    # so I don't see how a class-based form could be used.
     web_form_no_options = NoOptionsForm(request.form)
     if request.method == "POST":
         print("request.form = ", request.form)
 
-        list_of_symbol_IDs_in_expression = []
+        list_of_symbol_IDs_in_expression = []  # type: List[str]
+        symbol_id_dict = {}  # type: Dict[str, str]
 
         # request.form =  ImmutableMultiDict([('9380276', '9380276'), ('3511322', '3511322'), ('7540000', '7540000'), ('9481642', '9481642'), ('submit_button', 'update expressions')])
         for ke, val in request.form.items():
@@ -2798,6 +2871,11 @@ def to_add_symbols_and_operations_for_expression(
                         "to_add_symbols_and_operations_for_expression: add_symbol_to_expression"
                     ] = (time.time() - query_start_time)
 
+                symbol_id_dict[dict_of_symbol_dicts[val]["latex"]] = val
+
+        print("symbol_id_dict=", symbol_id_dict)
+        # example output: {'a': '5638458', 'b': '7152159'}
+
         print(
             "[TRACE] func: app/to_add_symbols_and_operations_for_expression end "
             + trace_id
@@ -2806,6 +2884,7 @@ def to_add_symbols_and_operations_for_expression(
             url_for(
                 "to_add_sympy_and_lean_for_latex_expression",
                 expression_id=expression_id,
+                symbol_id_dict=symbol_id_dict,
             )
         )
     return render_template(
@@ -2813,13 +2892,18 @@ def to_add_symbols_and_operations_for_expression(
         query_time_dict=query_time_dict,
         form=web_form_no_options,
         expression_dict=expression_dict,
+        list_of_potential_matching_symbols_from_sympy=list_of_potential_matching_symbols_from_sympy,
+        potential_symbols_found_in_Latex_expression=potential_symbols_found_in_Latex_expression,
         list_of_symbol_dicts=list_of_symbol_dicts,
     )
 
 
-@web_app.route("/sympy_and_latex_for_step/<expression_id>", methods=["GET", "POST"])
+@web_app.route(
+    "/sympy_and_latex_for_step/<expression_id>/<symbol_id_dict>",
+    methods=["GET", "POST"],
+)
 def to_add_sympy_and_lean_for_latex_expression(
-    expression_id: unique_numeric_id_as_str,
+    expression_id: unique_numeric_id_as_str, symbol_id_dict: dict
 ) -> str:
     """
     derivation_id is the numeric ID of the derivation being edited
@@ -2838,24 +2922,47 @@ def to_add_sympy_and_lean_for_latex_expression(
         query_time_dict[
             "to_add_sympy_and_lean_for_latex_expression, node_properties"
         ] = (time.time() - query_start_time)
-    print("expression_dict=", expression_dict)
+    print(
+        "to_add_sympy_and_lean_for_latex_expression: expression_dict=", expression_dict
+    )
+
+    print("to_add_sympy_and_lean_for_latex_expression: symbol_id_dict=", symbol_id_dict)
+    # symbol_id_dict= {'a': '5638458', 'b': '7152159'}
 
     # provide a guess for the SymPy based on the Latex provided
 
     cleaned_latex_str = compute.remove_latex_presention_markings(
         expression_dict["latex"]
     )
-    print("cleaned_latex_str=", cleaned_latex_str)
-    sympy_expr = str(
-        latex_and_sympy.cleaned_latex_str_to_sympy_expression(cleaned_latex_str)
+    print(
+        "to_add_sympy_and_lean_for_latex_expression: cleaned_latex_str=",
+        cleaned_latex_str,
     )
-    print("sympy_expr=", str(sympy_expr))
-    # list_of_sympy_symbols = latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(symp_expr)
+    sympy_expr = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
+        cleaned_latex_str
+    )
+    print("to_add_sympy_and_lean_for_latex_expression: sympy_expr=", str(sympy_expr))
+    # list_of_sympy_symbols = latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr)
     # print("list_of_sympy_symbols=",list_of_sympy_symbols)
 
-    # TODO? look at each sympy_symbol and compare to existing symbols
+    # look at each sympy_symbol replaced with PDG symbol
 
-    # TODO? provide the symbol IDs to be used in the SymPy and Lean strings
+    print("sympy_expr.atoms()=", sympy_expr.atoms())
+    revised_expr = sympy_expr
+    for this_symb in sympy_expr.atoms():
+        print("this_symb=", this_symb)
+        my_str = str(this_symb) + " = sympy.Symbol('" + str(this_symb) + "')"
+        print("to exec:", my_str)
+        exec(my_str)
+
+        pdg_id = symbol_id_dict[str(this_symb)]
+        print("pdg_id=", pdg_id)
+        print(sympy.Symbol(pdg_id))
+        print(type(sympy.Symbol(pdg_id)))
+
+        revised_expr = revised_expr.subs(this_symb, sympy.Symbol(pdg_id))
+
+    print("revised_expr=", revised_expr)
 
     web_form = SpecifyNewSympyLeanForm(request.form)
     if request.method == "POST":
@@ -2900,6 +3007,7 @@ def to_add_sympy_and_lean_for_latex_expression(
         "expression_sympy_and_lean.html",
         query_time_dict=query_time_dict,
         sympy_expr=sympy_expr,
+        revised_expr=revised_expr,
         form=web_form,
         expression_dict=expression_dict,
     )
