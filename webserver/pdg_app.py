@@ -1245,6 +1245,25 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
         list_of_symbol_IDs_in_expression,
     )
 
+    list_of_expression_dicts = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_expression_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, "expression"
+        )
+        query_time_dict["to_add_expression: list_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
+
+    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
+    for this_expression_dict in list_of_expression_dicts:
+        if "sympy" in this_expression_dict.keys():
+            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
+                latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
+            )
+        else:
+            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = None
+
     dict_of_symbol_dicts_in_expression = {}
     for this_symbol_ID in list_of_symbol_IDs_in_expression:
         print("pdg_app/to_edit_expression: this_symbol_ID=", this_symbol_ID)
@@ -1410,12 +1429,10 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
         form_no_options=web_form_no_options,
         form_new_expression=web_form_new_expression,
         dict_of_symbol_dicts_in_expression=dict_of_symbol_dicts_in_expression,
-        # dict_of_operation_dicts_in_expression=dict_of_operation_dicts_in_expression,
         dict_of_symbol_dicts_not_in_expression=dict_of_symbol_dicts_not_in_expression,
-        # dict_of_operation_dicts_not_in_expression=dict_of_operation_dicts_not_in_expression,
         expression_dict=expression_dict,
+        sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
-        # dict_of_all_operation_dicts=dict_of_all_operation_dicts,
     )
     # return redirect(url_for("to_list_expressions"))
 
@@ -1467,6 +1484,15 @@ def to_add_expression() -> str:
         "dimensional_consistency_per_expression_id=",
         dimensional_consistency_per_expression_id,
     )
+
+    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
+    for this_expression_dict in list_of_expression_dicts:
+        if "sympy" in this_expression_dict.keys():
+            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
+                latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
+            )
+        else:
+            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = None
 
     web_form = SpecifyNewExpressionForm(request.form)
     if request.method == "POST" and web_form.validate():
@@ -1529,6 +1555,7 @@ def to_add_expression() -> str:
         form=web_form,
         symbols_per_expression=symbols_per_expression,
         list_of_expression_dicts=list_of_expression_dicts,
+        sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
         dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,
     )
 
@@ -3661,6 +3688,15 @@ def to_list_expressions() -> str:
         dimensional_consistency_per_expression_id,
     )
 
+    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
+    for this_expression_dict in list_of_expression_dicts:
+        if "sympy" in this_expression_dict.keys():
+            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
+                latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
+            )
+        else:
+            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = None
+
     print("[TRACE] func: app/to_list_expressions end " + trace_id)
     return render_template(
         "expression_list.html",
@@ -3669,6 +3705,7 @@ def to_list_expressions() -> str:
         symbols_per_expression=symbols_per_expression,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
         dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,
+        sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
     )
 
 

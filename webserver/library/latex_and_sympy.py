@@ -18,6 +18,19 @@ import sympy  # type: ignore
 from sympy.parsing.latex import parse_latex  # type: ignore
 
 
+def sympy_to_latex_str(sympy_expr) -> str:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: latex_and_sympy/sympy_to_latex_str start " + trace_id)
+
+    print("SymPy to be converted to Latex: " + str(sympy_expr))
+
+    latex_str = sympy.latex(sympy_expr)
+
+    print("[TRACE] func: latex_and_sympy/sympy_to_latex_str end " + trace_id)
+    return latex_str
+
+
 def cleaned_latex_str_to_sympy_expression(expr_latex: str):
     """
     see compute.remove_latex_presention_markings()
@@ -30,7 +43,6 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
     >>> cleaned_latex_str_to_sympy_expression('a = b')
     Eq(a, b)
     """
-
     trace_id = str(random.randint(1000000, 9999999))
     print(
         "[TRACE] func: latex_and_sympy/cleaned_latex_str_to_sympy_expression start "
