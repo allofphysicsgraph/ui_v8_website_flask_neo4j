@@ -40,7 +40,10 @@ def list_IDs(tx, node_type: str) -> list:
     assert node_type in [
         "derivation",
         "inference_rule",
-        "symbol",
+        "operation",
+        "scalar",
+        "vector",
+        "matrix",
         "step",
         "expression",
     ]
@@ -142,7 +145,10 @@ def constrain_unique_id(tx) -> None:
     for node_type in [
         "derivation",
         "inference_rule",
-        "symbol",
+        "operation",
+        "scalar",
+        "vector",
+        "matrix",
         "step",
         "expression",
     ]:
@@ -169,13 +175,15 @@ def symbols_in_expression(tx, expression_id: str, symbol_type: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/symbols_in_expression start " + trace_id)
 
-    print("neo4j_query/symbols_in_expression: symbol_type=",symbol_type)
+    print("neo4j_query/symbols_in_expression: symbol_type=", symbol_type)
 
     assert symbol_type in ["operation", "scalar", "vector", "matrix"]
 
     symbol_list = []
     for result in tx.run(
-        "MATCH (e:expression)-[:HAS_SYMBOL]->(s:'"+symbol_type+"') WHERE e.id='"
+        "MATCH (e:expression)-[:HAS_SYMBOL]->(s:'"
+        + symbol_type
+        + "') WHERE e.id='"
         + expression_id
         + "' RETURN s.id"
     ):
@@ -202,7 +210,10 @@ def list_nodes_of_type(tx, node_type: str) -> list:
     assert node_type in [
         "derivation",
         "inference_rule",
-        "symbol",
+        "operation",
+        "scalar",
+        "vector",
+        "matrix",
         "step",
         "expression",
     ]
@@ -215,6 +226,24 @@ def list_nodes_of_type(tx, node_type: str) -> list:
 
     print("[TRACE] func: neo4j_query/list_nodes_of_type end " + trace_id)
     return node_list
+
+
+def derivations_that_use_feed(tx, feed_id: str) -> list:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: neo4j_query/derivations_that_use_feed start " + trace_id)
+    print("feed_id=", feed_id)
+
+    list_of_derivation_dicts = []
+    for result in tx.run(
+        'MATCH (d:derivation), (s:step), (f:feed) WHERE f.id = "'
+        + str(feed_id)
+        + '" RETURN d'
+    ):
+        list_of_derivation_dicts.append(result.data()["d"])
+
+    print("[TRACE] func: neo4j_query/derivations_that_use_feed end " + trace_id)
+    return list_of_derivation_dicts
 
 
 def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
@@ -428,7 +457,10 @@ def node_properties(tx, node_type: str, node_id: str) -> dict:
     assert node_type in [
         "derivation",
         "inference_rule",
-        "symbol",
+        "operation",
+        "scalar",
+        "vector",
+        "matrix",
         "step",
         "expression",
     ]
@@ -591,7 +623,10 @@ def edit_node_property(
     assert node_type in [
         "derivation",
         "inference_rule",
-        "symbol",
+        "operation",
+        "scalar",
+        "vector",
+        "matrix",
         "step",
         "expression",
     ]
@@ -700,7 +735,10 @@ def delete_node(tx, node_id: str, node_type) -> None:
     assert node_type in [
         "derivation",
         "inference_rule",
-        "symbol",
+        "operation",
+        "scalar",
+        "vector",
+        "matrix",
         "step",
         "expression",
     ]

@@ -277,7 +277,7 @@ class SpecifyNewExpressionForm(FlaskForm):
 
     expression_latex = StringField(
         "LaTeX expression",
-        validators=[validators.Length(min=1, max=1000)],
+        validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
     )
     expression_name = StringField(
         "name (LaTeX)",
@@ -286,6 +286,19 @@ class SpecifyNewExpressionForm(FlaskForm):
     expression_description = StringField(
         "description (LaTeX)",
         validators=[validators.Length(max=1000)],
+    )
+
+
+class SpecifyNewFeedForm(FlaskForm):
+    """
+    web form for user to specify expressions used by steps
+
+    this class is "LatexIO" in v7
+    """
+
+    feed_latex = StringField(
+        "LaTeX feed",
+        validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
     )
 
 
@@ -827,9 +840,9 @@ def main() -> str:
     number_of_operations = 0
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        number_of_operations = len(session.read_transaction(
-            neo4j_query.list_nodes_of_type, "operation"
-        ))
+        number_of_operations = len(
+            session.read_transaction(neo4j_query.list_nodes_of_type, "operation")
+        )
         query_time_dict["main: list_nodes_of_type, symbol for operation"] = (
             time.time() - query_start_time
         )
@@ -1492,8 +1505,11 @@ def to_add_expression() -> str:
             )
             query_time_dict["symbols_in_expression: "] = time.time() - query_start_time
 
-        print("list_of_symbol_scalar_IDs_in_expression=",list_of_symbol_scalar_IDs_in_expression)
-        
+        print(
+            "list_of_symbol_scalar_IDs_in_expression=",
+            list_of_symbol_scalar_IDs_in_expression,
+        )
+
         dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
             sympy_validate_expression.dimensional_consistency(
                 this_expression_dict,
@@ -2997,7 +3013,7 @@ def to_add_symbols_and_operations_for_expression(
             )
         )
     return render_template(
-        "expression_symbols_and_operations.html",
+        "expression_create_symbols_and_operations.html",
         query_time_dict=query_time_dict,
         form=web_form_no_options,
         expression_dict=expression_dict,
@@ -3124,7 +3140,7 @@ def to_add_sympy_and_lean_for_latex_expression(
 
     web_form.sympy_str.data = revised_expr_with_str
     return render_template(
-        "expression_sympy_and_lean.html",
+        "expression_create_sympy_and_lean.html",
         query_time_dict=query_time_dict,
         sympy_expr=sympy_expr,
         revised_expr=revised_expr,
@@ -3557,6 +3573,42 @@ def to_query() -> str:
         derivation_id=derivation_id,
         inference_rule_id=inference_rule_id,
         step_id=step_id,
+    )
+
+
+@web_app.route("/list_feeds", methods=["GET", "POST"])
+def to_list_feeds() -> str:
+    """
+    >>> to_list_feeds()
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: app/to_list_feeds start " + trace_id)
+    query_time_dict = {}  # type: Dict[str, float]
+
+    list_of_feed_dicts = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_feed_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, "feed"
+        )
+        query_time_dict["to_list_feeds: list_nodes_of_type, feed"] = (
+            time.time() - query_start_time
+        )
+    print("list_of_operation_dicts", list_of_feed_dicts)
+
+    (
+        dict_of_derivations_that_use_feed,
+        query_time_dict,
+    ) = compute.get_dict_of_derivations_that_use_feed(
+        graphDB_Driver, query_time_dict, list_of_feed_dicts
+    )
+
+    print("[TRACE] func: app/to_list_feeds end " + trace_id)
+    return render_template(
+        "feed_list.html",
+        query_time_dict=query_time_dict,
+        list_of_feed_dicts=list_of_feed_dicts,
+        dict_of_derivations_that_use_feed=dict_of_derivations_that_use_feed,
     )
 
 

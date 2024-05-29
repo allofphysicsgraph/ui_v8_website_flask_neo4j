@@ -94,10 +94,10 @@ def api_list_inference_rules():
     return jsonify(list_of_dicts)
 
 
-@bp.route("/v1/resources/symbol/list", methods=["GET"])
-def api_list_symbols():
+@bp.route("/v1/resources/operation/list", methods=["GET"])
+def api_list_operation_symbols():
     """
-    curl -s http://localhost:5000/api/v1/resources/symbol/list | python3 -m json.tool
+    curl -s http://localhost:5000/api/v1/resources/operation/list | python3 -m json.tool
     [
         {
             "argument_count": 2,
@@ -116,7 +116,97 @@ def api_list_symbols():
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
-            neo4j_query.list_nodes_of_type, "symbol"
+            neo4j_query.list_nodes_of_type, "operation"
+        )
+    print("list_of_dicts=", list_of_dicts)
+
+    print("[TRACE] func: pdg_api/api_list_symbols end " + trace_id)
+    return jsonify(list_of_dicts)
+
+
+@bp.route("/v1/resources/scalar/list", methods=["GET"])
+def api_list_scalar_symbols():
+    """
+    curl -s http://localhost:5000/api/v1/resources/scalar/list | python3 -m json.tool
+    [
+        {
+            "argument_count": 2,
+            "author_name_latex": "ben",
+            "description_latex": "",
+            "id": "7052411",
+            "latex": "=",
+            "name_latex": "equals",
+            "requires_arguments": true
+        }
+    ]
+
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: pdg_api/api_list_symbols start " + trace_id)
+
+    with graphDB_Driver.session() as session:
+        list_of_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, "scalar"
+        )
+    print("list_of_dicts=", list_of_dicts)
+
+    print("[TRACE] func: pdg_api/api_list_symbols end " + trace_id)
+    return jsonify(list_of_dicts)
+
+
+@bp.route("/v1/resources/vector/list", methods=["GET"])
+def api_list_vector_symbols():
+    """
+    curl -s http://localhost:5000/api/v1/resources/vector/list | python3 -m json.tool
+    [
+        {
+            "argument_count": 2,
+            "author_name_latex": "ben",
+            "description_latex": "",
+            "id": "7052411",
+            "latex": "=",
+            "name_latex": "equals",
+            "requires_arguments": true
+        }
+    ]
+
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: pdg_api/api_list_symbols start " + trace_id)
+
+    with graphDB_Driver.session() as session:
+        list_of_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, "vector"
+        )
+    print("list_of_dicts=", list_of_dicts)
+
+    print("[TRACE] func: pdg_api/api_list_symbols end " + trace_id)
+    return jsonify(list_of_dicts)
+
+
+@bp.route("/v1/resources/matrix/list", methods=["GET"])
+def api_list_matrix_symbols():
+    """
+    curl -s http://localhost:5000/api/v1/resources/matrix/list | python3 -m json.tool
+    [
+        {
+            "argument_count": 2,
+            "author_name_latex": "ben",
+            "description_latex": "",
+            "id": "7052411",
+            "latex": "=",
+            "name_latex": "equals",
+            "requires_arguments": true
+        }
+    ]
+
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: pdg_api/api_list_symbols start " + trace_id)
+
+    with graphDB_Driver.session() as session:
+        list_of_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, "matrix"
         )
     print("list_of_dicts=", list_of_dicts)
 

@@ -45,6 +45,7 @@ def generate_random_id(list_of_current_IDs: list) -> unique_numeric_id_as_str:
 def get_dict_of_expressions_that_use_symbol(
     graphDB_Driver, query_time_dict: dict, list_of_symbol_dicts: list
 ):
+    """ """
     dict_of_expressions_that_use_symbol = {}
     for this_symbol_dict in list_of_symbol_dicts:
         with graphDB_Driver.session() as session:
@@ -80,7 +81,27 @@ def get_dict_of_derivations_that_use_symbol(
     return dict_of_derivations_that_use_symbol, query_time_dict
 
 
-def get_dict_of_node_dicts(graphDB_Driver, query_time_dict: dict, node_type:str):
+def get_dict_of_derivations_that_use_feed(
+    graphDB_Driver, query_time_dict: dict, list_of_feed_dicts: list
+):
+    """ """
+    dict_of_derivations_that_use_feed = {}  # type: Dict[str, list]
+    for this_feed_dict in list_of_feed_dicts:
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_derivation_dicts = session.read_transaction(
+                neo4j_query.derivations_that_use_feed, this_feed_dict["id"]
+            )
+            query_time_dict[
+                "get_dict_of_derivations_that_use_feed: derivations_that_use_feed"
+            ] = (time.time() - query_start_time)
+        dict_of_derivations_that_use_feed[this_feed_dict["id"]] = (
+            list_of_derivation_dicts
+        )
+    return dict_of_derivations_that_use_feed, query_time_dict
+
+
+def get_dict_of_node_dicts(graphDB_Driver, query_time_dict: dict, node_type: str):
     """
     >>> get_dict_of_symbol_dicts()
     """
