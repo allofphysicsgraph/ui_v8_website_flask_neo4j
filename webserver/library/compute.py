@@ -48,14 +48,48 @@ def get_dict_of_expressions_that_use_symbol(
     """ """
     dict_of_expressions_that_use_symbol = {}
     for this_symbol_dict in list_of_symbol_dicts:
+        list_of_expression_dicts = []  # type: List[dict]
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            list_of_expression_dicts = session.read_transaction(
-                neo4j_query.expressions_that_use_symbol, this_symbol_dict["id"]
+            list_of_expression_dicts += session.read_transaction(
+                neo4j_query.expressions_that_use_symbol,
+                this_symbol_dict["id"],
+                "operation",
             )
             query_time_dict[
                 "get_dict_of_expressions_that_use_symbol: expressions_that_use_symbol"
             ] = (time.time() - query_start_time)
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_expression_dicts += session.read_transaction(
+                neo4j_query.expressions_that_use_symbol,
+                this_symbol_dict["id"],
+                "scalar",
+            )
+            query_time_dict[
+                "get_dict_of_expressions_that_use_symbol: expressions_that_use_symbol"
+            ] = (time.time() - query_start_time)
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_expression_dicts += session.read_transaction(
+                neo4j_query.expressions_that_use_symbol,
+                this_symbol_dict["id"],
+                "vector",
+            )
+            query_time_dict[
+                "get_dict_of_expressions_that_use_symbol: expressions_that_use_symbol"
+            ] = (time.time() - query_start_time)
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_expression_dicts += session.read_transaction(
+                neo4j_query.expressions_that_use_symbol,
+                this_symbol_dict["id"],
+                "matrix",
+            )
+            query_time_dict[
+                "get_dict_of_expressions_that_use_symbol: expressions_that_use_symbol"
+            ] = (time.time() - query_start_time)
+
         dict_of_expressions_that_use_symbol[this_symbol_dict["id"]] = (
             list_of_expression_dicts
         )
@@ -67,14 +101,48 @@ def get_dict_of_derivations_that_use_symbol(
 ):
     dict_of_derivations_that_use_symbol = {}
     for this_symbol_dict in list_of_symbol_dicts:
+        list_of_derivation_dicts = []  # type: List[dict]
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            list_of_derivation_dicts = session.read_transaction(
-                neo4j_query.derivations_that_use_symbol, this_symbol_dict["id"]
+            list_of_derivation_dicts += session.read_transaction(
+                neo4j_query.derivations_that_use_symbol,
+                this_symbol_dict["id"],
+                "operation",
             )
             query_time_dict[
                 "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol"
             ] = (time.time() - query_start_time)
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_derivation_dicts += session.read_transaction(
+                neo4j_query.derivations_that_use_symbol,
+                this_symbol_dict["id"],
+                "scalar",
+            )
+            query_time_dict[
+                "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol"
+            ] = (time.time() - query_start_time)
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_derivation_dicts += session.read_transaction(
+                neo4j_query.derivations_that_use_symbol,
+                this_symbol_dict["id"],
+                "vector",
+            )
+            query_time_dict[
+                "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol"
+            ] = (time.time() - query_start_time)
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_derivation_dicts += session.read_transaction(
+                neo4j_query.derivations_that_use_symbol,
+                this_symbol_dict["id"],
+                "matrix",
+            )
+            query_time_dict[
+                "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol"
+            ] = (time.time() - query_start_time)
+
         dict_of_derivations_that_use_symbol[this_symbol_dict["id"]] = (
             list_of_derivation_dicts
         )
@@ -103,10 +171,23 @@ def get_dict_of_derivations_that_use_feed(
 
 def get_dict_of_node_dicts(graphDB_Driver, query_time_dict: dict, node_type: str):
     """
-    >>> get_dict_of_symbol_dicts()
+    >>> get_dict_of_node_dicts()
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: compute/get_dict_of_node_dicts start " + trace_id)
+
+    assert node_type in [
+        "derivation",
+        "inference_rule",
+        "operation",
+        "feed",
+        "scalar",
+        "vector",
+        "matrix",
+        "step",
+        "expression",
+    ]
+    print("              node type:", node_type)
 
     list_of_all_node_dicts = []
     with graphDB_Driver.session() as session:
@@ -126,72 +207,6 @@ def get_dict_of_node_dicts(graphDB_Driver, query_time_dict: dict, node_type: str
 
     print("[TRACE] func: compute/get_dict_of_node_dicts end " + trace_id)
     return dict_of_all_node_dicts, query_time_dict
-
-
-# def split_symbol_categories(graphDB_Driver, query_time_dict: dict):
-#     """ """
-
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         list_of_symbol_dicts = session.read_transaction(
-#             neo4j_query.list_nodes_of_type, "symbol"
-#         )
-#         query_time_dict["split_symbol_categories: list_nodes_of_type symbol"] = (
-#             time.time() - query_start_time
-#         )
-#     print("list_of_symbol_dicts=", list_of_symbol_dicts)
-
-#     list_of_operation_dicts = []
-#     list_of_dimension0_symbol_dicts = []
-#     list_of_dimension1_symbol_dicts = []
-#     list_of_dimension2ormore_symbol_dicts = []
-
-#     for this_symbol_dict in list_of_symbol_dicts:
-#         print("this_symbol_dict=", this_symbol_dict)
-#         if this_symbol_dict["requires_arguments"]:
-#             list_of_operation_dicts.append(this_symbol_dict)
-#         else:
-#             if this_symbol_dict["dimension_count"] == 0:
-#                 list_of_dimension0_symbol_dicts.append(this_symbol_dict)
-#             elif this_symbol_dict["dimension_count"] == 1:
-#                 list_of_dimension1_symbol_dicts.append(this_symbol_dict)
-#             else:
-#                 list_of_dimension2ormore_symbol_dicts.append(this_symbol_dict)
-
-#     return (
-#         query_time_dict,
-#         list_of_symbol_dicts,
-#         list_of_operation_dicts,
-#         list_of_dimension0_symbol_dicts,
-#         list_of_dimension1_symbol_dicts,
-#         list_of_dimension2ormore_symbol_dicts,
-#     )
-
-
-# def get_dict_of_operation_dicts(
-#     graphDB_Driver,
-# ):
-#     """
-#     >>> get_dict_of_operation_dicts()
-#     """
-#     trace_id = str(random.randint(1000000, 9999999))
-#     print("[TRACE] func: compute/get_dict_of_operation_dicts start " + trace_id)
-
-#     list_of_all_operation_dicts = []
-#     with graphDB_Driver.session() as session:
-#         list_of_all_operation_dicts = session.read_transaction(
-#             neo4j_query.list_nodes_of_type, "symbol"
-#         )
-#     # TODO: there are fewer operations than symbols
-#     print("list_of_all_operation_dicts=", list_of_all_operation_dicts)
-
-#     dict_of_all_operation_dicts = {}
-#     for this_operation_dict in list_of_all_operation_dicts:
-#         dict_of_all_operation_dicts[this_operation_dict["id"]] = this_operation_dict
-#     print("dict_of_all_operation_dicts=", dict_of_all_operation_dicts)
-
-#     print("[TRACE] func: compute/get_dict_of_operation_dicts end " + trace_id)
-#     return dict_of_all_operation_dicts
 
 
 def get_dict_of_derivations_used_per_inference_rule(

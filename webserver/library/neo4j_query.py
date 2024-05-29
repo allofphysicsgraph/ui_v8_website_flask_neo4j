@@ -41,6 +41,7 @@ def list_IDs(tx, node_type: str) -> list:
         "derivation",
         "inference_rule",
         "operation",
+        "feed",
         "scalar",
         "vector",
         "matrix",
@@ -51,27 +52,6 @@ def list_IDs(tx, node_type: str) -> list:
     for result in tx.run("MATCH (n:" + node_type + ") RETURN n.id"):
         # print(result.data())
         list_of_IDs.append(result.data()["n.id"])
-
-    # if node_type == "derivation":
-    #     for result in tx.run("MATCH (n:derivation) RETURN n.derivation_id"):
-    #         list_of_IDs.append(result.data()["n.derivation_id"])
-    # elif node_type == "step":
-    #     for result in tx.run("MATCH (n:step) RETURN n.step_id"):
-    #         list_of_IDs.append(result.data()["n.step_id"])
-    # elif node_type == "symbol":
-    #     for result in tx.run("MATCH (n:symbol) RETURN n.symbol_id"):
-    #         list_of_IDs.append(result.data()["n.step_id"])
-    # elif node_type == "operation":
-    #     for result in tx.run("MATCH (n:operation) RETURN n.operation_id"):
-    #         list_of_IDs.append(result.data()["n.operation_id"])
-    # elif node_type == "expression":
-    #     for result in tx.run("MATCH (n:expression) RETURN n.expression_id"):
-    #         list_of_IDs.append(result.data()["n.expression_id"])
-    # elif node_type == "inference_rule":
-    #     for result in tx.run("MATCH (n:inference_rule) RETURN n.inference_rule_id"):
-    #         list_of_IDs.append(result.data()["n.inference_rule_id"])
-    # else:
-    #     raise Exception("ERROR: Unrecognized node type")
 
     print("[TRACE] func: neo4j_query/list_IDs end " + trace_id)
     return list_of_IDs
@@ -164,7 +144,7 @@ def constrain_unique_id(tx) -> None:
     return
 
 
-def symbols_in_expression(tx, expression_id: str, symbol_type: str) -> list:
+def symbols_in_expression(tx, expression_id: str, symbol_category: str) -> list:
     """
     an expression typically has one or more sybmols
     This read query returns which symbol IDs are used for the provided expression ID
@@ -175,14 +155,14 @@ def symbols_in_expression(tx, expression_id: str, symbol_type: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/symbols_in_expression start " + trace_id)
 
-    print("neo4j_query/symbols_in_expression: symbol_type=", symbol_type)
+    print("neo4j_query/symbols_in_expression: symbol_category=", symbol_category)
 
-    assert symbol_type in ["operation", "scalar", "vector", "matrix"]
+    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
 
     symbol_list = []
     for result in tx.run(
         "MATCH (e:expression)-[:HAS_SYMBOL]->(s:'"
-        + symbol_type
+        + symbol_category
         + "') WHERE e.id='"
         + expression_id
         + "' RETURN s.id"
@@ -211,6 +191,7 @@ def list_nodes_of_type(tx, node_type: str) -> list:
         "derivation",
         "inference_rule",
         "operation",
+        "feed",
         "scalar",
         "vector",
         "matrix",
@@ -282,7 +263,7 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
     return list_of_derivation_dicts
 
 
-def expressions_that_use_symbol(tx, symbol_id: str) -> list:
+def expressions_that_use_symbol(tx, symbol_id: str, symbol_category: str) -> list:
     """
     which expressions contain this symbol?
 
@@ -291,10 +272,16 @@ def expressions_that_use_symbol(tx, symbol_id: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/expressions_that_use_symbol start " + trace_id)
 
+    print("neo4j_query/expressions_that_use_symbol: symbol_category=", symbol_category)
+
+    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+
     list_of_expressions = []
 
     for result in tx.run(
-        "MATCH (e:expression), (s:symbol) WHERE s.id = '"
+        "MATCH (e:expression), (s:"
+        + symbol_category
+        + ") WHERE s.id = '"
         + str(symbol_id)
         + "' RETURN e"
     ):
@@ -306,7 +293,7 @@ def expressions_that_use_symbol(tx, symbol_id: str) -> list:
     return list_of_expressions
 
 
-def derivations_that_use_symbol(tx, symbol_id: str) -> list:
+def derivations_that_use_symbol(tx, symbol_id: str, symbol_category: str) -> list:
     """
     which derivations contain this symbol?
 
@@ -315,10 +302,14 @@ def derivations_that_use_symbol(tx, symbol_id: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/derivations_that_use_symbol start " + trace_id)
 
+    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+
     list_of_derivations = []
 
     for result in tx.run(
-        "MATCH (d:derivation), (s:symbol) WHERE s.id = '"
+        "MATCH (d:derivation), (s:"
+        + symbol_category
+        + ") WHERE s.id = '"
         + str(symbol_id)
         + "' RETURN d"
     ):
@@ -458,6 +449,7 @@ def node_properties(tx, node_type: str, node_id: str) -> dict:
         "derivation",
         "inference_rule",
         "operation",
+        "feed",
         "scalar",
         "vector",
         "matrix",
@@ -624,6 +616,7 @@ def edit_node_property(
         "derivation",
         "inference_rule",
         "operation",
+        "feed",
         "scalar",
         "vector",
         "matrix",
@@ -736,6 +729,7 @@ def delete_node(tx, node_id: str, node_type) -> None:
         "derivation",
         "inference_rule",
         "operation",
+        "feed",
         "scalar",
         "vector",
         "matrix",
@@ -752,7 +746,9 @@ def delete_node(tx, node_id: str, node_type) -> None:
     return
 
 
-def disconnect_symbol_from_expression(tx, symbol_id: str, expression_id: str) -> None:
+def disconnect_symbol_from_expression(
+    tx, symbol_id: str, expression_id: str, symbol_category: str
+) -> None:
     """
     called by "edit expression"
 
@@ -763,8 +759,12 @@ def disconnect_symbol_from_expression(tx, symbol_id: str, expression_id: str) ->
         "[TRACE] func: neo4j_query/disconnect_symbol_from_expression start " + trace_id
     )
 
+    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+
     result = tx.run(
-        "MATCH (e:expression)-[r:HAS_SYMBOL]->(s:symbol)"
+        "MATCH (e:expression)-[r:HAS_SYMBOL]->(s:"
+        + symbol_category
+        + ")"
         + 'WHERE e.id="'
         + str(expression_id)
         + '" AND s.id="'
@@ -777,11 +777,15 @@ def disconnect_symbol_from_expression(tx, symbol_id: str, expression_id: str) ->
     return
 
 
-def add_symbol_to_expression(tx, symbol_id: str, expression_id: str) -> None:
+def add_symbol_to_expression(
+    tx, symbol_id: str, expression_id: str, symbol_category: str
+) -> None:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/add_symbol_to_expression start " + trace_id)
     print("symbol_id=", symbol_id, "expression_id=", expression_id)
+
+    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
 
     # print(
     #     "MATCH (e:expression),(s:symbol) WHERE e.id='"
@@ -790,16 +794,18 @@ def add_symbol_to_expression(tx, symbol_id: str, expression_id: str) -> None:
     #     + str(symbol_id)
     #     + "' MERGE (e)-[r:HAS_SYMBOL]->(s) RETURN r"
     # )
-    print(
-        "MATCH (e:expression),(s:symbol) WHERE e.id='"
-        + str(expression_id)
-        + "' AND s.id='"
-        + str(symbol_id)
-        + "' MERGE (e)-[:HAS_SYMBOL]->(s)"
-    )
+    # print(
+    #     "MATCH (e:expression),(s:symbol) WHERE e.id='"
+    #     + str(expression_id)
+    #     + "' AND s.id='"
+    #     + str(symbol_id)
+    #     + "' MERGE (e)-[:HAS_SYMBOL]->(s)"
+    # )
 
     result = tx.run(
-        "MATCH (e:expression),(s:symbol) "
+        "MATCH (e:expression),(s:"
+        + symbol_category
+        + ") "
         + 'WHERE e.id="'
         + str(expression_id)
         + '" AND s.id="'
@@ -1007,10 +1013,10 @@ def add_quantum_operator_symbol(
     >>> add_symbol(tx,)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/add_symbol start " + trace_id)
+    print("[TRACE] func: neo4j_query/add_quantum_operator_symbol start " + trace_id)
 
     result = tx.run(
-        "CREATE (:symbol "
+        "CREATE (:quantum_operator "
         '{name_latex:"' + str(symbol_name) + '", '
         ' latex:"' + str(symbol_latex) + '", '
         ' description_latex:"' + str(symbol_description) + '", '
@@ -1020,7 +1026,7 @@ def add_quantum_operator_symbol(
         ' id:"' + str(symbol_id) + '"})'
     )
 
-    print("[TRACE] func: neo4j_query/add_symbol end " + trace_id)
+    print("[TRACE] func: neo4j_query/add_quantum_operator_symbol end " + trace_id)
     return
 
 
@@ -1047,7 +1053,7 @@ def add_scalar_symbol(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/add_symbol_direct_scalar start " + trace_id)
+    print("[TRACE] func: neo4j_query/add_scalar_symbol start " + trace_id)
 
     # corresponds to SpecifyNewSymbolDIRECTScalarForm
     assert len(symbol_latex) > 0
@@ -1055,7 +1061,7 @@ def add_scalar_symbol(
     assert len(symbol_variable_or_constant) > 0
 
     result = tx.run(
-        "CREATE (a:symbol "
+        "CREATE (a:scalar "
         '{name_latex:"' + str(symbol_name) + '", '
         ' latex:"' + str(symbol_latex) + '", '
         ' description_latex:"' + str(symbol_description) + '", '
@@ -1076,7 +1082,7 @@ def add_scalar_symbol(
         ' id:"' + str(symbol_id) + '"})'
     )
 
-    print("[TRACE] func: neo4j_query/add_symbol_direct_scalar end " + trace_id)
+    print("[TRACE] func: neo4j_query/add_scalar_symbol end " + trace_id)
     return
 
 
@@ -1097,14 +1103,14 @@ def add_vector_symbol(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/add_symbol_direct_vector start " + trace_id)
+    print("[TRACE] func: neo4j_query/add_vector_symbol start " + trace_id)
 
     # corresponds to SpecifyNewSymbolDIRECTVectorForm
     assert len(symbol_latex) > 0
 
     if symbol_size == "arbitrary":
         result = tx.run(
-            "CREATE (:symbol "
+            "CREATE (:vector "
             '{name_latex:"' + str(symbol_name) + '", '
             ' latex:"' + str(symbol_latex) + '", '
             ' description_latex:"' + str(symbol_description) + '", '
@@ -1119,7 +1125,7 @@ def add_vector_symbol(
         )
     else:  # fixed size
         result = tx.run(
-            "CREATE (:symbol "
+            "CREATE (:vector "
             '{name_latex:"' + str(symbol_name) + '", '
             ' latex:"' + str(symbol_latex) + '", '
             ' description_latex:"' + str(symbol_description) + '", '
@@ -1134,7 +1140,7 @@ def add_vector_symbol(
             ' id:"' + str(symbol_id) + '"})'
         )
 
-    print("[TRACE] func: neo4j_query/add_symbol_direct_vector end " + trace_id)
+    print("[TRACE] func: neo4j_query/add_vector_symbol end " + trace_id)
     return
 
 
@@ -1155,14 +1161,14 @@ def add_matrix_symbol(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/add_symbol_direct_matrix start " + trace_id)
+    print("[TRACE] func: neo4j_query/add_matrix_symbol start " + trace_id)
 
     # corresponds to SpecifyNewSymbolDIRECTMatrixForm
     assert len(symbol_latex) > 0
 
     if symbol_size == "arbitrary":
         result = tx.run(
-            "CREATE (:symbol "
+            "CREATE (:matrix "
             '{name_latex:"' + str(symbol_name) + '", '
             ' latex:"' + str(symbol_latex) + '", '
             ' description_latex:"' + str(symbol_description) + '", '
@@ -1176,7 +1182,7 @@ def add_matrix_symbol(
         )
     else:  # fixed size
         result = tx.run(
-            "CREATE (:symbol "
+            "CREATE (:matrix "
             '{name_latex:"' + str(symbol_name) + '", '
             ' latex:"' + str(symbol_latex) + '", '
             ' description_latex:"' + str(symbol_description) + '", '
@@ -1191,7 +1197,7 @@ def add_matrix_symbol(
             ' id:"' + str(symbol_id) + '"})'
         )
 
-    print("[TRACE] func: neo4j_query/add_symbol_direct_matrix end " + trace_id)
+    print("[TRACE] func: neo4j_query/add_matrix_symbol end " + trace_id)
     return
 
 
@@ -1210,7 +1216,7 @@ def add_operation_symbol(
     >>> add_operation(tx,)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/add_symbol_direct_operation start " + trace_id)
+    print("[TRACE] func: neo4j_query/add_operation_symbol start " + trace_id)
 
     # corresponds to SpecifyNewSymbolDIRECTOperationForm
     assert len(operation_name) > 0
@@ -1218,7 +1224,7 @@ def add_operation_symbol(
     assert int(operation_argument_count) > 0
 
     result = tx.run(
-        "CREATE (a:symbol "
+        "CREATE (a:operation "
         '{name_latex:"' + str(operation_name) + '", '
         ' latex:"' + str(operation_latex) + '", '
         ' description_latex:"' + str(operation_description) + '", '
@@ -1228,7 +1234,7 @@ def add_operation_symbol(
         ' id:"' + str(operation_id) + '"})'
     )
 
-    print("[TRACE] func: neo4j_query/add_symbol_direct_operation end " + trace_id)
+    print("[TRACE] func: neo4j_query/add_operation_symbol end " + trace_id)
     return
 
 

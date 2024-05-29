@@ -122,59 +122,52 @@ def dimensional_consistency(
         # print("symbol_id=", symbol_id)
         this_symbol_dict = dict_of_all_symbol_dicts[symbol_id]
         # print("this_symbol_dict=", this_symbol_dict)
-        if "argument_count" in this_symbol_dict.keys():  # no dimensionality to check
-            print(this_symbol_dict["latex"], this_symbol_dict["id"], "is an operator")
-        else:  # not an operator
-            symbol_dim_powers = ""
-            if this_symbol_dict["dimension_time"] != 0:
-                symbol_dim_powers += (
-                    "time**(" + str(this_symbol_dict["dimension_time"]) + ")*"
-                )
-            if this_symbol_dict["dimension_electric_charge"] != 0:
-                symbol_dim_powers += (
-                    "charge**("
-                    + str(this_symbol_dict["dimension_electric_charge"])
-                    + ")*"
-                )
-            if this_symbol_dict["dimension_luminous_intensity"] != 0:
-                symbol_dim_powers += (
-                    "luminous_intensity**("
-                    + str(this_symbol_dict["dimension_luminous_intensity"])
-                    + ")*"
-                )
-            if this_symbol_dict["dimension_length"] != 0:
-                symbol_dim_powers += (
-                    "length**(" + str(this_symbol_dict["dimension_length"]) + ")*"
-                )
-            if this_symbol_dict["dimension_amount_of_substance"] != 0:
-                symbol_dim_powers += (
-                    "amount_of_substance**("
-                    + str(this_symbol_dict["dimension_amount_of_substance"])
-                    + ")*"
-                )
-            if this_symbol_dict["dimension_mass"] != 0:
-                symbol_dim_powers += (
-                    "mass**(" + str(this_symbol_dict["dimension_mass"]) + ")*"
-                )
-            if this_symbol_dict["dimension_temperature"] != 0:
-                symbol_dim_powers += (
-                    "temperature**("
-                    + str(this_symbol_dict["dimension_temperature"])
-                    + ")*"
-                )
+        symbol_dim_powers = ""
+        if this_symbol_dict["dimension_time"] != 0:
+            symbol_dim_powers += (
+                "time**(" + str(this_symbol_dict["dimension_time"]) + ")*"
+            )
+        if this_symbol_dict["dimension_electric_charge"] != 0:
+            symbol_dim_powers += (
+                "charge**(" + str(this_symbol_dict["dimension_electric_charge"]) + ")*"
+            )
+        if this_symbol_dict["dimension_luminous_intensity"] != 0:
+            symbol_dim_powers += (
+                "luminous_intensity**("
+                + str(this_symbol_dict["dimension_luminous_intensity"])
+                + ")*"
+            )
+        if this_symbol_dict["dimension_length"] != 0:
+            symbol_dim_powers += (
+                "length**(" + str(this_symbol_dict["dimension_length"]) + ")*"
+            )
+        if this_symbol_dict["dimension_amount_of_substance"] != 0:
+            symbol_dim_powers += (
+                "amount_of_substance**("
+                + str(this_symbol_dict["dimension_amount_of_substance"])
+                + ")*"
+            )
+        if this_symbol_dict["dimension_mass"] != 0:
+            symbol_dim_powers += (
+                "mass**(" + str(this_symbol_dict["dimension_mass"]) + ")*"
+            )
+        if this_symbol_dict["dimension_temperature"] != 0:
+            symbol_dim_powers += (
+                "temperature**(" + str(this_symbol_dict["dimension_temperature"]) + ")*"
+            )
 
-            print("symbol_dim_powers=", symbol_dim_powers[:-1])
+        print("symbol_dim_powers=", symbol_dim_powers[:-1])
 
-            if (
-                symbol_dim_powers[:-1] == ""
-            ):  # everything was dimensionless for this variable
-                symbol_dim_powers_result = "mass/mass"
-            else:
-                symbol_dim_powers_result = symbol_dim_powers[:-1]
+        if (
+            symbol_dim_powers[:-1] == ""
+        ):  # everything was dimensionless for this variable
+            symbol_dim_powers_result = "mass/mass"
+        else:
+            symbol_dim_powers_result = symbol_dim_powers[:-1]
 
-            print("symbol_dim_powers_result=", symbol_dim_powers_result)
+        print("symbol_dim_powers_result=", symbol_dim_powers_result)
 
-            exec("pdg" + str(symbol_id) + " = " + symbol_dim_powers_result)
+        exec("pdg" + str(symbol_id) + " = " + symbol_dim_powers_result)
 
     # now that the symbol dimensions have been set,
     # evaluate the dimensionality of the expression

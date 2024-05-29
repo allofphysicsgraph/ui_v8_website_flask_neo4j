@@ -16,7 +16,7 @@
 { % endfor %}
 -->
 
-<H1>List of Symbols</H1>
+<H1>List of Scalar Symbols</H1>
 
 <P>The symbol ID links to a page where you can edit the symbol<BR>
 
@@ -37,12 +37,14 @@
 
 <fieldset>
 <legend>
-  <H2 id="action">Actions for Symbols</h2>
+  <H2 id="action">Actions for Scalar Symbols</h2>
 </legend>
 
 <P><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=list_symbols">add new scalar symbol</a> -- arguments not required. Includes bra, ket.
 
-  <P><a href="{{ url_for('to_add_symbol') }}?referrer=list_symbols">add new symbol</a> -- not clear which categorey; guide needed</P>
+<!--
+  <P><a href="{ { url_for('to_add_symbol') }}?referrer=list_symbols">add new symbol</a> -- not clear which categorey; guide needed</P>
+-->
 </UL>
 
 

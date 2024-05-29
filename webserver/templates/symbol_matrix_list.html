@@ -16,9 +16,9 @@
 { % endfor %}
 -->
 
-<H1>List of Symbols</H1>
+<H1>List of Matrices</H1>
 
-<P>The symbol ID links to a page where you can edit the symbol<BR>
+<P>The symbol ID links to a page where you can edit the matrix<BR>
 
 <fieldset>
 <legend>
@@ -35,12 +35,14 @@
 
 <fieldset>
 <legend>
-  <H2 id="action">Actions for Symbols</h2>
+  <H2 id="action">Actions for Matrices</h2>
 </legend>
 
 <P><a href="{{ url_for('to_add_symbol_matrix') }}?referrer=list_symbols">add new matrix symbol</a> (e.g., nxm or arbitrary size)
 
-  <P><a href="{{ url_for('to_add_symbol') }}?referrer=list_symbols">add new symbol</a> -- not clear which categorey; guide needed</P>
+<!--
+  <P><a href="{ { url_for('to_add_symbol') }}?referrer=list_symbols">add new symbol</a> -- not clear which categorey; guide needed</P>
+-->
 </UL>
 
 
