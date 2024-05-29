@@ -1435,10 +1435,38 @@ def to_add_expression() -> str:
         list_of_expression_dicts = session.read_transaction(
             neo4j_query.list_nodes_of_type, "expression"
         )
-
-        symbols_per_expression = compute.symbols_per_expression(
-            graphDB_Driver, query_time_dict, list_of_expression_dicts
+        query_time_dict["to_add_expression: list_nodes_of_type"] = (
+            time.time() - query_start_time
         )
+
+    symbols_per_expression = compute.symbols_per_expression(
+        graphDB_Driver, query_time_dict, list_of_expression_dicts
+    )
+
+    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_symbol_dicts(
+        graphDB_Driver, query_time_dict
+    )
+
+    dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
+    for this_expression_dict in list_of_expression_dicts:
+
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_symbol_IDs_in_expression = session.read_transaction(
+                neo4j_query.symbols_in_expression, this_expression_dict["id"]
+            )
+            query_time_dict["symbols_in_expression: "] = time.time() - query_start_time
+        dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
+            sympy_validate_expression.dimensional_consistency(
+                this_expression_dict,
+                list_of_symbol_IDs_in_expression,
+                dict_of_all_symbol_dicts,
+            )
+        )
+    print(
+        "dimensional_consistency_per_expression_id=",
+        dimensional_consistency_per_expression_id,
+    )
 
     web_form = SpecifyNewExpressionForm(request.form)
     if request.method == "POST" and web_form.validate():
@@ -1467,6 +1495,7 @@ def to_add_expression() -> str:
             list_of_expression_IDs = session.read_transaction(
                 neo4j_query.list_IDs, "expression"
             )
+            query_time_dict["list_IDs: expression"] = time.time() - query_start_time
         expression_id = compute.generate_random_id(list_of_expression_IDs)
 
         # https://neo4j.com/docs/python-manual/current/session-api/
@@ -1480,6 +1509,9 @@ def to_add_expression() -> str:
                 expression_description,
                 author_name_latex,
             )
+        query_time_dict["to_add_expression: add_expression"] = (
+            time.time() - query_start_time
+        )
 
         # after user provides latex for expression have them provide symbol count
         print("[TRACE] func: app/ end " + trace_id)
@@ -1497,6 +1529,7 @@ def to_add_expression() -> str:
         form=web_form,
         symbols_per_expression=symbols_per_expression,
         list_of_expression_dicts=list_of_expression_dicts,
+        dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,
     )
 
 
@@ -2988,6 +3021,10 @@ def to_add_sympy_and_lean_for_latex_expression(
         r"(pdg\d\d\d\d\d\d\d)", r"sympy.Symbol('\1')", str(revised_expr)
     )
 
+    revised_expr_with_str = re.sub(r"^Eq", "sympy.Eq", revised_expr_with_str)
+
+    print("revised_expr_with_str=", revised_expr_with_str)
+
     web_form = SpecifyNewSympyLeanForm(request.form)
     if request.method == "POST":
         print("request.form = ", request.form)
@@ -3583,16 +3620,46 @@ def to_list_expressions() -> str:
             neo4j_query.list_nodes_of_type, "expression"
         )
 
-    print("list_of_expression_dicts", list_of_expression_dicts)
+    print(
+        "pdg_app/to_list_expressions: list_of_expression_dicts",
+        list_of_expression_dicts,
+    )
 
     symbols_per_expression, query_time_dict = compute.symbols_per_expression(
         graphDB_Driver, query_time_dict, list_of_expression_dicts
+    )
+    print(
+        "pdg_app/to_list_expressions: symbols_per_expression=", symbols_per_expression
     )
 
     dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_symbol_dicts(
         graphDB_Driver, query_time_dict
     )
-    # dict_of_all_operation_dicts = compute.get_dict_of_operation_dicts(graphDB_Driver)
+    print(
+        "pdg_app/to_list_expressions: dict_of_all_symbol_dicts=",
+        dict_of_all_symbol_dicts,
+    )
+
+    dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
+    for this_expression_dict in list_of_expression_dicts:
+
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_symbol_IDs_in_expression = session.read_transaction(
+                neo4j_query.symbols_in_expression, this_expression_dict["id"]
+            )
+
+        dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
+            sympy_validate_expression.dimensional_consistency(
+                this_expression_dict,
+                list_of_symbol_IDs_in_expression,
+                dict_of_all_symbol_dicts,
+            )
+        )
+    print(
+        "dimensional_consistency_per_expression_id=",
+        dimensional_consistency_per_expression_id,
+    )
 
     print("[TRACE] func: app/to_list_expressions end " + trace_id)
     return render_template(
@@ -3600,9 +3667,8 @@ def to_list_expressions() -> str:
         query_time_dict=query_time_dict,
         list_of_expression_dicts=list_of_expression_dicts,
         symbols_per_expression=symbols_per_expression,
-        # operations_per_expression=operations_per_expression,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
-        # dict_of_all_operation_dicts=dict_of_all_operation_dicts,
+        dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,
     )
 
 

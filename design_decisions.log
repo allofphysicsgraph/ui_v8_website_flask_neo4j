@@ -3,6 +3,34 @@
 ****************************
 2024-05-28
 
+design decision: live assessments over caching
+
+I don't care much about performance of page loads since page loads are less than 5 seconds.
+Therefore I see no value in caching results.
+
+Also, caching could give a false response if the cache isn't refreshed appropriately.
+
+Live assessments provide immediate indicators of failure (rather than obfuscating).
+
+Caching would be additional complexity for the design and implementation.
+
+
+****************************
+2024-05-28
+
+design decision: validate expressions and steps at page-load time or off-line?
+
+The cost of validating expressions and steps at page-load time is 
+longer page-load durations. 
+
+The cost of validating expressions and steps off-line (e.g., at time of entry or modification) is lower certainty that nothing has changed (e.g., to a symbol)
+
+I'm going to do validation at page-load time because validity isn't an intrinsic property of the node.
+
+
+****************************
+2024-05-28
+
 design decision: sequence order number as property of edge or node for steps
 
 Steps in a derivation are ordered. Two options for specifying the order:

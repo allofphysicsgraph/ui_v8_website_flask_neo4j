@@ -8,6 +8,16 @@
 import random
 
 import sympy
+from sympy.physics.units import (
+    mass,
+    length,
+    time,
+    temperature,
+    luminous_intensity,
+    amount_of_substance,
+    charge,
+)
+from sympy.physics.units.systems.si import dimsys_SI  # type: ignore
 
 
 def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
@@ -30,6 +40,14 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
     print(
         "[TRACE] func: sympy_validate_expression/convert_sympy_expr_to_pdg_symbols start "
         + trace_id
+    )
+    print(
+        "sympy_validate_expression/convert_sympy_expr_to_pdg_symbols: sympy_expr=",
+        sympy_expr,
+    )
+    print(
+        "sympy_validate_expression/convert_sympy_expr_to_pdg_symbols: symbol_id_dict=",
+        symbol_id_dict,
     )
 
     print("sympy_expr.atoms=", sympy_expr.atoms())
@@ -58,3 +76,114 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
         + trace_id
     )
     return revised_expr
+
+
+def dimensional_consistency(
+    expression_dict: dict,
+    list_of_symbol_IDs_in_expression: list,
+    dict_of_all_symbol_dicts: dict,
+):
+    """
+    see sympy_validate_expression.README.md for more explanation.
+
+    >>> expression_dict = {'id': '9942'}
+    >>> dict_of_all_symbol_dicts = {'9942': {'id': '9942'}}
+    >>> dimensional_consistency(expression_dict,
+                                dict_of_all_symbol_dicts)
+    unknown
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print(
+        "[TRACE] func: sympy_validate_expression/dimensional_consistency start "
+        + trace_id
+    )
+    print("expression_dict=", expression_dict)
+    print("list_of_symbol_IDs_in_expression", list_of_symbol_IDs_in_expression)
+
+    if "sympy" not in expression_dict.keys():
+        return "sympy not provided for expression"
+
+    sympy_expr = eval(expression_dict["sympy"])
+    print("sympy_validate_expression/dimensional_consistency: sympy_expr=", sympy_expr)
+    try:
+        LHS = sympy_expr.lhs
+        RHS = sympy_expr.rhs
+    except Exception as err:
+        print(str(err))
+        return "unable to determine LHS,RHS for" + str(sympy_expr)
+
+    print("sympy_validate_expression/dimensional_consistency: LHS=", LHS)
+    print("sympy_validate_expression/dimensional_consistency: RHS=", RHS)
+
+    # for each symbol used in the expression,
+    # convert the numeric value for each dimension
+    # into a SymPy expression that gets multiplied together for all dimensions
+    for symbol_id in list_of_symbol_IDs_in_expression:
+        this_symbol_dict = dict_of_all_symbol_dicts[symbol_id]
+        symbol_dim_powers = ""
+        if this_symbol_dict["dimension_time"] != 0:
+            symbol_dim_powers += (
+                "time**(" + str(this_symbol_dict["dimension_time"]) + ")*"
+            )
+        if this_symbol_dict["dimension_electric_charge"] != 0:
+            symbol_dim_powers += (
+                "charge**(" + str(this_symbol_dict["dimension_electric_charge"]) + ")*"
+            )
+        if this_symbol_dict["dimension_luminous_intensity"] != 0:
+            symbol_dim_powers += (
+                "luminous_intensity**("
+                + str(this_symbol_dict["dimension_luminous_intensity"])
+                + ")*"
+            )
+        if this_symbol_dict["dimension_length"] != 0:
+            symbol_dim_powers += (
+                "length**(" + str(this_symbol_dict["dimension_length"]) + ")*"
+            )
+        if this_symbol_dict["dimension_amount_of_substance"] != 0:
+            symbol_dim_powers += (
+                "amount_of_substance**("
+                + str(this_symbol_dict["dimension_amount_of_substance"])
+                + ")*"
+            )
+        if this_symbol_dict["dimension_mass"] != 0:
+            symbol_dim_powers += (
+                "mass**(" + str(this_symbol_dict["dimension_mass"]) + ")*"
+            )
+        if this_symbol_dict["dimension_temperature"] != 0:
+            symbol_dim_powers += (
+                "temperature**(" + str(this_symbol_dict["dimension_temperature"]) + ")*"
+            )
+
+        print("symbol_dim_powers=", symbol_dim_powers[:-1])
+
+        if (
+            symbol_dim_powers[:-1] == ""
+        ):  # everything was dimensionless for this variable
+            symbol_dim_powers_result = "mass/mass"
+        else:
+            symbol_dim_powers_result = symbol_dim_powers[:-1]
+
+        print("symbol_dim_powers_result=", symbol_dim_powers_result)
+
+        exec("pdg" + str(symbol_id) + " = " + symbol_dim_powers_result)
+
+    # now that the symbol dimensions have been set,
+    # evaluate the dimensionality of the expression
+
+    try:
+        determine_consistency_bool = dimsys_SI.equivalent_dims(
+            eval(str(LHS)), eval(str(RHS))
+        )
+    except Exception as err:
+        return "error for dim with " + expr_global_id
+
+    if determine_consistency_bool:
+        return "dimensions are consistent"
+    else:
+        return "inconsistent dimensions"
+
+    print(
+        "[TRACE] func: sympy_validate_expression/dimensional_consistency start "
+        + trace_id
+    )
+    return "unknown"

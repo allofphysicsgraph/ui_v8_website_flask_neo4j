@@ -53,7 +53,9 @@
       { % endfor %}
     </td> <!-- operations -->
     <td>{{ expression_dict['sympy'] }}</td>
-    <TD>TODO</TD>
+    <TD>
+      <a href="{{ url_for( 'to_edit_expression', expression_id=expression_dict['id'] ) }}">
+        {{ dimensional_consistency_per_expression_id[expression_dict['id']] }}</a></TD>
     <td>{{ expression_dict['lean'] }}</td>
   </tr>
   {% endfor %}
