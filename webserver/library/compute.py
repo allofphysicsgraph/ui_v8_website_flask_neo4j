@@ -80,71 +80,71 @@ def get_dict_of_derivations_that_use_symbol(
     return dict_of_derivations_that_use_symbol, query_time_dict
 
 
-def get_dict_of_symbol_dicts(graphDB_Driver, query_time_dict: dict):
+def get_dict_of_node_dicts(graphDB_Driver, query_time_dict: dict, node_type:str):
     """
     >>> get_dict_of_symbol_dicts()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: compute/get_dict_of_symbol_dicts start " + trace_id)
+    print("[TRACE] func: compute/get_dict_of_node_dicts start " + trace_id)
 
-    list_of_all_symbol_dicts = []
+    list_of_all_node_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_all_symbol_dicts = session.read_transaction(
-            neo4j_query.list_nodes_of_type, "symbol"
+        list_of_all_node_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, node_type
         )
-        query_time_dict["get_dict_of_symbol_dicts, list_nodes_of_type"] = (
+        query_time_dict["get_dict_of_node_dicts, list_nodes_of_type"] = (
             time.time() - query_start_time
         )
-    print("list_of_all_symbol_dicts=", list_of_all_symbol_dicts)
+    print("list_of_all_node_dicts=", list_of_all_node_dicts)
 
-    dict_of_all_symbol_dicts = {}
-    for this_symbol_dict in list_of_all_symbol_dicts:
-        dict_of_all_symbol_dicts[this_symbol_dict["id"]] = this_symbol_dict
-    print("dict_of_all_symbol_dicts=", dict_of_all_symbol_dicts)
+    dict_of_all_node_dicts = {}
+    for this_node_dict in list_of_all_node_dicts:
+        dict_of_all_node_dicts[this_node_dict["id"]] = this_node_dict
+    print("dict_of_all_node_dicts=", dict_of_all_node_dicts)
 
-    print("[TRACE] func: compute/get_dict_of_symbol_dicts end " + trace_id)
-    return dict_of_all_symbol_dicts, query_time_dict
+    print("[TRACE] func: compute/get_dict_of_node_dicts end " + trace_id)
+    return dict_of_all_node_dicts, query_time_dict
 
 
-def split_symbol_categories(graphDB_Driver, query_time_dict: dict):
-    """ """
+# def split_symbol_categories(graphDB_Driver, query_time_dict: dict):
+#     """ """
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_symbol_dicts = session.read_transaction(
-            neo4j_query.list_nodes_of_type, "symbol"
-        )
-        query_time_dict["split_symbol_categories: list_nodes_of_type symbol"] = (
-            time.time() - query_start_time
-        )
-    print("list_of_symbol_dicts=", list_of_symbol_dicts)
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         list_of_symbol_dicts = session.read_transaction(
+#             neo4j_query.list_nodes_of_type, "symbol"
+#         )
+#         query_time_dict["split_symbol_categories: list_nodes_of_type symbol"] = (
+#             time.time() - query_start_time
+#         )
+#     print("list_of_symbol_dicts=", list_of_symbol_dicts)
 
-    list_of_operation_dicts = []
-    list_of_dimension0_symbol_dicts = []
-    list_of_dimension1_symbol_dicts = []
-    list_of_dimension2ormore_symbol_dicts = []
+#     list_of_operation_dicts = []
+#     list_of_dimension0_symbol_dicts = []
+#     list_of_dimension1_symbol_dicts = []
+#     list_of_dimension2ormore_symbol_dicts = []
 
-    for this_symbol_dict in list_of_symbol_dicts:
-        print("this_symbol_dict=", this_symbol_dict)
-        if this_symbol_dict["requires_arguments"]:
-            list_of_operation_dicts.append(this_symbol_dict)
-        else:
-            if this_symbol_dict["dimension_count"] == 0:
-                list_of_dimension0_symbol_dicts.append(this_symbol_dict)
-            elif this_symbol_dict["dimension_count"] == 1:
-                list_of_dimension1_symbol_dicts.append(this_symbol_dict)
-            else:
-                list_of_dimension2ormore_symbol_dicts.append(this_symbol_dict)
+#     for this_symbol_dict in list_of_symbol_dicts:
+#         print("this_symbol_dict=", this_symbol_dict)
+#         if this_symbol_dict["requires_arguments"]:
+#             list_of_operation_dicts.append(this_symbol_dict)
+#         else:
+#             if this_symbol_dict["dimension_count"] == 0:
+#                 list_of_dimension0_symbol_dicts.append(this_symbol_dict)
+#             elif this_symbol_dict["dimension_count"] == 1:
+#                 list_of_dimension1_symbol_dicts.append(this_symbol_dict)
+#             else:
+#                 list_of_dimension2ormore_symbol_dicts.append(this_symbol_dict)
 
-    return (
-        query_time_dict,
-        list_of_symbol_dicts,
-        list_of_operation_dicts,
-        list_of_dimension0_symbol_dicts,
-        list_of_dimension1_symbol_dicts,
-        list_of_dimension2ormore_symbol_dicts,
-    )
+#     return (
+#         query_time_dict,
+#         list_of_symbol_dicts,
+#         list_of_operation_dicts,
+#         list_of_dimension0_symbol_dicts,
+#         list_of_dimension1_symbol_dicts,
+#         list_of_dimension2ormore_symbol_dicts,
+#     )
 
 
 # def get_dict_of_operation_dicts(

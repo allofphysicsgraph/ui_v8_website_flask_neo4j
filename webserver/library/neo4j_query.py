@@ -158,7 +158,7 @@ def constrain_unique_id(tx) -> None:
     return
 
 
-def symbols_in_expression(tx, expression_id: str) -> list:
+def symbols_in_expression(tx, expression_id: str, symbol_type: str) -> list:
     """
     an expression typically has one or more sybmols
     This read query returns which symbol IDs are used for the provided expression ID
@@ -169,9 +169,13 @@ def symbols_in_expression(tx, expression_id: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/symbols_in_expression start " + trace_id)
 
+    print("neo4j_query/symbols_in_expression: symbol_type=",symbol_type)
+
+    assert symbol_type in ["operation", "scalar", "vector", "matrix"]
+
     symbol_list = []
     for result in tx.run(
-        "MATCH (e:expression)-[:HAS_SYMBOL]->(s:symbol) WHERE e.id='"
+        "MATCH (e:expression)-[:HAS_SYMBOL]->(s:'"+symbol_type+"') WHERE e.id='"
         + expression_id
         + "' RETURN s.id"
     ):
@@ -949,7 +953,7 @@ def add_expression(
     return
 
 
-def add_symbol(
+def add_quantum_operator_symbol(
     tx,
     symbol_id: str,
     symbol_name: str,
@@ -982,7 +986,7 @@ def add_symbol(
     return
 
 
-def add_symbol_direct_scalar(
+def add_scalar_symbol(
     tx,
     symbol_id: str,
     symbol_name: str,
@@ -1038,7 +1042,7 @@ def add_symbol_direct_scalar(
     return
 
 
-def add_symbol_direct_vector(
+def add_vector_symbol(
     tx,
     symbol_id: str,
     symbol_name: str,
@@ -1096,7 +1100,7 @@ def add_symbol_direct_vector(
     return
 
 
-def add_symbol_direct_matrix(
+def add_matrix_symbol(
     tx,
     symbol_id: str,
     symbol_name: str,
@@ -1153,7 +1157,7 @@ def add_symbol_direct_matrix(
     return
 
 
-def add_symbol_direct_operation(
+def add_operation_symbol(
     tx,
     operation_id: str,
     operation_name: str,

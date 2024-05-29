@@ -11,9 +11,15 @@
   <LI><a href="{{ url_for('to_list_derivations') }}?referrer=main">show {{ number_of_derivations }} derivations</a>, from which you can select a derivation to review.</LI>
   <LI><a href="{{ url_for('to_list_inference_rules') }}?referrer=main">show {{ number_of_inference_rules }} inference rules</a></LI>
   <LI><a href="{{ url_for('to_list_expressions') }}?referrer=main">show {{ number_of_expressions }} expressions</a></LI>
-  <LI><a href="{{ url_for('to_list_symbols') }}?referrer=main">show {{ number_of_symbols }} symbols</a>
-  (of which {{ number_of_operations }} are 
-<a href="{{ url_for('to_list_operations') }}?referrer=main">operations</a>)</LI>
+  <LI><a href="{{ url_for('to_list_feeds') }}?referrer=main">show {{ number_of_feeds }} feeds</a></LI>
+  <LI>symbols</LI>
+  <UL>
+    <LI><a href="{{ url_for('to_list_operations') }}?referrer=main">show {{ number_of_operations }} operations</a></LI>
+    <LI><a href="{{ url_for('to_list_scalars') }}?referrer=main">show {{ number_of_scalars }} scalars</a></LI>
+    <LI><a href="{{ url_for('to_list_vectors') }}?referrer=main">show {{ number_of_vectors }} vectors</a></LI>
+    <LI><a href="{{ url_for('to_list_matrices') }}?referrer=main">show {{ number_of_matrices }} matrices</a></LI>
+  </UL>
+
   <!--<LI><a href="{ { url_for('to_list_operations') }}?referrer=main">show { { number_of_operations } } operations</a> (<small>positive number of arguments required</small>)</LI>-->
   <!--
   <LI><a href="{ { url _for('to_list_all_nodes') }}?referrer=main">show all nodes</a>            (status: TODO)</LI>

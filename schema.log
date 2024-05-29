@@ -15,8 +15,43 @@ properties={'author_name_latex': str,     # 'jane doe'
             'id': str,                    # '2627576'
             'created_datetime': str}      # '2022-11-25_02-12-22-905120'
 
+node type: 'feed'
+properties={'author_name_latex': str      # 'jane doe'
+            'id': str,                    # '9424534'
+            'sympy': str,                 # "sympy.Symbol('a')"
+            'latex': str}                 # '\alpha'
 
-node type: 'symbol'
+
+node type: 'operation'
+properties={'author_name_latex': str      # 'jane doe'
+            'name_latex': str,            # 'speed of an unladen swallow'
+            'description_latex': str,     # 'explanation goes here'
+            'id': str,                    # '9424534'
+            'latex': str}                 # '\alpha'
+
+
+node type: 'scalar'
+properties={'author_name_latex': str      # 'jane doe'
+            'name_latex': str,            # 'speed of an unladen swallow'
+            'description_latex': str,     # 'explanation goes here'
+            'id': str,                    # '9424534'
+            'latex': str}                 # '\alpha'
+
+node type: 'vector'
+properties={'author_name_latex': str      # 'jane doe'
+            'name_latex': str,            # 'speed of an unladen swallow'
+            'description_latex': str,     # 'explanation goes here'
+            'id': str,                    # '9424534'
+            'latex': str}                 # '\alpha'
+
+node type: 'matrix'
+properties={'author_name_latex': str      # 'jane doe'
+            'name_latex': str,            # 'speed of an unladen swallow'
+            'description_latex': str,     # 'explanation goes here'
+            'id': str,                    # '9424534'
+            'latex': str}                 # '\alpha'
+
+node type: 'quantum_operator'
 properties={'author_name_latex': str      # 'jane doe'
             'name_latex': str,            # 'speed of an unladen swallow'
             'description_latex': str,     # 'explanation goes here'

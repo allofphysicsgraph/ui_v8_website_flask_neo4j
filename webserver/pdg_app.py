@@ -310,7 +310,7 @@ class SpecifyNewSympyLeanForm(FlaskForm):
     )
 
 
-class SpecifyNewSymbolDIRECTScalarForm(FlaskForm):
+class SpecifyNewSymbolScalarForm(FlaskForm):
     """
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
@@ -398,7 +398,7 @@ class SpecifyNewSymbolDIRECTScalarForm(FlaskForm):
     )
 
 
-class SpecifyNewSymbolDIRECTVectorForm(FlaskForm):
+class SpecifyNewSymbolVectorForm(FlaskForm):
     """
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
@@ -447,7 +447,7 @@ class SpecifyNewSymbolDIRECTVectorForm(FlaskForm):
     )
 
 
-class SpecifyNewSymbolDIRECTMatrixForm(FlaskForm):
+class SpecifyNewSymbolMatrixForm(FlaskForm):
     """
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
@@ -491,7 +491,7 @@ class SpecifyNewSymbolDIRECTMatrixForm(FlaskForm):
     )
 
 
-class SpecifyNewSymbolDIRECTOperationForm(FlaskForm):
+class SpecifyNewSymbolOperationForm(FlaskForm):
     operation_latex = StringField(
         "LaTeX symbol",
         validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
@@ -568,7 +568,7 @@ class SpecifyNewSymbolDimensionCountForm(FlaskForm):
 
 class SpecifyNewSymbolDimension0Form(FlaskForm):
     """
-    This overlaps with SpecifyNewSymbolDIRECTScalarForm
+    This overlaps with SpecifyNewSymbolScalarForm
     """
 
     # https://en.wikipedia.org/wiki/List_of_types_of_numbers
@@ -794,29 +794,45 @@ def main() -> str:
             time.time() - query_start_time
         )
 
-    number_of_symbols = None
+    number_of_scalars = None
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        number_of_symbols = len(
-            session.read_transaction(neo4j_query.list_nodes_of_type, "symbol")
+        number_of_scalars = len(
+            session.read_transaction(neo4j_query.list_nodes_of_type, "scalar")
         )
-        query_time_dict["main: list_nodes_of_type, symbol"] = (
+        query_time_dict["main: list_nodes_of_type, scalar"] = (
+            time.time() - query_start_time
+        )
+
+    number_of_vectors = None
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        number_of_vectors = len(
+            session.read_transaction(neo4j_query.list_nodes_of_type, "vector")
+        )
+        query_time_dict["main: list_nodes_of_type, vector"] = (
+            time.time() - query_start_time
+        )
+
+    number_of_matrices = None
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        number_of_matrices = len(
+            session.read_transaction(neo4j_query.list_nodes_of_type, "matrix")
+        )
+        query_time_dict["main: list_nodes_of_type, matrix"] = (
             time.time() - query_start_time
         )
 
     number_of_operations = 0
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_symbol_dicts = session.read_transaction(
-            neo4j_query.list_nodes_of_type, "symbol"
-        )
+        number_of_operations = len(session.read_transaction(
+            neo4j_query.list_nodes_of_type, "operation"
+        ))
         query_time_dict["main: list_nodes_of_type, symbol for operation"] = (
             time.time() - query_start_time
         )
-    # filter "list_of_symbol_dicts" down to "list_of_operation_dicts"
-    for this_symbol_dict in list_of_symbol_dicts:
-        if this_symbol_dict["requires_arguments"]:
-            number_of_operations += 1
 
     print("[TRACE] func: app/main end " + trace_id)
     return render_template(
@@ -826,7 +842,9 @@ def main() -> str:
         number_of_derivations=number_of_derivations,
         number_of_inference_rules=number_of_inference_rules,
         number_of_expressions=number_of_expressions,
-        number_of_symbols=number_of_symbols,
+        number_of_scalars=number_of_scalars,
+        number_of_vectors=number_of_vectors,
+        number_of_matrices=number_of_matrices,
         number_of_operations=number_of_operations,
     )
 
@@ -1469,14 +1487,17 @@ def to_add_expression() -> str:
 
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            list_of_symbol_IDs_in_expression = session.read_transaction(
-                neo4j_query.symbols_in_expression, this_expression_dict["id"]
+            list_of_symbol_scalar_IDs_in_expression = session.read_transaction(
+                neo4j_query.symbols_in_expression, this_expression_dict["id"], "scalar"
             )
             query_time_dict["symbols_in_expression: "] = time.time() - query_start_time
+
+        print("list_of_symbol_scalar_IDs_in_expression=",list_of_symbol_scalar_IDs_in_expression)
+        
         dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
             sympy_validate_expression.dimensional_consistency(
                 this_expression_dict,
-                list_of_symbol_IDs_in_expression,
+                list_of_symbol_scalar_IDs_in_expression,
                 dict_of_all_symbol_dicts,
             )
         )
@@ -1691,7 +1712,7 @@ def to_edit_symbol(symbol_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: app/to_edit_symbol end " + trace_id)
     return render_template(
-        "symbol_edit.html",
+        "symbol_scalar_edit.html",
         query_time_dict=query_time_dict,
         form_symbol_properties=web_form_symbol_properties,
         form_no_options=web_form_no_options,
@@ -1709,7 +1730,7 @@ def to_add_symbol_scalar() -> str:
     print("[TRACE] func: app/to_add_symbol_scalar start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    web_form_symbol_properties = SpecifyNewSymbolDIRECTScalarForm(request.form)
+    web_form_symbol_properties = SpecifyNewSymbolScalarForm(request.form)
     if request.method == "POST" and web_form_symbol_properties.validate():
         print("request.form = ", request.form)
 
@@ -1801,7 +1822,7 @@ def to_add_symbol_scalar() -> str:
 
     print("[TRACE] func: app/to_add_symbol_scalar end " + trace_id)
     return render_template(
-        "symbol_create_direct_scalar.html",
+        "symbol_scalar_create.html",
         query_time_dict=query_time_dict,
         form_symbol_properties=web_form_symbol_properties,
         list_of_dimension0_symbol_dicts=list_of_dimension0_symbol_dicts,
@@ -1819,7 +1840,7 @@ def to_add_symbol_vector() -> str:
     print("[TRACE] func: app/to_add_symbol_vector start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    web_form_symbol_properties = SpecifyNewSymbolDIRECTVectorForm(request.form)
+    web_form_symbol_properties = SpecifyNewSymbolVectorForm(request.form)
 
     if request.method == "POST" and web_form_symbol_properties.validate():
         print("request.form = ", request.form)
@@ -1884,7 +1905,7 @@ def to_add_symbol_vector() -> str:
 
     print("[TRACE] func: app/to_add_symbol_vector end " + trace_id)
     return render_template(
-        "symbol_create_direct_vector.html",
+        "symbol_vector_create.html",
         query_time_dict=query_time_dict,
         form_symbol_properties=web_form_symbol_properties,
         list_of_dimension1_symbol_dicts=list_of_dimension1_symbol_dicts,
@@ -1900,7 +1921,7 @@ def to_add_symbol_matrix() -> str:
     print("[TRACE] func: app/to_add_symbol_matrix start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    web_form_symbol_properties = SpecifyNewSymbolDIRECTMatrixForm(request.form)
+    web_form_symbol_properties = SpecifyNewSymbolMatrixForm(request.form)
     if request.method == "POST" and web_form_symbol_properties.validate():
         print("request.form = ", request.form)
 
@@ -1965,7 +1986,7 @@ def to_add_symbol_matrix() -> str:
 
     print("[TRACE] func: app/to_add_symbol_matrix end " + trace_id)
     return render_template(
-        "symbol_create_direct_matrix.html",
+        "symbol_matrix_create.html",
         query_time_dict=query_time_dict,
         form_symbol_properties=web_form_symbol_properties,
         list_of_dimension2ormore_symbol_dicts=list_of_dimension2ormore_symbol_dicts,
@@ -2558,7 +2579,7 @@ def to_add_operation() -> str:
         graphDB_Driver, query_time_dict, list_of_operation_dicts
     )
 
-    web_form = SpecifyNewSymbolDIRECTOperationForm(request.form)
+    web_form = SpecifyNewSymbolOperationForm(request.form)
     if request.method == "POST" and web_form.validate():
         print("request.form = ", request.form)
 
@@ -2600,7 +2621,7 @@ def to_add_operation() -> str:
 
     print("[TRACE] func: app/to_add_operation end " + trace_id)
     return render_template(
-        "symbol_create_direct_operation.html",
+        "symbol_operation_create.html",
         query_time_dict=query_time_dict,
         form_operation_properties=web_form,
         list_of_operation_dicts=list_of_operation_dicts,
