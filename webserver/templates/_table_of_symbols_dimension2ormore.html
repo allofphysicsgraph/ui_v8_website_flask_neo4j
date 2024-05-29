@@ -26,7 +26,7 @@
   {% for symbol_dict in list_of_dimension2ormore_symbol_dicts %}
   <tr>
     <td>
-      <a href="{{ url_for( 'to_edit_symbol', symbol_id=symbol_dict['id'] ) }}">
+      <a href="{{ url_for( 'to_edit_matrix_symbol', matrix_id=symbol_dict['id'] ) }}">
           {{ symbol_dict['id'] }}
       </a>
     </td>

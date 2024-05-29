@@ -1541,6 +1541,268 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_expressions"))
 
 
+@web_app.route("/edit_feed/<feed_id>", methods=["GET", "POST"])
+def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
+    """
+    edit feed
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: app/to_edit_feed start " + trace_id)
+    query_time_dict = {}  # type: Dict[str, float]
+
+    print("pdg_app/to_edit_feed: feed_id: ", feed_id)
+
+    feed_dict = {}
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        feed_dict = session.read_transaction(
+            neo4j_query.node_properties, "feed", feed_id
+        )
+    print("pdg_app/to_edit_feed: feed_dict:", feed_dict)
+
+    # editing the feed includes modifying the symbols present.
+
+    dict_of_all_symbol_dicts = {}  # type: Dict[str,dict]
+
+    dict_of_all_operation_dicts, query_time_dict = compute.get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "operation"
+    )
+    for ke, val in dict_of_all_operation_dicts.items():
+        dict_of_all_symbol_dicts[ke] = val
+
+    dict_of_all_scalar_dicts, query_time_dict = compute.get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "scalar"
+    )
+    for ke, val in dict_of_all_scalar_dicts.items():
+        dict_of_all_symbol_dicts[ke] = val
+
+    dict_of_all_vector_dicts, query_time_dict = compute.get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "vector"
+    )
+    for ke, val in dict_of_all_vector_dicts.items():
+        dict_of_all_symbol_dicts[ke] = val
+
+    dict_of_all_matrix_dicts, query_time_dict = compute.get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "matrix"
+    )
+    for ke, val in dict_of_all_matrix_dicts.items():
+        dict_of_all_symbol_dicts[ke] = val
+
+    print(
+        "pdg_app/to_edit_feed: dict_of_all_symbol_dicts=",
+        dict_of_all_symbol_dicts,
+    )
+    # dict_of_all_operation_dicts = compute.get_dict_of_operation_dicts(graphDB_Driver)
+    # print("dict_of_all_operation_dicts=", dict_of_all_operation_dicts)
+
+    list_of_symbol_IDs_in_feed = []
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_operation_IDs_in_feed = session.read_transaction(
+            neo4j_query.symbols_in_feed, feed_id, "operation"
+        )
+    for this_id in list_of_operation_IDs_in_feed:
+        list_of_symbol_IDs_in_feed.append(this_id)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_scalar_IDs_in_feed = session.read_transaction(
+            neo4j_query.symbols_in_feed, feed_id, "scalar"
+        )
+    for this_id in list_of_scalar_IDs_in_feed:
+        list_of_symbol_IDs_in_feed.append(this_id)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_vector_IDs_in_feed = session.read_transaction(
+            neo4j_query.symbols_in_feed, feed_id, "vector"
+        )
+    for this_id in list_of_vector_IDs_in_feed:
+        list_of_symbol_IDs_in_feed.append(this_id)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_matrix_IDs_in_feed = session.read_transaction(
+            neo4j_query.symbols_in_feed, feed_id, "matrix"
+        )
+    for this_id in list_of_matrix_IDs_in_feed:
+        list_of_symbol_IDs_in_feed.append(this_id)
+
+    print(
+        "pdg_app/to_edit_feed: feed_id=",
+        feed_id,
+        "list_of_symbol_IDs_in_feed=",
+        list_of_symbol_IDs_in_feed,
+    )
+
+    list_of_feed_dicts = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_feed_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, "feed"
+        )
+        query_time_dict["to_edit_feed: list_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
+
+    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
+    for this_feed_dict in list_of_feed_dicts:
+        if "sympy" in this_feed_dict.keys():
+            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = (
+                latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
+            )
+        else:
+            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = None
+
+    dict_of_symbol_dicts_in_feed = {}
+    for this_symbol_ID in list_of_symbol_IDs_in_feed:
+        print("pdg_app/to_edit_feed: this_symbol_ID=", this_symbol_ID)
+        print("dict_of_all_symbol_dicts.keys()=", dict_of_all_symbol_dicts.keys())
+        dict_of_symbol_dicts_in_feed[this_symbol_ID] = dict_of_all_symbol_dicts[
+            this_symbol_ID
+        ]
+    print("dict_of_symbol_dicts_in_feed=", dict_of_symbol_dicts_in_feed)
+
+    # create new dict of symbols NOT used in feed
+    dict_of_symbol_dicts_not_in_feed = {}
+    for this_symbol_id in dict_of_all_symbol_dicts.keys():
+        if this_symbol_id not in dict_of_symbol_dicts_in_feed.keys():
+            dict_of_symbol_dicts_not_in_feed[this_symbol_id] = dict_of_all_symbol_dicts[
+                this_symbol_id
+            ]
+    print(
+        "dict_of_symbol_dicts_not_in_feed=",
+        dict_of_symbol_dicts_not_in_feed,
+    )
+
+    # # create new dict of operations NOT used in feed
+    # dict_of_operation_dicts_not_in_feed = {}
+    # for this_operation_id in dict_of_all_operation_dicts.keys():
+    #     if this_operation_id not in dict_of_operation_dicts_in_feed.keys():
+    #         dict_of_operation_dicts_not_in_feed[this_operation_id] = (
+    #             dict_of_all_operation_dicts[this_operation_id]
+    #         )
+
+    web_form_new_feed = SpecifyNewfeedForm(request.form)
+    if request.method == "POST" and web_form_new_feed.validate():
+        print("to_edit_feed: with web_form, request.form = ", request.form)
+
+        feed_latex = (
+            str(web_form_new_feed.feed_latex.data).strip().replace("\\", "\\\\")
+        )
+        feed_name = str(web_form_new_feed.feed_name.data).strip()
+        feed_description = str(web_form_new_feed.feed_description.data).strip()
+
+        print("pdg_app/to_edit_feed: feed_latex=", feed_latex)
+        print("pdg_app/to_edit_feed: feed_name=", feed_name)
+        print(
+            "pdg_app/to_edit_feed: feed_description=",
+            feed_description,
+        )
+
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
+        author_name_latex = "ben"
+
+        # https://neo4j.com/docs/python-manual/current/session-api/
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            session.write_transaction(
+                neo4j_query.edit_feed,
+                feed_id,
+                feed_latex,
+                feed_name,
+                feed_description,
+                now_str,
+                author_name_latex,
+            )
+
+    web_form_no_options = NoOptionsForm(request.form)
+    # web_form_no_options = DeleteButtonForm(request.form)
+    if request.method == "POST":
+        print("to_edit_feed: no web_form; request.form = ", request.form)
+
+        print("to_edit_feed: no web_form; request.form.keys()", request.form.keys())
+
+        print(
+            "to_edit_feed: no web_form; len(request.form.keys())",
+            len(request.form.keys()),
+        )
+
+        # the "delete" button returns a dict with only the csrf token, so len==1
+        if len(request.form.keys()) == 1:
+            # https://neo4j.com/docs/python-manual/current/session-api/
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.delete_node,
+                    feed_id,
+                    "feed",
+                )
+                query_time_dict["to_edit_feed: delete_node"] = (
+                    time.time() - query_start_time
+                )
+
+        if "symbol_select_id_to_disconnect" in request.form.keys():
+            symbol_id_to_disconnect = str(
+                request.form["symbol_select_id_to_disconnect"]
+            )
+            print("to_edit_feed: symbol_id_to_disconnect=", symbol_id_to_disconnect)
+
+            # TODO: user was provided all the symbols as an optional disconnect
+            # but the function only handles disconnects of specific types (e.g., scalar, vector)
+            # FAULT EXPECTED for non-scalar disconnect requests
+
+            # https://neo4j.com/docs/python-manual/current/session-api/
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.disconnect_symbol_from_feed,
+                    symbol_id_to_disconnect,
+                    feed_id,
+                    "scalar",
+                )
+                query_time_dict["to_edit_feed: disconnect_symbol_from_feed"] = (
+                    time.time() - query_start_time
+                )
+
+        if "symbol_select_id_to_add" in request.form.keys():
+            symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
+            print("to_edit_feed: symbol_id_to_add=", symbol_id_to_add)
+
+            # TODO: user provided a symbol, but adding is per-category
+            # FAULT EXPECTED for non-scalar add
+
+            # https://neo4j.com/docs/python-manual/current/session-api/
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.add_symbol_to_feed,
+                    symbol_id_to_add,
+                    feed_id,
+                    "scalar",
+                )
+                query_time_dict["to_edit_feed: add_symbol_to_feed"] = (
+                    time.time() - query_start_time
+                )
+
+    print("[TRACE] func: app/to_edit_feed end " + trace_id)
+    return render_template(
+        "feed_edit.html",
+        query_time_dict=query_time_dict,
+        form_no_options=web_form_no_options,
+        form_new_feed=web_form_new_feed,
+        dict_of_symbol_dicts_in_feed=dict_of_symbol_dicts_in_feed,
+        dict_of_symbol_dicts_not_in_feed=dict_of_symbol_dicts_not_in_feed,
+        feed_dict=feed_dict,
+        sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
+        dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
+    )
+    # return redirect(url_for("to_list_feeds"))
+
+
 @web_app.route("/new_expression/", methods=["GET", "POST"])
 def to_add_expression() -> str:
     """
@@ -1729,12 +1991,12 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_operations"))
 
 
-@web_app.route("/edit_scalar_symbol/<symbol_id>", methods=["GET", "POST"])
-def to_edit_scalar_symbol(symbol_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_scalar_symbol/<scalar_id>", methods=["GET", "POST"])
+def to_edit_scalar_symbol(scalar_id: unique_numeric_id_as_str) -> str:
     """
     edit symbol
 
-    >>> to_edit_symbol()
+    >>> to_edit_scalar_symbol()
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: app/to_edit_scalar_symbol start " + trace_id)
@@ -1748,7 +2010,7 @@ def to_edit_scalar_symbol(symbol_id: unique_numeric_id_as_str) -> str:
         symbol_dict = session.read_transaction(
             neo4j_query.node_properties, "scalar", symbol_id
         )
-        query_time_dict["to_edit_symbol: node_properties"] = (
+        query_time_dict["to_edit_scalar_symbol: node_properties"] = (
             time.time() - query_start_time
         )
     print("symbol_dict:", symbol_dict)
@@ -1788,7 +2050,7 @@ def to_edit_scalar_symbol(symbol_id: unique_numeric_id_as_str) -> str:
     # elif request.method == "POST" and web_form_symbol_properties_vector.validate():
     #     print("request.form = ", request.form)
 
-    #     print("[TRACE] func: app/to_edit_symbol end " + trace_id)
+    #     print("[TRACE] func: app/to_edit_scalar_symbol end " + trace_id)
     #     return redirect(url_for("to_list_symbols"))
 
     elif request.method == "POST":
@@ -1806,6 +2068,50 @@ def to_edit_scalar_symbol(symbol_id: unique_numeric_id_as_str) -> str:
         form_symbol_properties=web_form_symbol_properties,
         form_no_options=web_form_no_options,
         symbol_dict=symbol_dict,
+    )
+
+
+@web_app.route("/edit_vector_symbol/<vector_id>", methods=["GET", "POST"])
+def to_edit_vector_symbol(vector_id: unique_numeric_id_as_str) -> str:
+    """
+    edit vector
+
+    >>> to_edit_vector_symbol()
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: app/to_edit_vector_symbol start " + trace_id)
+    query_time_dict = {}  # type: Dict[str, float]
+
+    print("vector_id: ", vector_id)
+
+    # TODO
+
+    print("[TRACE] func: app/to_edit_vector_symbol end " + trace_id)
+    return render_template(
+        "symbol_vector_edit.html",
+        query_time_dict=query_time_dict,
+    )
+
+
+@web_app.route("/edit_matrix_symbol/<matrix_id>", methods=["GET", "POST"])
+def to_edit_matrix_symbol(matrix_id: unique_numeric_id_as_str) -> str:
+    """
+    edit matrix
+
+    >>> to_edit_matrix_symbol()
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: app/to_edit_matrix_symbol start " + trace_id)
+    query_time_dict = {}  # type: Dict[str, float]
+
+    print("matrix_id: ", matrix_id)
+
+    # TODO
+
+    print("[TRACE] func: app/to_edit_matrix_symbol end " + trace_id)
+    return render_template(
+        "symbol_matrix_edit.html",
+        query_time_dict=query_time_dict,
     )
 
 
@@ -2421,8 +2727,8 @@ def to_add_symbol_matrix() -> str:
 #     )
 
 
-@web_app.route("/new_symbol_dimension0_properties/<symbol_id>", methods=["GET", "POST"])
-def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
+@web_app.route("/new_symbol_dimension0_properties/<scalar_id>", methods=["GET", "POST"])
+def to_add_symbol_dimension0_properties(scalar_id: unique_numeric_id_as_str):
     """
     novel symbol: how many dimensions?
     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -2435,7 +2741,7 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         symbol_dict = session.read_transaction(
-            neo4j_query.node_properties, "symbol", symbol_id
+            neo4j_query.node_properties, "scalar", scalar_id
         )
         query_time_dict[
             "to_add_symbol_dimension0_properties: node_properties, symbol"
@@ -2451,8 +2757,8 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.edit_node_property,
-                "symbol",
-                symbol_id,
+                "scalar",
+                scalar_id,
                 "scope",
                 symbol_scope,
             )
@@ -2467,8 +2773,8 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.edit_node_property,
-                "symbol",
-                symbol_id,
+                "scalar",
+                scalar_id,
                 "variable_or_constant",
                 symbol_variable_or_constant,
             )
@@ -2481,8 +2787,8 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.edit_node_property,
-                "symbol",
-                symbol_id,
+                "scalar",
+                scalar_id,
                 "domain",
                 symbol_domain,
             )
@@ -2495,8 +2801,8 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.edit_node_property,
-                "symbol",
-                symbol_id,
+                "scalar",
+                scalar_id,
                 "dimension_length",
                 dimension_length,
             )
@@ -2509,8 +2815,8 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.edit_node_property,
-                "symbol",
-                symbol_id,
+                "scalar",
+                scalar_id,
                 "dimension_time",
                 dimension_time,
             )
@@ -2523,8 +2829,8 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.edit_node_property,
-                "symbol",
-                symbol_id,
+                "scalar",
+                scalar_id,
                 "dimension_mass",
                 dimension_mass,
             )
@@ -2539,8 +2845,8 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.edit_node_property,
-                "symbol",
-                symbol_id,
+                "scalar",
+                scalar_id,
                 "dimension_temperature",
                 dimension_temperature,
             )
@@ -2555,8 +2861,8 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.edit_node_property,
-                "symbol",
-                symbol_id,
+                "scalar",
+                scalar_id,
                 "dimension_electric_charge",
                 dimension_electric_charge,
             )
@@ -2571,8 +2877,8 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.edit_node_property,
-                "symbol",
-                symbol_id,
+                "scalar",
+                scalar_id,
                 "dimension_amount_of_substance",
                 dimension_amount_of_substance,
             )
@@ -2587,8 +2893,8 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.edit_node_property,
-                "symbol",
-                symbol_id,
+                "scalar",
+                scalar_id,
                 "dimension_luminous_intensity",
                 dimension_luminous_intensity,
             )
@@ -2617,8 +2923,8 @@ def to_add_symbol_dimension0_properties(symbol_id: unique_numeric_id_as_str):
     )
 
 
-@web_app.route("/new_symbol_dimension1_properties/<symbol_id>", methods=["GET", "POST"])
-def to_add_symbol_dimension1_properties(symbol_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/new_symbol_dimension1_properties/<vector_id>", methods=["GET", "POST"])
+def to_add_symbol_dimension1_properties(vector_id: unique_numeric_id_as_str) -> str:
     """
 
     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -2631,7 +2937,7 @@ def to_add_symbol_dimension1_properties(symbol_id: unique_numeric_id_as_str) -> 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         symbol_dict = session.read_transaction(
-            neo4j_query.node_properties, "symbol", symbol_id
+            neo4j_query.node_properties, "vector", symbol_id
         )
         query_time_dict[
             "to_add_symbol_dimension1_properties: node_properties, symbol"
@@ -2656,8 +2962,8 @@ def to_add_symbol_dimension1_properties(symbol_id: unique_numeric_id_as_str) -> 
     )
 
 
-@web_app.route("/new_symbol_dimension2_properties/<symbol_id>", methods=["GET", "POST"])
-def to_add_symbol_dimension2_properties(symbol_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/new_symbol_dimension2_properties/<matrix_id>", methods=["GET", "POST"])
+def to_add_symbol_dimension2_properties(matrix_id: unique_numeric_id_as_str) -> str:
     """
 
     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -2670,7 +2976,7 @@ def to_add_symbol_dimension2_properties(symbol_id: unique_numeric_id_as_str) -> 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         symbol_dict = session.read_transaction(
-            neo4j_query.node_properties, "symbol", symbol_id
+            neo4j_query.node_properties, "matrix", symbol_id
         )
         query_time_dict[
             "to_add_symbol_dimension2_properties: node_properties, symbol"

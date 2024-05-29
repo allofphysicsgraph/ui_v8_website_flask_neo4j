@@ -39,7 +39,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   {% for symbol_id, symbol_dict in dict_of_symbol_dicts_in_expression.items() %}
   <tr>
     <td>
-      <a href="{{ url_for( 'to_edit_symbol', symbol_id=symbol_id ) }}">
+      <a href="{{ url_for( 'to_edit_scalar_symbol', symbol_id=symbol_id ) }}">
           {{ symbol_id }}
       </a>
     </td>
@@ -120,7 +120,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   </tr>
   { % for symbol_id, symbol_dict in dict_of_operation_dicts_in_expression.items() %}
   <tr>
-    <td><a href="{ { url_for('to_edit_symbol', symbol_id=symbol_id) }}">{ { symbol_id }}</a></td> <!-- ID - ->
+    <td><a href="{ { url_for('to_edit_scalar_symbol', symbol_id=symbol_id) }}">{ { symbol_id }}</a></td> <!-- ID - ->
     <td>{ { symbol_dict['latex'] }}</td> <!-- latex -- >
     <td>{ { symbol_dict['name_latex'] }}</td> <!-- name - ->
     <td>{ { symbol_dict['number_of_arguments'] }}</td>

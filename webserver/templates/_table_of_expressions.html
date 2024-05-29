@@ -43,7 +43,7 @@
     <td>TODO</td> <!-- derivation -->
     <td>{% for symbol_id in symbols_per_expression[expression_dict['id']] %}
       <UL>
-        <LI><a href="{{ url_for('to_edit_symbol', symbol_id=symbol_id) }}" title="see more about this symbol">{{ dict_of_all_symbol_dicts[symbol_id]['id'] }}</a>: 
+        <LI><a href="{{ url_for('to_edit_scalar_symbol', symbol_id=symbol_id) }}" title="see more about this symbol">{{ dict_of_all_symbol_dicts[symbol_id]['id'] }}</a>: 
             {{ dict_of_all_symbol_dicts[symbol_id]['latex'] }}</LI>
       </UL>
       {% endfor %}

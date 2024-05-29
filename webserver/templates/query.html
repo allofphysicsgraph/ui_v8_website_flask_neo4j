@@ -113,8 +113,20 @@ Examples:
   </tr>
   <tr>
     <td>list symbols</td>
-    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n:symbol) RETURN n">
-                                                  MATCH (n:symbol) RETURN n</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n:scalar) RETURN n">
+                                                  MATCH (n:scalar) RETURN n</a></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>list symbols</td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n:vector) RETURN n">
+                                                  MATCH (n:vector) RETURN n</a></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>list symbols</td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n:matrix) RETURN n">
+                                                  MATCH (n:matrix) RETURN n</a></td>
     <td></td>
   </tr>
   <tr>

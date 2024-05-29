@@ -26,7 +26,7 @@
   {% for feed_dict in list_of_feed_dicts %}
   <tr>
     <td>
-      <a href="{{ url_for( 'to_edit_expression', feed_id=feed_dict['id'] ) }}" title="see more about this expression">
+      <a href="{{ url_for( 'to_edit_feed', feed_id=feed_dict['id'] ) }}" title="see more about this expression">
           {{ feed_dict['id'] }}
       </a>
     </td>
@@ -42,7 +42,7 @@
     <td>TODO</td> <!-- derivation -->
     <td>{% for symbol_id in symbols_per_expression[feed_dict['id']] %}
       <UL>
-        <LI><a href="{{ url_for('to_edit_symbol', symbol_id=symbol_id) }}" title="see more about this symbol">{{ dict_of_all_symbol_dicts[symbol_id]['id'] }}</a>: 
+        <LI><a href="{{ url_for('to_edit_scalr_symbol', symbol_id=symbol_id) }}" title="see more about this symbol">{{ dict_of_all_symbol_dicts[symbol_id]['id'] }}</a>: 
             {{ dict_of_all_symbol_dicts[symbol_id]['latex'] }}</LI>
       </UL>
       {% endfor %}
