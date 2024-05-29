@@ -1,4 +1,29 @@
 
+****************************
+2024-05-28
+
+design decision: treat "symbol" as a node type, rather than have separate node types for subcategories like 
+"symbol_operation", "symbol_scalar", "symbol_vector", "symbol_matrix", "symbol_quantum_operator"
+
+Each of these subcategories have distinct properties
+
+https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
+
+****************************
+2024-05-28
+
+design decision: feed is a distinct node type
+
+in v7 JSON each step has zero or more feeds, and each feed was in the same category as expressions. 
+
+Feeds do not have the same attributes as symbols, nor do feeds have the same attributes as expressions. 
+The category of symbols includes operators, scalars, vectors, matrices. 
+Feeds can be composed of symbols, e.g., "x/a".
+Feeds should not have equality or inequality and cannot be checked for dimensional consistency.
+
+Feeds are specific to a step: "multiply both sides by" with the feed "x/a" used in two different steps refers to distinct feeds. 
+However, a step could feature multiple feeds, and each feed has separate properties.
+
 
 ****************************
 2024-05-28

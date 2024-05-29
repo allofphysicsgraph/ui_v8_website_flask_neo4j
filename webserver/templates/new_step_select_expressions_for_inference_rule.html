@@ -8,13 +8,15 @@
 <H2>Derivation: <a href="{{ url_for('to_review_derivation',derivation_id=derivation_dict['id']) }}">
   {{ derivation_dict['name_latex'] }}</a></H2>
 
-<P>expression IDs: <!--{ { list_of_expression_IDs } }-->
+<!--
+<P>expression IDs: <!- -{ { list_of_expression_IDs } }- ->
 
 <ul>
-{% for this_expression_ID in list_of_expression_IDs %}
-<li>{{ this_expression_ID }}</li>
-{% endfor %}
+{ % for this_expression_ID in list_of_expression_IDs %}
+<li>{ { this_expression_ID }}</li>
+{ % endfor %}
 </ul>
+-->
 
 <fieldset>
   <legend>
@@ -25,12 +27,13 @@
 
 <P>TODO: provide both local-to-derivation expressions and global expressions
 
-
+<!--
 <P>expressions: 
-  <UL>{% for k,v in dict_of_expression_dicts.items() %}
-    <LI>{{ k,v }}</LI>
-{% endfor %}
+  <UL>{ % for k,v in dict_of_expression_dicts.items() %}
+    <LI>{ { k,v }}</LI>
+{ % endfor %}
   </UL>
+-->
 
 <form method="post" action="">
   {{ form.csrf_token }}

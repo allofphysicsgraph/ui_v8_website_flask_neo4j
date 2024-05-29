@@ -119,13 +119,11 @@ def dimensional_consistency(
     # convert the numeric value for each dimension
     # into a SymPy expression that gets multiplied together for all dimensions
     for symbol_id in list_of_symbol_IDs_in_expression:
-        #print("symbol_id=", symbol_id)
+        # print("symbol_id=", symbol_id)
         this_symbol_dict = dict_of_all_symbol_dicts[symbol_id]
-        #print("this_symbol_dict=", this_symbol_dict)
-        if "argument_count" in this_symbol_dict.keys(): # no dimensionality to check
-            print(
-                this_symbol_dict["latex"], this_symbol_dict['id'], "is an operator"
-            )
+        # print("this_symbol_dict=", this_symbol_dict)
+        if "argument_count" in this_symbol_dict.keys():  # no dimensionality to check
+            print(this_symbol_dict["latex"], this_symbol_dict["id"], "is an operator")
         else:  # not an operator
             symbol_dim_powers = ""
             if this_symbol_dict["dimension_time"] != 0:
