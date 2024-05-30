@@ -132,6 +132,7 @@ def constrain_unique_id(tx) -> None:
         "step",
         "expression",
     ]:
+        # try:
         tx.run(
             "CREATE CONSTRAINT constrain_"
             + node_type
@@ -139,14 +140,18 @@ def constrain_unique_id(tx) -> None:
             + node_type
             + ") REQUIRE n.id IS UNIQUE"
         )
+        # except Exception as err:
+        #     print("neo4j/constrain_unique_id: WARNING:", err)
 
     print("[TRACE] func: neo4j_query/constrain_unique_id end " + trace_id)
     return
 
 
-def symbols_in_expression(tx, expression_id: str, symbol_category: str) -> list:
+def symbols_in_expression_or_feed(
+    tx, expression_or_feed: str, expression_or_feed_id: str, symbol_category: str
+) -> list:
     """
-    an expression typically has one or more sybmols
+    an expression has one or more sybmols
     This read query returns which symbol IDs are used for the provided expression ID
 
     this is the opposite query of `expressions_that_use_symbol`
@@ -157,20 +162,53 @@ def symbols_in_expression(tx, expression_id: str, symbol_category: str) -> list:
 
     print("neo4j_query/symbols_in_expression: symbol_category=", symbol_category)
 
+    assert expression_or_feed in ["expression", "feed"]
     assert symbol_category in ["operation", "scalar", "vector", "matrix"]
 
     symbol_list = []
     for result in tx.run(
-        "MATCH (e:expression)-[:HAS_SYMBOL]->(s:'"
+        "MATCH (e:"
+        + expression_or_feed
+        + ")-[:HAS_SYMBOL]->(s:'"
         + symbol_category
         + "') WHERE e.id='"
         + expression_id
         + "' RETURN s.id"
     ):
         symbol_list.append(result.data()["s.id"])
-    print("expression_id=", expression_id, "symbol_list=", symbol_list)
+    print("expression_or_feed_id=", expression_or_feed_id, "symbol_list=", symbol_list)
 
-    print("[TRACE] func: neo4j_query/symbols_in_expression end " + trace_id)
+    print("[TRACE] func: neo4j_query/symbols_in_expression_or_feed end " + trace_id)
+    return symbol_list
+
+
+def symbols_in_feed(tx, feed_id: str, symbol_category: str) -> list:
+    """
+    a feed has one or more sybmols
+    This read query returns which symbol IDs are used for the provided feed ID
+
+    this is the opposite query of `feeds_that_use_symbol`
+
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: neo4j_query/symbols_in_feed start " + trace_id)
+
+    print("neo4j_query/symbols_in_feed: symbol_category=", symbol_category)
+
+    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+
+    symbol_list = []
+    for result in tx.run(
+        "MATCH (e:feed)-[:HAS_SYMBOL]->(s:'"
+        + symbol_category
+        + "') WHERE e.id='"
+        + feed_id
+        + "' RETURN s.id"
+    ):
+        symbol_list.append(result.data()["s.id"])
+    print("feed_id=", feed_id, "symbol_list=", symbol_list)
+
+    print("[TRACE] func: neo4j_query/symbols_in_feed end " + trace_id)
     return symbol_list
 
 
@@ -601,6 +639,35 @@ def edit_expression(
     return
 
 
+def edit_feed(
+    tx,
+    feed_id: str,
+    feed_latex: str,
+    feed_name: str,
+    feed_description: str,
+    now_str: str,
+    author_name_latex: str,
+) -> None:
+    """
+    >>> edit_feed()
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: neo4j_query/edit_feed start " + trace_id)
+
+    result = tx.run(
+        'MERGE (e:feed {id:"' + str(feed_id) + '"})'
+        'SET e = {id: "' + str(feed_id) + '",'
+        'name_latex: "' + str(feed_name) + '",'
+        'description_latex: "' + str(feed_description) + '",'
+        'created_datetime:"' + now_str + '",'
+        'author_name_latex:"' + author_name_latex + '",'
+        'latex: "' + str(feed_latex) + '"}'
+    )
+
+    print("[TRACE] func: neo4j_query/edit_feed end " + trace_id)
+    return
+
+
 def edit_node_property(
     tx, node_type: str, node_id: str, property_key: str, property_value
 ) -> None:
@@ -777,6 +844,35 @@ def disconnect_symbol_from_expression(
     return
 
 
+def disconnect_symbol_from_feed(
+    tx, symbol_id: str, feed_id: str, symbol_category: str
+) -> None:
+    """
+    called by "edit feed"
+
+    https://neo4j.com/docs/cypher-manual/current/clauses/delete/
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: neo4j_query/disconnect_symbol_from_feed start " + trace_id)
+
+    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+
+    result = tx.run(
+        "MATCH (e:feed)-[r:HAS_SYMBOL]->(s:"
+        + symbol_category
+        + ")"
+        + 'WHERE e.id="'
+        + str(feed_id)
+        + '" AND s.id="'
+        + str(symbol_id)
+        + '"  DELETE r'
+    )
+    print("result.data=", result.data())
+
+    print("[TRACE] func: neo4j_query/disconnect_symbol_from_feed end " + trace_id)
+    return
+
+
 def add_symbol_to_expression(
     tx, symbol_id: str, expression_id: str, symbol_category: str
 ) -> None:
@@ -816,6 +912,46 @@ def add_symbol_to_expression(
     # print("result.data=", result.data())
 
     print("[TRACE] func: neo4j_query/add_symbol_to_expression end " + trace_id)
+    return
+
+
+def add_symbol_to_feed(tx, symbol_id: str, feed_id: str, symbol_category: str) -> None:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: neo4j_query/add_symbol_to_feed start " + trace_id)
+    print("symbol_id=", symbol_id, "feed_id=", feed_id)
+
+    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+
+    # print(
+    #     "MATCH (e:feed),(s:symbol) WHERE e.id='"
+    #     + str(feed_id)
+    #     + "' AND s.id='"
+    #     + str(symbol_id)
+    #     + "' MERGE (e)-[r:HAS_SYMBOL]->(s) RETURN r"
+    # )
+    # print(
+    #     "MATCH (e:feed),(s:symbol) WHERE e.id='"
+    #     + str(feed_id)
+    #     + "' AND s.id='"
+    #     + str(symbol_id)
+    #     + "' MERGE (e)-[:HAS_SYMBOL]->(s)"
+    # )
+
+    result = tx.run(
+        "MATCH (e:feed),(s:"
+        + symbol_category
+        + ") "
+        + 'WHERE e.id="'
+        + str(feed_id)
+        + '" AND s.id="'
+        + str(symbol_id)
+        + '" '
+        + "MERGE (e)-[r:HAS_SYMBOL]->(s)"
+    )
+    # print("result.data=", result.data())
+
+    print("[TRACE] func: neo4j_query/add_symbol_to_feed end " + trace_id)
     return
 
 
@@ -994,6 +1130,31 @@ def add_expression(
     )
 
     print("[TRACE] func: neo4j_query/add_expression end " + trace_id)
+    return
+
+
+def add_feed(
+    tx,
+    feed_id: str,
+    feed_latex: str,
+    author_name_latex: str,
+) -> None:
+    """
+    nothing returned by function because action is to write change to Neo4j database
+
+    >>> add_feed(tx,)
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: neo4j_query/add_feed start " + trace_id)
+
+    result = tx.run(
+        "CREATE (a:feed "
+        '{latex:"' + str(feed_latex) + '", '
+        ' author_name_latex:"' + str(author_name_latex) + '", '
+        ' id:"' + str(feed_id) + '"})'
+    )
+
+    print("[TRACE] func: neo4j_query/add_feed end " + trace_id)
     return
 
 

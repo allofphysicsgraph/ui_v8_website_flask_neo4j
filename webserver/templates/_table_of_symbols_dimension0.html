@@ -34,7 +34,7 @@
   {% for symbol_dict in list_of_dimension0_symbol_dicts %}
   <tr>
     <td>
-      <a href="{{ url_for( 'to_edit_scalar_symbol', scalar_id=symbol_dict['id'] ) }}">
+      <a href="{{ url_for( 'to_edit_scalar', scalar_id=symbol_dict['id'] ) }}">
           {{ symbol_dict['id'] }}
       </a>
     </td>

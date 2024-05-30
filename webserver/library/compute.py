@@ -169,6 +169,95 @@ def get_dict_of_derivations_that_use_feed(
     return dict_of_derivations_that_use_feed, query_time_dict
 
 
+def get_list_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> list:
+    """
+    >>>
+    """
+    list_of_symbol_dicts = []  # type: List[dict]
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_operation_symbol_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, "operation"
+        )
+        query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
+    for this_symbol_dict in list_of_operation_symbol_dicts:
+        this_symbol_dict["symbol_category"] = "operation"
+        list_of_symbol_dicts.append(this_symbol_dict)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_scalar_symbol_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, "scalar"
+        )
+        query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
+    for this_symbol_dict in list_of_scalar_symbol_dicts:
+        this_symbol_dict["symbol_category"] = "scalar"
+        list_of_symbol_dicts.append(this_symbol_dict)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_vector_symbol_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, "vector"
+        )
+        query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
+    for this_symbol_dict in list_of_vector_symbol_dicts:
+        this_symbol_dict["symbol_category"] = "vector"
+        list_of_symbol_dicts.append(this_symbol_dict)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_matrix_symbol_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, "matrix"
+        )
+        query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
+    for this_symbol_dict in list_of_matrix_symbol_dicts:
+        this_symbol_dict["symbol_category"] = "matrix"
+        list_of_symbol_dicts.append(this_symbol_dict)
+
+    return list_of_symbol_dicts, query_time_dict
+
+
+def get_dict_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> dict:
+    """
+    >>>
+    """
+    dict_of_all_symbol_dicts = {}  # type: Dict[str,dict]
+
+    dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "operation"
+    )
+    for ke, val in dict_of_all_operation_dicts.items():
+        dict_of_all_symbol_dicts[ke] = val
+
+    dict_of_all_scalar_dicts, query_time_dict = get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "scalar"
+    )
+    for ke, val in dict_of_all_scalar_dicts.items():
+        dict_of_all_symbol_dicts[ke] = val
+
+    dict_of_all_vector_dicts, query_time_dict = get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "vector"
+    )
+    for ke, val in dict_of_all_vector_dicts.items():
+        dict_of_all_symbol_dicts[ke] = val
+
+    dict_of_all_matrix_dicts, query_time_dict = get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "matrix"
+    )
+    for ke, val in dict_of_all_matrix_dicts.items():
+        dict_of_all_symbol_dicts[ke] = val
+
+    return dict_of_all_symbol_dicts, query_time_dict
+
+
 def get_dict_of_node_dicts(graphDB_Driver, query_time_dict: dict, node_type: str):
     """
     >>> get_dict_of_node_dicts()
@@ -245,8 +334,11 @@ def get_dict_of_derivations_used_per_inference_rule(
     return dict_of_derivations_used_per_inference_rule
 
 
-def symbols_per_expression(
-    graphDB_Driver, query_time_dict: dict, list_of_expression_dicts: list
+def symbols_per_expression_or_feed(
+    graphDB_Driver,
+    query_time_dict: dict,
+    expression_or_feed: str,
+    list_of_expression_or_feed_dicts: list,
 ):
     """
     >>>
@@ -254,21 +346,47 @@ def symbols_per_expression(
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: app/symbols_per_expression start " + trace_id)
 
-    symbols_per_expression = {}  # type: Dict[str, list]
-    for this_expression_dict in list_of_expression_dicts:
-        list_of_symbol_IDs_in_expression = []
+    symbols_per_expression_or_feed = {}  # type: Dict[str, list]
+    for this_expression_or_feed_dict in list_of_expression_or_feed_dicts:
+        list_of_symbol_IDs_in_expression_or_feed = []
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            list_of_symbol_IDs_in_expression = session.read_transaction(
-                neo4j_query.symbols_in_expression, this_expression_dict["id"]
+            list_of_symbol_IDs_in_expression_or_feed = session.read_transaction(
+                neo4j_query.symbols_in_expression_or_feed,
+                expression_or_feed,
+                this_expression_or_feed_dict["id"],
             )
-            query_time_dict["symbols_per_expression"] = time.time() - query_start_time
+            query_time_dict["symbols_per_expression_or_feed"] = (
+                time.time() - query_start_time
+            )
         symbols_per_expression[this_expression_dict["id"]] = (
             list_of_symbol_IDs_in_expression
         )
 
-    print("[TRACE] func: app/symbols_per_expression end " + trace_id)
-    return symbols_per_expression, query_time_dict
+    print("[TRACE] func: app/symbols_per_expression_or_feed end " + trace_id)
+    return symbols_per_expression_or_feed, query_time_dict
+
+
+def symbols_per_feed(graphDB_Driver, query_time_dict: dict, list_of_feed_dicts: list):
+    """
+    >>>
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: app/symbols_per_feed start " + trace_id)
+
+    symbols_per_feed = {}  # type: Dict[str, list]
+    for this_feed_dict in list_of_feed_dicts:
+        list_of_symbol_IDs_in_feed = []
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_symbol_IDs_in_feed = session.read_transaction(
+                neo4j_query.symbols_in_feed, this_feed_dict["id"]
+            )
+            query_time_dict["symbols_per_feed"] = time.time() - query_start_time
+        symbols_per_feed[this_feed_dict["id"]] = list_of_symbol_IDs_in_feed
+
+    print("[TRACE] func: app/symbols_per_feed end " + trace_id)
+    return symbols_per_feed, query_time_dict
 
 
 def all_steps_in_derivation(
@@ -382,28 +500,28 @@ def remove_latex_presention_markings(latex_str: str) -> str:
     if "\\right)" in latex_str:
         latex_str = latex_str.replace("\\right)", ")")
     if "\\," in latex_str:
-        logger.debug("found space \\,")
+        # logger.debug("found space \\,")
         latex_str = latex_str.replace("\\,", " ")  # thinspace
     if "\\ " in latex_str:
-        logger.debug("found space \\ ")
+        # logger.debug("found space \\ ")
         latex_str = latex_str.replace("\\ ", " ")
     if "\\;" in latex_str:
-        logger.debug("found space \\;")
+        # logger.debug("found space \\;")
         latex_str = latex_str.replace("\\;", " ")  # thick space
     if "\\:" in latex_str:
-        logger.debug("found space \\:")
+        # logger.debug("found space \\:")
         latex_str = latex_str.replace("\\:", " ")  # medium space
     if "\\!" in latex_str:
-        logger.debug("found space \\!")
+        # logger.debug("found space \\!")
         latex_str = latex_str.replace("\\!", " ")  # negative space
     if "\\;" in latex_str:
-        logger.debug("found space \\ ")
+        # logger.debug("found space \\ ")
         latex_str = latex_str.replace("\\ ", " ")
     if "\\quad" in latex_str:
-        logger.debug("found space \\quad")
+        # logger.debug("found space \\quad")
         latex_str = latex_str.replace("\\quad", " ")
     if "\\qquad" in latex_str:
-        logger.debug("found space \\qquad")
+        # logger.debug("found space \\qquad")
         latex_str = latex_str.replace("\\qquad", " ")
 
     print("latex after cleaning: " + latex_str)

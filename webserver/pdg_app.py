@@ -47,9 +47,6 @@ See https://neo4j.com/developer/python/
 
 """
 
-# TODO as of 2023-08-27: move neo4j queries into separate module
-# reasoning: separate front-end from back-end to make refactoring easier
-
 import random
 import time
 import datetime
@@ -109,7 +106,7 @@ from wtforms import (
     TextAreaField,  # multi-line tex input
     SubmitField,  # when the only input is a "submit" button
     BooleanField,
-)
+)  # type: ignore
 
 # type: ignore
 # from wtforms import PasswordField, FieldList
@@ -749,7 +746,9 @@ def main() -> str:
             print("file_obj.filename=", file_obj.filename)
             filename = secure_filename(file_obj.filename)
             print("filename = ", filename)
-            path_to_uploaded_file = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+            path_to_uploaded_file = os.path.join(
+                web_app.config["UPLOAD_FOLDER"], filename
+            )
             print("path_to_uploaded_file=", path_to_uploaded_file)
             try:
                 file_obj.save(path_to_uploaded_file)
@@ -769,12 +768,12 @@ def main() -> str:
                     time.time() - query_start_time
                 )
             # upload Cypher content inside the neo4j docker image
-            # TODO: how to automate this?
+            # automation TODO: how to automate this?
             print(
                 "docker exec <CONTAINER_ID> bin/cypher-shell --file dumping_grounds/pdg.cypher"
             )
 
-    # TODO: replace the counts below with
+    # performance TODO: replace the counts below with
     # MATCH (n) RETURN distinct labels(n), count(*)
 
     number_of_derivations = -1  # initialize to an intentionally a non-sensical number
@@ -1185,9 +1184,6 @@ def to_add_step_select_inference_rule(derivation_id: unique_numeric_id_as_str) -
     # if request.method == "POST": #and web_form.validate():
     #     print("request.form = ", request.form)
 
-    #     # TODO: get user name from Google login
-    #     author_name_latex = "ben"
-
     #     # TODO: get the inference_rule_id from the webform
     #     # inference_rule_id =
     #     print(inference_rule_id)
@@ -1266,38 +1262,9 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
 
     # editing the expression includes modifying the symbols present.
 
-    dict_of_all_symbol_dicts = {}  # type: Dict[str,dict]
-
-    dict_of_all_operation_dicts, query_time_dict = compute.get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "operation"
+    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
+        graphDB_Driver, query_time_dict
     )
-    for ke, val in dict_of_all_operation_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
-
-    dict_of_all_scalar_dicts, query_time_dict = compute.get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "scalar"
-    )
-    for ke, val in dict_of_all_scalar_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
-
-    dict_of_all_vector_dicts, query_time_dict = compute.get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "vector"
-    )
-    for ke, val in dict_of_all_vector_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
-
-    dict_of_all_matrix_dicts, query_time_dict = compute.get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "matrix"
-    )
-    for ke, val in dict_of_all_matrix_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
-
-    print(
-        "pdg_app/to_edit_expression: dict_of_all_symbol_dicts=",
-        dict_of_all_symbol_dicts,
-    )
-    # dict_of_all_operation_dicts = compute.get_dict_of_operation_dicts(graphDB_Driver)
-    # print("dict_of_all_operation_dicts=", dict_of_all_operation_dicts)
 
     list_of_symbol_IDs_in_expression = []
 
@@ -1562,38 +1529,9 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
 
     # editing the feed includes modifying the symbols present.
 
-    dict_of_all_symbol_dicts = {}  # type: Dict[str,dict]
-
-    dict_of_all_operation_dicts, query_time_dict = compute.get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "operation"
+    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
+        graphDB_Driver, query_time_dict
     )
-    for ke, val in dict_of_all_operation_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
-
-    dict_of_all_scalar_dicts, query_time_dict = compute.get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "scalar"
-    )
-    for ke, val in dict_of_all_scalar_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
-
-    dict_of_all_vector_dicts, query_time_dict = compute.get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "vector"
-    )
-    for ke, val in dict_of_all_vector_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
-
-    dict_of_all_matrix_dicts, query_time_dict = compute.get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "matrix"
-    )
-    for ke, val in dict_of_all_matrix_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
-
-    print(
-        "pdg_app/to_edit_feed: dict_of_all_symbol_dicts=",
-        dict_of_all_symbol_dicts,
-    )
-    # dict_of_all_operation_dicts = compute.get_dict_of_operation_dicts(graphDB_Driver)
-    # print("dict_of_all_operation_dicts=", dict_of_all_operation_dicts)
 
     list_of_symbol_IDs_in_feed = []
 
@@ -1684,7 +1622,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
     #             dict_of_all_operation_dicts[this_operation_id]
     #         )
 
-    web_form_new_feed = SpecifyNewfeedForm(request.form)
+    web_form_new_feed = SpecifyNewFeedForm(request.form)
     if request.method == "POST" and web_form_new_feed.validate():
         print("to_edit_feed: with web_form, request.form = ", request.form)
 
@@ -1822,12 +1760,12 @@ def to_add_expression() -> str:
             time.time() - query_start_time
         )
 
-    symbols_per_expression = compute.symbols_per_expression(
-        graphDB_Driver, query_time_dict, list_of_expression_dicts
+    symbols_per_expression = compute.symbols_per_expression_or_feed(
+        graphDB_Driver, query_time_dict, "expression", list_of_expression_dicts
     )
 
-    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "scalar"
+    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
+        graphDB_Driver, query_time_dict
     )
 
     dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
@@ -1884,7 +1822,6 @@ def to_add_expression() -> str:
         print("expression_name:", expression_name)
         print("expression_description", expression_description)
 
-        # TODO: this shouldn't be hardcoded
         author_name_latex = "ben"
 
         list_of_expression_IDs = []
@@ -1915,7 +1852,8 @@ def to_add_expression() -> str:
         print("[TRACE] func: app/ end " + trace_id)
         return redirect(
             url_for(
-                "to_add_symbols_and_operations_for_expression",
+                "to_add_symbols_and_operations_for",
+                expression_or_feed="expression",
                 expression_id=expression_id,
             )
         )
@@ -1932,6 +1870,94 @@ def to_add_expression() -> str:
     )
 
 
+@web_app.route("/new_feed/", methods=["GET", "POST"])
+def to_add_feed() -> str:
+    """
+    novel feed
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: app/to_add_feed start " + trace_id)
+    query_time_dict = {}  # type: Dict[str, float]
+
+    list_of_feed_dicts = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_feed_dicts = session.read_transaction(
+            neo4j_query.list_nodes_of_type, "feed"
+        )
+        query_time_dict["to_add_feed: list_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
+
+    symbols_per_feed = compute.symbols_per_expression_or_feed(
+        graphDB_Driver, query_time_dict, "feed", list_of_feed_dicts
+    )
+
+    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
+        graphDB_Driver, query_time_dict
+    )
+
+    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
+    for this_feed_dict in list_of_feed_dicts:
+        if "sympy" in this_feed_dict.keys():
+            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = (
+                latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
+            )
+        else:
+            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = None
+
+    web_form = SpecifyNewFeedForm(request.form)
+    if request.method == "POST" and web_form.validate():
+        print("request.form = ", request.form)
+
+        # request.form =  ImmutableMultiDict([('input1', 'a = b'), ('submit_button', 'Submit')])
+
+        feed_latex = str(web_form.feed_latex.data).strip().replace("\\", "\\\\")
+
+        print("feed_latex:", feed_latex)
+        # TODO: validate that this string is actually Latex before adding to database
+
+        author_name_latex = "ben"
+
+        list_of_feed_IDs = []
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_feed_IDs = session.read_transaction(neo4j_query.list_IDs, "feed")
+            query_time_dict["list_IDs: feed"] = time.time() - query_start_time
+        feed_id = compute.generate_random_id(list_of_feed_IDs)
+
+        # https://neo4j.com/docs/python-manual/current/session-api/
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            session.write_transaction(
+                neo4j_query.add_feed,
+                feed_id,
+                feed_latex,
+                author_name_latex,
+            )
+        query_time_dict["to_add_feed: add_feed"] = time.time() - query_start_time
+
+        # after user provides latex for feed have them provide symbol count
+        print("[TRACE] func: app/ end " + trace_id)
+        return redirect(
+            url_for(
+                "to_add_symbols_and_operations_for",
+                expression_or_feed="feed",
+                feed_id=feed_id,
+            )
+        )
+
+    print("[TRACE] func: app/to_add_feed end " + trace_id)
+    return render_template(
+        "feed_create.html",
+        query_time_dict=query_time_dict,
+        form=web_form,
+        symbols_per_feed=symbols_per_feed,
+        list_of_feed_dicts=list_of_feed_dicts,
+        sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
+    )
+
+
 @web_app.route("/edit_operation/<operation_id>", methods=["GET", "POST"])
 def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
     """
@@ -1941,7 +1967,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
     print("[TRACE] func: app/to_edit_operation start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    print("expression_id: ", operation_id)
+    print("operation_id: ", operation_id)
 
     web_form = SpecifyNewSymbolForm(request.form)
     print("request.method =", request.method)
@@ -1991,24 +2017,24 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_operations"))
 
 
-@web_app.route("/edit_scalar_symbol/<scalar_id>", methods=["GET", "POST"])
-def to_edit_scalar_symbol(scalar_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_scalar/<scalar_id>", methods=["GET", "POST"])
+def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
     """
     edit symbol
 
-    >>> to_edit_scalar_symbol()
+    >>> to_edit_scalar()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: app/to_edit_scalar_symbol start " + trace_id)
+    print("[TRACE] func: app/to_edit_scalar start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    print("symbol_id: ", symbol_id)
+    print("scalar_id: ", scalar_id)
 
     symbol_dict = {}
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         symbol_dict = session.read_transaction(
-            neo4j_query.node_properties, "scalar", symbol_id
+            neo4j_query.node_properties, "scalar", scalar_id
         )
         query_time_dict["to_edit_scalar_symbol: node_properties"] = (
             time.time() - query_start_time
@@ -2029,24 +2055,40 @@ def to_edit_scalar_symbol(scalar_id: unique_numeric_id_as_str) -> str:
         ).strip()
         symbol_reference = str(web_form_symbol_properties.symbol_reference.data).strip()
 
-        # shouldn't change this aspect
-        symbol_requires_arguments = symbol_dict["requires_arguments"]
-
         author_name_latex = "ben"
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_symbol,
-                symbol_id,
-                symbol_name,
-                symbol_latex,
-                symbol_description,
-                symbol_requires_arguments,
-                symbol_reference,
-                author_name_latex,
-            )
+        # instead of changing every property,
+        # only change the properties that are different from symbol_dict
+        for symbol_property, symbol_property_value in symbol_dict.items():
+
+            flash("NOT ENACTED YET 942492482324")
+            # TODO: check which properties are different
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "scalar",
+                    symbol_id,
+                    "argument_count",
+                    argument_count,
+                )
+                query_time_dict[
+                    "to_add_symbol_required_argument_count: edit_node_property, argument_count"
+                ] = (time.time() - query_start_time)
+
+        # # https://neo4j.com/docs/python-manual/current/session-api/
+        # with graphDB_Driver.session() as session:
+        #     query_start_time = time.time()
+        #     session.write_transaction(
+        #         neo4j_query.add_scalar_symbol,
+        #         scalar_id,
+        #         symbol_name,
+        #         symbol_latex,
+        #         symbol_description,
+        #         symbol_requires_arguments,
+        #         symbol_reference,
+        #         author_name_latex,
+        #     )
     # elif request.method == "POST" and web_form_symbol_properties_vector.validate():
     #     print("request.form = ", request.form)
 
@@ -2056,12 +2098,13 @@ def to_edit_scalar_symbol(scalar_id: unique_numeric_id_as_str) -> str:
     elif request.method == "POST":
         print("request.form = ", request.form)
 
+        flash("NOT ENACTED YET 994211499222")
         # TODO: delete symbol
 
-        print("[TRACE] func: app/to_edit_scalar_symbol end " + trace_id)
+        print("[TRACE] func: app/to_edit_scalar end " + trace_id)
         return redirect(url_for("to_list_scalars"))
 
-    print("[TRACE] func: app/to_edit_scalar_symbol end " + trace_id)
+    print("[TRACE] func: app/to_edit_scalar end " + trace_id)
     return render_template(
         "symbol_scalar_edit.html",
         query_time_dict=query_time_dict,
@@ -2071,44 +2114,46 @@ def to_edit_scalar_symbol(scalar_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/edit_vector_symbol/<vector_id>", methods=["GET", "POST"])
-def to_edit_vector_symbol(vector_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_vector/<vector_id>", methods=["GET", "POST"])
+def to_edit_vector(vector_id: unique_numeric_id_as_str) -> str:
     """
     edit vector
 
-    >>> to_edit_vector_symbol()
+    >>> to_edit_vector()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: app/to_edit_vector_symbol start " + trace_id)
+    print("[TRACE] func: app/to_edit_vector start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
     print("vector_id: ", vector_id)
 
+    flash("NOT ENACTED YET 13942942392")
     # TODO
 
-    print("[TRACE] func: app/to_edit_vector_symbol end " + trace_id)
+    print("[TRACE] func: app/to_edit_vector end " + trace_id)
     return render_template(
         "symbol_vector_edit.html",
         query_time_dict=query_time_dict,
     )
 
 
-@web_app.route("/edit_matrix_symbol/<matrix_id>", methods=["GET", "POST"])
-def to_edit_matrix_symbol(matrix_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_matrix/<matrix_id>", methods=["GET", "POST"])
+def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
     """
     edit matrix
 
-    >>> to_edit_matrix_symbol()
+    >>> to_edit_matrix()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: app/to_edit_matrix_symbol start " + trace_id)
+    print("[TRACE] func: app/to_edit_matrix start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
     print("matrix_id: ", matrix_id)
 
+    flash("NOT ENACTED YET 94294111111")
     # TODO
 
-    print("[TRACE] func: app/to_edit_matrix_symbol end " + trace_id)
+    print("[TRACE] func: app/to_edit_matrix end " + trace_id)
     return render_template(
         "symbol_matrix_edit.html",
         query_time_dict=query_time_dict,
@@ -2260,7 +2305,7 @@ def to_add_symbol_vector() -> str:
             web_form_symbol_properties.symbol_number_of_entries.data
         ).strip()
 
-        author_name_latex = "ben"  # TODO: get username
+        author_name_latex = "ben"
 
         list_of_symbol_IDs = []
         with graphDB_Driver.session() as session:
@@ -2341,7 +2386,7 @@ def to_add_symbol_matrix() -> str:
             web_form_symbol_properties.symbol_number_of_columns.data
         ).strip()
 
-        author_name_latex = "ben"  # TODO: get username
+        author_name_latex = "ben"
 
         list_of_symbol_IDs = []
         with graphDB_Driver.session() as session:
@@ -2937,7 +2982,7 @@ def to_add_symbol_dimension1_properties(vector_id: unique_numeric_id_as_str) -> 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         symbol_dict = session.read_transaction(
-            neo4j_query.node_properties, "vector", symbol_id
+            neo4j_query.node_properties, "vector", vector_id
         )
         query_time_dict[
             "to_add_symbol_dimension1_properties: node_properties, symbol"
@@ -2976,7 +3021,7 @@ def to_add_symbol_dimension2_properties(matrix_id: unique_numeric_id_as_str) -> 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         symbol_dict = session.read_transaction(
-            neo4j_query.node_properties, "matrix", symbol_id
+            neo4j_query.node_properties, "matrix", matrix_id
         )
         query_time_dict[
             "to_add_symbol_dimension2_properties: node_properties, symbol"
@@ -3242,59 +3287,61 @@ def to_add_step_select_expressions(
     )
 
 
+# @web_app.route(
+#     "/symbols_count_for_expression/<expression_id>",
+#     methods=["GET", "POST"],
+# )
+# def to_add_symbol_count_for_expression(
+#     expression_id: unique_numeric_id_as_str,
+# ) -> str:
+#     """
+#     derivation_id is the numeric ID of the derivation being edited
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     print("[TRACE] func: app/to_add_symbol_count_for_expression start " + trace_id)
+#     query_time_dict = {}  # type: Dict[str, float]
+
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         expression_dict = session.read_transaction(
+#             neo4j_query.node_properties, "expression", expression_id
+#         )
+#     print("expression_dict=", expression_dict)
+
+#     # TODO: use the right form
+#     web_form_no_options = NoOptionsForm(request.form)
+#     if request.method == "POST":
+#         print("request.form = ", request.form)
+
+#         # after user provides latex for expression have them provide symbol count
+#         print("[TRACE] func: app/to_add_symbol_count_for_expression end " + trace_id)
+#         return redirect(
+#             url_for(
+#                 "to_add_symbols_and_operations_for",
+#                 expression_or_feed=
+#                 expression_id=expression_id,
+#             )
+#         )
+
+#     print("[TRACE] func: app/to_add_symbol_count_for_expression end " + trace_id)
+#     return render_template(
+#         "expression_symbol_count.html",
+#         query_time_dict=query_time_dict,
+#         form=web_form_no_options,
+#         expression_dict=expression_dict,
+#     )
+
+
 @web_app.route(
-    "/symbols_count_for_expression/<expression_id>",
+    "/symbols_and_operations_for/<expression_or_feed>/<expression_or_feed_id>",
     methods=["GET", "POST"],
 )
-def to_add_symbol_count_for_expression(
-    expression_id: unique_numeric_id_as_str,
+def to_add_symbols_and_operations_for(
+    expression_or_feed: str,
+    expression_or_feed_id: unique_numeric_id_as_str,
 ) -> str:
     """
-    derivation_id is the numeric ID of the derivation being edited
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: app/to_add_symbol_count_for_expression start " + trace_id)
-    query_time_dict = {}  # type: Dict[str, float]
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        expression_dict = session.read_transaction(
-            neo4j_query.node_properties, "expression", expression_id
-        )
-    print("expression_dict=", expression_dict)
-
-    # TODO: use the right form
-    web_form_no_options = NoOptionsForm(request.form)
-    if request.method == "POST":
-        print("request.form = ", request.form)
-
-        # after user provides latex for expression have them provide symbol count
-        print("[TRACE] func: app/to_add_symbol_count_for_expression end " + trace_id)
-        return redirect(
-            url_for(
-                "to_add_symbols_and_operations_for_expression",
-                expression_id=expression_id,
-            )
-        )
-
-    print("[TRACE] func: app/to_add_symbol_count_for_expression end " + trace_id)
-    return render_template(
-        "expression_symbol_count.html",
-        query_time_dict=query_time_dict,
-        form=web_form_no_options,
-        expression_dict=expression_dict,
-    )
-
-
-@web_app.route(
-    "/symbols_and_operations_for_expression/<expression_id>",
-    methods=["GET", "POST"],
-)
-def to_add_symbols_and_operations_for_expression(
-    expression_id: unique_numeric_id_as_str,
-) -> str:
-    """
-    expression_id is the numeric ID of the expression
+    expression_or_feed_id is the numeric ID of the expression
 
     This step comes immediately after the Latex expression is provided.
 
@@ -3304,69 +3351,25 @@ def to_add_symbols_and_operations_for_expression(
     r_{\rm Earth} = 6
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: app/to_add_symbols_and_operations_for_expression start "
-        + trace_id
-    )
+    print("[TRACE] func: app/symbols_and_operations_for start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
+
+    assert expression_or_feed in ["expression", "feed"]
 
     # get the Latex for this expression_id
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         expression_dict = session.read_transaction(
-            neo4j_query.node_properties, "expression", expression_id
+            neo4j_query.node_properties, expression_or_feed, expression_id
         )
-        query_time_dict[
-            "to_add_symbols_and_operations_for_expression, node_properties"
-        ] = (time.time() - query_start_time)
+        query_time_dict["to_add_symbols_and_operations_for, node_properties"] = (
+            time.time() - query_start_time
+        )
     print("expression_dict=", expression_dict)
 
-    list_of_symbol_dicts = []
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_operation_symbol_dicts = session.read_transaction(
-            neo4j_query.list_nodes_of_type, "operation"
-        )
-        query_time_dict[
-            "to_add_symbols_and_operations_for_expression, list_nodes_of_type"
-        ] = (time.time() - query_start_time)
-    for this_symbol_dict in list_of_operation_symbol_dicts:
-        list_of_symbol_dicts.append(this_symbol_dict)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_scalar_symbol_dicts = session.read_transaction(
-            neo4j_query.list_nodes_of_type, "scalar"
-        )
-        query_time_dict[
-            "to_add_symbols_and_operations_for_expression, list_nodes_of_type"
-        ] = (time.time() - query_start_time)
-    for this_symbol_dict in list_of_scalar_symbol_dicts:
-        list_of_symbol_dicts.append(this_symbol_dict)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_vector_symbol_dicts = session.read_transaction(
-            neo4j_query.list_nodes_of_type, "vector"
-        )
-        query_time_dict[
-            "to_add_symbols_and_operations_for_expression, list_nodes_of_type"
-        ] = (time.time() - query_start_time)
-    for this_symbol_dict in list_of_vector_symbol_dicts:
-        list_of_symbol_dicts.append(this_symbol_dict)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_matrix_symbol_dicts = session.read_transaction(
-            neo4j_query.list_nodes_of_type, "matrix"
-        )
-        query_time_dict[
-            "to_add_symbols_and_operations_for_expression, list_nodes_of_type"
-        ] = (time.time() - query_start_time)
-    for this_symbol_dict in list_of_matrix_symbol_dicts:
-        list_of_symbol_dicts.append(this_symbol_dict)
-
+    list_of_symbol_dicts, query_time_dict = compute.get_list_of_all_symbol_dicts(
+        graphDB_Driver, query_time_dict
+    )
     print("list_of_symbols", list_of_symbol_dicts)
 
     # The naive option would be to return to the user the complete list of
@@ -3458,18 +3461,22 @@ def to_add_symbols_and_operations_for_expression(
         list_of_symbol_IDs_in_expression = []  # type: List[str]
         symbol_id_dict = {}  # type: Dict[str, str]
 
-        # request.form =  ImmutableMultiDict([('9380276', '9380276'), ('3511322', '3511322'), ('7540000', '7540000'), ('9481642', '9481642'), ('submit_button', 'update expressions')])
-        for ke, val in request.form.items():
+        # request.form =  ImmutableMultiDict([('symbol_id_to_connect_to_expression-1', '1324613'),
+        #                                     ('symbol_id_to_connect_to_expression-2', '6630937'),
+        #                                     ('symbol_id_to_connect_to_expression-3', '9188067'),
+        #                                     ('symbol_id_to_connect_to_expression-4', '1298921'),
+        #                                     ('submit_button', 'update expressions')])
+        for ke, symbol_id in request.form.items():
             # print("key=", ke)
             # print("value=", val)
             if "symbol_id_to_connect_to_expression" in ke:
                 with graphDB_Driver.session() as session:
                     query_start_time = time.time()
                     list_of_inference_rule_dicts = session.write_transaction(
-                        neo4j_query.add_symbol_to_expression, val, expression_id
+                        neo4j_query.add_symbol_to_expression, symbol_id, expression_id
                     )
                     query_time_dict[
-                        "to_add_symbols_and_operations_for_expression: add_symbol_to_expression"
+                        "to_add_symbols_and_operations_for: add_symbol_to_expression"
                     ] = (time.time() - query_start_time)
 
                 symbol_id_dict[dict_of_symbol_dicts[val]["latex"]] = val
@@ -3477,22 +3484,20 @@ def to_add_symbols_and_operations_for_expression(
         print("symbol_id_dict=", symbol_id_dict)
         # example output: {'a': '5638458', 'b': '7152159'}
 
-        print(
-            "[TRACE] func: app/to_add_symbols_and_operations_for_expression end "
-            + trace_id
-        )
+        print("[TRACE] func: app/to_add_symbols_and_operations_for end " + trace_id)
         return redirect(
             url_for(
-                "to_add_sympy_and_lean_for_latex_expression",
+                "to_add_sympy_and_lean_for",
+                expression_or_feed=expression_or_feed,
                 expression_id=expression_id,
                 symbol_id_dict=symbol_id_dict,
             )
         )
     return render_template(
-        "expression_create_symbols_and_operations.html",
+        "expression_or_feed_create_symbols_and_operations.html",
         query_time_dict=query_time_dict,
         form=web_form_no_options,
-        expression_dict=expression_dict,
+        expression_or_feed_dict=expression_or_feed_dict,
         list_of_potential_matching_symbols_from_sympy=list_of_potential_matching_symbols_from_sympy,
         potential_symbols_found_in_Latex_expression=potential_symbols_found_in_Latex_expression,
         list_of_symbol_dicts=list_of_symbol_dicts,
@@ -3500,19 +3505,19 @@ def to_add_symbols_and_operations_for_expression(
 
 
 @web_app.route(
-    "/sympy_and_latex_for_step/<expression_id>/<symbol_id_dict>",
+    "/sympy_and_latex_for/<expression_or_feed>/<expression_id>/<symbol_id_dict>",
     methods=["GET", "POST"],
 )
-def to_add_sympy_and_lean_for_latex_expression(
-    expression_id: unique_numeric_id_as_str, symbol_id_dict: dict
+def to_add_sympy_and_lean_for(
+    expression_or_feed: str,
+    expression_id: unique_numeric_id_as_str,
+    symbol_id_dict: dict,
 ) -> str:
     """
     derivation_id is the numeric ID of the derivation being edited
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: app/to_add_sympy_and_lean_for_latex_expression start " + trace_id
-    )
+    print("[TRACE] func: app/to_add_sympy_and_lean_for start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
     symbol_id_dict = eval(symbol_id_dict)
@@ -3521,16 +3526,14 @@ def to_add_sympy_and_lean_for_latex_expression(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         expression_dict = session.read_transaction(
-            neo4j_query.node_properties, "expression", expression_id
+            neo4j_query.node_properties, expression_or_feed, expression_id
         )
-        query_time_dict[
-            "to_add_sympy_and_lean_for_latex_expression, node_properties"
-        ] = (time.time() - query_start_time)
-    print(
-        "to_add_sympy_and_lean_for_latex_expression: expression_dict=", expression_dict
-    )
+        query_time_dict["to_add_sympy_and_lean_for, node_properties"] = (
+            time.time() - query_start_time
+        )
+    print("to_add_sympy_and_lean_for: expression_dict=", expression_dict)
 
-    print("to_add_sympy_and_lean_for_latex_expression: symbol_id_dict=", symbol_id_dict)
+    print("to_add_sympy_and_lean_for: symbol_id_dict=", symbol_id_dict)
     # symbol_id_dict= {'a': '5638458', 'b': '7152159'}
 
     # provide a guess for the SymPy based on the Latex provided
@@ -3545,7 +3548,7 @@ def to_add_sympy_and_lean_for_latex_expression(
     sympy_expr = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
         cleaned_latex_str
     )
-    print("to_add_sympy_and_lean_for_latex_expression: sympy_expr=", str(sympy_expr))
+    print("to_add_sympy_and_lean_for: sympy_expr=", str(sympy_expr))
     # list_of_sympy_symbols = latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr)
     # print("list_of_sympy_symbols=",list_of_sympy_symbols)
 
@@ -3580,50 +3583,51 @@ def to_add_sympy_and_lean_for_latex_expression(
                 query_start_time = time.time()
                 list_of_inference_rule_dicts = session.write_transaction(
                     neo4j_query.edit_node_property,
-                    "expression",
+                    expression_or_feed,
                     expression_id,
                     "sympy",
                     sympy_str,
                 )
                 query_time_dict[
-                    "to_add_sympy_and_lean_for_latex_expression: edit_node_property, expression sympy"
+                    "to_add_sympy_and_lean_for: edit_node_property, expression sympy"
                 ] = (time.time() - query_start_time)
 
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 list_of_inference_rule_dicts = session.write_transaction(
                     neo4j_query.edit_node_property,
-                    "expression",
+                    expression_or_feed,
                     expression_id,
                     "lean",
                     lean_str,
                 )
                 query_time_dict[
-                    "to_add_sympy_and_lean_for_latex_expression: edit_node_property, expression lean"
+                    "to_add_sympy_and_lean_for: edit_node_property, expression lean"
                 ] = (time.time() - query_start_time)
         except neo4j.exceptions.CypherSyntaxError as err:
             print("ERROR:", str(err))
             flash("ERROR:" + str(err))
             return redirect(
-                url_for("to_add_symbols_and_operations_for_expression", expression_id)
+                url_for(
+                    "to_add_symbols_and_operations_for",
+                    expression_or_feed=expression_or_feed,
+                    expression_id=expression_id,
+                )
             )
 
-        print(
-            "[TRACE] func: app/to_add_sympy_and_lean_for_latex_expression start "
-            + trace_id
-        )
+        print("[TRACE] func: app/to_add_sympy_and_lean_for start " + trace_id)
         return redirect(url_for("to_list_expressions"))
 
     web_form.sympy_str.data = revised_expr_with_str
     return render_template(
-        "expression_create_sympy_and_lean.html",
+        "expression_or_feed_create_sympy_and_lean.html",
         query_time_dict=query_time_dict,
         sympy_expr=sympy_expr,
         revised_expr=revised_expr,
         revised_expr_with_str=revised_expr_with_str,
         symbol_id_dict=symbol_id_dict,
         form=web_form,
-        expression_dict=expression_dict,
+        expression_or_feed_dict=expression_or_feed_dict,
     )
 
 
@@ -3667,7 +3671,6 @@ def to_add_inference_rule() -> str:
         number_of_outputs = int(
             str(web_form.inference_rule_number_of_outputs.data).strip()
         )
-        # TODO: name should come from authenticated user session
         author_name_latex = "ben"
 
         # https://neo4j.com/docs/python-manual/current/session-api/
@@ -3687,12 +3690,14 @@ def to_add_inference_rule() -> str:
             if inference_rule_name == inference_rule_dict["name_latex"]:
                 print("INVALID INPUT: inference rule with that name already exists")
                 # TODO: a notice should be provided to the user
+                flash("INVALID INPUT: inference rule with that name already exists")
 
                 print("[TRACE] func: app/to_add_inference_rule end " + trace_id)
                 return redirect(url_for("to_add_inference_rule"))
             if inference_rule_latex == inference_rule_dict["latex"]:
                 print("INVALID INPUT: inference rule with that latex already exists")
                 # TODO: a notice should be provided to the user
+                flash("INVALID INPUT: inference rule with that latex already exists")
 
                 print("[TRACE] func: app/to_add_inference_rule end " + trace_id)
                 return redirect(url_for("to_add_inference_rule"))
@@ -3807,7 +3812,6 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
         number_of_outputs = int(
             str(web_form.inference_rule_number_of_outputs.data).strip()
         )
-        # TODO: name should come from authenticated user session
         author_name_latex = "ben"
 
         # https://neo4j.com/docs/python-manual/current/session-api/
@@ -3824,12 +3828,14 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
             if inference_rule_name == inference_rule_dict["name"]:
                 print("INVALID INPUT: inference rule with that name already exists")
                 # TODO: a notice should be provided to the user
+                flash("INVALID INPUT: inference rule with that name already exists")
 
                 print("[TRACE] func: app/to_edit_inference_rule end " + trace_id)
                 return redirect(url_for("to_add_inference_rule"))
             if inference_rule_latex == inference_rule_dict["latex"]:
                 print("INVALID INPUT: inference rule with that latex already exists")
                 # TODO: a notice should be provided to the user
+                flash("INVALID INPUT: inference rule with that latex already exists")
 
                 print("[TRACE] func: app/to_edit_inference_rule end " + trace_id)
                 return redirect(url_for("to_add_inference_rule"))
@@ -4047,11 +4053,16 @@ def to_list_feeds() -> str:
         graphDB_Driver, query_time_dict, list_of_feed_dicts
     )
 
+    symbols_per_feed, query_time_dict = compute.symbols_per_expression_or_feed(
+        graphDB_Driver, query_time_dict, "feed", list_of_feed_dicts
+    )
+
     print("[TRACE] func: app/to_list_feeds end " + trace_id)
     return render_template(
         "feed_list.html",
         query_time_dict=query_time_dict,
         list_of_feed_dicts=list_of_feed_dicts,
+        symbols_per_feed=symbols_per_feed,
         dict_of_derivations_that_use_feed=dict_of_derivations_that_use_feed,
     )
 
@@ -4242,15 +4253,15 @@ def to_list_expressions() -> str:
         list_of_expression_dicts,
     )
 
-    symbols_per_expression, query_time_dict = compute.symbols_per_expression(
-        graphDB_Driver, query_time_dict, list_of_expression_dicts
+    symbols_per_expression, query_time_dict = compute.symbols_per_expression_or_feed(
+        graphDB_Driver, query_time_dict, "expression", list_of_expression_dicts
     )
     print(
         "pdg_app/to_list_expressions: symbols_per_expression=", symbols_per_expression
     )
 
-    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "scalar"
+    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
+        graphDB_Driver, query_time_dict
     )
     print(
         "pdg_app/to_list_expressions: dict_of_all_symbol_dicts=",
@@ -4285,7 +4296,7 @@ def to_list_expressions() -> str:
                 latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
             )
         else:
-            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = None
+            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
 
     print("[TRACE] func: app/to_list_expressions end " + trace_id)
     return render_template(

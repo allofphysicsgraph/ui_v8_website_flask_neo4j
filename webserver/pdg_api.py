@@ -17,6 +17,7 @@ import random
 from flask import Blueprint, flash, g, redirect, render_template, jsonify, request
 
 import sys
+from typing import NewType, Dict, List
 
 sys.path.append("library")
 

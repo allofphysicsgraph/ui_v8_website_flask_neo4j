@@ -1,3 +1,28 @@
+#!/usr/bin/env python3
+
+# Physics Derivation Graph
+# Ben Payne, 2021
+# https://creativecommons.org/licenses/by/4.0/
+# Attribution 4.0 International (CC BY 4.0)
+
+"""
+The purpose of this file is 
+"""
+
+import random
+import re
+import os
+import glob
+
+# move and copy files
+import shutil
+
+from subprocess import PIPE  # https://docs.python.org/3/library/subprocess.html
+import subprocess  # https://stackoverflow.com/questions/39187886/what-is-the-difference-between-subprocess-popen-and-subprocess-run/39187984
+
+proc_timeout = 30
+
+
 def make_string_safe_for_latex(unsafe_str: str) -> str:
     """
     latex characters that require an escape for printing:
@@ -68,13 +93,13 @@ def FROMv7_NOT_YET_CONVERTED_generate_tex_for_derivation(
     """
 
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[trace start " + trace_id + "]")
-    dat = clib.read_db(path_to_db)
+    # logger.info("[trace start " + trace_id + "]")
+    # dat = clib.read_db(path_to_db)
 
     path_to_tex = "/home/appuser/app/static/"  # must end with /
     tex_filename = deriv_id
 
-    remove_file_debris([path_to_tex, "./"], [tex_filename], ["tex", "log", "pdf"])
+    # remove_file_debris([path_to_tex, "./"], [tex_filename], ["tex", "log", "pdf"])
 
     with open(tex_filename + ".tex", "w") as lat_file:
         lat_file.write(
@@ -191,8 +216,8 @@ def FROMv7_NOT_YET_CONVERTED_generate_tex_for_derivation(
                     dat["derivations"][deriv_id]["notes"]
                 )
                 lat_file.write(safe_string + "\n")
-        else:
-            logger.warn("notes field should be present in derivation " + deriv_id)
+        # else:
+        # logger.warn("notes field should be present in derivation " + deriv_id)
         lat_file.write("\\end{abstract}\n")
 
         for linear_indx in list_of_linear_index:
@@ -224,10 +249,10 @@ def FROMv7_NOT_YET_CONVERTED_generate_tex_for_derivation(
                         lat_file.write("\\end{center}\n")
                     # using the newcommand, populate the expression identifiers
                     if step_dict["inf rule"] not in dat["inference rules"].keys():
-                        logger.error(
-                            'inference rule in step is not in dat["inference rules"]: ',
-                            step_dict["inf rule"],
-                        )
+                        # logger.error(
+                        #     'inference rule in step is not in dat["inference rules"]: ',
+                        #     step_dict["inf rule"],
+                        # )
                         raise Exception(
                             'inference rule in step is not in dat["inference rules"]: ',
                             step_dict["inf rule"],
@@ -271,7 +296,7 @@ def FROMv7_NOT_YET_CONVERTED_generate_tex_for_derivation(
         lat_file.write("% EOF\n")
 
     shutil.copy(tex_filename + ".tex", path_to_tex + tex_filename + ".tex")
-    logger.info("[trace end " + trace_id + "]")
+    # logger.info("[trace end " + trace_id + "]")
     return tex_filename  # pass back filename without extension because bibtex cannot handle .tex
 
 
@@ -292,8 +317,8 @@ def FROMv7_NOT_YET_CONVERTED_generate_pdf_for_derivation(
     >>> generate_pdf_for_derivation("000001", "myemail@address.com","pdg.db")
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[trace start " + trace_id + "]")
-    dat = clib.read_db(path_to_db)
+    # logger.info("[trace start " + trace_id + "]")
+    # dat = clib.read_db(path_to_db)
 
     # to isolate the build process, create a temporary folder
     tmp_latex_folder = "tmp_latex_folder_" + str(random.randint(1000000, 9999999))
@@ -340,14 +365,14 @@ def FROMv7_NOT_YET_CONVERTED_generate_pdf_for_derivation(
     latex_stdout = process.stdout.decode("utf-8")
     latex_stderr = process.stderr.decode("utf-8")
 
-    logger.debug("latex std out: %s", latex_stdout)
-    logger.debug("latex std err: %s", latex_stderr)
+    # logger.debug("latex std out: %s", latex_stdout)
+    # logger.debug("latex std err: %s", latex_stderr)
 
     if "Text line contains an invalid character" in latex_stdout:
-        logger.error("no PDF generated - tex contains invalid character")
+        # logger.error("no PDF generated - tex contains invalid character")
         raise Exception("no PDF generated - tex contains invalid character")
     if "No pages of output." in latex_stdout:
-        logger.error("no PDF generated - reason unknown")
+        # logger.error("no PDF generated - reason unknown")
         raise Exception("no PDF generated - reason unknown")
 
     # first of two bibtex runs
@@ -361,8 +386,8 @@ def FROMv7_NOT_YET_CONVERTED_generate_pdf_for_derivation(
     # https://stackoverflow.com/questions/41171791/how-to-suppress-or-capture-the-output-of-subprocess-run
     bibtex_stdout = process.stdout.decode("utf-8")
     bibtex_stderr = process.stderr.decode("utf-8")
-    logger.debug("bibtex std out: %s", bibtex_stdout)
-    logger.debug("bibtex std err: %s", bibtex_stderr)
+    # logger.debug("bibtex std out: %s", bibtex_stdout)
+    # logger.debug("bibtex std err: %s", bibtex_stderr)
 
     # second of two bibtex runs
     process = subprocess.run(
@@ -375,8 +400,8 @@ def FROMv7_NOT_YET_CONVERTED_generate_pdf_for_derivation(
     # https://stackoverflow.com/questions/41171791/how-to-suppress-or-capture-the-output-of-subprocess-run
     bibtex_stdout = process.stdout.decode("utf-8")
     bibtex_stderr = process.stderr.decode("utf-8")
-    logger.debug("bibtex std out: %s", bibtex_stdout)
-    logger.debug("bibtex std err: %s", bibtex_stderr)
+    # logger.debug("bibtex std out: %s", bibtex_stdout)
+    # logger.debug("bibtex std err: %s", bibtex_stderr)
 
     # run latex a second time to enable references to work
     process = subprocess.run(
@@ -410,8 +435,8 @@ def FROMv7_NOT_YET_CONVERTED_generate_pdf_for_derivation(
     dvipdf_stdout = process.stdout.decode("utf-8")
     dvipdf_stderr = process.stderr.decode("utf-8")
 
-    logger.debug("dvipdf std out: %s", dvipdf_stdout)
-    logger.debug("dvipdf std err: %s", dvipdf_stderr)
+    # logger.debug("dvipdf std out: %s", dvipdf_stdout)
+    # logger.debug("dvipdf std err: %s", dvipdf_stderr)
 
     shutil.move(
         tmp_latex_folder_full_path + pdf_filename + ".pdf",
@@ -419,7 +444,7 @@ def FROMv7_NOT_YET_CONVERTED_generate_pdf_for_derivation(
     )
     shutil.rmtree(tmp_latex_folder_full_path)
     # return True, pdf_filename + ".pdf"
-    logger.info("[trace end " + trace_id + "]")
+    # logger.info("[trace end " + trace_id + "]")
     return pdf_filename + ".pdf"
 
 
@@ -439,7 +464,7 @@ def FROMv7_NOT_YET_CONVERTED_create_tex_file_for_expr(
     >>> create_tex_file_for_expr('filename_without_extension', 'a \dot b \\nabla')
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[trace start " + trace_id + "]")
+    # logger.info("[trace start " + trace_id + "]")
 
     remove_file_debris(["./"], [tmp_file], ["tex"])
 
@@ -471,5 +496,5 @@ def FROMv7_NOT_YET_CONVERTED_create_tex_file_for_expr(
         lat_file.write("}\n")
         lat_file.write("\\end{document}\n")
     # logger.debug("wrote tex file")
-    logger.info("[trace end " + trace_id + "]")
+    # logger.info("[trace end " + trace_id + "]")
     return

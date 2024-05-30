@@ -2,7 +2,7 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=edit_step">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=expression_or_feed_create_sympy_and_lean">main page</a>
 </P>
 
 <fieldset>
@@ -10,9 +10,9 @@
     <H2>Provide <a href="https://www.sympy.org/">SymPy</a> and <a href="https://github.com/leanprover/lean4">Lean</a></H2>
   </legend>
 
-<P>as Latex: \({{ expression_dict['latex'] }}\)
+<P>as Latex: \({{ expression_or_feed_dict['latex'] }}\)
 
-<P>as string: {{ expression_dict['latex'] }}
+<P>as string: {{ expression_or_feed_dict['latex'] }}
 
 <P>symbols substituted: {{ revised_expr }}
 

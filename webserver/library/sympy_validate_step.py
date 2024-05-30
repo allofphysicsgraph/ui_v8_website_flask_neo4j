@@ -27,6 +27,8 @@ testmod(name ='split_expr_into_lhs_rhs', verbose = True)
 
 """
 
+import random
+
 import sympy  # type: ignore
 
 # the following is only relevant for doctests

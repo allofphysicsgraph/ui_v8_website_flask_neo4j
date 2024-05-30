@@ -2,7 +2,7 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=edit_step">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=expression_or_feed_create_symbols_and_operations">main page</a>
 </P>
 
 <P>list_of_potential_matching_symbols_from_sympy: {{ list_of_potential_matching_symbols_from_sympy }}
@@ -17,9 +17,9 @@
   </legend>
 Associating expressions with symbols enables the validation of expressions and steps.
 
-<H3>\({{ expression_dict['latex'] }}\)</H3>
+<H3>\({{ expression_or_feed_dict['latex'] }}\)</H3>
 
-<H3>{{ expression_dict['latex'] }}</H3>
+<H3>{{ expression_or_feed_dict['latex'] }}</H3>
 
   <form method="post" action="">
   {{ form.csrf_token }}
@@ -29,7 +29,7 @@ Associating expressions with symbols enables the validation of expressions and s
 -->
 {% for symbol_dict in potential_symbols_found_in_Latex_expression %}
 <UL>
-  <LI><input type="checkbox" name="symbol_id_to_connect_to_expression-{{ loop.index }}" value="{{ symbol_dict['id'] }}">\({{ symbol_dict['latex'] }}\), aka {{ symbol_dict['latex'] }}<BR>{{ symbol_dict }}<BR>
+  <LI><input type="checkbox" name="symbol_id_to_connect_to_expression-{{ loop.index }}" value="{{ symbol_dict['id'] }}_{{ symbol_dict['symbol_category'] }}">\({{ symbol_dict['latex'] }}\), aka {{ symbol_dict['latex'] }}<BR>{{ symbol_dict }}<BR>
   TODO: used in which derivations?</LI>
 </UL>
 {% endfor %}

@@ -177,7 +177,7 @@ def dimensional_consistency(
             eval(str(LHS)), eval(str(RHS))
         )
     except Exception as err:
-        return "error for dim with " + expr_global_id
+        return "ERROR for dim with " + expression_dict["id"]
 
     if determine_consistency_bool:
         return "dimensions are consistent"
