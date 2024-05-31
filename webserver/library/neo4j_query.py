@@ -25,6 +25,8 @@ https://neo4j.com/developer/kb/viewing-schema-data-with-apoc/
 import neo4j  # needed for exception handling
 import random  # for trace IDs
 
+import list_of_valid
+
 
 def list_IDs(tx, node_type: str) -> list:
     """
@@ -37,17 +39,8 @@ def list_IDs(tx, node_type: str) -> list:
 
     print("node_type=", node_type)
 
-    assert node_type in [
-        "derivation",
-        "inference_rule",
-        "operation",
-        "feed",
-        "scalar",
-        "vector",
-        "matrix",
-        "step",
-        "expression",
-    ]
+    assert node_type in list_of_valid.node_types
+
     list_of_IDs = []
     for result in tx.run("MATCH (n:" + node_type + ") RETURN n.id"):
         # print(result.data())
@@ -163,7 +156,7 @@ def symbols_in_expression_or_feed(
     print("neo4j_query/symbols_in_expression: symbol_category=", symbol_category)
 
     assert expression_or_feed in ["expression", "feed"]
-    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+    assert symbol_category in list_of_valid.symbol_categories
 
     symbol_list = []
     for result in tx.run(
@@ -195,7 +188,7 @@ def symbols_in_feed(tx, feed_id: str, symbol_category: str) -> list:
 
     print("neo4j_query/symbols_in_feed: symbol_category=", symbol_category)
 
-    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+    assert symbol_category in list_of_valid.symbol_categories
 
     symbol_list = []
     for result in tx.run(
@@ -225,17 +218,7 @@ def list_nodes_of_type(tx, node_type: str) -> list:
     print("node_type=", node_type)
 
     # must be one of these node types. See also 'schema.log' file
-    assert node_type in [
-        "derivation",
-        "inference_rule",
-        "operation",
-        "feed",
-        "scalar",
-        "vector",
-        "matrix",
-        "step",
-        "expression",
-    ]
+    assert node_type in list_of_valid.node_types
     print("              node type:", node_type)
 
     node_list = []
@@ -312,7 +295,7 @@ def expressions_that_use_symbol(tx, symbol_id: str, symbol_category: str) -> lis
 
     print("neo4j_query/expressions_that_use_symbol: symbol_category=", symbol_category)
 
-    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+    assert symbol_category in list_of_valid.symbol_categories
 
     list_of_expressions = []
 
@@ -340,7 +323,7 @@ def derivations_that_use_symbol(tx, symbol_id: str, symbol_category: str) -> lis
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/derivations_that_use_symbol start " + trace_id)
 
-    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+    assert symbol_category in list_of_valid.symbol_categories
 
     list_of_derivations = []
 
@@ -483,17 +466,7 @@ def node_properties(tx, node_type: str, node_id: str) -> dict:
 
     print("node_type=", node_type)
 
-    assert node_type in [
-        "derivation",
-        "inference_rule",
-        "operation",
-        "feed",
-        "scalar",
-        "vector",
-        "matrix",
-        "step",
-        "expression",
-    ]
+    assert node_type in list_of_valid.node_types
     print("node_type:", node_type)
     print("node_id:", node_id)
 
@@ -613,7 +586,9 @@ def edit_step_notes(
 def edit_expression(
     tx,
     expression_id: str,
-    expression_latex: str,
+    expression_latex_lhs: str,
+    expression_latex_rhs: str,
+    expression_latex_condition: str,
     expression_name: str,
     expression_description: str,
     now_str: str,
@@ -679,17 +654,7 @@ def edit_node_property(
 
     print("node_type=", node_type)
 
-    assert node_type in [
-        "derivation",
-        "inference_rule",
-        "operation",
-        "feed",
-        "scalar",
-        "vector",
-        "matrix",
-        "step",
-        "expression",
-    ]
+    assert node_type in list_of_valid.node_types
     print(
         "node_type=",
         node_type,
@@ -792,17 +757,7 @@ def delete_node(tx, node_id: str, node_type) -> None:
     print("node_type=", node_type)
 
     # must be one of these node types. See also 'schema.log' file
-    assert node_type in [
-        "derivation",
-        "inference_rule",
-        "operation",
-        "feed",
-        "scalar",
-        "vector",
-        "matrix",
-        "step",
-        "expression",
-    ]
+    assert node_type in list_of_valid.node_types
 
     result = tx.run(
         "MATCH (d:" + node_type + ' {id:"' + node_id + '"}) DETACH DELETE d'
@@ -826,7 +781,7 @@ def disconnect_symbol_from_expression(
         "[TRACE] func: neo4j_query/disconnect_symbol_from_expression start " + trace_id
     )
 
-    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+    assert symbol_category in list_of_valid.symbol_categories
 
     result = tx.run(
         "MATCH (e:expression)-[r:HAS_SYMBOL]->(s:"
@@ -855,7 +810,7 @@ def disconnect_symbol_from_feed(
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/disconnect_symbol_from_feed start " + trace_id)
 
-    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+    assert symbol_category in list_of_valid.symbol_categories
 
     result = tx.run(
         "MATCH (e:feed)-[r:HAS_SYMBOL]->(s:"
@@ -881,7 +836,7 @@ def add_symbol_to_expression(
     print("[TRACE] func: neo4j_query/add_symbol_to_expression start " + trace_id)
     print("symbol_id=", symbol_id, "expression_id=", expression_id)
 
-    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+    assert symbol_category in list_of_valid.symbol_categories
 
     # print(
     #     "MATCH (e:expression),(s:symbol) WHERE e.id='"
@@ -921,7 +876,7 @@ def add_symbol_to_feed(tx, symbol_id: str, feed_id: str, symbol_category: str) -
     print("[TRACE] func: neo4j_query/add_symbol_to_feed start " + trace_id)
     print("symbol_id=", symbol_id, "feed_id=", feed_id)
 
-    assert symbol_category in ["operation", "scalar", "vector", "matrix"]
+    assert symbol_category in list_of_valid.symbol_categories
 
     # print(
     #     "MATCH (e:feed),(s:symbol) WHERE e.id='"
@@ -1106,7 +1061,9 @@ def add_expression(
     tx,
     expression_id: str,
     expression_name: str,
-    expression_latex: str,
+    expression_latex_lhs: str,
+    expression_latex_rhs: str,
+    expression_latex_condition: str,
     expression_description: str,
     author_name_latex: str,
 ) -> None:
@@ -1121,7 +1078,10 @@ def add_expression(
     result = tx.run(
         "CREATE (a:expression "
         '{name_latex:"' + str(expression_name) + '", '
-        ' latex:"' + str(expression_latex) + '", '
+        ' latex_lhs:"' + str(expression_latex_lhs) + '", '
+        ' relation: "=",'
+        ' latex_rhs:"' + str(expression_latex_rhs) + '", '
+        ' latex_condition: "' + str(expression_latex_condition) + '", '
         #' lean:"' + str(expression_lean) + '", '
         #' sympy:"' + str(expression_sympy) + '", '
         ' description_latex:"' + str(expression_description) + '", '
@@ -1188,6 +1148,26 @@ def add_quantum_operator_symbol(
     )
 
     print("[TRACE] func: neo4j_query/add_quantum_operator_symbol end " + trace_id)
+    return
+
+
+def add_constant_value_with_units(
+    tx,
+    symbol_id: str,
+    number_decimal: float,
+    number_power: float,
+    dimension_mass_unit: str,
+    dimension_time_unit: str,
+    dimension_length_unit: str,
+    author_name_latex: str,
+):
+    """
+    >>>
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: neo4j_query/add_constant_value_with_units start " + trace_id)
+
+    print("[TRACE] func: neo4j_query/add_constant_value_with_units end " + trace_id)
     return
 
 

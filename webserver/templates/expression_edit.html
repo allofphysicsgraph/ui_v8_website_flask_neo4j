@@ -6,9 +6,9 @@
 or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_edit">list of expressions</a>
 </P>
 
-<P>\({{ expression_dict['latex'] }}\)
+<P>\({{ expression_dict['latex_lhs'] }}\) = \({{ expression_dict['latex_rhs'] }}\)
 
-<P>{{ expression_dict['latex'] }}
+<P>{{ expression_dict['latex'] }} = {{ expression_dict['latex_rhs'] }}
 
 <P>TODO: list derivations that use this expression. That could help provide context.
 

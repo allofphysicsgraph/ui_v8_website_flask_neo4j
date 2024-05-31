@@ -1,0 +1,58 @@
+{% extends "_base.html" %}
+{% block content %}
+
+<P>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_create">main page</a>
+  or return to <a href="{{ url_for('to_list_scalars') }}?referrer=symbol_scalar_constant_create">list of scalar symbols</a>
+</P>
+
+<fieldset>
+  <legend>
+    <H2>Specify value and units for constant</H2>
+  </legend>
+
+
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form_symbol_properties.csrf_token }}
+
+
+    <select name="mass_select_unit" class="selectpicker form-control" id="mass_select">
+      {% for mass_unit in list_of_dimension_mass_units %}
+      <option value="{{ mass_unit }}">{{ mass_unit }}</option>
+      {% endfor %}
+    </select>
+
+    <P><input type="submit" value="set value and dimension for constant scalar symbol">
+    </P>
+  </form>
+</fieldset>
+
+
+
+<P>{% include '_table_of_symbols_dimension0.html' %}
+
+<script>
+function select_symbol() {
+  // Declare variables
+  var input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById('symbol_input');
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("symbol_UL");
+  li = ul.getElementsByTagName('li');
+
+  // Loop through all list items, and hide those who don't match the search query
+  for (i = 0; i < li.length; i++) {
+    a = li[i].getElementsByTagName("a")[0];
+    txtValue = a.textContent || a.innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
+</script>
+
+
+
+{% endblock %}

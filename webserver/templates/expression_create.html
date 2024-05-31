@@ -12,29 +12,82 @@
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
-    <P>{{ form.expression_latex.label}} (<B>required</B>): 
-       {{ form.expression_latex(size=50, 
+    <P>{{ form.expression_latex_lhs.label}} (<B>required</B>): 
+       {{ form.expression_latex_lhs(size=50, 
                                 maxlength=1000,
-                                id="input_latex", 
+                                id="input_latex_lhs", 
                                 onchange="onChangeFunction();") }} </P>
 
     <P><input type="checkbox" 
-              id="display_input_latex" 
+              id="display_input_latex_lhs" 
               checked="" 
-              onchange="convert('input_latex',
-                                'display_input_latex', 
-                                'preview_input_latex',
-                                'output_input_latex')">
-       <small><label for="display_input_latex">Display style</label></small>
+              onchange="convert('input_latex_lhs',
+                                'display_input_latex_lhs', 
+                                'preview_input_latex_lhs',
+                                'output_input_latex_lhs')">
+       <small><label for="display_input_latex_lhs">Display style</label></small>
        <input type="button" 
               value="optional preview of TeX before submitting form" 
-              id="preview_input_latex" 
-              onclick="convert('input_latex',
-                               'display_input_latex', 
-                               'preview_input_latex',
-                               'output_input_latex')">
+              id="preview_input_latex_lhs" 
+              onclick="convert('input_latex_lhs',
+                               'display_input_latex_lhs', 
+                               'preview_input_latex_lhs',
+                               'output_input_latex_lhs')">
               <br clear="all">
-        <div id="output_input_latex"></div>
+        <div id="output_input_latex_lhs"></div>
+
+    =
+
+    {{ form.expression_latex_rhs.label}} (<B>required</B>): 
+       {{ form.expression_latex_rhs(size=50, 
+                                maxlength=1000,
+                                id="input_latex_rhs", 
+                                onchange="onChangeFunction();") }} </P>
+
+    <P><input type="checkbox" 
+              id="display_input_latex_rhs" 
+              checked="" 
+              onchange="convert('input_latex_rhs',
+                                'display_input_latex_rhs', 
+                                'preview_input_latex_rhs',
+                                'output_input_latex_rhs')">
+       <small><label for="display_input_latex_rhs">Display style</label></small>
+       <input type="button" 
+              value="optional preview of TeX before submitting form" 
+              id="preview_input_latex_rhs" 
+              onclick="convert('input_latex_rhs',
+                               'display_input_latex_rhs', 
+                               'preview_input_latex_rhs',
+                               'output_input_latex_rhs')">
+              <br clear="all">
+        <div id="output_input_latex_rhs"></div>
+
+    when
+
+    {{ form.expression_latex_condition.label}} (<B>required</B>): 
+       {{ form.expression_latex_condition(size=50, 
+                                maxlength=1000,
+                                id="input_latex_condition", 
+                                onchange="onChangeFunction();") }} </P>
+
+    <P><input type="checkbox" 
+              id="display_input_latex_condition" 
+              checked="" 
+              onchange="convert('input_latex_condition',
+                                'display_input_latex_condition', 
+                                'preview_input_latex_condition',
+                                'output_input_latex_condition')">
+       <small><label for="display_input_latex_condition">Display style</label></small>
+       <input type="button" 
+              value="optional preview of TeX before submitting form" 
+              id="preview_input_latex_condition" 
+              onclick="convert('input_latex_condition',
+                               'display_input_latex_condition', 
+                               'preview_input_latex_condition',
+                               'output_input_latex_condition')">
+              <br clear="all">
+        <div id="output_input_latex_condition"></div>
+
 
     <P>{{form.expression_name.label }} (optional): {{ form.expression_name(size=50, maxlength=1000) }}
 

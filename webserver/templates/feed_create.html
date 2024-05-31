@@ -7,7 +7,7 @@
 
 <fieldset>
   <legend>
-    Create feed
+    Create multi-symbol feed
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
@@ -41,6 +41,22 @@
     </P>
   </form>
 </fieldset>
+
+<fieldset>
+  <legend>
+    promote existing symbol to feed
+  </legend>
+
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form.csrf_token }}
+
+    {{ list_of_nonoperation_symbol_dicts }}
+
+    TODO
+
+  </form>
+</fieldset>
+
 
 TODO: as user is entering expression, filter the list of existing feeds
 

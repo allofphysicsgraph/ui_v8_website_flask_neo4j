@@ -102,6 +102,7 @@ from wtforms import (
     validators,
     FormField,
     IntegerField,
+    DecimalField,
     RadioField,
     TextAreaField,  # multi-line tex input
     SubmitField,  # when the only input is a "submit" button
@@ -272,10 +273,21 @@ class SpecifyNewExpressionForm(FlaskForm):
     this class is "LatexIO" in v7
     """
 
-    expression_latex = StringField(
-        "LaTeX expression",
+    expression_latex_lhs = StringField(
+        "LaTeX expression LHS",
         validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
     )
+    expression_latex_rhs = StringField(
+        "LaTeX expression RHS",
+        validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
+    )
+    # TODO: relation operation: ["=", "\lt", "\leq", "\gt", "\geq"]
+
+    expression_latex_condition = StringField(
+        "LaTeX expression condition",
+        validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
+    )
+
     expression_name = StringField(
         "name (LaTeX)",
         validators=[validators.Length(max=1000)],
@@ -406,6 +418,12 @@ class SpecifyNewSymbolScalarForm(FlaskForm):
         validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
         default=0,
     )
+
+
+class SpecifyNewConstantNumberForm(FlaskForm):
+    # , validators.Length(min=1, max=100) ?
+    number_decimal = DecimalField(validators.InputRequired(), default=0)
+    number_power = DecimalField(validators.InputRequired(), default=0)
 
 
 class SpecifyNewSymbolVectorForm(FlaskForm):
@@ -1359,8 +1377,18 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     if request.method == "POST" and web_form_new_expression.validate():
         print("to_edit_expression: with web_form, request.form = ", request.form)
 
-        expression_latex = (
-            str(web_form_new_expression.expression_latex.data)
+        expression_latex_lhs = (
+            str(web_form_new_expression.expression_latex_lhs.data)
+            .strip()
+            .replace("\\", "\\\\")
+        )
+        expression_latex_rhs = (
+            str(web_form_new_expression.expression_latex_rhs.data)
+            .strip()
+            .replace("\\", "\\\\")
+        )
+        expression_latex_condition = (
+            str(web_form_new_expression.expression_latex_condition.data)
             .strip()
             .replace("\\", "\\\\")
         )
@@ -1369,7 +1397,11 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
             web_form_new_expression.expression_description.data
         ).strip()
 
-        print("pdg_app/to_edit_expression: expression_latex=", expression_latex)
+        print("pdg_app/to_edit_expression: expression_latex=", expression_latex_lhs)
+        print("pdg_app/to_edit_expression: expression_latex=", expression_latex_rhs)
+        print(
+            "pdg_app/to_edit_expression: expression_latex=", expression_latex_condition
+        )
         print("pdg_app/to_edit_expression: expression_name=", expression_name)
         print(
             "pdg_app/to_edit_expression: expression_description=",
@@ -1387,7 +1419,9 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
             session.write_transaction(
                 neo4j_query.edit_expression,
                 expression_id,
-                expression_latex,
+                expression_latex_lhs,
+                expression_latex_rhs,
+                expression_latex_condition,
                 expression_name,
                 expression_description,
                 now_str,
@@ -1810,8 +1844,14 @@ def to_add_expression() -> str:
 
         # request.form =  ImmutableMultiDict([('input1', 'a = b'), ('submit_button', 'Submit')])
 
-        expression_latex = (
-            str(web_form.expression_latex.data).strip().replace("\\", "\\\\")
+        expression_latex_lhs = (
+            str(web_form.expression_latex_lhs.data).strip().replace("\\", "\\\\")
+        )
+        expression_latex_rhs = (
+            str(web_form.expression_latex_rhs.data).strip().replace("\\", "\\\\")
+        )
+        expression_latex_condition = (
+            str(web_form.expression_latex_condition.data).strip().replace("\\", "\\\\")
         )
         expression_name = str(web_form.expression_name.data).strip()
         expression_description = str(web_form.expression_description.data).strip()
@@ -1840,7 +1880,9 @@ def to_add_expression() -> str:
                 neo4j_query.add_expression,
                 expression_id,
                 expression_name,
-                expression_latex,
+                expression_latex_lhs,
+                expression_latex_rhs,
+                expression_latex_condition,
                 expression_description,
                 author_name_latex,
             )
@@ -1906,6 +1948,12 @@ def to_add_feed() -> str:
         else:
             sympy_as_latex_per_expr_id[this_feed_dict["id"]] = None
 
+    list_of_nonoperation_symbol_dicts, query_time_dict = (
+        compute.get_list_of_all_nonoperation_symbol_dicts(
+            graphDB_Driver, query_time_dict
+        )
+    )
+
     web_form = SpecifyNewFeedForm(request.form)
     if request.method == "POST" and web_form.validate():
         print("request.form = ", request.form)
@@ -1952,6 +2000,7 @@ def to_add_feed() -> str:
         "feed_create.html",
         query_time_dict=query_time_dict,
         form=web_form,
+        list_of_nonoperation_symbol_dicts=list_of_nonoperation_symbol_dicts,
         symbols_per_feed=symbols_per_feed,
         list_of_feed_dicts=list_of_feed_dicts,
         sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
@@ -2160,6 +2209,80 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
     )
 
 
+@web_app.route("/new_symbol_scalar_constant/<symbol_id>/", methods=["GET", "POST"])
+def to_add_symbol_scalar_constant(symbol_id: unique_numeric_id_as_str) -> str:
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: app/to_add_symbol_scalar_constant start " + trace_id)
+    query_time_dict = {}  # type: Dict[str, float]
+
+    print("request.form = ", request.form)
+    web_form_constant_properties = SpecifyNewConstantNumberForm(request.form)
+    if request.method == "POST" and web_form_constant_properties.validate():
+        print("request.form = ", request.form)
+
+        number_decimal = float(web_form_constant_properties.number_decimal.data)
+        number_power = float(web_form_constant_properties.number_decimal.data)
+
+        dimension_mass_unit = "kilogram"
+        dimension_time_unit = "year"
+        dimension_length_unit = "meter"
+
+        author_name_latex = "ben"
+
+        # https://neo4j.com/docs/python-manual/current/session-api/
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            session.write_transaction(
+                neo4j_query.add_constant_value_with_units,
+                symbol_id,
+                number_decimal,
+                number_power,
+                dimension_mass_unit,
+                dimension_time_unit,
+                dimension_length_unit,
+                author_name_latex,
+            )
+
+    # TODO:
+    #  * specify numeric value
+    #  * specify units per dimension
+    #      * dimension:length can have units
+    #      * dimension:time   can have units
+    #      * dimension:mass   can have units
+    # the power per dimension was already specified on the previous page.
+
+    list_of_dimension_mass_units = ["kilogram", "gram", "pound"]
+    list_of_dimension_time_units = [
+        "year",
+        "month",
+        "fortnight",
+        "week",
+        "day",
+        "hour",
+        "minute",
+        "second",
+        "millisecond",
+        "microsecond",
+        "picosecond",
+        "femptosecond",
+    ]
+    list_of_dimension_length_units = [
+        "meter",
+        "centimeter",
+        "millimeter",
+        "feet",
+        "foot",
+        "mile",
+    ]
+
+    print("[TRACE] func: app/to_add_symbol_scalar_constant end " + trace_id)
+    return render_template(
+        "symbol_scalar_constant_create.html",
+        query_time_dict=query_time_dict,
+        form_symbol_properties=web_form_symbol_properties,
+    )
+
+
 @web_app.route("/new_symbol_scalar/", methods=["GET", "POST"])
 def to_add_symbol_scalar() -> str:
     """
@@ -2234,6 +2357,11 @@ def to_add_symbol_scalar() -> str:
                 dimension_amount_of_substance,
                 dimension_luminous_intensity,
                 author_name_latex,
+            )
+
+        if symbol_variable_or_constant == "constant":
+            return redirect(
+                url_for("to_add_symbol_scalar_constant", symbol_id=symbol_id)
             )
         return redirect(url_for("to_list_scalars"))
 

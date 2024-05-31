@@ -2,6 +2,28 @@
 ****************************
 2024-05-28
 
+design decision: Constrain user input of expressions to separately provide lhs, relation, rhs, when 
+
+For example:
+F = m a when v<<c
+
+(Previously (in v7) I accepted arbitrary Latex as input)
+
+****************************
+2024-05-28
+
+design decision: force user to see all expressions before adding new
+
+The landing page intentionally does not have links to "create new expression" and "create new symbol" and "create new inference rule.
+The user is forced to see all existing symbols (and expressions and inference rules) before creating a new instance.
+
+The same reasoning applies to where "create new symbol" is placed on the page -- at the bottom, which forces the user to scroll past all existing symbols. 
+Same for expressions and inference rules.
+
+
+****************************
+2024-05-28
+
 design decision: treat "symbol" as a node type, rather than have separate node types for subcategories like 
 "symbol_operation", "symbol_scalar", "symbol_vector", "symbol_matrix", "symbol_quantum_operator"
 
