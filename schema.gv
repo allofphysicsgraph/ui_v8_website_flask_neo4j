@@ -1,0 +1,31 @@
+digraph G {
+
+derivation [label="derivation\n- id\n- name" shape="box"];
+step [label="step\n-id" shape="box"];
+expression [label="expression\n- id\n- name" shape="box"];
+inference_rule [label="inference_rule\n-id" shape="box"];
+feed [label="feed\n-id" shape="box"];
+scalar [label="scalar\n- id" shape="box"];
+value_with_units [label="value_with_units\n-id" shape="box"];
+vector [label="vector\n- id" shape="box"];
+matrix [label="matrix\n- id" shape="box"];
+operation [label="operation\n- id" shape="box"];
+
+derivation -> step [label="has_step"];
+step -> inference_rule [label="has_inference_rule"];
+step -> expression [label="has_expression"];
+step -> feed [label="has_feed"];
+expression -> scalar [label="has_scalar"];
+feed -> scalar [label="has_scalar"];
+expression -> vector [label="has_vector"];
+feed -> vector [label="has_vector"];
+expression -> matrix [label="has_matrix"];
+feed -> matrix [label="has_matrix"];
+expression -> operation [label="has_operation"];
+feed -> operation [label="has_operation"];
+scalar -> value_with_units [label="has_value_with_units"];
+vector -> scalar [label="has_scalar"];
+matrix -> scalar [label="has_scalar"];
+
+}
+

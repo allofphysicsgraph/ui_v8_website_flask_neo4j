@@ -6,6 +6,7 @@ node_types = [
     "scalar",
     "vector",
     "matrix",
+    "value_with_units",
     "step",
     "expression",
 ]

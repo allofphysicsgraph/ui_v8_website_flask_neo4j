@@ -15,30 +15,54 @@
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_constant_properties.csrf_token }}
 
-    <P>{{ form_constant_properties.number_decimal.label}} (<B>required</B>): 
-       {{ form_constant_properties.number_decimal(size=50, minlength=1, maxlength=100) }}
-       *10^
-       {{ form_constant_properties.number_power.label}} (<B>required</B>): 
-       {{ form_constant_properties.number_power(size=50, minlength=1, maxlength=100) }}
+
+<table border="0">
+  <tr>
+    <td>{{ form_constant_properties.number_decimal(size=50) }}</td>
+    <td>*10^</td>
+    <td>{{ form_constant_properties.number_power(size=50, minlength=1, maxlength=100) }}</td>
+  </tr>
+  <tr>
+    <td>{{ form_constant_properties.number_decimal.label}} (<B>required</B>)</td>
+    <td></td>
+    <td>{{ form_constant_properties.number_power.label}} (<B>required</B>)</td>
+  </tr>
+       
 
     <P>with units
+
+{% if scalar_dict['dimension_mass'] != 0 %}
     <select name="mass_select_unit" class="selectpicker form-control" id="mass_select">
       {% for mass_unit in list_of_dimension_mass_units %}
       <option value="{{ mass_unit }}">{{ mass_unit }}</option>
       {% endfor %}
     </select>
+{% endif %}
 
+{% if scalar_dict['dimension_time'] != 0 %}
     <select name="time_select_unit" class="selectpicker form-control" id="time_select">
       {% for time_unit in list_of_dimension_time_units %}
       <option value="{{ time_unit }}">{{ time_unit }}</option>
       {% endfor %}
     </select>
+{% endif %}
 
+{% if scalar_dict['dimension_length'] != 0 %}
     <select name="length_select_unit" class="selectpicker form-control" id="length_select">
       {% for length_unit in list_of_dimension_length_units %}
       <option value="{{ length_unit }}">{{ length_unit }}</option>
       {% endfor %}
     </select>
+{% endif %}
+
+{% if scalar_dict['dimension_temperature'] != 0 %}
+{% endif %}
+{% if scalar_dict['dimension_electric_charge'] != 0 %}
+{% endif %}
+{% if scalar_dict['dimension_amount_of_substance'] != 0 %}
+{% endif %}
+{% if scalar_dict['dimension_luminous_intensity'] != 0 %}
+{% endif %}
 
     <P><input type="submit" value="set value and dimension for constant scalar symbol">
     </P>

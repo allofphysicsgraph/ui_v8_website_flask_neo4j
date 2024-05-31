@@ -54,8 +54,18 @@ properties={'author_name_latex': str      # 'jane doe'
             'dimension_temperature': int, # 0
             'dimension_electric_charge': int,     # 0
             'dimension_amount_of_substance': int, # 0
-            'dimension_luminous_intensity': int,  # 0
+            'dimension_luminous_intensity': int}  # 0
 
+node type: 'value_and_units'
+properties={'author_name_latex': str      # 'jane doe'
+            'id': str,                    # '9424534'
+            'dimension_length_unit': int,      # "meter"
+            'dimension_time_unit': int,        # "second"
+            'dimension_mass_unit': int,        # "kilogram"
+            'dimension_temperature_unit': int, # "celcius"
+            'dimension_electric_charge_unit': int,     # "coloumb"
+            'dimension_amount_of_substance_unit': int, # "mol"
+            'dimension_luminous_intensity_unit': int,  # "?"
 
 node type: 'vector'
 properties={'author_name_latex': str      # 'jane doe'
@@ -109,15 +119,15 @@ edges:
 type='HAS_STEP' properties={'sequence_index': '1'}
 :step
 
-:inference_rule
+:step
 type='HAS_INPUT' properties={'sequence_index': '0'}
 :expression
 
-:inference_rule
+:step
 type='HAS_FEED' properties={'sequence_index': '0'}
 :expression
 
-:inference_rule
+:step
 type='HAS_OUTPUT' properties={'sequence_index': '0'}
 :expression
 
@@ -125,10 +135,43 @@ type='HAS_OUTPUT' properties={'sequence_index': '0'}
 type='HAS_INFERENCE_RULE'
 :inference_rule
 
+:expression
+type='HAS_SYMBOL'
+:scalar
 
 :expression
 type='HAS_SYMBOL'
-:symbol
+:vector
+
+:expression
+type='HAS_SYMBOL'
+:matrix
+
+:expression
+type='HAS_SYMBOL'
+:operation
+
+:feed
+type='HAS_SYMBOL'
+:scalar
+
+:feed
+type='HAS_SYMBOL'
+:vector
+
+:feed
+type='HAS_SYMBOL'
+:matrix
+
+:feed
+type='HAS_SYMBOL'
+:operation
+
+
+
+:scalar
+type='HAS_VALUE'
+:value_and_units
 
 
 

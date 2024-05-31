@@ -454,7 +454,7 @@ def step_has_expressions(tx, step_id: str, expression_type: str) -> list:
     return list_of_expression_IDs
 
 
-def node_properties(tx, node_type: str, node_id: str) -> dict:
+def get_node_properties(tx, node_type: str, node_id: str) -> dict:
     """
     metadata associated with the node_id
 
@@ -1118,7 +1118,8 @@ def add_quantum_operator_symbol(
 
 def add_constant_value_with_units(
     tx,
-    symbol_id: str,
+    scalar_id: str,
+    value_with_units_id: str,
     number_decimal: float,
     number_power: float,
     dimension_mass_unit: str,
@@ -1131,6 +1132,29 @@ def add_constant_value_with_units(
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/add_constant_value_with_units start " + trace_id)
+
+    # create new node for value
+    result = tx.run(
+        "merge (:value_with_units "
+        "{number_decimal:" + str(number_decimal) + ", "
+        " number_power: " + str(number_power) + ", "
+        ' id:"' + str(value_with_units_id) + '", '
+        ' dimension_mass_unit:"' + str(dimension_mass_unit) + '", '
+        ' dimension_time_unit:"' + str(dimension_time_unit) + '", '
+        ' dimension_length_unit:"' + str(dimension_length_unit) + '", '
+        ' author_name_latex:"' + str(author_name_latex) + '"})'
+    )
+
+    # create edge between scalar and value
+    result = tx.run(
+        "MATCH (s:scalar),(v:value_with_units) "
+        'WHERE s.id="'
+        + str(scalar_id)
+        + '" AND v.id="'
+        + str(value_with_units_id)
+        + '" '
+        "MERGE (s)-[:HAS_VALUE]->(v)"
+    )
 
     print("[TRACE] func: neo4j_query/add_constant_value_with_units end " + trace_id)
     return

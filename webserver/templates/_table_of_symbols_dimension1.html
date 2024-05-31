@@ -5,7 +5,7 @@
 <!- - { { list_of_vector_dicts } } - ->
 
 <ul>
-{ % for this_vector_dict in list_of_dimension1_vector_dicts %}
+{ % for this_vector_dict in list_of_vector_dicts %}
 <li>{ { this_vector_dict }}</li>
 { % endfor %}
 </ul>
@@ -24,7 +24,7 @@
     <th>is_composite</th>
     <th>size</th>
   </tr>
-  {% for vector_dict in list_of_dimension1_vector_dicts %}
+  {% for vector_dict in list_of_vector_dicts %}
   <tr>
     <td>
       <a href="{{ url_for( 'to_edit_vector', vector_id=vector_dict['id'] ) }}">

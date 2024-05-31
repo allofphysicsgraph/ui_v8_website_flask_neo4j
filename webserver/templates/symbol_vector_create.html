@@ -19,13 +19,17 @@
 
     <P>{{ form_vector_properties.vector_latex.label}} (<B>required</B>): {{ form_vector_properties.vector_latex(size=50, minlength=1, maxlength=1000) }}</P>
 
-    <P>{{ form_vector_properties.vector_is_composite.label }} (<B><em>required</em></B>): {{ form_vector_properties.vector_is_composite }}</p>
+    <P>{{ form_vector_properties.vector_is_composite.label }} (<B><em>required</em></B>): 
+       {{ form_vector_properties.vector_is_composite }}</p>
     
-    <P>{{form_vector_properties.vector_name.label }} (<small><em>optional</em></small>): {{ form_vector_properties.vector_name(size=50, maxlength=1000) }}</p>
+    <P>{{ form_vector_properties.vector_name_latex.label }} (<small><em>optional</em></small>): 
+       {{ form_vector_properties.vector_name_latex(size=50, maxlength=1000) }}</p>
     
-    <P>{{form_vector_properties.vector_description.label }} (<small><em>optional</em></small>): {{ form_vector_properties.vector_description(size=50, maxlength=1000) }}</p>
+    <P>{{ form_vector_properties.vector_description_latex.label }} (<small><em>optional</em></small>): 
+       {{ form_vector_properties.vector_description_latex(size=50, maxlength=1000) }}</p>
 
-    <P>{{ form_vector_properties.vector_reference.label }} (<small><em>optional</em></small>): {{ form_vector_properties.vector_reference(size=50, maxlength=1000) }}</p>
+    <P>{{ form_vector_properties.vector_reference_latex.label }} (<small><em>optional</em></small>): 
+       {{ form_vector_properties.vector_reference_latex(size=50, maxlength=1000) }}</p>
 
 <table>
 <table border="0" id="scope_table">

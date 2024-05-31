@@ -5,7 +5,7 @@
 <!- - { { list_of_matrix_dicts } } - ->
 
 <ul>
-{ % for this_matrix_dict in list_of_dimension2ormore_matrix_dicts %}
+{ % for this_matrix_dict in list_of_matrix_dicts %}
 <li>{ { this_matrix_dict }}</li>
 { % endfor %}
 </ul>
@@ -23,7 +23,7 @@
     <th>is_composite</th>
     <th>size</th>
   </tr>
-  {% for matrix_dict in list_of_dimension2ormore_matrix_dicts %}
+  {% for matrix_dict in list_of_matrix_dicts %}
   <tr>
     <td>
       <a href="{{ url_for( 'to_edit_matrix', matrix_id=matrix_dict['id'] ) }}">

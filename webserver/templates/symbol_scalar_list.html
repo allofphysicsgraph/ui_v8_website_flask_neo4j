@@ -21,7 +21,7 @@
 
 <fieldset>
 <legend>
-  <H2 id="scalar">There are {{ list_of_dimension0_symbol_dicts|length }} Scalars, aka symbols of dimension 0</h2>
+  <H2 id="scalar">There are {{ list_of_scalar_dicts|length }} Scalars, aka symbols of dimension 0</h2>
 </legend>
 
 <P>The symbol ID links to a page where you can edit the symbol<BR>
@@ -56,9 +56,9 @@
 function select_symbol() {
   // Declare variables
   var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('symbol_input');
+  input = document.getElementById('scalar_input');
   filter = input.value.toUpperCase();
-  ul = document.getElementById("symbol_UL");
+  ul = document.getElementById("scalar_UL");
   li = ul.getElementsByTagName('li');
 
   // Loop through all list items, and hide those who don't match the search query

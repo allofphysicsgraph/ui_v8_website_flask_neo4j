@@ -12,6 +12,7 @@
 import random
 import time
 import neo4j_query
+import list_of_valid
 
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
@@ -21,7 +22,9 @@ from typing import NewType, Dict, List
 unique_numeric_id_as_str = NewType("unique_numeric_id_as_str", str)
 
 
-def generate_random_id(list_of_current_IDs: list) -> unique_numeric_id_as_str:
+def generate_random_id(
+    graphDB_Driver, query_time_dict: dict, node_type: str
+) -> unique_numeric_id_as_str:
     """
     create statically defined numeric IDs for nodes in the graph
 
@@ -31,15 +34,25 @@ def generate_random_id(list_of_current_IDs: list) -> unique_numeric_id_as_str:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: compute/generate_random_id start " + trace_id)
 
+    assert node_type in list_of_valid.node_types
+
+    list_of_existing_IDs = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_existing_IDs = session.read_transaction(neo4j_query.list_IDs, node_type)
+        query_time_dict["compute/generate_random_id: list_IDs" + node_type] = (
+            time.time() - query_start_time
+        )
+
     found_new_ID = False
     while not found_new_ID:
         new_id = str(random.randint(1000000, 9999999))
-        if new_id not in list_of_current_IDs:
+        if new_id not in list_of_existing_IDs:
             found_new_ID = True
 
     print("new_id=", str(new_id))
     print("[TRACE] func: compute/generate_random_id end " + trace_id)
-    return str(new_id)
+    return str(new_id), query_time_dict
 
 
 def get_dict_of_expressions_that_use_symbol(
@@ -110,7 +123,7 @@ def get_dict_of_derivations_that_use_symbol(
                 "operation",
             )
             query_time_dict[
-                "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol"
+                "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol operation"
             ] = (time.time() - query_start_time)
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -120,7 +133,7 @@ def get_dict_of_derivations_that_use_symbol(
                 "scalar",
             )
             query_time_dict[
-                "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol"
+                "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol scalar"
             ] = (time.time() - query_start_time)
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -130,7 +143,7 @@ def get_dict_of_derivations_that_use_symbol(
                 "vector",
             )
             query_time_dict[
-                "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol"
+                "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol vector"
             ] = (time.time() - query_start_time)
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -140,7 +153,7 @@ def get_dict_of_derivations_that_use_symbol(
                 "matrix",
             )
             query_time_dict[
-                "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol"
+                "get_dict_of_derivations_that_use_symbol: derivations_that_use_symbol matrix"
             ] = (time.time() - query_start_time)
 
         dict_of_derivations_that_use_symbol[this_symbol_dict["id"]] = (

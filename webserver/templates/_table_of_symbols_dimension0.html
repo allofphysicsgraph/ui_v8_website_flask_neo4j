@@ -1,15 +1,12 @@
 
-<!--
+
 <P>For debugging purposes, here is the all the info available:
 
-<!- - { { list_of_scalar_dicts } } - ->
-
 <ul>
-{ % for this_scalar_dict in list_of_dimension0_scalar_dicts %}
-<li>{ { this_scalar_dict }}</li>
-{ % endfor %}
+{% for this_scalar_dict in list_of_scalar_dicts %}
+<li>{{ this_scalar_dict }}</li>
+{% endfor %}
 </ul>
--->
 
 <table border="1" id="scalar_table" class="sortable">
   <tr>
@@ -31,7 +28,7 @@
     <th><small>dimension:</small> amount of substance</th>
     <th><small>dimension:</small> temperature</th>
   </tr>
-  {% for scalar_dict in list_of_dimension0_scalar_dicts %}
+  {% for scalar_dict in list_of_scalar_dicts %}
   <tr>
     <td>
       <a href="{{ url_for( 'to_edit_scalar', scalar_id=scalar_dict['id'] ) }}">
