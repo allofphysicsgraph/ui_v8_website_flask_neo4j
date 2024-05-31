@@ -124,6 +124,7 @@ import latex_and_sympy
 import latex
 import sympy_validate_step
 import sympy_validate_expression
+import list_of_valid
 
 # ORDERING: this has to come before the functions that use this type
 from compute import unique_numeric_id_as_str
@@ -2221,7 +2222,7 @@ def to_add_symbol_scalar_constant(symbol_id: unique_numeric_id_as_str) -> str:
         print("request.form = ", request.form)
 
         number_decimal = float(web_form_constant_properties.number_decimal.data)
-        number_power = float(web_form_constant_properties.number_decimal.data)
+        number_power = float(web_form_constant_properties.number_power.data)
 
         dimension_mass_unit = "kilogram"
         dimension_time_unit = "year"
@@ -2251,35 +2252,14 @@ def to_add_symbol_scalar_constant(symbol_id: unique_numeric_id_as_str) -> str:
     #      * dimension:mass   can have units
     # the power per dimension was already specified on the previous page.
 
-    list_of_dimension_mass_units = ["kilogram", "gram", "pound"]
-    list_of_dimension_time_units = [
-        "year",
-        "month",
-        "fortnight",
-        "week",
-        "day",
-        "hour",
-        "minute",
-        "second",
-        "millisecond",
-        "microsecond",
-        "picosecond",
-        "femptosecond",
-    ]
-    list_of_dimension_length_units = [
-        "meter",
-        "centimeter",
-        "millimeter",
-        "feet",
-        "foot",
-        "mile",
-    ]
-
     print("[TRACE] func: app/to_add_symbol_scalar_constant end " + trace_id)
     return render_template(
         "symbol_scalar_constant_create.html",
         query_time_dict=query_time_dict,
-        form_symbol_properties=web_form_symbol_properties,
+        form_constant_properties=web_form_constant_properties,
+        list_of_dimension_mass_units=list_of_valid.dimension_mass_units,
+        list_of_dimension_time_units=list_of_valid.dimension_time_units,
+        list_of_dimension_length_units=list_of_valid.dimension_length_units,
     )
 
 
