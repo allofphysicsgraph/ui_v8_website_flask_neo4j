@@ -9,7 +9,6 @@
 """
 queries for Neo4j, written in Cypher
 
-TODO: replace CREATE with MERGE
 
 TODO: view current schema
 https://neo4j.com/docs/getting-started/current/cypher-intro/schema/
@@ -162,10 +161,10 @@ def symbols_in_expression_or_feed(
     for result in tx.run(
         "MATCH (e:"
         + expression_or_feed
-        + ")-[:HAS_SYMBOL]->(s:'"
+        + ")-[:HAS_SYMBOL]->(s:"
         + symbol_category
-        + "') WHERE e.id='"
-        + expression_id
+        + ") WHERE e.id='"
+        + expression_or_feed_id
         + "' RETURN s.id"
     ):
         symbol_list.append(result.data()["s.id"])
@@ -487,6 +486,7 @@ def add_derivation(
     now_str: str,
     derivation_name_latex: str,
     derivation_abstract_latex: str,
+    derivation_reference_latex: str,
     author_name_latex: str,
 ) -> None:
     """
@@ -506,10 +506,11 @@ def add_derivation(
     )
 
     result = tx.run(
-        "CREATE (:derivation "
+        "merge (:derivation "
         '{name_latex:"' + derivation_name_latex + '",'
         ' abstract_latex:"' + derivation_abstract_latex + '",'
         ' created_datetime:"' + now_str + '",'
+        ' reference_latex:"' + derivation_reference_latex + '",'
         ' author_name_latex:"' + author_name_latex + '",'
         ' id:"' + derivation_id + '"})'
     )
@@ -549,7 +550,7 @@ def add_inference_rule(
     assert int(number_of_outputs) >= 0
 
     result = tx.run(
-        "CREATE (a:inference_rule "
+        "merge (:inference_rule "
         '{name_latex:"' + inference_rule_name + '", '
         ' latex:"' + inference_rule_latex + '", '
         ' author_name_latex:"' + author_name_latex + '", '
@@ -587,10 +588,12 @@ def edit_expression(
     tx,
     expression_id: str,
     expression_latex_lhs: str,
+    expression_relation: str,
     expression_latex_rhs: str,
     expression_latex_condition: str,
-    expression_name: str,
-    expression_description: str,
+    expression_name_latex: str,
+    expression_description_latex: str,
+    expression_reference_latex: str,
     now_str: str,
     author_name_latex: str,
 ) -> None:
@@ -603,11 +606,15 @@ def edit_expression(
     result = tx.run(
         'MERGE (e:expression {id:"' + str(expression_id) + '"})'
         'SET e = {id: "' + str(expression_id) + '",'
-        'name_latex: "' + str(expression_name) + '",'
-        'description_latex: "' + str(expression_description) + '",'
+        'name_latex: "' + str(expression_name_latex) + '",'
+        'description_latex: "' + str(expression_description_latex) + '",'
+        'reference_latex: "' + str(expression_reference_latex) + '",'
         'created_datetime:"' + now_str + '",'
         'author_name_latex:"' + author_name_latex + '",'
-        'latex: "' + str(expression_latex) + '"}'
+        'latex_lhs: "' + str(expression_latex_lhs) + '",'
+        'relation: "' + str(expression_relation) + '",'
+        'latex_rhs: "' + str(expression_latex_rhs) + '",'
+        'latex_condition: "' + str(expression_latex_condition) + '"}'
     )
 
     print("[TRACE] func: neo4j_query/edit_expression end " + trace_id)
@@ -828,85 +835,36 @@ def disconnect_symbol_from_feed(
     return
 
 
-def add_symbol_to_expression(
-    tx, symbol_id: str, expression_id: str, symbol_category: str
+def add_symbol_to_expression_or_feed(
+    tx,
+    expression_or_feed: str,
+    symbol_id: str,
+    expression_or_feed_id: str,
+    symbol_category: str,
 ) -> None:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/add_symbol_to_expression start " + trace_id)
-    print("symbol_id=", symbol_id, "expression_id=", expression_id)
+    print("symbol_id=", symbol_id, "expression_or_feed_id=", expression_or_feed_id)
 
+    assert expression_or_feed in ["expression", "feed"]
     assert symbol_category in list_of_valid.symbol_categories
 
-    # print(
-    #     "MATCH (e:expression),(s:symbol) WHERE e.id='"
-    #     + str(expression_id)
-    #     + "' AND s.id='"
-    #     + str(symbol_id)
-    #     + "' MERGE (e)-[r:HAS_SYMBOL]->(s) RETURN r"
-    # )
-    # print(
-    #     "MATCH (e:expression),(s:symbol) WHERE e.id='"
-    #     + str(expression_id)
-    #     + "' AND s.id='"
-    #     + str(symbol_id)
-    #     + "' MERGE (e)-[:HAS_SYMBOL]->(s)"
-    # )
-
     result = tx.run(
-        "MATCH (e:expression),(s:"
+        "MATCH (e:"
+        + expression_or_feed
+        + "),(s:"
         + symbol_category
         + ") "
         + 'WHERE e.id="'
-        + str(expression_id)
+        + str(expression_or_feed_id)
         + '" AND s.id="'
         + str(symbol_id)
         + '" '
         + "MERGE (e)-[r:HAS_SYMBOL]->(s)"
     )
-    # print("result.data=", result.data())
 
     print("[TRACE] func: neo4j_query/add_symbol_to_expression end " + trace_id)
-    return
-
-
-def add_symbol_to_feed(tx, symbol_id: str, feed_id: str, symbol_category: str) -> None:
-    """ """
-    trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/add_symbol_to_feed start " + trace_id)
-    print("symbol_id=", symbol_id, "feed_id=", feed_id)
-
-    assert symbol_category in list_of_valid.symbol_categories
-
-    # print(
-    #     "MATCH (e:feed),(s:symbol) WHERE e.id='"
-    #     + str(feed_id)
-    #     + "' AND s.id='"
-    #     + str(symbol_id)
-    #     + "' MERGE (e)-[r:HAS_SYMBOL]->(s) RETURN r"
-    # )
-    # print(
-    #     "MATCH (e:feed),(s:symbol) WHERE e.id='"
-    #     + str(feed_id)
-    #     + "' AND s.id='"
-    #     + str(symbol_id)
-    #     + "' MERGE (e)-[:HAS_SYMBOL]->(s)"
-    # )
-
-    result = tx.run(
-        "MATCH (e:feed),(s:"
-        + symbol_category
-        + ") "
-        + 'WHERE e.id="'
-        + str(feed_id)
-        + '" AND s.id="'
-        + str(symbol_id)
-        + '" '
-        + "MERGE (e)-[r:HAS_SYMBOL]->(s)"
-    )
-    # print("result.data=", result.data())
-
-    print("[TRACE] func: neo4j_query/add_symbol_to_feed end " + trace_id)
     return
 
 
@@ -1060,11 +1018,13 @@ def add_expressions_to_step(
 def add_expression(
     tx,
     expression_id: str,
-    expression_name: str,
+    expression_name_latex: str,
     expression_latex_lhs: str,
+    expression_relation: str,
     expression_latex_rhs: str,
     expression_latex_condition: str,
-    expression_description: str,
+    expression_description_latex: str,
+    expression_reference_latex: str,
     author_name_latex: str,
 ) -> None:
     """
@@ -1076,15 +1036,16 @@ def add_expression(
     print("[TRACE] func: neo4j_query/add_expression start " + trace_id)
 
     result = tx.run(
-        "CREATE (a:expression "
-        '{name_latex:"' + str(expression_name) + '", '
+        "MERGE (:expression "
+        '{name_latex:"' + str(expression_name_latex) + '", '
         ' latex_lhs:"' + str(expression_latex_lhs) + '", '
-        ' relation: "=",'
+        ' relation:"' + str(expression_relation) + '", '
         ' latex_rhs:"' + str(expression_latex_rhs) + '", '
         ' latex_condition: "' + str(expression_latex_condition) + '", '
         #' lean:"' + str(expression_lean) + '", '
         #' sympy:"' + str(expression_sympy) + '", '
-        ' description_latex:"' + str(expression_description) + '", '
+        ' description_latex:"' + str(expression_description_latex) + '", '
+        ' reference_latex:"' + str(expression_reference_latex) + '", '
         ' author_name_latex:"' + str(author_name_latex) + '", '
         ' id:"' + str(expression_id) + '"})'
     )
@@ -1097,6 +1058,8 @@ def add_feed(
     tx,
     feed_id: str,
     feed_latex: str,
+    feed_sympy: str,
+    feed_lean: str,
     author_name_latex: str,
 ) -> None:
     """
@@ -1108,9 +1071,11 @@ def add_feed(
     print("[TRACE] func: neo4j_query/add_feed start " + trace_id)
 
     result = tx.run(
-        "CREATE (a:feed "
+        "merge (:feed "
         '{latex:"' + str(feed_latex) + '", '
         ' author_name_latex:"' + str(author_name_latex) + '", '
+        ' sympy:"' + str(feed_sympy) + '", '
+        ' lean:"' + str(feed_lean) + '", '
         ' id:"' + str(feed_id) + '"})'
     )
 
@@ -1137,13 +1102,13 @@ def add_quantum_operator_symbol(
     print("[TRACE] func: neo4j_query/add_quantum_operator_symbol start " + trace_id)
 
     result = tx.run(
-        "CREATE (:quantum_operator "
+        "merge (:quantum_operator "
         '{name_latex:"' + str(symbol_name) + '", '
         ' latex:"' + str(symbol_latex) + '", '
         ' description_latex:"' + str(symbol_description) + '", '
         ' author_name_latex:"' + str(author_name_latex) + '", '
         " requires_arguments:" + str(symbol_requires_arguments) + ", "
-        ' symbol_reference:"' + str(symbol_reference) + '", '
+        ' reference_latex:"' + str(symbol_reference) + '", '
         ' id:"' + str(symbol_id) + '"})'
     )
 
@@ -1202,12 +1167,11 @@ def add_scalar_symbol(
     assert len(symbol_variable_or_constant) > 0
 
     result = tx.run(
-        "CREATE (a:scalar "
+        "merge (:scalar "
         '{name_latex:"' + str(symbol_name) + '", '
         ' latex:"' + str(symbol_latex) + '", '
         ' description_latex:"' + str(symbol_description) + '", '
-        ' reference:"' + str(symbol_reference) + '",'
-        " dimension_count: 0,"
+        ' reference_latex:"' + str(symbol_reference) + '",'
         ' scope:"' + str(symbol_scope) + '",'
         ' variable_or_constant:"' + str(symbol_variable_or_constant) + '",'
         ' domain:"' + str(symbol_domain) + '",'
@@ -1218,7 +1182,6 @@ def add_scalar_symbol(
         " dimension_electric_charge: " + str(dimension_electric_charge) + ", "
         " dimension_amount_of_substance: " + str(dimension_amount_of_substance) + ", "
         " dimension_luminous_intensity: " + str(dimension_luminous_intensity) + ", "
-        " requires_arguments: False,"
         ' author_name_latex:"' + str(author_name_latex) + '", '
         ' id:"' + str(symbol_id) + '"})'
     )
@@ -1251,32 +1214,28 @@ def add_vector_symbol(
 
     if symbol_size == "arbitrary":
         result = tx.run(
-            "CREATE (:vector "
+            "merge (:vector "
             '{name_latex:"' + str(symbol_name) + '", '
             ' latex:"' + str(symbol_latex) + '", '
             ' description_latex:"' + str(symbol_description) + '", '
-            ' symbol_reference:"' + str(symbol_reference) + '", '
-            " dimension_count: 1,"
+            ' reference_latex:"' + str(symbol_reference) + '", '
             'orientation:"' + str(symbol_orientation) + '", '
             " size: '" + str(symbol_size) + "',"
             "is_composite:" + str(symbol_is_composite) + ","
-            " requires_arguments: False,"
             ' author_name_latex:"' + str(author_name_latex) + '", '
             ' id:"' + str(symbol_id) + '"})'
         )
     else:  # fixed size
         result = tx.run(
-            "CREATE (:vector "
+            "merge (:vector "
             '{name_latex:"' + str(symbol_name) + '", '
             ' latex:"' + str(symbol_latex) + '", '
             ' description_latex:"' + str(symbol_description) + '", '
-            ' symbol_reference:"' + str(symbol_reference) + '", '
-            " dimension_count: 1,"
+            ' reference_latex:"' + str(symbol_reference) + '", '
             'orientation:"' + str(symbol_orientation) + '", '
             " size: '" + str(symbol_size) + "',"
             'number_of_entries:"' + str(symbol_number_of_entries) + '", '
             "is_composite:" + str(symbol_is_composite) + ","
-            " requires_arguments: False,"
             ' author_name_latex:"' + str(author_name_latex) + '", '
             ' id:"' + str(symbol_id) + '"})'
         )
@@ -1309,31 +1268,27 @@ def add_matrix_symbol(
 
     if symbol_size == "arbitrary":
         result = tx.run(
-            "CREATE (:matrix "
+            "merge (:matrix "
             '{name_latex:"' + str(symbol_name) + '", '
             ' latex:"' + str(symbol_latex) + '", '
             ' description_latex:"' + str(symbol_description) + '", '
-            ' symbol_reference:"' + str(symbol_reference) + '", '
-            " dimension_count: 2,"
+            ' reference_latex:"' + str(symbol_reference) + '", '
             " size: '" + str(symbol_size) + "',"
             "is_composite:" + str(symbol_is_composite) + ","
-            " requires_arguments: False,"
             ' author_name_latex:"' + str(author_name_latex) + '", '
             ' id:"' + str(symbol_id) + '"})'
         )
     else:  # fixed size
         result = tx.run(
-            "CREATE (:matrix "
+            "merge (:matrix "
             '{name_latex:"' + str(symbol_name) + '", '
             ' latex:"' + str(symbol_latex) + '", '
             ' description_latex:"' + str(symbol_description) + '", '
-            ' symbol_reference:"' + str(symbol_reference) + '", '
-            " dimension_count: 2,"
+            ' reference_latex:"' + str(symbol_reference) + '", '
             " size: '" + str(symbol_size) + "',"
             'number_of_rows:"' + str(symbol_number_of_rows) + '", '
             'number_of_columns:"' + str(symbol_number_of_columns) + '", '
             "is_composite:" + str(symbol_is_composite) + ","
-            " requires_arguments: False,"
             ' author_name_latex:"' + str(author_name_latex) + '", '
             ' id:"' + str(symbol_id) + '"})'
         )
@@ -1347,7 +1302,8 @@ def add_operation_symbol(
     operation_id: str,
     operation_name: str,
     operation_latex: str,
-    operation_description: str,
+    operation_description_latex: str,
+    operation_reference_latex: str,
     operation_argument_count: int,
     author_name_latex: str,
 ) -> None:
@@ -1365,12 +1321,12 @@ def add_operation_symbol(
     assert int(operation_argument_count) > 0
 
     result = tx.run(
-        "CREATE (a:operation "
+        "merge (:operation "
         '{name_latex:"' + str(operation_name) + '", '
         ' latex:"' + str(operation_latex) + '", '
-        ' description_latex:"' + str(operation_description) + '", '
+        ' description_latex:"' + str(operation_description_latex) + '", '
+        ' reference_latex:"' + str(operation_reference_latex) + '", '
         " argument_count:" + str(operation_argument_count) + ", "
-        " requires_arguments: True,"
         ' author_name_latex:"' + str(author_name_latex) + '", '
         ' id:"' + str(operation_id) + '"})'
     )

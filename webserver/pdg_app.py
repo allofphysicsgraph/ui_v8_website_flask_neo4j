@@ -214,6 +214,10 @@ class SpecifyNewDerivationForm(FlaskForm):
         "derivation name (latex)",
         validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
     )
+    derivation_reference_latex = StringField(
+        "derivation reference (latex)",
+        validators=[validators.Length(min=0, max=1000)],
+    )
     abstract_latex = StringField(
         "abstract (latex)",
         validators=[validators.InputRequired(), validators.Length(min=5, max=10000)],
@@ -289,11 +293,15 @@ class SpecifyNewExpressionForm(FlaskForm):
         validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
     )
 
-    expression_name = StringField(
+    expression_name_latex = StringField(
         "name (LaTeX)",
         validators=[validators.Length(max=1000)],
     )
-    expression_description = StringField(
+    expression_reference_latex = StringField(
+        "reference (LaTeX)",
+        validators=[validators.Length(max=1000)],
+    )
+    expression_description_latex = StringField(
         "description (LaTeX)",
         validators=[validators.Length(max=1000)],
     )
@@ -338,22 +346,22 @@ class SpecifyNewSymbolScalarForm(FlaskForm):
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
 
-    symbol_latex = StringField(
-        label="LaTeX symbol",
+    scalar_latex = StringField(
+        label="LaTeX scalar",
         validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
     )
 
-    symbol_name = StringField(
+    scalar_name_latex = StringField(
         label="name (LaTeX)",
         validators=[validators.Length(max=1000)],
     )
-    symbol_description = StringField(
+    scalar_description_latex = StringField(
         label="description (LaTeX)",
         validators=[validators.Length(max=1000)],
     )
-    symbol_reference = StringField("reference")
+    scalar_reference_latex = StringField("reference")
 
-    symbol_scope = RadioField(
+    scalar_scope = RadioField(
         label="scope",
         choices=[
             ("real", "real"),
@@ -365,7 +373,7 @@ class SpecifyNewSymbolScalarForm(FlaskForm):
         validators=[validators.InputRequired()],
     )
 
-    symbol_variable_or_constant = RadioField(
+    scalar_variable_or_constant = RadioField(
         label="variable or constant",
         choices=[("variable", "variable"), ("constant", "constant")],
         default="variable",
@@ -373,7 +381,7 @@ class SpecifyNewSymbolScalarForm(FlaskForm):
     )
 
     # domain = input; range = output
-    symbol_domain = RadioField(
+    scalar_domain = RadioField(
         "domain",
         choices=[
             ("any", "any"),
@@ -432,34 +440,34 @@ class SpecifyNewSymbolVectorForm(FlaskForm):
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
 
-    symbol_latex = StringField(
-        label="LaTeX symbol",
+    vector_latex = StringField(
+        label="LaTeX vector",
         validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
     )
 
-    symbol_name = StringField(
+    vector_name_latex = StringField(
         label="name (LaTeX)",
         validators=[validators.Length(max=1000)],
     )
-    symbol_description = StringField(
+    vector_description_latex = StringField(
         label="description (LaTeX)",
         validators=[validators.Length(max=1000)],
     )
-    symbol_reference = StringField("reference")
+    vector_reference_latex = StringField("reference")
 
-    symbol_is_composite = BooleanField(
+    vector_is_composite = BooleanField(
         label="is composite",
         description="check for 'yes'; unchecked for 'no'",
     )
 
-    symbol_size = RadioField(
+    vector_size = RadioField(
         label="size",
         choices=[("arbitrary", "arbitrary"), ("fixed", "fixed")],
         default="arbitrary",
         validators=[validators.InputRequired()],
     )
 
-    symbol_orientation = RadioField(
+    vector_orientation = RadioField(
         label="orientation",
         choices=[
             ("row vector", "row vector"),
@@ -469,7 +477,7 @@ class SpecifyNewSymbolVectorForm(FlaskForm):
         default="arbitrary",
     )
 
-    symbol_number_of_entries = IntegerField(
+    vector_number_of_entries = IntegerField(
         label="number of entries",
         validators=[validators.NumberRange(min=1, max=20)],
         default=1,
@@ -481,39 +489,39 @@ class SpecifyNewSymbolMatrixForm(FlaskForm):
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
 
-    symbol_latex = StringField(
-        label="LaTeX symbol",
+    matrix_latex = StringField(
+        label="LaTeX matrix",
         validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
     )
 
-    symbol_name = StringField(
+    matrix_name_latex = StringField(
         label="name (LaTeX)",
         validators=[validators.Length(max=1000)],
     )
-    symbol_description = StringField(
+    matrix_description_latex = StringField(
         label="description (LaTeX)",
         validators=[validators.Length(max=1000)],
     )
-    symbol_reference = StringField("reference")
+    matrix_reference_latex = StringField("reference")
 
-    symbol_is_composite = BooleanField(
+    matrix_is_composite = BooleanField(
         label="is composite",
         description="check for 'yes'; unchecked for 'no'",
     )
 
-    symbol_size = RadioField(
+    matrix_size = RadioField(
         label="size",
         choices=[("arbitrary", "arbitrary"), ("fixed", "fixed")],
         default="arbitrary",
         validators=[validators.InputRequired()],
     )
 
-    symbol_number_of_rows = IntegerField(
+    matrix_number_of_rows = IntegerField(
         label="number of rows",
         validators=[validators.InputRequired(), validators.NumberRange(min=1, max=20)],
         default=1,
     )
-    symbol_number_of_columns = IntegerField(
+    matrix_number_of_columns = IntegerField(
         label="number of columns",
         validators=[validators.InputRequired(), validators.NumberRange(min=1, max=20)],
         default=1,
@@ -532,150 +540,150 @@ class SpecifyNewSymbolOperationForm(FlaskForm):
         default=1,
     )
 
-    operation_name = StringField(
+    operation_name_latex = StringField(
         "name (LaTeX)",
         validators=[validators.InputRequired(), validators.Length(max=1000)],
     )
-    operation_description = StringField(
+    operation_description_latex = StringField(
         "description (LaTeX)",
         validators=[validators.Length(max=1000)],
     )
-    operation_reference = StringField("reference")
+    operation_reference_latex = StringField("reference")
 
 
-class SpecifyNewSymbolForm(FlaskForm):
-    """
-    web form for user to specify symbols used in expressions
+# class SpecifyNewSymbolForm(FlaskForm):
+#     """
+#     web form for user to specify symbols used in expressions
 
-    user hasn't specified whether this is an operation, scalar, vector, or matrix
-    """
+#     user hasn't specified whether this is an operation, scalar, vector, or matrix
+#     """
 
-    symbol_latex = StringField(
-        label="LaTeX symbol",
-        validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
-    )
+#     symbol_latex = StringField(
+#         label="LaTeX symbol",
+#         validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
+#     )
 
-    symbol_requires_arguments = BooleanField(
-        label="requires arguments",
-        description="check for 'yes' (as in +); unchecked for 'no' (as in c)",
-    )
+#     symbol_requires_arguments = BooleanField(
+#         label="requires arguments",
+#         description="check for 'yes' (as in +); unchecked for 'no' (as in c)",
+#     )
 
-    symbol_name = StringField(
-        label="name (LaTeX)",
-        validators=[validators.Length(max=1000)],
-    )
-    symbol_description = StringField(
-        label="description (LaTeX)",
-        validators=[validators.Length(max=1000)],
-    )
-    symbol_reference = StringField("reference")
-
-
-class SpecifyNewSymbolArgumentCountForm(FlaskForm):
-    """
-    user has specified this is an operation, so now they need to specify number of arguments
-    """
-
-    argument_count = IntegerField(
-        label="number of arguments",
-        validators=[validators.InputRequired(), validators.NumberRange(min=1, max=20)],
-        default=1,
-    )
+#     symbol_name_latex = StringField(
+#         label="name (LaTeX)",
+#         validators=[validators.Length(max=1000)],
+#     )
+#     symbol_description_latex = StringField(
+#         label="description (LaTeX)",
+#         validators=[validators.Length(max=1000)],
+#     )
+#     symbol_reference_latex = StringField("reference (LaTeX)")
 
 
-class SpecifyNewSymbolDimensionCountForm(FlaskForm):
-    """
-    User has specified this is NOT an opersion, so now they need to specify whether the symbol is scalar, vector, or matrix
-    """
+# class SpecifyNewSymbolArgumentCountForm(FlaskForm):
+#     """
+#     user has specified this is an operation, so now they need to specify number of arguments
+#     """
 
-    dimension_count = IntegerField(
-        label="number of dimensions",
-        validators=[validators.InputRequired(), validators.NumberRange(min=0, max=3)],
-        default=0,
-    )
-
-
-class SpecifyNewSymbolDimension0Form(FlaskForm):
-    """
-    This overlaps with SpecifyNewSymbolScalarForm
-    """
-
-    # https://en.wikipedia.org/wiki/List_of_types_of_numbers
-    symbol_scope = RadioField(
-        label="scope",
-        choices=[("real", "real"), ("complex", "complex"), ("integer", "integer")],
-        default="real",
-        validators=[validators.InputRequired()],
-    )
-
-    symbol_variable_or_constant = RadioField(
-        label="variable or constant",
-        choices=[("variable", "variable"), ("constant", "constant")],
-        default="variable",
-        validators=[validators.InputRequired()],
-    )
-
-    # domain = input; range = output
-    symbol_domain = RadioField(
-        "domain",
-        choices=[
-            ("any", "any"),
-            ("positive", "positive"),
-            ("negative", "negative"),
-            ("non-negative", "non-negative"),
-        ],
-        default="any",
-        validators=[validators.InputRequired()],
-    )
-    dimension_length = IntegerField(
-        "dimension: length",
-        validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
-        default=0,
-    )
-    dimension_time = IntegerField(
-        "dimension: time",
-        validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
-        default=0,
-    )
-    dimension_mass = IntegerField(
-        "dimension: mass",
-        validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
-        default=0,
-    )
-    dimension_temperature = IntegerField(
-        "dimension: temperature",
-        validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
-        default=0,
-    )
-    dimension_electric_charge = IntegerField(
-        "dimension: electric charge",
-        validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
-        default=0,
-    )
-    dimension_amount_of_substance = IntegerField(
-        "dimension: amount of substance",
-        validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
-        default=0,
-    )
-    dimension_luminous_intensity = IntegerField(
-        "dimension: luminous intensity",
-        validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
-        default=0,
-    )
+#     argument_count = IntegerField(
+#         label="number of arguments",
+#         validators=[validators.InputRequired(), validators.NumberRange(min=1, max=20)],
+#         default=1,
+#     )
 
 
-class SpecifyNewSymbolDimension1Form(FlaskForm):
-    symbol_is_composite = BooleanField(
-        label="is composite",
-        description="check for 'yes'; unchecked for 'no'",
-    )
+# class SpecifyNewSymbolDimensionCountForm(FlaskForm):
+#     """
+#     User has specified this is NOT an opersion, so now they need to specify whether the symbol is scalar, vector, or matrix
+#     """
+
+#     dimension_count = IntegerField(
+#         label="number of dimensions",
+#         validators=[validators.InputRequired(), validators.NumberRange(min=0, max=3)],
+#         default=0,
+#     )
 
 
-class SpecifyNewSymbolDimension2Form(FlaskForm):
-    symbol_is_composite = BooleanField(
-        label="is composite",
-        description="check for 'yes'; unchecked for 'no'",
-    )
+# class SpecifyNewSymbolDimension0Form(FlaskForm):
+#     """
+#     This overlaps with SpecifyNewSymbolScalarForm
+#     """
+
+#     # https://en.wikipedia.org/wiki/List_of_types_of_numbers
+#     symbol_scope = RadioField(
+#         label="scope",
+#         choices=[("real", "real"), ("complex", "complex"), ("integer", "integer")],
+#         default="real",
+#         validators=[validators.InputRequired()],
+#     )
+
+#     symbol_variable_or_constant = RadioField(
+#         label="variable or constant",
+#         choices=[("variable", "variable"), ("constant", "constant")],
+#         default="variable",
+#         validators=[validators.InputRequired()],
+#     )
+
+#     # domain = input; range = output
+#     symbol_domain = RadioField(
+#         "domain",
+#         choices=[
+#             ("any", "any"),
+#             ("positive", "positive"),
+#             ("negative", "negative"),
+#             ("non-negative", "non-negative"),
+#         ],
+#         default="any",
+#         validators=[validators.InputRequired()],
+#     )
+#     dimension_length = IntegerField(
+#         "dimension: length",
+#         validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
+#         default=0,
+#     )
+#     dimension_time = IntegerField(
+#         "dimension: time",
+#         validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
+#         default=0,
+#     )
+#     dimension_mass = IntegerField(
+#         "dimension: mass",
+#         validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
+#         default=0,
+#     )
+#     dimension_temperature = IntegerField(
+#         "dimension: temperature",
+#         validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
+#         default=0,
+#     )
+#     dimension_electric_charge = IntegerField(
+#         "dimension: electric charge",
+#         validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
+#         default=0,
+#     )
+#     dimension_amount_of_substance = IntegerField(
+#         "dimension: amount of substance",
+#         validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
+#         default=0,
+#     )
+#     dimension_luminous_intensity = IntegerField(
+#         "dimension: luminous intensity",
+#         validators=[validators.InputRequired(), validators.NumberRange(min=-5, max=5)],
+#         default=0,
+#     )
+
+
+# class SpecifyNewSymbolDimension1Form(FlaskForm):
+#     symbol_is_composite = BooleanField(
+#         label="is composite",
+#         description="check for 'yes'; unchecked for 'no'",
+#     )
+
+
+# class SpecifyNewSymbolDimension2Form(FlaskForm):
+#     symbol_is_composite = BooleanField(
+#         label="is composite",
+#         description="check for 'yes'; unchecked for 'no'",
+#     )
 
 
 class CypherQueryForm(FlaskForm):
@@ -949,6 +957,9 @@ def to_add_derivation() -> str:
     if request.method == "POST" and web_form.validate():
         print("request.form =", request.form)
         derivation_name_latex = str(web_form.derivation_name_latex.data).strip()
+        derivation_reference_latex = str(
+            web_form.derivation_reference_latex.data
+        ).strip()
         abstract_latex = str(web_form.abstract_latex.data).strip()
         print("       derivation:", derivation_name_latex)
         print("       abstract:", abstract_latex)
@@ -977,6 +988,7 @@ def to_add_derivation() -> str:
                 now_str,
                 derivation_name_latex,
                 abstract_latex,
+                derivation_reference_latex,
                 author_name_latex,
             )
 
@@ -1290,7 +1302,10 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_operation_IDs_in_expression = session.read_transaction(
-            neo4j_query.symbols_in_expression, expression_id, "operation"
+            neo4j_query.symbols_in_expression_or_feed,
+            "expression",
+            expression_id,
+            "operation",
         )
     for this_id in list_of_operation_IDs_in_expression:
         list_of_symbol_IDs_in_expression.append(this_id)
@@ -1298,7 +1313,10 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_scalar_IDs_in_expression = session.read_transaction(
-            neo4j_query.symbols_in_expression, expression_id, "scalar"
+            neo4j_query.symbols_in_expression_or_feed,
+            "expression",
+            expression_id,
+            "scalar",
         )
     for this_id in list_of_scalar_IDs_in_expression:
         list_of_symbol_IDs_in_expression.append(this_id)
@@ -1306,7 +1324,10 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_vector_IDs_in_expression = session.read_transaction(
-            neo4j_query.symbols_in_expression, expression_id, "vector"
+            neo4j_query.symbols_in_expression_or_feed,
+            "expression",
+            expression_id,
+            "vector",
         )
     for this_id in list_of_vector_IDs_in_expression:
         list_of_symbol_IDs_in_expression.append(this_id)
@@ -1314,7 +1335,10 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_matrix_IDs_in_expression = session.read_transaction(
-            neo4j_query.symbols_in_expression, expression_id, "matrix"
+            neo4j_query.symbols_in_expression_or_feed,
+            "expression",
+            expression_id,
+            "matrix",
         )
     for this_id in list_of_matrix_IDs_in_expression:
         list_of_symbol_IDs_in_expression.append(this_id)
@@ -1343,7 +1367,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
                 latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
             )
         else:
-            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = None
+            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
 
     dict_of_symbol_dicts_in_expression = {}
     for this_symbol_ID in list_of_symbol_IDs_in_expression:
@@ -1383,6 +1407,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
             .strip()
             .replace("\\", "\\\\")
         )
+        expression_relation = "="  # TODO
         expression_latex_rhs = (
             str(web_form_new_expression.expression_latex_rhs.data)
             .strip()
@@ -1393,20 +1418,21 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
             .strip()
             .replace("\\", "\\\\")
         )
-        expression_name = str(web_form_new_expression.expression_name.data).strip()
-        expression_description = str(
-            web_form_new_expression.expression_description.data
+        expression_name_latex = str(
+            web_form_new_expression.expression_name_latex.data
+        ).strip()
+        expression_reference_latex = str(
+            web_form_new_expression.expression_name_latex.data
+        ).strip()
+        expression_description_latex = str(
+            web_form_new_expression.expression_description_latex.data
         ).strip()
 
-        print("pdg_app/to_edit_expression: expression_latex=", expression_latex_lhs)
-        print("pdg_app/to_edit_expression: expression_latex=", expression_latex_rhs)
+        print("pdg_app/to_edit_expression: expression_latex_lhs=", expression_latex_lhs)
+        print("pdg_app/to_edit_expression: expression_latex_rhs=", expression_latex_rhs)
         print(
-            "pdg_app/to_edit_expression: expression_latex=", expression_latex_condition
-        )
-        print("pdg_app/to_edit_expression: expression_name=", expression_name)
-        print(
-            "pdg_app/to_edit_expression: expression_description=",
-            expression_description,
+            "pdg_app/to_edit_expression: expression_latex_condition=",
+            expression_latex_condition,
         )
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
@@ -1421,10 +1447,12 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
                 neo4j_query.edit_expression,
                 expression_id,
                 expression_latex_lhs,
+                expression_relation,
                 expression_latex_rhs,
                 expression_latex_condition,
-                expression_name,
-                expression_description,
+                expression_name_latex,
+                expression_description_latex,
+                expression_reference_latex,
                 now_str,
                 author_name_latex,
             )
@@ -1493,7 +1521,8 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 session.write_transaction(
-                    neo4j_query.add_symbol_to_expression,
+                    neo4j_query.add_symbol_to_expression_or_feed,
+                    "expression",
                     symbol_id_to_add,
                     expression_id,
                     "scalar",
@@ -1626,7 +1655,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
                 latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
             )
         else:
-            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = None
+            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
 
     dict_of_symbol_dicts_in_feed = {}
     for this_symbol_ID in list_of_symbol_IDs_in_feed:
@@ -1752,7 +1781,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 session.write_transaction(
-                    neo4j_query.add_symbol_to_feed,
+                    neo4j_query.add_symbol_to_expression_or_feed,
+                    "feed",
                     symbol_id_to_add,
                     feed_id,
                     "scalar",
@@ -1809,7 +1839,10 @@ def to_add_expression() -> str:
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_symbol_scalar_IDs_in_expression = session.read_transaction(
-                neo4j_query.symbols_in_expression, this_expression_dict["id"], "scalar"
+                neo4j_query.symbols_in_expression_or_feed,
+                "expression",
+                this_expression_dict["id"],
+                "scalar",
             )
             query_time_dict["symbols_in_expression: "] = time.time() - query_start_time
 
@@ -1837,7 +1870,7 @@ def to_add_expression() -> str:
                 latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
             )
         else:
-            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = None
+            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
 
     web_form = SpecifyNewExpressionForm(request.form)
     if request.method == "POST" and web_form.validate():
@@ -1848,20 +1881,29 @@ def to_add_expression() -> str:
         expression_latex_lhs = (
             str(web_form.expression_latex_lhs.data).strip().replace("\\", "\\\\")
         )
+        expression_relation = (
+            "="  # TODO -- dropdown of ["=", "\leq", "\lt", "\gt", "\geq"]
+        )
         expression_latex_rhs = (
             str(web_form.expression_latex_rhs.data).strip().replace("\\", "\\\\")
         )
         expression_latex_condition = (
             str(web_form.expression_latex_condition.data).strip().replace("\\", "\\\\")
         )
-        expression_name = str(web_form.expression_name.data).strip()
-        expression_description = str(web_form.expression_description.data).strip()
+        expression_name_latex = str(web_form.expression_name_latex.data).strip()
+        expression_reference_latex = str(
+            web_form.expression_reference_latex.data
+        ).strip()
+        expression_description_latex = str(
+            web_form.expression_description_latex.data
+        ).strip()
 
-        print("expression_latex:", expression_latex)
+        print("expression_latex_lhs:", expression_latex_lhs)
+        print("expression_latex_rhs:", expression_latex_rhs)
         # TODO: validate that this string is actually Latex before adding to database
 
-        print("expression_name:", expression_name)
-        print("expression_description", expression_description)
+        print("expression_name_latex:", expression_name_latex)
+        print("expression_description_latex", expression_description_latex)
 
         author_name_latex = "ben"
 
@@ -1880,11 +1922,13 @@ def to_add_expression() -> str:
             session.write_transaction(
                 neo4j_query.add_expression,
                 expression_id,
-                expression_name,
+                expression_name_latex,
                 expression_latex_lhs,
+                expression_relation,
                 expression_latex_rhs,
                 expression_latex_condition,
-                expression_description,
+                expression_description_latex,
+                expression_reference_latex,
                 author_name_latex,
             )
         query_time_dict["to_add_expression: add_expression"] = (
@@ -1947,7 +1991,7 @@ def to_add_feed() -> str:
                 latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
             )
         else:
-            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = None
+            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
 
     list_of_nonoperation_symbol_dicts, query_time_dict = (
         compute.get_list_of_all_nonoperation_symbol_dicts(
@@ -1966,6 +2010,9 @@ def to_add_feed() -> str:
         print("feed_latex:", feed_latex)
         # TODO: validate that this string is actually Latex before adding to database
 
+        feed_sympy = "TODO"  # TODO: if promoting existing symbol, this can be filled in immediately
+        feed_lean = "TODO"
+
         author_name_latex = "ben"
 
         list_of_feed_IDs = []
@@ -1982,6 +2029,8 @@ def to_add_feed() -> str:
                 neo4j_query.add_feed,
                 feed_id,
                 feed_latex,
+                feed_sympy,
+                feed_lean,
                 author_name_latex,
             )
         query_time_dict["to_add_feed: add_feed"] = time.time() - query_start_time
@@ -2019,7 +2068,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
 
     print("operation_id: ", operation_id)
 
-    web_form = SpecifyNewSymbolForm(request.form)
+    web_form = SpecifyNewSymbolOperationForm(request.form)
     print("request.method =", request.method)
     print("request.form = ", request.form)
     if request.method == "POST" and web_form.validate():
@@ -2091,7 +2140,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
         )
     print("symbol_dict:", symbol_dict)
 
-    web_form_symbol_properties = SpecifyNewSymbolForm(request.form)
+    web_form_symbol_properties = SpecifyNewSymbolScalarForm(request.form)
     web_form_no_options = NoOptionsForm(request.form)
     if request.method == "POST" and web_form_symbol_properties.validate():
         print("request.form = ", request.form)
@@ -2099,11 +2148,15 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
         symbol_latex = str(
             web_form_symbol_properties.symbol_latex.data
         ).strip()  # .replace("\\","\\\\")
-        symbol_name = str(web_form_symbol_properties.symbol_name.data).strip()
-        symbol_description = str(
-            web_form_symbol_properties.symbol_description.data
+        symbol_name_latex = str(
+            web_form_symbol_properties.symbol_name_latex.data
         ).strip()
-        symbol_reference = str(web_form_symbol_properties.symbol_reference.data).strip()
+        symbol_description_latex = str(
+            web_form_symbol_properties.symbol_description_latex.data
+        ).strip()
+        symbol_reference_latex = str(
+            web_form_symbol_properties.symbol_reference_latex.data
+        ).strip()
 
         author_name_latex = "ben"
 
@@ -2111,16 +2164,19 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
         # only change the properties that are different from symbol_dict
         for symbol_property, symbol_property_value in symbol_dict.items():
 
+            print("symbol_property=", symbol_property)
+            print("symbol_property_value=", symbol_property_value)
+
             flash("NOT ENACTED YET 942492482324")
             # TODO: check which properties are different
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 session.write_transaction(
                     neo4j_query.edit_node_property,
-                    "scalar",
-                    symbol_id,
-                    "argument_count",
-                    argument_count,
+                    "scalar",  # Neo4j node type
+                    scalar_id,
+                    "dimension_length",  # property to edit
+                    5,  # new value
                 )
                 query_time_dict[
                     "to_add_symbol_required_argument_count: edit_node_property, argument_count"
@@ -2210,8 +2266,8 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/new_symbol_scalar_constant/<symbol_id>/", methods=["GET", "POST"])
-def to_add_symbol_scalar_constant(symbol_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/new_symbol_scalar_constant/<scalar_id>/", methods=["GET", "POST"])
+def to_add_symbol_scalar_constant(scalar_id: unique_numeric_id_as_str) -> str:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: app/to_add_symbol_scalar_constant start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
@@ -2235,7 +2291,7 @@ def to_add_symbol_scalar_constant(symbol_id: unique_numeric_id_as_str) -> str:
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.add_constant_value_with_units,
-                symbol_id,
+                scalar_id,
                 number_decimal,
                 number_power,
                 dimension_mass_unit,
@@ -2272,63 +2328,63 @@ def to_add_symbol_scalar() -> str:
     print("[TRACE] func: app/to_add_symbol_scalar start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    web_form_symbol_properties = SpecifyNewSymbolScalarForm(request.form)
-    if request.method == "POST" and web_form_symbol_properties.validate():
+    web_form_scalar_properties = SpecifyNewSymbolScalarForm(request.form)
+    if request.method == "POST" and web_form_scalar_properties.validate():
         print("request.form = ", request.form)
 
-        symbol_latex = str(web_form_symbol_properties.symbol_latex.data).strip()
-        symbol_name = str(web_form_symbol_properties.symbol_name.data).strip()
-        symbol_description = str(
-            web_form_symbol_properties.symbol_description.data
+        scalar_latex = str(web_form_scalar_properties.scalar_latex.data).strip()
+        scalar_name = str(web_form_scalar_properties.scalar_name.data).strip()
+        scalar_description = str(
+            web_form_scalar_properties.scalar_description.data
         ).strip()
-        symbol_reference = str(web_form_symbol_properties.symbol_reference.data).strip()
+        scalar_reference = str(web_form_scalar_properties.scalar_reference.data).strip()
 
-        print("symbol_latex:", symbol_latex)
-        print("symbol_name:", symbol_name)
-        print("symbol_description", symbol_description)
+        print("scalar_latex:", scalar_latex)
+        print("scalar_name:", scalar_name)
+        print("scalar_description", scalar_description)
 
-        symbol_scope = web_form_symbol_properties.symbol_scope.data
-        symbol_variable_or_constant = (
-            web_form_symbol_properties.symbol_variable_or_constant.data
+        scalar_scope = web_form_scalar_properties.scalar_scope.data
+        scalar_variable_or_constant = (
+            web_form_scalar_properties.scalar_variable_or_constant.data
         )
-        symbol_domain = web_form_symbol_properties.symbol_domain.data
-        dimension_length = web_form_symbol_properties.dimension_length.data
-        dimension_time = web_form_symbol_properties.dimension_time.data
-        dimension_mass = web_form_symbol_properties.dimension_mass.data
-        dimension_temperature = web_form_symbol_properties.dimension_temperature.data
+        scalar_domain = web_form_scalar_properties.scalar_domain.data
+        dimension_length = web_form_scalar_properties.dimension_length.data
+        dimension_time = web_form_scalar_properties.dimension_time.data
+        dimension_mass = web_form_scalar_properties.dimension_mass.data
+        dimension_temperature = web_form_scalar_properties.dimension_temperature.data
         dimension_electric_charge = (
-            web_form_symbol_properties.dimension_electric_charge.data
+            web_form_scalar_properties.dimension_electric_charge.data
         )
         dimension_amount_of_substance = (
-            web_form_symbol_properties.dimension_amount_of_substance.data
+            web_form_scalar_properties.dimension_amount_of_substance.data
         )
         dimension_luminous_intensity = (
-            web_form_symbol_properties.dimension_luminous_intensity.data
+            web_form_scalar_properties.dimension_luminous_intensity.data
         )
 
         author_name_latex = "ben"
 
-        list_of_symbol_IDs = []
+        list_of_scalar_IDs = []
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            list_of_symbol_IDs = session.read_transaction(
+            list_of_scalar_IDs = session.read_transaction(
                 neo4j_query.list_IDs, "scalar"
             )
-        symbol_id = compute.generate_random_id(list_of_symbol_IDs)
+        scalar_id = compute.generate_random_id(list_of_scalar_IDs)
 
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.add_scalar_symbol,
-                symbol_id,
-                symbol_name,
-                symbol_latex,
-                symbol_description,
-                symbol_reference,
-                symbol_scope,
-                symbol_variable_or_constant,
-                symbol_domain,
+                scalar_id,
+                scalar_name,
+                scalar_latex,
+                scalar_description,
+                scalar_reference,
+                scalar_scope,
+                scalar_variable_or_constant,
+                scalar_domain,
                 dimension_length,
                 dimension_time,
                 dimension_mass,
@@ -2339,15 +2395,15 @@ def to_add_symbol_scalar() -> str:
                 author_name_latex,
             )
 
-        if symbol_variable_or_constant == "constant":
+        if scalar_variable_or_constant == "constant":
             return redirect(
-                url_for("to_add_symbol_scalar_constant", symbol_id=symbol_id)
+                url_for("to_add_scalar_scalar_constant", scalar_id=scalar_id)
             )
         return redirect(url_for("to_list_scalars"))
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_symbol_dicts = session.read_transaction(
+        list_of_scalar_dicts = session.read_transaction(
             neo4j_query.list_nodes_of_type, "scalar"
         )
         query_time_dict["to_list_scalars: list_nodes_of_type scalar"] = (
@@ -2355,95 +2411,95 @@ def to_add_symbol_scalar() -> str:
         )
 
     (
-        dict_of_expressions_that_use_symbol,
+        dict_of_expressions_that_use_scalar,
         query_time_dict,
     ) = compute.get_dict_of_expressions_that_use_symbol(
-        graphDB_Driver, query_time_dict, list_of_symbol_dicts
+        graphDB_Driver, query_time_dict, list_of_scalar_dicts
     )
     (
-        dict_of_derivations_that_use_symbol,
+        dict_of_derivations_that_use_scalar,
         query_time_dict,
     ) = compute.get_dict_of_derivations_that_use_symbol(
-        graphDB_Driver, query_time_dict, list_of_symbol_dicts
+        graphDB_Driver, query_time_dict, list_of_scalar_dicts
     )
 
     print("[TRACE] func: app/to_add_symbol_scalar end " + trace_id)
     return render_template(
         "symbol_scalar_create.html",
         query_time_dict=query_time_dict,
-        form_symbol_properties=web_form_symbol_properties,
-        list_of_dimension0_symbol_dicts=list_of_symbol_dicts,
-        dict_of_expressions_that_use_symbol=dict_of_expressions_that_use_symbol,
-        dict_of_derivations_that_use_symbol=dict_of_derivations_that_use_symbol,
+        form_scalar_properties=web_form_scalar_properties,
+        list_of_dimension0_scalar_dicts=list_of_scalar_dicts,
+        dict_of_expressions_that_use_scalar=dict_of_expressions_that_use_scalar,
+        dict_of_derivations_that_use_scalar=dict_of_derivations_that_use_scalar,
     )
 
 
 @web_app.route("/new_symbol_vector/", methods=["GET", "POST"])
 def to_add_symbol_vector() -> str:
     """
-    novel symbol
+    novel vector
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: app/to_add_symbol_vector start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    web_form_symbol_properties = SpecifyNewSymbolVectorForm(request.form)
+    web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
 
-    if request.method == "POST" and web_form_symbol_properties.validate():
+    if request.method == "POST" and web_form_vector_properties.validate():
         print("request.form = ", request.form)
 
-        symbol_latex = str(web_form_symbol_properties.symbol_latex.data).strip()
-        symbol_name = str(web_form_symbol_properties.symbol_name.data).strip()
-        symbol_description = str(
-            web_form_symbol_properties.symbol_description.data
+        vector_latex = str(web_form_vector_properties.vector_latex.data).strip()
+        vector_name = str(web_form_vector_properties.vector_name.data).strip()
+        vector_description = str(
+            web_form_vector_properties.vector_description.data
         ).strip()
-        symbol_reference = str(web_form_symbol_properties.symbol_reference.data).strip()
-        symbol_is_composite = web_form_symbol_properties.symbol_is_composite.data
+        vector_reference = str(web_form_vector_properties.vector_reference.data).strip()
+        vector_is_composite = web_form_vector_properties.vector_is_composite.data
 
-        symbol_size = str(web_form_symbol_properties.symbol_size.data).strip()
-        symbol_orientation = str(
-            web_form_symbol_properties.symbol_orientation.data
+        vector_size = str(web_form_vector_properties.vector_size.data).strip()
+        vector_orientation = str(
+            web_form_vector_properties.vector_orientation.data
         ).strip()
 
-        print("symbol_latex:", symbol_latex)
-        print("symbol_name:", symbol_name)
-        print("symbol_description", symbol_description)
+        print("vector_latex:", vector_latex)
+        print("vector_name:", vector_name)
+        print("vector_description", vector_description)
 
-        symbol_number_of_entries = str(
-            web_form_symbol_properties.symbol_number_of_entries.data
+        vector_number_of_entries = str(
+            web_form_vector_properties.vector_number_of_entries.data
         ).strip()
 
         author_name_latex = "ben"
 
-        list_of_symbol_IDs = []
+        list_of_vector_IDs = []
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            list_of_symbol_IDs = session.read_transaction(
+            list_of_vector_IDs = session.read_transaction(
                 neo4j_query.list_IDs, "vector"
             )
-        symbol_id = compute.generate_random_id(list_of_symbol_IDs)
+        vector_id = compute.generate_random_id(list_of_vector_IDs)
 
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.add_vector_symbol,
-                symbol_id,
-                symbol_name,
-                symbol_latex,
-                symbol_description,
-                symbol_reference,
-                symbol_is_composite,
-                symbol_size,
-                symbol_orientation,
-                symbol_number_of_entries,
+                vector_id,
+                vector_name,
+                vector_latex,
+                vector_description,
+                vector_reference,
+                vector_is_composite,
+                vector_size,
+                vector_orientation,
+                vector_number_of_entries,
                 author_name_latex,
             )
         return redirect(url_for("to_list_vectors"))
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_symbol_dicts = session.read_transaction(
+        list_of_vector_dicts = session.read_transaction(
             neo4j_query.list_nodes_of_type, "vector"
         )
         query_time_dict["to_list_scalars: list_nodes_of_type vector"] = (
@@ -2454,77 +2510,77 @@ def to_add_symbol_vector() -> str:
     return render_template(
         "symbol_vector_create.html",
         query_time_dict=query_time_dict,
-        form_symbol_properties=web_form_symbol_properties,
-        list_of_dimension1_symbol_dicts=list_of_symbol_dicts,
+        form_vector_properties=web_form_vector_properties,
+        list_of_dimension1_vector_dicts=list_of_vector_dicts,
     )
 
 
 @web_app.route("/new_symbol_matrix/", methods=["GET", "POST"])
 def to_add_symbol_matrix() -> str:
     """
-    novel symbol
+    novel matrix
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: app/to_add_symbol_matrix start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    web_form_symbol_properties = SpecifyNewSymbolMatrixForm(request.form)
-    if request.method == "POST" and web_form_symbol_properties.validate():
+    web_form_matrix_properties = SpecifyNewSymbolMatrixForm(request.form)
+    if request.method == "POST" and web_form_matrix_properties.validate():
         print("request.form = ", request.form)
 
-        symbol_latex = str(web_form_symbol_properties.symbol_latex.data).strip()
-        symbol_name = str(web_form_symbol_properties.symbol_name.data).strip()
-        symbol_description = str(
-            web_form_symbol_properties.symbol_description.data
+        matrix_latex = str(web_form_matrix_properties.matrix_latex.data).strip()
+        matrix_name = str(web_form_matrix_properties.matrix_name.data).strip()
+        matrix_description = str(
+            web_form_matrix_properties.matrix_description.data
         ).strip()
-        symbol_reference = str(web_form_symbol_properties.symbol_reference.data).strip()
+        matrix_reference = str(web_form_matrix_properties.matrix_reference.data).strip()
 
-        symbol_is_composite = web_form_symbol_properties.symbol_is_composite.data
+        matrix_is_composite = web_form_matrix_properties.matrix_is_composite.data
 
-        symbol_size = str(web_form_symbol_properties.symbol_size.data).strip()
+        matrix_size = str(web_form_matrix_properties.matrix_size.data).strip()
 
-        print("symbol_latex:", symbol_latex)
-        print("symbol_name:", symbol_name)
-        print("symbol_description", symbol_description)
+        print("matrix_latex:", matrix_latex)
+        print("matrix_name:", matrix_name)
+        print("matrix_description", matrix_description)
 
-        symbol_number_of_rows = str(
-            web_form_symbol_properties.symbol_number_of_rows.data
+        matrix_number_of_rows = str(
+            web_form_matrix_properties.matrix_number_of_rows.data
         ).strip()
-        symbol_number_of_columns = str(
-            web_form_symbol_properties.symbol_number_of_columns.data
+        matrix_number_of_columns = str(
+            web_form_matrix_properties.matrix_number_of_columns.data
         ).strip()
 
         author_name_latex = "ben"
 
-        list_of_symbol_IDs = []
+        list_of_matrix_IDs = []
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            list_of_symbol_IDs = session.read_transaction(
+            list_of_matrix_IDs = session.read_transaction(
                 neo4j_query.list_IDs, "matrix"
             )
-        symbol_id = compute.generate_random_id(list_of_symbol_IDs)
+        matrix_id = compute.generate_random_id(list_of_matrix_IDs)
 
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.add_matrix_symbol,
-                symbol_id,
-                symbol_name,
-                symbol_latex,
-                symbol_description,
-                symbol_reference,
-                symbol_is_composite,
-                symbol_size,
-                symbol_number_of_rows,
-                symbol_number_of_columns,
+                matrix_id,
+                matrix_name,
+                matrix_latex,
+                matrix_description,
+                matrix_reference,
+                matrix_is_composite,
+                matrix_size,
+                matrix_number_of_rows,
+                matrix_number_of_columns,
                 author_name_latex,
             )
         return redirect(url_for("to_list_matrices"))
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_symbol_dicts = session.read_transaction(
+        list_of_matrix_dicts = session.read_transaction(
             neo4j_query.list_nodes_of_type, "matrix"
         )
         query_time_dict["to_list_scalars: list_nodes_of_type matrix"] = (
@@ -2535,8 +2591,8 @@ def to_add_symbol_matrix() -> str:
     return render_template(
         "symbol_matrix_create.html",
         query_time_dict=query_time_dict,
-        form_symbol_properties=web_form_symbol_properties,
-        list_of_dimension2ormore_symbol_dicts=list_of_symbol_dicts,
+        form_matrix_properties=web_form_matrix_properties,
+        list_of_dimension2ormore_matrix_dicts=list_of_matrix_dicts,
     )
 
 
@@ -2880,278 +2936,278 @@ def to_add_symbol_matrix() -> str:
 #     )
 
 
-@web_app.route("/new_symbol_dimension0_properties/<scalar_id>", methods=["GET", "POST"])
-def to_add_symbol_dimension0_properties(scalar_id: unique_numeric_id_as_str):
-    """
-    novel symbol: how many dimensions?
-    see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: app/to_add_symbol_dimension0_properties start " + trace_id)
-    query_time_dict = {}  # type: Dict[str, float]
+# @web_app.route("/new_symbol_dimension0_properties/<scalar_id>", methods=["GET", "POST"])
+# def to_add_symbol_dimension0_properties(scalar_id: unique_numeric_id_as_str):
+#     """
+#     novel symbol: how many dimensions?
+#     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     print("[TRACE] func: app/to_add_symbol_dimension0_properties start " + trace_id)
+#     query_time_dict = {}  # type: Dict[str, float]
 
-    symbol_dict = {}
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        symbol_dict = session.read_transaction(
-            neo4j_query.node_properties, "scalar", scalar_id
-        )
-        query_time_dict[
-            "to_add_symbol_dimension0_properties: node_properties, symbol"
-        ] = (time.time() - query_start_time)
-    print("symbol_dict:", symbol_dict)
+#     symbol_dict = {}
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         symbol_dict = session.read_transaction(
+#             neo4j_query.node_properties, "scalar", scalar_id
+#         )
+#         query_time_dict[
+#             "to_add_symbol_dimension0_properties: node_properties, symbol"
+#         ] = (time.time() - query_start_time)
+#     print("symbol_dict:", symbol_dict)
 
-    web_form_symbol_properties = SpecifyNewSymbolDimension0Form(request.form)
-    if request.method == "POST" and web_form_symbol_properties.validate():
-        print("request.form = ", request.form)
+#     web_form_symbol_properties = SpecifyNewSymbolDimension0Form(request.form)
+#     if request.method == "POST" and web_form_symbol_properties.validate():
+#         print("request.form = ", request.form)
 
-        symbol_scope = str(web_form_symbol_properties.symbol_scope.data).strip()
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_node_property,
-                "scalar",
-                scalar_id,
-                "scope",
-                symbol_scope,
-            )
-            query_time_dict[
-                "to_add_symbol_dimension0_properties: edit_node_property, symbol_scope"
-            ] = (time.time() - query_start_time)
+#         symbol_scope = str(web_form_symbol_properties.symbol_scope.data).strip()
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             session.write_transaction(
+#                 neo4j_query.edit_node_property,
+#                 "scalar",
+#                 scalar_id,
+#                 "scope",
+#                 symbol_scope,
+#             )
+#             query_time_dict[
+#                 "to_add_symbol_dimension0_properties: edit_node_property, symbol_scope"
+#             ] = (time.time() - query_start_time)
 
-        symbol_variable_or_constant = str(
-            web_form_symbol_properties.symbol_variable_or_constant.data
-        ).strip()
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_node_property,
-                "scalar",
-                scalar_id,
-                "variable_or_constant",
-                symbol_variable_or_constant,
-            )
-            query_time_dict[
-                "to_add_symbol_dimension0_properties: edit_node_property, symbol_variable_or_constant"
-            ] = (time.time() - query_start_time)
+#         symbol_variable_or_constant = str(
+#             web_form_symbol_properties.symbol_variable_or_constant.data
+#         ).strip()
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             session.write_transaction(
+#                 neo4j_query.edit_node_property,
+#                 "scalar",
+#                 scalar_id,
+#                 "variable_or_constant",
+#                 symbol_variable_or_constant,
+#             )
+#             query_time_dict[
+#                 "to_add_symbol_dimension0_properties: edit_node_property, symbol_variable_or_constant"
+#             ] = (time.time() - query_start_time)
 
-        symbol_domain = str(web_form_symbol_properties.symbol_domain.data).strip()
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_node_property,
-                "scalar",
-                scalar_id,
-                "domain",
-                symbol_domain,
-            )
-            query_time_dict[
-                "to_add_symbol_dimension0_properties: edit_node_property, symbol_domain"
-            ] = (time.time() - query_start_time)
+#         symbol_domain = str(web_form_symbol_properties.symbol_domain.data).strip()
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             session.write_transaction(
+#                 neo4j_query.edit_node_property,
+#                 "scalar",
+#                 scalar_id,
+#                 "domain",
+#                 symbol_domain,
+#             )
+#             query_time_dict[
+#                 "to_add_symbol_dimension0_properties: edit_node_property, symbol_domain"
+#             ] = (time.time() - query_start_time)
 
-        dimension_length = int(web_form_symbol_properties.dimension_length.data)
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_node_property,
-                "scalar",
-                scalar_id,
-                "dimension_length",
-                dimension_length,
-            )
-            query_time_dict[
-                "to_add_symbol_dimension0_properties: edit_node_property, dimension_length"
-            ] = (time.time() - query_start_time)
+#         dimension_length = int(web_form_symbol_properties.dimension_length.data)
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             session.write_transaction(
+#                 neo4j_query.edit_node_property,
+#                 "scalar",
+#                 scalar_id,
+#                 "dimension_length",
+#                 dimension_length,
+#             )
+#             query_time_dict[
+#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_length"
+#             ] = (time.time() - query_start_time)
 
-        dimension_time = int(web_form_symbol_properties.dimension_time.data)
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_node_property,
-                "scalar",
-                scalar_id,
-                "dimension_time",
-                dimension_time,
-            )
-            query_time_dict[
-                "to_add_symbol_dimension0_properties: edit_node_property, dimension_time"
-            ] = (time.time() - query_start_time)
+#         dimension_time = int(web_form_symbol_properties.dimension_time.data)
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             session.write_transaction(
+#                 neo4j_query.edit_node_property,
+#                 "scalar",
+#                 scalar_id,
+#                 "dimension_time",
+#                 dimension_time,
+#             )
+#             query_time_dict[
+#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_time"
+#             ] = (time.time() - query_start_time)
 
-        dimension_mass = int(web_form_symbol_properties.dimension_mass.data)
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_node_property,
-                "scalar",
-                scalar_id,
-                "dimension_mass",
-                dimension_mass,
-            )
-            query_time_dict[
-                "to_add_symbol_dimension0_properties: edit_node_property, dimension_mass"
-            ] = (time.time() - query_start_time)
+#         dimension_mass = int(web_form_symbol_properties.dimension_mass.data)
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             session.write_transaction(
+#                 neo4j_query.edit_node_property,
+#                 "scalar",
+#                 scalar_id,
+#                 "dimension_mass",
+#                 dimension_mass,
+#             )
+#             query_time_dict[
+#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_mass"
+#             ] = (time.time() - query_start_time)
 
-        dimension_temperature = int(
-            web_form_symbol_properties.dimension_temperature.data
-        )
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_node_property,
-                "scalar",
-                scalar_id,
-                "dimension_temperature",
-                dimension_temperature,
-            )
-            query_time_dict[
-                "to_add_symbol_dimension0_properties: edit_node_property, dimension_temperature"
-            ] = (time.time() - query_start_time)
+#         dimension_temperature = int(
+#             web_form_symbol_properties.dimension_temperature.data
+#         )
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             session.write_transaction(
+#                 neo4j_query.edit_node_property,
+#                 "scalar",
+#                 scalar_id,
+#                 "dimension_temperature",
+#                 dimension_temperature,
+#             )
+#             query_time_dict[
+#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_temperature"
+#             ] = (time.time() - query_start_time)
 
-        dimension_electric_charge = int(
-            web_form_symbol_properties.dimension_electric_charge.data
-        )
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_node_property,
-                "scalar",
-                scalar_id,
-                "dimension_electric_charge",
-                dimension_electric_charge,
-            )
-            query_time_dict[
-                "to_add_symbol_dimension0_properties: edit_node_property, dimension_electric_charge"
-            ] = (time.time() - query_start_time)
+#         dimension_electric_charge = int(
+#             web_form_symbol_properties.dimension_electric_charge.data
+#         )
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             session.write_transaction(
+#                 neo4j_query.edit_node_property,
+#                 "scalar",
+#                 scalar_id,
+#                 "dimension_electric_charge",
+#                 dimension_electric_charge,
+#             )
+#             query_time_dict[
+#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_electric_charge"
+#             ] = (time.time() - query_start_time)
 
-        dimension_amount_of_substance = int(
-            web_form_symbol_properties.dimension_amount_of_substance.data
-        )
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_node_property,
-                "scalar",
-                scalar_id,
-                "dimension_amount_of_substance",
-                dimension_amount_of_substance,
-            )
-            query_time_dict[
-                "to_add_symbol_dimension0_properties: edit_node_property, dimension_amount_of_substance"
-            ] = (time.time() - query_start_time)
+#         dimension_amount_of_substance = int(
+#             web_form_symbol_properties.dimension_amount_of_substance.data
+#         )
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             session.write_transaction(
+#                 neo4j_query.edit_node_property,
+#                 "scalar",
+#                 scalar_id,
+#                 "dimension_amount_of_substance",
+#                 dimension_amount_of_substance,
+#             )
+#             query_time_dict[
+#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_amount_of_substance"
+#             ] = (time.time() - query_start_time)
 
-        dimension_luminous_intensity = int(
-            web_form_symbol_properties.dimension_luminous_intensity.data
-        )
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_node_property,
-                "scalar",
-                scalar_id,
-                "dimension_luminous_intensity",
-                dimension_luminous_intensity,
-            )
-            query_time_dict[
-                "to_add_symbol_dimension0_properties: edit_node_property, dimension_luminous_intensity"
-            ] = (time.time() - query_start_time)
+#         dimension_luminous_intensity = int(
+#             web_form_symbol_properties.dimension_luminous_intensity.data
+#         )
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             session.write_transaction(
+#                 neo4j_query.edit_node_property,
+#                 "scalar",
+#                 scalar_id,
+#                 "dimension_luminous_intensity",
+#                 dimension_luminous_intensity,
+#             )
+#             query_time_dict[
+#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_luminous_intensity"
+#             ] = (time.time() - query_start_time)
 
-        return redirect(url_for("to_list_scalars"))
+#         return redirect(url_for("to_list_scalars"))
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_dimension0_symbol_dicts = session.read_transaction(
-            neo4j_query.list_nodes_of_type, "scalar"
-        )
-        query_time_dict["to_list_scalars: list_nodes_of_type scalar"] = (
-            time.time() - query_start_time
-        )
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         list_of_dimension0_symbol_dicts = session.read_transaction(
+#             neo4j_query.list_nodes_of_type, "scalar"
+#         )
+#         query_time_dict["to_list_scalars: list_nodes_of_type scalar"] = (
+#             time.time() - query_start_time
+#         )
 
-    print("[TRACE] func: app/to_add_symbol_dimension0_properties end " + trace_id)
-    return render_template(
-        "symbol_create_dimension0.html",
-        form_symbol_properties=web_form_symbol_properties,
-        symbol_dict=symbol_dict,
-        query_time_dict=query_time_dict,
-        list_of_dimension0_symbol_dicts=list_of_dimension0_symbol_dicts,
-    )
-
-
-@web_app.route("/new_symbol_dimension1_properties/<vector_id>", methods=["GET", "POST"])
-def to_add_symbol_dimension1_properties(vector_id: unique_numeric_id_as_str) -> str:
-    """
-
-    see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: app/to_add_symbol_dimension1_properties start " + trace_id)
-    query_time_dict = {}  # type: Dict[str, float]
-
-    symbol_dict = {}
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        symbol_dict = session.read_transaction(
-            neo4j_query.node_properties, "vector", vector_id
-        )
-        query_time_dict[
-            "to_add_symbol_dimension1_properties: node_properties, symbol"
-        ] = (time.time() - query_start_time)
-    print("symbol_dict:", symbol_dict)
-
-    web_form_symbol_properties = SpecifyNewSymbolDimension1Form(request.form)
-    if request.method == "POST" and web_form_symbol_properties.validate():
-        print("request.form = ", request.form)
-
-        symbol_is_composite = web_form_symbol_properties.symbol_is_composite.data
-        print("symbol_is_composite=", symbol_is_composite)
-
-        return redirect(url_for("to_list_vectors"))
-
-    print("[TRACE] func: app/to_add_symbol_dimension1_properties end " + trace_id)
-    return render_template(
-        "symbol_create_dimension1.html",
-        form_symbol_properties=web_form_symbol_properties,
-        symbol_dict=symbol_dict,
-        query_time_dict=query_time_dict,
-    )
+#     print("[TRACE] func: app/to_add_symbol_dimension0_properties end " + trace_id)
+#     return render_template(
+#         "symbol_create_dimension0.html",
+#         form_symbol_properties=web_form_symbol_properties,
+#         symbol_dict=symbol_dict,
+#         query_time_dict=query_time_dict,
+#         list_of_dimension0_symbol_dicts=list_of_dimension0_symbol_dicts,
+#     )
 
 
-@web_app.route("/new_symbol_dimension2_properties/<matrix_id>", methods=["GET", "POST"])
-def to_add_symbol_dimension2_properties(matrix_id: unique_numeric_id_as_str) -> str:
-    """
+# @web_app.route("/new_symbol_dimension1_properties/<vector_id>", methods=["GET", "POST"])
+# def to_add_symbol_dimension1_properties(vector_id: unique_numeric_id_as_str) -> str:
+#     """
 
-    see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: app/to_add_symbol_dimension2_properties start " + trace_id)
-    query_time_dict = {}  # type: Dict[str, float]
+#     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     print("[TRACE] func: app/to_add_symbol_dimension1_properties start " + trace_id)
+#     query_time_dict = {}  # type: Dict[str, float]
 
-    symbol_dict = {}
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        symbol_dict = session.read_transaction(
-            neo4j_query.node_properties, "matrix", matrix_id
-        )
-        query_time_dict[
-            "to_add_symbol_dimension2_properties: node_properties, symbol"
-        ] = (time.time() - query_start_time)
-    print("symbol_dict:", symbol_dict)
+#     symbol_dict = {}
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         symbol_dict = session.read_transaction(
+#             neo4j_query.node_properties, "vector", vector_id
+#         )
+#         query_time_dict[
+#             "to_add_symbol_dimension1_properties: node_properties, symbol"
+#         ] = (time.time() - query_start_time)
+#     print("symbol_dict:", symbol_dict)
 
-    web_form_symbol_properties = SpecifyNewSymbolDimension2Form(request.form)
-    if request.method == "POST" and web_form_symbol_properties.validate():
-        print("request.form = ", request.form)
+#     web_form_symbol_properties = SpecifyNewSymbolDimension1Form(request.form)
+#     if request.method == "POST" and web_form_symbol_properties.validate():
+#         print("request.form = ", request.form)
 
-        symbol_is_composite = web_form_symbol_properties.symbol_is_composite.data
-        print("symbol_is_composite=", symbol_is_composite)
+#         symbol_is_composite = web_form_symbol_properties.symbol_is_composite.data
+#         print("symbol_is_composite=", symbol_is_composite)
 
-        return redirect(url_for("to_list_matrices"))
+#         return redirect(url_for("to_list_vectors"))
 
-    print("[TRACE] func: app/to_add_symbol_dimension2_properties end " + trace_id)
-    return render_template(
-        "symbol_create_dimension2.html",
-        form_symbol_properties=web_form_symbol_properties,
-        symbol_dict=symbol_dict,
-        query_time_dict=query_time_dict,
-    )
+#     print("[TRACE] func: app/to_add_symbol_dimension1_properties end " + trace_id)
+#     return render_template(
+#         "symbol_create_dimension1.html",
+#         form_symbol_properties=web_form_symbol_properties,
+#         symbol_dict=symbol_dict,
+#         query_time_dict=query_time_dict,
+#     )
+
+
+# @web_app.route("/new_symbol_dimension2_properties/<matrix_id>", methods=["GET", "POST"])
+# def to_add_symbol_dimension2_properties(matrix_id: unique_numeric_id_as_str) -> str:
+#     """
+
+#     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     print("[TRACE] func: app/to_add_symbol_dimension2_properties start " + trace_id)
+#     query_time_dict = {}  # type: Dict[str, float]
+
+#     symbol_dict = {}
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         symbol_dict = session.read_transaction(
+#             neo4j_query.node_properties, "matrix", matrix_id
+#         )
+#         query_time_dict[
+#             "to_add_symbol_dimension2_properties: node_properties, symbol"
+#         ] = (time.time() - query_start_time)
+#     print("symbol_dict:", symbol_dict)
+
+#     web_form_symbol_properties = SpecifyNewSymbolDimension2Form(request.form)
+#     if request.method == "POST" and web_form_symbol_properties.validate():
+#         print("request.form = ", request.form)
+
+#         symbol_is_composite = web_form_symbol_properties.symbol_is_composite.data
+#         print("symbol_is_composite=", symbol_is_composite)
+
+#         return redirect(url_for("to_list_matrices"))
+
+#     print("[TRACE] func: app/to_add_symbol_dimension2_properties end " + trace_id)
+#     return render_template(
+#         "symbol_create_dimension2.html",
+#         form_symbol_properties=web_form_symbol_properties,
+#         symbol_dict=symbol_dict,
+#         query_time_dict=query_time_dict,
+#     )
 
 
 @web_app.route("/new_operation/", methods=["GET", "POST"])
@@ -3194,13 +3250,16 @@ def to_add_operation() -> str:
         # request.form =  ImmutableMultiDict([('input1', 'a = b'), ('submit_button', 'Submit')])
 
         operation_latex = str(web_form.operation_latex.data).strip()
-        operation_name = str(web_form.operation_name.data).strip()
-        operation_description = str(web_form.operation_description.data).strip()
+        operation_name_latex = str(web_form.operation_name_latex.data).strip()
+        operation_description_latex = str(
+            web_form.operation_description_latex.data
+        ).strip()
+        operation_reference_latex = str(web_form.operation_reference_latex.data).strip()
         operation_argument_count = int(web_form.operation_argument_count.data)
 
         print("operation_latex:", operation_latex)
-        print("operation_name:", operation_name)
-        print("operation_description", operation_description)
+        print("operation_name_latex:", operation_name_latex)
+        print("operation_description_latex", operation_description_latex)
         print("operation_argument_count", operation_argument_count)
 
         author_name_latex = "ben"
@@ -3218,9 +3277,10 @@ def to_add_operation() -> str:
             session.write_transaction(
                 neo4j_query.add_operation_symbol,
                 operation_id,
-                operation_name,
+                operation_name_latex,
                 operation_latex,
-                operation_description,
+                operation_description_latex,
+                operation_reference_latex,
                 operation_argument_count,
                 author_name_latex,
             )
@@ -3467,13 +3527,13 @@ def to_add_symbols_and_operations_for(
     # get the Latex for this expression_id
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        expression_dict = session.read_transaction(
-            neo4j_query.node_properties, expression_or_feed, expression_id
+        expression_or_feed_dict = session.read_transaction(
+            neo4j_query.node_properties, expression_or_feed, expression_or_feed_id
         )
         query_time_dict["to_add_symbols_and_operations_for, node_properties"] = (
             time.time() - query_start_time
         )
-    print("expression_dict=", expression_dict)
+    print("expression_or_feed_dict=", expression_or_feed_dict)
 
     list_of_symbol_dicts, query_time_dict = compute.get_list_of_all_symbol_dicts(
         graphDB_Driver, query_time_dict
@@ -3497,7 +3557,7 @@ def to_add_symbols_and_operations_for(
 
     # SYMBOLSEARCHSYMPY
     cleaned_latex_str = compute.remove_latex_presention_markings(
-        expression_dict["latex"]
+        expression_or_feed_dict["latex"]
     )
     print("cleaned_latex_str=", cleaned_latex_str)
     sympy_expr = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
@@ -3557,7 +3617,7 @@ def to_add_symbols_and_operations_for(
     potential_symbols_found_in_Latex_expression = []  # type: List[str]
 
     for this_symbol_dict in list_of_symbol_dicts:
-        if this_symbol_dict["latex"] in expression_dict["latex"]:
+        if this_symbol_dict["latex"] in expression_or_feed_dict["latex"]:
             potential_symbols_found_in_Latex_expression.append(this_symbol_dict)
 
     # The checkboxes are determined dynamically,
@@ -3574,20 +3634,27 @@ def to_add_symbols_and_operations_for(
         #                                     ('symbol_id_to_connect_to_expression-3', '9188067'),
         #                                     ('symbol_id_to_connect_to_expression-4', '1298921'),
         #                                     ('submit_button', 'update expressions')])
-        for ke, symbol_id in request.form.items():
+        for ke, symbol_id_and_category in request.form.items():
             # print("key=", ke)
             # print("value=", val)
             if "symbol_id_to_connect_to_expression" in ke:
+                symbol_id = symbol_id_and_category.split("_")[0]
+                symbol_category = symbol_id_and_category.split("_")[1]
+
                 with graphDB_Driver.session() as session:
                     query_start_time = time.time()
                     list_of_inference_rule_dicts = session.write_transaction(
-                        neo4j_query.add_symbol_to_expression, symbol_id, expression_id
+                        neo4j_query.add_symbol_to_expression_or_feed,
+                        expression_or_feed,
+                        symbol_id,
+                        expression_or_feed_id,
+                        symbol_category,
                     )
                     query_time_dict[
                         "to_add_symbols_and_operations_for: add_symbol_to_expression"
                     ] = (time.time() - query_start_time)
 
-                symbol_id_dict[dict_of_symbol_dicts[val]["latex"]] = val
+                symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
 
         print("symbol_id_dict=", symbol_id_dict)
         # example output: {'a': '5638458', 'b': '7152159'}
@@ -3597,7 +3664,7 @@ def to_add_symbols_and_operations_for(
             url_for(
                 "to_add_sympy_and_lean_for",
                 expression_or_feed=expression_or_feed,
-                expression_id=expression_id,
+                expression_or_feed_id=expression_or_feed_id,
                 symbol_id_dict=symbol_id_dict,
             )
         )
@@ -3633,13 +3700,15 @@ def to_add_sympy_and_lean_for(
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        expression_dict = session.read_transaction(
+        expression_or_feed_dict = session.read_transaction(
             neo4j_query.node_properties, expression_or_feed, expression_id
         )
         query_time_dict["to_add_sympy_and_lean_for, node_properties"] = (
             time.time() - query_start_time
         )
-    print("to_add_sympy_and_lean_for: expression_dict=", expression_dict)
+    print(
+        "to_add_sympy_and_lean_for: expression_or_feed_dict=", expression_or_feed_dict
+    )
 
     print("to_add_sympy_and_lean_for: symbol_id_dict=", symbol_id_dict)
     # symbol_id_dict= {'a': '5638458', 'b': '7152159'}
@@ -3647,7 +3716,7 @@ def to_add_sympy_and_lean_for(
     # provide a guess for the SymPy based on the Latex provided
 
     cleaned_latex_str = compute.remove_latex_presention_markings(
-        expression_dict["latex"]
+        expression_or_feed_dict["latex"]
     )
     print(
         "to_add_sympy_and_lean_for_latex_expression: cleaned_latex_str=",
@@ -4014,7 +4083,7 @@ def to_query() -> str:
     # the method is GET
     print("request.method=", request.method)
 
-    query = None
+    query = ""
 
     # query via URL keyword
     query_str = request.args.get("cypher", None)
@@ -4382,7 +4451,10 @@ def to_list_expressions() -> str:
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_symbol_IDs_in_expression = session.read_transaction(
-                neo4j_query.symbols_in_expression, this_expression_dict["id"], "scalar"
+                neo4j_query.symbols_in_expression_or_feed,
+                "expression",
+                this_expression_dict["id"],
+                "scalar",
             )
 
         dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (

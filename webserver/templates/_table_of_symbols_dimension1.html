@@ -2,16 +2,16 @@
 <!--
 <P>For debugging purposes, here is the all the info available:
 
-<!- - { { list_of_symbol_dicts } } - ->
+<!- - { { list_of_vector_dicts } } - ->
 
 <ul>
-{ % for this_symbol_dict in list_of_dimension1_symbol_dicts %}
-<li>{ { this_symbol_dict }}</li>
+{ % for this_vector_dict in list_of_dimension1_vector_dicts %}
+<li>{ { this_vector_dict }}</li>
 { % endfor %}
 </ul>
 -->
 
-<table border="1" id="symbol_table" class="sortable">
+<table border="1" id="vector_table" class="sortable">
   <tr>
     <th>ID</th>
     <th>latex</th>
@@ -24,33 +24,33 @@
     <th>is_composite</th>
     <th>size</th>
   </tr>
-  {% for symbol_dict in list_of_dimension1_symbol_dicts %}
+  {% for vector_dict in list_of_dimension1_vector_dicts %}
   <tr>
     <td>
-      <a href="{{ url_for( 'to_edit_vector', vector_id=symbol_dict['id'] ) }}">
-          {{ symbol_dict['id'] }}
+      <a href="{{ url_for( 'to_edit_vector', vector_id=vector_dict['id'] ) }}">
+          {{ vector_dict['id'] }}
       </a>
     </td>
-    <td>\({{ symbol_dict['latex']}}\)<BR>
-          {{ symbol_dict['latex']}}</td>
-    <td>{{ symbol_dict['name_latex'] }}</td>
-    <td>{{ symbol_dict['description_latex'] }}</td>
-    <td>{{ symbol_dict['orientation'] }}</td>
-    <td>{% for expression_dict in dict_of_expressions_that_use_symbol[symbol_dict['id']] %}
+    <td>\({{ vector_dict['latex']}}\)<BR>
+          {{ vector_dict['latex']}}</td>
+    <td>{{ vector_dict['name_latex'] }}</td>
+    <td>{{ vector_dict['description_latex'] }}</td>
+    <td>{{ vector_dict['orientation'] }}</td>
+    <td>{% for expression_dict in dict_of_expressions_that_use_vector[vector_dict['id']] %}
       <UL>
         <LI><a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id']) }}?referrer=table_of_symbols_requires_arguments">{{ expression_dict['id'] }}</a></LI>
       </UL>
         {% endfor %}
     </td> <!-- used in expressions -->
-    <td>{% for derivation_dict in dict_of_derivations_that_use_symbol[symbol_dict['id']] %}
+    <td>{% for derivation_dict in dict_of_derivations_that_use_vector[vector_dict['id']] %}
       <UL>
         <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['id'] }}</a></LI>
       </UL>
         {% endfor %}
     </td> <!-- used in derivation -->
-    <td>{{ symbol_dict['symbol_reference'] }}</td>
-    <td>{{ symbol_dict['is_composite'] }}</td>
-    <td>{{ symbol_dict['size'] }}</td>
+    <td>{{ vector_dict['vector_reference'] }}</td>
+    <td>{{ vector_dict['is_composite'] }}</td>
+    <td>{{ vector_dict['size'] }}</td>
   </tr>
   {% endfor %}
 </table>

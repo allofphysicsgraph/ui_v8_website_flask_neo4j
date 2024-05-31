@@ -1,11 +1,16 @@
 schema
 
+The source of truth for the schema is to review results of searching "merge (:" in the file library/neo4j_query.py
+That's where nodes are created
+
+
 
 node type: 'derivation'
 properties={'author_name_latex': str,    # 'jane doe'
             'name_latex': str,           # 'mass energy conservation'
             'id': str,                   # '2627576'
             'abstract_latex': str,       # 'explanation goes here'
+            'reference_latex': str,      # link to wikipedia
             'created_datetime': str}     # '2022-11-25_02-12-22-905120'
 
 node type: 'step'
@@ -19,13 +24,16 @@ node type: 'feed'
 properties={'author_name_latex': str      # 'jane doe'
             'id': str,                    # '9424534'
             'sympy': str,                 # "sympy.Symbol('a')"
+            'lean': str,                  # "?"
             'latex': str}                 # '\alpha'
 
 
 node type: 'operation'
 properties={'author_name_latex': str      # 'jane doe'
             'name_latex': str,            # 'speed of an unladen swallow'
+            'argument_count': int         # 2
             'description_latex': str,     # 'explanation goes here'
+            'reference_latex': str,       # link to wikipedia
             'id': str,                    # '9424534'
             'latex': str}                 # '\alpha'
 
@@ -35,12 +43,25 @@ properties={'author_name_latex': str      # 'jane doe'
             'name_latex': str,            # 'speed of an unladen swallow'
             'description_latex': str,     # 'explanation goes here'
             'id': str,                    # '9424534'
-            'latex': str}                 # '\alpha'
+            'reference_latex': str,       # link to wikipedia
+            'latex': str,                 # '\alpha'
+            'scope': str,                 # '
+            'variable_or_constant': str,  # '
+            'domain': str,                # '
+            'dimension_length': int,      # 0
+            'dimension_time': int,        # 0
+            'dimension_mass': int,        # 0
+            'dimension_temperature': int, # 0
+            'dimension_electric_charge': int,     # 0
+            'dimension_amount_of_substance': int, # 0
+            'dimension_luminous_intensity': int,  # 0
+
 
 node type: 'vector'
 properties={'author_name_latex': str      # 'jane doe'
             'name_latex': str,            # 'speed of an unladen swallow'
             'description_latex': str,     # 'explanation goes here'
+            'reference_latex': str,       # link to wikipedia
             'id': str,                    # '9424534'
             'latex': str}                 # '\alpha'
 
@@ -49,12 +70,15 @@ properties={'author_name_latex': str      # 'jane doe'
             'name_latex': str,            # 'speed of an unladen swallow'
             'description_latex': str,     # 'explanation goes here'
             'id': str,                    # '9424534'
+            'reference_latex': str,       # link to wikipedia
             'latex': str}                 # '\alpha'
 
 node type: 'quantum_operator'
 properties={'author_name_latex': str      # 'jane doe'
             'name_latex': str,            # 'speed of an unladen swallow'
             'description_latex': str,     # 'explanation goes here'
+            'requires_arguments': bool,   # 
+            'reference_latex': str,       # link to wikipedia
             'id': str,                    # '9424534'
             'latex': str}                 # '\alpha'
 
@@ -71,6 +95,7 @@ node type: 'expression'
 properties={'author_name_latex': str,     # 'jane doe'
             'name_latex': str,            # 'name of expression'
             'description_latex': str,     # 'explanation goes here'
+            'reference_latex': str,       # link to wikipedia
             'id': str,                    # '9424534'
             'latex': str,                 # 'a = b'
             'lean': str,                  # '?'

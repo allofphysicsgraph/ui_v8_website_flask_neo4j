@@ -2,16 +2,16 @@
 <!-- 
 <P>For debugging purposes, here is the all the info available:
 
-<!- - { { list_of_symbol_dicts } } - ->
+<!- - { { list_of_matrix_dicts } } - ->
 
 <ul>
-{ % for this_symbol_dict in list_of_dimension2ormore_symbol_dicts %}
-<li>{ { this_symbol_dict }}</li>
+{ % for this_matrix_dict in list_of_dimension2ormore_matrix_dicts %}
+<li>{ { this_matrix_dict }}</li>
 { % endfor %}
 </ul>
 -->
 
-<table border="1" id="symbol_table" class="sortable">
+<table border="1" id="matrix_table" class="sortable">
   <tr>
     <th>ID</th>
     <th>latex</th>
@@ -23,32 +23,32 @@
     <th>is_composite</th>
     <th>size</th>
   </tr>
-  {% for symbol_dict in list_of_dimension2ormore_symbol_dicts %}
+  {% for matrix_dict in list_of_dimension2ormore_matrix_dicts %}
   <tr>
     <td>
-      <a href="{{ url_for( 'to_edit_matrix', matrix_id=symbol_dict['id'] ) }}">
-          {{ symbol_dict['id'] }}
+      <a href="{{ url_for( 'to_edit_matrix', matrix_id=matrix_dict['id'] ) }}">
+          {{ matrix_dict['id'] }}
       </a>
     </td>
-    <td>\({{ symbol_dict['latex']}}\)<BR>
-          {{ symbol_dict['latex']}}</td>
-    <td>{{ symbol_dict['name_latex'] }}</td>
-    <td>{{ symbol_dict['description_latex'] }}</td>
-    <td>{% for expression_dict in dict_of_expressions_that_use_symbol[symbol_dict['id']] %}
+    <td>\({{ matrix_dict['latex']}}\)<BR>
+          {{ matrix_dict['latex']}}</td>
+    <td>{{ matrix_dict['name_latex'] }}</td>
+    <td>{{ matrix_dict['description_latex'] }}</td>
+    <td>{% for expression_dict in dict_of_expressions_that_use_matrix[matrix_dict['id']] %}
       <UL>
         <LI><a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id']) }}?referrer=table_of_symbols_requires_arguments">{{ expression_dict['id'] }}</a></LI>
       </UL>
         {% endfor %}
     </td> <!-- used in expressions -->
-    <td>{% for derivation_dict in dict_of_derivations_that_use_symbol[symbol_dict['id']] %}
+    <td>{% for derivation_dict in dict_of_derivations_that_use_matrix[matrix_dict['id']] %}
       <UL>
         <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['id'] }}</a></LI>
       </UL>
         {% endfor %}
     </td> <!-- used in derivation -->
-    <td>{{ symbol_dict['symbol_reference'] }}</td>
-    <td>{{ symbol_dict['is_composite'] }}</td>
-    <td>{{ symbol_dict['size'] }}</td>
+    <td>{{ matrix_dict['matrix_reference'] }}</td>
+    <td>{{ matrix_dict['is_composite'] }}</td>
+    <td>{{ matrix_dict['size'] }}</td>
   </tr>
   {% endfor %}
 </table>

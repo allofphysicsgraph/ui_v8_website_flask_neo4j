@@ -446,8 +446,8 @@ def symbols_per_expression_or_feed(
             query_time_dict["symbols_per_expression_or_feed"] = (
                 time.time() - query_start_time
             )
-        symbols_per_expression[this_expression_dict["id"]] = (
-            list_of_symbol_IDs_in_expression
+        symbols_per_expression_or_feed[this_expression_or_feed_dict["id"]] = (
+            list_of_symbol_IDs_in_expression_or_feed
         )
 
     print("[TRACE] func: app/symbols_per_expression_or_feed end " + trace_id)

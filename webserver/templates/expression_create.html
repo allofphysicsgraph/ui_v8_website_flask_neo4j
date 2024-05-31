@@ -89,10 +89,15 @@
         <div id="output_input_latex_condition"></div>
 
 
-    <P>{{form.expression_name.label }} (optional): {{ form.expression_name(size=50, maxlength=1000) }}
+    <P>{{ form.expression_name_latex.label }} (optional): 
+       {{ form.expression_name_latex(size=50, maxlength=1000) }}
+
+    <P>{{ form.expression_reference_latex.label }} (optional): 
+       {{ form.expression_reference_latex(size=50, maxlength=1000) }}
 
 
-    <P>{{form.expression_description.label }} (optional): {{ form.expression_description(size=50, maxlength=1000) }}
+    <P>{{ form.expression_description_latex.label }} (optional): 
+       {{ form.expression_description_latex(size=50, maxlength=1000) }}
 
     <P><input type="submit" value="add expression">
     </P>

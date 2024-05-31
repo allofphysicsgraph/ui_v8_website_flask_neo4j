@@ -45,14 +45,14 @@
     <P>{{ form_operation_properties.operation_argument_count.label}} (<B>required</B>): 
        {{ form_operation_properties.operation_argument_count() }}
 
-    <P>{{ form_operation_properties.operation_name.label }} (<B>required</B>): 
-       {{ form_operation_properties.operation_name(size=50, maxlength=1000) }}</p>
+    <P>{{ form_operation_properties.operation_name_latex.label }} (<B>required</B>): 
+       {{ form_operation_properties.operation_name_latex(size=50, maxlength=1000) }}</p>
     
-    <P>{{form_operation_properties.operation_description.label }} (<small><em>optional</em></small>):  
-       {{ form_operation_properties.operation_description(size=50, maxlength=1000) }}</p>
+    <P>{{form_operation_properties.operation_description_latex.label }} (<small><em>optional</em></small>):  
+       {{ form_operation_properties.operation_description_latex(size=50, maxlength=1000) }}</p>
 
-    <P>{{ form_operation_properties.operation_reference.label }} (<small><em>optional</em></small>): 
-       {{ form_operation_properties.operation_reference }}</p>
+    <P>{{ form_operation_properties.operation_reference_latex.label }} (<small><em>optional</em></small>): 
+       {{ form_operation_properties.operation_reference_latex }}</p>
 
       <input type="submit" value="add operation">
     </P>
