@@ -124,7 +124,6 @@ import latex
 import sympy_validate_step
 import sympy_validate_expression
 import list_of_valid
-import pdg_api
 
 
 # ORDERING: this has to come before the functions that use this type
@@ -169,12 +168,26 @@ except neo4j.exceptions.ClientError as er:
 
 import importlib
 
-print("flask", importlib.metadata.version("flask"))
-print("secure", importlib.metadata.version("secure"))
-print("wtforms", importlib.metadata.version("wtforms"))
-print("werkzeug", importlib.metadata.version("werkzeug"))
+print(
+    "flask",
+    importlib.metadata.version("flask"),
+    "- https://flask.palletsprojects.com/en/3.0.x/",
+)
+print(
+    "secure", importlib.metadata.version("secure"), "- https://pypi.org/project/secure/"
+)
+print(
+    "wtforms",
+    importlib.metadata.version("wtforms"),
+    "- https://wtforms.readthedocs.io/en/3.1.x/",
+)
+print(
+    "werkzeug",
+    importlib.metadata.version("werkzeug"),
+    "- https://werkzeug.palletsprojects.com/en/3.0.x/",
+)
 print("flask_wtf", importlib.metadata.version("flask_wtf"))
-print("neo4j", importlib.metadata.version("neo4j"))
+print("neo4j", importlib.metadata.version("neo4j"), "- https://pypi.org/project/neo4j/")
 print("python", sys.version)
 
 
@@ -200,6 +213,9 @@ web_app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
     0  # https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
 )
 web_app.config["DEBUG"] = True
+
+# the following import has to happen after web_app is configured because pdg_app uses graphDB_Driver
+import pdg_api
 
 web_app.register_blueprint(pdg_api.bp)
 
@@ -338,6 +354,29 @@ class SpecifyNewFeedForm(FlaskForm):
     feed_latex = StringField(
         label="LaTeX feed",
         validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
+    )
+
+
+class SpecifyEditFeedForm(FlaskForm):
+    """
+    web form for user to specify expressions used by steps
+
+    this class is "LatexIO" in v7
+    """
+
+    feed_latex = StringField(
+        label="LaTeX feed",
+        validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
+    )
+
+    feed_sympy = StringField(
+        label="SymPy feed",
+        validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
+    )
+
+    feed_lean = StringField(
+        label="Lean feed",
+        validators=[validators.Length(min=0, max=1000)],
     )
 
 
@@ -1739,40 +1778,49 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
     #             dict_of_all_operation_dicts[this_operation_id]
     #         )
 
-    web_form_new_feed = SpecifyNewFeedForm(request.form)
+    web_form_new_feed = SpecifyEditFeedForm(request.form)
     if request.method == "POST" and web_form_new_feed.validate():
         print("to_edit_feed: with web_form, request.form = ", request.form)
 
         feed_latex = (
             str(web_form_new_feed.feed_latex.data).strip().replace("\\", "\\\\")
         )
-        feed_name = str(web_form_new_feed.feed_name.data).strip()
-        feed_description = str(web_form_new_feed.feed_description.data).strip()
+        feed_sympy = (
+            str(web_form_new_feed.feed_sympy.data).strip().replace("\\", "\\\\")
+        )
+        feed_lean = str(web_form_new_feed.feed_lean.data).strip().replace("\\", "\\\\")
 
         print("pdg_app/to_edit_feed: feed_latex=", feed_latex)
-        print("pdg_app/to_edit_feed: feed_name=", feed_name)
-        print(
-            "pdg_app/to_edit_feed: feed_description=",
-            feed_description,
-        )
+        print("pdg_app/to_edit_feed: feed_sympy=", feed_sympy)
+        print("pdg_app/to_edit_feed: feed_lean=", feed_lean)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
         author_name_latex = "ben"
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_feed,
-                feed_id,
-                feed_latex,
-                feed_name,
-                feed_description,
-                now_str,
-                author_name_latex,
-            )
+        # alter node properties based on user input
+        if feed_dict["latex"] != feed_latex:
+            # https://neo4j.com/docs/python-manual/current/session-api/
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.edit_node_property("feed", feed_id, "latex", feed_latex)
+                )
+        if feed_dict["sympy"] != feed_sympy:
+            # https://neo4j.com/docs/python-manual/current/session-api/
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.edit_node_property("feed", feed_id, "sympy", feed_sympy)
+                )
+        if feed_dict["lean"] != feed_lean:
+            # https://neo4j.com/docs/python-manual/current/session-api/
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.edit_node_property("feed", feed_id, "lean", feed_lean)
+                )
 
     web_form_no_options = NoOptionsForm(request.form)
     # web_form_no_options = DeleteButtonForm(request.form)
@@ -3682,9 +3730,10 @@ def to_add_symbols_and_operations_for(
     r_{\rm Earth} = 6
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: app/symbols_and_operations_for start " + trace_id)
+    print("[TRACE] func: pdg_app/symbols_and_operations_for start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
+    print("pdg_app/symbols_and_operations_for: expression_or_feed=", expression_or_feed)
     assert expression_or_feed in ["expression", "feed"]
 
     # get the Latex for this expression_id
@@ -3696,12 +3745,15 @@ def to_add_symbols_and_operations_for(
         query_time_dict["to_add_symbols_and_operations_for, node_properties"] = (
             time.time() - query_start_time
         )
-    print("expression_or_feed_dict=", expression_or_feed_dict)
+    print(
+        "pdg_app/symbols_and_operations_for: expression_or_feed_dict=",
+        expression_or_feed_dict,
+    )
 
     list_of_symbol_dicts, query_time_dict = compute.get_list_of_all_symbol_dicts(
         graphDB_Driver, query_time_dict
     )
-    print("list_of_symbols", list_of_symbol_dicts)
+    print("pdg_app/symbols_and_operations_for: list_of_symbols", list_of_symbol_dicts)
 
     # The naive option would be to return to the user the complete list of
     # symbols and then ask the user to select relevant symbols.
@@ -3882,7 +3934,7 @@ def to_add_symbols_and_operations_for(
 
 
 @web_app.route(
-    "/sympy_and_latex_for/<expression_or_feed>/<expression_id>/<symbol_id_dict>",
+    "/sympy_and_latex_for/<expression_or_feed>/<expression_or_feed_id>/<symbol_id_dict>",
     methods=["GET", "POST"],
 )
 def to_add_sympy_and_lean_for(
@@ -3995,8 +4047,12 @@ def to_add_sympy_and_lean_for(
                 )
             )
 
-        print("[TRACE] func: app/to_add_sympy_and_lean_for start " + trace_id)
-        return redirect(url_for("to_list_expressions"))
+        if expression_or_feed == "expression":
+            print("[TRACE] func: app/to_add_sympy_and_lean_for end " + trace_id)
+            return redirect(url_for("to_list_expressions"))
+        else:
+            print("[TRACE] func: app/to_add_sympy_and_lean_for end " + trace_id)
+            return redirect(url_for("to_list_feeds"))
 
     web_form.sympy_str.data = revised_expr_with_str
     return render_template(
@@ -4449,6 +4505,10 @@ def to_list_feeds() -> str:
         else:
             sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
 
+    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
+        graphDB_Driver, query_time_dict
+    )
+
     print("[TRACE] func: app/to_list_feeds end " + trace_id)
     return render_template(
         "feed_list.html",
@@ -4456,6 +4516,7 @@ def to_list_feeds() -> str:
         list_of_feed_dicts=list_of_feed_dicts,
         symbols_per_feed=symbols_per_feed,
         sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
+        dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
         dict_of_derivation_dicts_that_use_feed=dict_of_derivation_dicts_that_use_feed,
     )
 

@@ -380,7 +380,7 @@ def get_dict_of_node_dicts(graphDB_Driver, query_time_dict: dict, node_type: str
         "step",
         "expression",
     ]
-    print("compute/get_dict_of_node_dicts: node type=", node_type)
+    # print("compute/get_dict_of_node_dicts: node type=", node_type)
 
     list_of_all_node_dicts = []
     with graphDB_Driver.session() as session:
@@ -391,13 +391,13 @@ def get_dict_of_node_dicts(graphDB_Driver, query_time_dict: dict, node_type: str
         query_time_dict["get_dict_of_node_dicts, list_nodes_of_type"] = (
             time.time() - query_start_time
         )
-    print("list_of_all_node_dicts=", list_of_all_node_dicts)
+    # print("list_of_all_node_dicts=", list_of_all_node_dicts)
 
     dict_of_all_node_dicts = {}
     for this_node_dict in list_of_all_node_dicts:
         this_node_dict["node_type"] = node_type
         dict_of_all_node_dicts[this_node_dict["id"]] = this_node_dict
-    print("dict_of_all_node_dicts=", dict_of_all_node_dicts)
+    # print("dict_of_all_node_dicts=", dict_of_all_node_dicts)
 
     print("[TRACE] func: compute/get_dict_of_node_dicts end " + trace_id)
     return dict_of_all_node_dicts, query_time_dict

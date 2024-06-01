@@ -224,9 +224,9 @@ def get_list_nodes_of_type(tx, node_type: str) -> list:
     >>> list_nodes_of_type(tx)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/list_nodes_of_type start " + trace_id)
+    print("[TRACE] func: neo4j_query/get_list_nodes_of_type start " + trace_id)
 
-    print("node_type=", node_type)
+    print("neo4j_query/get_list_nodes_of_type: node_type=", node_type)
 
     # must be one of these node types. See also 'schema.log' file
     print("neo4j_query/get_list_nodes_of_type:  node type:", node_type)
@@ -237,15 +237,17 @@ def get_list_nodes_of_type(tx, node_type: str) -> list:
         # print(result.data()["n"])
         node_list.append(result.data()["n"])
 
-    print("[TRACE] func: neo4j_query/list_nodes_of_type end " + trace_id)
+    print("[TRACE] func: neo4j_query/get_list_nodes_of_type end " + trace_id)
     return node_list
 
 
 def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/derivations_that_use_feed start " + trace_id)
-    print("feed_id=", feed_id)
+    print(
+        "[TRACE] func: neo4j_query/get_derivation_dicts_that_use_feed start " + trace_id
+    )
+    print("neo4j_query/get_derivation_dicts_that_use_feed: feed_id=", feed_id)
 
     # TODO: this should be derivation->step->feed
     list_of_derivation_dicts = []
@@ -256,7 +258,9 @@ def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
     ):
         list_of_derivation_dicts.append(result.data()["d"])
 
-    print("[TRACE] func: neo4j_query/derivations_that_use_feed end " + trace_id)
+    print(
+        "[TRACE] func: neo4j_query/get_derivation_dicts_that_use_feed end " + trace_id
+    )
     return list_of_derivation_dicts
 
 
@@ -272,7 +276,10 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
         + trace_id
     )
 
-    print("inference_rule_id=", inference_rule_id)
+    print(
+        "neo4j_query/derivations_that_use_inference_rule: inference_rule_id=",
+        inference_rule_id,
+    )
 
     # TODO: this should be derivation->step->inference_rule
     list_of_derivation_dicts = []
@@ -284,12 +291,12 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
         list_of_derivation_dicts.append(result.data()["d"])
         # print("list_of_derivations=", list_of_derivations)
 
-    print(
-        "inference_rule_id=",
-        inference_rule_id,
-        "list_of_derivations=",
-        list_of_derivation_dicts,
-    )
+    # print(
+    #     "inference_rule_id=",
+    #     inference_rule_id,
+    #     "list_of_derivations=",
+    #     list_of_derivation_dicts,
+    # )
 
     print(
         "[TRACE] func: neo4j_query/derivations_that_use_inference_rule end " + trace_id
@@ -334,7 +341,12 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(
     ):
         list_of_expression_dicts.append(result.data()["e"])
 
-    print("symbol_id=", symbol_id, "list_of_expressions=", list_of_expression_dicts)
+    print(
+        "neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_id=",
+        symbol_id,
+        "list_of_expressions=",
+        list_of_expression_dicts,
+    )
 
     print(
         "[TRACE] func: neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category end "
@@ -398,9 +410,14 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
 
     list_of_step_dicts = []  # type: List[dict]
     for result in tx.run(
-        'MATCH (n:derivation {id:"' + derivation_id + '"})-[r]->(m:step) RETURN n,r,m',
+        'MATCH (d:derivation {id:"' + derivation_id + '"})-[r]->(s:step) RETURN d,r,s',
     ):
-        this_step_dict = result.data()["m"]
+
+        res = result.data()
+
+        print("res=", res)
+
+        this_step_dict = result.data()["s"]
         print(
             "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_dict=",
             this_step_dict,
@@ -408,7 +425,7 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
 
         this_step_index_dict = result.data()["r"]
         print(
-            "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_dict=",
+            "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_index_dict=",
             this_step_index_dict,
         )
 
@@ -422,7 +439,7 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
         #     result.data()["m"],
         # )
 
-        this_step_dict["sequence_index"] = result.data()["r"]["sequence_index"]
+        # this_step_dict["sequence_index"] = result.data()["r"]["sequence_index"]
 
         list_of_step_dicts.append(this_step_dict)
 
@@ -445,7 +462,7 @@ def step_has_sequence_index(tx, step_id: str) -> int:
     )
     # print(type(result)) # don't access the `result` variable more than once, as mentioned on https://neo4j.com/docs/python-manual/current/transformers/
     sequence_index = result.data()[0]["r.sequence_index"]
-    print("sequence_index=", sequence_index)
+    print("neo4j_query/step_has_sequence_index: sequence_index=", sequence_index)
 
     print("[TRACE] func: neo4j_query/step_has_sequence_index end " + trace_id)
     return sequence_index
@@ -476,50 +493,51 @@ def step_has_inference_rule(tx, step_id: str):
     return inf_rule_list_of_dicts[0]["m"]
 
 
-def step_has_expressions(tx, step_id: str, expression_type: str) -> list:
-    """
-    use case: when displaying a derivation, for each step the user wants to know the inputs, feeds, and outputs.
+# def step_has_expressions(tx, step_id: str, expression_type: str) -> list:
+#     """
+#     use case: when displaying a derivation,
+#     for each step the user wants to know the inputs, feeds, and outputs.
 
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/step_has_expressions start " + trace_id)
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     print("[TRACE] func: neo4j_query/step_has_expressions start " + trace_id)
 
-    print(
-        "neo4j_query/step_has_expressions: step_id=",
-        step_id,
-        "; expression_type=",
-        expression_type,
-    )
-    assert (
-        expression_type == "HAS_INPUT"
-        or expression_type == "HAS_FEED"
-        or expression_type == "HAS_OUTPUT"
-    )
+#     print(
+#         "neo4j_query/step_has_expressions: step_id=",
+#         step_id,
+#         "; expression_type=",
+#         expression_type,
+#     )
+#     assert (
+#         expression_type == "HAS_INPUT"
+#         or expression_type == "HAS_FEED"
+#         or expression_type == "HAS_OUTPUT"
+#     )
 
-    print("TODO: figure out how to get the sequence_index for this expression")
-    print(
-        'MATCH (n:step {id:"'
-        + step_id
-        + '"})-[r:'
-        + expression_type
-        + "]->(m:expression) RETURN m"
-    )
+#     # print("TODO: figure out how to get the sequence_index for this expression")
+#     # print(
+#     #     'MATCH (n:step {id:"'
+#     #     + step_id
+#     #     + '"})-[r:'
+#     #     + expression_type
+#     #     + "]->(m:expression) RETURN m"
+#     # )
 
-    list_of_expression_IDs = []
-    for result in tx.run(
-        'MATCH (n:step {id:"'
-        + step_id
-        + '"})-[r:'
-        + expression_type
-        + "]->(m:expression) RETURN m"
-    ):
-        # print(result.data())
-        list_of_expression_IDs.append(result.data())
+#     list_of_expression_IDs = []
+#     for result in tx.run(
+#         'MATCH (n:step {id:"'
+#         + step_id
+#         + '"})-[r:'
+#         + expression_type
+#         + "]->(m:expression) RETURN m"
+#     ):
+#         # print(result.data())
+#         list_of_expression_IDs.append(result.data())
 
-    print("list_of_expression_IDs=", list_of_expression_IDs)
+#     print("list_of_expression_IDs=", list_of_expression_IDs)
 
-    print("[TRACE] func: neo4j_query/step_has_expressions end " + trace_id)
-    return list_of_expression_IDs
+#     print("[TRACE] func: neo4j_query/step_has_expressions end " + trace_id)
+#     return list_of_expression_IDs
 
 
 def get_node_properties(tx, node_type: str, node_id: str) -> dict:
@@ -531,16 +549,16 @@ def get_node_properties(tx, node_type: str, node_id: str) -> dict:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/node_properties start " + trace_id)
 
-    print("node_type=", node_type)
+    print("neo4j_query/node_properties: node_type=", node_type)
     assert node_type in list_of_valid.node_types
-    print("node_id:", node_id)
+    print("neo4j_query/node_properties: node_id:", node_id)
 
     result = tx.run(
         "MATCH (n: " + str(node_type) + ') WHERE n.id = "' + str(node_id) + '" RETURN n'
     )
     # node_data = result.data()['n']
     node_data = result.data()[0]["n"]
-    print("node_data=", node_data)
+    print("neo4j_query/node_properties: node_data=", node_data)
 
     print("[TRACE] func: neo4j_query/node_properties end " + trace_id)
     return node_data
@@ -656,7 +674,7 @@ def edit_expression(
     tx,
     expression_id: str,
     expression_latex_lhs: str,
-    expression_relation: str,
+    expression_latex_relation: str,
     expression_latex_rhs: str,
     expression_latex_condition: str,
     expression_name_latex: str,
@@ -680,7 +698,7 @@ def edit_expression(
         'created_datetime:"' + now_str + '",'
         'author_name_latex:"' + author_name_latex + '",'
         'latex_lhs: "' + str(expression_latex_lhs) + '",'
-        'relation: "' + str(expression_relation) + '",'
+        'latex_relation: "' + str(expression_latex_relation) + '",'
         'latex_rhs: "' + str(expression_latex_rhs) + '",'
         'latex_condition: "' + str(expression_latex_condition) + '"}'
     )
@@ -689,33 +707,33 @@ def edit_expression(
     return
 
 
-def edit_feed(
-    tx,
-    feed_id: str,
-    feed_latex: str,
-    feed_name: str,
-    feed_description: str,
-    now_str: str,
-    author_name_latex: str,
-) -> None:
-    """
-    >>> edit_feed()
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/edit_feed start " + trace_id)
+# def edit_feed(
+#     tx,
+#     feed_id: str,
+#     feed_latex: str,
+#     feed_name: str,
+#     feed_description: str,
+#     now_str: str,
+#     author_name_latex: str,
+# ) -> None:
+#     """
+#     >>> edit_feed()
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     print("[TRACE] func: neo4j_query/edit_feed start " + trace_id)
 
-    result = tx.run(
-        'MERGE (e:feed {id:"' + str(feed_id) + '"})'
-        'SET e = {id: "' + str(feed_id) + '",'
-        'name_latex: "' + str(feed_name) + '",'
-        'description_latex: "' + str(feed_description) + '",'
-        'created_datetime:"' + now_str + '",'
-        'author_name_latex:"' + author_name_latex + '",'
-        'latex: "' + str(feed_latex) + '"}'
-    )
+#     result = tx.run(
+#         'MERGE (e:feed {id:"' + str(feed_id) + '"})'
+#         'SET e = {id: "' + str(feed_id) + '",'
+#         'name_latex: "' + str(feed_name) + '",'
+#         'description_latex: "' + str(feed_description) + '",'
+#         'created_datetime:"' + now_str + '",'
+#         'author_name_latex:"' + author_name_latex + '",'
+#         'latex: "' + str(feed_latex) + '"}'
+#     )
 
-    print("[TRACE] func: neo4j_query/edit_feed end " + trace_id)
-    return
+#     print("[TRACE] func: neo4j_query/edit_feed end " + trace_id)
+#     return
 
 
 def edit_node_property(
@@ -1101,7 +1119,7 @@ def add_expression(
     expression_id: str,
     expression_name_latex: str,
     expression_latex_lhs: str,
-    expression_relation: str,
+    expression_latex_relation: str,
     expression_latex_rhs: str,
     expression_latex_condition: str,
     expression_description_latex: str,
@@ -1120,7 +1138,7 @@ def add_expression(
         "MERGE (:expression "
         '{name_latex:"' + str(expression_name_latex) + '", '
         ' latex_lhs:"' + str(expression_latex_lhs) + '", '
-        ' relation:"' + str(expression_relation) + '", '
+        ' latex_relation:"' + str(expression_latex_relation) + '", '
         ' latex_rhs:"' + str(expression_latex_rhs) + '", '
         ' latex_condition: "' + str(expression_latex_condition) + '", '
         #' lean:"' + str(expression_lean) + '", '
