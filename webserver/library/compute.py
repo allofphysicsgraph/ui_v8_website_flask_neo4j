@@ -87,6 +87,88 @@ def remove_file_debris(
     return
 
 
+def get_list_of_symbol_IDs_in_expression_or_feed(
+    graphDB_Driver,
+    query_time_dict: dict,
+    expression_or_feed: str,
+    expression_id: unique_numeric_id_as_str,
+):
+    """
+    >>>
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print(
+        "[TRACE] func: compute/get_list_of_symbol_IDs_in_expression_or_feed start "
+        + trace_id
+    )
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_symbol_IDs_in_expression_or_feed = session.read_transaction(
+            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+            expression_or_feed,
+            expression_id,
+            "operation",
+        )
+        query_time_dict[
+            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed operation"
+        ] = (time.time() - query_start_time)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+            expression_or_feed,
+            expression_id,
+            "relation",
+        )
+        query_time_dict[
+            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed relation"
+        ] = (time.time() - query_start_time)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+            expression_or_feed,
+            expression_id,
+            "scalar",
+        )
+        query_time_dict[
+            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed scalar"
+        ] = (time.time() - query_start_time)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+            expression_or_feed,
+            expression_id,
+            "vector",
+        )
+        query_time_dict[
+            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed vector"
+        ] = (time.time() - query_start_time)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+            expression_or_feed,
+            expression_id,
+            "matrix",
+        )
+        query_time_dict[
+            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed matrix"
+        ] = (time.time() - query_start_time)
+
+    print(
+        "[TRACE] func: compute/get_list_of_symbol_IDs_in_expression_or_feed end "
+        + trace_id
+    )
+    return list_of_symbol_IDs_in_expression_or_feed, query_time_dict
+
+
 def get_list_of_expression_dicts_that_use_symbol_id(
     graphDB_Driver, query_time_dict: dict, symbol_id: str
 ) -> Tuple[List[dict], Dict[str, float]]:
@@ -449,75 +531,75 @@ def get_dict_of_derivations_used_per_inference_rule(
     return dict_of_derivations_used_per_inference_rule
 
 
-def symbols_per_expression_or_feed(
-    graphDB_Driver,
-    query_time_dict: dict,
-    expression_or_feed: str,
-    list_of_expression_or_feed_dicts: list,
-):
-    """
-    >>>
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: app/symbols_per_expression start " + trace_id)
+# def symbols_per_expression_or_feed(
+#     graphDB_Driver,
+#     query_time_dict: dict,
+#     expression_or_feed: str,
+#     list_of_expression_or_feed_dicts: list,
+# ):
+#     """
+#     >>>
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     print("[TRACE] func: app/symbols_per_expression start " + trace_id)
 
-    symbols_per_expression_or_feed = {}  # type: Dict[str, list]
-    for this_expression_or_feed_dict in list_of_expression_or_feed_dicts:
-        list_of_symbol_IDs_in_expression_or_feed = []
+#     symbols_per_expression_or_feed = {}  # type: Dict[str, list]
+#     for this_expression_or_feed_dict in list_of_expression_or_feed_dicts:
+#         list_of_symbol_IDs_in_expression_or_feed = []
 
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
-                neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-                expression_or_feed,
-                this_expression_or_feed_dict["id"],
-                "operation",
-            )
-            query_time_dict["symbols_per_expression_or_feed"] = (
-                time.time() - query_start_time
-            )
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+#                 neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
+#                 expression_or_feed,
+#                 this_expression_or_feed_dict["id"],
+#                 "operation",
+#             )
+#             query_time_dict["symbols_per_expression_or_feed"] = (
+#                 time.time() - query_start_time
+#             )
 
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
-                neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-                expression_or_feed,
-                this_expression_or_feed_dict["id"],
-                "scalar",
-            )
-            query_time_dict["symbols_per_expression_or_feed"] = (
-                time.time() - query_start_time
-            )
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+#                 neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
+#                 expression_or_feed,
+#                 this_expression_or_feed_dict["id"],
+#                 "scalar",
+#             )
+#             query_time_dict["symbols_per_expression_or_feed"] = (
+#                 time.time() - query_start_time
+#             )
 
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
-                neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-                expression_or_feed,
-                this_expression_or_feed_dict["id"],
-                "vector",
-            )
-            query_time_dict["symbols_per_expression_or_feed"] = (
-                time.time() - query_start_time
-            )
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+#                 neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
+#                 expression_or_feed,
+#                 this_expression_or_feed_dict["id"],
+#                 "vector",
+#             )
+#             query_time_dict["symbols_per_expression_or_feed"] = (
+#                 time.time() - query_start_time
+#             )
 
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
-                neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-                expression_or_feed,
-                this_expression_or_feed_dict["id"],
-                "matrix",
-            )
-            query_time_dict["symbols_per_expression_or_feed"] = (
-                time.time() - query_start_time
-            )
-        symbols_per_expression_or_feed[this_expression_or_feed_dict["id"]] = (
-            list_of_symbol_IDs_in_expression_or_feed
-        )
+#         with graphDB_Driver.session() as session:
+#             query_start_time = time.time()
+#             list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+#                 neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
+#                 expression_or_feed,
+#                 this_expression_or_feed_dict["id"],
+#                 "matrix",
+#             )
+#             query_time_dict["symbols_per_expression_or_feed"] = (
+#                 time.time() - query_start_time
+#             )
+#         symbols_per_expression_or_feed[this_expression_or_feed_dict["id"]] = (
+#             list_of_symbol_IDs_in_expression_or_feed
+#         )
 
-    print("[TRACE] func: app/symbols_per_expression_or_feed end " + trace_id)
-    return symbols_per_expression_or_feed, query_time_dict
+#     print("[TRACE] func: app/symbols_per_expression_or_feed end " + trace_id)
+#     return symbols_per_expression_or_feed, query_time_dict
 
 
 def all_steps_in_derivation(

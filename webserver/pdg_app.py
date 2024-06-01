@@ -1390,51 +1390,11 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
         graphDB_Driver, query_time_dict
     )
 
-    list_of_symbol_IDs_in_expression = []
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_operation_IDs_in_expression = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-            "expression",
-            expression_id,
-            "operation",
+    list_of_symbol_IDs_in_expression, query_time_dict = (
+        compute.get_list_of_symbol_IDs_in_expression_or_feed(
+            graphDB_Driver, query_time_dict, "expression", expression_id
         )
-    for this_id in list_of_operation_IDs_in_expression:
-        list_of_symbol_IDs_in_expression.append(this_id)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_scalar_IDs_in_expression = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-            "expression",
-            expression_id,
-            "scalar",
-        )
-    for this_id in list_of_scalar_IDs_in_expression:
-        list_of_symbol_IDs_in_expression.append(this_id)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_vector_IDs_in_expression = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-            "expression",
-            expression_id,
-            "vector",
-        )
-    for this_id in list_of_vector_IDs_in_expression:
-        list_of_symbol_IDs_in_expression.append(this_id)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_matrix_IDs_in_expression = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-            "expression",
-            expression_id,
-            "matrix",
-        )
-    for this_id in list_of_matrix_IDs_in_expression:
-        list_of_symbol_IDs_in_expression.append(this_id)
+    )
 
     print(
         "pdg_app/to_edit_expression: expression_id=",
@@ -1706,51 +1666,11 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
         graphDB_Driver, query_time_dict
     )
 
-    list_of_symbol_IDs_in_feed = []
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_operation_IDs_in_feed = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-            "feed",
-            feed_id,
-            "operation",
+    list_of_symbol_IDs_in_feed, query_time_dict = (
+        compute.get_list_of_symbol_IDs_in_expression_or_feed(
+            graphDB_Driver, query_time_dict, "feed", feed_id
         )
-    for this_id in list_of_operation_IDs_in_feed:
-        list_of_symbol_IDs_in_feed.append(this_id)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_scalar_IDs_in_feed = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-            "feed",
-            feed_id,
-            "scalar",
-        )
-    for this_id in list_of_scalar_IDs_in_feed:
-        list_of_symbol_IDs_in_feed.append(this_id)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_vector_IDs_in_feed = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-            "feed",
-            feed_id,
-            "vector",
-        )
-    for this_id in list_of_vector_IDs_in_feed:
-        list_of_symbol_IDs_in_feed.append(this_id)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_matrix_IDs_in_feed = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
-            "feed",
-            feed_id,
-            "matrix",
-        )
-    for this_id in list_of_matrix_IDs_in_feed:
-        list_of_symbol_IDs_in_feed.append(this_id)
+    )
 
     print(
         "pdg_app/to_edit_feed: feed_id=",
@@ -1955,9 +1875,18 @@ def to_add_expression() -> str:
             time.time() - query_start_time
         )
 
-    symbols_per_expression = compute.symbols_per_expression_or_feed(
-        graphDB_Driver, query_time_dict, "expression", list_of_expression_dicts
-    )
+    symbol_IDs_per_expression_id = (
+        {}
+    )  # type:Dict[str,list] # _table_of_expressions.html
+    for this_expression_dict in list_of_expression_dicts:
+        symbol_IDs_per_expression_id[this_expression_dict["id"]], query_time_dict = (
+            compute.get_list_of_symbol_IDs_in_expression_or_feed(
+                graphDB_Driver,
+                query_time_dict,
+                "expression",
+                this_expression_dict["id"],
+            )
+        )
 
     dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
         graphDB_Driver, query_time_dict
@@ -1969,7 +1898,7 @@ def to_add_expression() -> str:
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_symbol_scalar_IDs_in_expression = session.read_transaction(
-                neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
+                neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
                 "expression",
                 this_expression_dict["id"],
                 "scalar",
@@ -2064,9 +1993,8 @@ def to_add_expression() -> str:
         print("[TRACE] func: pdg_app/ end " + trace_id)
         return redirect(
             url_for(
-                "to_add_symbols_and_operations_for",
-                expression_or_feed="expression",
-                expression_or_feed_id=expression_id,
+                "to_add_symbols_and_operations_for_expression",
+                expression_id=expression_id,
             )
         )
 
@@ -2087,7 +2015,7 @@ def to_add_expression() -> str:
         query_time_dict=query_time_dict,
         form=web_form,
         list_of_relation_dicts=list_of_relation_dicts,
-        symbols_per_expression=symbols_per_expression,
+        symbol_IDs_per_expression_id=symbol_IDs_per_expression_id,  # _table_of_expressions.html
         list_of_expression_dicts=list_of_expression_dicts,
         sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
         dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,
@@ -2113,9 +2041,13 @@ def to_add_feed() -> str:
             time.time() - query_start_time
         )
 
-    symbols_per_feed = compute.symbols_per_expression_or_feed(
-        graphDB_Driver, query_time_dict, "feed", list_of_feed_dicts
-    )
+    symbol_IDs_per_feed_id = {}  # type:Dict[str,list]  # _table_of_feeds.html
+    for this_feed_dict in list_of_feed_dicts:
+        symbol_IDs_per_feed_id[this_feed_dict["id"]], query_time_dict = (
+            compute.get_list_of_symbol_IDs_in_expression_or_feed(
+                graphDB_Driver, query_time_dict, "feed", this_feed_dict["id"]
+            )
+        )
 
     dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
         graphDB_Driver, query_time_dict
@@ -2173,9 +2105,8 @@ def to_add_feed() -> str:
         print("[TRACE] func: pdg_app/ end " + trace_id)
         return redirect(
             url_for(
-                "to_add_symbols_and_operations_for",
-                expression_or_feed="feed",
-                expression_or_feed_id=feed_id,
+                "to_add_symbols_and_operations_for_feed",
+                feed_id=feed_id,
             )
         )
     elif request.method == "POST":
@@ -2187,7 +2118,7 @@ def to_add_feed() -> str:
         query_time_dict=query_time_dict,
         form=web_form,
         list_of_nonoperation_symbol_dicts=list_of_nonoperation_symbol_dicts,
-        symbols_per_feed=symbols_per_feed,
+        symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,  # _table_of_feeds.html
         list_of_feed_dicts=list_of_feed_dicts,
         sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
     )
@@ -4876,9 +4807,13 @@ def to_list_feeds() -> str:
             list_of_derivation_dicts
         )
 
-    symbols_per_feed, query_time_dict = compute.symbols_per_expression_or_feed(
-        graphDB_Driver, query_time_dict, "feed", list_of_feed_dicts
-    )
+    symbol_IDs_per_feed_id = {}  # type:Dict[str,list] # _table_of_feeds.html
+    for this_feed_dict in list_of_feed_dicts:
+        symbol_IDs_per_feed_id[this_feed_dict["id"]], query_time_dict = (
+            compute.get_list_of_symbol_IDs_in_expression_or_feed(
+                graphDB_Driver, query_time_dict, "feed", this_feed_dict["id"]
+            )
+        )
 
     sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
     for this_feed_dict in list_of_feed_dicts:
@@ -4898,7 +4833,7 @@ def to_list_feeds() -> str:
         "feed_list.html",
         query_time_dict=query_time_dict,
         list_of_feed_dicts=list_of_feed_dicts,
-        symbols_per_feed=symbols_per_feed,
+        symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,
         sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
         dict_of_derivation_dicts_that_use_feed=dict_of_derivation_dicts_that_use_feed,
@@ -5206,11 +5141,21 @@ def to_list_expressions() -> str:
         list_of_expression_dicts,
     )
 
-    symbols_per_expression, query_time_dict = compute.symbols_per_expression_or_feed(
-        graphDB_Driver, query_time_dict, "expression", list_of_expression_dicts
-    )
+    symbol_IDs_per_expression_id = (
+        {}
+    )  # type:Dict[str,list] # _table_of_expressions.html
+    for this_expression_dict in list_of_expression_dicts:
+        symbol_IDs_per_expression_id[this_expression_dict["id"]], query_time_dict = (
+            compute.get_list_of_symbol_IDs_in_expression_or_feed(
+                graphDB_Driver,
+                query_time_dict,
+                "expression",
+                this_expression_dict["id"],
+            )
+        )
     print(
-        "pdg_app/to_list_expressions: symbols_per_expression=", symbols_per_expression
+        "pdg_app/to_list_expressions: symbol_IDs_per_expression_id=",
+        symbol_IDs_per_expression_id,
     )
 
     dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
@@ -5227,7 +5172,7 @@ def to_list_expressions() -> str:
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_symbol_IDs_in_expression = session.read_transaction(
-                neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
+                neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
                 "expression",
                 this_expression_dict["id"],
                 "scalar",
@@ -5259,7 +5204,7 @@ def to_list_expressions() -> str:
         "expression_list.html",
         query_time_dict=query_time_dict,
         list_of_expression_dicts=list_of_expression_dicts,
-        symbols_per_expression=symbols_per_expression,
+        symbol_IDs_per_expression_id=symbol_IDs_per_expression_id,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
         dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,
         sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,

@@ -1,18 +1,14 @@
+symbol_categories = ["operation", "relation", "scalar", "vector", "matrix"]
+
 node_types = [
     "derivation",
-    "inference_rule",
-    "operation",
-    "relation",
-    "feed",
-    "scalar",
-    "vector",
-    "matrix",
-    "value_with_units",
     "step",
+    "inference_rule",
+    "feed",
     "expression",
-]
+    "value_with_units",
+] + symbol_categories
 
-symbol_categories = ["operation", "scalar", "vector", "matrix"]
 
 dimension_mass_units = [
     "kilogram",

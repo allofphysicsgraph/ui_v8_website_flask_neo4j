@@ -130,7 +130,7 @@ def constrain_unique_id(tx) -> None:
     return
 
 
-def get_list_of_symbol_IDs_in_expression_or_feed(
+def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     tx, expression_or_feed: str, expression_or_feed_id: str, symbol_category: str
 ) -> List[str]:
     """
