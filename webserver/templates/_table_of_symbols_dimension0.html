@@ -1,12 +1,13 @@
 
-
+<!--
 <P>For debugging purposes, here is the all the info available:
 
 <ul>
-{% for this_scalar_dict in list_of_scalar_dicts %}
-<li>{{ this_scalar_dict }}</li>
-{% endfor %}
+{ % for this_scalar_dict in list_of_scalar_dicts %}
+<li>{ { this_scalar_dict }}</li>
+{ % endfor %}
 </ul>
+-->
 
 <table border="1" id="scalar_table" class="sortable">
   <tr>
@@ -41,13 +42,13 @@
     <td>{{ scalar_dict['description_latex'] }}</td>
     <td>{{ scalar_dict['scope'] }}</td>
     <td>{{ scalar_dict['domain'] }}</td>
-    <td>{% for expression_dict in dict_of_expressions_that_use_scalar[scalar_dict['id']] %}
+    <td>{% for expression_dict in dict_of_expression_dicts_that_use_scalar[scalar_dict['id']] %}
       <UL>
-        <LI><a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id']) }}?referrer=table_of_symbols_requires_arguments">{{ expression_dict['id'] }}</a></LI>
+        <LI><a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id']) }}?referrer=table_of_symbols_dimension0">{{ expression_dict['id'] }}</a></LI>
       </UL>
         {% endfor %}
     </td> <!-- used in expressions -->
-    <td>{% for derivation_dict in dict_of_derivations_that_use_scalar[scalar_dict['id']] %}
+    <td>{% for derivation_dict in dict_of_derivation_dicts_that_use_scalar_id[scalar_dict['id']] %}
       <UL>
         <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
       </UL>

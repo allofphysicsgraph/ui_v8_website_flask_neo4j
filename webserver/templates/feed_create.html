@@ -2,12 +2,13 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=expression_create">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=feed_create">main page</a>
+  or <a href="{{ url_for('to_list_feeds') }}?referrer=feed_create">list of feeds</a>.
 </P>
 
 <fieldset>
   <legend>
-    Create multi-symbol feed
+    <H2>Create multi-symbol feed</H2>
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
@@ -44,15 +45,18 @@
 
 <fieldset>
   <legend>
-    promote existing symbol to feed
+    <H2>promote existing symbol to feed</H2>
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
 
-    {{ list_of_nonoperation_symbol_dicts }}
-
-    TODO
+    <select name="symbol_select_id_to_add" class="selectpicker form-control" id="symbol_select">
+      {% for this_symbol_dict in list_of_nonoperation_symbol_dicts %}
+      <option value="{{ this_symbol_dict['id'] }}">{{ this_symbol_dict['id'] }}, {{ this_symbol_dict['latex'] }} </option>
+      {% endfor %}
+    </select>
+    <input type="submit" value="symbol to promote to feed">
 
   </form>
 </fieldset>
@@ -60,7 +64,7 @@
 
 TODO: as user is entering expression, filter the list of existing feeds
 
-{% include '_table_of_expressions.html' %}
+{% include '_table_of_feeds.html' %}
 
 <script>
 function select_expression() {

@@ -2,7 +2,7 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=list_symbols">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_scalar_list">main page</a>
 </P>
 
 <P>See also Wikipedia's <a href="https://en.wikipedia.org/wiki/Glossary_of_mathematical_symbols">list of symbols</a></P>
@@ -40,7 +40,7 @@
   <H2 id="action">Actions for Scalar Symbols</h2>
 </legend>
 
-<P><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=list_symbols">add new scalar symbol</a> -- arguments not required. Includes bra, ket.
+<P><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=list_symbols">add new scalar symbol</a> -- arguments not required. 
 
 <!--
   <P><a href="{ { url_for('to_add_symbol') }}?referrer=list_symbols">add new symbol</a> -- not clear which categorey; guide needed</P>

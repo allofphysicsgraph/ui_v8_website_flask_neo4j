@@ -2,7 +2,7 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=symbol_create">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_scalar_constant_create">main page</a>
   or return to <a href="{{ url_for('to_list_scalars') }}?referrer=symbol_scalar_constant_create">list of scalar symbols</a>
 </P>
 
@@ -27,42 +27,111 @@
     <td></td>
     <td>{{ form_constant_properties.number_power.label}} (<B>required</B>)</td>
   </tr>
-       
+</table>
 
-    <P>with units
-
+<table border="0">
+  <tr>
+    <td>with units</td>
+    <td></td>
+  </tr>
+  <tr>
 {% if scalar_dict['dimension_mass'] != 0 %}
+    <td>
     <select name="mass_select_unit" class="selectpicker form-control" id="mass_select">
       {% for mass_unit in list_of_dimension_mass_units %}
       <option value="{{ mass_unit }}">{{ mass_unit }}</option>
       {% endfor %}
     </select>
+    ^{{ scalar_dict['dimension_mass'] }}
+    </td>
 {% endif %}
-
 {% if scalar_dict['dimension_time'] != 0 %}
+    <td>
     <select name="time_select_unit" class="selectpicker form-control" id="time_select">
       {% for time_unit in list_of_dimension_time_units %}
       <option value="{{ time_unit }}">{{ time_unit }}</option>
       {% endfor %}
     </select>
+    ^{{ scalar_dict['dimension_time'] }}
+    </td>
 {% endif %}
-
 {% if scalar_dict['dimension_length'] != 0 %}
+    <td>
     <select name="length_select_unit" class="selectpicker form-control" id="length_select">
       {% for length_unit in list_of_dimension_length_units %}
       <option value="{{ length_unit }}">{{ length_unit }}</option>
       {% endfor %}
     </select>
+    ^{{ scalar_dict['dimension_length'] }}
+    </td>
 {% endif %}
-
 {% if scalar_dict['dimension_temperature'] != 0 %}
+    <td>
+    <select name="temperature_select_unit" class="selectpicker form-control" id="temperature_select">
+      {% for temperature_unit in list_of_dimension_temperature_units %}
+      <option value="{{ temperature_unit }}">{{ temperature_unit }}</option>
+      {% endfor %}
+    </select>
+    ^{{ scalar_dict['dimension_temperature'] }}
+    </td>
 {% endif %}
 {% if scalar_dict['dimension_electric_charge'] != 0 %}
+    <td>
+    <select name="electric_charge_select_unit" class="selectpicker form-control" id="electric_charge_select">
+      {% for electric_charge_unit in list_of_dimension_electric_charge_units %}
+      <option value="{{ electric_charge_unit }}">{{ electric_charge_unit }}</option>
+      {% endfor %}
+    </select>
+    ^{{ scalar_dict['dimension_electric_charge'] }}
+    </td>
 {% endif %}
 {% if scalar_dict['dimension_amount_of_substance'] != 0 %}
+    <td>
+    <select name="amount_of_substance_select_unit" class="selectpicker form-control" id="amount_of_substance_select">
+      {% for amount_of_substance_unit in list_of_dimension_amount_of_substance_units %}
+      <option value="{{ amount_of_substance_unit }}">{{ amount_of_substance_unit }}</option>
+      {% endfor %}
+    </select>
+    ^{{ scalar_dict['dimension_amount_of_substance'] }}
+    </td>
 {% endif %}
 {% if scalar_dict['dimension_luminous_intensity'] != 0 %}
+    <td>
+    <select name="luminous_intensity_select_unit" class="selectpicker form-control" id="luminous_intensity_select">
+      {% for luminous_intensity_unit in list_of_dimension_luminous_intensity_units %}
+      <option value="{{ luminous_intensity_unit }}">{{ luminous_intensity_unit }}</option>
+      {% endfor %}
+    </select>
+    ^{{ scalar_dict['dimension_luminous_intensity'] }}
+    </td>
 {% endif %}
+
+  </tr>
+  <tr>
+{% if scalar_dict['dimension_mass'] != 0 %}
+    <td>mass</td>
+{% endif %}
+{% if scalar_dict['dimension_time'] != 0 %}
+    <td>time</td>
+{% endif %}
+{% if scalar_dict['dimension_length'] != 0 %}
+    <td>length</td>
+{% endif %}
+{% if scalar_dict['dimension_temperature'] != 0 %}
+    <td>temperature</td>
+{% endif %}
+{% if scalar_dict['dimension_electric_charge'] != 0 %}
+    <td>electric charge</td>
+{% endif %}
+{% if scalar_dict['dimension_amount_of_substance'] != 0 %}
+    <td>amount of substance</td>
+{% endif %}
+{% if scalar_dict['dimension_luminous_intensity'] != 0 %}
+    <td>luminous intensity</td>
+{% endif %}
+  </tr>
+</table>
+
 
     <P><input type="submit" value="set value and dimension for constant scalar symbol">
     </P>

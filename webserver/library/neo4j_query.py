@@ -139,7 +139,7 @@ def constrain_unique_id(tx) -> None:
     return
 
 
-def symbols_in_expression_or_feed(
+def get_list_of_symbol_IDs_in_expression_or_feed(
     tx, expression_or_feed: str, expression_or_feed_id: str, symbol_category: str
 ) -> list:
     """
@@ -174,37 +174,37 @@ def symbols_in_expression_or_feed(
     return symbol_list
 
 
-def symbols_in_feed(tx, feed_id: str, symbol_category: str) -> list:
-    """
-    a feed has one or more sybmols
-    This read query returns which symbol IDs are used for the provided feed ID
+# def symbols_in_feed(tx, feed_id: str, symbol_category: str) -> list:
+#     """
+#     a feed has one or more sybmols
+#     This read query returns which symbol IDs are used for the provided feed ID
 
-    this is the opposite query of `feeds_that_use_symbol`
+#     this is the opposite query of `feeds_that_use_symbol`
 
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/symbols_in_feed start " + trace_id)
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     print("[TRACE] func: neo4j_query/symbols_in_feed start " + trace_id)
 
-    print("neo4j_query/symbols_in_feed: symbol_category=", symbol_category)
+#     print("neo4j_query/symbols_in_feed: symbol_category=", symbol_category)
 
-    assert symbol_category in list_of_valid.symbol_categories
+#     assert symbol_category in list_of_valid.symbol_categories
 
-    symbol_list = []
-    for result in tx.run(
-        "MATCH (e:feed)-[:HAS_SYMBOL]->(s:'"
-        + symbol_category
-        + "') WHERE e.id='"
-        + feed_id
-        + "' RETURN s.id"
-    ):
-        symbol_list.append(result.data()["s.id"])
-    print("feed_id=", feed_id, "symbol_list=", symbol_list)
+#     symbol_list = []
+#     for result in tx.run(
+#         "MATCH (e:feed)-[:HAS_SYMBOL]->(s:'"
+#         + symbol_category
+#         + "') WHERE e.id='"
+#         + feed_id
+#         + "' RETURN s.id"
+#     ):
+#         symbol_list.append(result.data()["s.id"])
+#     print("feed_id=", feed_id, "symbol_list=", symbol_list)
 
-    print("[TRACE] func: neo4j_query/symbols_in_feed end " + trace_id)
-    return symbol_list
+#     print("[TRACE] func: neo4j_query/symbols_in_feed end " + trace_id)
+#     return symbol_list
 
 
-def list_nodes_of_type(tx, node_type: str) -> list:
+def get_list_nodes_of_type(tx, node_type: str) -> list:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a list of all nodes
@@ -229,7 +229,7 @@ def list_nodes_of_type(tx, node_type: str) -> list:
     return node_list
 
 
-def derivations_that_use_feed(tx, feed_id: str) -> list:
+def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/derivations_that_use_feed start " + trace_id)
@@ -283,20 +283,21 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
     return list_of_derivation_dicts
 
 
-def expressions_that_use_symbol(tx, symbol_id: str, symbol_category: str) -> list:
+def get_list_of_expression_dicts_that_use_symbol_id_by_category(tx, 
+    symbol_id: str, symbol_category: str) -> list:
     """
     which expressions contain this symbol?
 
     >>> expressions_that_use_symbol()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/expressions_that_use_symbol start " + trace_id)
+    print("[TRACE] func: neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category start " + trace_id)
 
-    print("neo4j_query/expressions_that_use_symbol: symbol_category=", symbol_category)
+    print("neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_category=", symbol_category)
 
     assert symbol_category in list_of_valid.symbol_categories
 
-    list_of_expressions = []
+    list_of_expression_dicts = []  # type: List[dict]
 
     for result in tx.run(
         "MATCH (e:expression), (s:"
@@ -305,26 +306,27 @@ def expressions_that_use_symbol(tx, symbol_id: str, symbol_category: str) -> lis
         + str(symbol_id)
         + "' RETURN e"
     ):
-        list_of_expressions.append(result.data()["e"])
+        list_of_expression_dicts.append(result.data()["e"])
 
-    print("symbol_id=", symbol_id, "list_of_expressions=", list_of_expressions)
+    print("symbol_id=", symbol_id, "list_of_expressions=", list_of_expression_dicts)
 
-    print("[TRACE] func: neo4j_query/expressions_that_use_symbol end " + trace_id)
-    return list_of_expressions
+    print("[TRACE] func: neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category end " + trace_id)
+    return list_of_expression_dicts
 
 
-def derivations_that_use_symbol(tx, symbol_id: str, symbol_category: str) -> list:
+def get_list_of_derivation_dicts_that_use_symbol_id_by_category(tx, 
+    symbol_id: str, symbol_category: str) -> list:
     """
     which derivations contain this symbol?
 
     >>> derivations_that_use_symbol()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/derivations_that_use_symbol start " + trace_id)
+    print("[TRACE] func: neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category start " + trace_id)
 
     assert symbol_category in list_of_valid.symbol_categories
 
-    list_of_derivations = []
+    list_of_derivation_dicts = []  # type: List[dict]
 
     for result in tx.run(
         "MATCH (d:derivation), (s:"
@@ -333,41 +335,55 @@ def derivations_that_use_symbol(tx, symbol_id: str, symbol_category: str) -> lis
         + str(symbol_id)
         + "' RETURN d"
     ):
-        list_of_derivations.append(result.data()["d"])
+        list_of_derivation_dicts.append(result.data()["d"])
 
-    print("symbol_id=", symbol_id, "list_of_derivations=", list_of_derivations)
+#    print("symbol_id=", symbol_id, "list_of_derivations=", list_of_derivation_dicts)
 
-    print("[TRACE] func: neo4j_query/derivations_that_use_symbol end " + trace_id)
-    return list_of_derivations
+    print("[TRACE] func: neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category end " + trace_id)
+    return list_of_derivation_dicts
 
 
-def steps_in_this_derivation(tx, derivation_id: str) -> list:
+def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
     """
     For a given derivation, what are all the associated step IDs?
 
-    >>> steps_in_this_derivation(tx)
+    >>> get_list_of_step_dicts_in_this_derivation(tx)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/steps_in_this_derivation start " + trace_id)
+    print("[TRACE] func: neo4j_query/get_list_of_step_dicts_in_this_derivation start " + trace_id)
 
     list_of_step_IDs = []
     for result in tx.run(
         'MATCH (n:derivation {id:"' + derivation_id + '"})-[r]->(m:step) RETURN n,r,m',
     ):
-        print("result:", result)
+        this_step_dict = result.data()["m"]
         print(
-            "    n=",
-            result.data()["n"],
-            "\n    r=",
-            result.data()["r"],
-            "\n    m=",
-            result.data()["m"],
+            "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_dict=",
+            this_step_dict,
         )
 
-        list_of_step_IDs.append(result.data()["m"])
+        this_step_index_dict = result.data()["r"]
+        print(
+            "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_dict=",
+            this_step_index_dict,
+        )
 
-    print("[TRACE] func: neo4j_query/steps_in_this_derivation end " + trace_id)
-    return list_of_step_IDs
+        # print("result:", result)
+        # print(
+        #     "    n=",
+        #     result.data()["n"],
+        #     "\n    r=",
+        #     result.data()["r"],
+        #     "\n    m=",
+        #     result.data()["m"],
+        # )
+
+        this_step_dict["sequence_index"] = result.data()["r"]["sequence_index"]
+
+        list_of_step_dicts.append(this_step_dict)
+
+    print("[TRACE] func: neo4j_query/get_list_of_step_dicts_in_this_derivation end " + trace_id)
+    return list_of_step_dicts
 
 
 def step_has_sequence_index(tx, step_id: str) -> int:
@@ -568,6 +584,8 @@ def edit_step_notes(
     tx, step_id: str, note_before_step_latex: str, note_after_step_latex: str
 ) -> None:
     """
+    TODO: deprecate this in favor of edit_node_properties
+
     >>> edit_step_notes()
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -700,6 +718,8 @@ def edit_derivation_metadata(
     author_name_latex: str,
 ) -> None:
     """
+    TODO: deprecate this in favor of modify node properties
+
     >>> edit_derivation_metadata()
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -868,7 +888,7 @@ def add_symbol_to_expression_or_feed(
     return
 
 
-def list_sequence_values(tx, derivation_id: str) -> list:
+def get_list_of_sequence_values_for_derivation_id(tx, derivation_id: str) -> list:
     """
     sequence value is a positive integer for ordering the steps of a derivation
     """
@@ -894,6 +914,7 @@ def list_sequence_values(tx, derivation_id: str) -> list:
 
         list_of_sequence_values.append(int(record["r.sequence_index"]))
 
+    list_of_sequence_values.sort()
     print("list_of_sequence_values=", list_of_sequence_values)
 
     print("[TRACE] func: neo4j_query/list_sequence_values end " + trace_id)
@@ -1125,6 +1146,10 @@ def add_constant_value_with_units(
     dimension_mass_unit: str,
     dimension_time_unit: str,
     dimension_length_unit: str,
+    dimension_temperature_unit: str,
+    dimension_electric_charge_unit: str,
+    dimension_amount_of_substance_unit: str,
+    dimension_luminous_intensity_unit: str,
     author_name_latex: str,
 ):
     """
@@ -1132,6 +1157,22 @@ def add_constant_value_with_units(
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/add_constant_value_with_units start " + trace_id)
+
+    assert dimension_mass_unit in list_of_valid.dimension_mass_units
+    assert dimension_time_unit in list_of_valid.dimension_time_units
+    assert dimension_length_unit in list_of_valid.dimension_length_units
+    assert dimension_temperature_unit in list_of_valid.dimension_temperature_units
+    assert (
+        dimension_electric_charge_unit in list_of_valid.dimension_electric_charge_units
+    )
+    assert (
+        dimension_amount_of_substance_unit
+        in list_of_valid.dimension_amount_of_substance_units
+    )
+    assert (
+        dimension_luminous_intensity_unit
+        in list_of_valid.dimension_luminous_intensity_units
+    )
 
     # create new node for value
     result = tx.run(
@@ -1142,6 +1183,16 @@ def add_constant_value_with_units(
         ' dimension_mass_unit:"' + str(dimension_mass_unit) + '", '
         ' dimension_time_unit:"' + str(dimension_time_unit) + '", '
         ' dimension_length_unit:"' + str(dimension_length_unit) + '", '
+        ' dimension_temperature_unit:"' + str(dimension_temperature_unit) + '", '
+        ' dimension_electric_charge_unit:"'
+        + str(dimension_electric_charge_unit)
+        + '", '
+        ' dimension_amount_of_substance_unit:"'
+        + str(dimension_amount_of_substance_unit)
+        + '", '
+        ' dimension_luminous_intensity_unit:"'
+        + str(dimension_luminous_intensity_unit)
+        + '", '
         ' author_name_latex:"' + str(author_name_latex) + '"})'
     )
 

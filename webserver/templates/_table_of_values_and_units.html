@@ -1,0 +1,35 @@
+
+<!--
+<P>For debugging purposes, here is the all the info available:
+
+<ul>
+{ % for this_scalar_dict in list_of_scalar_dicts %}
+<li>{ { this_scalar_dict }}</li>
+{ % endfor %}
+</ul>
+-->
+
+<table border="1" id="scalar_table" class="sortable">
+  <tr>
+    <th>decimal</th>
+    <th>power</th>
+    <th>units</th>
+  </tr>
+  {% for value_and_units_dict in list_of_values_and_units %}
+  <tr>
+    <td>{{ value_and_units_dict['number_decimal'] }}</td>
+    <td>{{ value_and_units_dict['number_power'] }}</td>
+    <td>
+{% if scalar_dict['dimension_mass'] != 0 %}
+({{ value_and_units_dict['dimension_mass_unit'] }}^{{ scalar_dict['dimension_mass'] }})
+{% endif %}
+{% if scalar_dict['dimension_time'] != 0 %}
+({{ value_and_units_dict['dimension_time_unit'] }}^{{ scalar_dict['dimension_time'] }})
+{% endif %}
+{% if scalar_dict['dimension_length'] != 0 %}
+({{ value_and_units_dict['dimension_length_unit'] }}^{{ scalar_dict['dimension_length'] }})
+{% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>

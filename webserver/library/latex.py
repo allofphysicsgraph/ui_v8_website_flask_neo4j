@@ -14,6 +14,8 @@ import re
 import os
 import glob
 
+import compute
+
 # move and copy files
 import shutil
 
@@ -68,38 +70,65 @@ def make_string_safe_for_latex(unsafe_str: str) -> str:
     return no_hashtag_str
 
 
-def FROMv7_NOT_YET_CONVERTED_generate_tex_for_derivation(
-    deriv_id: str, user_email: str, path_to_db: str
+def generate_tex_file_for_derivation(
+    graphDB_Driver, query_time_dict: dict, derivation_id: str, path_to_tex_file: str
 ) -> str:
     """
-    In this iteration of the PDG (v7), I allow for inference rule names
-    to have spaces. In previous versions, the inference rule names were
-    camel case. When I implemented this function, I learned why the
+    In v7 the PDG I started allowing inference rule names
+    to have spaces. (In versions prior to 7 the inference rule names were
+    camel case.) When I implemented this function in v7 I learned why the
     inference rule names had been camel case: Latex does not like
     newcommand names to have underscore in them; see https://tex.stackexchange.com/questions/306110/new-command-with-an-underscore
-    Therefore, I remove all spaces from the inference rule name
+    Therefore, I remove all spaces from the inference rule name.
 
     Args:
-        deriv_id: numeric identifier of the derivation
-        user_email: email address of the content author
-        path_to_db: filename of the SQL database containing
-                    a JSON entry that returns a nested dictionary
+        query_time_dict:
+        derivation_id: numeric identifier of the derivation
     Returns:
         tex_filename: pass back filename without extension because bibtex cannot handle .tex
     Raises:
 
-
-    >>> generate_tex_for_derivation("000001", "myemail@address.com","pdg.db")
+    >>> path_to_tex = "/home/appuser/app/static/"  # must end with /
+    >>> generate_tex_for_derivation("000001")
     """
 
     trace_id = str(random.randint(1000000, 9999999))
-    # logger.info("[trace start " + trace_id + "]")
-    # dat = clib.read_db(path_to_db)
+    print("[TRACE] func: app/to_add_derivation start " + trace_id)
 
-    path_to_tex = "/home/appuser/app/static/"  # must end with /
-    tex_filename = deriv_id
+    tex_filename = derivation_id
 
-    # remove_file_debris([path_to_tex, "./"], [tex_filename], ["tex", "log", "pdf"])
+    compute.remove_file_debris(
+        [path_to_tex, "./"], [tex_filename], ["tex", "log", "pdf", "aux"]
+    )
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_inference_rule_dicts = session.read_transaction(
+            neo4j_query.get_list_nodes_of_type, "inference_rule"
+        )
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        derivation_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "derivation", derivation_id
+        )
+    print("latex/generate_tex_file_for_derivation: derivation_dict=", derivation_dict)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_step_dicts_in_this_derivation = session.read_transaction(
+            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+        )
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_sequence_values = session.read_transaction(
+            neo4j_query.get_list_of_sequence_values_for_derivation_id, derivation_id
+        )
+    print(
+        "latex/generate_tex_file_for_derivation: list_of_sequence_values=",
+        list_of_sequence_values,
+    )
 
     with open(tex_filename + ".tex", "w") as lat_file:
         lat_file.write(
@@ -128,19 +157,19 @@ def FROMv7_NOT_YET_CONVERTED_generate_tex_for_derivation(
 
         # first, write the inference rules as newcommand at top of .tex file
         lat_file.write("% inference rules as newcommand for use in the body\n")
-        for infrule_name, infrule_dict in dat["inference rules"].items():
+        for infrule_dict in list_of_inference_rule_dicts:
             number_of_args = (
-                infrule_dict["number of feeds"]
-                + infrule_dict["number of inputs"]
-                + infrule_dict["number of outputs"]
+                infrule_dict["number_of_feeds"]
+                + infrule_dict["number_of_inputs"]
+                + infrule_dict["number_of_outputs"]
             )
             # https://en.wikibooks.org/wiki/LaTeX/Macros#New_commands
             if number_of_args < 10:
                 lat_file.write(
                     "\\newcommand\\"
                     + "".join(
-                        filter(str.isalpha, infrule_name)
-                    )  # digits cannot be used to name macros
+                        filter(str.isalpha, infrule_dict["name_latex"])
+                    )  # digits cannot be used to name macros. FAULT EXPECTED: This filtering will create a collision if the only characters distinguishing infrules is a digit
                     + "["
                     + str(  # https://tex.stackexchange.com/questions/306110/new-command-with-an-underscore
                         number_of_args  # macros are limited to 9 inputs;
@@ -152,17 +181,17 @@ def FROMv7_NOT_YET_CONVERTED_generate_tex_for_derivation(
             else:  # 10 or more args; see https://www.texfaq.org/FAQ-moren9
                 lat_file.write(
                     "\\newcommand\\"
-                    + "".join(filter(str.isalpha, infrule_name))
+                    + "".join(filter(str.isalpha, infrule_dict["name_latex"]))
                     + "[9]{"
                     + "\\def\\ArgOne{{#1}}\n\\def\\ArgTwo{{#2}}\n\\def\\ArgThree{{#3}}\n\\def\\ArgFour{{#4}}\n\\def\\ArgFive{{#5}}\n"
                     + "\\def\\ArgSix{{#6}}\n\\def\\ArgSeven{{#7}}\n\\def\\ArgEight{{#8}}\n\\def\\ArgNine{{#9}}\n\\"
-                    + "".join(filter(str.isalpha, infrule_name))
+                    + "".join(filter(str.isalpha, infrule_dict["name_latex"]))
                     + "Relay\n"
                     + "}\n"
                 )
                 lat_file.write(
                     "\\newcommand\\"
-                    + "".join(filter(str.isalpha, infrule_name))
+                    + "".join(filter(str.isalpha, infrule_dict["name_latex"]))
                     + "Relay["
                     + str(number_of_args - 9)
                     + "]{"
@@ -184,19 +213,9 @@ def FROMv7_NOT_YET_CONVERTED_generate_tex_for_derivation(
                     + "}\n"
                 )
 
-        # extract the list of linear index from the derivation
-        list_of_linear_index = []
-        for step_id, step_dict in dat["derivations"][deriv_id]["steps"].items():
-            list_of_linear_index.append(step_dict["linear index"])
-        list_of_linear_index.sort()
-
-        lat_file.write(
-            "\\title{"
-            + make_string_safe_for_latex(dat["derivations"][deriv_id]["name"])
-            + "}\n"
-        )
+        lat_file.write("\\title{" + derivation_dict["name_latex"] + "}\n")
         lat_file.write("\\date{\\today}\n")
-        lat_file.write("\\author{" + make_string_safe_for_latex(user_email) + "}\n")
+        lat_file.write("\\author{" + derivation_dict["author_name_latex"]) + "}\n"
         lat_file.write("\\setlength{\\topmargin}{-.5in}\n")
         lat_file.write("\\setlength{\\textheight}{9in}\n")
         lat_file.write("\\setlength{\\oddsidemargin}{0in}\n")
@@ -209,19 +228,15 @@ def FROMv7_NOT_YET_CONVERTED_generate_tex_for_derivation(
         lat_file.write(
             "Generated by the \\href{http://derivationmap.net/}{Physics Derivation Graph}.\n"
         )
-        if "notes" in dat["derivations"][deriv_id].keys():
-            if len(dat["derivations"][deriv_id]["notes"]) > 0:
-                # fixed bug https://github.com/allofphysicsgraph/proofofconcept/issues/249
-                safe_string = make_string_safe_for_latex(
-                    dat["derivations"][deriv_id]["notes"]
-                )
-                lat_file.write(safe_string + "\n")
-        # else:
-        # logger.warn("notes field should be present in derivation " + deriv_id)
+        if len(derivation_dict["abstract_latex"]) > 0:
+            # fixed bug https://github.com/allofphysicsgraph/proofofconcept/issues/249
+            safe_string = dat["derivations"][deriv_id]["notes"]
+            #                lat_file.write(safe_string + "\n")
+            lat_file.write(derivation_dict["abstract_latex"] + "\n")
         lat_file.write("\\end{abstract}\n")
 
-        for linear_indx in list_of_linear_index:
-            for step_id, step_dict in dat["derivations"][deriv_id]["steps"].items():
+        for linear_indx in list_of_sequence_values:
+            for step_dict in list_of_step_dicts_in_this_derivation:
                 if step_dict["linear index"] == linear_indx:
                     if "image" in step_dict.keys():
                         lat_file.write("\\begin{center}\n")
@@ -236,14 +251,10 @@ def FROMv7_NOT_YET_CONVERTED_generate_tex_for_derivation(
                             + "}\n"
                         )
                         lat_file.write(
-                            "\\caption{"
-                            + make_string_safe_for_latex(step_dict["image"]["caption"])
-                            + "}\n"
+                            "\\caption{" + step_dict["image"]["caption"] + "}\n"
                         )
                         lat_file.write(
-                            "\\label{fig:"
-                            + make_string_safe_for_latex(step_dict["image"]["label"])
-                            + "}\n"
+                            "\\label{fig:" + step_dict["image"]["label"] + "}\n"
                         )
                         lat_file.write("\\end{figure}\n")
                         lat_file.write("\\end{center}\n")
@@ -278,7 +289,7 @@ def FROMv7_NOT_YET_CONVERTED_generate_tex_for_derivation(
                     lat_file.write("\n")
                     if len(step_dict["notes"]) > 0:
                         lat_file.write(
-                            make_string_safe_for_latex(step_dict["notes"]) + "\n"
+                            step_dict["notes"] + "\n"
                         )  # TODO: if the note contains a $ or %, shenanigans arise
                     # write output expressions
                     for expr_local_id in step_dict["outputs"]:
