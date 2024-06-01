@@ -2128,6 +2128,7 @@ def to_add_feed() -> str:
         "feed_create.html",
         query_time_dict=query_time_dict,
         form=web_form,
+        dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
         list_of_nonoperation_symbol_dicts=list_of_nonoperation_symbol_dicts,
         symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,  # _table_of_feeds.html
         list_of_feed_dicts=list_of_feed_dicts,
@@ -2151,6 +2152,9 @@ def to_edit_symbol(symbol_id: unique_numeric_id_as_str) -> str:
     if dict_of_all_symbol_dicts[symbol_id]["node_type"] == "operation":
         print("[TRACE] func: pdg_app/to_edit_symbol end " + trace_id)
         return redirect(url_for("to_edit_operation", operation_id=symbol_id))
+    elif dict_of_all_symbol_dicts[symbol_id]["node_type"] == "relation":
+        print("[TRACE] func: pdg_app/to_edit_symbol end " + trace_id)
+        return redirect(url_for("to_edit_relation", relation_id=symbol_id))
     elif dict_of_all_symbol_dicts[symbol_id]["node_type"] == "scalar":
         print("[TRACE] func: pdg_app/to_edit_symbol end " + trace_id)
         return redirect(url_for("to_edit_scalar", scalar_id=symbol_id))
@@ -2692,8 +2696,34 @@ def to_add_symbol_vector() -> str:
     print("[TRACE] func: pdg_app/to_add_symbol_vector start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_vector_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "vector"
+        )
+        query_time_dict["to_list_scalars: list_nodes_of_type vector"] = (
+            time.time() - query_start_time
+        )
 
+    dict_of_expression_dicts_that_use_vector = {}  # type:Dict[str,list]
+    for this_vector_dict in list_of_vector_dicts:
+        (
+            dict_of_expression_dicts_that_use_vector[this_vector_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_vector_dict["id"]
+        )
+
+    dict_of_derivation_dicts_that_use_vector = {}  # type:Dict[str,list]
+    for this_vector_dict in list_of_vector_dicts:
+        (
+            dict_of_derivation_dicts_that_use_vector[this_vector_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_vector_dict["id"]
+        )
+
+    web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
     if request.method == "POST" and web_form_vector_properties.validate():
         print("request.form = ", request.form)
 
@@ -2749,20 +2779,13 @@ def to_add_symbol_vector() -> str:
             )
         return redirect(url_for("to_list_vectors"))
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_vector_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "vector"
-        )
-        query_time_dict["to_list_scalars: list_nodes_of_type vector"] = (
-            time.time() - query_start_time
-        )
-
     print("[TRACE] func: pdg_app/to_add_symbol_vector end " + trace_id)
     return render_template(
         "symbol_vector_create.html",
         query_time_dict=query_time_dict,
         form_vector_properties=web_form_vector_properties,
+        dict_of_expression_dicts_that_use_vector=dict_of_expression_dicts_that_use_vector,
+        dict_of_derivation_dicts_that_use_vector=dict_of_derivation_dicts_that_use_vector,
         list_of_vector_dicts=list_of_vector_dicts,
     )
 
@@ -2775,6 +2798,34 @@ def to_add_symbol_matrix() -> str:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_add_symbol_matrix start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_matrix_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "matrix"
+        )
+        query_time_dict["to_list_scalars: list_nodes_of_type matrix"] = (
+            time.time() - query_start_time
+        )
+    print("pdg_app/to_add_symbol_matrix: list_of_matrix_dicts=", list_of_matrix_dicts)
+
+    dict_of_expression_dicts_that_use_matrix = {}  # type:Dict[str,list]
+    for this_matrix_dict in list_of_matrix_dicts:
+        (
+            dict_of_expression_dicts_that_use_matrix[this_matrix_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_matrix_dict["id"]
+        )
+
+    dict_of_derivation_dicts_that_use_matrix = {}  # type:Dict[str,list]
+    for this_matrix_dict in list_of_matrix_dicts:
+        (
+            dict_of_derivation_dicts_that_use_matrix[this_matrix_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_matrix_dict["id"]
+        )
 
     web_form_matrix_properties = SpecifyNewSymbolMatrixForm(request.form)
     if request.method == "POST" and web_form_matrix_properties.validate():
@@ -2835,22 +2886,14 @@ def to_add_symbol_matrix() -> str:
             )
         return redirect(url_for("to_list_matrices"))
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_matrix_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "matrix"
-        )
-        query_time_dict["to_list_scalars: list_nodes_of_type matrix"] = (
-            time.time() - query_start_time
-        )
-    print("pdg_app/to_add_symbol_matrix: list_of_matrix_dicts=", list_of_matrix_dicts)
-
     print("[TRACE] func: pdg_app/to_add_symbol_matrix end " + trace_id)
     return render_template(
         "symbol_matrix_create.html",
         query_time_dict=query_time_dict,
         form_matrix_properties=web_form_matrix_properties,
         list_of_matrix_dicts=list_of_matrix_dicts,
+        dict_of_expression_dicts_that_use_matrix=dict_of_expression_dicts_that_use_matrix,
+        dict_of_derivation_dicts_that_use_matrix=dict_of_derivation_dicts_that_use_matrix,
     )
 
 
@@ -5020,7 +5063,7 @@ def to_list_relations() -> str:
     print("[TRACE] func: pdg_app/to_list_relations start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    list_of_relation_dicts = []
+    list_of_relation_dicts = []  # type:List[dict]
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_relation_dicts = session.read_transaction(
@@ -5067,12 +5110,30 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
     print("[TRACE] func: pdg_app/to_list_constant_values start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    # TODO: get list of values for this constant
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_value_dicts = session.read_transaction(
+            neo4j_query.get_list_of_value_dicts_for_constant_id, scalar_id
+        )
+        query_time_dict[
+            "pdg_app/to_list_constant_values get_list_of_value_dicts_for_constant_id:"
+        ] = (time.time() - query_start_time)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        scalar_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "scalar", scalar_id
+        )
+        query_time_dict["pdg_app/to_add_symbol_scalar_constant get_node_properties"] = (
+            time.time() - query_start_time
+        )
 
     print("[TRACE] func: pdg_app/to_list_constant_values end " + trace_id)
     return render_template(
         "symbol_scalar_constant_values_list.html",
         query_time_dict=query_time_dict,
+        list_of_value_dicts=list_of_value_dicts,
+        scalar_dict=scalar_dict
     )
 
 
@@ -5087,12 +5148,30 @@ def to_edit_constant_value_and_units(scalar_id: unique_numeric_id_as_str) -> str
     print("[TRACE] func: pdg_app/to_edit_constant_value_and_units start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    # TODO: get list of values for this constant
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_value_dicts = session.read_transaction(
+            neo4j_query.get_list_of_value_dicts_for_constant_id, scalar_id
+        )
+        query_time_dict[
+            "pdg_app/to_list_constant_values get_list_of_value_dicts_for_constant_id:"
+        ] = (time.time() - query_start_time)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        scalar_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "scalar", scalar_id
+        )
+        query_time_dict["pdg_app/to_add_symbol_scalar_constant get_node_properties"] = (
+            time.time() - query_start_time
+        )
 
     print("[TRACE] func: pdg_app/to_edit_constant_value_and_units start " + trace_id)
     return render_template(
         "symbol_scalar_constant_values_edit.html",
         query_time_dict=query_time_dict,
+        list_of_value_dicts=list_of_value_dicts,
+        scalar_dict=scalar_dict
     )
 
 

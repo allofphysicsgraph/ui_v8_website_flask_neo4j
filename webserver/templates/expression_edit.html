@@ -6,9 +6,10 @@
 or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_edit">list of expressions</a>
 </P>
 
-<P>\({{ expression_dict['latex_lhs'] }}\) = \({{ expression_dict['latex_rhs'] }}\)
-
-<P>{{ expression_dict['latex'] }} = {{ expression_dict['latex_rhs'] }}
+<P>See also 
+  <a href="{{ url_for('to_list_scalars') }}?referrer=expession_edit">scalar symbols</a>,
+  <a href="{{ url_for('to_list_vectors') }}?referrer=expession_edit">vector symbols</a>,
+  <a href="{{ url_for('to_list_matrices') }}?referrer=expession_edit">matrix symbols</a>.</P>
 
 <P>TODO: list derivations that use this expression. That could help provide context.
 
@@ -17,7 +18,10 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     <H2>Symbols in Expression</h2>
   </legend>
 
-<P>See also <a href="{{ url_for('to_list_scalars') }}?referrer=expession_edit">all scalar symbols</a>.</P>
+<P>\({{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}\)
+
+<P>{{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}
+
 
 <table border="1" id="symbol_table">
   <tr>
@@ -39,7 +43,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   {% for symbol_id, symbol_dict in dict_of_symbol_dicts_in_expression.items() %}
   <tr>
     <td>
-      <a href="{{ url_for( 'to_edit_scalar_symbol', symbol_id=symbol_id ) }}">
+      <a href="{{ url_for( 'to_edit_symbol', symbol_id=symbol_id ) }}">
           {{ symbol_id }}
       </a>
     </td>
@@ -55,8 +59,8 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     <td>{{ symbol_dict['dimension_luminous_intensity'] }}</td>
     <td>{{ symbol_dict['dimension_amount_of_substance'] }}</td>
     <td>{{ symbol_dict['dimension_temperature'] }}</td>
-    <td>{{ symbol_dict['symbol_scope'] }}</td>
-    <td>{{ symbol_dict['symbol_domain'] }}</td>
+    <td>{{ symbol_dict['scope'] }}</td>
+    <td>{{ symbol_dict['domain'] }}</td>
   </tr>
   {% endfor %}
 </table>

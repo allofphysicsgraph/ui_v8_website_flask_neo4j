@@ -385,6 +385,29 @@ def get_list_of_derivation_dicts_that_use_symbol_id_by_category(
     return list_of_derivation_dicts
 
 
+def get_list_of_value_dicts_for_constant_id(tx, scalar_id: str) -> list:
+    """
+    >>>
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_value_dicts_for_constant_id start "
+        + trace_id
+    )
+    print("neo4j_query/get_list_of_value_dicts_for_constant_id: scalar_id=", scalar_id)
+
+    list_of_value_dicts = []  # type: List[dict]
+    for result in tx.run(
+        'MATCH (s:scalar {id:"' + scalar_id + '"})-[r]->(v:value_with_units) RETURN v',
+    ):
+        list_of_value_dicts.append(result.data()["v"])
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_value_dicts_for_constant_id start "
+        + trace_id
+    )
+    return list_of_value_dicts
+
+
 def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
     """
     For a given derivation, what are all the associated step IDs?

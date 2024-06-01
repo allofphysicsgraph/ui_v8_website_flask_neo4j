@@ -2,7 +2,7 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=symbol_scalar_constant_list">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_scalar_constant_value_list">main page</a>
 </P>
 
 <P>See also Wikipedia's <a href="https://en.wikipedia.org/wiki/Glossary_of_mathematical_symbols">list of symbols</a></P>
@@ -21,7 +21,7 @@
 
 <fieldset>
 <legend>
-  <H2 id="scalar">There are {{ list_of_scalar_dicts|length }} values for constant </h2>
+  <H2 id="scalar">There are {{ list_of_value_dicts|length }} values for constant </h2>
 </legend>
 
 <P>The ID links to a page where you can edit the value and units<BR>
@@ -40,7 +40,7 @@
   <H2 id="action">Actions for Constant values</h2>
 </legend>
 
-<P><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=list_symbols">add new value</a> 
+<P><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=symbol_scalar_constant_value_list">add new value</a> 
 
 <!--
   <P><a href="{ { url_for('to_add_symbol') }}?referrer=list_symbols">add new symbol</a> -- not clear which categorey; guide needed</P>
