@@ -23,9 +23,14 @@ def sympy_to_latex_str(sympy_expr) -> str:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: latex_and_sympy/sympy_to_latex_str start " + trace_id)
 
-    print("SymPy to be converted to Latex: " + str(sympy_expr))
+    print(
+        "latex_and_sympy/sympy_to_latex_str: SymPy to be converted to Latex: "
+        + str(sympy_expr)
+    )
 
     latex_str = sympy.latex(sympy_expr)
+
+    print("latex_and_sympy/sympy_to_latex_str: latex_str=", latex_str)
 
     print("[TRACE] func: latex_and_sympy/sympy_to_latex_str end " + trace_id)
     return latex_str

@@ -2,10 +2,12 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=list_symbols">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_matrix_list">main page</a>
 </P>
 
+<!--
 <P>See also Wikipedia's <a href="https://en.wikipedia.org/wiki/Glossary_of_mathematical_symbols">list of symbols</a></P>
+-->
 
 <!--
 <P>All symbols:
@@ -28,7 +30,7 @@
 <!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
 (TODO) this box doesn't actually search yet: <input type="text" id="symbol_input" onkeyup="select_symbol()" placeholder="Select symbol to review">
 
-{% include '_table_of_symbols_dimension2ormore.html' %}
+{% include '_table_of_symbols_matrix.html' %}
 
 </fieldset>
 

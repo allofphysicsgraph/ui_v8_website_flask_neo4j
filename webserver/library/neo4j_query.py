@@ -40,7 +40,7 @@ def list_IDs(tx, node_type: str) -> List[str]:
     print("neo4j_query/list_IDs: node_type=", node_type)
     assert node_type in list_of_valid.node_types
 
-    list_of_IDs = []
+    list_of_IDs = []  # type:List[str]
     for result in tx.run("MATCH (n:" + node_type + ") RETURN n.id"):
         # print(result.data())
         list_of_IDs.append(result.data()["n.id"])
@@ -114,16 +114,7 @@ def constrain_unique_id(tx) -> None:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/constrain_unique_id start " + trace_id)
 
-    for node_type in [
-        "derivation",
-        "inference_rule",
-        "operation",
-        "scalar",
-        "vector",
-        "matrix",
-        "step",
-        "expression",
-    ]:
+    for node_type in list_of_valid.node_types:
         # try:
         tx.run(
             "CREATE CONSTRAINT constrain_"
@@ -166,7 +157,7 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
     print("neo4j_query/list_IDs: symbol_category=", symbol_category)
     assert symbol_category in list_of_valid.symbol_categories
 
-    symbol_list = []
+    symbol_list = []  # type:List[str]
     for result in tx.run(
         "MATCH (e:"
         + expression_or_feed
@@ -226,13 +217,11 @@ def get_list_nodes_of_type(tx, node_type: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/get_list_nodes_of_type start " + trace_id)
 
-    print("neo4j_query/get_list_nodes_of_type: node_type=", node_type)
-
     # must be one of these node types. See also 'schema.log' file
     print("neo4j_query/get_list_nodes_of_type:  node type:", node_type)
     assert node_type in list_of_valid.node_types
 
-    node_list = []
+    node_list = []  # type:List[dict]
     for result in tx.run("MATCH (n:" + node_type + ") RETURN n"):
         # print(result.data()["n"])
         node_list.append(result.data()["n"])
@@ -250,7 +239,7 @@ def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
     print("neo4j_query/get_derivation_dicts_that_use_feed: feed_id=", feed_id)
 
     # TODO: this should be derivation->step->feed
-    list_of_derivation_dicts = []
+    list_of_derivation_dicts = []  # type:List[dict]
     for result in tx.run(
         'MATCH (d:derivation), (s:step), (f:feed) WHERE f.id = "'
         + str(feed_id)
@@ -282,7 +271,7 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
     )
 
     # TODO: this should be derivation->step->inference_rule
-    list_of_derivation_dicts = []
+    list_of_derivation_dicts = []  # type:List[dict]
     for result in tx.run(
         'MATCH (d:derivation), (s:step), (i:inference_rule) WHERE i.id = "'
         + str(inference_rule_id)
@@ -493,51 +482,51 @@ def step_has_inference_rule(tx, step_id: str):
     return inf_rule_list_of_dicts[0]["m"]
 
 
-# def step_has_expressions(tx, step_id: str, expression_type: str) -> list:
-#     """
-#     use case: when displaying a derivation,
-#     for each step the user wants to know the inputs, feeds, and outputs.
+def step_id_has_expressions(tx, step_id: str, expression_type: str) -> list:
+    """
+    use case: when displaying a derivation,
+    for each step the user wants to know the inputs, feeds, and outputs.
 
-#     """
-#     trace_id = str(random.randint(1000000, 9999999))
-#     print("[TRACE] func: neo4j_query/step_has_expressions start " + trace_id)
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: neo4j_query/step_id_has_expressions start " + trace_id)
 
-#     print(
-#         "neo4j_query/step_has_expressions: step_id=",
-#         step_id,
-#         "; expression_type=",
-#         expression_type,
-#     )
-#     assert (
-#         expression_type == "HAS_INPUT"
-#         or expression_type == "HAS_FEED"
-#         or expression_type == "HAS_OUTPUT"
-#     )
+    print(
+        "neo4j_query/step_has_expressions: step_id=",
+        step_id,
+        "; expression_type=",
+        expression_type,
+    )
+    assert (
+        expression_type == "HAS_INPUT"
+        or expression_type == "HAS_FEED"
+        or expression_type == "HAS_OUTPUT"
+    )
 
-#     # print("TODO: figure out how to get the sequence_index for this expression")
-#     # print(
-#     #     'MATCH (n:step {id:"'
-#     #     + step_id
-#     #     + '"})-[r:'
-#     #     + expression_type
-#     #     + "]->(m:expression) RETURN m"
-#     # )
+    # print("TODO: figure out how to get the sequence_index for this expression")
+    # print(
+    #     'MATCH (n:step {id:"'
+    #     + step_id
+    #     + '"})-[r:'
+    #     + expression_type
+    #     + "]->(m:expression) RETURN m"
+    # )
 
-#     list_of_expression_IDs = []
-#     for result in tx.run(
-#         'MATCH (n:step {id:"'
-#         + step_id
-#         + '"})-[r:'
-#         + expression_type
-#         + "]->(m:expression) RETURN m"
-#     ):
-#         # print(result.data())
-#         list_of_expression_IDs.append(result.data())
+    list_of_expression_dicts = []  # type:List[dict]
+    for result in tx.run(
+        'MATCH (n:step {id:"'
+        + step_id
+        + '"})-[r:'
+        + expression_type
+        + "]->(m:expression) RETURN m"
+    ):
+        # print(result.data())
+        list_of_expression_dicts.append(result.data())
 
-#     print("list_of_expression_IDs=", list_of_expression_IDs)
+    print("list_of_expression_dicts=", list_of_expression_dicts)
 
-#     print("[TRACE] func: neo4j_query/step_has_expressions end " + trace_id)
-#     return list_of_expression_IDs
+    print("[TRACE] func: neo4j_query/step_id_has_expressions end " + trace_id)
+    return list_of_expression_dicts
 
 
 def get_node_properties(tx, node_type: str, node_id: str) -> dict:
@@ -973,7 +962,7 @@ def get_list_of_sequence_values_for_derivation_id(tx, derivation_id: str) -> lis
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/list_sequence_values start " + trace_id)
 
-    list_of_sequence_values = []
+    list_of_sequence_values = []  # type:List[int]
 
     print("derivation_id=", derivation_id)
     print(
@@ -1449,14 +1438,15 @@ def add_matrix_symbol(
     return
 
 
-def add_operation_symbol(
+def add_operation_or_relation_symbol(
     tx,
-    operation_id: str,
-    operation_name: str,
-    operation_latex: str,
-    operation_description_latex: str,
-    operation_reference_latex: str,
-    operation_argument_count: int,
+    operation_or_relation: str,
+    operation_or_relation_id: str,
+    operation_or_relation_name: str,
+    operation_or_relation_latex: str,
+    operation_or_relation_description_latex: str,
+    operation_or_relation_reference_latex: str,
+    operation_or_relation_argument_count: int,
     author_name_latex: str,
 ) -> None:
     """
@@ -1465,25 +1455,49 @@ def add_operation_symbol(
     >>> add_operation(tx,)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/add_operation_symbol start " + trace_id)
-
-    # corresponds to SpecifyNewSymbolDIRECTOperationForm
-    assert len(operation_name) > 0
-    assert len(operation_latex) > 0
-    assert int(operation_argument_count) > 0
-
-    result = tx.run(
-        "merge (:operation "
-        '{name_latex:"' + str(operation_name) + '", '
-        ' latex:"' + str(operation_latex) + '", '
-        ' description_latex:"' + str(operation_description_latex) + '", '
-        ' reference_latex:"' + str(operation_reference_latex) + '", '
-        " argument_count:" + str(operation_argument_count) + ", "
-        ' author_name_latex:"' + str(author_name_latex) + '", '
-        ' id:"' + str(operation_id) + '"})'
+    print(
+        "[TRACE] func: neo4j_query/add_operation_or_relation_symbol start " + trace_id
     )
 
-    print("[TRACE] func: neo4j_query/add_operation_symbol end " + trace_id)
+    print(
+        "neo4j_query/add_operation_or_relation_symbol: operation_or_relation=",
+        operation_or_relation,
+    )
+    assert operation_or_relation in ["operation", "relation"]
+
+    # corresponds to SpecifyNewSymbolDIRECTOperationForm
+    assert len(operation_or_relation_name) > 0
+    assert len(operation_or_relation_latex) > 0
+    assert int(operation_or_relation_argument_count) > 0
+
+    if operation_or_relation == "operation":
+        result = tx.run(
+            "merge (:operation "
+            '{name_latex:"' + str(operation_or_relation_name) + '", '
+            ' latex:"' + str(operation_or_relation_latex) + '", '
+            ' description_latex:"'
+            + str(operation_or_relation_description_latex)
+            + '", '
+            ' reference_latex:"' + str(operation_or_relation_reference_latex) + '", '
+            " argument_count:" + str(operation_or_relation_argument_count) + ", "
+            ' author_name_latex:"' + str(author_name_latex) + '", '
+            ' id:"' + str(operation_or_relation_id) + '"})'
+        )
+    else:  # relation
+        result = tx.run(
+            "merge (:relation "
+            '{name_latex:"' + str(operation_or_relation_name) + '", '
+            ' latex:"' + str(operation_or_relation_latex) + '", '
+            ' description_latex:"'
+            + str(operation_or_relation_description_latex)
+            + '", '
+            ' reference_latex:"' + str(operation_or_relation_reference_latex) + '", '
+            " argument_count: 2, "
+            ' author_name_latex:"' + str(author_name_latex) + '", '
+            ' id:"' + str(operation_or_relation_id) + '"})'
+        )
+
+    print("[TRACE] func: neo4j_query/add_operation_or_relation_symbol end " + trace_id)
     return
 
 

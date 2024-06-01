@@ -2,23 +2,23 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=symbol_operation_create">main page</a>
-  or return to <a href="{{ url_for('to_list_operations') }}?referrer=symbol_operation_create">list of operations</a>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_relation_create">main page</a>
+  or return to <a href="{{ url_for('to_list_relations') }}?referrer=symbol_relation_create">list of relations</a>
 </P>
 
 <fieldset>
   <legend>
-    <H2>Create operation</H2>
+    <H2>Create relation</H2>
   </legend>
 
 <P>TODO: as user is entering symbol, filter the list of existing symbols.
   That way the user can recognize collisions.
 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form_operation_properties.csrf_token }}
+    {{ form_relation_properties.csrf_token }}
 
-    <P>{{ form_operation_properties.operation_latex.label}} (<B>required</B>): 
-       {{ form_operation_properties.operation_latex(size=50, 
+    <P>{{ form_relation_properties.relation_latex.label}} (<B>required</B>): 
+       {{ form_relation_properties.relation_latex(size=50, 
                       minlength=1, 
                       maxlength=1000,
                       id="input_latex", 
@@ -42,33 +42,31 @@
               <br clear="all">
         <div id="output_input_latex"></div>
 
-    <P>{{ form_operation_properties.operation_argument_count.label}} (<B>required</B>): 
-       {{ form_operation_properties.operation_argument_count() }}
 
-    <P>{{ form_operation_properties.operation_name_latex.label }} (<B>required</B>): 
-       {{ form_operation_properties.operation_name_latex(size=50, maxlength=1000) }}</p>
+    <P>{{ form_relation_properties.relation_name_latex.label }} (<B>required</B>): 
+       {{ form_relation_properties.relation_name_latex(size=50, maxlength=1000) }}</p>
     
-    <P>{{form_operation_properties.operation_description_latex.label }} (<small><em>optional</em></small>):  
-       {{ form_operation_properties.operation_description_latex(size=50, maxlength=1000) }}</p>
+    <P>{{form_relation_properties.relation_description_latex.label }} (<small><em>optional</em></small>):  
+       {{ form_relation_properties.relation_description_latex(size=50, maxlength=1000) }}</p>
 
-    <P>{{ form_operation_properties.operation_reference_latex.label }} (<small><em>optional</em></small>): 
-       {{ form_operation_properties.operation_reference_latex }}</p>
+    <P>{{ form_relation_properties.relation_reference_latex.label }} (<small><em>optional</em></small>): 
+       {{ form_relation_properties.relation_reference_latex }}</p>
 
-      <input type="submit" value="add operation">
+      <input type="submit" value="add relation">
     </P>
   </form>
 </fieldset>
 
 
-<P>{% include '_table_of_symbols_operation.html' %}
+<P>{% include '_table_of_symbols_relation.html' %}
 
 <script>
 function select_symbol() {
   // Declare variables
   var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('operation_input');
+  input = document.getElementById('relation_input');
   filter = input.value.toUpperCase();
-  ul = document.getElementById("operation_UL");
+  ul = document.getElementById("relation_UL");
   li = ul.getElementsByTagName('li');
 
   // Loop through all list items, and hide those who don't match the search query

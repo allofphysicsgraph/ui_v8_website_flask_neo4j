@@ -2,7 +2,7 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=review_derivation">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=derivation_review">main page</a>
 </P>
 
 <H2>Review {{ derivation_dict['name_latex'] }}</H2>
@@ -30,21 +30,21 @@
     </td><!-- step 0,1,2... -->
     <td><a href="{{ url_for('to_edit_inference_rule', inference_rule_id=step_dict['inference rule dict']['id']) }}">{{step_dict['inference rule dict']['id']}}</a><BR>
     {{ step_dict['inference rule dict'] }}</td> <!-- inference rule -->
-    <td>{% for m_dict in step_dict['list of input IDs'] %}
+    <td>{% for m_dict in step_dict['list of input dicts'] %}
       <OL>
         <LI><a href="{{ url_for('to_edit_expression', expression_id=m_dict['m']['id']) }}">{{m_dict['m']['id']}}</a><BR>
         \({{ m_dict['m']['latex'] }}\)</LI>
       </OL>
         {% endfor %}
     </td>
-    <td>{% for m_dict in step_dict['list of feed IDs'] %}
+    <td>{% for m_dict in step_dict['list of feed dicts'] %}
       <OL>
         <LI><a href="{{ url_for('to_edit_expression', expression_id=m_dict['m']['id']) }}">{{m_dict['m']['id']}}</a><BR>
         \({{ m_dict['m']['latex'] }}\)</LI>
       </OL>
         {% endfor %}
     </td>
-    <td>{% for m_dict in step_dict['list of output IDs'] %}
+    <td>{% for m_dict in step_dict['list of output dicts'] %}
       <OL>
         <LI><a href="{{ url_for('to_edit_expression', expression_id=m_dict['m']['id']) }}">{{m_dict['m']['id']}}</a><BR>
         \({{ m_dict['m']['latex'] }}\)</LI>

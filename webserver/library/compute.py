@@ -102,7 +102,10 @@ def get_list_of_expression_dicts_that_use_symbol_id(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: compute/ start " + trace_id)
+    print(
+        "[TRACE] func: compute/get_list_of_expression_dicts_that_use_symbol_id start "
+        + trace_id
+    )
 
     list_of_expression_dicts = []  # type: List[dict]
     with graphDB_Driver.session() as session:
@@ -146,6 +149,10 @@ def get_list_of_expression_dicts_that_use_symbol_id(
             "get_dict_of_expression_dicts_that_use_symbol_id: get_dict_of_expression_dicts_that_use_symbol_id_by_category matrix"
         ] = (time.time() - query_start_time)
 
+    print(
+        "[TRACE] func: compute/get_list_of_expression_dicts_that_use_symbol_id end "
+        + trace_id
+    )
     return list_of_expression_dicts, query_time_dict
 
 
@@ -548,31 +555,31 @@ def all_steps_in_derivation(
         print("inference_rule_dict=", inference_rule_dict)
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            list_of_input_IDs = session.read_transaction(
-                neo4j_query.step_has_expressions, this_step_dict["id"], "HAS_INPUT"
+            list_of_input_dicts = session.read_transaction(
+                neo4j_query.step_id_has_expressions, this_step_dict["id"], "HAS_INPUT"
             )
             query_time_dict[
-                "all_steps_in_derivation: step_has_expressions, HAS_INPUT"
+                "all_steps_in_derivation: step_id_has_expressions, HAS_INPUT"
             ] = (time.time() - query_start_time)
-        print("list_of_input_IDs=", list_of_input_IDs)
+        print("list_of_input_dicts=", list_of_input_dicts)
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            list_of_feed_IDs = session.read_transaction(
-                neo4j_query.step_has_expressions, this_step_dict["id"], "HAS_FEED"
+            list_of_feed_dicts = session.read_transaction(
+                neo4j_query.step_id_has_expressions, this_step_dict["id"], "HAS_FEED"
             )
             query_time_dict[
-                "all_steps_in_derivation: step_has_expressions, HAS_FEED"
+                "all_steps_in_derivation: step_id_has_expressions, HAS_FEED"
             ] = (time.time() - query_start_time)
-        print("list_of_feed_IDs=", list_of_feed_IDs)
+        print("list_of_feed_dicts=", list_of_feed_dicts)
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            list_of_output_IDs = session.read_transaction(
-                neo4j_query.step_has_expressions, this_step_dict["id"], "HAS_OUTPUT"
+            list_of_output_dicts = session.read_transaction(
+                neo4j_query.step_id_has_expressions, this_step_dict["id"], "HAS_OUTPUT"
             )
             query_time_dict[
-                "all_steps_in_derivation: step_has_expressions, HAS_OUTPUT"
+                "all_steps_in_derivation: step_id_has_expressions, HAS_OUTPUT"
             ] = (time.time() - query_start_time)
-        print("list_of_output_IDs=", list_of_output_IDs)
+        print("list_of_output_dicts=", list_of_output_dicts)
 
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -587,9 +594,9 @@ def all_steps_in_derivation(
         all_steps[this_step_dict["id"]] = {
             "sequence index": sequence_index,
             "inference rule dict": inference_rule_dict,
-            "list of input IDs": list_of_input_IDs,
-            "list of feed IDs": list_of_feed_IDs,
-            "list of output IDs": list_of_output_IDs,
+            "list of input dicts": list_of_input_dicts,
+            "list of feed dicts": list_of_feed_dicts,
+            "list of output dicts": list_of_output_dicts,
         }
     print("[TRACE] func: app/all_steps_in_derivation end " + trace_id)
     return all_steps, query_time_dict

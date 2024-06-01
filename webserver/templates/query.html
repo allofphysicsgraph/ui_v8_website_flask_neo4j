@@ -2,7 +2,7 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=show_friends">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=query">main page</a>
 </P>
 
 Three ways to submit a read-only query:
@@ -133,6 +133,12 @@ Examples:
     <td>list operations</td>
     <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n:operation) RETURN n">
                                                   MATCH (n:operation) RETURN n</a></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>list relations</td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n:relation) RETURN n">
+                                                  MATCH (n:relation) RETURN n</a></td>
     <td></td>
   </tr>
   <tr>

@@ -21,7 +21,17 @@ Latex:
                                 maxlength=1000,
                                 id="input_latex_lhs", 
                                 onchange="onChangeFunction();") }}</td>
-    <td>=</td>
+    <td>
+
+
+
+    <select name="symbol_relation_id_to_add" class="selectpicker form-control" id="relation_select">
+      {% for relation_dict in list_of_relation_dicts %}
+      <option value="{{ relation_dict['id'] }}">{{ relation_dict['latex'] }} </option>
+      {% endfor %}
+    </select>
+
+    </td>
     <td>{{ form.expression_latex_rhs(size=50, 
                                 maxlength=1000,
                                 id="input_latex_rhs", 

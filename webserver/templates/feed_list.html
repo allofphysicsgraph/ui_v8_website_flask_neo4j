@@ -2,7 +2,7 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=list_expressions">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=feed_list">main page</a>
 </P>
 
 <fieldset>
@@ -23,7 +23,7 @@
 <legend>
   <H2>Actions for Feeds</h2>
 </legend>
-<a href="{{ url_for('to_add_feed') }}?referrer=list_feeds">add new feed</a>
+<a href="{{ url_for('to_add_feed') }}?referrer=feed_list">add new feed</a>
 </fieldset>
 
 <script>

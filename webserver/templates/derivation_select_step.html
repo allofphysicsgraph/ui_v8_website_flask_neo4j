@@ -2,7 +2,7 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('main') }}?referrer=list_derivations">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=derivation_select_step">main page</a>
 </P>
 
 <P>derivation_dict: {{ derivation_dict }}
@@ -31,14 +31,14 @@
   {% for step_dict in list_of_step_dicts %}
   <tr>
     <td>
-      <a href="{{ url_for( 'to_edit_step', step_id=step_dict['id'] ) }}">
+      <a href="{{ url_for( 'to_edit_step', step_id=step_dict['id'] ) }}?referrer=derivation_select_step">
           {{ step_dict['id'] }}
       </a>
     </td>
     <td>{{ step_dict['inference rule ID']}}</td>
-    <td>{{ step_dict['list of input IDs'] }}</td>
-    <td>{{ step_dict['list of feed IDs'] }}</td>
-    <td>{{ step_dict['list of output IDs'] }}</td>
+    <td>{{ step_dict['list of input dicts'] }}</td>
+    <td>{{ step_dict['list of feed dicts'] }}</td>
+    <td>{{ step_dict['list of output dicts'] }}</td>
   </tr>
   {% endfor %}
 </table>

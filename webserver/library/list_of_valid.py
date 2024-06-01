@@ -2,6 +2,7 @@ node_types = [
     "derivation",
     "inference_rule",
     "operation",
+    "relation",
     "feed",
     "scalar",
     "vector",
@@ -53,6 +54,6 @@ dimension_length_units = [
 ]
 
 dimension_temperature_units = ["fahrenheit", "celsius", "kelvin"]
-dimension_electric_charge_units = ["coulomb"]
+dimension_electric_charge_units = ["coulomb"]  # https://en.wikipedia.org/wiki/Coulomb
 dimension_amount_of_substance_units = ["mol"]
 dimension_luminous_intensity_units = ["candela"]
