@@ -23,11 +23,12 @@ https://neo4j.com/developer/kb/viewing-schema-data-with-apoc/
 
 import neo4j  # needed for exception handling
 import random  # for trace IDs
+from typing import Dict, List
 
 import list_of_valid
 
 
-def list_IDs(tx, node_type: str) -> list:
+def list_IDs(tx, node_type: str) -> List[str]:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a list of all PDG IDs for the nodes
@@ -36,8 +37,7 @@ def list_IDs(tx, node_type: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/list_IDs start " + trace_id)
 
-    print("node_type=", node_type)
-
+    print("neo4j_query/list_IDs: node_type=", node_type)
     assert node_type in list_of_valid.node_types
 
     list_of_IDs = []
@@ -141,20 +141,29 @@ def constrain_unique_id(tx) -> None:
 
 def get_list_of_symbol_IDs_in_expression_or_feed(
     tx, expression_or_feed: str, expression_or_feed_id: str, symbol_category: str
-) -> list:
+) -> List[str]:
     """
     an expression has one or more sybmols
     This read query returns which symbol IDs are used for the provided expression ID
 
     this is the opposite query of `expressions_that_use_symbol`
 
+    >>> get_list_of_symbol_IDs_in_expression_or_feed()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/symbols_in_expression start " + trace_id)
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_symbol_IDs_in_expression_or_feed start "
+        + trace_id
+    )
 
-    print("neo4j_query/symbols_in_expression: symbol_category=", symbol_category)
+    print(
+        "neo4j_query/get_list_of_symbol_IDs_in_expression_or_feed: symbol_category=",
+        symbol_category,
+    )
 
+    print("neo4j_query/list_IDs: expression_or_feed=", expression_or_feed)
     assert expression_or_feed in ["expression", "feed"]
+    print("neo4j_query/list_IDs: symbol_category=", symbol_category)
     assert symbol_category in list_of_valid.symbol_categories
 
     symbol_list = []
@@ -170,7 +179,10 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
         symbol_list.append(result.data()["s.id"])
     print("expression_or_feed_id=", expression_or_feed_id, "symbol_list=", symbol_list)
 
-    print("[TRACE] func: neo4j_query/symbols_in_expression_or_feed end " + trace_id)
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_symbol_IDs_in_expression_or_feed end "
+        + trace_id
+    )
     return symbol_list
 
 
@@ -217,8 +229,8 @@ def get_list_nodes_of_type(tx, node_type: str) -> list:
     print("node_type=", node_type)
 
     # must be one of these node types. See also 'schema.log' file
+    print("neo4j_query/get_list_nodes_of_type:  node type:", node_type)
     assert node_type in list_of_valid.node_types
-    print("              node type:", node_type)
 
     node_list = []
     for result in tx.run("MATCH (n:" + node_type + ") RETURN n"):
@@ -235,6 +247,7 @@ def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
     print("[TRACE] func: neo4j_query/derivations_that_use_feed start " + trace_id)
     print("feed_id=", feed_id)
 
+    # TODO: this should be derivation->step->feed
     list_of_derivation_dicts = []
     for result in tx.run(
         'MATCH (d:derivation), (s:step), (f:feed) WHERE f.id = "'
@@ -261,6 +274,7 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
 
     print("inference_rule_id=", inference_rule_id)
 
+    # TODO: this should be derivation->step->inference_rule
     list_of_derivation_dicts = []
     for result in tx.run(
         'MATCH (d:derivation), (s:step), (i:inference_rule) WHERE i.id = "'
@@ -283,22 +297,34 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
     return list_of_derivation_dicts
 
 
-def get_list_of_expression_dicts_that_use_symbol_id_by_category(tx, 
-    symbol_id: str, symbol_category: str) -> list:
+def get_list_of_expression_dicts_that_use_symbol_id_by_category(
+    tx, symbol_id: str, symbol_category: str
+) -> list:
     """
     which expressions contain this symbol?
 
     >>> expressions_that_use_symbol()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category start " + trace_id)
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category start "
+        + trace_id
+    )
 
-    print("neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_category=", symbol_category)
+    print(
+        "neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_category=",
+        symbol_category,
+    )
 
+    print(
+        "neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_category=",
+        symbol_category,
+    )
     assert symbol_category in list_of_valid.symbol_categories
 
     list_of_expression_dicts = []  # type: List[dict]
 
+    # TODO: this should be expression->symbol
     for result in tx.run(
         "MATCH (e:expression), (s:"
         + symbol_category
@@ -310,24 +336,36 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(tx,
 
     print("symbol_id=", symbol_id, "list_of_expressions=", list_of_expression_dicts)
 
-    print("[TRACE] func: neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category end " + trace_id)
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category end "
+        + trace_id
+    )
     return list_of_expression_dicts
 
 
-def get_list_of_derivation_dicts_that_use_symbol_id_by_category(tx, 
-    symbol_id: str, symbol_category: str) -> list:
+def get_list_of_derivation_dicts_that_use_symbol_id_by_category(
+    tx, symbol_id: str, symbol_category: str
+) -> list:
     """
     which derivations contain this symbol?
 
     >>> derivations_that_use_symbol()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category start " + trace_id)
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category start "
+        + trace_id
+    )
 
+    print(
+        "neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category: symbol_category=",
+        symbol_category,
+    )
     assert symbol_category in list_of_valid.symbol_categories
 
     list_of_derivation_dicts = []  # type: List[dict]
 
+    # TODO: should be derivation->step->expression->symbol
     for result in tx.run(
         "MATCH (d:derivation), (s:"
         + symbol_category
@@ -337,9 +375,12 @@ def get_list_of_derivation_dicts_that_use_symbol_id_by_category(tx,
     ):
         list_of_derivation_dicts.append(result.data()["d"])
 
-#    print("symbol_id=", symbol_id, "list_of_derivations=", list_of_derivation_dicts)
+    #    print("symbol_id=", symbol_id, "list_of_derivations=", list_of_derivation_dicts)
 
-    print("[TRACE] func: neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category end " + trace_id)
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category end "
+        + trace_id
+    )
     return list_of_derivation_dicts
 
 
@@ -350,9 +391,12 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
     >>> get_list_of_step_dicts_in_this_derivation(tx)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/get_list_of_step_dicts_in_this_derivation start " + trace_id)
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_step_dicts_in_this_derivation start "
+        + trace_id
+    )
 
-    list_of_step_IDs = []
+    list_of_step_dicts = []  # type: List[dict]
     for result in tx.run(
         'MATCH (n:derivation {id:"' + derivation_id + '"})-[r]->(m:step) RETURN n,r,m',
     ):
@@ -382,7 +426,10 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
 
         list_of_step_dicts.append(this_step_dict)
 
-    print("[TRACE] func: neo4j_query/get_list_of_step_dicts_in_this_derivation end " + trace_id)
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_step_dicts_in_this_derivation end "
+        + trace_id
+    )
     return list_of_step_dicts
 
 
@@ -437,12 +484,17 @@ def step_has_expressions(tx, step_id: str, expression_type: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/step_has_expressions start " + trace_id)
 
+    print(
+        "neo4j_query/step_has_expressions: step_id=",
+        step_id,
+        "; expression_type=",
+        expression_type,
+    )
     assert (
         expression_type == "HAS_INPUT"
         or expression_type == "HAS_FEED"
         or expression_type == "HAS_OUTPUT"
     )
-    print("step_id=", step_id, "; expression_type=", expression_type)
 
     print("TODO: figure out how to get the sequence_index for this expression")
     print(
@@ -480,9 +532,7 @@ def get_node_properties(tx, node_type: str, node_id: str) -> dict:
     print("[TRACE] func: neo4j_query/node_properties start " + trace_id)
 
     print("node_type=", node_type)
-
     assert node_type in list_of_valid.node_types
-    print("node_type:", node_type)
     print("node_id:", node_id)
 
     result = tx.run(
@@ -677,9 +727,6 @@ def edit_node_property(
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/edit_node_property start " + trace_id)
 
-    print("node_type=", node_type)
-
-    assert node_type in list_of_valid.node_types
     print(
         "node_type=",
         node_type,
@@ -690,6 +737,7 @@ def edit_node_property(
         ", property_value=",
         property_value,
     )
+    assert node_type in list_of_valid.node_types
 
     # https://neo4j.com/docs/getting-started/cypher-intro/updating/
 
@@ -781,9 +829,8 @@ def delete_node(tx, node_id: str, node_type) -> None:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/delete_node start " + trace_id)
 
-    print("node_type=", node_type)
-
     # must be one of these node types. See also 'schema.log' file
+    print("neo4j_query/delete_node: node_type=", node_type)
     assert node_type in list_of_valid.node_types
 
     result = tx.run(
@@ -808,6 +855,10 @@ def disconnect_symbol_from_expression(
         "[TRACE] func: neo4j_query/disconnect_symbol_from_expression start " + trace_id
     )
 
+    print(
+        "neo4j_query/disconnect_symbol_from_expression: symbol_category=",
+        symbol_category,
+    )
     assert symbol_category in list_of_valid.symbol_categories
 
     result = tx.run(
@@ -837,6 +888,7 @@ def disconnect_symbol_from_feed(
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/disconnect_symbol_from_feed start " + trace_id)
 
+    print("neo4j_query/disconnect_symbol_from_feed: symbol_category=", symbol_category)
     assert symbol_category in list_of_valid.symbol_categories
 
     result = tx.run(
@@ -867,7 +919,15 @@ def add_symbol_to_expression_or_feed(
     print("[TRACE] func: neo4j_query/add_symbol_to_expression start " + trace_id)
     print("symbol_id=", symbol_id, "expression_or_feed_id=", expression_or_feed_id)
 
+    print(
+        "neo4j_query/add_symbol_to_expression_or_feed: expression_or_feed=",
+        expression_or_feed,
+    )
     assert expression_or_feed in ["expression", "feed"]
+    print(
+        "neo4j_query/add_symbol_to_expression_or_feed: symbol_category=",
+        symbol_category,
+    )
     assert symbol_category in list_of_valid.symbol_categories
 
     result = tx.run(
@@ -1143,57 +1203,56 @@ def add_constant_value_with_units(
     value_with_units_id: str,
     number_decimal: float,
     number_power: float,
-    dimension_mass_unit: str,
-    dimension_time_unit: str,
-    dimension_length_unit: str,
-    dimension_temperature_unit: str,
-    dimension_electric_charge_unit: str,
-    dimension_amount_of_substance_unit: str,
-    dimension_luminous_intensity_unit: str,
+    dict_of_units: dict,
     author_name_latex: str,
-):
+) -> None:
     """
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/add_constant_value_with_units start " + trace_id)
 
-    assert dimension_mass_unit in list_of_valid.dimension_mass_units
-    assert dimension_time_unit in list_of_valid.dimension_time_units
-    assert dimension_length_unit in list_of_valid.dimension_length_units
-    assert dimension_temperature_unit in list_of_valid.dimension_temperature_units
-    assert (
-        dimension_electric_charge_unit in list_of_valid.dimension_electric_charge_units
-    )
-    assert (
-        dimension_amount_of_substance_unit
-        in list_of_valid.dimension_amount_of_substance_units
-    )
-    assert (
-        dimension_luminous_intensity_unit
-        in list_of_valid.dimension_luminous_intensity_units
-    )
+    # print("neo4j_query/add_constant_value_with_units: =",)
+    # assert dimension_mass_unit in list_of_valid.dimension_mass_units
+    # print("neo4j_query/add_constant_value_with_units: =",)
+    # assert dimension_time_unit in list_of_valid.dimension_time_units
+    # print("neo4j_query/add_constant_value_with_units: =",)
+    # assert dimension_length_unit in list_of_valid.dimension_length_units
+    # print("neo4j_query/add_constant_value_with_units: =",)
+    # assert dimension_temperature_unit in list_of_valid.dimension_temperature_units
+    # print("neo4j_query/add_constant_value_with_units: =",)
+    # assert (
+    #     dimension_electric_charge_unit in list_of_valid.dimension_electric_charge_units
+    # )
+    # print("neo4j_query/add_constant_value_with_units: =",)
+    # assert (
+    #     dimension_amount_of_substance_unit
+    #     in list_of_valid.dimension_amount_of_substance_units
+    # )
+    # print("neo4j_query/add_constant_value_with_units: =",)
+    # assert (
+    #     dimension_luminous_intensity_unit
+    #     in list_of_valid.dimension_luminous_intensity_units
+    # )
+
+    str_to_add = ""
+    for property_key, property_value in dict_of_units.items():
+        str_to_add += property_key + ':"' + str(property_value) + '", '
+
+    print("neo4j_query/add_constant_value_with_units: str_to_add=", str_to_add)
 
     # create new node for value
     result = tx.run(
         "merge (:value_with_units "
         "{number_decimal:" + str(number_decimal) + ", "
         " number_power: " + str(number_power) + ", "
-        ' id:"' + str(value_with_units_id) + '", '
-        ' dimension_mass_unit:"' + str(dimension_mass_unit) + '", '
-        ' dimension_time_unit:"' + str(dimension_time_unit) + '", '
-        ' dimension_length_unit:"' + str(dimension_length_unit) + '", '
-        ' dimension_temperature_unit:"' + str(dimension_temperature_unit) + '", '
-        ' dimension_electric_charge_unit:"'
-        + str(dimension_electric_charge_unit)
+        ' id:"'
+        + str(value_with_units_id)
         + '", '
-        ' dimension_amount_of_substance_unit:"'
-        + str(dimension_amount_of_substance_unit)
-        + '", '
-        ' dimension_luminous_intensity_unit:"'
-        + str(dimension_luminous_intensity_unit)
-        + '", '
-        ' author_name_latex:"' + str(author_name_latex) + '"})'
+        + str_to_add
+        + ' author_name_latex:"'
+        + str(author_name_latex)
+        + '"})'
     )
 
     # create edge between scalar and value

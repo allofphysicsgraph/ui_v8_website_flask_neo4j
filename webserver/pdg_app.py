@@ -51,17 +51,6 @@ import random
 import time
 import datetime
 
-# https://docs.python.org/3/library/typing.html
-# inspired by https://news.ycombinator.com/item?id=33844117
-from typing import NewType, Dict, List
-
-
-# https://docs.python.org/3/library/re.html
-import re
-
-import neo4j
-from neo4j import GraphDatabase
-
 # https://docs.python.org/3/howto/logging.html
 import logging
 
@@ -69,6 +58,17 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 import os
+import sys
+
+# https://docs.python.org/3/library/typing.html
+# inspired by https://news.ycombinator.com/item?id=33844117
+from typing import NewType, Dict, List
+
+# https://docs.python.org/3/library/re.html
+import re
+
+import neo4j
+from neo4j import GraphDatabase
 
 # import logging
 
@@ -114,7 +114,6 @@ from wtforms import (
 
 from secure import SecureHeaders  # type: ignore
 
-import sys
 
 sys.path.append("library")
 
@@ -125,6 +124,8 @@ import latex
 import sympy_validate_step
 import sympy_validate_expression
 import list_of_valid
+import pdg_api
+
 
 # ORDERING: this has to come before the functions that use this type
 from compute import unique_numeric_id_as_str
@@ -166,6 +167,17 @@ except neo4j.exceptions.ClientError as er:
     print("Neo4j exception: " + str(er))
 
 
+import importlib
+
+print("flask", importlib.metadata.version("flask"))
+print("secure", importlib.metadata.version("secure"))
+print("wtforms", importlib.metadata.version("wtforms"))
+print("werkzeug", importlib.metadata.version("werkzeug"))
+print("flask_wtf", importlib.metadata.version("flask_wtf"))
+print("neo4j", importlib.metadata.version("neo4j"))
+print("python", sys.version)
+
+
 class Config(object):
     """
     https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
@@ -188,9 +200,6 @@ web_app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
     0  # https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
 )
 web_app.config["DEBUG"] = True
-
-
-import pdg_api
 
 web_app.register_blueprint(pdg_api.bp)
 
@@ -1634,7 +1643,10 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_operation_IDs_in_feed = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed, "feed", feed_id, "operation"
+            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
+            "feed",
+            feed_id,
+            "operation",
         )
     for this_id in list_of_operation_IDs_in_feed:
         list_of_symbol_IDs_in_feed.append(this_id)
@@ -1642,7 +1654,10 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_scalar_IDs_in_feed = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed, "feed", feed_id, "scalar"
+            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
+            "feed",
+            feed_id,
+            "scalar",
         )
     for this_id in list_of_scalar_IDs_in_feed:
         list_of_symbol_IDs_in_feed.append(this_id)
@@ -1650,7 +1665,10 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_vector_IDs_in_feed = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed, "feed", feed_id, "vector"
+            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
+            "feed",
+            feed_id,
+            "vector",
         )
     for this_id in list_of_vector_IDs_in_feed:
         list_of_symbol_IDs_in_feed.append(this_id)
@@ -1658,7 +1676,10 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_matrix_IDs_in_feed = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed, "feed", feed_id, "matrix"
+            neo4j_query.get_list_of_symbol_IDs_in_expression_or_feed,
+            "feed",
+            feed_id,
+            "matrix",
         )
     for this_id in list_of_matrix_IDs_in_feed:
         list_of_symbol_IDs_in_feed.append(this_id)
@@ -2341,16 +2362,36 @@ def to_add_symbol_scalar_constant(scalar_id: unique_numeric_id_as_str) -> str:
     if request.method == "POST" and web_form_constant_properties.validate():
         print("request.form = ", request.form)
 
+        # request.form =  ImmutableMultiDict([('number_decimal', '5'),
+        #        ('number_power', '0.00'), ('mass_select_unit', 'stone'),
+        #        ('length_select_unit', 'meter'), ('temperature_select_unit', 'fahrenheit')])
+
         number_decimal = float(web_form_constant_properties.number_decimal.data)
         number_power = float(web_form_constant_properties.number_power.data)
 
-        dimension_mass_unit = ""
-        dimension_time_unit = ""
-        dimension_length_unit = ""
-        dimension_temperature_unit = ""
-        dimension_electric_charge_unit = ""
-        dimension_amount_of_substance_unit = ""
-        dimension_luminous_intensity_unit = ""
+        dict_of_units = {}  # type:Dict[str,str]
+        if "mass_select_unit" in request.form.keys():
+            dict_of_units["dimension_mass_unit"] = request.form["mass_select_unit"]
+        if "time_select_unit" in request.form.keys():
+            dict_of_units["dimension_time_unit"] = request.form["time_select_unit"]
+        if "length_select_unit" in request.form.keys():
+            dict_of_units["dimension_length_unit"] = request.form["length_select_unit"]
+        if "temperature_select_unit" in request.form.keys():
+            dict_of_units["dimension_temperature_unit"] = request.form[
+                "temperature_select_unit"
+            ]
+        if "electric_charge_select_unit" in request.form.keys():
+            dict_of_units["dimension_electric_charge_unit"] = request.form[
+                "electric_charge_select_unit"
+            ]
+        if "amount_of_substance_select_unit" in request.form.keys():
+            dict_of_units["dimension_amount_of_substance_unit"] = request.form[
+                "amount_of_substance_select_unit"
+            ]
+        if "luminous_intensity_select_unit" in request.form.keys():
+            dict_of_units["dimension_luminous_intensity_unit"] = request.form[
+                "luminous_intensity_select_unit"
+            ]
 
         value_with_units_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "value_with_units"
@@ -2367,13 +2408,7 @@ def to_add_symbol_scalar_constant(scalar_id: unique_numeric_id_as_str) -> str:
                 value_with_units_id,
                 number_decimal,
                 number_power,
-                dimension_mass_unit,
-                dimension_time_unit,
-                dimension_length_unit,
-                dimension_temperature_unit,
-                dimension_electric_charge_unit,
-                dimension_amount_of_substance_unit,
-                dimension_luminous_intensity_unit,
+                dict_of_units,
                 author_name_latex,
             )
 
@@ -2388,20 +2423,35 @@ def to_add_symbol_scalar_constant(scalar_id: unique_numeric_id_as_str) -> str:
             time.time() - query_start_time
         )
 
-    dict_of_expression_dicts_that_use_scalar = {} # type:Dict[str,dict]
+    dict_of_expression_dicts_that_use_scalar = {}  # type:Dict[str,list]
     for this_scalar_dict in list_of_scalar_dicts:
-        dict_of_expression_dicts_that_use_scalar[this_scalar_dict['id']] = compute.get_list_of_expression_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_scalar_dict['id'])
+        (
+            dict_of_expression_dicts_that_use_scalar[this_scalar_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_scalar_dict["id"]
+        )
+    print(
+        "dict_of_expression_dicts_that_use_scalar=",
+        dict_of_expression_dicts_that_use_scalar,
+    )
 
-    dict_of_derivation_dicts_that_use_scalar = {} # type:Dict[str,dict]
+    dict_of_derivation_dicts_that_use_scalar = {}  # type:Dict[str,list]
     for this_scalar_dict in list_of_scalar_dicts:
-        dict_of_derivation_dicts_that_use_scalar[this_scalar_dict['id']] = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_scalar_dict['id'])
-
+        (
+            dict_of_derivation_dicts_that_use_scalar[this_scalar_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_scalar_dict["id"]
+        )
+    print(
+        "dict_of_derivation_dicts_that_use_scalar=",
+        dict_of_derivation_dicts_that_use_scalar,
+    )
 
     print("[TRACE] func: app/to_add_symbol_scalar_constant end " + trace_id)
     return render_template(
-        "symbol_scalar_constant_create.html",
+        "symbol_scalar_constant_values_create.html",
         query_time_dict=query_time_dict,
         form_constant_properties=web_form_constant_properties,
         scalar_dict=scalar_dict,
@@ -2411,6 +2461,10 @@ def to_add_symbol_scalar_constant(scalar_id: unique_numeric_id_as_str) -> str:
         list_of_dimension_mass_units=list_of_valid.dimension_mass_units,
         list_of_dimension_time_units=list_of_valid.dimension_time_units,
         list_of_dimension_length_units=list_of_valid.dimension_length_units,
+        list_of_dimension_temperature_units=list_of_valid.dimension_temperature_units,
+        list_of_dimension_electric_charge_units=list_of_valid.dimension_electric_charge_units,
+        list_of_dimension_amount_of_substance_units=list_of_valid.dimension_amount_of_substance_units,
+        list_of_dimension_luminous_intensity_units=list_of_valid.dimension_luminous_intensity_units,
     )
 
 
@@ -2507,23 +2561,30 @@ def to_add_symbol_scalar() -> str:
 
     print("pdg_app/to_add_symbol_scalar: list_of_scalar_dicts =", list_of_scalar_dicts)
 
-    dict_of_expression_dicts_that_use_scalar = {} # type:Dict[str,dict]
+    dict_of_expression_dicts_that_use_scalar = {}  # type:Dict[str,list]
     for this_scalar_dict in list_of_scalar_dicts:
-        dict_of_expression_dicts_that_use_scalar[this_scalar_dict['id']] = compute.get_list_of_expression_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_scalar_dict['id'])
+        (
+            dict_of_expression_dicts_that_use_scalar[this_scalar_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_scalar_dict["id"]
+        )
 
-    dict_of_derivation_dicts_that_use_scalar = {} # type:Dict[str,dict]
+    dict_of_derivation_dicts_that_use_scalar = {}  # type:Dict[str,list]
     for this_scalar_dict in list_of_scalar_dicts:
-        dict_of_derivation_dicts_that_use_scalar[this_scalar_dict['id']] = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_scalar_dict['id'])
-
+        (
+            dict_of_derivation_dicts_that_use_scalar[this_scalar_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_scalar_dict["id"]
+        )
 
     print("[TRACE] func: app/to_add_symbol_scalar end " + trace_id)
     return render_template(
         "symbol_scalar_create.html",
         query_time_dict=query_time_dict,
         form_scalar_properties=web_form_scalar_properties,
-        list_of_dimension0_scalar_dicts=list_of_scalar_dicts,
+        list_of_scalar_dicts=list_of_scalar_dicts,
         dict_of_expression_dicts_that_use_scalar=dict_of_expression_dicts_that_use_scalar,
         dict_of_derivation_dicts_that_use_scalar=dict_of_derivation_dicts_that_use_scalar,
     )
@@ -2626,6 +2687,11 @@ def to_add_symbol_matrix() -> str:
     if request.method == "POST" and web_form_matrix_properties.validate():
         print("request.form = ", request.form)
 
+        # request.form =  ImmutableMultiDict([('matrix_latex', '\\hat{p}'),
+        #       ('matrix_name_latex', ''), ('matrix_description_latex', ''),
+        #       ('matrix_reference_latex', ''), ('matrix_size', 'arbitrary'),
+        #       ('matrix_number_of_rows', '1'), ('matrix_number_of_columns', '1')])
+
         matrix_latex = str(web_form_matrix_properties.matrix_latex.data).strip()
         matrix_name_latex = str(
             web_form_matrix_properties.matrix_name_latex.data
@@ -2684,6 +2750,7 @@ def to_add_symbol_matrix() -> str:
         query_time_dict["to_list_scalars: list_nodes_of_type matrix"] = (
             time.time() - query_start_time
         )
+    print("pdg_app/to_add_symbol_matrix: list_of_matrix_dicts=", list_of_matrix_dicts)
 
     print("[TRACE] func: app/to_add_symbol_matrix end " + trace_id)
     return render_template(
@@ -3323,16 +3390,26 @@ def to_add_operation() -> str:
             neo4j_query.get_list_nodes_of_type, "operation"
         )
 
-    dict_of_expression_dicts_that_use_operation = {} # type:Dict[str,dict]
+    dict_of_expression_dicts_that_use_operation = {}  # type:Dict[str,list]
     for this_operation_dict in list_of_operation_dicts:
-        dict_of_expression_dicts_that_use_operation[this_operation_dict['id']] = compute.get_list_of_expression_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_operation_dict['id'])
+        (
+            list_of_expression_dicts,
+            query_time_dict,
+        ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_operation_dict["id"]
+        )
+        dict_of_expression_dicts_that_use_operation[this_operation_dict["id"]] = (
+            list_of_expression_dicts
+        )
 
-    dict_of_derivation_dicts_that_use_operation = {} # type:Dict[str,dict]
+    dict_of_derivation_dicts_that_use_operation = {}  # type:Dict[str,list]
     for this_operation_dict in list_of_operation_dicts:
-        dict_of_derivation_dicts_that_use_operation[this_operation_dict['id']] = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_operation_dict['id'])
-
+        (
+            dict_of_derivation_dicts_that_use_operation[this_operation_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_operation_dict["id"]
+        )
 
     web_form = SpecifyNewSymbolOperationForm(request.form)
     if request.method == "POST" and web_form.validate():
@@ -3820,8 +3897,9 @@ def to_add_sympy_and_lean_for(
     print("[TRACE] func: app/to_add_sympy_and_lean_for start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
+    print("to_add_sympy_and_lean_for: type(symbol_id_dict)=", type(symbol_id_dict))
     symbol_id_dict = eval(symbol_id_dict)
-    print("symbol_id_dict=", symbol_id_dict)
+    print("to_add_sympy_and_lean_for: symbol_id_dict=", symbol_id_dict)
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -4344,17 +4422,19 @@ def to_list_feeds() -> str:
         )
     print("list_of_operation_dicts", list_of_feed_dicts)
 
-    dict_of_derivation_dicts_that_use_feed = {} # type:Dict[str,dict]
+    dict_of_derivation_dicts_that_use_feed = {}  # type:Dict[str,list]
     for this_feed_dict in list_of_feed_dicts:
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_derivation_dicts = session.read_transaction(
-                neo4j_query.get_derivation_dicts_that_use_feed, this_feed_dict['id']
+                neo4j_query.get_derivation_dicts_that_use_feed, this_feed_dict["id"]
             )
             query_time_dict[
                 "get_dict_of_derivation_dicts_that_use_feed: derivation_dicts_that_use_feed"
             ] = (time.time() - query_start_time)
-        dict_of_derivation_dicts_that_use_feed[this_feed_dict['id']] = list_of_derivation_dicts
+        dict_of_derivation_dicts_that_use_feed[this_feed_dict["id"]] = (
+            list_of_derivation_dicts
+        )
 
     symbols_per_feed, query_time_dict = compute.symbols_per_expression_or_feed(
         graphDB_Driver, query_time_dict, "feed", list_of_feed_dicts
@@ -4399,16 +4479,23 @@ def to_list_operations() -> str:
             time.time() - query_start_time
         )
 
-    dict_of_expression_dicts_that_use_operation = {} # type:Dict[str,dict]
+    dict_of_expression_dicts_that_use_operation = {}  # type:Dict[str,list]
     for this_operation_dict in list_of_operation_dicts:
-        dict_of_expression_dicts_that_use_operation[this_operation_dict['id']] = compute.get_list_of_expression_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_operation_dict['id'])
+        (
+            dict_of_expression_dicts_that_use_operation[this_operation_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_operation_dict["id"]
+        )
 
-    dict_of_derivation_dicts_that_use_operation = {} # type:Dict[str,dict]
+    dict_of_derivation_dicts_that_use_operation = {}  # type:Dict[str,list]
     for this_operation_dict in list_of_operation_dicts:
-        dict_of_derivation_dicts_that_use_operation[this_operation_dict['id']] = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_operation_dict['id'])
-
+        (
+            dict_of_derivation_dicts_that_use_operation[this_operation_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_operation_dict["id"]
+        )
 
     print("[TRACE] func: app/to_list_operations end " + trace_id)
     return render_template(
@@ -4418,6 +4505,38 @@ def to_list_operations() -> str:
         dict_of_expression_dicts_that_use_operation=dict_of_expression_dicts_that_use_operation,
         dict_of_derivation_dicts_that_use_operation=dict_of_derivation_dicts_that_use_operation,
     )
+
+
+@web_app.route("/list_constant_values/<scalar_id>", methods=["GET", "POST"])
+def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
+    """
+    >>> to_list_constant_values()
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: app/to_list_constant_values start " + trace_id)
+    query_time_dict = {}  # type: Dict[str, float]
+
+    # TODO: get list of values for this constant
+
+    print("[TRACE] func: app/to_list_constant_values end " + trace_id)
+    return render_template("symbol_scalar_constant_values_list.html")
+
+
+@web_app.route("/edit_constant_value_and_units/<scalar_id>", methods=["GET", "POST"])
+def to_edit_constant_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
+    """
+    edit value and units for a constant
+
+    >>> to_edit_constant_value_and_units()
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: app/to_edit_constant_value_and_units start " + trace_id)
+    query_time_dict = {}  # type: Dict[str, float]
+
+    # TODO: get list of values for this constant
+
+    print("[TRACE] func: app/to_edit_constant_value_and_units start " + trace_id)
+    return render_template("symbol_scalar_constant_values_edit.html")
 
 
 @web_app.route("/list_scalars", methods=["GET", "POST"])
@@ -4440,16 +4559,31 @@ def to_list_scalars() -> str:
 
     print("pdg_app/to_list_scalars: list_of_scalar_dicts=", list_of_scalar_dicts)
 
-    dict_of_expression_dicts_that_use_scalar = {} # type:Dict[str,dict]
+    dict_of_expression_dicts_that_use_scalar = {}  # type:Dict[str,list]
     for this_scalar_dict in list_of_scalar_dicts:
-        dict_of_expression_dicts_that_use_scalar[this_scalar_dict['id']] = compute.get_list_of_expression_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_scalar_dict['id'])
+        (
+            dict_of_expression_dicts_that_use_scalar[this_scalar_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_scalar_dict["id"]
+        )
+    print(
+        "dict_of_expression_dicts_that_use_scalar=",
+        dict_of_expression_dicts_that_use_scalar,
+    )
 
-    dict_of_derivation_dicts_that_use_scalar = {} # type:Dict[str,dict]
+    dict_of_derivation_dicts_that_use_scalar = {}  # type:Dict[str,list]
     for this_scalar_dict in list_of_scalar_dicts:
-        dict_of_derivation_dicts_that_use_scalar[this_scalar_dict['id']] = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_scalar_dict['id'])
-
+        (
+            dict_of_derivation_dicts_that_use_scalar[this_scalar_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_scalar_dict["id"]
+        )
+    print(
+        "dict_of_derivation_dicts_that_use_scalar=",
+        dict_of_derivation_dicts_that_use_scalar,
+    )
 
     print("[TRACE] func: app/to_list_scalars end " + trace_id)
     return render_template(
@@ -4479,16 +4613,23 @@ def to_list_vectors() -> str:
             time.time() - query_start_time
         )
 
-    dict_of_expression_dicts_that_use_vector = {} # type:Dict[str,dict]
+    dict_of_expression_dicts_that_use_vector = {}  # type:Dict[str,list]
     for this_vector_dict in list_of_vector_dicts:
-        dict_of_expression_dicts_that_use_vector[this_vector_dict['id']] = compute.get_list_of_expression_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_vector_dict['id'])
+        (
+            dict_of_expression_dicts_that_use_vector[this_vector_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_vector_dict["id"]
+        )
 
-    dict_of_derivation_dicts_that_use_vector = {} # type:Dict[str,dict]
+    dict_of_derivation_dicts_that_use_vector = {}  # type:Dict[str,list]
     for this_vector_dict in list_of_vector_dicts:
-        dict_of_derivation_dicts_that_use_vector[this_vector_dict['id']] = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_vector_dict['id'])
-
+        (
+            dict_of_derivation_dicts_that_use_vector[this_vector_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_vector_dict["id"]
+        )
 
     print("[TRACE] func: app/to_list_vectors end " + trace_id)
     return render_template(
@@ -4518,23 +4659,29 @@ def to_list_matrices() -> str:
             time.time() - query_start_time
         )
 
-
-    dict_of_expression_dicts_that_use_matrix = {} # type:Dict[str,dict]
+    dict_of_expression_dicts_that_use_matrix = {}  # type:Dict[str,list]
     for this_matrix_dict in list_of_matrix_dicts:
-        dict_of_expression_dicts_that_use_matrix[this_matrix_dict['id']] = compute.get_list_of_expression_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_matrix_dict['id'])
+        (
+            dict_of_expression_dicts_that_use_matrix[this_matrix_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_matrix_dict["id"]
+        )
 
-    dict_of_derivation_dicts_that_use_matrix = {} # type:Dict[str,dict]
+    dict_of_derivation_dicts_that_use_matrix = {}  # type:Dict[str,list]
     for this_matrix_dict in list_of_matrix_dicts:
-        dict_of_derivation_dicts_that_use_matrix[this_matrix_dict['id']] = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-            graphDB_Driver, query_time_dict, this_matrix_dict['id'])
-
+        (
+            dict_of_derivation_dicts_that_use_matrix[this_matrix_dict["id"]],
+            query_time_dict,
+        ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
+            graphDB_Driver, query_time_dict, this_matrix_dict["id"]
+        )
 
     print("[TRACE] func: app/to_list_matrices end " + trace_id)
     return render_template(
         "symbol_matrix_list.html",
         query_time_dict=query_time_dict,
-        list_of_dimension2ormore_matrix_dicts=list_of_matrix_dicts,
+        list_of_matrix_dicts=list_of_matrix_dicts,
         dict_of_expression_dicts_that_use_matrix=dict_of_expression_dicts_that_use_matrix,
         dict_of_derivation_dicts_that_use_matrix=dict_of_derivation_dicts_that_use_matrix,
     )

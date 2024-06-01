@@ -13,14 +13,15 @@ import random
 import re
 import os
 import glob
-
-import compute
+import time
 
 # move and copy files
 import shutil
-
 from subprocess import PIPE  # https://docs.python.org/3/library/subprocess.html
 import subprocess  # https://stackoverflow.com/questions/39187886/what-is-the-difference-between-subprocess-popen-and-subprocess-run/39187984
+
+import compute
+import neo4j_query
 
 proc_timeout = 30
 
@@ -88,7 +89,7 @@ def generate_tex_file_for_derivation(
         tex_filename: pass back filename without extension because bibtex cannot handle .tex
     Raises:
 
-    >>> path_to_tex = "/home/appuser/app/static/"  # must end with /
+    >>> path_to_tex_file = "/home/appuser/app/static/"  # must end with /
     >>> generate_tex_for_derivation("000001")
     """
 
@@ -98,7 +99,7 @@ def generate_tex_file_for_derivation(
     tex_filename = derivation_id
 
     compute.remove_file_debris(
-        [path_to_tex, "./"], [tex_filename], ["tex", "log", "pdf", "aux"]
+        [path_to_tex_file, "./"], [tex_filename], ["tex", "log", "pdf", "aux"]
     )
 
     with graphDB_Driver.session() as session:
@@ -230,7 +231,7 @@ def generate_tex_file_for_derivation(
         )
         if len(derivation_dict["abstract_latex"]) > 0:
             # fixed bug https://github.com/allofphysicsgraph/proofofconcept/issues/249
-            safe_string = dat["derivations"][deriv_id]["notes"]
+            # safe_string = dat["derivations"][deriv_id]["notes"]
             #                lat_file.write(safe_string + "\n")
             lat_file.write(derivation_dict["abstract_latex"] + "\n")
         lat_file.write("\\end{abstract}\n")
@@ -259,20 +260,11 @@ def generate_tex_file_for_derivation(
                         lat_file.write("\\end{figure}\n")
                         lat_file.write("\\end{center}\n")
                     # using the newcommand, populate the expression identifiers
-                    if step_dict["inf rule"] not in dat["inference rules"].keys():
-                        # logger.error(
-                        #     'inference rule in step is not in dat["inference rules"]: ',
-                        #     step_dict["inf rule"],
-                        # )
-                        raise Exception(
-                            'inference rule in step is not in dat["inference rules"]: ',
-                            step_dict["inf rule"],
-                        )
-                    lat_file.write("% step ID = " + step_id + "\n")
+                    lat_file.write("% step ID = " + step_dict["id"] + "\n")
                     lat_file.write(
                         # digits cannot be used to name macros
                         "\\"
-                        + "".join(filter(str.isalpha, step_dict["inf rule"]))
+                        + "".join(filter(str.isalpha, step_dict["inference_rule"]))
                     )
                     for expr_local_id in step_dict["feeds"]:
                         #                        lat_file.write("{" + expr_local_id + "}")
@@ -306,21 +298,19 @@ def generate_tex_file_for_derivation(
         lat_file.write("\\end{document}\n")
         lat_file.write("% EOF\n")
 
-    shutil.copy(tex_filename + ".tex", path_to_tex + tex_filename + ".tex")
+    shutil.copy(tex_filename + ".tex", path_to_tex_file + tex_filename + ".tex")
     # logger.info("[trace end " + trace_id + "]")
     return tex_filename  # pass back filename without extension because bibtex cannot handle .tex
 
 
 def FROMv7_NOT_YET_CONVERTED_generate_pdf_for_derivation(
-    deriv_id: str, user_email: str, path_to_db: str
+    graphDB_Driver, query_time_dict: dict, derivation_id: str, path_to_pdf: str
 ) -> str:
     """
 
     Args:
         deriv_id: numeric identifier of the derivation
-        user_email: email address of the content author
-        path_to_db: filename of the SQL database containing
-                    a JSON entry that returns a nested dictionary
+        path_to_pdf = "/home/appuser/app/static/"  # must end with /
     Returns:
         pdf_filename + ".pdf":
     Raises:
@@ -337,14 +327,14 @@ def FROMv7_NOT_YET_CONVERTED_generate_pdf_for_derivation(
     os.mkdir(tmp_latex_folder_full_path)
 
     # destination for the PDF once file is built
-    path_to_pdf = "/home/appuser/app/static/"  # must end with /
-    pdf_filename = deriv_id
+
+    pdf_filename = derivation_id
 
     # no longer necessary since the temporary build folder is empty
-    # remove_file_debris([path_to_pdf], [pdf_filename], ["log", "pdf"])
+    # compute.remove_file_debris([path_to_pdf], [pdf_filename], ["log", "pdf"])
 
-    tex_filename_without_extension = generate_tex_for_derivation(
-        deriv_id, user_email, path_to_db
+    tex_filename_without_extension = generate_tex_file_for_derivation(
+        graphDB_Driver, query_time_dict, derivation_id, path_to_pdf
     )
     shutil.move(tex_filename_without_extension + ".tex", tmp_latex_folder_full_path)
 
@@ -459,7 +449,7 @@ def FROMv7_NOT_YET_CONVERTED_generate_pdf_for_derivation(
     return pdf_filename + ".pdf"
 
 
-def FROMv7_NOT_YET_CONVERTED_create_tex_file_for_expr(
+def FROMv7_NOT_YET_CONVERTED_create_tex_file_for_expression(
     tmp_file: str, input_latex_str: str
 ) -> None:
     """
@@ -477,7 +467,7 @@ def FROMv7_NOT_YET_CONVERTED_create_tex_file_for_expr(
     trace_id = str(random.randint(1000000, 9999999))
     # logger.info("[trace start " + trace_id + "]")
 
-    remove_file_debris(["./"], [tmp_file], ["tex"])
+    compute.remove_file_debris(["./"], [tmp_file], ["tex"])
 
     with open(tmp_file + ".tex", "w") as lat_file:
         lat_file.write("\\documentclass[12pt]{article}\n")

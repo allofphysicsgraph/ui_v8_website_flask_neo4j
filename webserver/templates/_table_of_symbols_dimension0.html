@@ -48,13 +48,19 @@
       </UL>
         {% endfor %}
     </td> <!-- used in expressions -->
-    <td>{% for derivation_dict in dict_of_derivation_dicts_that_use_scalar_id[scalar_dict['id']] %}
+    <td>{% for derivation_dict in dict_of_derivation_dicts_that_use_scalar[scalar_dict['id']] %}
       <UL>
         <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
       </UL>
         {% endfor %}
     </td> <!-- used in derivation -->
-    <td>{{ scalar_dict['variable_or_constant'] }}</td>
+    <td>
+      {% if scalar_dict['variable_or_constant']=="constant" %}
+        <a href="{{ url_for('to_list_constant_values', scalar_id=scalar_dict['id']) }}">{{ scalar_dict['variable_or_constant'] }}</a>
+      {% else %}
+        {{ scalar_dict['variable_or_constant'] }}
+      {% endif %}
+    </td>
     <td>{{ scalar_dict['scalar_reference'] }}</td>
     <td>{{ scalar_dict['dimension_time'] }}</td>
     <td>{{ scalar_dict['dimension_length'] }}</td>

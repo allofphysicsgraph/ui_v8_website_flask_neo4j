@@ -8,13 +8,17 @@
 
 <fieldset>
   <legend>
-    <H2>Specify value and units for constant</H2>
+    <H2>Specify value and units for constant \({{ scalar_dict['latex'] }}\)</H2>
   </legend>
 
+<P>name: {{ scalar_dict['name_latex'] }}<BR>
+   reference: {{ scalar_dict['reference_latex'] }}<BR>
+   description: {{ scalar_dict['description_latex'] }}
 
+<P>&nbsp;
+  
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_constant_properties.csrf_token }}
-
 
 <table border="0">
   <tr>
