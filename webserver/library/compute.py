@@ -315,7 +315,7 @@ def get_list_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> list:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_operation_symbol_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "operation"
+            neo4j_query.get_list_node_dicts_of_type, "operation"
         )
         query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
             time.time() - query_start_time
@@ -327,7 +327,7 @@ def get_list_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> list:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_scalar_symbol_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "scalar"
+            neo4j_query.get_list_node_dicts_of_type, "scalar"
         )
         query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
             time.time() - query_start_time
@@ -339,7 +339,7 @@ def get_list_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> list:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_vector_symbol_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "vector"
+            neo4j_query.get_list_node_dicts_of_type, "vector"
         )
         query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
             time.time() - query_start_time
@@ -351,7 +351,7 @@ def get_list_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> list:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_matrix_symbol_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "matrix"
+            neo4j_query.get_list_node_dicts_of_type, "matrix"
         )
         query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
             time.time() - query_start_time
@@ -379,7 +379,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_scalar_symbol_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "scalar"
+            neo4j_query.get_list_node_dicts_of_type, "scalar"
         )
         query_time_dict[
             "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
@@ -391,7 +391,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_vector_symbol_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "vector"
+            neo4j_query.get_list_node_dicts_of_type, "vector"
         )
         query_time_dict[
             "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
@@ -403,7 +403,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_matrix_symbol_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "matrix"
+            neo4j_query.get_list_node_dicts_of_type, "matrix"
         )
         query_time_dict[
             "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
@@ -475,7 +475,7 @@ def get_dict_of_node_dicts(graphDB_Driver, query_time_dict: dict, node_type: str
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_all_node_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, node_type
+            neo4j_query.get_list_node_dicts_of_type, node_type
         )
         query_time_dict["get_dict_of_node_dicts, list_nodes_of_type"] = (
             time.time() - query_start_time

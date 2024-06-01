@@ -45,7 +45,11 @@
   {% if inference_rule_dict['number_of_inputs']>0 %}
   <select name="input1_expression_field_name" class="selectpicker form-control" id="input1_expression_field_id">
     {% for expression_id in list_of_expression_IDs %}
-    <option value="{{ expression_id }}">{{ expression_id }}, {{ dict_of_expression_dicts[expression_id]['latex'] }} </option>
+    <option value="{{ expression_id }}">{{ expression_id }}, 
+    {{ dict_of_expression_dicts[expression_id]['latex_lhs'] }} 
+    {{ dict_of_expression_dicts[expression_id]['latex_relation'] }}
+    {{ dict_of_expression_dicts[expression_id]['latex_rhs'] }}
+  </option>
     {% endfor %}
   </select><BR>
   {% endif %}
@@ -69,25 +73,25 @@
   <P>feed count: {{ inference_rule_dict['number_of_feeds'] }}<BR>
 
   {% if inference_rule_dict['number_of_feeds']>0 %}
-  <select name="feed1_expression_field_name" class="selectpicker form-control" id="feed1_expression_field_id">
-    {% for expression_id in list_of_expression_IDs %}
-    <option value="{{ expression_id }}">{{ expression_id }}, {{ dict_of_expression_dicts[expression_id]['latex'] }}</option>
+  <select name="feed1_field_name" class="selectpicker form-control" id="feed1_field_id">
+    {% for feed_id in list_of_feed_IDs %}
+    <option value="{{ feed_id }}">{{ feed_id }}, {{ dict_of_feed_dicts[feed_id]['latex'] }}</option>
     {% endfor %}
   </select><BR>
   {% endif %}
 
   {% if inference_rule_dict['number_of_feeds']>1 %}
-  <select name="feed2_expression_field_name" class="selectpicker form-control" id="feed2_expression_field_id">
-    {% for expression_id in list_of_expression_IDs %}
-    <option value="{{ expression_id }}">{{ expression_id }}, {{ dict_of_expression_dicts[expression_id]['latex'] }}</option>
+  <select name="feed2_field_name" class="selectpicker form-control" id="feed2_field_id">
+    {% for feed_id in list_of_feed_IDs %}
+    <option value="{{ feed_id }}">{{ feed_id }}, {{ dict_of_feed_dicts[feed_id]['latex'] }}</option>
     {% endfor %}
   </select><BR>
   {% endif %}
 
   {% if inference_rule_dict['number_of_feeds']>2 %}
-  <select name="feed3_expression_field_name" class="selectpicker form-control" id="feed3_expression_field_id">
-    {% for expression_id in list_of_expression_IDs %}
-    <option value="{{ expression_id }}">{{ expression_id }}, {{ dict_of_expression_dicts[expression_id]['latex'] }}</option>
+  <select name="feed3_field_name" class="selectpicker form-control" id="feed3_field_id">
+    {% for feed_id in list_of_feed_IDs %}
+    <option value="{{ feed_id }}">{{ feed_id }}, {{ dict_of_feed_dicts[feed_id]['latex'] }}</option>
     {% endfor %}
   </select><BR>
   {% endif %}

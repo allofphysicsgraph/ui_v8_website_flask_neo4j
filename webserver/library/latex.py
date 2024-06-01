@@ -105,7 +105,7 @@ def generate_tex_file_for_derivation(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_inference_rule_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "inference_rule"
+            neo4j_query.get_list_node_dicts_of_type, "inference_rule"
         )
 
     with graphDB_Driver.session() as session:

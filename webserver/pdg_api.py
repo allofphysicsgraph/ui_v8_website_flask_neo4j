@@ -55,7 +55,7 @@ def api_list_derivations():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "derivation"
+            neo4j_query.get_list_node_dicts_of_type, "derivation"
         )
         query_time_dict[
             "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
@@ -87,7 +87,7 @@ def api_list_inference_rules():
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "inference_rule"
+            neo4j_query.get_list_node_dicts_of_type, "inference_rule"
         )
     print("list_of_dicts=", list_of_dicts)
 
@@ -117,7 +117,7 @@ def api_list_operation_symbols():
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "operation"
+            neo4j_query.get_list_node_dicts_of_type, "operation"
         )
     print("list_of_dicts=", list_of_dicts)
 
@@ -147,7 +147,7 @@ def api_list_scalar_symbols():
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "scalar"
+            neo4j_query.get_list_node_dicts_of_type, "scalar"
         )
     print("list_of_dicts=", list_of_dicts)
 
@@ -177,7 +177,7 @@ def api_list_vector_symbols():
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "vector"
+            neo4j_query.get_list_node_dicts_of_type, "vector"
         )
     print("list_of_dicts=", list_of_dicts)
 
@@ -207,7 +207,7 @@ def api_list_matrix_symbols():
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "matrix"
+            neo4j_query.get_list_node_dicts_of_type, "matrix"
         )
     print("list_of_dicts=", list_of_dicts)
 
@@ -234,7 +234,7 @@ def api_list_expressions():
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_nodes_of_type, "expression"
+            neo4j_query.get_list_node_dicts_of_type, "expression"
         )
     print("list_of_dicts=", list_of_dicts)
 

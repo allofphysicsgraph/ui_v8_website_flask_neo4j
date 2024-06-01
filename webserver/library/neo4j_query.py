@@ -207,7 +207,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
 #     return symbol_list
 
 
-def get_list_nodes_of_type(tx, node_type: str) -> list:
+def get_list_node_dicts_of_type(tx, node_type: str) -> list:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a list of all nodes
@@ -215,10 +215,10 @@ def get_list_nodes_of_type(tx, node_type: str) -> list:
     >>> list_nodes_of_type(tx)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/get_list_nodes_of_type start " + trace_id)
+    print("[TRACE] func: neo4j_query/get_list_node_dicts_of_type start " + trace_id)
 
     # must be one of these node types. See also 'schema.log' file
-    print("neo4j_query/get_list_nodes_of_type:  node type:", node_type)
+    print("neo4j_query/get_list_node_dicts_of_type:  node type:", node_type)
     assert node_type in list_of_valid.node_types
 
     node_list = []  # type:List[dict]
@@ -226,7 +226,7 @@ def get_list_nodes_of_type(tx, node_type: str) -> list:
         # print(result.data()["n"])
         node_list.append(result.data()["n"])
 
-    print("[TRACE] func: neo4j_query/get_list_nodes_of_type end " + trace_id)
+    print("[TRACE] func: neo4j_query/get_list_node_dicts_of_type end " + trace_id)
     return node_list
 
 
@@ -1438,15 +1438,14 @@ def add_matrix_symbol(
     return
 
 
-def add_operation_or_relation_symbol(
+def add_operation_symbol(
     tx,
-    operation_or_relation: str,
-    operation_or_relation_id: str,
-    operation_or_relation_name: str,
-    operation_or_relation_latex: str,
-    operation_or_relation_description_latex: str,
-    operation_or_relation_reference_latex: str,
-    operation_or_relation_argument_count: int,
+    operation_id: str,
+    operation_name: str,
+    operation_latex: str,
+    operation_description_latex: str,
+    operation_reference_latex: str,
+    operation_argument_count: int,
     author_name_latex: str,
 ) -> None:
     """
@@ -1455,49 +1454,60 @@ def add_operation_or_relation_symbol(
     >>> add_operation(tx,)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: neo4j_query/add_operation_or_relation_symbol start " + trace_id
-    )
-
-    print(
-        "neo4j_query/add_operation_or_relation_symbol: operation_or_relation=",
-        operation_or_relation,
-    )
-    assert operation_or_relation in ["operation", "relation"]
+    print("[TRACE] func: neo4j_query/add_operation_symbol start " + trace_id)
 
     # corresponds to SpecifyNewSymbolDIRECTOperationForm
-    assert len(operation_or_relation_name) > 0
-    assert len(operation_or_relation_latex) > 0
-    assert int(operation_or_relation_argument_count) > 0
+    assert len(operation_name) > 0
+    assert len(operation_latex) > 0
+    assert int(operation_argument_count) > 0
 
-    if operation_or_relation == "operation":
-        result = tx.run(
-            "merge (:operation "
-            '{name_latex:"' + str(operation_or_relation_name) + '", '
-            ' latex:"' + str(operation_or_relation_latex) + '", '
-            ' description_latex:"'
-            + str(operation_or_relation_description_latex)
-            + '", '
-            ' reference_latex:"' + str(operation_or_relation_reference_latex) + '", '
-            " argument_count:" + str(operation_or_relation_argument_count) + ", "
-            ' author_name_latex:"' + str(author_name_latex) + '", '
-            ' id:"' + str(operation_or_relation_id) + '"})'
-        )
-    else:  # relation
-        result = tx.run(
-            "merge (:relation "
-            '{name_latex:"' + str(operation_or_relation_name) + '", '
-            ' latex:"' + str(operation_or_relation_latex) + '", '
-            ' description_latex:"'
-            + str(operation_or_relation_description_latex)
-            + '", '
-            ' reference_latex:"' + str(operation_or_relation_reference_latex) + '", '
-            " argument_count: 2, "
-            ' author_name_latex:"' + str(author_name_latex) + '", '
-            ' id:"' + str(operation_or_relation_id) + '"})'
-        )
+    result = tx.run(
+        "merge (:operation "
+        '{name_latex:"' + str(operation_name) + '", '
+        ' latex:"' + str(operation_latex) + '", '
+        ' description_latex:"' + str(operation_description_latex) + '", '
+        ' reference_latex:"' + str(operation_reference_latex) + '", '
+        " argument_count:" + str(operation_argument_count) + ", "
+        ' author_name_latex:"' + str(author_name_latex) + '", '
+        ' id:"' + str(operation_id) + '"})'
+    )
 
-    print("[TRACE] func: neo4j_query/add_operation_or_relation_symbol end " + trace_id)
+    print("[TRACE] func: neo4j_query/add_operation_symbol end " + trace_id)
+    return
+
+
+def add_relation_symbol(
+    tx,
+    relation_id: str,
+    relation_name_latex: str,
+    relation_latex: str,
+    relation_description_latex: str,
+    relation_reference_latex: str,
+    author_name_latex: str,
+) -> None:
+    """
+    nothing returned by function because action is to write change to Neo4j database
+
+    >>> add_operation(tx,)
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: neo4j_query/add_relation_symbol start " + trace_id)
+
+    # corresponds to SpecifyNewSymbolDIRECTOperationForm
+    assert len(relation_name_latex) > 0
+    assert len(relation_latex) > 0
+
+    result = tx.run(
+        "merge (:relation "
+        '{name_latex:"' + str(relation_name_latex) + '", '
+        ' latex:"' + str(relation_latex) + '", '
+        ' description_latex:"' + str(relation_description_latex) + '", '
+        ' reference_latex:"' + str(relation_reference_latex) + '", '
+        ' author_name_latex:"' + str(author_name_latex) + '", '
+        ' id:"' + str(relation_id) + '"})'
+    )
+
+    print("[TRACE] func: neo4j_query/add_relation_symbol end " + trace_id)
     return
 
 

@@ -53,3 +53,9 @@ dimension_temperature_units = ["fahrenheit", "celsius", "kelvin"]
 dimension_electric_charge_units = ["coulomb"]  # https://en.wikipedia.org/wiki/Coulomb
 dimension_amount_of_substance_units = ["mol"]
 dimension_luminous_intensity_units = ["candela"]
+
+
+# Would it be appropriate to constrain list of valid latex relations?
+# =, \lt, \leq, \gt, \geq
+# https://en.wikipedia.org/wiki/Equals_sign
+# https://en.wikipedia.org/wiki/Glossary_of_mathematical_symbols
