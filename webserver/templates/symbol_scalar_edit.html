@@ -16,13 +16,13 @@
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form_scalar_properties.csrf_token }}
+    {{ form.csrf_token }}
     <P>
-      {{ form_scalar_properties.scalar_latex.label}}: {{ form_scalar_properties.scalar_latex(size=50, maxlength=1000, value=scalar_dict['latex']) }} <BR/>
+      {{ form.scalar_latex.label}}: {{ form.scalar_latex(size=50, maxlength=1000, value=scalar_dict['latex']) }} <BR/>
       &nbsp;<BR/>
-      {{form_scalar_properties.scalar_name.label }}: {{ form_scalar_properties.scalar_name(size=50, maxlength=1000, value=scalar_dict['name']) }}<BR/>
+      {{form.scalar_name.label }}: {{ form.scalar_name(size=50, maxlength=1000, value=scalar_dict['name']) }}<BR/>
       &nbsp;<BR/>
-      {{form_scalar_properties.scalar_description.label }}: {{ form_scalar_properties.scalar_description(size=50, maxlength=1000, value=scalar_dict['description']) }}<BR/>
+      {{form.scalar_description.label }}: {{ form.scalar_description(size=50, maxlength=1000, value=scalar_dict['description']) }}<BR/>
       &nbsp;<BR/>
       <input type="submit" value="Edit scalar">
     </P>

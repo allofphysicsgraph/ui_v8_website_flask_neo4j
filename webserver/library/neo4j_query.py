@@ -137,6 +137,31 @@ def constrain_unique_id(tx) -> None:
     return
 
 
+def get_scalar_id_that_has_value_and_units_id(tx, value_and_units_id: str):
+    """
+    >>>
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print(
+        "[TRACE] func: neo4j_query/get_scalar_id_that_has_value_and_units_id start "
+        + trace_id
+    )
+    result = tx.run(
+        "MATCH (s:scalar)-[]->(v:value_with_units) WHERE v.id='"
+        + value_and_units_id
+        + "' RETURN s.id"
+    )
+
+    scalar_id = result.data()
+    print("neo4j_query/get_scalar_id_that_has_value_and_units_id: scalar_id", scalar_id)
+
+    print(
+        "[TRACE] func: neo4j_query/get_scalar_id_that_has_value_and_units_id end "
+        + trace_id
+    )
+    return scalar_id
+
+
 def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     tx, expression_or_feed: str, expression_or_feed_id: str, symbol_category: str
 ) -> List[str]:
@@ -430,31 +455,22 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
         res = result.data()
 
         print("neo4j_query/get_list_of_step_dicts_in_this_derivation: res=", res)
+        # res= {'r.sequence_index': 0, 's': {'note_after_step_latex': '', 'author_name_latex': 'ben', 'id': '4022988', 'created_datetime': '2024-06-02_21-40-52-881678', 'note_before_step_latex': ''}}
 
-        this_step_dict = result.data()["s"]
-        print(
-            "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_dict=",
-            this_step_dict,
-        )
-
-        this_step_index_dict = result.data()["r"]
-        print(
-            "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_index_dict=",
-            this_step_index_dict,
-        )
-
-        # print("result:", result)
+        this_step_dict = res["s"]
         # print(
-        #     "    n=",
-        #     result.data()["n"],
-        #     "\n    r=",
-        #     result.data()["r"],
-        #     "\n    m=",
-        #     result.data()["m"],
+        #     "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_dict=",
+        #     this_step_dict,
         # )
 
-        # TODO: I want to add sequence_index property value to dict
-        # this_step_dict["sequence_index"] = result.data()["r"]["sequence_index"]
+        this_step_index = res["r.sequence_index"]
+        print(
+            "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_index_dict=",
+            this_step_index,
+        )
+
+        # add sequence_index property value to dict
+        this_step_dict["sequence_index"] = this_step_index
 
         list_of_step_dicts.append(this_step_dict)
 
@@ -540,7 +556,10 @@ def get_list_of_expression_dicts_from_step_id_and_expr_type(
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/step_id_has_expressions start " + trace_id)
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_expression_dicts_from_step_id_and_expr_type start "
+        + trace_id
+    )
 
     print(
         "neo4j_query/step_has_expressions: step_id=",
@@ -564,19 +583,40 @@ def get_list_of_expression_dicts_from_step_id_and_expr_type(
     # )
 
     list_of_expression_dicts = []  # type:List[dict]
-    for result in tx.run(
-        'MATCH (n:step {id:"'
+
+    if expression_type == "HAS_FEED":
+        destination_node_type = "feed"
+    else:
+        destination_node_type = "expression"
+
+    print(
+        'MATCH (:step {id:"'
         + step_id
         + '"})-[r:'
         + expression_type
-        + "]->(m:expression) RETURN m"
+        + "]->(m:"
+        + destination_node_type
+        + ") RETURN m"
+    )
+
+    for result in tx.run(
+        'MATCH (:step {id:"'
+        + step_id
+        + '"})-[r:'
+        + expression_type
+        + "]->(m:"
+        + destination_node_type
+        + ") RETURN m"
     ):
         # print(result.data())
         list_of_expression_dicts.append(result.data())
 
     print("list_of_expression_dicts=", list_of_expression_dicts)
 
-    print("[TRACE] func: neo4j_query/step_id_has_expressions end " + trace_id)
+    print(
+        "[TRACE] func: neo4j_query/get_list_of_expression_dicts_from_step_id_and_expr_type end "
+        + trace_id
+    )
     return list_of_expression_dicts
 
 
@@ -1097,7 +1137,7 @@ def add_step_to_derivation(
     return
 
 
-def add_expressions_to_step(
+def connect_expressions_to_step(
     tx,
     step_id: str,
     now_str: str,
@@ -1109,10 +1149,10 @@ def add_expressions_to_step(
     """
     adding expressions to step can only be done once step exists
 
-    >>> add_expressions_to_step()
+    >>> connect_expressions_to_step()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: neo4j_query/add_expressions_to_step start " + trace_id)
+    print("[TRACE] func: neo4j_query/connect_expressions_to_step start " + trace_id)
 
     assert (
         (len(list_of_input_expression_IDs) > 0)
@@ -1139,7 +1179,7 @@ def add_expressions_to_step(
     for feed_index, feed_id in enumerate(list_of_feed_expression_IDs):
         print("feed_id=", feed_id, "; feed_index=", feed_index)
         result = tx.run(
-            "MATCH (a:step),(b:expression) "
+            "MATCH (a:step),(b:feed) "
             'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(feed_id) + '" '
             'MERGE (a)-[:HAS_FEED {sequence_index: "' + str(feed_index) + '"}]->(b)'
         )
@@ -1155,7 +1195,7 @@ def add_expressions_to_step(
         )
         # print(result.data()) # this just shows "[]"
 
-    print("[TRACE] func: neo4j_query/add_expressions_to_step end " + trace_id)
+    print("[TRACE] func: neo4j_query/connect_expressions_to_step end " + trace_id)
     return
 
 

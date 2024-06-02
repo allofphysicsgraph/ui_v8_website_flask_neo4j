@@ -186,7 +186,11 @@ print(
     importlib.metadata.version("werkzeug"),
     "- https://werkzeug.palletsprojects.com/en/3.0.x/",
 )
-print("flask_wtf", importlib.metadata.version("flask_wtf"))
+print(
+    "flask_wtf",
+    importlib.metadata.version("flask_wtf"),
+    "- https://flask-wtf.readthedocs.io/en/1.2.x/",
+)
 print("neo4j", importlib.metadata.version("neo4j"), "- https://pypi.org/project/neo4j/")
 print("python", sys.version)
 
@@ -1934,6 +1938,7 @@ def to_add_expression() -> str:
             "pdg_app/to_add_expression get_list_node_dicts_of_type relation"
         ] = (time.time() - query_start_time)
 
+    # print("list_of_relation_dicts=",list_of_relation_dicts)
     # sort list_of_relation_dicts such that "=" is in position 0
     sorted_list_of_relation_dicts = []  # type:List[dict]
     for this_relation_dict in list_of_relation_dicts:
@@ -1942,6 +1947,7 @@ def to_add_expression() -> str:
     for this_relation_dict in list_of_relation_dicts:
         if this_relation_dict["latex"] != "=":
             sorted_list_of_relation_dicts.append(this_relation_dict)
+    list_of_relation_dicts = sorted_list_of_relation_dicts
 
     web_form = SpecifyNewExpressionForm(request.form)
     if request.method == "POST" and web_form.validate():
@@ -2433,7 +2439,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
     return render_template(
         "symbol_scalar_edit.html",
         query_time_dict=query_time_dict,
-        form_symbol_properties=web_form_symbol_properties,
+        form=web_form_symbol_properties,
         form_no_options=web_form_no_options,
         scalar_dict=scalar_dict,
     )
@@ -3813,7 +3819,9 @@ def to_add_step_select_expressions(
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
-    print("derivation_dict is ", derivation_dict)
+    print(
+        "pdg_app/to_add_step_select_expressions: derivation_dict is ", derivation_dict
+    )
 
     inference_rule_dict = {}
     with graphDB_Driver.session() as session:
@@ -3822,31 +3830,31 @@ def to_add_step_select_expressions(
             neo4j_query.get_node_properties, "inference_rule", inference_rule_id
         )
 
-    print("inference_rule_dict is ", inference_rule_dict)
+    print(
+        "pdg_app/to_add_step_select_expressions: inference_rule_dict is ",
+        inference_rule_dict,
+    )
 
     web_form = SpecifyNewStepForm(request.form)
     if request.method == "POST" and web_form.validate():
-        print("request.form = ", request.form)
+        print("pdg_app/to_add_step_select_expressions: request.form = ", request.form)
 
         note_before_step_latex = str(web_form.note_before_step_latex.data).strip()
         note_after_step_latex = str(web_form.note_after_step_latex.data).strip()
 
+        # there's an arbitrary number of input, feed, and output expressions to add
         list_of_input_expression_IDs = []
         list_of_feed_expression_IDs = []
         list_of_output_expression_IDs = []
         for k, v in request.form.items():
             print("k=", k, "v=", v)
-            if ("input" in k) and (
-                "expression_" in k
-            ):  # field name is what matters here
+            if "input" in k:  # field name is what matters here
                 print("input adding", v)
                 list_of_input_expression_IDs.append(str(v))
-            if ("feed" in k) and ("feed_" in k):  # field name is what matters here
+            if "feed" in k:  # field name is what matters here
                 print("feed adding", v)
                 list_of_feed_expression_IDs.append(str(v))
-            if ("output" in k) and (
-                "expression_" in k
-            ):  # field name is what matters here
+            if "output" in k:  # field name is what matters here
                 print("out adding", v)
                 list_of_output_expression_IDs.append(str(v))
 
@@ -3855,7 +3863,7 @@ def to_add_step_select_expressions(
         step_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "step"
         )
-        print("generated step_id=", step_id)
+        print("pdg_app/to_add_step_select_expressions: generated step_id=", step_id)
 
         # for the derivation, determine the list of all sequence_index values,
         #       then increment max to get the sequence_index for this step
@@ -3892,7 +3900,7 @@ def to_add_step_select_expressions(
 
             # adding expressions can only be done after step exists
             session.write_transaction(
-                neo4j_query.add_expressions_to_step,
+                neo4j_query.connect_expressions_to_step,
                 step_id,
                 now_str,
                 list_of_input_expression_IDs,
@@ -4589,8 +4597,7 @@ def to_add_sympy_and_lean_for_feed(
     if request.method == "POST":
         print("request.form = ", request.form)
 
-        sympy_str_lhs = str(web_form.sympy_str_lhs.data).strip()
-        sympy_str_rhs = str(web_form.sympy_str_rhs.data).strip()
+        sympy_str = str(web_form.sympy_str.data).strip()
         lean_str = str(web_form.lean_str.data).strip()
 
         print("submitted sympy_str=", sympy_str)
@@ -4773,11 +4780,17 @@ def to_edit_step(
         if each_step_dict["id"] == step_id:
             this_step_dict = each_step_dict
             break
-    print("this_step_dict=", this_step_dict)
+    print("pdg_app/to_edit_step: this_step_dict=", this_step_dict)
 
     web_form = SpecifyNewStepForm(request.form)
-    if request.method == "POST" and web_form.validate():
-        print("request.form = ", request.form)
+    if (
+        request.method == "POST" and web_form.validate()
+    ):  # form always validates because no field is required
+        print("pdg_app/to_edit_step: request.form = ", request.form)
+
+        # TODO: how to detect user wants to delete step?
+
+        print("len(request.form.keys())=", len(request.form.keys()))
 
         note_before_step_latex = str(web_form.note_before_step_latex.data).strip()
         note_after_step_latex = str(web_form.note_after_step_latex.data).strip()
@@ -4785,6 +4798,7 @@ def to_edit_step(
         print("note_before_step_latex", note_before_step_latex)
         print("note_after_step_latex", note_after_step_latex)
 
+        # TODO: deprecate this "edit_step_notes" and replace with edit_node_properties
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             session.write_transaction(
@@ -5342,7 +5356,12 @@ def to_edit_constant_value_and_units(
             neo4j_query.get_node_properties, "value_with_units", value_and_units_id
         )
 
-    # which :scalar has this value?
+    # which scalar has this value?
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        scalar_id = session.read_transaction(
+            neo4j_query.get_scalar_id_that_has_value_and_units_id, value_and_units_id
+        )
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -5353,10 +5372,21 @@ def to_edit_constant_value_and_units(
             time.time() - query_start_time
         )
 
+    # to compare with other existing values:
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_value_dicts = session.read_transaction(
+            neo4j_query.get_list_of_value_dicts_for_constant_id, scalar_id
+        )
+        query_time_dict[
+            "pdg_app/to_list_constant_values get_list_of_value_dicts_for_constant_id:"
+        ] = (time.time() - query_start_time)
+
     print("[TRACE] func: pdg_app/to_edit_constant_value_and_units start " + trace_id)
     return render_template(
         "symbol_scalar_constant_values_edit.html",
         query_time_dict=query_time_dict,
+        value_and_units_dict=value_and_units_dict,
         list_of_value_dicts=list_of_value_dicts,
         scalar_dict=scalar_dict,
     )

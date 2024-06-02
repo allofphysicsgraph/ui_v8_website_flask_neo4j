@@ -155,11 +155,16 @@ For the query <BR>
                                                   MATCH (n:step), (m:derivation) WHERE m.id='{{ derivation_id }}' RETURN n</a></td>
     <td></td>
   </tr>
-
+  <tr>
+    <td>list every node that a step connects to</td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (s:step)-[r]->(e) WHERE s.id='{{step_id}}' RETURN e">
+MATCH (s:step)-[r]->(e) WHERE s.id='{{step_id}}' RETURN e</a></td>
+    <td>all input expressions, feeds, and output expressions</td>
+  </tr>
   <tr>
     <td>list inference rule used in a specific step</td>
-    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n:inference_rule), (m:step) WHERE m.id='{{step_id}}' RETURN n">
-MATCH (n:inference_rule), (m:step) WHERE m.id='{{step_id}}' RETURN n</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (i:inference_rule), (s:step) WHERE s.id='{{step_id}}' RETURN i">
+MATCH (i:inference_rule), (s:step) WHERE s.id='{{step_id}}' RETURN i</a></td>
     <td></td>
   </tr>
   <tr>
