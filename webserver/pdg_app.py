@@ -391,8 +391,12 @@ class SpecifyNewSympyLeanForm(FlaskForm):
     without a clear indicator to the HTML user
     """
 
-    sympy_str = TextAreaField(
-        label="SymPy",
+    sympy_str_lhs = TextAreaField(
+        label="SymPy for LHS",
+        # validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
+    )
+    sympy_str_rhs = TextAreaField(
+        label="SymPy for RHS",
         # validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
     )
     lean_str = StringField(
@@ -1411,25 +1415,27 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
         list_of_symbol_IDs_in_expression,
     )
 
-    list_of_expression_dicts = []
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_expression_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "expression"
-        )
-        query_time_dict["to_add_expression: list_nodes_of_type"] = (
-            time.time() - query_start_time
-        )
+    # BHP: why does this function need "list_of_expression_dicts"
+    # if we are just editing one expression?
+    # list_of_expression_dicts = []
+    # with graphDB_Driver.session() as session:
+    #     query_start_time = time.time()
+    #     list_of_expression_dicts = session.read_transaction(
+    #         neo4j_query.get_list_node_dicts_of_type, "expression"
+    #     )
+    #     query_time_dict["to_edit_expression: list_nodes_of_type"] = (
+    #         time.time() - query_start_time
+    #     )
 
-    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
-    for this_expression_dict in list_of_expression_dicts:
-        if "sympy" in this_expression_dict.keys():
-            print("this_expression_dict['sympy']=", this_expression_dict["sympy"])
-            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
-                latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
-            )
-        else:
-            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
+    # sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
+    # for this_expression_dict in list_of_expression_dicts:
+    #     if "sympy" in this_expression_dict.keys():
+    #         print("this_expression_dict['sympy']=", this_expression_dict["sympy"])
+    #         sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
+    #             latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
+    #         )
+    #     else:
+    #         sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
 
     dict_of_symbol_dicts_in_expression = {}
     for this_symbol_ID in list_of_symbol_IDs_in_expression:
@@ -1548,6 +1554,12 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
             len(request.form.keys()),
         )
 
+        # user was provided all the symbols as an optional disconnect
+        # but the function only handles disconnects of specific types (e.g., scalar, vector)
+        dict_of_symbol_id_and_type, query_time_dict = (
+            compute.get_dict_of_node_type_for_every_id(graphDB_Driver, query_time_dict)
+        )
+
         # the "delete" button returns a dict with only the csrf token, so len==1
         if len(request.form.keys()) == 1:
             # https://neo4j.com/docs/python-manual/current/session-api/
@@ -1570,10 +1582,6 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
                 "to_edit_expression: symbol_id_to_disconnect=", symbol_id_to_disconnect
             )
 
-            # TODO: user was provided all the symbols as an optional disconnect
-            # but the function only handles disconnects of specific types (e.g., scalar, vector)
-            # FAULT EXPECTED for non-scalar disconnect requests
-
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
@@ -1581,7 +1589,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
                     neo4j_query.disconnect_symbol_from_expression,
                     symbol_id_to_disconnect,
                     expression_id,
-                    "scalar",
+                    dict_of_symbol_id_and_type[symbol_id_to_disconnect],
                 )
                 query_time_dict[
                     "to_edit_expression: disconnect_symbol_from_expression"
@@ -1602,37 +1610,11 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
                     "expression",
                     symbol_id_to_add,
                     expression_id,
-                    "scalar",
+                    dict_of_symbol_id_and_type[symbol_id_to_add],
                 )
                 query_time_dict["to_edit_expression: add_symbol_to_expression"] = (
                     time.time() - query_start_time
                 )
-
-        # if "operation_select_id_to_disconnect" in request.form.keys():
-        #     operation_id_to_disconnect = str(
-        #         request.form["operation_select_id_to_disconnect"]
-        #     )
-        #     print("symbol_id_to_disconnect=", operation_id_to_disconnect)
-
-        #     # https://neo4j.com/docs/python-manual/current/session-api/
-        #     with graphDB_Driver.session() as session:
-        #         session.write_transaction(
-        #             neo4j_query.disconnect_operation_from_expression,
-        #             operation_id_to_disconnect,
-        #             expression_id,
-        #         )
-
-        # if "operation_select_id_to_add" in request.form.keys():
-        #     operation_id_to_add = str(request.form["operation_select_id_to_add"])
-        #     print("symbol_id_to_add=", operation_id_to_add)
-
-        #     # https://neo4j.com/docs/python-manual/current/session-api/
-        #     with graphDB_Driver.session() as session:
-        #         session.write_transaction(
-        #             neo4j_query.add_operation_to_expression,
-        #             symbol_id_to_add,
-        #             expression_id,
-        #         )
 
     print("[TRACE] func: pdg_app/to_edit_expression end " + trace_id)
     return render_template(
@@ -1643,7 +1625,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
         dict_of_symbol_dicts_in_expression=dict_of_symbol_dicts_in_expression,
         dict_of_symbol_dicts_not_in_expression=dict_of_symbol_dicts_not_in_expression,
         expression_dict=expression_dict,
-        sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
+        # sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
     )
     # return redirect(url_for("to_list_expressions"))
@@ -1952,6 +1934,15 @@ def to_add_expression() -> str:
             "pdg_app/to_add_expression get_list_node_dicts_of_type relation"
         ] = (time.time() - query_start_time)
 
+    # sort list_of_relation_dicts such that "=" is in position 0
+    sorted_list_of_relation_dicts = []  # type:List[dict]
+    for this_relation_dict in list_of_relation_dicts:
+        if this_relation_dict["latex"] == "=":
+            sorted_list_of_relation_dicts.append(this_relation_dict)
+    for this_relation_dict in list_of_relation_dicts:
+        if this_relation_dict["latex"] != "=":
+            sorted_list_of_relation_dicts.append(this_relation_dict)
+
     web_form = SpecifyNewExpressionForm(request.form)
     if request.method == "POST" and web_form.validate():
         print("request.form = ", request.form)
@@ -2164,65 +2155,61 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> str:
     """
     edit any node -- actually redirect to respective subcategory
 
-
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_records = session.read_transaction(
-            neo4j_query.list_of_all_node_IDs_and_labels
-        )
-        query_time_dict["to_query: list_of_all_nodes"] = time.time() - query_start_time
-
-    # [{'n.id': '8379131', 'labels(n)': ['relation']},
-    #  {'n.id': '2201316', 'labels(n)': ['relation']},
-    #  {'n.id': '9729306', 'labels(n)': ['relation']},
-    #  {'n.id': '3354598', 'labels(n)': ['operation']},
-    #  {'n.id': '3018530', 'labels(n)': ['operation']},
-    #  {'n.id': '1685753', 'labels(n)': ['operation']},
-    #  {'n.id': '3682453', 'labels(n)': ['scalar', 'symbol']},
-    #  {'n.id': '9472315', 'labels(n)': ['scalar', 'symbol']},
-    #  {'n.id': '5141110', 'labels(n)': ['value_with_units']},
-    #  {'n.id': '6266889', 'labels(n)': ['scalar', 'symbol']},
-    #  {'n.id': '8800098', 'labels(n)': ['vector', 'symbol']},
-    #  {'n.id': '8047316', 'labels(n)': ['vector', 'symbol']},
-    #  {'n.id': '2587054', 'labels(n)': ['vector']}, {'n.id': '7688226', 'labels(n)': ['feed']}, {'n.id': '6529449', 'labels(n)': ['feed']}, {'n.id': '6529458', 'labels(n)': ['feed']}]
-
-    dict_of_symbol_id_and_type = {}  # type:Dict[str,str]
-    for this_dict in list_of_records:
-        if len(this_dict["labels(n)"]) > 1:
-            for symbol_category in this_dict["labels(n)"]:
-                if symbol_category != "symbol":
-                    dict_of_symbol_id_and_type[this_dict["n.id"]] = symbol_category
-        else:  # there's just one node label
-            dict_of_symbol_id_and_type[this_dict["n.id"]] = this_dict["labels(n)"][0]
-
-    print("dict_of_symbol_id_and_type=", dict_of_symbol_id_and_type)
-
-
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_edit_node start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
-        graphDB_Driver, query_time_dict
-    )
+    # dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
+    #     graphDB_Driver, query_time_dict
+    # )
 
-    if dict_of_all_symbol_dicts[node_id]["node_type"] == "operation":
+    dict_of_symbol_id_and_type, query_time_dict = (
+        compute.get_dict_of_node_type_for_every_id(graphDB_Driver, query_time_dict)
+    )
+    print("dict_of_symbol_id_and_type=", dict_of_symbol_id_and_type)
+
+    if dict_of_symbol_id_and_type[node_id] == "derivation":
+        print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
+        return redirect(url_for("to_review_derivation", derivation_id=node_id))
+    elif dict_of_symbol_id_and_type[node_id] == "step":
+        # which derivation is this step in?
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            derivation_id = session.read_transaction(
+                neo4j_query.get_derivation_id_from_step_id, node_id
+            )
+
+        print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
+        return redirect(
+            url_for("to_edit_step", derivation_id=derivation_id, step_id=node_id)
+        )
+    elif dict_of_symbol_id_and_type[node_id] == "inference_rule":
+        print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
+        return redirect(url_for("to_edit_inference_rule", inference_rule_id=node_id))
+    elif dict_of_symbol_id_and_type[node_id] == "feed":
+        print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
+        return redirect(url_for("to_edit_feed", feed_id=node_id))
+    elif dict_of_symbol_id_and_type[node_id] == "operation":
         print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
         return redirect(url_for("to_edit_operation", operation_id=node_id))
-    elif dict_of_all_symbol_dicts[node_id]["node_type"] == "relation":
+    elif dict_of_symbol_id_and_type[node_id] == "relation":
         print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
         return redirect(url_for("to_edit_relation", relation_id=node_id))
-    elif dict_of_all_symbol_dicts[node_id]["node_type"] == "scalar":
+    elif dict_of_symbol_id_and_type[node_id] == "scalar":
         print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
         return redirect(url_for("to_edit_scalar", scalar_id=node_id))
-    elif dict_of_all_symbol_dicts[node_id]["node_type"] == "vector":
+    elif dict_of_symbol_id_and_type[node_id] == "vector":
         print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
         return redirect(url_for("to_edit_vector", vector_id=node_id))
-    elif dict_of_all_symbol_dicts[node_id]["node_type"] == "matrix":
+    elif dict_of_symbol_id_and_type[node_id] == "matrix":
         print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
         return redirect(url_for("to_edit_matrix", matrix_id=node_id))
+    elif dict_of_symbol_id_and_type[node_id] == "value_with_units":
+        print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
+        return redirect(
+            url_for("to_edit_constant_value_and_units", value_with_units=node_id)
+        )
     else:
         print("ERROR: shouldn't reach here")
         raise Exception("ERROR: shouldn't reach here")
@@ -2286,7 +2273,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
         "symbol_operation_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
-        # operation_dict=operation_dict,
+        operation_dict=operation_dict,
     )
 
 
@@ -2361,16 +2348,16 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
 
     print("scalar_id: ", scalar_id)
 
-    symbol_dict = {}
+    scalar_dict = {}
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        symbol_dict = session.read_transaction(
+        scalar_dict = session.read_transaction(
             neo4j_query.get_node_properties, "scalar", scalar_id
         )
         query_time_dict["to_edit_scalar_symbol: node_properties"] = (
             time.time() - query_start_time
         )
-    print("symbol_dict:", symbol_dict)
+    print("scalar_dict:", scalar_dict)
 
     web_form_symbol_properties = SpecifyNewSymbolScalarForm(request.form)
     web_form_no_options = NoOptionsForm(request.form)
@@ -2394,7 +2381,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
 
         # instead of changing every property,
         # only change the properties that are different from symbol_dict
-        for symbol_property, symbol_property_value in symbol_dict.items():
+        for symbol_property, symbol_property_value in scalar_dict.items():
 
             print("symbol_property=", symbol_property)
             print("symbol_property_value=", symbol_property_value)
@@ -2448,7 +2435,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
         query_time_dict=query_time_dict,
         form_symbol_properties=web_form_symbol_properties,
         form_no_options=web_form_no_options,
-        symbol_dict=symbol_dict,
+        scalar_dict=scalar_dict,
     )
 
 
@@ -2468,10 +2455,16 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> str:
     flash("NOT ENACTED YET 13942942392")
     # TODO
 
+    vector_dict = {}
+
+    web_form = ""
+
     print("[TRACE] func: pdg_app/to_edit_vector end " + trace_id)
     return render_template(
         "symbol_vector_edit.html",
         query_time_dict=query_time_dict,
+        form=web_form,
+        vector_dict=vector_dict,
     )
 
 
@@ -2491,10 +2484,16 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
     flash("NOT ENACTED YET 94294111111")
     # TODO
 
+    matrix_dict = {}
+
+    web_form = ""
+
     print("[TRACE] func: pdg_app/to_edit_matrix end " + trace_id)
     return render_template(
         "symbol_matrix_edit.html",
         query_time_dict=query_time_dict,
+        form=web_form,
+        matrix_dict=matrix_dict,
     )
 
 
@@ -4241,10 +4240,21 @@ def to_add_sympy_and_lean_for_expression(
     if request.method == "POST":
         print("to_add_sympy_and_lean_for_expression: request.form = ", request.form)
 
-        sympy_str = str(web_form.sympy_str.data).strip()
+        sympy_str_lhs = str(web_form.sympy_str_lhs.data).strip()
+        sympy_str_rhs = str(web_form.sympy_str_rhs.data).strip()
         lean_str = str(web_form.lean_str.data).strip()
 
-        print("to_add_sympy_and_lean_for_expression: submitted sympy_str=", sympy_str)
+        print(
+            "to_add_sympy_and_lean_for_expression: submitted sympy_str=",
+            sympy_str_lhs,
+            sympy_str_rhs,
+        )
+
+        if expression_dict["latex_relation"] == "=":
+            sympy_str_combined = "sympy.Eq(" + sympy_str_lhs + "," + sympy_str_rhs + ")"
+        else:
+            print(expression_dict["latex_relation"])
+            raise Exception("to_add_sympy_and_lean_for_expression: unknown relation")
 
         try:
             # CAVEAT: sympy_str must use single quotes (') since neo4j query uses (")
@@ -4254,8 +4264,34 @@ def to_add_sympy_and_lean_for_expression(
                     neo4j_query.edit_node_property,
                     "expression",
                     expression_id,
+                    "sympy_lhs",
+                    sympy_str_lhs,
+                )
+                query_time_dict[
+                    "to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
+                ] = (time.time() - query_start_time)
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                list_of_inference_rule_dicts = session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "expression",
+                    expression_id,
+                    "sympy_rhs",
+                    sympy_str_rhs,
+                )
+                query_time_dict[
+                    "to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
+                ] = (time.time() - query_start_time)
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                list_of_inference_rule_dicts = session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "expression",
+                    expression_id,
                     "sympy",
-                    sympy_str,
+                    sympy_str_combined,
                 )
                 query_time_dict[
                     "to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
@@ -4273,12 +4309,13 @@ def to_add_sympy_and_lean_for_expression(
                 query_time_dict[
                     "to_add_sympy_and_lean_for_expression: edit_node_property, expression lean"
                 ] = (time.time() - query_start_time)
+
         except neo4j.exceptions.CypherSyntaxError as err:
             print("ERROR:", str(err))
             flash("ERROR:" + str(err))
             return redirect(
                 url_for(
-                    "to_add_symbols_and_operations_for_expression",
+                    "to_add_sympy_and_lean_for_expression",
                     expression_id=expression_id,
                 )
             )
@@ -4288,7 +4325,10 @@ def to_add_sympy_and_lean_for_expression(
         )
         return redirect(url_for("to_list_expressions"))
 
-    web_form.sympy_str.data = revised_expr_with_str
+    # set the default text
+    web_form.sympy_str_lhs.data = revised_expr_lhs_with_str
+    web_form.sympy_str_rhs.data = revised_expr_rhs_with_str
+
     return render_template(
         "expression_create_sympy_and_lean.html",
         query_time_dict=query_time_dict,
@@ -4296,7 +4336,6 @@ def to_add_sympy_and_lean_for_expression(
         sympy_expr_rhs=sympy_expr_rhs,
         revised_expr_lhs=revised_expr_lhs,
         revised_expr_rhs=revised_expr_rhs,
-        revised_expr_with_str=revised_expr_with_str,
         symbol_id_dict=symbol_id_dict,
         form=web_form,
         expression_dict=expression_dict,
@@ -4550,7 +4589,8 @@ def to_add_sympy_and_lean_for_feed(
     if request.method == "POST":
         print("request.form = ", request.form)
 
-        sympy_str = str(web_form.sympy_str.data).strip()
+        sympy_str_lhs = str(web_form.sympy_str_lhs.data).strip()
+        sympy_str_rhs = str(web_form.sympy_str_rhs.data).strip()
         lean_str = str(web_form.lean_str.data).strip()
 
         print("submitted sympy_str=", sympy_str)
@@ -4868,34 +4908,37 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
 def to_query() -> str:
     """
     page for submitting Cypher queries
+
+    possibly clean the URL using https://stackoverflow.com/a/26619855/1164295
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_query start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    web_form = CypherQueryForm(request.form)
-
-    # When the page is reached directly for the first time
-    # the method is GET
-    print("request.method=", request.method)
+    list_of_records_with_hyperlinks = ["nothing returned from Neo4j"]  # type:List[str]
 
     query = ""
 
-    # query via URL keyword
-    query_str = request.args.get("cypher", None)
-    if query_str:
-        print("query via URL:", query_str)
-        query = query_str
+    # When the page is reached directly for the first time the method is GET
+    # When the form button is clicked the method is POST
+    print("pdg_app/to_query: request.method=", request.method)
 
-    # query via web form
-    elif request.method == "POST" and web_form.validate():
+    web_form = CypherQueryForm(request.form)
+    if request.method == "POST" and web_form.validate():
         query = str(web_form.query.data).strip()
-        print("query via web form:", query)
+        print("pdg_app/to_query: form valid; query via web form:", query)
+    elif request.method == "POST":  # form did not validate
+        print("pdg_app/to_query: form did not validate")
+    elif request.method == "GET":  # query via URL keyword, or new page load
+        query_str = request.args.get("cypher", None)
+        if query_str:
+            print("query via URL:", query_str)
+            query = query_str
 
-    print("query=", query)
+    print("pdg_app/to_query: query=", query)
 
-    list_of_records = ["nothing returned from Neo4j"]
     if query:
+        list_of_records = []  # type:List[str]
         try:
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
@@ -4912,9 +4955,11 @@ def to_query() -> str:
         # print("list_of_records=", list_of_records)
         # list_of_records= ["<Record type(r)='HAS_VALUE'>", "<Record type(r)='HAS_SYMBOL'>"]
 
-        list_of_records_with_hyperlinks = []  # type:List[str]
+        # convert list of strings to strings-with-html
+        # We can't use jinja2 to process the content (because then links would not work)
+        # so we have to "safe" the strings before adding links
         for this_record in list_of_records:
-            print("this_record=", this_record)
+            # print("this_record=", this_record)
             # 'relation' --> <a href="{{url_for('to_list_relations')}}">'relation'</a>
             revised_record = this_record
 
@@ -4924,99 +4969,71 @@ def to_query() -> str:
             revised_record = revised_record.replace("'", "&#39;")
             revised_record = revised_record.replace('"', "&#34;")
 
+            # lesson learned: embedding jinja2 links for processing by flask
+            # doesn't work, regardless of "| safe" or not.
             # revised_record = re.sub(
             #     r"frozenset\({'feed'\)",
             #     r"frozenset\({'<a href=\"{{ url_for\('to_list_feeds'\) }}\">feed</a>'\)",
             #     revised_record,
             # )
             # revised_record = re.sub(
-            #     r"'derivation'",
-            #     r"'<a href='{{ url_for('to_list_derivations') }}'>derivation</a>'",
-            #     revised_record,
-            # )
-            # revised_record = re.sub(
-            #     r"'step'",
-            #     r"'<a href='{{ url_for('to_list_steps') }}'>step</a>'",
-            #     revised_record,
-            # )
-            # revised_record = re.sub(
-            #     r"feed",
-            #     r"'<a href='\{\{ url_for('to_list_feeds') \}\}'>feed</a>'",
-            #     revised_record,
-            # )
-            # revised_record = re.sub(
-            #     r"'expression'",
-            #     r"'<a href='{{ url_for('to_list_expressions') }}'>expression</a>'",
-            #     revised_record,
-            # )
-            # revised_record = re.sub(
-            #     r"'scalar'",
-            #     r"'<a href='{{ url_for('to_list_scalars') }}'>scalar</a>'",
-            #     revised_record,
-            # )
-            # revised_record = re.sub(
-            #     r"vector",
-            #     r"'<a href='{{ url_for('to_list_vectors') }}'>vector</a>'",
-            #     revised_record,
-            # )
-            # revised_record = re.sub(
-            #     r"'matrix'",
-            #     r"'<a href='{{ url_for('to_list_matrices') }}'>matrix</a>'",
-            #     revised_record,
-            # )
-            # revised_record = re.sub(
-            #     r"frozenset\(, 'feed'}\)",
-            #     r"frozenset\(, '<a href=\"{{ url_for\('to_list_feeds'\) }}\">feed</a>'}\)",
-            #     revised_record,
-            # )
-            # revised_record = re.sub(
-            #     r"'id': '(\d\d\d\d\d\d\d)'",
-            #     r"'id': '<a href='\{\{ url_for('to_edit_node', node_id='\1' \}\}'>\1</a>'",
-            #     revised_record,
-            # )
-            # revised_record = re.sub(
             #     r"'id': '(\d\d\d\d\d\d\d)'",
             #     r"'id': '<a href='\{\{ url_for('to_edit_node', node_id='\1' \}\}'>\1</a>'",
             #     revised_record,
             # )
 
+            # using relative paths is not flask-like, but it works
             revised_record = revised_record.replace(
                 "&#39;derivation&#39;",
-                '&#39;<a href="http://localhost:5000/list_derivations">derivation</a>&#39;',
+                '&#39;<a href="list_derivations">derivation</a>&#39;',
             )
             revised_record = revised_record.replace(
                 "&#39;step&#39;",
-                '&#39;<a href="http://localhost:5000/list_steps">step</a>&#39;',
+                '&#39;<a href="list_steps">step</a>&#39;',
             )
             revised_record = revised_record.replace(
                 "&#39;feed&#39;",
-                '&#39;<a href="http://localhost:5000/list_feeds">feed</a>&#39;',
+                '&#39;<a href="list_feeds">feed</a>&#39;',
             )
             revised_record = revised_record.replace(
                 "&#39;scalar&#39;",
-                '&#39;<a href="http://localhost:5000/list_scalars">scalar</a>&#39;',
+                '&#39;<a href="../list_scalars">scalar</a>&#39;',
             )
             revised_record = revised_record.replace(
                 "&#39;operation&#39;",
-                '&#39;<a href="http://localhost:5000/list_operations">operation</a>&#39;',
+                '&#39;<a href="/list_operations">operation</a>&#39;',
             )
             revised_record = revised_record.replace(
                 "&#39;relation&#39;",
-                '&#39;<a href="http://localhost:5000/list_relations">relation</a>&#39;',
+                '&#39;<a href="/list_relations">relation</a>&#39;',
             )
             revised_record = revised_record.replace(
                 "&#39;vector&#39;",
-                '&#39;<a href="http://localhost:5000/list_vectors">vector</a>&#39;',
+                '&#39;<a href="/list_vectors">vector</a>&#39;',
             )
             revised_record = revised_record.replace(
                 "&#39;matrix&#39;",
-                '&#39;<a href="http://localhost:5000/list_matrices">matrix</a>&#39;',
+                '&#39;<a href="list_matrices">matrix</a>&#39;',
+            )
+            # there is no "value_with_units" list,
+            # so no page to hyperlink to
+
+            # anywhere an "id"-like string is found, hyperlink to "edit_node"
+            revised_record = re.sub(
+                r"&#39;(\d\d\d\d\d\d\d)&#39;",
+                r"&#39;<a href='edit_node/\1'>\1</a>&#39;",
+                revised_record,
+            )
+            # sympy strings have "pdg" prefix
+            revised_record = re.sub(
+                r"&#39;pdg(\d\d\d\d\d\d\d)&#39;",
+                r"&#39;<a href='edit_node/\1'>pdg\1</a>&#39;",
+                revised_record,
             )
 
-            print("revised_record=", revised_record)
+            # print("revised_record=", revised_record)
 
             list_of_records_with_hyperlinks.append(revised_record)
-
 
     if query:
         # render with links to API reference
@@ -5304,8 +5321,12 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/edit_constant_value_and_units/<scalar_id>", methods=["GET", "POST"])
-def to_edit_constant_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
+@web_app.route(
+    "/edit_constant_value_and_units/<value_and_units_id>", methods=["GET", "POST"]
+)
+def to_edit_constant_value_and_units(
+    value_and_units_id: unique_numeric_id_as_str,
+) -> str:
     """
     edit value and units for a constant
 
@@ -5317,12 +5338,11 @@ def to_edit_constant_value_and_units(scalar_id: unique_numeric_id_as_str) -> str
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_value_dicts = session.read_transaction(
-            neo4j_query.get_list_of_value_dicts_for_constant_id, scalar_id
+        value_and_units_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "value_with_units", value_and_units_id
         )
-        query_time_dict[
-            "pdg_app/to_list_constant_values get_list_of_value_dicts_for_constant_id:"
-        ] = (time.time() - query_start_time)
+
+    # which :scalar has this value?
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()

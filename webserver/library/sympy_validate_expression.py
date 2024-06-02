@@ -103,7 +103,16 @@ def dimensional_consistency(
     if "sympy" not in expression_dict.keys():
         return "sympy not provided for expression"
 
-    sympy_expr = eval(expression_dict["sympy"])
+    try:
+        sympy_expr = eval(expression_dict["sympy"])
+    except NameError as err:
+        return (
+            "unable to parse "
+            + expression_dict["sympy"]
+            + " as SymPy; error="
+            + str(err)
+        )
+
     print("sympy_validate_expression/dimensional_consistency: sympy_expr=", sympy_expr)
     try:
         LHS = sympy_expr.lhs

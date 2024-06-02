@@ -24,10 +24,23 @@
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
-    <P>{{ form.sympy_str.label}}: 
-       {{ form.sympy_str(cols=80, rows=5, 
-                         maxlength=1000) }}</P>
-                         <!--
+
+<table border="0">
+  <tr>
+    <td>{{ form.sympy_str_lhs(cols=50, rows=5, 
+                         maxlength=1000) }}</td> <!-- LHS -->
+    <td>{{ expression_dict['latex_relation'] }}</td> <!-- relation -->
+    <td>{{ form.sympy_str_rhs(cols=50, rows=5, 
+                         maxlength=1000) }}</td> <!-- RHS -->
+  </tr>
+  <tr>
+    <td>{{ form.sympy_str_lhs.label}}</td> <!-- LHS -->
+    <td></td> <!-- relation -->
+    <td>{{ form.sympy_str_rhs.label}}</td> <!-- RHS -->
+  </tr>
+</table>
+
+           <!--
                           "TextArea doesn't have a value attribute,"
                          value=revised_expr_with_str) }}</P>
                          -->

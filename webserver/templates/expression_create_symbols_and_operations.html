@@ -29,6 +29,13 @@ Associating expressions with symbols enables the validation of expressions and s
 <!--
 { % for symbol_dict in list_of_symbol_dicts % }
 -->
+{% if potential_symbols_found_in_Latex_expression|length==0 %}
+<P>No matching symbols were identified. That's bad. See 
+<a href="{{ url_for('to_list_scalars') }}">list of scalars</a> or 
+<a href="{{ url_for('to_list_vectors') }}">list of vectors</a> or 
+<a href="{{ url_for('to_list_matrices') }}">list of matrices</a> and maybe add some?<BR>
+Or maybe symbol detection is having a bad day.
+{% endif %}
 {% for symbol_dict in potential_symbols_found_in_Latex_expression %}
 <UL>
   <LI><input type="checkbox" name="symbol_id_to_connect_to_expression-{{ loop.index }}" value="{{ symbol_dict['id'] }}_{{ symbol_dict['symbol_category'] }}">\({{ symbol_dict['latex'] }}\), aka {{ symbol_dict['latex'] }}<BR>{{ symbol_dict }}<BR>

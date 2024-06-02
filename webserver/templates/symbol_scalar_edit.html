@@ -6,25 +6,25 @@
   or return to <a href="{{ url_for('to_list_scalars') }}?referrer=symbol_scalar_edit">list of all scalar symbols</a>
 </P>
 
-<P>Symbol dict: {{ symbol_dict }}
+<P>Scalar dict: {{ scalar_dict }}
 
-<P>TODO: list of derivations that use this symbol
+<P>TODO: list of derivations that use this scalar
 
 <fieldset>
   <legend>
-    <H2>Edit Symbol</h2>
+    <H2>Edit scalar</h2>
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form_symbol_properties.csrf_token }}
+    {{ form_scalar_properties.csrf_token }}
     <P>
-      {{ form_symbol_properties.symbol_latex.label}}: {{ form_symbol_properties.symbol_latex(size=50, maxlength=1000, value=symbol_dict['latex']) }} <BR/>
+      {{ form_scalar_properties.scalar_latex.label}}: {{ form_scalar_properties.scalar_latex(size=50, maxlength=1000, value=scalar_dict['latex']) }} <BR/>
       &nbsp;<BR/>
-      {{form_symbol_properties.symbol_name.label }}: {{ form_symbol_properties.symbol_name(size=50, maxlength=1000, value=symbol_dict['name']) }}<BR/>
+      {{form_scalar_properties.scalar_name.label }}: {{ form_scalar_properties.scalar_name(size=50, maxlength=1000, value=scalar_dict['name']) }}<BR/>
       &nbsp;<BR/>
-      {{form_symbol_properties.symbol_description.label }}: {{ form_symbol_properties.symbol_description(size=50, maxlength=1000, value=symbol_dict['description']) }}<BR/>
+      {{form_scalar_properties.scalar_description.label }}: {{ form_scalar_properties.scalar_description(size=50, maxlength=1000, value=scalar_dict['description']) }}<BR/>
       &nbsp;<BR/>
-      <input type="submit" value="Edit symbol">
+      <input type="submit" value="Edit scalar">
     </P>
   </form>
 
@@ -34,14 +34,14 @@ TODO: edit dimension
 
 <fieldset>
   <legend>
-    <H2>Delete Symbol</H2>
+    <H2>Delete scalar</H2>
   </legend>
 
 <form method="post" action="" onsubmit="return checkForm(this);">
   {{ form_no_options.csrf_token }}
   <P>
 
-  <input type="submit" value="Delete symbol">
+  <input type="submit" value="Delete scalar">
 
 </form>
 </fieldset>

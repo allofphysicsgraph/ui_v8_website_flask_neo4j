@@ -88,7 +88,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P><!--symbol count: { { list_of_symbol_IDs|length } }-->
-    <select name="symbol_select_id_to_remove" class="selectpicker form-control" id="symbol_select">
+    <select name="symbol_select_id_to_disconnect" class="selectpicker form-control" id="symbol_select">
       {% for symbol_id in dict_of_symbol_dicts_in_expression.keys() %}
       <option value="{{ symbol_id }}">{{ symbol_id }}, {{ dict_of_all_symbol_dicts[symbol_id]['latex'] }} </option>
       {% endfor %}

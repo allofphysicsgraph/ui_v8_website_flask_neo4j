@@ -57,6 +57,47 @@ def generate_random_id(
     return str(new_id), query_time_dict
 
 
+def get_dict_of_node_type_for_every_id(
+    graphDB_Driver, query_time_dict: dict
+) -> Tuple[dict, dict]:
+    """
+    >>> get_node_type_from_id()
+    """
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_records = session.read_transaction(
+            neo4j_query.list_of_all_node_IDs_and_labels
+        )
+        query_time_dict["to_edit_node: list_of_all_node_IDs_and_labels"] = (
+            time.time() - query_start_time
+        )
+
+    # [{'n.id': '8379131', 'labels(n)': ['relation']},
+    #  {'n.id': '2201316', 'labels(n)': ['relation']},
+    #  {'n.id': '9729306', 'labels(n)': ['relation']},
+    #  {'n.id': '3354598', 'labels(n)': ['operation']},
+    #  {'n.id': '3018530', 'labels(n)': ['operation']},
+    #  {'n.id': '1685753', 'labels(n)': ['operation']},
+    #  {'n.id': '3682453', 'labels(n)': ['scalar', 'symbol']},
+    #  {'n.id': '9472315', 'labels(n)': ['scalar', 'symbol']},
+    #  {'n.id': '5141110', 'labels(n)': ['value_with_units']},
+    #  {'n.id': '6266889', 'labels(n)': ['scalar', 'symbol']},
+    #  {'n.id': '8800098', 'labels(n)': ['vector', 'symbol']},
+    #  {'n.id': '8047316', 'labels(n)': ['vector', 'symbol']},
+    #  {'n.id': '2587054', 'labels(n)': ['vector']}, {'n.id': '7688226', 'labels(n)': ['feed']}, {'n.id': '6529449', 'labels(n)': ['feed']}, {'n.id': '6529458', 'labels(n)': ['feed']}]
+
+    dict_of_symbol_id_and_type = {}  # type:Dict[str,str]
+    for this_dict in list_of_records:
+        if len(this_dict["labels(n)"]) > 1:
+            for symbol_category in this_dict["labels(n)"]:
+                if symbol_category != "symbol":
+                    dict_of_symbol_id_and_type[this_dict["n.id"]] = symbol_category
+        else:  # there's just one node label
+            dict_of_symbol_id_and_type[this_dict["n.id"]] = this_dict["labels(n)"][0]
+
+    return dict_of_symbol_id_and_type, query_time_dict
+
+
 def remove_file_debris(
     list_of_paths_to_files: list,
     list_of_file_names: list,
@@ -662,7 +703,9 @@ def all_steps_in_derivation(
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_input_dicts = session.read_transaction(
-                neo4j_query.step_id_has_expressions, this_step_dict["id"], "HAS_INPUT"
+                neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
+                this_step_dict["id"],
+                "HAS_INPUT",
             )
             query_time_dict[
                 "all_steps_in_derivation: step_id_has_expressions, HAS_INPUT"
@@ -671,7 +714,9 @@ def all_steps_in_derivation(
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_feed_dicts = session.read_transaction(
-                neo4j_query.step_id_has_expressions, this_step_dict["id"], "HAS_FEED"
+                neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
+                this_step_dict["id"],
+                "HAS_FEED",
             )
             query_time_dict[
                 "all_steps_in_derivation: step_id_has_expressions, HAS_FEED"
@@ -680,7 +725,9 @@ def all_steps_in_derivation(
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_output_dicts = session.read_transaction(
-                neo4j_query.step_id_has_expressions, this_step_dict["id"], "HAS_OUTPUT"
+                neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
+                this_step_dict["id"],
+                "HAS_OUTPUT",
             )
             query_time_dict[
                 "all_steps_in_derivation: step_id_has_expressions, HAS_OUTPUT"

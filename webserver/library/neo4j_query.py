@@ -508,7 +508,32 @@ def step_has_inference_rule(tx, step_id: str):
     return inf_rule_list_of_dicts[0]["m"]
 
 
-def step_id_has_expressions(tx, step_id: str, expression_type: str) -> list:
+def get_derivation_id_from_step_id(tx, step_id: str) -> str:
+    """
+    >>>
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: neo4j_query/get_derivation_id_from_step_id start " + trace_id)
+
+    print("neo4j_query/get_derivation_id_from_step_id: step_id=", step_id)
+
+    result = tx.run(
+        'MATCH (d:derivation)-[r:"HAS_STEP"]->(:step {"id":"'
+        + step_id
+        + "}) RETURN d.id"
+    )
+
+    derivation_id = result.data()
+
+    print("neo4j_query/get_derivation_id_from_step_id: derivation_id=", derivation_id)
+
+    print("[TRACE] func: neo4j_query/get_derivation_id_from_step_id end " + trace_id)
+    return derivation_id
+
+
+def get_list_of_expression_dicts_from_step_id_and_expr_type(
+    tx, step_id: str, expression_type: str
+) -> list:
     """
     use case: when displaying a derivation,
     for each step the user wants to know the inputs, feeds, and outputs.

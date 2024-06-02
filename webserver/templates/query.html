@@ -7,14 +7,14 @@
 
 Three ways to submit a read-only query:
 <UL>
-  <LI>insert a Cypher query string in the prompt below</LI>
-  <LI>click on one of the pre-defined Cypher queries in the table below</LI>
+  <LI>provide a Cypher query string in <a href="#user_prompt">the prompt below</a>.</LI>
+  <LI>click on one of the pre-defined Cypher queries in <a href="#example_queries">the table below</a>.</LI>
   <LI>submit a URL of the form <code>/query?cypher=</code>
 </UL>
 
 <fieldset>
   <legend>
-    <H2>Cypher query</H2>
+    <H2 id="user_prompt">Cypher query</H2>
   </legend>
 
 <form method="post" action="" onsubmit="return checkForm(this);">
@@ -26,9 +26,11 @@ Three ways to submit a read-only query:
 </fieldset>
 
 {% if submitted_query is defined %}
+  {% if submitted_query|length > 0 %}
 For the query <BR>
   {{ submitted_query | safe }}<BR> <!-- https://stackoverflow.com/a/35215981/1164295 -->
   the results are
+{% endif %}
 {% endif %}
 <UL>
 {% for record in list_of_records %}
@@ -37,7 +39,7 @@ For the query <BR>
 </UL>
 
 
-Examples:
+<div id="example_queries">Example queries:</div>
 <table border="1">
   <tr>
     <th>purpose</th>
