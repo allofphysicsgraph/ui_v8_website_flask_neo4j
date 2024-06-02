@@ -21,8 +21,10 @@
 
 <fieldset>
 <legend>
-  <H2 id="scalar">There are {{ list_of_value_dicts|length }} values for constant </h2>
+  <H2 id="scalar">There are {{ list_of_value_dicts|length }} values for constant \({{ scalar_dict['latex'] }}\)</h2>
 </legend>
+
+<P>{{ scalar_dict['latex'] }}
 
 <P>The ID links to a page where you can edit the value and units<BR>
 
@@ -40,7 +42,7 @@
   <H2 id="action">Actions for Constant values</h2>
 </legend>
 
-<P><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=symbol_scalar_constant_value_list">add new value</a> 
+<P><a href="{{ url_for('to_add_value_and_units',scalar_id=scalar_dict['id']) }}?referrer=symbol_scalar_constant_value_list">add new value</a> 
 
 <!--
   <P><a href="{ { url_for('to_add_symbol') }}?referrer=list_symbols">add new symbol</a> -- not clear which categorey; guide needed</P>

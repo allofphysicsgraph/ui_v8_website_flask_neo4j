@@ -6,9 +6,12 @@
 or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of feeds</a>
 </P>
 
-<P>\({{ feed_dict['latex'] }}\)
 
-<P>{{ feed_dict['latex'] }}
+
+<P>See also 
+  <a href="{{ url_for('to_list_scalars') }}?referrer=expession_edit">scalar symbols</a>,
+  <a href="{{ url_for('to_list_vectors') }}?referrer=expession_edit">vector symbols</a>,
+  <a href="{{ url_for('to_list_matrices') }}?referrer=expession_edit">matrix symbols</a>.</P>
 
 <P>TODO: list derivations that use this feed. That could help provide context.
 
@@ -17,8 +20,10 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     <H2>Scalar symbols in Feed</h2>
   </legend>
 
-<P>See also <a href="{{ url_for('to_list_scalar_symbols') }}?referrer=feed_edit">all scalar symbols</a>.</P>
+<P>\({{ feed_dict['latex'] }}\)
 
+<P>{{ feed_dict['latex'] }}
+  
 <table border="1" id="symbol_table">
   <tr>
     <th>ID</th>

@@ -40,13 +40,15 @@
     <td>{{ symbol_dict['description_latex'] }}</td>
     <td>{% for expression_dict in dict_of_expression_dicts_that_use_operation[symbol_dict['id']] %}
       <UL>
-        <LI><a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id']) }}?referrer=table_of_symbols_requires_arguments">{{ expression_dict['id'] }}</a></LI>
+        <LI><a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id']) }}?referrer=table_of_symbols_requires_arguments">{{ expression_dict['id'] }}</a><BR>
+          \({{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}\)
+        </LI>
       </UL>
         {% endfor %}
     </td> <!-- used in expressions -->
     <td>{% for derivation_dict in dict_of_derivation_dicts_that_use_operation[symbol_dict['id']] %}
       <UL>
-        <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['id'] }}</a></LI>
+        <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
       </UL>
         {% endfor %}
     </td> <!-- used in derivation -->

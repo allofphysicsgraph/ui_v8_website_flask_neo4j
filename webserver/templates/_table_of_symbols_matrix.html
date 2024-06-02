@@ -48,7 +48,11 @@
     </td> <!-- used in derivation -->
     <td>{{ matrix_dict['matrix_reference'] }}</td>
     <td>{{ matrix_dict['is_composite'] }}</td>
-    <td>{{ matrix_dict['size'] }}</td>
+    <td>{{ matrix_dict['size'] }}
+{% if vector_dict['size']=="fixed" %}
+: matrix_dict['number_of_rows'] rows x matrix_dict['number_of_columns'] columns
+{% endif %}
+    </td>
   </tr>
   {% endfor %}
 </table>

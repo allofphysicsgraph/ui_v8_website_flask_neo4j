@@ -50,7 +50,11 @@
     </td> <!-- used in derivation -->
     <td>{{ vector_dict['vector_reference'] }}</td>
     <td>{{ vector_dict['is_composite'] }}</td>
-    <td>{{ vector_dict['size'] }}</td>
+    <td>{{ vector_dict['size'] }}
+{% if vector_dict['size']=="fixed" %}
+: vector_dict['number_of_entries']
+{% endif %}
+    </td>
   </tr>
   {% endfor %}
 </table>

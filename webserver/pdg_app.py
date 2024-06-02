@@ -2081,13 +2081,11 @@ def to_add_feed() -> str:
 
     web_form = SpecifyNewFeedForm(request.form)
     if request.method == "POST" and web_form.validate():
-        print("request.form = ", request.form)
-
-        # request.form =  ImmutableMultiDict([('input1', 'a = b'), ('submit_button', 'Submit')])
+        print("pdg_app/to_add_feed: request.form = ", request.form)
 
         feed_latex = str(web_form.feed_latex.data).strip().replace("\\", "\\\\")
 
-        print("feed_latex:", feed_latex)
+        print("pdg_app/to_add_feed: feed_latex:", feed_latex)
         # TODO: validate that this string is actually Latex before adding to database
 
         feed_sympy = "TODO"  # TODO: if promoting existing symbol, this can be filled in immediately
@@ -2110,7 +2108,9 @@ def to_add_feed() -> str:
                 feed_lean,
                 author_name_latex,
             )
-        query_time_dict["to_add_feed: add_feed"] = time.time() - query_start_time
+        query_time_dict["to_add_feed: add_feed new multi-symbol"] = (
+            time.time() - query_start_time
+        )
 
         # after user provides latex for feed have them provide symbol count
         print("[TRACE] func: pdg_app/ end " + trace_id)
@@ -2121,7 +2121,30 @@ def to_add_feed() -> str:
             )
         )
     elif request.method == "POST":
-        print("request.form = ", request.form)
+        print("pdg_app/to_add_feed: request.form = ", request.form)
+
+        # request.form =  ImmutableMultiDict([('symbol_select_id_to_add', '3819395')])
+
+        feed_id, query_time_dict = compute.generate_random_id(
+            graphDB_Driver, query_time_dict, "feed"
+        )
+
+        for symbol_dict in list_of_nonoperation_symbol_dicts:
+            if symbol_dict["id"] == request.form["symbol_select_id_to_add"]:
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_feed,
+                        feed_id,
+                        symbol_dict["latex"],
+                        "sympy.Symbol('pdg" + symbol_dict["id"] + "')",
+                        feed_lean="",
+                        author_name_latex="ben",
+                    )
+                query_time_dict["to_add_feed: add_feed promoted symbol"] = (
+                    time.time() - query_start_time
+                )
 
     print("[TRACE] func: pdg_app/to_add_feed end " + trace_id)
     return render_template(
@@ -2439,10 +2462,10 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/new_symbol_scalar_constant/<scalar_id>/", methods=["GET", "POST"])
-def to_add_symbol_scalar_constant(scalar_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/new_symbol_scalar_constant_value_and_units/<scalar_id>/", methods=["GET", "POST"])
+def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_app/to_add_symbol_scalar_constant start " + trace_id)
+    print("[TRACE] func: pdg_app/to_add_value_and_units start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
     with graphDB_Driver.session() as session:
@@ -2450,7 +2473,7 @@ def to_add_symbol_scalar_constant(scalar_id: unique_numeric_id_as_str) -> str:
         list_of_scalar_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "scalar"
         )
-        query_time_dict["to_add_symbol_scalar_constant: list_nodes_of_type scalar"] = (
+        query_time_dict["to_add_value_and_units: list_nodes_of_type scalar"] = (
             time.time() - query_start_time
         )
 
@@ -2516,7 +2539,7 @@ def to_add_symbol_scalar_constant(scalar_id: unique_numeric_id_as_str) -> str:
         scalar_dict = session.read_transaction(
             neo4j_query.get_node_properties, "scalar", scalar_id
         )
-        query_time_dict["pdg_app/to_add_symbol_scalar_constant get_node_properties"] = (
+        query_time_dict["pdg_app/to_add_value_and_units get_node_properties"] = (
             time.time() - query_start_time
         )
 
@@ -2546,7 +2569,7 @@ def to_add_symbol_scalar_constant(scalar_id: unique_numeric_id_as_str) -> str:
         dict_of_derivation_dicts_that_use_scalar,
     )
 
-    print("[TRACE] func: pdg_app/to_add_symbol_scalar_constant end " + trace_id)
+    print("[TRACE] func: pdg_app/to_add_value_and_units end " + trace_id)
     return render_template(
         "symbol_scalar_constant_values_create.html",
         query_time_dict=query_time_dict,
@@ -2643,7 +2666,7 @@ def to_add_symbol_scalar() -> str:
 
         if scalar_variable_or_constant == "constant":
             return redirect(
-                url_for("to_add_symbol_scalar_constant", scalar_id=scalar_id)
+                url_for("to_add_value_and_units", scalar_id=scalar_id)
             )
         return redirect(url_for("to_list_scalars"))
 
@@ -5124,7 +5147,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
         scalar_dict = session.read_transaction(
             neo4j_query.get_node_properties, "scalar", scalar_id
         )
-        query_time_dict["pdg_app/to_add_symbol_scalar_constant get_node_properties"] = (
+        query_time_dict["pdg_app/to_add_value_and_units get_node_properties"] = (
             time.time() - query_start_time
         )
 
@@ -5133,7 +5156,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
         "symbol_scalar_constant_values_list.html",
         query_time_dict=query_time_dict,
         list_of_value_dicts=list_of_value_dicts,
-        scalar_dict=scalar_dict
+        scalar_dict=scalar_dict,
     )
 
 
@@ -5162,7 +5185,7 @@ def to_edit_constant_value_and_units(scalar_id: unique_numeric_id_as_str) -> str
         scalar_dict = session.read_transaction(
             neo4j_query.get_node_properties, "scalar", scalar_id
         )
-        query_time_dict["pdg_app/to_add_symbol_scalar_constant get_node_properties"] = (
+        query_time_dict["pdg_app/to_add_value_and_units get_node_properties"] = (
             time.time() - query_start_time
         )
 
@@ -5171,7 +5194,7 @@ def to_edit_constant_value_and_units(scalar_id: unique_numeric_id_as_str) -> str
         "symbol_scalar_constant_values_edit.html",
         query_time_dict=query_time_dict,
         list_of_value_dicts=list_of_value_dicts,
-        scalar_dict=scalar_dict
+        scalar_dict=scalar_dict,
     )
 
 
@@ -5529,6 +5552,9 @@ def to_delete_graph_content() -> str:
 @web_app.route("/export_to_json")
 def to_export_json() -> str:
     """
+    https://github.com/neo4j/apoc
+    https://neo4j.com/labs/apoc/4.1/installation/
+
     TODO: export "graph to JSON" as file via web interface
     """
     trace_id = str(random.randint(1000000, 9999999))

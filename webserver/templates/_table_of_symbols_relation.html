@@ -44,7 +44,7 @@
     </td> <!-- used in expressions -->
     <td>{% for derivation_dict in dict_of_derivation_dicts_that_use_relation[symbol_dict['id']] %}
       <UL>
-        <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['id'] }}</a></LI>
+        <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
       </UL>
         {% endfor %}
     </td> <!-- used in derivation -->

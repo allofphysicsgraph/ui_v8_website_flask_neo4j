@@ -15,9 +15,16 @@ https://neo4j.com/docs/getting-started/current/cypher-intro/schema/
 https://neo4j.com/developer/kb/viewing-schema-data-with-apoc/
 
 
+
 # CYPHER help
 * <https://neo4j.com/docs/cypher-manual/current>
 * <https://neo4j.com/docs/cypher-refcard/current/>
+* https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887
+
+In Cypher queries
+- parenthesis indicate a node
+- in `p:Person` the `p` is a variable and node label is `Person`
+- {} brackets to add properties (key-value pairs) to the node
 
 """
 
@@ -241,7 +248,7 @@ def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
     # TODO: this should be derivation->step->feed
     list_of_derivation_dicts = []  # type:List[dict]
     for result in tx.run(
-        'MATCH (d:derivation), (s:step), (f:feed) WHERE f.id = "'
+        'MATCH (d:derivation)-[]->(s:step)-[]->(f:feed) WHERE f.id = "'
         + str(feed_id)
         + '" RETURN d'
     ):
@@ -270,10 +277,9 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
         inference_rule_id,
     )
 
-    # TODO: this should be derivation->step->inference_rule
     list_of_derivation_dicts = []  # type:List[dict]
     for result in tx.run(
-        'MATCH (d:derivation), (s:step), (i:inference_rule) WHERE i.id = "'
+        'MATCH (d:derivation)-[]->(s:step)-[]->(i:inference_rule) WHERE i.id = "'
         + str(inference_rule_id)
         + '" RETURN d'
     ):
@@ -312,17 +318,12 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(
         symbol_category,
     )
 
-    print(
-        "neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_category=",
-        symbol_category,
-    )
     assert symbol_category in list_of_valid.symbol_categories
 
     list_of_expression_dicts = []  # type: List[dict]
 
-    # TODO: this should be expression->symbol
     for result in tx.run(
-        "MATCH (e:expression), (s:"
+        "MATCH (e:expression)-[r]->(s:"
         + symbol_category
         + ") WHERE s.id = '"
         + str(symbol_id)
@@ -368,7 +369,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id_by_category(
 
     # TODO: should be derivation->step->expression->symbol
     for result in tx.run(
-        "MATCH (d:derivation), (s:"
+        "MATCH (d:derivation)-[]->(:step)-[]->(:expression)-[]->(s:"
         + symbol_category
         + ") WHERE s.id = '"
         + str(symbol_id)
@@ -398,7 +399,7 @@ def get_list_of_value_dicts_for_constant_id(tx, scalar_id: str) -> list:
 
     list_of_value_dicts = []  # type: List[dict]
     for result in tx.run(
-        'MATCH (s:scalar {id:"' + scalar_id + '"})-[r]->(v:value_with_units) RETURN v',
+        'MATCH (s:scalar {id:"' + scalar_id + '"})-[]->(v:value_with_units) RETURN v',
     ):
         list_of_value_dicts.append(result.data()["v"])
     print(
@@ -422,12 +423,13 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
 
     list_of_step_dicts = []  # type: List[dict]
     for result in tx.run(
-        'MATCH (d:derivation {id:"' + derivation_id + '"})-[r]->(s:step) RETURN d,r,s',
+        'MATCH (d:derivation {id:"'
+        + derivation_id
+        + '"})-[r:HAS_STEP]->(s:step) RETURN r.sequence_index,s',
     ):
-
         res = result.data()
 
-        print("res=", res)
+        print("neo4j_query/get_list_of_step_dicts_in_this_derivation: res=", res)
 
         this_step_dict = result.data()["s"]
         print(
@@ -451,6 +453,7 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
         #     result.data()["m"],
         # )
 
+        # TODO: I want to add sequence_index property value to dict
         # this_step_dict["sequence_index"] = result.data()["r"]["sequence_index"]
 
         list_of_step_dicts.append(this_step_dict)
@@ -665,6 +668,7 @@ def edit_step_notes(
 ) -> None:
     """
     TODO: deprecate this in favor of edit_node_properties
+    see https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887#update-node-properties-add-new-or-modify
 
     >>> edit_step_notes()
     """
@@ -696,6 +700,8 @@ def edit_expression(
     author_name_latex: str,
 ) -> None:
     """
+    see https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887#update-node-properties-add-new-or-modify
+
     >>> edit_expression()
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -753,6 +759,8 @@ def edit_node_property(
 ) -> None:
     """
     property_value can be either str or int
+
+    see https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887#update-node-properties-add-new-or-modify
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/edit_node_property start " + trace_id)
@@ -1242,29 +1250,6 @@ def add_constant_value_with_units(
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/add_constant_value_with_units start " + trace_id)
 
-    # print("neo4j_query/add_constant_value_with_units: =",)
-    # assert dimension_mass_unit in list_of_valid.dimension_mass_units
-    # print("neo4j_query/add_constant_value_with_units: =",)
-    # assert dimension_time_unit in list_of_valid.dimension_time_units
-    # print("neo4j_query/add_constant_value_with_units: =",)
-    # assert dimension_length_unit in list_of_valid.dimension_length_units
-    # print("neo4j_query/add_constant_value_with_units: =",)
-    # assert dimension_temperature_unit in list_of_valid.dimension_temperature_units
-    # print("neo4j_query/add_constant_value_with_units: =",)
-    # assert (
-    #     dimension_electric_charge_unit in list_of_valid.dimension_electric_charge_units
-    # )
-    # print("neo4j_query/add_constant_value_with_units: =",)
-    # assert (
-    #     dimension_amount_of_substance_unit
-    #     in list_of_valid.dimension_amount_of_substance_units
-    # )
-    # print("neo4j_query/add_constant_value_with_units: =",)
-    # assert (
-    #     dimension_luminous_intensity_unit
-    #     in list_of_valid.dimension_luminous_intensity_units
-    # )
-
     str_to_add = ""
     for property_key, property_value in dict_of_units.items():
         str_to_add += property_key + ':"' + str(property_value) + '", '
@@ -1331,7 +1316,7 @@ def add_scalar_symbol(
     assert len(symbol_variable_or_constant) > 0
 
     result = tx.run(
-        "merge (:scalar "
+        "merge (:symbol:scalar "
         '{name_latex:"' + str(symbol_name) + '", '
         ' latex:"' + str(symbol_latex) + '", '
         ' description_latex:"' + str(symbol_description) + '", '
@@ -1378,7 +1363,7 @@ def add_vector_symbol(
 
     if symbol_size == "arbitrary":
         result = tx.run(
-            "merge (:vector "
+            "merge (:symbol:vector "
             '{name_latex:"' + str(symbol_name) + '", '
             ' latex:"' + str(symbol_latex) + '", '
             ' description_latex:"' + str(symbol_description) + '", '
@@ -1391,7 +1376,7 @@ def add_vector_symbol(
         )
     else:  # fixed size
         result = tx.run(
-            "merge (:vector "
+            "merge (:symbol:vector "
             '{name_latex:"' + str(symbol_name) + '", '
             ' latex:"' + str(symbol_latex) + '", '
             ' description_latex:"' + str(symbol_description) + '", '
@@ -1432,7 +1417,7 @@ def add_matrix_symbol(
 
     if symbol_size == "arbitrary":
         result = tx.run(
-            "merge (:matrix "
+            "merge (:symbol:matrix "
             '{name_latex:"' + str(symbol_name) + '", '
             ' latex:"' + str(symbol_latex) + '", '
             ' description_latex:"' + str(symbol_description) + '", '

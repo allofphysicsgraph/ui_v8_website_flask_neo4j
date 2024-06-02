@@ -8,7 +8,7 @@
 
 <fieldset>
   <legend>
-    <H2>Create multi-symbol feed</H2>
+    <H2>Create new multi-symbol feed</H2>
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
@@ -42,10 +42,10 @@
     </P>
   </form>
 </fieldset>
-
+xor
 <fieldset>
   <legend>
-    <H2>promote existing symbol to feed</H2>
+    <H2>Promote existing symbol to feed</H2>
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
@@ -56,7 +56,7 @@
       <option value="{{ this_symbol_dict['id'] }}">{{ this_symbol_dict['id'] }}, {{ this_symbol_dict['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" value="symbol to promote to feed">
+    <input type="submit" value="promote symbol to feed">
 
   </form>
 </fieldset>
