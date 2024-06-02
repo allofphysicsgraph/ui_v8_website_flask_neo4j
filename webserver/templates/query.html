@@ -32,7 +32,7 @@ For the query <BR>
 {% endif %}
 <UL>
 {% for record in list_of_records %}
-    <LI>{{ record }}</LI>
+    <LI>{{ record | safe }}</LI>
 {% endfor %}
 </UL>
 

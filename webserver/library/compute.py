@@ -306,6 +306,14 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
 
 def get_list_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> list:
     """
+    a better Cypher query might make this function slimmer
+
+    MATCH (n)
+    WHERE n:operation OR n:relation OR n:scalar OR n:vector OR n:matrix
+    RETURN n, label(n)
+
+    (based on https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887 )
+
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -369,6 +377,14 @@ def get_list_of_all_nonoperation_symbol_dicts(
     """
     use for "new feed" when promoting existing symbols to feed
 
+    a better Cypher query might make this function slimmer
+
+    MATCH (n)
+    WHERE n:scalar OR n:vector OR n:matrix
+    RETURN n, label(n)
+
+    (based on https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887 )
+
     >>> get_list_of_all_nonoperation_symbol_dicts
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -417,6 +433,14 @@ def get_list_of_all_nonoperation_symbol_dicts(
 
 def get_dict_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> dict:
     """
+    a better Cypher query might make this function slimmer
+
+    MATCH (n)
+    WHERE n:symbol
+    RETURN n, label(n)
+
+    (based on https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887 )
+
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))

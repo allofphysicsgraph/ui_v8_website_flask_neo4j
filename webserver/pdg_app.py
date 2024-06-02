@@ -2159,34 +2159,70 @@ def to_add_feed() -> str:
     )
 
 
-@web_app.route("/edit_symbol/<symbol_id>", methods=["GET", "POST"])
-def to_edit_symbol(symbol_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_node/<node_id>", methods=["GET", "POST"])
+def to_edit_node(node_id: unique_numeric_id_as_str) -> str:
     """
-    edit any symbol -- actually redirect to respective subcategory
+    edit any node -- actually redirect to respective subcategory
+
+
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_records = session.read_transaction(
+            neo4j_query.list_of_all_node_IDs_and_labels
+        )
+        query_time_dict["to_query: list_of_all_nodes"] = time.time() - query_start_time
+
+    # [{'n.id': '8379131', 'labels(n)': ['relation']},
+    #  {'n.id': '2201316', 'labels(n)': ['relation']},
+    #  {'n.id': '9729306', 'labels(n)': ['relation']},
+    #  {'n.id': '3354598', 'labels(n)': ['operation']},
+    #  {'n.id': '3018530', 'labels(n)': ['operation']},
+    #  {'n.id': '1685753', 'labels(n)': ['operation']},
+    #  {'n.id': '3682453', 'labels(n)': ['scalar', 'symbol']},
+    #  {'n.id': '9472315', 'labels(n)': ['scalar', 'symbol']},
+    #  {'n.id': '5141110', 'labels(n)': ['value_with_units']},
+    #  {'n.id': '6266889', 'labels(n)': ['scalar', 'symbol']},
+    #  {'n.id': '8800098', 'labels(n)': ['vector', 'symbol']},
+    #  {'n.id': '8047316', 'labels(n)': ['vector', 'symbol']},
+    #  {'n.id': '2587054', 'labels(n)': ['vector']}, {'n.id': '7688226', 'labels(n)': ['feed']}, {'n.id': '6529449', 'labels(n)': ['feed']}, {'n.id': '6529458', 'labels(n)': ['feed']}]
+
+    dict_of_symbol_id_and_type = {}  # type:Dict[str,str]
+    for this_dict in list_of_records:
+        if len(this_dict["labels(n)"]) > 1:
+            for symbol_category in this_dict["labels(n)"]:
+                if symbol_category != "symbol":
+                    dict_of_symbol_id_and_type[this_dict["n.id"]] = symbol_category
+        else:  # there's just one node label
+            dict_of_symbol_id_and_type[this_dict["n.id"]] = this_dict["labels(n)"][0]
+
+    print("dict_of_symbol_id_and_type=", dict_of_symbol_id_and_type)
+
+
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_app/to_edit_symbol start " + trace_id)
+    print("[TRACE] func: pdg_app/to_edit_node start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
     dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
         graphDB_Driver, query_time_dict
     )
 
-    if dict_of_all_symbol_dicts[symbol_id]["node_type"] == "operation":
-        print("[TRACE] func: pdg_app/to_edit_symbol end " + trace_id)
-        return redirect(url_for("to_edit_operation", operation_id=symbol_id))
-    elif dict_of_all_symbol_dicts[symbol_id]["node_type"] == "relation":
-        print("[TRACE] func: pdg_app/to_edit_symbol end " + trace_id)
-        return redirect(url_for("to_edit_relation", relation_id=symbol_id))
-    elif dict_of_all_symbol_dicts[symbol_id]["node_type"] == "scalar":
-        print("[TRACE] func: pdg_app/to_edit_symbol end " + trace_id)
-        return redirect(url_for("to_edit_scalar", scalar_id=symbol_id))
-    elif dict_of_all_symbol_dicts[symbol_id]["node_type"] == "vector":
-        print("[TRACE] func: pdg_app/to_edit_symbol end " + trace_id)
-        return redirect(url_for("to_edit_vector", vector_id=symbol_id))
-    elif dict_of_all_symbol_dicts[symbol_id]["node_type"] == "matrix":
-        print("[TRACE] func: pdg_app/to_edit_symbol end " + trace_id)
-        return redirect(url_for("to_edit_matrix", matrix_id=symbol_id))
+    if dict_of_all_symbol_dicts[node_id]["node_type"] == "operation":
+        print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
+        return redirect(url_for("to_edit_operation", operation_id=node_id))
+    elif dict_of_all_symbol_dicts[node_id]["node_type"] == "relation":
+        print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
+        return redirect(url_for("to_edit_relation", relation_id=node_id))
+    elif dict_of_all_symbol_dicts[node_id]["node_type"] == "scalar":
+        print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
+        return redirect(url_for("to_edit_scalar", scalar_id=node_id))
+    elif dict_of_all_symbol_dicts[node_id]["node_type"] == "vector":
+        print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
+        return redirect(url_for("to_edit_vector", vector_id=node_id))
+    elif dict_of_all_symbol_dicts[node_id]["node_type"] == "matrix":
+        print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
+        return redirect(url_for("to_edit_matrix", matrix_id=node_id))
     else:
         print("ERROR: shouldn't reach here")
         raise Exception("ERROR: shouldn't reach here")
@@ -2462,7 +2498,9 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/new_symbol_scalar_constant_value_and_units/<scalar_id>/", methods=["GET", "POST"])
+@web_app.route(
+    "/new_symbol_scalar_constant_value_and_units/<scalar_id>/", methods=["GET", "POST"]
+)
 def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_add_value_and_units start " + trace_id)
@@ -2665,9 +2703,7 @@ def to_add_symbol_scalar() -> str:
             )
 
         if scalar_variable_or_constant == "constant":
-            return redirect(
-                url_for("to_add_value_and_units", scalar_id=scalar_id)
-            )
+            return redirect(url_for("to_add_value_and_units", scalar_id=scalar_id))
         return redirect(url_for("to_list_scalars"))
 
     with graphDB_Driver.session() as session:
@@ -4872,9 +4908,116 @@ def to_query() -> str:
             list_of_records = ["WRITE OPERATIONS NOT ALLOWED (3)"]
         except neo4j.exceptions.TransactionError:
             list_of_records = ["probably tried a write Cypher query (TransactionError)"]
-    # else:
-    #     print("[TRACE] func: pdg_app/to_query end " + trace_id)
-    #     raise Exception("Shouldn't get here")
+
+        # print("list_of_records=", list_of_records)
+        # list_of_records= ["<Record type(r)='HAS_VALUE'>", "<Record type(r)='HAS_SYMBOL'>"]
+
+        list_of_records_with_hyperlinks = []  # type:List[str]
+        for this_record in list_of_records:
+            print("this_record=", this_record)
+            # 'relation' --> <a href="{{url_for('to_list_relations')}}">'relation'</a>
+            revised_record = this_record
+
+            # because we want to use "| safe" in jinja, we have to do the HTML-safening ourselves
+            revised_record = revised_record.replace("<", "&lt;")
+            revised_record = revised_record.replace(">", "&gt;")
+            revised_record = revised_record.replace("'", "&#39;")
+            revised_record = revised_record.replace('"', "&#34;")
+
+            # revised_record = re.sub(
+            #     r"frozenset\({'feed'\)",
+            #     r"frozenset\({'<a href=\"{{ url_for\('to_list_feeds'\) }}\">feed</a>'\)",
+            #     revised_record,
+            # )
+            # revised_record = re.sub(
+            #     r"'derivation'",
+            #     r"'<a href='{{ url_for('to_list_derivations') }}'>derivation</a>'",
+            #     revised_record,
+            # )
+            # revised_record = re.sub(
+            #     r"'step'",
+            #     r"'<a href='{{ url_for('to_list_steps') }}'>step</a>'",
+            #     revised_record,
+            # )
+            # revised_record = re.sub(
+            #     r"feed",
+            #     r"'<a href='\{\{ url_for('to_list_feeds') \}\}'>feed</a>'",
+            #     revised_record,
+            # )
+            # revised_record = re.sub(
+            #     r"'expression'",
+            #     r"'<a href='{{ url_for('to_list_expressions') }}'>expression</a>'",
+            #     revised_record,
+            # )
+            # revised_record = re.sub(
+            #     r"'scalar'",
+            #     r"'<a href='{{ url_for('to_list_scalars') }}'>scalar</a>'",
+            #     revised_record,
+            # )
+            # revised_record = re.sub(
+            #     r"vector",
+            #     r"'<a href='{{ url_for('to_list_vectors') }}'>vector</a>'",
+            #     revised_record,
+            # )
+            # revised_record = re.sub(
+            #     r"'matrix'",
+            #     r"'<a href='{{ url_for('to_list_matrices') }}'>matrix</a>'",
+            #     revised_record,
+            # )
+            # revised_record = re.sub(
+            #     r"frozenset\(, 'feed'}\)",
+            #     r"frozenset\(, '<a href=\"{{ url_for\('to_list_feeds'\) }}\">feed</a>'}\)",
+            #     revised_record,
+            # )
+            # revised_record = re.sub(
+            #     r"'id': '(\d\d\d\d\d\d\d)'",
+            #     r"'id': '<a href='\{\{ url_for('to_edit_node', node_id='\1' \}\}'>\1</a>'",
+            #     revised_record,
+            # )
+            # revised_record = re.sub(
+            #     r"'id': '(\d\d\d\d\d\d\d)'",
+            #     r"'id': '<a href='\{\{ url_for('to_edit_node', node_id='\1' \}\}'>\1</a>'",
+            #     revised_record,
+            # )
+
+            revised_record = revised_record.replace(
+                "&#39;derivation&#39;",
+                '&#39;<a href="http://localhost:5000/list_derivations">derivation</a>&#39;',
+            )
+            revised_record = revised_record.replace(
+                "&#39;step&#39;",
+                '&#39;<a href="http://localhost:5000/list_steps">step</a>&#39;',
+            )
+            revised_record = revised_record.replace(
+                "&#39;feed&#39;",
+                '&#39;<a href="http://localhost:5000/list_feeds">feed</a>&#39;',
+            )
+            revised_record = revised_record.replace(
+                "&#39;scalar&#39;",
+                '&#39;<a href="http://localhost:5000/list_scalars">scalar</a>&#39;',
+            )
+            revised_record = revised_record.replace(
+                "&#39;operation&#39;",
+                '&#39;<a href="http://localhost:5000/list_operations">operation</a>&#39;',
+            )
+            revised_record = revised_record.replace(
+                "&#39;relation&#39;",
+                '&#39;<a href="http://localhost:5000/list_relations">relation</a>&#39;',
+            )
+            revised_record = revised_record.replace(
+                "&#39;vector&#39;",
+                '&#39;<a href="http://localhost:5000/list_vectors">vector</a>&#39;',
+            )
+            revised_record = revised_record.replace(
+                "&#39;matrix&#39;",
+                '&#39;<a href="http://localhost:5000/list_matrices">matrix</a>&#39;',
+            )
+
+            print("revised_record=", revised_record)
+
+            list_of_records_with_hyperlinks.append(revised_record)
+
+
     if query:
         # render with links to API reference
         query = query.replace(
@@ -4902,6 +5045,7 @@ def to_query() -> str:
             '<a href="https://neo4j.com/docs/cypher-manual/current/clauses/delete/">DELETE</a>',
         )
 
+    # get a valid derivation ID for the demos
     derivation_id = ""
     list_of_derivation_dicts = []
     with graphDB_Driver.session() as session:
@@ -4956,7 +5100,7 @@ def to_query() -> str:
         query_time_dict=query_time_dict,
         form=web_form,
         submitted_query=query,
-        list_of_records=list_of_records,
+        list_of_records=list_of_records_with_hyperlinks,
         derivation_id=derivation_id,
         inference_rule_id=inference_rule_id,
         step_id=step_id,

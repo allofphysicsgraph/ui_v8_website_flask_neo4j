@@ -1519,6 +1519,16 @@ def add_relation_symbol(
     return
 
 
+def list_of_all_node_IDs_and_labels(tx) -> list:
+    """
+    >>> list_of_all_nodes()
+    """
+    result = tx.run("MATCH (n) RETURN n.id, labels(n)")
+    record = result.data()
+    # print("neo4j_query/list_of_all_nodes: record=", record)
+    return record
+
+
 def delete_all_nodes_and_relationships(tx) -> None:
     """
     Delete all nodes and relationships from Neo4j database

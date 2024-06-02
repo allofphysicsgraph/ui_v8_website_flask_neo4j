@@ -43,7 +43,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   {% for symbol_id, symbol_dict in dict_of_symbol_dicts_in_expression.items() %}
   <tr>
     <td>
-      <a href="{{ url_for( 'to_edit_symbol', symbol_id=symbol_id ) }}">
+      <a href="{{ url_for( 'to_edit_node', node_id=symbol_id ) }}">
           {{ symbol_id }}
       </a>
     </td>
