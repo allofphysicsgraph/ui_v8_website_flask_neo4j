@@ -1,0 +1,129 @@
+digraph G {
+
+rankdir="LR";
+
+which_ui [label="which UI?", shape=rectangle];
+ui_cmd_line [label="command line"];
+which_ui -> ui_cmd_line;
+ui_api [label="API", style=filled];
+which_ui -> ui_api;
+ui_web [label="web", style=filled];
+which_ui -> ui_web;
+
+which_language [label="which language?", shape=rectangle];
+lang_python [label="Python", style=filled];
+which_language -> lang_python;
+lang_bash [label="bash"];
+which_language -> lang_bash;
+
+
+which_web_framework [label="which web framework?", shape=rectangle];
+ui_web -> which_web_framework;
+web_framework_flask [label="flask", style=filled];
+which_web_framework -> web_framework_flask;
+lang_python -> web_framework_flask;
+web_framework_django [label="django"];
+which_web_framework -> web_framework_django;
+lang_python -> web_framework_django;
+ui_api -> web_framework_flask;
+
+which_backend_db [label="which backend database?", shape=rectangle];
+db_use_neo4j [label="Neo4j", style=filled];
+which_backend_db -> db_use_neo4j;
+db_use_csv [label="CSV"];
+which_backend_db -> db_use_csv;
+db_use_rdf [label="RDF"];
+which_backend_db -> db_use_rdf;
+db_use_sql [label="SQL"];
+which_backend_db -> db_use_sql;
+db_use_json [label="JSON"];
+which_backend_db -> db_use_json;
+
+which_cas [label="which computer algebra system?", shape=rectangle];
+cas_mathematica [label="Mathematica"];
+which_cas -> cas_mathematica;
+cas_sympy [label="SymPy", style=filled];
+which_cas -> cas_sympy;
+
+which_expression_representation [label="which expression representation?", shape=rectangle];
+expr_latex [label="Latex", style=filled];
+which_expression_representation -> expr_latex;
+expr_mathml [label="MathML"];
+which_expression_representation -> expr_mathml;
+expr_sympy [label="SymPy"];
+which_expression_representation -> expr_sympy;
+which_expression_representation -> cas_mathematica;
+
+portability [label="portability, reproducibility", shape=rectangle];
+bare_metal [label="bare metal"];
+portability -> bare_metal;
+containers [label="containers", style=filled];
+portability -> containers;
+
+which_container [label="which container?", shape=rectangle];
+containers -> which_container;
+container_apptainer [label="Apptainer"];
+which_container -> container_apptainer;
+container_podman [label="Podman"];
+which_container -> container_podman;
+container_charliecloud [label="Charlie Cloud"];
+which_container -> container_charliecloud;
+container_docker [label="Docker", style=filled];
+which_container -> container_docker;
+
+what_to_test [label="what to test?", shape=rectangle];
+test_web_ui [label="web UI", style=filled]
+what_to_test -> test_web_ui;
+ui_web -> test_web_ui;
+test_python [label="Python", style=filled];
+what_to_test -> test_python;
+lang_python -> test_python;
+
+how_test_web_ui [label="how test web UI?", shape=rectangle];
+test_web_ui -> how_test_web_ui;
+test_web_ui_selenium [label="selenium", style=filled];
+how_test_web_ui -> test_web_ui_selenium;
+test_web_ui_manually [label="manually"];
+how_test_web_ui -> test_web_ui_manually;
+
+how_test_python [label="how test Python?", shape=rectangle]
+test_python -> how_test_python;
+test_python_docstring [label="docstring", style=filled];
+how_test_python -> test_python_docstring;
+
+container_monolithic_or_microservice [label="monolith or microservices?", shape=rectangle];
+containers -> container_monolithic_or_microservice;
+container_monolith [label="monolith"];
+container_monolithic_or_microservice -> container_monolith;
+container_microservices [label="microservices", style=filled];
+container_monolithic_or_microservice -> container_microservices;
+
+what_is_schema [label="what is schema?", shape=rectangle];
+db_use_neo4j -> what_is_schema;
+schema_expression_is_node [label="expression is node", style=filled];
+what_is_schema -> schema_expression_is_node;
+schema_infrule_is_node [label="inference rule is node", style=filled];
+what_is_schema -> schema_infrule_is_node;
+
+db_use_neo4j -> container_microservices;
+
+docker_compose [label="docker compose", style=filled];
+container_microservices -> docker_compose;
+container_docker -> docker_compose;
+
+what_user_input_for_expression [label="user input for expression", shape=rectangle];
+ui_web -> what_user_input_for_expression;
+expr_latex -> what_user_input_for_expression;
+user_input_complete_latex_expression [label="complete Latex expression"];
+what_user_input_for_expression -> user_input_complete_latex_expression;
+user_input_separate_lhs_relation_rhs [label="separate Latex LHS, relation, RHS", style=filled];
+what_user_input_for_expression -> user_input_separate_lhs_relation_rhs;
+
+live_or_cached [label="live or cached results?", shape=rectangle];
+ui_web -> live_or_cached;
+results_live [label="live results", style=filled]
+live_or_cached -> results_live;
+results_cached [label="cached"];
+live_or_cached -> results_cached;
+
+}

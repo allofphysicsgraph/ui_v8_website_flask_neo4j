@@ -4924,6 +4924,11 @@ def to_query() -> str:
     page for submitting Cypher queries
 
     possibly clean the URL using https://stackoverflow.com/a/26619855/1164295
+
+
+    Embedding Jinja2 expansions into the string passed to the web page doesn't work in either a case where you have safe or unsafe pipe 
+    The pipe safe situation means the string is interpreted as is with no alterations, 
+    When there is no pipe then the string is converted to HTML safe text
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_query start " + trace_id)
@@ -5033,6 +5038,7 @@ def to_query() -> str:
             # so no page to hyperlink to
 
             # anywhere an "id"-like string is found, hyperlink to "edit_node"
+            # Since the page is a relative link, I don't need to specify the domain
             revised_record = re.sub(
                 r"&#39;(\d\d\d\d\d\d\d)&#39;",
                 r"&#39;<a href='edit_node/\1'>\1</a>&#39;",
