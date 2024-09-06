@@ -5804,7 +5804,7 @@ def pg_to_export_cypher() -> str:
 csrf = CSRFProtect()
 
 # https://secure.readthedocs.io/en/latest/frameworks.html#flask
-secure_headers = secure.SecureHeaders()
+secure_headers = secure.Secure()
 
 
 # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
