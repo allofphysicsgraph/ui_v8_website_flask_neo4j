@@ -112,7 +112,7 @@ from wtforms import (
 # type: ignore
 # from wtforms import PasswordField, FieldList
 
-from secure import SecureHeaders  # type: ignore
+import secure  # type: ignore
 
 
 sys.path.append("library")
@@ -5804,7 +5804,7 @@ def pg_to_export_cypher() -> str:
 csrf = CSRFProtect()
 
 # https://secure.readthedocs.io/en/latest/frameworks.html#flask
-secure_headers = SecureHeaders()
+secure_headers = secure.SecureHeaders()
 
 
 # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
