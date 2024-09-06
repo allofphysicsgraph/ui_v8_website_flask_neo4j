@@ -1,0 +1,10 @@
+{% extends "_pg_base.html" %}
+{% block content %}
+
+<P>
+  Return to <a href="{{ url_for('pg_main') }}?referrer=view_cypher">main page</a>
+</P>
+
+<a href="{{ url_for('pg_static', filename='pdg.cypher') }}">Cypher for PDG</a>
+
+{% endblock %}

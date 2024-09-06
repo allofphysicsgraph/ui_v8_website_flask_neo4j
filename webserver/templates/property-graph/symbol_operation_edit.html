@@ -2,16 +2,17 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=edit_operation">main page</a>
+  Return to <a href="{{ url_for('pg_main') }}?referrer=symbol_operation_edit">main page</a>
+  or return to <a href="{{ url_for('pg_to_list_scalars') }}?referrer=symbol_operation_edit">list of all operations</a>
 </P>
 
-<P>Operation dict: {{ operation_dict }}
+<P>operation dict: {{ operation_dict }}
 
-<P>TODO: list of derivations that use this symbol
+<P>TODO: list of derivations that use this operation
 
 <fieldset>
   <legend>
-    <H2>Edit Operation</h2>
+    <H2>Edit operation</h2>
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
@@ -27,17 +28,20 @@
     </P>
   </form>
 
+TODO: edit dimension
+
 </fieldset>
 
 <fieldset>
   <legend>
-    Delete operation
+    <H2>Delete operation</H2>
   </legend>
 
 <form method="post" action="" onsubmit="return checkForm(this);">
-  {{ form.csrf_token }}
+  {{ form_no_options.csrf_token }}
+  <P>
 
-  <input type="submit" value="delete operation">
+  <input type="submit" value="Delete operation">
 
 </form>
 </fieldset>

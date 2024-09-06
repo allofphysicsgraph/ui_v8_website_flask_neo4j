@@ -1,0 +1,102 @@
+{% extends "_pg_base.html" %}
+{% block content %}
+
+<P>
+  Return to <a href="{{ url_for('pg_main') }}?referrer=symbol_scalar_create">main page</a>
+  or return to <a href="{{ url_for('pg_to_list_scalars') }}?referrer=symbol_scalar_create">list of scalar symbols</a>
+</P>
+
+<fieldset>
+  <legend>
+    <H2>Create scalar symbol</H2>
+  </legend>
+
+<P>TODO: as user is entering scalar, filter the list of existing scalars.
+  That way the user can recognize collisions.
+
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form_scalar_properties.csrf_token }}
+
+    <P>{{ form_scalar_properties.scalar_latex.label}} (<B>required</B>): 
+    {{ form_scalar_properties.scalar_latex(size=50, minlength=1, maxlength=1000) }}</P>
+    
+    <P>{{ form_scalar_properties.scalar_name_latex.label }} (<small><em>optional</em></small>): 
+       {{ form_scalar_properties.scalar_name_latex(size=50, maxlength=1000) }}</p>
+    
+    <P>{{ form_scalar_properties.scalar_description_latex.label }} (<small><em>optional</em></small>): 
+       {{ form_scalar_properties.scalar_description_latex(size=50, maxlength=1000) }}</p>
+
+    <P>{{ form_scalar_properties.scalar_reference_latex.label }} (<small><em>optional</em></small>): 
+       {{ form_scalar_properties.scalar_reference_latex(size=50, maxlength=1000) }}</p>
+
+<table border="0" id="scope_table">
+  <tr>
+    <td>{{ form_scalar_properties.scalar_scope.label }}: 
+    {{ form_scalar_properties.scalar_scope }}</td>
+
+    <td>{{ form_scalar_properties.scalar_variable_or_constant.label }}: 
+    {{ form_scalar_properties.scalar_variable_or_constant }}</td>
+
+    <td>{{ form_scalar_properties.scalar_domain.label}}: 
+    {{ form_scalar_properties.scalar_domain }}</td>
+  </tr>
+</table>
+
+<P>These dimensions are relevant for checking dimensional consistency of expressions.
+<table border="0" id="dimension_table">
+  <tr>
+    <td>{{ form_scalar_properties.dimension_length.label }} (<B>required</B>): 
+    {{ form_scalar_properties.dimension_length() }}</P>
+    <P>{{ form_scalar_properties.dimension_time.label }} (<B>required</B>): 
+    {{ form_scalar_properties.dimension_time() }}</P>
+    <P>{{ form_scalar_properties.dimension_mass.label }} (<B>required</B>): 
+    {{ form_scalar_properties.dimension_mass() }}</P>
+    </td>
+    <td>
+    <P>{{ form_scalar_properties.dimension_temperature.label }} (<B>required</B>): 
+    {{ form_scalar_properties.dimension_temperature() }}</P>
+    <P>{{ form_scalar_properties.dimension_electric_charge.label }} (<B>required</B>): 
+    {{ form_scalar_properties.dimension_electric_charge() }}</P>
+    </td>
+    <td>
+    <P>{{ form_scalar_properties.dimension_amount_of_substance.label }} (<B>required</B>): 
+    {{ form_scalar_properties.dimension_amount_of_substance() }}</P>
+    <P>{{ form_scalar_properties.dimension_luminous_intensity.label }} (<B>required</B>): 
+    {{ form_scalar_properties.dimension_luminous_intensity() }}</td>
+  </tr>
+</table>
+
+    <P><input type="submit" value="add scalar symbol">
+    </P>
+  </form>
+</fieldset>
+
+
+
+<P>{% include '_table_of_symbols_scalar.html' %}
+
+<script>
+function select_symbol() {
+  // Declare variables
+  var input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById('scalar_input');
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("scalar_UL");
+  li = ul.getElementsByTagName('li');
+
+  // Loop through all list items, and hide those who don't match the search query
+  for (i = 0; i < li.length; i++) {
+    a = li[i].getElementsByTagName("a")[0];
+    txtValue = a.textContent || a.innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
+</script>
+
+
+
+{% endblock %}

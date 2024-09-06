@@ -1,0 +1,64 @@
+
+<!--
+<P>For debugging purposes, here is the all the info available:
+
+<!- - { { list_of_feed_dicts } } - ->
+
+<ul>
+{ % for this_feed_dict in list_of_feed_dicts %}
+<li>{ { this_feed_dict }}</li>
+{ % endfor %}
+</ul>
+-->
+
+<table border="1" id="feed_table" class="sortable">
+  <tr>
+    <th>ID</th>
+    <th>latex</th>
+    <th>name</th>
+    <th>description</th>
+    <th>used in derivation</th>
+    <TH>symbols</TH>
+<!--    <TH>operations</TH> -->
+    <th><a href="https://www.sympy.org/">sympy</a></th>
+    <th><a href="https://github.com/leanprover/lean4">lean 4</a></th>
+  </tr>
+  {% for feed_dict in list_of_feed_dicts %}
+  <tr>
+    <td>
+      <a href="{{ url_for('pg_to_edit_feed', feed_id=feed_dict['id'] ) }}" title="see more about this feed">
+          {{ feed_dict['id'] }}
+      </a>
+    </td>
+    <!-- Latex like `r_{\rm Earth}` get interpreted by Jinja2.
+         Previously this was addressed by replacing `\` with `\\` which also makes the string safe for JSON.
+         Now I'm using Jinja2 manual escape, as documented on
+         https://jinja.palletsprojects.com/en/3.0.x/templates/#working-with-manual-escaping
+      -->
+    <td>\({{ feed_dict['latex']|e }}\)<BR>
+          {{ feed_dict['latex']|e }}</td>
+    <td>{{ feed_dict['name_latex'] }}</td>
+    <td>{{ feed_dict['description_latex'] }}</td>
+    <td>TODO</td> <!-- derivation -->
+    <td>{% for symbol_id in symbol_IDs_per_feed_id[feed_dict['id']] %}
+      <UL>
+        <LI><a href="{{ url_for('pg_to_edit_node', node_id=symbol_id) }}" title="see more about this symbol">{{ dict_of_all_symbol_dicts[symbol_id]['id'] }}</a>: 
+            {{ dict_of_all_symbol_dicts[symbol_id]['latex'] }}</LI>
+      </UL>
+      {% endfor %}
+    </td> <!-- symbols -->
+    <!--<td>{ % for operation_id in operations_per_feed[feed_dict['id']] %}
+      <UL>
+        <LI><a href="{ { url_for('to_edit_operation', operation_id=operation_id) }}">{ { dict_of_all_operation_dicts[operation_id]['id'] }}</a>: 
+            { { dict_of_all_operation_dicts[operation_id]['latex'] }}</LI>
+      </UL>
+      { % endfor %}
+    </td> <!-- operations -->
+    <td>
+      <P>{{ feed_dict['sympy'] }}
+      <P>{{ sympy_as_latex_per_expr_id[feed_dict['id']] }}
+    </td>
+    <td>{{ feed_dict['lean'] }}</td>
+  </tr>
+  {% endfor %}
+</table>

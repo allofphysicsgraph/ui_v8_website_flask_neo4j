@@ -1,0 +1,45 @@
+{% extends "_pg_base.html" %}
+{% block content %}
+
+<P>
+  Return to <a href="{{ url_for('pg_main') }}?referrer=feed_create_sympy_and_lean">main page</a>
+</P>
+
+<fieldset>
+  <legend>
+    <H2>Provide <a href="https://www.sympy.org/">SymPy</a> and <a href="https://github.com/leanprover/lean4">Lean</a></H2>
+  </legend>
+
+<P>as Latex: \({{ feed_dict['latex'] }}\)
+
+<P>as string: {{ feed_dict['latex'] }}
+
+<P>symbols substituted: {{ revised_expr }}
+
+<P>symbols lookup: {{ symbol_id_dict }}
+
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form.csrf_token }}
+    <P>{{ form.sympy_str.label}}: 
+       {{ form.sympy_str(cols=80, rows=5, 
+                         maxlength=1000) }}</P>
+                         <!--
+                          "TextArea doesn't have a value attribute,"
+                         value=revised_expr_with_str) }}</P>
+                         -->
+    <P>{{ form.lean_str.label}}: 
+       {{ form.lean_str(size=100, 
+                        maxlength=1000) }}</P>
+
+    <P><input type="submit" name="submit_button" value="update feed"></P>
+  </form>
+
+The SymPy is relevant for checking dimensionality of expressions and for validating steps in derivations.
+
+The Lean is relevant for proving steps in derivations. 
+
+</fieldset>
+
+
+
+{% endblock %}

@@ -224,7 +224,7 @@ import pdg_api
 web_app.register_blueprint(pdg_api.bp)
 
 
-class DeleteButtonForm(FlaskForm):
+class pg_DeleteButtonForm(FlaskForm):
     """
     TODO: not in use yet
     """
@@ -232,7 +232,7 @@ class DeleteButtonForm(FlaskForm):
     delete_button = SubmitField()
 
 
-class SpecifyNewDerivationForm(FlaskForm):
+class pg_SpecifyNewDerivationForm(FlaskForm):
     """
     web form for user to provide name of (new) derivation
 
@@ -259,7 +259,7 @@ class SpecifyNewDerivationForm(FlaskForm):
     )
 
 
-class SpecifyNewInferenceRuleForm(FlaskForm):
+class pg_SpecifyNewInferenceRuleForm(FlaskForm):
     """
     web form for user to provide inference rule
 
@@ -293,7 +293,7 @@ class SpecifyNewInferenceRuleForm(FlaskForm):
     )
 
 
-class SpecifyNewStepForm(FlaskForm):
+class pg_SpecifyNewStepForm(FlaskForm):
     """
     web form for user to specify inference rule for a step
 
@@ -310,7 +310,7 @@ class SpecifyNewStepForm(FlaskForm):
     )
 
 
-class SpecifyNewExpressionForm(FlaskForm):
+class pg_SpecifyNewExpressionForm(FlaskForm):
     """
     web form for user to specify expressions used by steps
 
@@ -348,7 +348,7 @@ class SpecifyNewExpressionForm(FlaskForm):
     )
 
 
-class SpecifyNewFeedForm(FlaskForm):
+class pg_SpecifyNewFeedForm(FlaskForm):
     """
     web form for user to specify expressions used by steps
 
@@ -361,7 +361,7 @@ class SpecifyNewFeedForm(FlaskForm):
     )
 
 
-class SpecifyEditFeedForm(FlaskForm):
+class pg_SpecifyEditFeedForm(FlaskForm):
     """
     web form for user to specify expressions used by steps
 
@@ -384,7 +384,7 @@ class SpecifyEditFeedForm(FlaskForm):
     )
 
 
-class SpecifyNewSympyLeanForm(FlaskForm):
+class pg_SpecifyNewSympyLeanForm(FlaskForm):
     """
     web form for user to provide SymPy and Lean vesions of expression
 
@@ -409,7 +409,7 @@ class SpecifyNewSympyLeanForm(FlaskForm):
     )
 
 
-class SpecifyNewSymbolScalarForm(FlaskForm):
+class pg_SpecifyNewSymbolScalarForm(FlaskForm):
     """
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
@@ -497,7 +497,7 @@ class SpecifyNewSymbolScalarForm(FlaskForm):
     )
 
 
-class SpecifyNewConstantNumberForm(FlaskForm):
+class pg_SpecifyNewConstantNumberForm(FlaskForm):
     # , validators.Length(min=1, max=100) ?
     number_decimal = DecimalField(
         label="decimal", validators=[validators.InputRequired()], default=0
@@ -505,7 +505,7 @@ class SpecifyNewConstantNumberForm(FlaskForm):
     number_power = DecimalField(label="power", default=0)
 
 
-class SpecifyNewSymbolVectorForm(FlaskForm):
+class pg_SpecifyNewSymbolVectorForm(FlaskForm):
     """
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
@@ -554,7 +554,7 @@ class SpecifyNewSymbolVectorForm(FlaskForm):
     )
 
 
-class SpecifyNewSymbolMatrixForm(FlaskForm):
+class pg_SpecifyNewSymbolMatrixForm(FlaskForm):
     """
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
@@ -598,7 +598,7 @@ class SpecifyNewSymbolMatrixForm(FlaskForm):
     )
 
 
-class SpecifyNewSymbolOperationForm(FlaskForm):
+class pg_SpecifyNewSymbolOperationForm(FlaskForm):
     operation_latex = StringField(
         "LaTeX symbol",
         validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
@@ -621,7 +621,7 @@ class SpecifyNewSymbolOperationForm(FlaskForm):
     operation_reference_latex = StringField("reference")
 
 
-class SpecifyNewSymbolRelationForm(FlaskForm):
+class pg_SpecifyNewSymbolRelationForm(FlaskForm):
     relation_latex = StringField(
         "LaTeX symbol",
         validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
@@ -638,7 +638,7 @@ class SpecifyNewSymbolRelationForm(FlaskForm):
     relation_reference_latex = StringField("reference")
 
 
-# class SpecifyNewSymbolForm(FlaskForm):
+# class pg_SpecifyNewSymbolForm(FlaskForm):
 #     """
 #     web form for user to specify symbols used in expressions
 
@@ -666,7 +666,7 @@ class SpecifyNewSymbolRelationForm(FlaskForm):
 #     symbol_reference_latex = StringField("reference (LaTeX)")
 
 
-# class SpecifyNewSymbolArgumentCountForm(FlaskForm):
+# class pg_SpecifyNewSymbolArgumentCountForm(FlaskForm):
 #     """
 #     user has specified this is an operation, so now they need to specify number of arguments
 #     """
@@ -678,7 +678,7 @@ class SpecifyNewSymbolRelationForm(FlaskForm):
 #     )
 
 
-# class SpecifyNewSymbolDimensionCountForm(FlaskForm):
+# class pg_SpecifyNewSymbolDimensionCountForm(FlaskForm):
 #     """
 #     User has specified this is NOT an opersion, so now they need to specify whether the symbol is scalar, vector, or matrix
 #     """
@@ -690,7 +690,7 @@ class SpecifyNewSymbolRelationForm(FlaskForm):
 #     )
 
 
-# class SpecifyNewSymbolDimension0Form(FlaskForm):
+# class pg_SpecifyNewSymbolDimension0Form(FlaskForm):
 #     """
 #     This overlaps with SpecifyNewSymbolScalarForm
 #     """
@@ -759,21 +759,21 @@ class SpecifyNewSymbolRelationForm(FlaskForm):
 #     )
 
 
-# class SpecifyNewSymbolDimension1Form(FlaskForm):
+# class pg_SpecifyNewSymbolDimension1Form(FlaskForm):
 #     symbol_is_composite = BooleanField(
 #         label="is composite",
 #         description="check for 'yes'; unchecked for 'no'",
 #     )
 
 
-# class SpecifyNewSymbolDimension2Form(FlaskForm):
+# class pg_SpecifyNewSymbolDimension2Form(FlaskForm):
 #     symbol_is_composite = BooleanField(
 #         label="is composite",
 #         description="check for 'yes'; unchecked for 'no'",
 #     )
 
 
-class CypherQueryForm(FlaskForm):
+class pg_CypherQueryForm(FlaskForm):
     """
     web form for user to provide Cypher query for Neo4j database
 
@@ -787,7 +787,7 @@ class CypherQueryForm(FlaskForm):
     )
 
 
-class NoOptionsForm(FlaskForm):
+class pg_NoOptionsForm(FlaskForm):
     """
     no text input
     """
@@ -818,8 +818,8 @@ def before_request():
     return
 
 
-@web_app.route("/", methods=["GET", "POST"])
-def main() -> str:
+@web_app.route("/pg/", methods=["GET", "POST"])
+def pg_main() -> str:
     """
     initial page
 
@@ -994,7 +994,7 @@ def main() -> str:
 
     print("[TRACE] func: pdg_app/main end " + trace_id)
     return render_template(
-        "site_map.html",
+        "property-graph/site_map.html",
         title="site map",
         query_time_dict=query_time_dict,
         number_of_derivations=number_of_derivations,
@@ -1009,8 +1009,8 @@ def main() -> str:
     )
 
 
-@web_app.route("/new_derivation", methods=["GET", "POST"])
-def to_add_derivation() -> str:
+@web_app.route("/pg/new_derivation", methods=["GET", "POST"])
+def pg_to_add_derivation() -> str:
     """
     create new derivation
     user provides deritivation name and abstract
@@ -1106,7 +1106,7 @@ def to_add_derivation() -> str:
 
     print("[TRACE] func: pdg_app/to_add_derivation end " + trace_id)
     return render_template(
-        "derivation_create.html",
+        "property-graph/derivation_create.html",
         query_time_dict=query_time_dict,
         form=web_form,
         list_of_derivation_dicts=list_of_derivation_dicts,
@@ -1114,8 +1114,8 @@ def to_add_derivation() -> str:
     )
 
 
-@web_app.route("/review_derivation/<derivation_id>", methods=["GET", "POST"])
-def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/review_derivation/<derivation_id>", methods=["GET", "POST"])
+def pg_to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     """
     options from this page:
     * add step to existing derivation
@@ -1181,7 +1181,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
     return render_template(
-        "derivation_review.html",
+        "property-graph/derivation_review.html",
         query_time_dict=query_time_dict,
         derivation_dict=derivation_dict,
         all_steps=all_steps,
@@ -1189,8 +1189,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/select_step/<derivation_id>/", methods=["GET", "POST"])
-def to_select_step(derivation_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/select_step/<derivation_id>/", methods=["GET", "POST"])
+def pg_to_select_step(derivation_id: unique_numeric_id_as_str) -> str:
     """
     User wants to delete step or edit step
     """
@@ -1235,7 +1235,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_select_step end " + trace_id)
     return render_template(
-        "derivation_select_step.html",
+        "property-graph/derivation_select_step.html",
         derivation_dict=derivation_dict,
         list_of_step_dicts=list_of_step_dicts,
         all_steps=all_steps,
@@ -1243,8 +1243,8 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/edit_derivation_metadata/<derivation_id>/", methods=["GET", "POST"])
-def to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/edit_derivation_metadata/<derivation_id>/", methods=["GET", "POST"])
+def pg_to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> str:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_edit_derivation_metadata start " + trace_id)
@@ -1298,7 +1298,7 @@ def to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_edit_derivation_metadata end " + trace_id)
     return render_template(
-        "derivation_edit_metadata.html",
+        "property-graph/derivation_edit_metadata.html",
         query_time_dict=query_time_dict,
         form=web_form,
         derivation_dict=derivation_dict,
@@ -1308,7 +1308,7 @@ def to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> str:
 @web_app.route(
     "/new_step_select_inference_rule/<derivation_id>/", methods=["GET", "POST"]
 )
-def to_add_step_select_inference_rule(derivation_id: unique_numeric_id_as_str) -> str:
+def pg_to_add_step_select_inference_rule(derivation_id: unique_numeric_id_as_str) -> str:
     """
     add new step to existing derivation
 
@@ -1368,7 +1368,7 @@ def to_add_step_select_inference_rule(derivation_id: unique_numeric_id_as_str) -
 
     print("[TRACE] func: pdg_app/to_add_step_select_inference_rule end " + trace_id)
     return render_template(
-        "new_step_select_inference_rule.html",
+        "property-graph/new_step_select_inference_rule.html",
         query_time_dict=query_time_dict,
         list_of_inference_rule_dicts=list_of_inference_rule_dicts,
         derivation_dict=derivation_dict,
@@ -1381,8 +1381,8 @@ def to_add_step_select_inference_rule(derivation_id: unique_numeric_id_as_str) -
     # return redirect(url_for("to_review_derivation", derivation_id=derivation_id))
 
 
-@web_app.route("/edit_expression/<expression_id>", methods=["GET", "POST"])
-def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/edit_expression/<expression_id>", methods=["GET", "POST"])
+def pg_to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     """
     novel expression
     """
@@ -1622,7 +1622,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_edit_expression end " + trace_id)
     return render_template(
-        "expression_edit.html",
+        "property-graph/expression_edit.html",
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
         form_new_expression=web_form_new_expression,
@@ -1635,8 +1635,8 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_expressions"))
 
 
-@web_app.route("/edit_feed/<feed_id>", methods=["GET", "POST"])
-def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/edit_feed/<feed_id>", methods=["GET", "POST"])
+def pg_to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
     """
     edit feed
     """
@@ -1837,7 +1837,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_edit_feed end " + trace_id)
     return render_template(
-        "feed_edit.html",
+        "property-graph/feed_edit.html",
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
         form_new_feed=web_form_new_feed,
@@ -1850,8 +1850,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_feeds"))
 
 
-@web_app.route("/new_expression/", methods=["GET", "POST"])
-def to_add_expression() -> str:
+@web_app.route("/pg/new_expression/", methods=["GET", "POST"])
+def pg_to_add_expression() -> str:
     """
     novel expression
     """
@@ -2018,7 +2018,7 @@ def to_add_expression() -> str:
 
     print("[TRACE] func: pdg_app/to_add_expression end " + trace_id)
     return render_template(
-        "expression_create.html",
+        "property-graph/expression_create.html",
         query_time_dict=query_time_dict,
         form=web_form,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
@@ -2030,8 +2030,8 @@ def to_add_expression() -> str:
     )
 
 
-@web_app.route("/new_feed/", methods=["GET", "POST"])
-def to_add_feed() -> str:
+@web_app.route("/pg/new_feed/", methods=["GET", "POST"])
+def pg_to_add_feed() -> str:
     """
     novel feed
     """
@@ -2145,7 +2145,7 @@ def to_add_feed() -> str:
 
     print("[TRACE] func: pdg_app/to_add_feed end " + trace_id)
     return render_template(
-        "feed_create.html",
+        "property-graph/feed_create.html",
         query_time_dict=query_time_dict,
         form=web_form,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
@@ -2156,8 +2156,8 @@ def to_add_feed() -> str:
     )
 
 
-@web_app.route("/edit_node/<node_id>", methods=["GET", "POST"])
-def to_edit_node(node_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/edit_node/<node_id>", methods=["GET", "POST"])
+def pg_to_edit_node(node_id: unique_numeric_id_as_str) -> str:
     """
     edit any node -- actually redirect to respective subcategory
 
@@ -2222,8 +2222,8 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> str:
     return "ERROR: definitely shouldn't get here"
 
 
-@web_app.route("/edit_operation/<operation_id>", methods=["GET", "POST"])
-def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/edit_operation/<operation_id>", methods=["GET", "POST"])
+def pg_to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
     """
     edit operation
     """
@@ -2276,15 +2276,15 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_edit_operation end " + trace_id)
     return render_template(
-        "symbol_operation_edit.html",
+        "property-graph/symbol_operation_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
         operation_dict=operation_dict,
     )
 
 
-@web_app.route("/edit_relation/<relation_id>", methods=["GET", "POST"])
-def to_edit_relation(relation_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/edit_relation/<relation_id>", methods=["GET", "POST"])
+def pg_to_edit_relation(relation_id: unique_numeric_id_as_str) -> str:
     """
     edit relation
     """
@@ -2334,15 +2334,15 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_edit_relation end " + trace_id)
     return render_template(
-        "symbol_relation_edit.html",
+        "property-graph/symbol_relation_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
         relation_dict=relation_dict,
     )
 
 
-@web_app.route("/edit_scalar/<scalar_id>", methods=["GET", "POST"])
-def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/edit_scalar/<scalar_id>", methods=["GET", "POST"])
+def pg_to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
     """
     edit symbol
 
@@ -2437,7 +2437,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_edit_scalar end " + trace_id)
     return render_template(
-        "symbol_scalar_edit.html",
+        "property-graph/symbol_scalar_edit.html",
         query_time_dict=query_time_dict,
         form=web_form_symbol_properties,
         form_no_options=web_form_no_options,
@@ -2445,8 +2445,8 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/edit_vector/<vector_id>", methods=["GET", "POST"])
-def to_edit_vector(vector_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/edit_vector/<vector_id>", methods=["GET", "POST"])
+def pg_to_edit_vector(vector_id: unique_numeric_id_as_str) -> str:
     """
     edit vector
 
@@ -2467,15 +2467,15 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_edit_vector end " + trace_id)
     return render_template(
-        "symbol_vector_edit.html",
+        "property-graph/symbol_vector_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
         vector_dict=vector_dict,
     )
 
 
-@web_app.route("/edit_matrix/<matrix_id>", methods=["GET", "POST"])
-def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/edit_matrix/<matrix_id>", methods=["GET", "POST"])
+def pg_to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
     """
     edit matrix
 
@@ -2496,7 +2496,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_edit_matrix end " + trace_id)
     return render_template(
-        "symbol_matrix_edit.html",
+        "property-graph/symbol_matrix_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
         matrix_dict=matrix_dict,
@@ -2506,7 +2506,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
 @web_app.route(
     "/new_symbol_scalar_constant_value_and_units/<scalar_id>/", methods=["GET", "POST"]
 )
-def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
+def pg_to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_add_value_and_units start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
@@ -2614,7 +2614,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_add_value_and_units end " + trace_id)
     return render_template(
-        "symbol_scalar_constant_values_create.html",
+        "property-graph/symbol_scalar_constant_values_create.html",
         query_time_dict=query_time_dict,
         form_constant_properties=web_form_constant_properties,
         scalar_dict=scalar_dict,
@@ -2631,8 +2631,8 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/new_symbol_scalar/", methods=["GET", "POST"])
-def to_add_symbol_scalar() -> str:
+@web_app.route("/pg/new_symbol_scalar/", methods=["GET", "POST"])
+def pg_to_add_symbol_scalar() -> str:
     """
     novel scalar symbol
     """
@@ -2742,7 +2742,7 @@ def to_add_symbol_scalar() -> str:
 
     print("[TRACE] func: pdg_app/to_add_symbol_scalar end " + trace_id)
     return render_template(
-        "symbol_scalar_create.html",
+        "property-graph/symbol_scalar_create.html",
         query_time_dict=query_time_dict,
         form_scalar_properties=web_form_scalar_properties,
         list_of_scalar_dicts=list_of_scalar_dicts,
@@ -2751,8 +2751,8 @@ def to_add_symbol_scalar() -> str:
     )
 
 
-@web_app.route("/new_symbol_vector/", methods=["GET", "POST"])
-def to_add_symbol_vector() -> str:
+@web_app.route("/pg/new_symbol_vector/", methods=["GET", "POST"])
+def pg_to_add_symbol_vector() -> str:
     """
     novel vector
     """
@@ -2845,7 +2845,7 @@ def to_add_symbol_vector() -> str:
 
     print("[TRACE] func: pdg_app/to_add_symbol_vector end " + trace_id)
     return render_template(
-        "symbol_vector_create.html",
+        "property-graph/symbol_vector_create.html",
         query_time_dict=query_time_dict,
         form_vector_properties=web_form_vector_properties,
         dict_of_expression_dicts_that_use_vector=dict_of_expression_dicts_that_use_vector,
@@ -2854,8 +2854,8 @@ def to_add_symbol_vector() -> str:
     )
 
 
-@web_app.route("/new_symbol_matrix/", methods=["GET", "POST"])
-def to_add_symbol_matrix() -> str:
+@web_app.route("/pg/new_symbol_matrix/", methods=["GET", "POST"])
+def pg_to_add_symbol_matrix() -> str:
     """
     novel matrix
     """
@@ -2952,7 +2952,7 @@ def to_add_symbol_matrix() -> str:
 
     print("[TRACE] func: pdg_app/to_add_symbol_matrix end " + trace_id)
     return render_template(
-        "symbol_matrix_create.html",
+        "property-graph/symbol_matrix_create.html",
         query_time_dict=query_time_dict,
         form_matrix_properties=web_form_matrix_properties,
         list_of_matrix_dicts=list_of_matrix_dicts,
@@ -2961,8 +2961,8 @@ def to_add_symbol_matrix() -> str:
     )
 
 
-# @web_app.route("/new_symbol/", methods=["GET", "POST"])
-# def to_add_symbol() -> str:
+# @web_app.route("/pg/new_symbol/", methods=["GET", "POST"])
+# def pg_to_add_symbol() -> str:
 #     """
 #     novel symbol
 #     """
@@ -3143,7 +3143,7 @@ def to_add_symbol_matrix() -> str:
 # @web_app.route(
 #     "/new_symbol_required_argument_count/<symbol_id>", methods=["GET", "POST"]
 # )
-# def to_add_symbol_required_argument_count(symbol_id: unique_numeric_id_as_str) -> str:
+# def pg_to_add_symbol_required_argument_count(symbol_id: unique_numeric_id_as_str) -> str:
 #     """
 #     novel symbol: how many arguments?
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -3220,7 +3220,7 @@ def to_add_symbol_matrix() -> str:
 # @web_app.route(
 #     "/new_symbol_specify_dimension_count/<symbol_id>", methods=["GET", "POST"]
 # )
-# def to_add_symbol_dimension_count(symbol_id: unique_numeric_id_as_str):
+# def pg_to_add_symbol_dimension_count(symbol_id: unique_numeric_id_as_str):
 #     """
 #     novel symbol: how many dimensions?
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -3301,8 +3301,8 @@ def to_add_symbol_matrix() -> str:
 #     )
 
 
-# @web_app.route("/new_symbol_dimension0_properties/<scalar_id>", methods=["GET", "POST"])
-# def to_add_symbol_dimension0_properties(scalar_id: unique_numeric_id_as_str):
+# @web_app.route("/pg/new_symbol_dimension0_properties/<scalar_id>", methods=["GET", "POST"])
+# def pg_to_add_symbol_dimension0_properties(scalar_id: unique_numeric_id_as_str):
 #     """
 #     novel symbol: how many dimensions?
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -3497,8 +3497,8 @@ def to_add_symbol_matrix() -> str:
 #     )
 
 
-# @web_app.route("/new_symbol_dimension1_properties/<vector_id>", methods=["GET", "POST"])
-# def to_add_symbol_dimension1_properties(vector_id: unique_numeric_id_as_str) -> str:
+# @web_app.route("/pg/new_symbol_dimension1_properties/<vector_id>", methods=["GET", "POST"])
+# def pg_to_add_symbol_dimension1_properties(vector_id: unique_numeric_id_as_str) -> str:
 #     """
 
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -3536,8 +3536,8 @@ def to_add_symbol_matrix() -> str:
 #     )
 
 
-# @web_app.route("/new_symbol_dimension2_properties/<matrix_id>", methods=["GET", "POST"])
-# def to_add_symbol_dimension2_properties(matrix_id: unique_numeric_id_as_str) -> str:
+# @web_app.route("/pg/new_symbol_dimension2_properties/<matrix_id>", methods=["GET", "POST"])
+# def pg_to_add_symbol_dimension2_properties(matrix_id: unique_numeric_id_as_str) -> str:
 #     """
 
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -3575,8 +3575,8 @@ def to_add_symbol_matrix() -> str:
 #     )
 
 
-@web_app.route("/new_operation/", methods=["GET", "POST"])
-def to_add_operation() -> str:
+@web_app.route("/pg/new_operation/", methods=["GET", "POST"])
+def pg_to_add_operation() -> str:
     """
     novel operation
     """
@@ -3654,7 +3654,7 @@ def to_add_operation() -> str:
 
     print("[TRACE] func: pdg_app/to_add_operation end " + trace_id)
     return render_template(
-        "symbol_operation_create.html",
+        "property-graph/symbol_operation_create.html",
         query_time_dict=query_time_dict,
         form_operation_properties=web_form,
         list_of_operation_dicts=list_of_operation_dicts,
@@ -3663,8 +3663,8 @@ def to_add_operation() -> str:
     )
 
 
-@web_app.route("/new_relation/", methods=["GET", "POST"])
-def to_add_relation() -> str:
+@web_app.route("/pg/new_relation/", methods=["GET", "POST"])
+def pg_to_add_relation() -> str:
     """
     novel relation
     """
@@ -3742,7 +3742,7 @@ def to_add_relation() -> str:
 
     print("[TRACE] func: pdg_app/to_add_relation end " + trace_id)
     return render_template(
-        "symbol_relation_create.html",
+        "property-graph/symbol_relation_create.html",
         query_time_dict=query_time_dict,
         form_relation_properties=web_form,
         list_of_relation_dicts=list_of_relation_dicts,
@@ -3754,7 +3754,7 @@ def to_add_relation() -> str:
 @web_app.route(
     "/new_step_expressions/<derivation_id>/<inference_rule_id>", methods=["GET", "POST"]
 )
-def to_add_step_select_expressions(
+def pg_to_add_step_select_expressions(
     derivation_id: unique_numeric_id_as_str, inference_rule_id: unique_numeric_id_as_str
 ) -> str:
     """
@@ -3919,7 +3919,7 @@ def to_add_step_select_expressions(
     # first visit to this page
     print("[TRACE] func: pdg_app/to_add_step_select_expressions end " + trace_id)
     return render_template(
-        "new_step_select_expressions_for_inference_rule.html",
+        "property-graph/new_step_select_expressions_for_inference_rule.html",
         query_time_dict=query_time_dict,
         form=web_form,
         list_of_expression_IDs=list_of_expression_IDs,
@@ -3935,7 +3935,7 @@ def to_add_step_select_expressions(
     "/symbols_and_operations_for_expression/<expression_id>",
     methods=["GET", "POST"],
 )
-def to_add_symbols_and_operations_for_expression(
+def pg_to_add_symbols_and_operations_for_expression(
     expression_id: unique_numeric_id_as_str,
 ) -> str:
     """
@@ -4138,7 +4138,7 @@ def to_add_symbols_and_operations_for_expression(
         )
 
     return render_template(
-        "expression_create_symbols_and_operations.html",
+        "property-graph/expression_create_symbols_and_operations.html",
         query_time_dict=query_time_dict,
         form=web_form_no_options,
         expression_dict=expression_dict,
@@ -4152,7 +4152,7 @@ def to_add_symbols_and_operations_for_expression(
     "/sympy_and_latex_for_expression/<expression_id>/<symbol_id_dict>",
     methods=["GET", "POST"],
 )
-def to_add_sympy_and_lean_for_expression(
+def pg_to_add_sympy_and_lean_for_expression(
     expression_id: unique_numeric_id_as_str,
     symbol_id_dict: dict,
 ) -> str:
@@ -4338,7 +4338,7 @@ def to_add_sympy_and_lean_for_expression(
     web_form.sympy_str_rhs.data = revised_expr_rhs_with_str
 
     return render_template(
-        "expression_create_sympy_and_lean.html",
+        "property-graph/expression_create_sympy_and_lean.html",
         query_time_dict=query_time_dict,
         sympy_expr_lhs=sympy_expr_lhs,
         sympy_expr_rhs=sympy_expr_rhs,
@@ -4354,7 +4354,7 @@ def to_add_sympy_and_lean_for_expression(
     "/symbols_and_operations_for_feed/<feed_id>",
     methods=["GET", "POST"],
 )
-def to_add_symbols_and_operations_for_feed(
+def pg_to_add_symbols_and_operations_for_feed(
     feed_id: unique_numeric_id_as_str,
 ) -> str:
     """
@@ -4521,7 +4521,7 @@ def to_add_symbols_and_operations_for_feed(
         )
 
     return render_template(
-        "feed_create_symbols_and_operations.html",
+        "property-graph/feed_create_symbols_and_operations.html",
         query_time_dict=query_time_dict,
         form=web_form_no_options,
         feed_dict=feed_dict,
@@ -4535,7 +4535,7 @@ def to_add_symbols_and_operations_for_feed(
     "/sympy_and_latex_for_feed/<feed_id>/<symbol_id_dict>",
     methods=["GET", "POST"],
 )
-def to_add_sympy_and_lean_for_feed(
+def pg_to_add_sympy_and_lean_for_feed(
     feed_id: unique_numeric_id_as_str,
     symbol_id_dict: dict,
 ) -> str:
@@ -4644,7 +4644,7 @@ def to_add_sympy_and_lean_for_feed(
 
     web_form.sympy_str.data = revised_expr_with_str
     return render_template(
-        "feed_create_sympy_and_lean.html",
+        "property-graph/feed_create_sympy_and_lean.html",
         query_time_dict=query_time_dict,
         sympy_expr=sympy_expr,
         revised_expr=revised_expr,
@@ -4655,8 +4655,8 @@ def to_add_sympy_and_lean_for_feed(
     )
 
 
-@web_app.route("/new_inference_rule/", methods=["GET", "POST"])
-def to_add_inference_rule() -> str:
+@web_app.route("/pg/new_inference_rule/", methods=["GET", "POST"])
+def pg_to_add_inference_rule() -> str:
     """
     create inference rule
 
@@ -4751,7 +4751,7 @@ def to_add_inference_rule() -> str:
 
     print("[TRACE] func: pdg_app/to_add_inference_rule end " + trace_id)
     return render_template(
-        "inference_rule_create.html",
+        "property-graph/inference_rule_create.html",
         query_time_dict=query_time_dict,
         form=web_form,
         list_of_inference_rule_dicts=list_of_inference_rule_dicts,
@@ -4759,8 +4759,8 @@ def to_add_inference_rule() -> str:
     )
 
 
-@web_app.route("/edit_step/<derivation_id>/<step_id>", methods=["GET", "POST"])
-def to_edit_step(
+@web_app.route("/pg/edit_step/<derivation_id>/<step_id>", methods=["GET", "POST"])
+def pg_to_edit_step(
     derivation_id: unique_numeric_id_as_str, step_id: unique_numeric_id_as_str
 ) -> str:
     """ """
@@ -4810,15 +4810,15 @@ def to_edit_step(
 
     print("[TRACE] func: pdg_app/to_edit_step end " + trace_id)
     return render_template(
-        "step_edit.html",
+        "property-graph/step_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
         step_dict=this_step_dict,
     )
 
 
-@web_app.route("/edit_inference_rule/<inference_rule_id>", methods=["GET", "POST"])
-def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/edit_inference_rule/<inference_rule_id>", methods=["GET", "POST"])
+def pg_to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_edit_inference_rule start " + trace_id)
@@ -4908,7 +4908,7 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_edit_inference_rule end " + trace_id)
     return render_template(
-        "inference_rule_edit.html",
+        "property-graph/inference_rule_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
         inference_rule_dict=inference_rule_dict,
@@ -4918,8 +4918,8 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_inference_rules"))
 
 
-@web_app.route("/query", methods=["GET", "POST"])
-def to_query() -> str:
+@web_app.route("/pg/query", methods=["GET", "POST"])
+def pg_to_query() -> str:
     """
     page for submitting Cypher queries
 
@@ -5133,7 +5133,7 @@ def to_query() -> str:
 
     print("[TRACE] func: pdg_app/to_query end " + trace_id)
     return render_template(
-        "query.html",
+        "property-graph/query.html",
         query_time_dict=query_time_dict,
         form=web_form,
         submitted_query=query,
@@ -5144,8 +5144,8 @@ def to_query() -> str:
     )
 
 
-@web_app.route("/list_feeds", methods=["GET", "POST"])
-def to_list_feeds() -> str:
+@web_app.route("/pg/list_feeds", methods=["GET", "POST"])
+def pg_to_list_feeds() -> str:
     """
     >>> to_list_feeds()
     """
@@ -5201,7 +5201,7 @@ def to_list_feeds() -> str:
 
     print("[TRACE] func: pdg_app/to_list_feeds end " + trace_id)
     return render_template(
-        "feed_list.html",
+        "property-graph/feed_list.html",
         query_time_dict=query_time_dict,
         list_of_feed_dicts=list_of_feed_dicts,
         symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,
@@ -5211,8 +5211,8 @@ def to_list_feeds() -> str:
     )
 
 
-@web_app.route("/list_operations", methods=["GET", "POST"])
-def to_list_operations() -> str:
+@web_app.route("/pg/list_operations", methods=["GET", "POST"])
+def pg_to_list_operations() -> str:
     """
     >>> to_list_operations()
     """
@@ -5250,7 +5250,7 @@ def to_list_operations() -> str:
 
     print("[TRACE] func: pdg_app/to_list_operations end " + trace_id)
     return render_template(
-        "symbol_operation_list.html",
+        "property-graph/symbol_operation_list.html",
         query_time_dict=query_time_dict,
         list_of_operation_dicts=list_of_operation_dicts,
         dict_of_expression_dicts_that_use_operation=dict_of_expression_dicts_that_use_operation,
@@ -5258,8 +5258,8 @@ def to_list_operations() -> str:
     )
 
 
-@web_app.route("/list_relations", methods=["GET", "POST"])
-def to_list_relations() -> str:
+@web_app.route("/pg/list_relations", methods=["GET", "POST"])
+def pg_to_list_relations() -> str:
     """
     >>> to_list_relations()
     """
@@ -5297,7 +5297,7 @@ def to_list_relations() -> str:
 
     print("[TRACE] func: pdg_app/to_list_relations end " + trace_id)
     return render_template(
-        "symbol_relation_list.html",
+        "property-graph/symbol_relation_list.html",
         query_time_dict=query_time_dict,
         list_of_relation_dicts=list_of_relation_dicts,
         dict_of_expression_dicts_that_use_relation=dict_of_expression_dicts_that_use_relation,
@@ -5305,8 +5305,8 @@ def to_list_relations() -> str:
     )
 
 
-@web_app.route("/list_constant_values/<scalar_id>", methods=["GET", "POST"])
-def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/pg/list_constant_values/<scalar_id>", methods=["GET", "POST"])
+def pg_to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
     """
     >>> to_list_constant_values()
     """
@@ -5334,7 +5334,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
 
     print("[TRACE] func: pdg_app/to_list_constant_values end " + trace_id)
     return render_template(
-        "symbol_scalar_constant_values_list.html",
+        "property-graph/symbol_scalar_constant_values_list.html",
         query_time_dict=query_time_dict,
         list_of_value_dicts=list_of_value_dicts,
         scalar_dict=scalar_dict,
@@ -5344,7 +5344,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
 @web_app.route(
     "/edit_constant_value_and_units/<value_and_units_id>", methods=["GET", "POST"]
 )
-def to_edit_constant_value_and_units(
+def pg_to_edit_constant_value_and_units(
     value_and_units_id: unique_numeric_id_as_str,
 ) -> str:
     """
@@ -5390,7 +5390,7 @@ def to_edit_constant_value_and_units(
 
     print("[TRACE] func: pdg_app/to_edit_constant_value_and_units start " + trace_id)
     return render_template(
-        "symbol_scalar_constant_values_edit.html",
+        "property-graph/symbol_scalar_constant_values_edit.html",
         query_time_dict=query_time_dict,
         value_and_units_dict=value_and_units_dict,
         list_of_value_dicts=list_of_value_dicts,
@@ -5398,8 +5398,8 @@ def to_edit_constant_value_and_units(
     )
 
 
-@web_app.route("/list_scalars", methods=["GET", "POST"])
-def to_list_scalars() -> str:
+@web_app.route("/pg/list_scalars", methods=["GET", "POST"])
+def pg_to_list_scalars() -> str:
     """
     >>> to_list_scalars()
     """
@@ -5446,7 +5446,7 @@ def to_list_scalars() -> str:
 
     print("[TRACE] func: pdg_app/to_list_scalars end " + trace_id)
     return render_template(
-        "symbol_scalar_list.html",
+        "property-graph/symbol_scalar_list.html",
         query_time_dict=query_time_dict,
         list_of_scalar_dicts=list_of_scalar_dicts,
         dict_of_expression_dicts_that_use_scalar=dict_of_expression_dicts_that_use_scalar,
@@ -5454,8 +5454,8 @@ def to_list_scalars() -> str:
     )
 
 
-@web_app.route("/list_vectors", methods=["GET", "POST"])
-def to_list_vectors() -> str:
+@web_app.route("/pg/list_vectors", methods=["GET", "POST"])
+def pg_to_list_vectors() -> str:
     """
     >>> to_list_vectors()
     """
@@ -5492,7 +5492,7 @@ def to_list_vectors() -> str:
 
     print("[TRACE] func: pdg_app/to_list_vectors end " + trace_id)
     return render_template(
-        "symbol_vector_list.html",
+        "property-graph/symbol_vector_list.html",
         query_time_dict=query_time_dict,
         list_of_vector_dicts=list_of_vector_dicts,
         dict_of_expression_dicts_that_use_vector=dict_of_expression_dicts_that_use_vector,
@@ -5500,8 +5500,8 @@ def to_list_vectors() -> str:
     )
 
 
-@web_app.route("/list_matrices", methods=["GET", "POST"])
-def to_list_matrices() -> str:
+@web_app.route("/pg/list_matrices", methods=["GET", "POST"])
+def pg_to_list_matrices() -> str:
     """
     >>> to_list_matrices()
     """
@@ -5538,7 +5538,7 @@ def to_list_matrices() -> str:
 
     print("[TRACE] func: pdg_app/to_list_matrices end " + trace_id)
     return render_template(
-        "symbol_matrix_list.html",
+        "property-graph/symbol_matrix_list.html",
         query_time_dict=query_time_dict,
         list_of_matrix_dicts=list_of_matrix_dicts,
         dict_of_expression_dicts_that_use_matrix=dict_of_expression_dicts_that_use_matrix,
@@ -5546,8 +5546,8 @@ def to_list_matrices() -> str:
     )
 
 
-@web_app.route("/list_expressions", methods=["GET", "POST"])
-def to_list_expressions() -> str:
+@web_app.route("/pg/list_expressions", methods=["GET", "POST"])
+def pg_to_list_expressions() -> str:
     """
     >>> to_list_expressions()
     """
@@ -5627,7 +5627,7 @@ def to_list_expressions() -> str:
 
     print("[TRACE] func: pdg_app/to_list_expressions end " + trace_id)
     return render_template(
-        "expression_list.html",
+        "property-graph/expression_list.html",
         query_time_dict=query_time_dict,
         list_of_expression_dicts=list_of_expression_dicts,
         symbol_IDs_per_expression_id=symbol_IDs_per_expression_id,
@@ -5637,8 +5637,8 @@ def to_list_expressions() -> str:
     )
 
 
-@web_app.route("/list_derivations", methods=["GET", "POST"])
-def to_list_derivations() -> str:
+@web_app.route("/pg/list_derivations", methods=["GET", "POST"])
+def pg_to_list_derivations() -> str:
     """
     this page is a gateway for the task "which existing derivation to edit?"
 
@@ -5686,15 +5686,15 @@ def to_list_derivations() -> str:
 
     print("[TRACE] func: pdg_app/to_list_derivations end " + trace_id)
     return render_template(
-        "derivation_list.html",
+        "property-graph/derivation_list.html",
         query_time_dict=query_time_dict,
         list_of_derivation_dicts=list_of_derivation_dicts,
         number_of_steps_per_derivation=number_of_steps_per_derivation,
     )
 
 
-@web_app.route("/list_inference_rules")
-def to_list_inference_rules() -> str:
+@web_app.route("/pg/list_inference_rules")
+def pg_to_list_inference_rules() -> str:
     """
     >>> to_show_all_inference_rules()
     """
@@ -5721,15 +5721,15 @@ def to_list_inference_rules() -> str:
 
     print("[TRACE] func: pdg_app/to_list_inference_rules end " + trace_id)
     return render_template(
-        "inference_rule_list.html",
+        "property-graph/inference_rule_list.html",
         query_time_dict=query_time_dict,
         list_of_inference_rule_dicts=list_of_inference_rule_dicts,
         dict_of_derivations_used_per_inference_rule=dict_of_derivations_used_per_inference_rule,
     )
 
 
-@web_app.route("/delete_all")
-def to_delete_graph_content() -> str:
+@web_app.route("/pg/delete_all")
+def pg_to_delete_graph_content() -> str:
     """
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
     https://neo4j.com/developer/kb/large-delete-transaction-best-practices-in-neo4j/
@@ -5749,8 +5749,8 @@ def to_delete_graph_content() -> str:
     return redirect(url_for("main"))
 
 
-@web_app.route("/export_to_json")
-def to_export_json() -> str:
+@web_app.route("/pg/export_to_json")
+def pg_to_export_json() -> str:
     """
     https://github.com/neo4j/apoc
     https://neo4j.com/labs/apoc/4.1/installation/
@@ -5772,8 +5772,8 @@ def to_export_json() -> str:
     return redirect(url_for("static", filename="dumping_grounds/pdg.json"))
 
 
-@web_app.route("/export_to_cypher")
-def to_export_cypher() -> str:
+@web_app.route("/pg/export_to_cypher")
+def pg_to_export_cypher() -> str:
     """
     TODO: export "graph to CYPHER" as file via web interface
 

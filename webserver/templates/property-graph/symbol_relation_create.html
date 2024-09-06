@@ -2,27 +2,28 @@
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=symbol_create">main page</a>
-  or return to <a href="{{ url_for('pg_to_list_symbols') }}?referrer=symbol_create">list of all symbols</a>
+  Return to <a href="{{ url_for('pg_main') }}?referrer=symbol_relation_create">main page</a>
+  or return to <a href="{{ url_for('pg_to_list_relations') }}?referrer=symbol_relation_create">list of relations</a>
 </P>
 
 <fieldset>
   <legend>
-    <H2>Create symbol</H2>
+    <H2>Create relation</H2>
   </legend>
 
 <P>TODO: as user is entering symbol, filter the list of existing symbols.
   That way the user can recognize collisions.
 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form_symbol_properties.csrf_token }}
-    <P>{{ form_symbol_properties.symbol_latex.label}} (<B>required</B>): 
-    {{ form_symbol_properties.symbol_latex(size=50, 
-                minlength=1, 
-                maxlength=1000,
-                id="input_latex", 
-                onchange="onChangeFunction();") }}</P>
+    {{ form_relation_properties.csrf_token }}
 
+    <P>{{ form_relation_properties.relation_latex.label}} (<B>required</B>): 
+       {{ form_relation_properties.relation_latex(size=50, 
+                      minlength=1, 
+                      maxlength=1000,
+                      id="input_latex", 
+                      onchange="onChangeFunction();") }}</P>
+    
     <P><input type="checkbox" 
               id="display_input_latex" 
               checked="" 
@@ -41,37 +42,31 @@
               <br clear="all">
         <div id="output_input_latex"></div>
 
-    <P>{{ form_symbol_properties.symbol_requires_arguments.label }} (<B><em>required</em></B>): 
-    {{ form_symbol_properties.symbol_requires_arguments }} Example: "+" requires arguments, so check the box. "c" does not, so leave box unchecked. </p>
-    
-    <P>{{form_symbol_properties.symbol_name.label }} (<small><em>optional</em></small>): 
-    {{ form_symbol_properties.symbol_name(size=50, maxlength=1000) }}</p>
-    
-    <P>{{form_symbol_properties.symbol_description.label }} (<small><em>optional</em></small>): 
-    {{ form_symbol_properties.symbol_description(size=50, maxlength=1000) }}</p>
 
-    <P>{{ form_symbol_properties.symbol_reference.label }} (<small><em>optional</em></small>): 
-    {{ form_symbol_properties.symbol_reference }}</p>
+    <P>{{ form_relation_properties.relation_name_latex.label }} (<B>required</B>): 
+       {{ form_relation_properties.relation_name_latex(size=50, maxlength=1000) }}</p>
+    
+    <P>{{form_relation_properties.relation_description_latex.label }} (<small><em>optional</em></small>):  
+       {{ form_relation_properties.relation_description_latex(size=50, maxlength=1000) }}</p>
 
-      <input type="submit" value="add symbol">
+    <P>{{ form_relation_properties.relation_reference_latex.label }} (<small><em>optional</em></small>): 
+       {{ form_relation_properties.relation_reference_latex }}</p>
+
+      <input type="submit" value="add relation">
     </P>
   </form>
 </fieldset>
 
 
-
-<P>{% include '_table_of_symbols_requires_arguments.html' %}
-<P>{% include '_table_of_symbols_dimension0.html' %}
-<P>{% include '_table_of_symbols_dimension1.html' %}
-<P>{% include '_table_of_symbols_dimension2ormore.html' %}
+<P>{% include '_table_of_symbols_relation.html' %}
 
 <script>
 function select_symbol() {
   // Declare variables
   var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('symbol_input');
+  input = document.getElementById('relation_input');
   filter = input.value.toUpperCase();
-  ul = document.getElementById("symbol_UL");
+  ul = document.getElementById("relation_UL");
   li = ul.getElementsByTagName('li');
 
   // Loop through all list items, and hide those who don't match the search query
