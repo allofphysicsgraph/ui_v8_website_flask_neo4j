@@ -7,7 +7,6 @@
 
 # https://docs.docker.com/compose/compose-file/
 # https://docs.docker.com/compose/compose-file/#environment
-version: "3.6"
 
 services:
   webserver:
@@ -17,8 +16,8 @@ services:
     restart: unless-stopped
     environment:
      - SECRET_KEY=${SECRET_KEY}
-    expose:
-      - 5000
+#    expose:
+#      - 5000
 # using "ports" makes flask/gunicorn accessible without going through nginx
 #    ports:
 #     - "5000:5000"
