@@ -5,7 +5,7 @@ Flask-WTF
 neo4j
 
 # https://github.com/allofphysicsgraph/proofofconcept/issues/157
-secure==0.2.1
+secure==0.3.0
 
 # code formatting and consistency checking
 #mypy==0.910
@@ -26,3 +26,5 @@ antlr4-python3-runtime==4.11
 # from https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https
 #pyOpenSSL==20.0.1
 pyOpenSSL
+
+#EOF
