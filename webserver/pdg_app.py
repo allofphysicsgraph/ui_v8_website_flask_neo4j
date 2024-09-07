@@ -2,7 +2,6 @@
 # Ben Payne
 # Physics Derivation Graph
 # https://allofphysics.com
-
 # Creative Commons Attribution 4.0 International License
 # https://creativecommons.org/licenses/by/4.0/
 
@@ -47,18 +46,12 @@ See https://neo4j.com/developer/python/
 
 """
 
-import random
-import time
-import datetime
-
-# https://docs.python.org/3/howto/logging.html
-import logging
-
-# https://gist.github.com/ibeex/3257877
-from logging.handlers import RotatingFileHandler
-
 import os
 import sys
+
+import time
+import random
+import datetime
 
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
@@ -67,10 +60,13 @@ from typing import NewType, Dict, List
 # https://docs.python.org/3/library/re.html
 import re
 
+# https://docs.python.org/3/howto/logging.html
+import logging
+# https://gist.github.com/ibeex/3257877
+from logging.handlers import RotatingFileHandler
 import neo4j
 from neo4j import GraphDatabase
 
-# import logging
 
 # logger = logging.getLogger(__name__)
 
@@ -92,6 +88,8 @@ from flask import (
 # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
 from flask_wtf import FlaskForm, CSRFProtect, Form  # type: ignore
 
+# https://github.com/TypeError/secure
+import secure  # type: ignore
 # https://stackoverflow.com/a/61729817/1164295
 from werkzeug.utils import secure_filename
 
@@ -112,7 +110,7 @@ from wtforms import (
 # type: ignore
 # from wtforms import PasswordField, FieldList
 
-import secure  # type: ignore
+
 
 
 sys.path.append("pg_library")
@@ -218,7 +216,7 @@ web_app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
 )
 web_app.config["DEBUG"] = True
 
-# the following import has to happen after web_app is configured because pdg_app uses graphDB_Driver
+# the following import has to happen after web_app is configured because pdg_pg_app uses graphDB_Driver
 import pdg_pg_api
 
 web_app.register_blueprint(pdg_pg_api.bp)
