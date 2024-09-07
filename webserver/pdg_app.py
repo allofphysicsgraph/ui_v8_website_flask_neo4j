@@ -818,8 +818,8 @@ def before_request():
     return
 
 
-@web_app.route("/pg/", methods=["GET", "POST"])
-def pg_main() -> str:
+@web_app.route("/", methods=["GET", "POST"])
+def main() -> str:
     """
     initial page
 

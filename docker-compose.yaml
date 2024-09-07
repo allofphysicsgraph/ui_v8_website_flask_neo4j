@@ -16,11 +16,11 @@ services:
     restart: unless-stopped
     environment:
      - SECRET_KEY=${SECRET_KEY}
-#    expose:
-#      - 5000
+    expose:
+      - 5000
 # using "ports" makes flask/gunicorn accessible without going through nginx
-#    ports:
-#     - "5000:5000"
+    ports:
+     - "5000:5000"
     depends_on:
       neo4j_docker:
 # https://docs.docker.com/compose/compose-file/05-services/#healthcheck
@@ -29,7 +29,6 @@ services:
       neo4j-internal:
         aliases:
           - neo4j-network
-
     volumes:
      - ${PWD}/:/scratch
      - './dumping_grounds:/code/static/dumping_grounds'
