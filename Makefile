@@ -28,7 +28,14 @@ help:
 
 # create and start the webserver. This will build the Docker image if that's needed
 up:
-	if (! docker stats --no-stream ); then  open /Applications/Docker.app; while (! docker stats --no-stream ); do    echo "Waiting for Docker to launch...";  sleep 1; done; fi; docker compose down --volumes --remove-orphans; docker compose up --build --remove-orphans
+	if (! docker stats --no-stream ); then  open /Applications/Docker.app; while (! docker stats --no-stream ); do    echo "Waiting for Docker to launch...";  sleep 1; done; fi; 
+	docker ps
+	if [ `docker ps | wc -l` -gt 1 ]; then \
+	       	docker kill $$(docker ps -q); \
+		fi
+	docker ps
+	docker run -it --rm -v `pwd`:/scratch ui_v8_website_flask_neo4j_webserver /bin/bash -c 'for filename in /scratch/webserver/*.py; do echo $$filename; done | xargs black'
+	docker compose down --volumes --remove-orphans; docker compose up --build --remove-orphans
 
 # possibly to add as new target:
 # make black_out; docker ps | grep property | cut -d' ' -f1 | xargs docker kill; date; make up

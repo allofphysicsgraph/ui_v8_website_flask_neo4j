@@ -219,9 +219,9 @@ web_app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
 web_app.config["DEBUG"] = True
 
 # the following import has to happen after web_app is configured because pdg_app uses graphDB_Driver
-import pdg_api
+import pdg_pg_api
 
-web_app.register_blueprint(pdg_api.bp)
+web_app.register_blueprint(pdg_pg_api.bp)
 
 
 class pg_DeleteButtonForm(FlaskForm):
@@ -1308,7 +1308,9 @@ def pg_to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> s
 @web_app.route(
     "/new_step_select_inference_rule/<derivation_id>/", methods=["GET", "POST"]
 )
-def pg_to_add_step_select_inference_rule(derivation_id: unique_numeric_id_as_str) -> str:
+def pg_to_add_step_select_inference_rule(
+    derivation_id: unique_numeric_id_as_str,
+) -> str:
     """
     add new step to existing derivation
 
@@ -4926,8 +4928,8 @@ def pg_to_query() -> str:
     possibly clean the URL using https://stackoverflow.com/a/26619855/1164295
 
 
-    Embedding Jinja2 expansions into the string passed to the web page doesn't work in either a case where you have safe or unsafe pipe 
-    The pipe safe situation means the string is interpreted as is with no alterations, 
+    Embedding Jinja2 expansions into the string passed to the web page doesn't work in either a case where you have safe or unsafe pipe
+    The pipe safe situation means the string is interpreted as is with no alterations,
     When there is no pipe then the string is converted to HTML safe text
     """
     trace_id = str(random.randint(1000000, 9999999))
