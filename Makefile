@@ -35,7 +35,7 @@ up:
 		fi
 	docker ps
 	docker run -it --rm -v `pwd`:/scratch ui_v8_website_flask_neo4j_webserver /bin/bash -c 'for filename in /scratch/webserver/*.py; do echo $$filename; done | xargs black'
-	docker compose down --volumes --remove-orphans; docker compose up --build --remove-orphans
+	docker compose up --build --remove-orphans
 
 # possibly to add as new target:
 # make black_out; docker ps | grep property | cut -d' ' -f1 | xargs docker kill; date; make up
