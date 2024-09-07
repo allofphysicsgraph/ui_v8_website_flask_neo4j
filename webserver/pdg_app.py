@@ -115,7 +115,7 @@ from wtforms import (
 import secure  # type: ignore
 
 
-sys.path.append("library")
+sys.path.append("pg_library")
 
 import neo4j_query
 import compute
