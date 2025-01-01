@@ -113,7 +113,7 @@ from wtforms import (
 # from wtforms import PasswordField, FieldList
 
 
-sys.path.append("pg_library")
+sys.path.append("library")
 
 import neo4j_query
 import compute
@@ -216,13 +216,13 @@ web_app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
 )
 web_app.config["DEBUG"] = True
 
-# the following import has to happen after web_app is configured because pdg_pg_app uses graphDB_Driver
-import pdg_pg_api
+# the following import has to happen after web_app is configured because pdg_app uses graphDB_Driver
+import pdg_api
 
-web_app.register_blueprint(pdg_pg_api.bp)
+web_app.register_blueprint(pdg_api.bp)
 
 
-class pg_DeleteButtonForm(FlaskForm):
+class DeleteButtonForm(FlaskForm):
     """
     TODO: not in use yet
     """
@@ -230,7 +230,7 @@ class pg_DeleteButtonForm(FlaskForm):
     delete_button = SubmitField()
 
 
-class pg_SpecifyNewDerivationForm(FlaskForm):
+class SpecifyNewDerivationForm(FlaskForm):
     """
     web form for user to provide name of (new) derivation
 
@@ -257,7 +257,7 @@ class pg_SpecifyNewDerivationForm(FlaskForm):
     )
 
 
-class pg_SpecifyNewInferenceRuleForm(FlaskForm):
+class SpecifyNewInferenceRuleForm(FlaskForm):
     """
     web form for user to provide inference rule
 
@@ -291,7 +291,7 @@ class pg_SpecifyNewInferenceRuleForm(FlaskForm):
     )
 
 
-class pg_SpecifyNewStepForm(FlaskForm):
+class SpecifyNewStepForm(FlaskForm):
     """
     web form for user to specify inference rule for a step
 
@@ -308,7 +308,7 @@ class pg_SpecifyNewStepForm(FlaskForm):
     )
 
 
-class pg_SpecifyNewExpressionForm(FlaskForm):
+class SpecifyNewExpressionForm(FlaskForm):
     """
     web form for user to specify expressions used by steps
 
@@ -346,7 +346,7 @@ class pg_SpecifyNewExpressionForm(FlaskForm):
     )
 
 
-class pg_SpecifyNewFeedForm(FlaskForm):
+class SpecifyNewFeedForm(FlaskForm):
     """
     web form for user to specify expressions used by steps
 
@@ -359,7 +359,7 @@ class pg_SpecifyNewFeedForm(FlaskForm):
     )
 
 
-class pg_SpecifyEditFeedForm(FlaskForm):
+class SpecifyEditFeedForm(FlaskForm):
     """
     web form for user to specify expressions used by steps
 
@@ -382,7 +382,7 @@ class pg_SpecifyEditFeedForm(FlaskForm):
     )
 
 
-class pg_SpecifyNewSympyLeanForm(FlaskForm):
+class SpecifyNewSympyLeanForm(FlaskForm):
     """
     web form for user to provide SymPy and Lean vesions of expression
 
@@ -407,7 +407,7 @@ class pg_SpecifyNewSympyLeanForm(FlaskForm):
     )
 
 
-class pg_SpecifyNewSymbolScalarForm(FlaskForm):
+class SpecifyNewSymbolScalarForm(FlaskForm):
     """
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
@@ -495,7 +495,7 @@ class pg_SpecifyNewSymbolScalarForm(FlaskForm):
     )
 
 
-class pg_SpecifyNewConstantNumberForm(FlaskForm):
+class SpecifyNewConstantNumberForm(FlaskForm):
     # , validators.Length(min=1, max=100) ?
     number_decimal = DecimalField(
         label="decimal", validators=[validators.InputRequired()], default=0
@@ -503,7 +503,7 @@ class pg_SpecifyNewConstantNumberForm(FlaskForm):
     number_power = DecimalField(label="power", default=0)
 
 
-class pg_SpecifyNewSymbolVectorForm(FlaskForm):
+class SpecifyNewSymbolVectorForm(FlaskForm):
     """
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
@@ -552,7 +552,7 @@ class pg_SpecifyNewSymbolVectorForm(FlaskForm):
     )
 
 
-class pg_SpecifyNewSymbolMatrixForm(FlaskForm):
+class SpecifyNewSymbolMatrixForm(FlaskForm):
     """
     https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
     """
@@ -596,7 +596,7 @@ class pg_SpecifyNewSymbolMatrixForm(FlaskForm):
     )
 
 
-class pg_SpecifyNewSymbolOperationForm(FlaskForm):
+class SpecifyNewSymbolOperationForm(FlaskForm):
     operation_latex = StringField(
         "LaTeX symbol",
         validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
@@ -619,7 +619,7 @@ class pg_SpecifyNewSymbolOperationForm(FlaskForm):
     operation_reference_latex = StringField("reference")
 
 
-class pg_SpecifyNewSymbolRelationForm(FlaskForm):
+class SpecifyNewSymbolRelationForm(FlaskForm):
     relation_latex = StringField(
         "LaTeX symbol",
         validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
@@ -636,7 +636,7 @@ class pg_SpecifyNewSymbolRelationForm(FlaskForm):
     relation_reference_latex = StringField("reference")
 
 
-# class pg_SpecifyNewSymbolForm(FlaskForm):
+# class SpecifyNewSymbolForm(FlaskForm):
 #     """
 #     web form for user to specify symbols used in expressions
 
@@ -664,7 +664,7 @@ class pg_SpecifyNewSymbolRelationForm(FlaskForm):
 #     symbol_reference_latex = StringField("reference (LaTeX)")
 
 
-# class pg_SpecifyNewSymbolArgumentCountForm(FlaskForm):
+# class SpecifyNewSymbolArgumentCountForm(FlaskForm):
 #     """
 #     user has specified this is an operation, so now they need to specify number of arguments
 #     """
@@ -676,7 +676,7 @@ class pg_SpecifyNewSymbolRelationForm(FlaskForm):
 #     )
 
 
-# class pg_SpecifyNewSymbolDimensionCountForm(FlaskForm):
+# class SpecifyNewSymbolDimensionCountForm(FlaskForm):
 #     """
 #     User has specified this is NOT an opersion, so now they need to specify whether the symbol is scalar, vector, or matrix
 #     """
@@ -688,7 +688,7 @@ class pg_SpecifyNewSymbolRelationForm(FlaskForm):
 #     )
 
 
-# class pg_SpecifyNewSymbolDimension0Form(FlaskForm):
+# class SpecifyNewSymbolDimension0Form(FlaskForm):
 #     """
 #     This overlaps with SpecifyNewSymbolScalarForm
 #     """
@@ -757,21 +757,21 @@ class pg_SpecifyNewSymbolRelationForm(FlaskForm):
 #     )
 
 
-# class pg_SpecifyNewSymbolDimension1Form(FlaskForm):
+# class SpecifyNewSymbolDimension1Form(FlaskForm):
 #     symbol_is_composite = BooleanField(
 #         label="is composite",
 #         description="check for 'yes'; unchecked for 'no'",
 #     )
 
 
-# class pg_SpecifyNewSymbolDimension2Form(FlaskForm):
+# class SpecifyNewSymbolDimension2Form(FlaskForm):
 #     symbol_is_composite = BooleanField(
 #         label="is composite",
 #         description="check for 'yes'; unchecked for 'no'",
 #     )
 
 
-class pg_CypherQueryForm(FlaskForm):
+class CypherQueryForm(FlaskForm):
     """
     web form for user to provide Cypher query for Neo4j database
 
@@ -785,7 +785,7 @@ class pg_CypherQueryForm(FlaskForm):
     )
 
 
-class pg_NoOptionsForm(FlaskForm):
+class NoOptionsForm(FlaskForm):
     """
     no text input
     """
@@ -817,7 +817,7 @@ def before_request():
 
 
 @web_app.route("/", methods=["GET", "POST"])
-def pg_main() -> str:
+def main() -> str:
     """
     initial page
 
@@ -1007,8 +1007,8 @@ def pg_main() -> str:
     )
 
 
-@web_app.route("/pg/new_derivation", methods=["GET", "POST"])
-def pg_to_add_derivation() -> str:
+@web_app.route("/new_derivation", methods=["GET", "POST"])
+def to_add_derivation() -> str:
     """
     create new derivation
     user provides deritivation name and abstract
@@ -1112,8 +1112,8 @@ def pg_to_add_derivation() -> str:
     )
 
 
-@web_app.route("/pg/review_derivation/<derivation_id>", methods=["GET", "POST"])
-def pg_to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/review_derivation/<derivation_id>", methods=["GET", "POST"])
+def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     """
     options from this page:
     * add step to existing derivation
@@ -1187,8 +1187,8 @@ def pg_to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/pg/select_step/<derivation_id>/", methods=["GET", "POST"])
-def pg_to_select_step(derivation_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/select_step/<derivation_id>/", methods=["GET", "POST"])
+def to_select_step(derivation_id: unique_numeric_id_as_str) -> str:
     """
     User wants to delete step or edit step
     """
@@ -1241,8 +1241,8 @@ def pg_to_select_step(derivation_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/pg/edit_derivation_metadata/<derivation_id>/", methods=["GET", "POST"])
-def pg_to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_derivation_metadata/<derivation_id>/", methods=["GET", "POST"])
+def to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> str:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_edit_derivation_metadata start " + trace_id)
@@ -1306,7 +1306,7 @@ def pg_to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> s
 @web_app.route(
     "/new_step_select_inference_rule/<derivation_id>/", methods=["GET", "POST"]
 )
-def pg_to_add_step_select_inference_rule(
+def to_add_step_select_inference_rule(
     derivation_id: unique_numeric_id_as_str,
 ) -> str:
     """
@@ -1381,8 +1381,8 @@ def pg_to_add_step_select_inference_rule(
     # return redirect(url_for("to_review_derivation", derivation_id=derivation_id))
 
 
-@web_app.route("/pg/edit_expression/<expression_id>", methods=["GET", "POST"])
-def pg_to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_expression/<expression_id>", methods=["GET", "POST"])
+def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     """
     novel expression
     """
@@ -1635,8 +1635,8 @@ def pg_to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_expressions"))
 
 
-@web_app.route("/pg/edit_feed/<feed_id>", methods=["GET", "POST"])
-def pg_to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_feed/<feed_id>", methods=["GET", "POST"])
+def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
     """
     edit feed
     """
@@ -1850,8 +1850,8 @@ def pg_to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
     # return redirect(url_for("to_list_feeds"))
 
 
-@web_app.route("/pg/new_expression/", methods=["GET", "POST"])
-def pg_to_add_expression() -> str:
+@web_app.route("/new_expression/", methods=["GET", "POST"])
+def to_add_expression() -> str:
     """
     novel expression
     """
@@ -2030,8 +2030,8 @@ def pg_to_add_expression() -> str:
     )
 
 
-@web_app.route("/pg/new_feed/", methods=["GET", "POST"])
-def pg_to_add_feed() -> str:
+@web_app.route("/new_feed/", methods=["GET", "POST"])
+def to_add_feed() -> str:
     """
     novel feed
     """
@@ -2156,8 +2156,8 @@ def pg_to_add_feed() -> str:
     )
 
 
-@web_app.route("/pg/edit_node/<node_id>", methods=["GET", "POST"])
-def pg_to_edit_node(node_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_node/<node_id>", methods=["GET", "POST"])
+def to_edit_node(node_id: unique_numeric_id_as_str) -> str:
     """
     edit any node -- actually redirect to respective subcategory
 
@@ -2222,8 +2222,8 @@ def pg_to_edit_node(node_id: unique_numeric_id_as_str) -> str:
     return "ERROR: definitely shouldn't get here"
 
 
-@web_app.route("/pg/edit_operation/<operation_id>", methods=["GET", "POST"])
-def pg_to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_operation/<operation_id>", methods=["GET", "POST"])
+def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
     """
     edit operation
     """
@@ -2283,8 +2283,8 @@ def pg_to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/pg/edit_relation/<relation_id>", methods=["GET", "POST"])
-def pg_to_edit_relation(relation_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_relation/<relation_id>", methods=["GET", "POST"])
+def to_edit_relation(relation_id: unique_numeric_id_as_str) -> str:
     """
     edit relation
     """
@@ -2341,8 +2341,8 @@ def pg_to_edit_relation(relation_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/pg/edit_scalar/<scalar_id>", methods=["GET", "POST"])
-def pg_to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_scalar/<scalar_id>", methods=["GET", "POST"])
+def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
     """
     edit symbol
 
@@ -2445,8 +2445,8 @@ def pg_to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/pg/edit_vector/<vector_id>", methods=["GET", "POST"])
-def pg_to_edit_vector(vector_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_vector/<vector_id>", methods=["GET", "POST"])
+def to_edit_vector(vector_id: unique_numeric_id_as_str) -> str:
     """
     edit vector
 
@@ -2474,8 +2474,8 @@ def pg_to_edit_vector(vector_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/pg/edit_matrix/<matrix_id>", methods=["GET", "POST"])
-def pg_to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_matrix/<matrix_id>", methods=["GET", "POST"])
+def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
     """
     edit matrix
 
@@ -2506,7 +2506,7 @@ def pg_to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
 @web_app.route(
     "/new_symbol_scalar_constant_value_and_units/<scalar_id>/", methods=["GET", "POST"]
 )
-def pg_to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
+def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_add_value_and_units start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
@@ -2631,8 +2631,8 @@ def pg_to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
     )
 
 
-@web_app.route("/pg/new_symbol_scalar/", methods=["GET", "POST"])
-def pg_to_add_symbol_scalar() -> str:
+@web_app.route("/new_symbol_scalar/", methods=["GET", "POST"])
+def to_add_symbol_scalar() -> str:
     """
     novel scalar symbol
     """
@@ -2751,8 +2751,8 @@ def pg_to_add_symbol_scalar() -> str:
     )
 
 
-@web_app.route("/pg/new_symbol_vector/", methods=["GET", "POST"])
-def pg_to_add_symbol_vector() -> str:
+@web_app.route("/new_symbol_vector/", methods=["GET", "POST"])
+def to_add_symbol_vector() -> str:
     """
     novel vector
     """
@@ -2854,8 +2854,8 @@ def pg_to_add_symbol_vector() -> str:
     )
 
 
-@web_app.route("/pg/new_symbol_matrix/", methods=["GET", "POST"])
-def pg_to_add_symbol_matrix() -> str:
+@web_app.route("/new_symbol_matrix/", methods=["GET", "POST"])
+def to_add_symbol_matrix() -> str:
     """
     novel matrix
     """
@@ -2961,8 +2961,8 @@ def pg_to_add_symbol_matrix() -> str:
     )
 
 
-# @web_app.route("/pg/new_symbol/", methods=["GET", "POST"])
-# def pg_to_add_symbol() -> str:
+# @web_app.route("/new_symbol/", methods=["GET", "POST"])
+# def to_add_symbol() -> str:
 #     """
 #     novel symbol
 #     """
@@ -3143,7 +3143,7 @@ def pg_to_add_symbol_matrix() -> str:
 # @web_app.route(
 #     "/new_symbol_required_argument_count/<symbol_id>", methods=["GET", "POST"]
 # )
-# def pg_to_add_symbol_required_argument_count(symbol_id: unique_numeric_id_as_str) -> str:
+# def to_add_symbol_required_argument_count(symbol_id: unique_numeric_id_as_str) -> str:
 #     """
 #     novel symbol: how many arguments?
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -3220,7 +3220,7 @@ def pg_to_add_symbol_matrix() -> str:
 # @web_app.route(
 #     "/new_symbol_specify_dimension_count/<symbol_id>", methods=["GET", "POST"]
 # )
-# def pg_to_add_symbol_dimension_count(symbol_id: unique_numeric_id_as_str):
+# def to_add_symbol_dimension_count(symbol_id: unique_numeric_id_as_str):
 #     """
 #     novel symbol: how many dimensions?
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -3301,8 +3301,8 @@ def pg_to_add_symbol_matrix() -> str:
 #     )
 
 
-# @web_app.route("/pg/new_symbol_dimension0_properties/<scalar_id>", methods=["GET", "POST"])
-# def pg_to_add_symbol_dimension0_properties(scalar_id: unique_numeric_id_as_str):
+# @web_app.route("/new_symbol_dimension0_properties/<scalar_id>", methods=["GET", "POST"])
+# def to_add_symbol_dimension0_properties(scalar_id: unique_numeric_id_as_str):
 #     """
 #     novel symbol: how many dimensions?
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -3497,8 +3497,8 @@ def pg_to_add_symbol_matrix() -> str:
 #     )
 
 
-# @web_app.route("/pg/new_symbol_dimension1_properties/<vector_id>", methods=["GET", "POST"])
-# def pg_to_add_symbol_dimension1_properties(vector_id: unique_numeric_id_as_str) -> str:
+# @web_app.route("/new_symbol_dimension1_properties/<vector_id>", methods=["GET", "POST"])
+# def to_add_symbol_dimension1_properties(vector_id: unique_numeric_id_as_str) -> str:
 #     """
 
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -3536,8 +3536,8 @@ def pg_to_add_symbol_matrix() -> str:
 #     )
 
 
-# @web_app.route("/pg/new_symbol_dimension2_properties/<matrix_id>", methods=["GET", "POST"])
-# def pg_to_add_symbol_dimension2_properties(matrix_id: unique_numeric_id_as_str) -> str:
+# @web_app.route("/new_symbol_dimension2_properties/<matrix_id>", methods=["GET", "POST"])
+# def to_add_symbol_dimension2_properties(matrix_id: unique_numeric_id_as_str) -> str:
 #     """
 
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
@@ -3575,8 +3575,8 @@ def pg_to_add_symbol_matrix() -> str:
 #     )
 
 
-@web_app.route("/pg/new_operation/", methods=["GET", "POST"])
-def pg_to_add_operation() -> str:
+@web_app.route("/new_operation/", methods=["GET", "POST"])
+def to_add_operation() -> str:
     """
     novel operation
     """
@@ -3663,8 +3663,8 @@ def pg_to_add_operation() -> str:
     )
 
 
-@web_app.route("/pg/new_relation/", methods=["GET", "POST"])
-def pg_to_add_relation() -> str:
+@web_app.route("/new_relation/", methods=["GET", "POST"])
+def to_add_relation() -> str:
     """
     novel relation
     """
@@ -3754,7 +3754,7 @@ def pg_to_add_relation() -> str:
 @web_app.route(
     "/new_step_expressions/<derivation_id>/<inference_rule_id>", methods=["GET", "POST"]
 )
-def pg_to_add_step_select_expressions(
+def to_add_step_select_expressions(
     derivation_id: unique_numeric_id_as_str, inference_rule_id: unique_numeric_id_as_str
 ) -> str:
     """
@@ -3935,7 +3935,7 @@ def pg_to_add_step_select_expressions(
     "/symbols_and_operations_for_expression/<expression_id>",
     methods=["GET", "POST"],
 )
-def pg_to_add_symbols_and_operations_for_expression(
+def to_add_symbols_and_operations_for_expression(
     expression_id: unique_numeric_id_as_str,
 ) -> str:
     """
@@ -4152,7 +4152,7 @@ def pg_to_add_symbols_and_operations_for_expression(
     "/sympy_and_latex_for_expression/<expression_id>/<symbol_id_dict>",
     methods=["GET", "POST"],
 )
-def pg_to_add_sympy_and_lean_for_expression(
+def to_add_sympy_and_lean_for_expression(
     expression_id: unique_numeric_id_as_str,
     symbol_id_dict: dict,
 ) -> str:
@@ -4354,7 +4354,7 @@ def pg_to_add_sympy_and_lean_for_expression(
     "/symbols_and_operations_for_feed/<feed_id>",
     methods=["GET", "POST"],
 )
-def pg_to_add_symbols_and_operations_for_feed(
+def to_add_symbols_and_operations_for_feed(
     feed_id: unique_numeric_id_as_str,
 ) -> str:
     """
@@ -4535,7 +4535,7 @@ def pg_to_add_symbols_and_operations_for_feed(
     "/sympy_and_latex_for_feed/<feed_id>/<symbol_id_dict>",
     methods=["GET", "POST"],
 )
-def pg_to_add_sympy_and_lean_for_feed(
+def to_add_sympy_and_lean_for_feed(
     feed_id: unique_numeric_id_as_str,
     symbol_id_dict: dict,
 ) -> str:
@@ -4655,8 +4655,8 @@ def pg_to_add_sympy_and_lean_for_feed(
     )
 
 
-@web_app.route("/pg/new_inference_rule/", methods=["GET", "POST"])
-def pg_to_add_inference_rule() -> str:
+@web_app.route("/new_inference_rule/", methods=["GET", "POST"])
+def to_add_inference_rule() -> str:
     """
     create inference rule
 
@@ -4759,8 +4759,8 @@ def pg_to_add_inference_rule() -> str:
     )
 
 
-@web_app.route("/pg/edit_step/<derivation_id>/<step_id>", methods=["GET", "POST"])
-def pg_to_edit_step(
+@web_app.route("/edit_step/<derivation_id>/<step_id>", methods=["GET", "POST"])
+def to_edit_step(
     derivation_id: unique_numeric_id_as_str, step_id: unique_numeric_id_as_str
 ) -> str:
     """ """
@@ -4817,8 +4817,8 @@ def pg_to_edit_step(
     )
 
 
-@web_app.route("/pg/edit_inference_rule/<inference_rule_id>", methods=["GET", "POST"])
-def pg_to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/edit_inference_rule/<inference_rule_id>", methods=["GET", "POST"])
+def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_edit_inference_rule start " + trace_id)
@@ -4918,8 +4918,8 @@ def pg_to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> st
     # return redirect(url_for("to_list_inference_rules"))
 
 
-@web_app.route("/pg/query", methods=["GET", "POST"])
-def pg_to_query() -> str:
+@web_app.route("/query", methods=["GET", "POST"])
+def to_query() -> str:
     """
     page for submitting Cypher queries
 
@@ -5144,8 +5144,8 @@ def pg_to_query() -> str:
     )
 
 
-@web_app.route("/pg/list_feeds", methods=["GET", "POST"])
-def pg_to_list_feeds() -> str:
+@web_app.route("/list_feeds", methods=["GET", "POST"])
+def to_list_feeds() -> str:
     """
     >>> to_list_feeds()
     """
@@ -5211,8 +5211,8 @@ def pg_to_list_feeds() -> str:
     )
 
 
-@web_app.route("/pg/list_operations", methods=["GET", "POST"])
-def pg_to_list_operations() -> str:
+@web_app.route("/list_operations", methods=["GET", "POST"])
+def to_list_operations() -> str:
     """
     >>> to_list_operations()
     """
@@ -5258,8 +5258,8 @@ def pg_to_list_operations() -> str:
     )
 
 
-@web_app.route("/pg/list_relations", methods=["GET", "POST"])
-def pg_to_list_relations() -> str:
+@web_app.route("/list_relations", methods=["GET", "POST"])
+def to_list_relations() -> str:
     """
     >>> to_list_relations()
     """
@@ -5305,8 +5305,8 @@ def pg_to_list_relations() -> str:
     )
 
 
-@web_app.route("/pg/list_constant_values/<scalar_id>", methods=["GET", "POST"])
-def pg_to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
+@web_app.route("/list_constant_values/<scalar_id>", methods=["GET", "POST"])
+def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
     """
     >>> to_list_constant_values()
     """
@@ -5344,7 +5344,7 @@ def pg_to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
 @web_app.route(
     "/edit_constant_value_and_units/<value_and_units_id>", methods=["GET", "POST"]
 )
-def pg_to_edit_constant_value_and_units(
+def to_edit_constant_value_and_units(
     value_and_units_id: unique_numeric_id_as_str,
 ) -> str:
     """
@@ -5398,8 +5398,8 @@ def pg_to_edit_constant_value_and_units(
     )
 
 
-@web_app.route("/pg/list_scalars", methods=["GET", "POST"])
-def pg_to_list_scalars() -> str:
+@web_app.route("/list_scalars", methods=["GET", "POST"])
+def to_list_scalars() -> str:
     """
     >>> to_list_scalars()
     """
@@ -5454,8 +5454,8 @@ def pg_to_list_scalars() -> str:
     )
 
 
-@web_app.route("/pg/list_vectors", methods=["GET", "POST"])
-def pg_to_list_vectors() -> str:
+@web_app.route("/list_vectors", methods=["GET", "POST"])
+def to_list_vectors() -> str:
     """
     >>> to_list_vectors()
     """
@@ -5500,8 +5500,8 @@ def pg_to_list_vectors() -> str:
     )
 
 
-@web_app.route("/pg/list_matrices", methods=["GET", "POST"])
-def pg_to_list_matrices() -> str:
+@web_app.route("/list_matrices", methods=["GET", "POST"])
+def to_list_matrices() -> str:
     """
     >>> to_list_matrices()
     """
@@ -5546,8 +5546,8 @@ def pg_to_list_matrices() -> str:
     )
 
 
-@web_app.route("/pg/list_expressions", methods=["GET", "POST"])
-def pg_to_list_expressions() -> str:
+@web_app.route("/list_expressions", methods=["GET", "POST"])
+def to_list_expressions() -> str:
     """
     >>> to_list_expressions()
     """
@@ -5637,8 +5637,8 @@ def pg_to_list_expressions() -> str:
     )
 
 
-@web_app.route("/pg/list_derivations", methods=["GET", "POST"])
-def pg_to_list_derivations() -> str:
+@web_app.route("/list_derivations", methods=["GET", "POST"])
+def to_list_derivations() -> str:
     """
     this page is a gateway for the task "which existing derivation to edit?"
 
@@ -5693,8 +5693,8 @@ def pg_to_list_derivations() -> str:
     )
 
 
-@web_app.route("/pg/list_inference_rules")
-def pg_to_list_inference_rules() -> str:
+@web_app.route("/list_inference_rules")
+def to_list_inference_rules() -> str:
     """
     >>> to_show_all_inference_rules()
     """
@@ -5728,8 +5728,8 @@ def pg_to_list_inference_rules() -> str:
     )
 
 
-@web_app.route("/pg/delete_all")
-def pg_to_delete_graph_content() -> str:
+@web_app.route("/delete_all")
+def to_delete_graph_content() -> str:
     """
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
     https://neo4j.com/developer/kb/large-delete-transaction-best-practices-in-neo4j/
@@ -5749,8 +5749,8 @@ def pg_to_delete_graph_content() -> str:
     return redirect(url_for("main"))
 
 
-@web_app.route("/pg/export_to_json")
-def pg_to_export_json() -> str:
+@web_app.route("/export_to_json")
+def to_export_json() -> str:
     """
     https://github.com/neo4j/apoc
     https://neo4j.com/labs/apoc/4.1/installation/
@@ -5772,8 +5772,8 @@ def pg_to_export_json() -> str:
     return redirect(url_for("static", filename="dumping_grounds/pdg.json"))
 
 
-@web_app.route("/pg/export_to_cypher")
-def pg_to_export_cypher() -> str:
+@web_app.route("/export_to_cypher")
+def to_export_cypher() -> str:
     """
     TODO: export "graph to CYPHER" as file via web interface
 
