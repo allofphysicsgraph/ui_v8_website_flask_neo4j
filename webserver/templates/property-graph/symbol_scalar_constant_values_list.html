@@ -1,8 +1,8 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=symbol_scalar_constant_value_list">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_scalar_constant_value_list">main page</a>
 </P>
 
 <P>See also Wikipedia's <a href="https://en.wikipedia.org/wiki/Glossary_of_mathematical_symbols">list of symbols</a></P>
@@ -31,7 +31,7 @@
 <!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
 (TODO) this box doesn't actually search yet: <input type="text" id="symbol_input" onkeyup="select_symbol()" placeholder="Select symbol to review">
 
-{% include '_pg_table_of_values_and_units.html' %}
+{% include '_table_of_values_and_units.html' %}
 
 
 </fieldset>
@@ -42,7 +42,7 @@
   <H2 id="action">Actions for Constant values</h2>
 </legend>
 
-<P><a href="{{ url_for('pg_to_add_value_and_units',scalar_id=scalar_dict['id']) }}?referrer=symbol_scalar_constant_value_list">add new value</a> 
+<P><a href="{{ url_for('to_add_value_and_units',scalar_id=scalar_dict['id']) }}?referrer=symbol_scalar_constant_value_list">add new value</a> 
 
 <!--
   <P><a href="{ { url_for('to_add_symbol') }}?referrer=list_symbols">add new symbol</a> -- not clear which categorey; guide needed</P>

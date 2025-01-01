@@ -1,9 +1,9 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=symbol_matrix_create">main page</a>
-  or return to <a href="{{ url_for('pg_to_list_matrices') }}?referrer=symbol_matrix_create">list of matrices</a>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_matrix_create">main page</a>
+  or return to <a href="{{ url_for('to_list_matrices') }}?referrer=symbol_matrix_create">list of matrices</a>
 </P>
 
 <fieldset>

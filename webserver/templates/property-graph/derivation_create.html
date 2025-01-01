@@ -1,8 +1,8 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=derivation_create">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=derivation_create">main page</a>
 </P>
 
 <fieldset>
@@ -26,7 +26,7 @@
 
 <P>TODO: as user is entering derivation name, filter the list of existing derivations
 
-{% include '_pg_table_of_derivations.html' %}
+{% include '_table_of_derivations.html' %}
 
 <script>
 function select_derivation() {

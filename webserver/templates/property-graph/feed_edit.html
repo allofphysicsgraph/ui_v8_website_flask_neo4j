@@ -1,17 +1,17 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=feed_edit">main page</a>
-or return to <a href="{{ url_for('pg_to_list_feeds') }}?referrer=feed_edit">list of feeds</a>
+  Return to <a href="{{ url_for('main') }}?referrer=feed_edit">main page</a>
+or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of feeds</a>
 </P>
 
 
 
 <P>See also 
-  <a href="{{ url_for('pg_to_list_scalars') }}?referrer=expession_edit">scalar symbols</a>,
-  <a href="{{ url_for('pg_to_list_vectors') }}?referrer=expession_edit">vector symbols</a>,
-  <a href="{{ url_for('pg_to_list_matrices') }}?referrer=expession_edit">matrix symbols</a>.</P>
+  <a href="{{ url_for('to_list_scalars') }}?referrer=expession_edit">scalar symbols</a>,
+  <a href="{{ url_for('to_list_vectors') }}?referrer=expession_edit">vector symbols</a>,
+  <a href="{{ url_for('to_list_matrices') }}?referrer=expession_edit">matrix symbols</a>.</P>
 
 <P>TODO: list derivations that use this feed. That could help provide context.
 
@@ -44,7 +44,7 @@ or return to <a href="{{ url_for('pg_to_list_feeds') }}?referrer=feed_edit">list
   {% for symbol_id, symbol_dict in dict_of_symbol_dicts_in_feed.items() %}
   <tr>
     <td>
-      <a href="{{ url_for('pg_to_edit_scalar_symbol', symbol_id=symbol_id ) }}">
+      <a href="{{ url_for('to_edit_scalar_symbol', symbol_id=symbol_id ) }}">
           {{ symbol_id }}
       </a>
     </td>

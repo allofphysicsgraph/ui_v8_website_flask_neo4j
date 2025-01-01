@@ -1,8 +1,8 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=derivation_select_step">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=derivation_select_step">main page</a>
 </P>
 
 <P>derivation_dict: {{ derivation_dict }}
@@ -31,7 +31,7 @@
   {% for step_dict in list_of_step_dicts %}
   <tr>
     <td>
-      <a href="{{ url_for('pg_to_edit_step', step_id=step_dict['id'] ) }}?referrer=derivation_select_step">
+      <a href="{{ url_for('to_edit_step', step_id=step_dict['id'] ) }}?referrer=derivation_select_step">
           {{ step_dict['id'] }}
       </a>
     </td>

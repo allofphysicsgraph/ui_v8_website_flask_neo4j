@@ -19,7 +19,7 @@
   {% for derivation_dict in list_of_derivation_dicts %}
   <tr>
     <td>
-      <a href="{{ url_for('pg_to_review_derivation', derivation_id=derivation_dict['id'] ) }}">
+      <a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id'] ) }}">
         {{ derivation_dict['name_latex'] }}
       </a>
     </td>

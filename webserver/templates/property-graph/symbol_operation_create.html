@@ -1,9 +1,9 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=symbol_operation_create">main page</a>
-  or return to <a href="{{ url_for('pg_to_list_operations') }}?referrer=symbol_operation_create">list of operations</a>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_operation_create">main page</a>
+  or return to <a href="{{ url_for('to_list_operations') }}?referrer=symbol_operation_create">list of operations</a>
 </P>
 
 <fieldset>

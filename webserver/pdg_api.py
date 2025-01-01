@@ -33,7 +33,7 @@ bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 
 
 @bp.route("/v1/resources/derivation/list", methods=["GET"])
-def pg_api_list_derivations():
+def api_list_derivations():
     """
     curl -s http://localhost:5000/api/v1/resources/derivation/list | python3 -m json.tool
     [
@@ -66,7 +66,7 @@ def pg_api_list_derivations():
 
 
 @bp.route("/v1/resources/inference_rule/list", methods=["GET"])
-def pg_api_list_inference_rules():
+def api_list_inference_rules():
     """
     curl -s http://localhost:5000/api/v1/resources/inference_rule/list | python3 -m json.tool
     [
@@ -96,7 +96,7 @@ def pg_api_list_inference_rules():
 
 
 @bp.route("/v1/resources/operation/list", methods=["GET"])
-def pg_api_list_operation_symbols():
+def api_list_operation_symbols():
     """
     curl -s http://localhost:5000/api/v1/resources/operation/list | python3 -m json.tool
     [
@@ -126,7 +126,7 @@ def pg_api_list_operation_symbols():
 
 
 @bp.route("/v1/resources/scalar/list", methods=["GET"])
-def pg_api_list_scalar_symbols():
+def api_list_scalar_symbols():
     """
     curl -s http://localhost:5000/api/v1/resources/scalar/list | python3 -m json.tool
     [
@@ -156,7 +156,7 @@ def pg_api_list_scalar_symbols():
 
 
 @bp.route("/v1/resources/vector/list", methods=["GET"])
-def pg_api_list_vector_symbols():
+def api_list_vector_symbols():
     """
     curl -s http://localhost:5000/api/v1/resources/vector/list | python3 -m json.tool
     [
@@ -186,7 +186,7 @@ def pg_api_list_vector_symbols():
 
 
 @bp.route("/v1/resources/matrix/list", methods=["GET"])
-def pg_api_list_matrix_symbols():
+def api_list_matrix_symbols():
     """
     curl -s http://localhost:5000/api/v1/resources/matrix/list | python3 -m json.tool
     [
@@ -216,7 +216,7 @@ def pg_api_list_matrix_symbols():
 
 
 @bp.route("/v1/resources/expression/list", methods=["GET"])
-def pg_api_list_expressions():
+def api_list_expressions():
     """
     curl -s http://localhost:5000/api/v1/resources/expression/list | python3 -m json.tool
     [
@@ -243,7 +243,7 @@ def pg_api_list_expressions():
 
 
 @bp.route("/v1/resources/derivation/metadata", methods=["GET"])
-def pg_api_derivation_metadata():
+def api_derivation_metadata():
     """
     curl -s http://localhost:5000/api/v1/resources/derivation/metadata?derivation_id=3445848 | python3 -m json.tool
     {
@@ -277,7 +277,7 @@ def pg_api_derivation_metadata():
 
 
 @bp.route("/v1/resources/derivation/step/list", methods=["GET"])
-def pg_api_derivation_steps():
+def api_derivation_steps():
     """
     curl -s http://localhost:5000/api/v1/resources/derivation/step/list?derivation_id=3445848 | python3 -m json.tool
     [

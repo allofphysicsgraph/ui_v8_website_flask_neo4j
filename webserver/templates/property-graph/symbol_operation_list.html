@@ -1,8 +1,8 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=symbol_operation_list">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_operation_list">main page</a>
 </P>
 
 <fieldset>
@@ -15,14 +15,14 @@
 
 <P>The operation ID links to a page where you can edit the operation<BR>
 
-<P>{% include '_pg_table_of_symbols_operation.html' %}
+<P>{% include '_table_of_symbols_operation.html' %}
 
 </fieldset>
 
 <fieldset>
 <legend><H2>Actions for operations:</H2></legend>
 <UL>
-  <LI><a href="{{ url_for('pg_to_add_operation') }}?referrer=symbol_operation_list">add new operation</a></LI>
+  <LI><a href="{{ url_for('to_add_operation') }}?referrer=symbol_operation_list">add new operation</a></LI>
 </UL>
 </fieldset>
 

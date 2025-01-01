@@ -1,24 +1,24 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <H2>Physics Derivation Graph</H2>
 
 <UL>
-  <LI><a href="{{ url_for('pg_main') }}?referrer=main">site map</a> (this page)</LI>
-  <LI><a href="{{ url_for('pg_to_query') }}?referrer=main">query graph using Cypher</a></LI>
-  <LI><a href="{{ url_for('pg_to_export_cypher') }}?referrer=main">export as Cypher</a>
-   or <a href="{{ url_for('pg_to_export_json') }}?referrer=main">  export as JSON</a></LI>
-  <LI><a href="{{ url_for('pg_to_list_derivations') }}?referrer=main">show {{ number_of_derivations }} derivations</a>, from which you can select a derivation to review.</LI>
-  <LI><a href="{{ url_for('pg_to_list_inference_rules') }}?referrer=main">show {{ number_of_inference_rules }} inference rules</a></LI>
-  <LI><a href="{{ url_for('pg_to_list_expressions') }}?referrer=main">show {{ number_of_expressions }} expressions</a> (which have equality or inequality)</LI>
-  <LI><a href="{{ url_for('pg_to_list_feeds') }}?referrer=main">show {{ number_of_feeds }} feeds</a> (which have one or more non-operation symbols; no equality or inequality)</LI>
+  <LI><a href="{{ url_for('main') }}?referrer=main">site map</a> (this page)</LI>
+  <LI><a href="{{ url_for('to_query') }}?referrer=main">query graph using Cypher</a></LI>
+  <LI><a href="{{ url_for('to_export_cypher') }}?referrer=main">export as Cypher</a>
+   or <a href="{{ url_for('to_export_json') }}?referrer=main">  export as JSON</a></LI>
+  <LI><a href="{{ url_for('to_list_derivations') }}?referrer=main">show {{ number_of_derivations }} derivations</a>, from which you can select a derivation to review.</LI>
+  <LI><a href="{{ url_for('to_list_inference_rules') }}?referrer=main">show {{ number_of_inference_rules }} inference rules</a></LI>
+  <LI><a href="{{ url_for('to_list_expressions') }}?referrer=main">show {{ number_of_expressions }} expressions</a> (which have equality or inequality)</LI>
+  <LI><a href="{{ url_for('to_list_feeds') }}?referrer=main">show {{ number_of_feeds }} feeds</a> (which have one or more non-operation symbols; no equality or inequality)</LI>
   <LI>symbols</LI>
   <UL>
-    <LI><a href="{{ url_for('pg_to_list_operations') }}?referrer=main">show {{ number_of_operations }} operations</a> (which require arguments; separate terms within one side of an expression)</LI>
-    <LI><a href="{{ url_for('pg_to_list_relations') }}?referrer=main">show {{ number_of_relations }} relations</a> (which separate LHS and RHS of expression)</LI>
-    <LI><a href="{{ url_for('pg_to_list_scalars') }}?referrer=main">show {{ number_of_scalars }} scalars</a> (which have dimensionality)</LI>
-    <LI><a href="{{ url_for('pg_to_list_vectors') }}?referrer=main">show {{ number_of_vectors }} vectors</a> (of size 1xn or nx1). Includes bra, ket.</LI>
-    <LI><a href="{{ url_for('pg_to_list_matrices') }}?referrer=main">show {{ number_of_matrices }} matrices</a> (of size nxm)</LI>
+    <LI><a href="{{ url_for('to_list_operations') }}?referrer=main">show {{ number_of_operations }} operations</a> (which require arguments; separate terms within one side of an expression)</LI>
+    <LI><a href="{{ url_for('to_list_relations') }}?referrer=main">show {{ number_of_relations }} relations</a> (which separate LHS and RHS of expression)</LI>
+    <LI><a href="{{ url_for('to_list_scalars') }}?referrer=main">show {{ number_of_scalars }} scalars</a> (which have dimensionality)</LI>
+    <LI><a href="{{ url_for('to_list_vectors') }}?referrer=main">show {{ number_of_vectors }} vectors</a> (of size 1xn or nx1). Includes bra, ket.</LI>
+    <LI><a href="{{ url_for('to_list_matrices') }}?referrer=main">show {{ number_of_matrices }} matrices</a> (of size nxm)</LI>
   </UL>
 
   <!--<LI><a href="{ { url_for('to_list_operations') }}?referrer=main">show { { number_of_operations } } operations</a> (<small>positive number of arguments required</small>)</LI>-->
@@ -35,7 +35,7 @@
   <legend>
     <h2>Danger zone!</h2>
   </legend>
-  <P><a href="{{ url_for('pg_to_delete_graph_content') }}?referrer=main">delete all content</a></P>
+  <P><a href="{{ url_for('to_delete_graph_content') }}?referrer=main">delete all content</a></P>
 
   <fieldset>
     <legend>

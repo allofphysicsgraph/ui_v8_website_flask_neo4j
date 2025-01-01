@@ -1,8 +1,8 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=symbol_relation_list">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_relation_list">main page</a>
 </P>
 
 <fieldset>
@@ -15,14 +15,14 @@
 
 <P>The relation ID links to a page where you can edit the relation<BR>
 
-<P>{% include '_pg_table_of_symbols_relation.html' %}
+<P>{% include '_table_of_symbols_relation.html' %}
 
 </fieldset>
 
 <fieldset>
 <legend><H2>Actions for relations</H2></legend>
 <UL>
-  <LI><a href="{{ url_for('pg_to_add_relation') }}?referrer=symbol_relation_list">add new relation</a></LI>
+  <LI><a href="{{ url_for('to_add_relation') }}?referrer=symbol_relation_list">add new relation</a></LI>
 </UL>
 </fieldset>
 

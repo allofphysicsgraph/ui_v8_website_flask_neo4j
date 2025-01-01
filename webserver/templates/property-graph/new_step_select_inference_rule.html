@@ -1,8 +1,8 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=new_step_select_inference_rule">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=new_step_select_inference_rule">main page</a>
 </P>
 
 <!-- TODO: sometimes "name_latex" won't look right in HTML -->
@@ -33,7 +33,7 @@
     {% for inference_rule_dict in list_of_inference_rule_dicts %}
     <tr>
       <td>
-        <a href="{{ url_for('pg_to_add_step_select_expressions',
+        <a href="{{ url_for('to_add_step_select_expressions',
         derivation_id=derivation_dict['id'],
         inference_rule_id=inference_rule_dict['id'] ) }}">
           {{ inference_rule_dict['name_latex'] }}
@@ -58,7 +58,7 @@
 
   <P>
     If you don't see the inference rule you need, <BR>
-      <a href="{{ url_for('pg_to_add_inference_rule') }}?referrer=derivationID_{{derivation_dict['id']}}">
+      <a href="{{ url_for('to_add_inference_rule') }}?referrer=derivationID_{{derivation_dict['id']}}">
         Create a new inference rule</a>
   </P>
 </fieldset>

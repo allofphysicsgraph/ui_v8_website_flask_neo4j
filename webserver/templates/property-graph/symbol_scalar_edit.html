@@ -1,9 +1,9 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=symbol_scalar_edit">main page</a>
-  or return to <a href="{{ url_for('pg_to_list_scalars') }}?referrer=symbol_scalar_edit">list of all scalar symbols</a>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_scalar_edit">main page</a>
+  or return to <a href="{{ url_for('to_list_scalars') }}?referrer=symbol_scalar_edit">list of all scalar symbols</a>
 </P>
 
 <P>Scalar dict: {{ scalar_dict }}

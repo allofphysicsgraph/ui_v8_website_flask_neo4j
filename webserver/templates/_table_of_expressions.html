@@ -27,7 +27,7 @@
   {% for expression_dict in list_of_expression_dicts %}
   <tr>
     <td>
-      <a href="{{ url_for('pg_to_edit_expression', expression_id=expression_dict['id'] ) }}" title="see more about this expression">
+      <a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id'] ) }}" title="see more about this expression">
           {{ expression_dict['id'] }}
       </a>
     </td>
@@ -43,7 +43,7 @@
     <td>TODO</td> <!-- derivation -->
     <td>{% for symbol_id in symbol_IDs_per_expression_id[expression_dict['id']] %}
       <UL>
-        <LI><a href="{{ url_for('pg_to_edit_node', node_id=symbol_id) }}" title="see more about this symbol">{{ dict_of_all_symbol_dicts[symbol_id]['id'] }}</a>: 
+        <LI><a href="{{ url_for('to_edit_node', node_id=symbol_id) }}" title="see more about this symbol">{{ dict_of_all_symbol_dicts[symbol_id]['id'] }}</a>: 
             {{ dict_of_all_symbol_dicts[symbol_id]['latex'] }}</LI>
       </UL>
       {% endfor %}
@@ -60,7 +60,7 @@
       <P>{{ sympy_as_latex_per_expr_id[expression_dict['id']] }}
     </td>
     <TD>
-      <a href="{{ url_for('pg_to_edit_expression', expression_id=expression_dict['id'] ) }}" title="see more about this expression">
+      <a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id'] ) }}" title="see more about this expression">
         {{ dimensional_consistency_per_expression_id[expression_dict['id']] }}</a></TD>
     <td>{{ expression_dict['lean'] }}</td>
   </tr>

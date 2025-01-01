@@ -28,7 +28,7 @@
   {% for symbol_dict in list_of_relation_dicts %}
   <tr>
     <td>
-      <a href="{{ url_for('pg_to_edit_relation', relation_id=symbol_dict['id'] ) }}">
+      <a href="{{ url_for('to_edit_relation', relation_id=symbol_dict['id'] ) }}">
           {{ symbol_dict['id'] }}
       </a>
     </td>
@@ -38,13 +38,13 @@
     <td>{{ symbol_dict['description_latex'] }}</td>
     <td>{% for expression_dict in dict_of_expression_dicts_that_use_relation[symbol_dict['id']] %}
       <UL>
-        <LI><a href="{{ url_for('pg_to_edit_expression', expression_id=expression_dict['id']) }}?referrer=table_of_symbols_requires_arguments">{{ expression_dict['id'] }}</a></LI>
+        <LI><a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id']) }}?referrer=table_of_symbols_requires_arguments">{{ expression_dict['id'] }}</a></LI>
       </UL>
         {% endfor %}
     </td> <!-- used in expressions -->
     <td>{% for derivation_dict in dict_of_derivation_dicts_that_use_relation[symbol_dict['id']] %}
       <UL>
-        <LI><a href="{{ url_for('pg_to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
+        <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
       </UL>
         {% endfor %}
     </td> <!-- used in derivation -->

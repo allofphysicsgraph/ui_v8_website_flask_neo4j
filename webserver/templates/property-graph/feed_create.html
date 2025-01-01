@@ -1,9 +1,9 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=feed_create">main page</a>
-  or <a href="{{ url_for('pg_to_list_feeds') }}?referrer=feed_create">list of feeds</a>.
+  Return to <a href="{{ url_for('main') }}?referrer=feed_create">main page</a>
+  or <a href="{{ url_for('to_list_feeds') }}?referrer=feed_create">list of feeds</a>.
 </P>
 
 <fieldset>

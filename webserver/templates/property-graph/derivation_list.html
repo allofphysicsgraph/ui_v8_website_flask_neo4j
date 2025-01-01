@@ -1,8 +1,8 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=derivation_list">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=derivation_list">main page</a>
 </P>
 
 <fieldset>
@@ -23,7 +23,7 @@
 
   <P>The derivation ID below links to a page where you can review that derivation.
 
-  <P>{% include '_pg_table_of_derivations.html' %}
+  <P>{% include '_table_of_derivations.html' %}
 
 </fieldset>
 
@@ -33,7 +33,7 @@
   </legend>
 
   <UL>
-    <LI><a href="{{ url_for('pg_to_add_derivation') }}?referrer=main">add new derivation</a> </LI>
+    <LI><a href="{{ url_for('to_add_derivation') }}?referrer=main">add new derivation</a> </LI>
   </UL>
 </fieldset>
 

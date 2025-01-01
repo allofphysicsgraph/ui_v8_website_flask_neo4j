@@ -1,8 +1,8 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=expression_create_symbols_and_operations">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=expression_create_symbols_and_operations">main page</a>
 </P>
 
 <P>list_of_potential_matching_symbols_from_sympy: {{ list_of_potential_matching_symbols_from_sympy }}
@@ -31,9 +31,9 @@ Associating expressions with symbols enables the validation of expressions and s
 -->
 {% if potential_symbols_found_in_Latex_expression|length==0 %}
 <P>No matching symbols were identified. That's bad. See 
-<a href="{{ url_for('pg_to_list_scalars') }}">list of scalars</a> or 
-<a href="{{ url_for('pg_to_list_vectors') }}">list of vectors</a> or 
-<a href="{{ url_for('pg_to_list_matrices') }}">list of matrices</a> and maybe add some?<BR>
+<a href="{{ url_for('to_list_scalars') }}">list of scalars</a> or 
+<a href="{{ url_for('to_list_vectors') }}">list of vectors</a> or 
+<a href="{{ url_for('to_list_matrices') }}">list of matrices</a> and maybe add some?<BR>
 Or maybe symbol detection is having a bad day.
 {% endif %}
 {% for symbol_dict in potential_symbols_found_in_Latex_expression %}

@@ -1,8 +1,8 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=inference_rule_list">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=inference_rule_list">main page</a>
 </P>
 
 <!--
@@ -21,7 +21,7 @@ TODO: this search box doesn't work as of 2024-05-11: <input type="text" id="infe
 
 <P>The inference rule ID links to a page where you can edit the inference rule<BR>
 
-<P>{% include '_pg_table_of_inference_rules.html' %}
+<P>{% include '_table_of_inference_rules.html' %}
 
 </fieldset>
 
@@ -30,7 +30,7 @@ TODO: this search box doesn't work as of 2024-05-11: <input type="text" id="infe
   <H2>Actions for Inference Rules</h2>
 </legend>
 
-<P><a href="{{ url_for('pg_to_add_inference_rule')  }}?referrer=inference_rule_list">add inference rule</a>
+<P><a href="{{ url_for('to_add_inference_rule')  }}?referrer=inference_rule_list">add inference rule</a>
 </fieldset>
 <script>
 function select_inference_rule() {

@@ -1,8 +1,8 @@
-{% extends "_pg_base.html" %}
+{% extends "_base.html" %}
 {% block content %}
 
 <P>
-  Return to <a href="{{ url_for('pg_main') }}?referrer=derivation_review">main page</a>
+  Return to <a href="{{ url_for('main') }}?referrer=derivation_review">main page</a>
 </P>
 
 <H2>Review {{ derivation_dict['name_latex'] }}</H2>
@@ -23,29 +23,29 @@
   {% for step_id, step_dict in all_steps.items() %}
   <tr>
     <td>
-      <a href="{{ url_for('pg_to_edit_step', derivation_id=derivation_dict['id'], step_id=step_id ) }}">
+      <a href="{{ url_for('to_edit_step', derivation_id=derivation_dict['id'], step_id=step_id ) }}">
         {{ step_dict['sequence index'] }}
       </a>
     </td><!-- step 0,1,2... -->
-    <td><a href="{{ url_for('pg_to_edit_inference_rule', inference_rule_id=step_dict['inference rule dict']['id']) }}">{{step_dict['inference rule dict']['id']}}</a><BR>
+    <td><a href="{{ url_for('to_edit_inference_rule', inference_rule_id=step_dict['inference rule dict']['id']) }}">{{step_dict['inference rule dict']['id']}}</a><BR>
     {{ step_dict['inference rule dict'] }}</td> <!-- inference rule -->
     <td>{% for m_dict in step_dict['list of input dicts'] %}
       <OL>
-        <LI><a href="{{ url_for('pg_to_edit_expression', expression_id=m_dict['m']['id']) }}">{{m_dict['m']['id']}}</a><BR>
+        <LI><a href="{{ url_for('to_edit_expression', expression_id=m_dict['m']['id']) }}">{{m_dict['m']['id']}}</a><BR>
         \({{ m_dict['m']['latex_lhs'] }}{{ m_dict['m']['latex_relation'] }}{{ m_dict['m']['latex_rhs'] }}\)</LI>
       </OL>
         {% endfor %}
     </td>
     <td>{% for m_dict in step_dict['list of feed dicts'] %}
       <OL>
-        <LI><a href="{{ url_for('pg_to_edit_feed', feed_id=m_dict['m']['id']) }}">{{m_dict['m']['id']}}</a><BR>
+        <LI><a href="{{ url_for('to_edit_feed', feed_id=m_dict['m']['id']) }}">{{m_dict['m']['id']}}</a><BR>
         \({{ m_dict['m']['latex'] }}\)</LI>
       </OL>
         {% endfor %}
     </td>
     <td>{% for m_dict in step_dict['list of output dicts'] %}
       <OL>
-        <LI><a href="{{ url_for('pg_to_edit_expression', expression_id=m_dict['m']['id']) }}">{{m_dict['m']['id']}}</a><BR>
+        <LI><a href="{{ url_for('to_edit_expression', expression_id=m_dict['m']['id']) }}">{{m_dict['m']['id']}}</a><BR>
         \({{ m_dict['m']['latex_lhs'] }}{{ m_dict['m']['latex_relation'] }}{{ m_dict['m']['latex_rhs'] }}\)</LI>
       </OL>
         {% endfor %}
@@ -73,13 +73,13 @@
 </legend>
 
 <UL>
-<LI> <a href="{{ url_for('pg_to_add_step_select_inference_rule', derivation_id=derivation_dict['id']) }}">add step to this derivation</a></LI>
+<LI> <a href="{{ url_for('to_add_step_select_inference_rule', derivation_id=derivation_dict['id']) }}">add step to this derivation</a></LI>
 <!--
 the following two were removed because the user should click on step ID in table
 <LI> <a href="{ { url_for('to_select_step', derivation_id=derivation_dict['id']) } }">delete step from this derivation</a></LI>
 <LI> <a href="{ { url_for('to_select_step', derivation_id=derivation_dict['id']) } }">edit step in this derivation</a></LI>-->
-<LI> <a href="{{ url_for('pg_to_edit_derivation_metadata', derivation_id=derivation_dict['id']) }}">rename this derivation</a></LI>
-<LI> <a href="{{ url_for('pg_to_edit_derivation_metadata', derivation_id=derivation_dict['id']) }}">edit abstract for this derivation</a></LI>
+<LI> <a href="{{ url_for('to_edit_derivation_metadata', derivation_id=derivation_dict['id']) }}">rename this derivation</a></LI>
+<LI> <a href="{{ url_for('to_edit_derivation_metadata', derivation_id=derivation_dict['id']) }}">edit abstract for this derivation</a></LI>
   </UL>
 
 </fieldset>
