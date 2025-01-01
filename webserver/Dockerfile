@@ -9,8 +9,8 @@
 FROM phusion/baseimage:focal-1.1.0
 
 WORKDIR /code
-ENV FLASK_APP pdg_app.py
-ENV FLASK_RUN_HOST 0.0.0.0
+ENV FLASK_APP=pdg_app.py
+ENV FLASK_RUN_HOST=0.0.0.0
 
 # since I'm not using python:3.7, I have to install Python
 # from https://github.com/Docker-Hub-frolvlad/docker-alpine-python3/blob/master/Dockerfile
@@ -19,7 +19,7 @@ ENV FLASK_RUN_HOST 0.0.0.0
 ENV PYTHONUNBUFFERED=1
 
 # PYTHONDONTWRITEBYTECODE: Prevents Python from writing pyc files to disk (equivalent to python -B option)
-ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONDONTWRITEBYTECODE=1
 
 # https://docs.docker.com/engine/reference/builder/#run
 RUN apt-get update && \

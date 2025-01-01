@@ -35,19 +35,25 @@ up:
 		fi
 	docker ps
 	docker run -it --rm -v `pwd`:/scratch ui_v8_website_flask_neo4j_webserver /bin/bash -c 'for filename in /scratch/webserver/*.py; do echo $$filename; done | xargs black'
-	docker compose up --build --remove-orphans
-
-# possibly to add as new target:
-# make black_out; docker ps | grep property | cut -d' ' -f1 | xargs docker kill; date; make up
-
-up_DEPRECATED:
-	# https://docs.docker.com/compose/reference/down/
-	docker compose down --volumes --remove-orphans
 	# https://docs.docker.com/compose/reference/up/
 	docker compose up --build --remove-orphans
 
+
 down:
-	docker compose down
+	# https://docs.docker.com/compose/reference/down/
+	docker compose down --volumes --remove-orphans
+
+
+docker: docker_build docker_live
+
+docker_build:
+	cd webserver && docker build -t ui_v8_website_flask_neo4j_webserver .
+
+docker_live:
+	docker run -it --rm \
+                -v `pwd`:/scratch -w /scratch/ \
+                --user $(id -u):$(id -g) \
+                ui_v8_website_flask_neo4j_webserver /bin/bash
 
 black_out:
 	docker run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ property_graph_webserver make black_in

@@ -62,6 +62,7 @@ import re
 
 # https://docs.python.org/3/howto/logging.html
 import logging
+
 # https://gist.github.com/ibeex/3257877
 from logging.handlers import RotatingFileHandler
 import neo4j
@@ -90,6 +91,7 @@ from flask_wtf import FlaskForm, CSRFProtect, Form  # type: ignore
 
 # https://github.com/TypeError/secure
 import secure  # type: ignore
+
 # https://stackoverflow.com/a/61729817/1164295
 from werkzeug.utils import secure_filename
 
@@ -109,8 +111,6 @@ from wtforms import (
 
 # type: ignore
 # from wtforms import PasswordField, FieldList
-
-
 
 
 sys.path.append("pg_library")
