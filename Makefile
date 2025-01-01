@@ -28,6 +28,7 @@ help:
 
 # create and start the webserver. This will build the Docker image if that's needed
 up:
+	cd neo4j_pdg && chmod -R g+rwx * && chmod -R o+rwx * 
 	if (! docker stats --no-stream ); then  open /Applications/Docker.app; while (! docker stats --no-stream ); do    echo "Waiting for Docker to launch...";  sleep 1; done; fi; 
 	docker ps
 	if [ `docker ps | wc -l` -gt 1 ]; then \
@@ -46,8 +47,9 @@ down:
 
 docker: docker_build docker_live
 
+# https://docs.docker.com/build/building/multi-platform/
 docker_build:
-	cd webserver && docker build -t ui_v8_website_flask_neo4j_webserver .
+	cd webserver && docker build --platform linux/amd64,linux/arm64 -t ui_v8_website_flask_neo4j_webserver .
 
 docker_live:
 	docker run -it --rm \

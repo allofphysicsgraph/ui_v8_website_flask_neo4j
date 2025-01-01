@@ -8,20 +8,15 @@ The website and back-end work locally.
 
 To start the containers, run
 ```bash
-docker kill $(docker ps -q); make up
+make up
 ```
 and then, in a web browser, go to <http://localhost:5000>
 
-As a developer repeatedly restarting the containers, I use
-```bash
-make black_out; docker ps | grep property | cut -d' ' -f1 | xargs docker kill; date; make up
-```
-
 
 Because software is in Docker containers (for reproducibility), the versions of the Docker software you're using matter. The software in this repo has been tested with
-* docker-compose 1.29.2
+* `docker compose version` yields "v2.2.1"
 * Compose file format 3.6
-* Docker Engine release 20.10.11
+* `docker --version` yeilds "Docker Engine release 20.10.11"
 See <https://docs.docker.com/compose/compose-file/compose-versioning/> for compatibility of versions.
 
 # Project contents

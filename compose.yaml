@@ -34,11 +34,14 @@ services:
 
 
   # see https://neo4j.com/docs/operations-manual/current/docker/introduction/
+  # https://neo4j.com/docs/operations-manual/current/docker/introduction/
   # https://neo4j.com/docs/operations-manual/current/docker/clustering/
   # https://stackoverflow.com/questions/48465046/run-neo4j-with-docker-compose-neo4j-not-accessible-from-localhost7474
   # https://medium.com/@faaizhussain/neo4j-4-0-docker-compose-9bead6634c8
   neo4j_docker:
     image: neo4j:4.4.4-community   # https://hub.docker.com/_/neo4j/tags
+#    platform: "linux/amd64"
+    platform: "linux/arm64"
     restart: unless-stopped
     hostname: neo4j_host
     #network_mode: "bridge"
