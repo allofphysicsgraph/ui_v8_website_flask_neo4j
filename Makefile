@@ -2,6 +2,9 @@
 # Physics Derivation Graph
 # https://allofphysics.com
 
+container=docker
+#container=podman
+
 #
 .PHONY: help docker
 
@@ -11,7 +14,7 @@ help:
 	@echo "==== Targets outside container ===="
 	@echo ""
 	@echo "make up"
-	@echo "      build and run docker"
+	@echo "      build and run $(container)"
 	@echo ""
 	@echo "make mypy_out"
 	@echo "      run mypy type checking for all .py files"
@@ -29,43 +32,43 @@ help:
 # create and start the webserver. This will build the Docker image if that's needed
 up:
 	cd neo4j_pdg && chmod -R g+rwx * && chmod -R o+rwx * 
-	if (! docker stats --no-stream ); then  open /Applications/Docker.app; while (! docker stats --no-stream ); do    echo "Waiting for Docker to launch...";  sleep 1; done; fi; 
-	docker ps
-	if [ `docker ps | wc -l` -gt 1 ]; then \
-	       	docker kill $$(docker ps -q); \
+	#if (! $(container) stats --no-stream ); then  open /Applications/Docker.app; while (! $(container) stats --no-stream ); do    echo "Waiting for Docker to launch...";  sleep 1; done; fi; 
+	$(container) ps
+	if [ `$(container) ps | wc -l` -gt 1 ]; then \
+	       	$(container) kill $$($(container) ps -q); \
 		fi
-	docker ps
-	docker run -it --rm -v `pwd`:/scratch ui_v8_website_flask_neo4j_webserver /bin/bash -c 'for filename in /scratch/webserver/*.py; do echo $$filename; done | xargs black'
+	$(container) ps
+	$(container) run -it --rm -v `pwd`:/scratch localhost/ui_v8_website_flask_neo4j_webserver /bin/bash -c 'for filename in /scratch/webserver/*.py; do echo $$filename; done | xargs black'
 	# https://docs.docker.com/compose/reference/up/
-	docker compose up --build --remove-orphans
+	$(container) compose up --build --remove-orphans
 
 
 down:
 	# https://docs.docker.com/compose/reference/down/
-	docker compose down --volumes --remove-orphans
+	$(container) compose down --volumes --remove-orphans
 
 
-docker: docker_build docker_live
+container: container_build container_live
 
 # https://docs.docker.com/build/building/multi-platform/
-docker_build:
-	cd webserver && docker build --platform linux/amd64,linux/arm64 -t ui_v8_website_flask_neo4j_webserver .
+container_build:
+	cd webserver && $(container) build --platform linux/amd64,linux/arm64 -t ui_v8_website_flask_neo4j_webserver .
 
 docker_live:
-	docker run -it --rm \
+	$(container) run -it --rm \
                 -v `pwd`:/scratch -w /scratch/ \
                 --user $(id -u):$(id -g) \
                 ui_v8_website_flask_neo4j_webserver /bin/bash
 
 black_out:
-	docker run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ property_graph_webserver make black_in
+	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ property_graph_webserver make black_in
 
 black_in:
 	black webserver/*.py webserver/library/*.py
 #webserver/neo4j_query.py webserver/compute.py
 
 mypy_out:
-	docker run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ property_graph_webserver mypy --check-untyped-defs webserver/pdg_app.py webserver/library
+	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ property_graph_webserver mypy --check-untyped-defs webserver/pdg_app.py webserver/library
 
 
 # keep the conf folder since that has the configuration
