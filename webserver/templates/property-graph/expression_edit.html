@@ -79,6 +79,8 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     </select>
     <input type="submit" value="add symbol to expression">
   </form>
+
+  <P>Symbol not listed? <a href="">Create a new symbol</a>
 </fieldset>
 
 <fieldset>
@@ -198,7 +200,17 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
                                'output_input_latex_lhs')">
               <br clear="all">
         <div id="output_input_latex_lhs"></div>
+
 =
+<!--
+    <select name="relation-operator" class="selectpicker form-control" id="relation_select">
+      <option value="{{ relation_id }}">{{ relation_id }}, {{ dict_of_all_symbol_dicts[relation_id]['latex'] }} </option>
+      { % for relation_id in dict_of_relation_dicts.keys() % }
+      <option value="{{ relation_id }}">{{ relation_id }}, {{ dict_of_all_symbol_dicts[relation_id]['latex'] }} </option>
+      { % endfor % }
+    </select>
+-->
+
     <P>{{ form_new_expression.expression_latex_rhs.label}} (<B>required</B>): 
        {{ form_new_expression.expression_latex_rhs(size=50, 
                     maxlength=1000, 

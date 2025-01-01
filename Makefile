@@ -38,7 +38,8 @@ up:
 	       	$(container) kill $$($(container) ps -q); \
 		fi
 	$(container) ps
-	$(container) run -it --rm -v `pwd`:/scratch localhost/ui_v8_website_flask_neo4j_webserver /bin/bash -c 'for filename in /scratch/webserver/*.py; do echo $$filename; done | xargs black'
+	$(container) run -it --rm -v `pwd`:/scratch ui_v8_website_flask_neo4j_webserver /bin/bash -c 'for filename in /scratch/webserver/*.py; do echo $$filename; done | xargs black'
+	$(container) run -it --rm -v `pwd`:/scratch ui_v8_website_flask_neo4j_webserver /bin/bash -c 'for filename in /scratch/webserver/library/*.py; do echo $$filename; done | xargs black'
 	# https://docs.docker.com/compose/reference/up/
 	$(container) compose up --build --remove-orphans
 

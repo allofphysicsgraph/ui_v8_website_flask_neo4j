@@ -124,6 +124,18 @@ Latex:
     <P><input type="submit" value="add expression">
     </P>
   </form>
+
+<fieldset>
+  <legend>actions</legend>
+<ul>
+  <LI><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=new_step_select_expressions_for_inference_rule">add new scalar</a></LI>
+  <LI><a href="{{ url_for('to_add_symbol_vector') }}?referrer=new_step_select_expressions_for_inference_rule">add new vector</a></LI>
+  <LI><a href="{{ url_for('to_add_symbol_matrix') }}?referrer=new_step_select_expressions_for_inference_rule">add new matrix</a></LI>
+  <LI><a href="{{ url_for('to_add_operation') }}?referrer=new_step_select_expressions_for_inference_rule">add new operation</a></LI>
+  <LI><a href="{{ url_for('to_add_relation') }}?referrer=new_step_select_expressions_for_inference_rule">add new relation</a></LI>
+</ul>
+</fieldset>
+  
 </fieldset>
 
 TODO: as user is entering expression, filter the list of existing expressions

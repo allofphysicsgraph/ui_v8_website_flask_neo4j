@@ -20,8 +20,9 @@
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
-    <P>{{ form.sympy_str.label}}: 
-       {{ form.sympy_str(cols=80, rows=5, 
+    <!-- using sympy_str_lhs even though feeds don't distinguish LHS and RHS-->
+    <P>{{ form.sympy_str_lhs.label}}: 
+       {{ form.sympy_str_lhs(cols=80, rows=5, 
                          maxlength=1000) }}</P>
                          <!--
                           "TextArea doesn't have a value attribute,"
