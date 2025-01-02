@@ -115,15 +115,15 @@ from wtforms import (
 # from wtforms import PasswordField, FieldList
 
 
-sys.path.append("library")
+# sys.path.append("library")
 
-import neo4j_query
-import compute
-import latex_and_sympy
-import latex
-import sympy_validate_step
-import sympy_validate_expression
-import list_of_valid
+import library.neo4j_query as neo4j_query
+import library.compute as compute
+import library.latex_and_sympy as latex_and_sympy
+import library.latex as latex
+import library.sympy_validate_step as sympy_validate_step
+import library.sympy_validate_expression as sympy_validate_expression
+import library.list_of_valid as list_of_valid
 
 
 # ORDERING: this has to come before the functions that use this type
@@ -1168,6 +1168,9 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     * edit step in derivation
     * delete derivation
 
+    TODO: display graph of derivation (e.g., graphviz, d3js)
+    TODO: display tex, PDF
+
     https://derivationmap.net/static/property_graph_schema.png
 
     >>> to_review_derivation()
@@ -1175,8 +1178,6 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_review_derivation start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
-
-    #    if request.method == "POST" and web_form.validate():
 
     derivation_dict = {}
     with graphDB_Driver.session() as session:
@@ -1192,6 +1193,16 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     all_steps, query_time_dict = compute.all_steps_in_derivation(
         graphDB_Driver, derivation_id, query_time_dict
     )
+
+    # TODO: display graph of derivation (e.g., graphviz, d3js)
+
+    # TODO: display tex, PDF
+
+    path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
+    tex_filename = latex.generate_tex_file_for_derivation(
+        graphDB_Driver, query_time_dict, derivation_id, path_to_tex_file
+    )
+    # tex_filename is str(derivation_id)
 
     web_form = NoOptionsForm(request.form)
     # web_form = DeleteButtonForm(request.form)
@@ -1210,7 +1221,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
             query_time_dict[
                 "to_review_derivation: get_list_of_step_dicts_in_this_derivation"
             ] = round(time.time() - query_start_time, 3)
-        print("list_of_step_dicts=", list_of_step_dicts)
+        print("list_of_step_dicts (to delete)=", list_of_step_dicts)
 
         for this_step_dict in list_of_step_dicts:
             with graphDB_Driver.session() as session:
@@ -1223,6 +1234,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
             session.write_transaction(
                 neo4j_query.delete_node, derivation_id, "derivation"
             )
+        print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
+        redirect(url_for("to_list_derivations"))
 
     print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
     return render_template(
@@ -2419,8 +2432,8 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
 
     if request.method == "POST":
         print("request.form = ", request.form)
-        #('scalar_latex', 'a'), ('scalar_name_latex', 'name of scalar'), 
-        # ('scalar_description_latex', 'description of scalar'), 
+        # ('scalar_latex', 'a'), ('scalar_name_latex', 'name of scalar'),
+        # ('scalar_description_latex', 'description of scalar'),
         # ('scalar_reference_latex', 'this is a referec')])
 
     if request.method == "POST" and web_form_symbol_properties.validate():
