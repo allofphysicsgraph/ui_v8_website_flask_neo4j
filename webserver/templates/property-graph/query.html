@@ -189,6 +189,12 @@ MATCH (n:expression), (m:inference_rule) WHERE m.id='{{inference_rule_id}}' RETU
     </a></td>
     <td></td>
   </tr>
+  <tr>
+    <td>regex search for text in a node's property</td>
+    <td><a href="{{ url_for('to_query') }}?cypher=match (m:scalar) where (any(prop in keys(m) where m[prop] =~ '.*ddd.*')) return m">
+      match (m:scalar) where (any(prop in keys(m) where m[prop] =~ '.*ddd.*')) return m
+    </a></td>
+    <td></td>
 
 </table>
 <P>
