@@ -20,6 +20,11 @@ import shutil
 from subprocess import PIPE  # https://docs.python.org/3/library/subprocess.html
 import subprocess  # https://stackoverflow.com/questions/39187886/what-is-the-difference-between-subprocess-popen-and-subprocess-run/39187984
 
+# https://docs.python.org/3/library/typing.html
+# from typing import Tuple, TextIO, List  # mypy
+# TextIO is file handle assocaited with `open()`
+from typing import TextIO
+
 import compute
 import neo4j_query
 
@@ -214,9 +219,9 @@ def generate_tex_file_for_derivation(
                     + "}\n"
                 )
 
-        lat_file.write("\\title{" + derivation_dict["name_latex"] + "}\n")
+        lat_file.write("\\title{" + str(derivation_dict["name_latex"]) + "}\n")
         lat_file.write("\\date{\\today}\n")
-        lat_file.write("\\author{" + derivation_dict["author_name_latex"]) + "}\n"
+        lat_file.write("\\author{" + str(derivation_dict["author_name_latex"]) + "}\n")
         lat_file.write("\\setlength{\\topmargin}{-.5in}\n")
         lat_file.write("\\setlength{\\textheight}{9in}\n")
         lat_file.write("\\setlength{\\oddsidemargin}{0in}\n")
@@ -237,8 +242,10 @@ def generate_tex_file_for_derivation(
         lat_file.write("\\end{abstract}\n")
 
         for linear_indx in list_of_sequence_values:
+            # print("linear_indx=", linear_indx)
             for step_dict in list_of_step_dicts_in_this_derivation:
-                if step_dict["linear index"] == linear_indx:
+                # print("step_dict=", step_dict)
+                if step_dict["sequence_index"] == linear_indx:
                     if "image" in step_dict.keys():
                         lat_file.write("\\begin{center}\n")
                         lat_file.write("\\begin{figure}\n")
@@ -638,20 +645,20 @@ def create_derivation_png(deriv_id: str, path_to_db: str) -> str:
     dat = clib.read_db(path_to_db)
 
     dot_filename = "/home/appuser/app/static/derivation_" + deriv_id + ".dot"
-    with open(dot_filename, "w") as fil:
-        fil.write("digraph physicsDerivation { \n")
-        fil.write("overlap = false;\n")
-        fil.write(
+    with open(dot_filename, "w") as file_handle:
+        file_handle.write("digraph physicsDerivation { \n")
+        file_handle.write("overlap = false;\n")
+        file_handle.write(
             'label="derivation: '
             + dat["derivations"][deriv_id]["name"]
             + '\nhttps://derivationmap.net";\n'
         )
-        fil.write("fontsize=12;\n")
+        file_handle.write("fontsize=12;\n")
 
         for step_id, step_dict in dat["derivations"][deriv_id]["steps"].items():
-            write_step_to_graphviz_file(deriv_id, step_id, fil, path_to_db)
+            write_step_to_graphviz_file(deriv_id, step_id, file_handle, path_to_db)
 
-        fil.write("}\n")
+        file_handle.write("}\n")
 
     # name the PNG file referencing the hash of the .dot so we can detect changes
     output_filename = (
@@ -714,22 +721,22 @@ def create_step_graphviz_png(deriv_id: str, step_id: str, path_to_db: str) -> st
     remove_file_debris(["/home/appuser/app/static/"], ["graphviz"], ["dot"])
 
     with open(dot_filename, "w") as fil:
-        fil.write("digraph physicsDerivation { \n")
-        fil.write("overlap = false;\n")
-        fil.write(
+        file_handle.write("digraph physicsDerivation { \n")
+        file_handle.write("overlap = false;\n")
+        file_handle.write(
             'label="step '
             + step_id
             + " in "
             + dat["derivations"][deriv_id]["name"]
             + '\nhttps://derivationmap.net";\n'
         )
-        fil.write("fontsize=12;\n")
+        file_handle.write("fontsize=12;\n")
 
-        write_step_to_graphviz_file(deriv_id, step_id, fil, path_to_db)
-        fil.write("}\n")
+        write_step_to_graphviz_file(deriv_id, step_id, file_handle, path_to_db)
+        file_handle.write("}\n")
 
     #    with open(dot_filename,'r') as fil:
-    #       logger.debug(fil.read())
+    #       logger.debug(file_handle.read())
 
     output_filename = step_id + ".png"
     logger.debug("output_filename = %s", output_filename)
@@ -774,7 +781,7 @@ def write_step_to_graphviz_file(
     Raises:
 
     >>> fil = open('a_file','r')
-    >>> write_step_to_graphviz_file("000001", "1029890", fil, "pdg.db")
+    >>> write_step_to_graphviz_file("000001", "1029890", file_handle, "pdg.db")
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[trace start " + trace_id + "]")
@@ -795,7 +802,7 @@ def write_step_to_graphviz_file(
     png_name = "".join(filter(str.isalnum, step_dict["inf rule"]))
     if not os.path.isfile("/home/appuser/app/static/" + png_name + ".png"):
         create_png_from_latex("\\text{" + step_dict["inf rule"] + "}", png_name)
-    fil.write(
+    file_handle.write(
         step_id
         + ' [shape=invtrapezium, color=blue, label="",image="/home/appuser/app/static/'
         + png_name
@@ -809,8 +816,8 @@ def write_step_to_graphviz_file(
         png_name = expr_global_id
         if not os.path.isfile("/home/appuser/app/static/" + png_name + ".png"):
             create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_name)
-        fil.write(expr_local_id + " -> " + step_id + ";\n")
-        fil.write(
+        file_handle.write(expr_local_id + " -> " + step_id + ";\n")
+        file_handle.write(
             expr_local_id
             + ' [shape=ellipse, color=black,label="",image="/home/appuser/app/static/'
             + png_name
@@ -824,8 +831,8 @@ def write_step_to_graphviz_file(
         png_name = expr_global_id
         if not os.path.isfile("/home/appuser/app/static/" + png_name + ".png"):
             create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_name)
-        fil.write(step_id + " -> " + expr_local_id + ";\n")
-        fil.write(
+        file_handle.write(step_id + " -> " + expr_local_id + ";\n")
+        file_handle.write(
             expr_local_id
             + ' [shape=ellipse, color=black,label="",image="/home/appuser/app/static/'
             + png_name
@@ -839,8 +846,8 @@ def write_step_to_graphviz_file(
         png_name = expr_global_id
         if not os.path.isfile("/home/appuser/app/static/" + png_name + ".png"):
             create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_name)
-        fil.write(expr_local_id + " -> " + step_id + ";\n")
-        fil.write(
+        file_handle.write(expr_local_id + " -> " + step_id + ";\n")
+        file_handle.write(
             expr_local_id
             + ' [shape=box, color=red,label="",image="/home/appuser/app/static/'
             + png_name
