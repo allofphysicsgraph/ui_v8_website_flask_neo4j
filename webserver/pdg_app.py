@@ -115,15 +115,24 @@ from wtforms import (
 # from wtforms import PasswordField, FieldList
 
 
-# sys.path.append("library")
+# https://stackoverflow.com/questions/6323860/sibling-package-imports/50193944
+# 2025-01-01: BHP commented out the `sys.path.append` and instead used
+# `import library.neo4j_query as neo4j_query`
+# but that failed because in neo4j_query.py there's an
+# `import list_of_valid`
+# that gets confused. BHP also tried
+# `from ..library import list_of_valid`
+# but that results in
+# `ValueError: attempted relative import beyond top-level package`
+sys.path.append("library")
 
-import library.neo4j_query as neo4j_query
-import library.compute as compute
-import library.latex_and_sympy as latex_and_sympy
-import library.latex as latex
-import library.sympy_validate_step as sympy_validate_step
-import library.sympy_validate_expression as sympy_validate_expression
-import library.list_of_valid as list_of_valid
+import neo4j_query
+import compute
+import latex_and_sympy
+import latex
+import sympy_validate_step
+import sympy_validate_expression
+import list_of_valid
 
 
 # ORDERING: this has to come before the functions that use this type
