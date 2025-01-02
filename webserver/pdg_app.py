@@ -318,6 +318,7 @@ class SpecifyNewExpressionForm(FlaskForm):
 
     this class is "LatexIO" in v7
 
+    https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/12
     BHP spent most of 2025-01-01 trying to figure out how to
     dynamically populate the dropdown menu for relations (e.g., =, >).
     The tuples for the dropdown cannot be hardcoded; they are set by the user.
