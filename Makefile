@@ -55,7 +55,7 @@ container: container_build container_live
 container_build:
 	cd webserver && $(container) build --platform linux/amd64,linux/arm64 -t ui_v8_website_flask_neo4j_webserver .
 
-docker_live:
+container_live:
 	$(container) run -it --rm \
                 -v `pwd`:/scratch -w /scratch/ \
                 --user $(id -u):$(id -g) \
