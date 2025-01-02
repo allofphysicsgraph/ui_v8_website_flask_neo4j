@@ -317,6 +317,12 @@ class SpecifyNewExpressionForm(FlaskForm):
     https://wtforms.readthedocs.io/en/2.3.x/fields/
 
     this class is "LatexIO" in v7
+
+    BHP spent most of 2025-01-01 trying to figure out how to
+    dynamically populate the dropdown menu for relations (e.g., =, >).
+    The tuples for the dropdown cannot be hardcoded; they are set by the user.
+    BHP tried adding a new variable, list_of_relation_dropdown_tuples, upon
+    initialization of the class, and then set that at call time.
     """
 
     # def __init__(self, list_of_relation_dropdown_tuples):
@@ -329,11 +335,12 @@ class SpecifyNewExpressionForm(FlaskForm):
 
     # relation operation: ["=", "\lt", "\leq", "\gt", "\geq"]
     # https://wtforms.readthedocs.io/en/2.3.x/fields/#wtforms.fields.SelectField
-    expression_relation = SelectField(
-        # "relation", choices=self.list_of_relation_dropdown_tuples
-        "relation",
-        choices=[("eq", "="), ("<", "lt")],
-    )
+    # expression_relation = SelectField(
+    #    # "relation", choices=self.list_of_relation_dropdown_tuples
+    #    "relation",
+    #    # second entry in the tuple is what gets displayed in the dropdown menu
+    #    choices=[("numeric ID for equal", "="), ("numeric ID for less than", "<")],
+    # )
 
     expression_latex_rhs = StringField(
         label="LaTeX expression RHS",
@@ -396,9 +403,9 @@ class SpecifyEditFeedForm(FlaskForm):
     )
 
 
-class SpecifyNewSympyLeanForm(FlaskForm):
+class SpecifyNewExpressionSympyLeanForm(FlaskForm):
     """
-    web form for user to provide SymPy and Lean vesions of expression
+    web form for user to provide SymPy and Lean versions of expression
 
     https://wtforms.readthedocs.io/en/2.3.x/validators/
 
@@ -411,10 +418,35 @@ class SpecifyNewSympyLeanForm(FlaskForm):
         label="SymPy for LHS",
         # validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
     )
+
+    # TODO: relation dropdown
+
     sympy_str_rhs = TextAreaField(
         label="SymPy for RHS",
         # validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
     )
+    lean_str = StringField(
+        label="Lean",
+        # validators=[validators.InputRequired(), validators.Length(min=5, max=10000)],
+    )
+
+
+class SpecifyNewFeedSympyLeanForm(FlaskForm):
+    """
+    web form for user to provide SymPy and Lean versions of feed
+
+    https://wtforms.readthedocs.io/en/2.3.x/validators/
+
+    the validators here need to also be present
+    in the HTML, otherwise the form validation fails
+    without a clear indicator to the HTML user
+    """
+
+    sympy_str = TextAreaField(
+        label="SymPy for feed",
+        # validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
+    )
+
     lean_str = StringField(
         label="Lean",
         # validators=[validators.InputRequired(), validators.Length(min=5, max=10000)],
@@ -1960,6 +1992,9 @@ def to_add_expression() -> str:
 
     # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
     web_form = SpecifyNewExpressionForm(request.form)
+    if request.method == "POST":
+        print("POSTED!")
+        print("request.form = ", request.form)
     if request.method == "POST" and web_form.validate():
         print("request.form = ", request.form)
 
@@ -2354,7 +2389,11 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> str:
 @web_app.route("/edit_scalar/<scalar_id>", methods=["GET", "POST"])
 def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
     """
-    edit symbol
+    edit symbol:
+    - change the Latex
+    - change name
+    - change description
+    - change reference
 
     >>> to_edit_scalar()
     """
@@ -2377,8 +2416,15 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
 
     web_form_symbol_properties = SpecifyNewSymbolScalarForm(request.form)
     web_form_no_options = NoOptionsForm(request.form)
-    if request.method == "POST" and web_form_symbol_properties.validate():
+
+    if request.method == "POST":
         print("request.form = ", request.form)
+        #('scalar_latex', 'a'), ('scalar_name_latex', 'name of scalar'), 
+        # ('scalar_description_latex', 'description of scalar'), 
+        # ('scalar_reference_latex', 'this is a referec')])
+
+    if request.method == "POST" and web_form_symbol_properties.validate():
+        print("request.form validated")
 
         symbol_latex = str(
             web_form_symbol_properties.symbol_latex.data
@@ -2439,7 +2485,10 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
     elif request.method == "POST":
         print("request.form = ", request.form)
 
-        flash("NOT ENACTED YET 994211499222")
+        print("verification of form failed")
+
+        # TODO: update the respective fields for this symbol
+
         # TODO: delete symbol
 
         print("[TRACE] func: pdg_app/to_edit_scalar end " + trace_id)
@@ -4254,7 +4303,7 @@ def to_add_sympy_and_lean_for_expression(
         revised_expr_with_str,
     )
 
-    web_form = SpecifyNewSympyLeanForm(request.form)
+    web_form = SpecifyNewExpressionSympyLeanForm(request.form)
     if request.method == "POST":
         print("to_add_sympy_and_lean_for_expression: request.form = ", request.form)
 
@@ -4603,11 +4652,11 @@ def to_add_sympy_and_lean_for_feed(
 
     print("revised_expr_with_str=", revised_expr_with_str)
 
-    web_form = SpecifyNewSympyLeanForm(request.form)
+    web_form = SpecifyNewFeedSympyLeanForm(request.form)
     if request.method == "POST":
         print("request.form = ", request.form)
 
-        sympy_str = str(web_form.sympy_str_lhs.data).strip()
+        sympy_str = str(web_form.sympy_str.data).strip()
         lean_str = str(web_form.lean_str.data).strip()
 
         print("submitted sympy_str=", sympy_str)

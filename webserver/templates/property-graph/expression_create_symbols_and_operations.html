@@ -33,20 +33,35 @@ Associating expressions with symbols enables the validation of expressions and s
 <P>No matching symbols were identified. That's bad. See 
 <a href="{{ url_for('to_list_scalars') }}">list of scalars</a> or 
 <a href="{{ url_for('to_list_vectors') }}">list of vectors</a> or 
-<a href="{{ url_for('to_list_matrices') }}">list of matrices</a> and maybe add some?<BR>
+<a href="{{ url_for('to_list_matrices') }}">list of matrices</a> to review what should have been detected.
 Or maybe symbol detection is having a bad day.
-{% endif %}
+
+{% else %}
+
 {% for symbol_dict in potential_symbols_found_in_Latex_expression %}
 <UL>
   <LI><input type="checkbox" name="symbol_id_to_connect_to_expression-{{ loop.index }}" value="{{ symbol_dict['id'] }}_{{ symbol_dict['symbol_category'] }}">\({{ symbol_dict['latex'] }}\), aka {{ symbol_dict['latex'] }}<BR>{{ symbol_dict }}<BR>
   TODO: used in which derivations?</LI>
 </UL>
 {% endfor %}
-
-
   <P><input type="submit" name="submit_button" value="update expressions">
+
+{% endif %}
+
   </form>
 
 </fieldset>
 
+
+<fieldset>
+  <legend>Actions</legend>
+<UL>
+  <LI><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=new_step_select_expressions_for_inference_rule">add new scalar</a></LI>
+  <LI><a href="{{ url_for('to_add_symbol_vector') }}?referrer=new_step_select_expressions_for_inference_rule">add new vector</a></LI>
+  <LI><a href="{{ url_for('to_add_symbol_matrix') }}?referrer=new_step_select_expressions_for_inference_rule">add new matrix</a></LI>
+  <LI><a href="{{ url_for('to_add_operation') }}?referrer=new_step_select_expressions_for_inference_rule">add new operation</a></LI>
+  <LI><a href="{{ url_for('to_add_relation') }}?referrer=new_step_select_expressions_for_inference_rule">add new relation</a></LI>
+</UL>
+
+</fieldset>
 {% endblock %}

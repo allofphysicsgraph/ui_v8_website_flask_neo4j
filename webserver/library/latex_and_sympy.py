@@ -19,7 +19,13 @@ from sympy.parsing.latex import parse_latex  # type: ignore
 
 
 def sympy_to_latex_str(sympy_expr) -> str:
-    """ """
+    """
+        TODO: this isn't working as desired.
+
+    latex_and_sympy/sympy_to_latex_str: SymPy to be converted to Latex: sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))
+    latex_and_sympy/sympy_to_latex_str: latex_str= \mathtt{\text{sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))}}
+
+    """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: latex_and_sympy/sympy_to_latex_str start " + trace_id)
 

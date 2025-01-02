@@ -7,21 +7,30 @@
 
 <fieldset>
   <legend>
-    <H2>Provide <a href="https://www.sympy.org/">SymPy</a> and <a href="https://github.com/leanprover/lean4">Lean</a></H2>
+    <H2><a href="https://www.sympy.org/">SymPy</a> and <a href="https://github.com/leanprover/lean4">Lean</a> for this Expression</H2>
   </legend>
 
-<P>
 
-<H3>as Latex: \({{ expression_dict['latex_lhs'] }} {{ expression_dict['latex_relation'] }} {{ expression_dict['latex_rhs'] }}\)</H3>
+<table border="1">
+  <tr>
+    <td>as Latex</td>
+    <td>\({{ expression_dict['latex_lhs'] }} {{ expression_dict['latex_relation'] }} {{ expression_dict['latex_rhs'] }}\)</td>
+  </tr>
+  <tr>
+    <td>as strings</td>
+    <td>{{ expression_dict['latex_lhs'] }} 
+        {{ expression_dict['latex_relation'] }} 
+        {{ expression_dict['latex_rhs'] }}</td>
+  </tr>
+  <tr>
+    <td>symbols substituted</td>
+    <td>{{ revised_expr_lhs }} = {{ revised_expr_rhs }}</td> <!-- TODO: is there a revised_expr_relation ? -->
+  </tr>
+</table>
 
-<H3>as string: {{ expression_dict['latex_lhs'] }} 
-    {{ expression_dict['latex_relation'] }} 
-    {{ expression_dict['latex_rhs'] }}</H3>
+<P>where {{ symbol_id_dict }}
 
-<P>symbols substituted: {{ revised_expr_lhs }} = {{ revised_expr_rhs }}
-
-<P>symbols lookup: {{ symbol_id_dict }}
-
+<H3>SymPy</H3>
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
 
@@ -48,15 +57,15 @@
        {{ form.lean_str(size=100, 
                         maxlength=1000) }}</P>
 
-    <P><input type="submit" name="submit_button" value="update expressions"></P>
+    <P><input type="submit" name="submit_button" value="update expressions"> </P>
   </form>
 
-The SymPy is relevant for checking dimensionality of expressions and for validating steps in derivations.
-
-The Lean is relevant for proving steps in derivations. 
 
 </fieldset>
 
+<P>The SymPy representation is relevant for checking dimensionality of expressions and for validating steps in derivations.
+
+<P>The Lean representation is relevant for proving steps in derivations. 
 
 
 {% endblock %}

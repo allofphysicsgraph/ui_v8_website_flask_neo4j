@@ -25,6 +25,12 @@ Latex:
 
 
 
+<!--
+  2025-01-01: BHP wasn't able to figue out how to dynamically set the tuples in the class
+{ { form.expression_relation() } }
+-->
+
+
     <select name="symbol_relation_id_to_add" class="selectpicker form-control" id="relation_select">
       {% for relation_dict in list_of_relation_dicts %}
       <option value="{{ relation_dict['id'] }}">\({{ relation_dict['latex'] }}\)</option>
@@ -58,7 +64,7 @@ Latex:
                                 'display_input_latex_lhs', 
                                 'preview_input_latex_lhs',
                                 'output_input_latex_lhs')">
-       <small><label for="display_input_latex_lhs">Display style</label></small>
+       <small><label id="display_input_latex_lhs">Display style</label></small>
        <input type="button" 
               value="optional preview of TeX before submitting" 
               id="preview_input_latex_lhs" 
@@ -77,7 +83,7 @@ Latex:
                                 'display_input_latex_rhs', 
                                 'preview_input_latex_rhs',
                                 'output_input_latex_rhs')">
-       <small><label for="display_input_latex_rhs">Display style</label></small>
+       <small><label id="display_input_latex_rhs">Display style</label></small>
        <input type="button" 
               value="optional preview of TeX before submitting" 
               id="preview_input_latex_rhs" 
@@ -96,7 +102,7 @@ Latex:
                                 'display_input_latex_condition', 
                                 'preview_input_latex_condition',
                                 'output_input_latex_condition')">
-       <small><label for="display_input_latex_condition">Display style</label></small>
+       <small><label id="display_input_latex_condition">Display style</label></small>
        <input type="button" 
               value="optional preview of TeX before submitting" 
               id="preview_input_latex_condition" 
@@ -126,7 +132,7 @@ Latex:
   </form>
 
 <fieldset>
-  <legend>actions</legend>
+  <legend>Actions</legend>
 <ul>
   <LI><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=new_step_select_expressions_for_inference_rule">add new scalar</a></LI>
   <LI><a href="{{ url_for('to_add_symbol_vector') }}?referrer=new_step_select_expressions_for_inference_rule">add new vector</a></LI>
