@@ -1,6 +1,7 @@
 schema
 
-The source of truth for the schema is to review results of searching "merge (:" in the file library/neo4j_query.py
+The source of truth for the schema is to review results of 
+searching "merge (:" in the file library/neo4j_query.py
 That's where nodes are created
 
 
