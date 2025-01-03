@@ -589,15 +589,15 @@ def get_list_of_expression_dicts_from_step_id_and_expr_type(
     else:
         destination_node_type = "expression"
 
-    print(
-        'MATCH (:step {id:"'
-        + step_id
-        + '"})-[r:'
-        + expression_type
-        + "]->(m:"
-        + destination_node_type
-        + ") RETURN m"
-    )
+    # print(
+    #     'MATCH (:step {id:"'
+    #     + step_id
+    #     + '"})-[r:'
+    #     + expression_type
+    #     + "]->(m:"
+    #     + destination_node_type
+    #     + ") RETURN m"
+    # )
 
     for result in tx.run(
         'MATCH (:step {id:"'
@@ -661,13 +661,13 @@ def add_derivation(
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/add_derivation start " + trace_id)
 
-    print(
-        derivation_id,
-        now_str,
-        derivation_name_latex,
-        derivation_abstract_latex,
-        author_name_latex,
-    )
+    # print(
+    #     derivation_id,
+    #     now_str,
+    #     derivation_name_latex,
+    #     derivation_abstract_latex,
+    #     author_name_latex,
+    # )
 
     result = tx.run(
         "merge (:derivation "
@@ -830,16 +830,16 @@ def edit_node_property(
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: neo4j_query/edit_node_property start " + trace_id)
 
-    print(
-        "node_type=",
-        node_type,
-        ", node_id=",
-        node_id,
-        ",property_key=",
-        property_key,
-        ", property_value=",
-        property_value,
-    )
+    # print(
+    #     "node_type=",
+    #     node_type,
+    #     ", node_id=",
+    #     node_id,
+    #     ",property_key=",
+    #     property_key,
+    #     ", property_value=",
+    #     property_value,
+    # )
     assert node_type in list_of_valid.node_types
 
     # https://neo4j.com/docs/getting-started/cypher-intro/updating/
