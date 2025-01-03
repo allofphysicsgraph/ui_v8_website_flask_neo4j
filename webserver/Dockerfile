@@ -38,7 +38,9 @@ RUN apt-get update && \
 # npm for mathjax
                npm \
 # compile .tex to .dvi
-               texlive   && \
+               texlive  \
+# LaTeX Error: File `letltxmacro.sty' not found. https://askubuntu.com/a/1253683
+               texlive-latex-extra && \
     if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi && \
     pip3 install --no-cache --upgrade pip setuptools wheel && \
     if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi
