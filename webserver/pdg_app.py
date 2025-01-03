@@ -18,8 +18,37 @@ with cleaner separation between the MVC and the database.
 Previous versions had a "local ID" which is needed when including
 more than one derivation in the same Latex document.
 For this version, the specific-to-Latex "local ID" (for expression labels)
-can be contructed using <derivation_id>_<expression_id>.
+can be contructed using md5hash(<derivation_id>_<expression_id>).
 
+
+
+****************************
+
+# convention: every call to flash must be either a string or the content must be wrapped in str()
+# reason: when content is passed to flash() that cannot be serialized, the Flask error and the website crashes
+
+
+# convention: every Python function starts with
+```
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: pdg_app/main start " + trace_id)
+    query_time_dict = {}  # type: Dict[str, float]
+```
+and exits with
+```
+    print("[TRACE] func: pdg_app/main start " + trace_id)
+    return
+```
+# reason: This enables creation of a flamegraph <https://www.brendangregg.com/flamegraphs.html>
+
+
+# convention: every debug/print of request.form includes the function name:
+```
+    print("pdg_app/main: request.form = %s", request.form)
+```
+# reason: improved ability to understand which path the request was made by
+
+****************************
 
 # options for connecting to Neo4j from Python
 - native driver
@@ -39,10 +68,6 @@ See https://neo4j.com/developer/python/
 # Tips on using Cypher from Python
 - https://neo4j.com/docs/python-manual/current/cypher-workflow/
 
-****************************
-
-# convention: every call to flash must be either a string or the content must be wrapped in str()
-# reason: when content is passed to flash() that cannot be serialized, the Flask error and the website crashes
 
 """
 
@@ -885,12 +910,12 @@ def main() -> str:
     query_time_dict = {}  # type: Dict[str, float]
 
     if request.method == "POST":
-        print("request.form = %s", request.form)
+        print("pdg_app/main: request.form = %s", request.form)
 
         # check if the post request has the file part
         if "file" not in request.files:
             error_message_for_user = "ERROR: file not in request files"
-            print("ERROR: file not in request files")
+            print("pdg_app/main: ERROR: file not in request files")
             print("[TRACE] func: pdg_app/main end " + trace_id)
             return redirect(request.url)
         file_obj = request.files["file"]
@@ -900,7 +925,7 @@ def main() -> str:
         # submit an empty part without filename
         if file_obj.filename == "":
             error_message_for_user = "WARN: no selected file"
-            print("WARN: no selected file")
+            print("pdg_app/main: WARN: no selected file")
             print("[TRACE] func: pdg_app/main end " + trace_id)
             return redirect(request.url)
         if "upload_cypher" in request.form.keys():
@@ -912,7 +937,7 @@ def main() -> str:
         if file_obj and allowed_bool:
             print("file_obj.filename=", file_obj.filename)
             filename = secure_filename(file_obj.filename)
-            print("filename = ", filename)
+            print("pdg_app/main: filename = ", filename)
             path_to_uploaded_file = os.path.join(
                 web_app.config["UPLOAD_FOLDER"], filename
             )
@@ -1110,14 +1135,14 @@ def to_add_derivation() -> str:
     #     print("derivation_name_from_URL:", derivation_name_from_URL)
     #     print("derivation_abstract_from_URL:", derivation_abstract_from_URL)
 
-    print("request.form=", request.form)
+    print("pdg_app/to_add_derivation: request.form=", request.form)
     web_form = SpecifyNewDerivationForm(request.form)
 
-    print("request.method=", request.method)
-    print("web_form.validate()=", web_form.validate())
+    print("pdg_app/to_add_derivation: request.method=", request.method)
+    print("pdg_app/to_add_derivation: web_form.validate()=", web_form.validate())
 
     if request.method == "POST" and web_form.validate():
-        print("request.form =", request.form)
+        print("pdg_app/to_add_derivation: request.form =", request.form)
         derivation_name_latex = str(web_form.derivation_name_latex.data).strip()
         derivation_reference_latex = str(
             web_form.derivation_reference_latex.data
@@ -1130,7 +1155,7 @@ def to_add_derivation() -> str:
         derivation_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "derivation"
         )
-        print("derivation_id=", derivation_id)
+        print("pdg_app/to_add_derivation: derivation_id=", derivation_id)
 
         # as per https://strftime.org/
         # %f = Microsecond as a decimal number, zero-padded on the left.
@@ -1208,7 +1233,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     web_form_tex_pdf = NoOptionsForm(request.form)
     # web_form = DeleteButtonForm(request.form)
     if request.method == "POST":
-        print("request.form = ", request.form)
+        print("pdg_app/to_review_derivation: request.form = ", request.form)
 
         if request.form["submit_button"] == "generate_pdf":
             # request.form = ImmutableMultiDict([('derivation_selected', 'another deriv'), ('submit_button', 'generate_pdf')])
@@ -1254,7 +1279,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
             return redirect(
                 url_for(
                     "static",
-                    filename="dumping_grounds/" + tex_filename,
+                    filename="dumping_grounds/" + tex_filename + ".tex",
                     referrer="select_from_existing_derivations",
                 )
             )
@@ -1289,7 +1314,10 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
             print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
             redirect(url_for("to_list_derivations"))
         else:
-            flash("unrecongized button in" + str(request.form))
+            flash(
+                "pdg_app/to_review_derivation: unrecongized button in"
+                + str(request.form)
+            )
 
     print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
     return render_template(
@@ -1365,7 +1393,7 @@ def to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> str:
 
     web_form = SpecifyNewDerivationForm(request.form)
     if request.method == "POST" and web_form.validate():
-        print("request.form = ", request.form)
+        print("pdg_app/to_edit_derivation_metadata: request.form = ", request.form)
 
         # request.form =  ImmutableMultiDict(('derivation_name_latex', 'this isa'), ('abstract_latex', 'heresasdf00')])
 
@@ -1407,7 +1435,7 @@ def to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> str:
         query_time_dict["to_edit_derivation_metadata: node_properties"] = round(
             time.time() - query_start_time, 3
         )
-    print("derivation_dict:", derivation_dict)
+    print("pdg_app/to_edit_derivation_metadata: derivation_dict:", derivation_dict)
 
     print("[TRACE] func: pdg_app/to_edit_derivation_metadata end " + trace_id)
     return render_template(
@@ -1433,7 +1461,7 @@ def to_add_step_select_inference_rule(
     print("[TRACE] func: pdg_app/to_add_step_select_inference_rule start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    print("derivation_id: ", derivation_id)
+    print("pdg_app/to_add_step_select_inference_rule: derivation_id: ", derivation_id)
 
     # # web_form = SpecifyNewStepForm(request.form)
     # if request.method == "POST": #and web_form.validate():
@@ -1459,7 +1487,10 @@ def to_add_step_select_inference_rule(
             neo4j_query.get_list_node_dicts_of_type, "inference_rule"
         )
 
-    print("list_of_inference_rule_dicts=", list_of_inference_rule_dicts)
+    print(
+        "pdg_app/to_add_step_select_inference_rule: list_of_inference_rule_dicts=",
+        list_of_inference_rule_dicts,
+    )
 
     # Inference rules have the schema
     # [{'id': '7616707',
@@ -1479,7 +1510,9 @@ def to_add_step_select_inference_rule(
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
-    print("derivation_dict:", derivation_dict)
+    print(
+        "pdg_app/to_add_step_select_inference_rule: derivation_dict:", derivation_dict
+    )
 
     print("[TRACE] func: pdg_app/to_add_step_select_inference_rule end " + trace_id)
     return render_template(
@@ -1548,7 +1581,10 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
         dict_of_symbol_dicts_in_expression[this_symbol_ID] = dict_of_all_symbol_dicts[
             this_symbol_ID
         ]
-    print("dict_of_symbol_dicts_in_expression=", dict_of_symbol_dicts_in_expression)
+    print(
+        "pdg_app/to_edit_expression: dict_of_symbol_dicts_in_expression=",
+        dict_of_symbol_dicts_in_expression,
+    )
 
     # create new dict of symbols NOT used in expression
     dict_of_symbol_dicts_not_in_expression = {}
@@ -1558,7 +1594,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
                 dict_of_all_symbol_dicts[this_symbol_id]
             )
     print(
-        "dict_of_symbol_dicts_not_in_expression=",
+        "pdg_app/to_edit_expression: dict_of_symbol_dicts_not_in_expression=",
         dict_of_symbol_dicts_not_in_expression,
     )
 
@@ -2061,10 +2097,10 @@ def to_add_expression() -> str:
     # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
     web_form = SpecifyNewExpressionForm(request.form)
     if request.method == "POST":
-        print("POSTED!")
-        print("request.form = ", request.form)
+        print("pdg_app/to_add_expression: POSTED!")
+        print("pdg_app/to_add_expression: request.form = ", request.form)
     if request.method == "POST" and web_form.validate():
-        print("request.form = ", request.form)
+        print("pdg_app/to_add_expression: request.form = ", request.form)
 
         # request.form =  ImmutableMultiDict([('input1', 'a = b'), ('submit_button', 'Submit')])
 
@@ -2088,11 +2124,13 @@ def to_add_expression() -> str:
             web_form.expression_description_latex.data
         ).strip()
 
-        print("expression_latex_lhs:", expression_latex_lhs)
+        print("pdg_app/to_add_expression: expression_latex_lhs:", expression_latex_lhs)
         print("expression_latex_rhs:", expression_latex_rhs)
         # TODO: validate that this string is actually Latex before adding to database
 
-        print("expression_name_latex:", expression_name_latex)
+        print(
+            "pdg_app/to_add_expression: expression_name_latex:", expression_name_latex
+        )
         print("expression_description_latex", expression_description_latex)
 
         author_name_latex = "ben"
@@ -2355,10 +2393,10 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> str:
         )
 
     web_form = SpecifyNewSymbolOperationForm(request.form)
-    print("request.method =", request.method)
-    print("request.form = ", request.form)
+    print("pdg_app/to_edit_operation: request.method =", request.method)
+    print("pdg_app/to_edit_operation: request.form = ", request.form)
     if request.method == "POST" and web_form.validate():
-        print("in POST the request.form = ", request.form)
+        print("pdg_app/to_edit_operation in POST the request.form = ", request.form)
 
         operation_latex = str(web_form.operation_latex.data).strip()
         operation_name_latex = str(web_form.operation_name_latex.data).strip()
@@ -2416,10 +2454,10 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> str:
         )
 
     web_form = SpecifyNewSymbolRelationForm(request.form)
-    print("request.method =", request.method)
-    print("request.form = ", request.form)
+    print("pdg_app/to_edit_relation: request.method =", request.method)
+    print("pdg_app/to_edit_relation: request.form = ", request.form)
     if request.method == "POST" and web_form.validate():
-        print("in POST the request.form = ", request.form)
+        print("pdg_app/to_edit_relation: in POST the request.form = ", request.form)
 
         relation_latex = str(web_form.relation_latex.data).strip()
         relation_name_latex = str(web_form.relation_name_latex.data).strip()
@@ -2480,19 +2518,19 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
         query_time_dict["to_edit_scalar_symbol: node_properties"] = round(
             time.time() - query_start_time, 3
         )
-    print("scalar_dict:", scalar_dict)
+    print("pdg_app/to_edit_scalar scalar_dict:", scalar_dict)
 
     web_form_symbol_properties = SpecifyNewSymbolScalarForm(request.form)
     web_form_no_options = NoOptionsForm(request.form)
 
     if request.method == "POST":
-        print("request.form = ", request.form)
+        print("pdg_app/to_edit_scalar: request.form = ", request.form)
         # ('scalar_latex', 'a'), ('scalar_name_latex', 'name of scalar'),
         # ('scalar_description_latex', 'description of scalar'),
         # ('scalar_reference_latex', 'this is a referec')])
 
     if request.method == "POST" and web_form_symbol_properties.validate():
-        print("request.form validated")
+        print("pdg_app/to_edit_scalar: request.form validated")
 
         symbol_latex = str(
             web_form_symbol_properties.symbol_latex.data
@@ -2513,10 +2551,10 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
         # only change the properties that are different from symbol_dict
         for symbol_property, symbol_property_value in scalar_dict.items():
 
-            print("symbol_property=", symbol_property)
+            print("pdg_app/to_edit_scalar: symbol_property=", symbol_property)
             print("symbol_property_value=", symbol_property_value)
 
-            flash("NOT ENACTED YET 942492482324")
+            flash("pdg_app/to_edit_scalar: NOT ENACTED YET 942492482324")
             # TODO: check which properties are different
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
@@ -2551,7 +2589,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> str:
     #     return redirect(url_for("to_list_symbols"))
 
     elif request.method == "POST":
-        print("request.form = ", request.form)
+        print("pdg_app/to_edit_scalar: request.form = ", request.form)
 
         print("verification of form failed")
 
@@ -2585,7 +2623,7 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> str:
 
     print("vector_id: ", vector_id)
 
-    flash("NOT ENACTED YET 13942942392")
+    flash("pdg_app/to_edit_vector: NOT ENACTED YET 13942942392")
     # TODO
 
     vector_dict = {}
@@ -2614,7 +2652,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> str:
 
     print("matrix_id: ", matrix_id)
 
-    flash("NOT ENACTED YET 94294111111")
+    flash("pdg_app/to_edit_matrix: NOT ENACTED YET 94294111111")
     # TODO
 
     matrix_dict = {}
@@ -2647,10 +2685,10 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
             time.time() - query_start_time, 3
         )
 
-    print("request.form = ", request.form)
+    print("pdg_app/to_add_value_and_units: request.form = ", request.form)
     web_form_constant_properties = SpecifyNewConstantNumberForm(request.form)
     if request.method == "POST" and web_form_constant_properties.validate():
-        print("request.form = ", request.form)
+        print("pdg_app/to_add_value_and_units: request.form = ", request.form)
 
         # request.form =  ImmutableMultiDict([('number_decimal', '5'),
         #        ('number_power', '0.00'), ('mass_select_unit', 'stone'),
@@ -2702,6 +2740,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> str:
                 author_name_latex,
             )
 
+        print("[TRACE] func: pdg_app/to_add_value_and_units end " + trace_id)
         return redirect(url_for("to_list_scalars"))
 
     with graphDB_Driver.session() as session:
@@ -2769,7 +2808,7 @@ def to_add_symbol_scalar() -> str:
 
     web_form_scalar_properties = SpecifyNewSymbolScalarForm(request.form)
     if request.method == "POST" and web_form_scalar_properties.validate():
-        print("request.form = ", request.form)
+        print("pdg_app/to_add_symbol_scalar: request.form = ", request.form)
 
         scalar_latex = str(web_form_scalar_properties.scalar_latex.data).strip()
         scalar_name_latex = str(
@@ -2782,7 +2821,7 @@ def to_add_symbol_scalar() -> str:
             web_form_scalar_properties.scalar_reference_latex.data
         ).strip()
 
-        print("scalar_latex:", scalar_latex)
+        print("pdg_app/to_add_symbol_scalar: scalar_latex:", scalar_latex)
         print("scalar_name_latex:", scalar_name_latex)
         print("scalar_description_latex", scalar_description_latex)
 
@@ -2916,7 +2955,7 @@ def to_add_symbol_vector() -> str:
 
     web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
     if request.method == "POST" and web_form_vector_properties.validate():
-        print("request.form = ", request.form)
+        print("pdg_app/to_add_symbol_vector: request.form = ", request.form)
 
         vector_latex = str(web_form_vector_properties.vector_latex.data).strip()
         vector_name_latex = str(
@@ -3020,7 +3059,7 @@ def to_add_symbol_matrix() -> str:
 
     web_form_matrix_properties = SpecifyNewSymbolMatrixForm(request.form)
     if request.method == "POST" and web_form_matrix_properties.validate():
-        print("request.form = ", request.form)
+        print("pdg_app/to_add_symbol_matrix: request.form = ", request.form)
 
         # request.form =  ImmutableMultiDict([('matrix_latex', '\\hat{p}'),
         #       ('matrix_name_latex', ''), ('matrix_description_latex', ''),
@@ -3042,7 +3081,7 @@ def to_add_symbol_matrix() -> str:
 
         matrix_size = str(web_form_matrix_properties.matrix_size.data).strip()
 
-        print("matrix_latex:", matrix_latex)
+        print("pdg_app/to_add_symbol_matrix matrix_latex:", matrix_latex)
         print("matrix_name_latex:", matrix_name_latex)
         print("matrix_description_latex", matrix_description_latex)
 
@@ -3075,6 +3114,7 @@ def to_add_symbol_matrix() -> str:
                 matrix_number_of_columns,
                 author_name_latex,
             )
+        print("[TRACE] func: pdg_app/to_add_symbol_matrix end " + trace_id)
         return redirect(url_for("to_list_matrices"))
 
     print("[TRACE] func: pdg_app/to_add_symbol_matrix end " + trace_id)
@@ -3740,7 +3780,7 @@ def to_add_operation() -> str:
 
     web_form = SpecifyNewSymbolOperationForm(request.form)
     if request.method == "POST" and web_form.validate():
-        print("request.form = ", request.form)
+        print("pdg_app/to_add_operation: request.form = ", request.form)
 
         # request.form =  ImmutableMultiDict([('input1', 'a = b'), ('submit_button', 'Submit')])
 
@@ -3752,7 +3792,7 @@ def to_add_operation() -> str:
         operation_reference_latex = str(web_form.operation_reference_latex.data).strip()
         operation_argument_count = int(web_form.operation_argument_count.data)
 
-        print("operation_latex:", operation_latex)
+        print("pdg_app/to_add_operation operation_latex:", operation_latex)
         print("operation_name_latex:", operation_name_latex)
         print("operation_description_latex", operation_description_latex)
         print("operation_argument_count", operation_argument_count)
@@ -3841,7 +3881,7 @@ def to_add_relation() -> str:
         relation_reference_latex = str(web_form.relation_reference_latex.data).strip()
         relation_argument_count = 2
 
-        print("relation_latex:", relation_latex)
+        print("pdg_app/to_add_relation relation_latex:", relation_latex)
         print("relation_name_latex:", relation_name_latex)
         print("relation_description_latex", relation_description_latex)
         print("relation_argument_count", relation_argument_count)
@@ -4129,7 +4169,10 @@ def to_add_symbols_and_operations_for_expression(
     cleaned_latex_str_rhs = compute.remove_latex_presention_markings(
         expression_dict["latex_rhs"]
     )
-    print("cleaned_latex_str_lhs=", cleaned_latex_str_lhs)
+    print(
+        "pdg_app/symbols_and_operations_for_expression cleaned_latex_str_lhs=",
+        cleaned_latex_str_lhs,
+    )
     print("cleaned_latex_str_relation=", cleaned_latex_str_relation)
     print("cleaned_latex_str_rhs=", cleaned_latex_str_rhs)
     sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
@@ -4142,7 +4185,10 @@ def to_add_symbols_and_operations_for_expression(
     sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
         cleaned_latex_str_rhs
     )
-    print("sympy_expr_lhs=", str(sympy_expr_lhs))
+    print(
+        "pdg_app/symbols_and_operations_for_expression sympy_expr_lhs=",
+        str(sympy_expr_lhs),
+    )
     # print("sympy_expr_relation=", str(sympy_expr_relation))
     print("sympy_expr_rhs=", str(sympy_expr_rhs))
 
@@ -4160,7 +4206,10 @@ def to_add_symbols_and_operations_for_expression(
     )
 
     # TODO: this is missing relation operators like "="
-    print("list_of_sympy_symbols_from_expr=", list_of_sympy_symbols_from_expr)
+    print(
+        "pdg_app/symbols_and_operations_for_expression list_of_sympy_symbols_from_expr=",
+        list_of_sympy_symbols_from_expr,
+    )
 
     # do any of the list_of_sympy_symbols_from_expr
     # show up in list_of_symbol_dicts?
@@ -4221,7 +4270,10 @@ def to_add_symbols_and_operations_for_expression(
     # so I don't see how a class-based form could be used.
     web_form_no_options = NoOptionsForm(request.form)
     if request.method == "POST":
-        print("request.form = ", request.form)
+        print(
+            "pdg_app/symbols_and_operations_for_expression request.form = ",
+            request.form,
+        )
 
         list_of_symbol_IDs_in_expression = []  # type: List[str]
         symbol_id_dict = {}  # type: Dict[str, str]
@@ -4249,7 +4301,10 @@ def to_add_symbols_and_operations_for_expression(
 
                 symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
 
-        print("symbol_id_dict=", symbol_id_dict)
+        print(
+            "pdg_app/symbols_and_operations_for_expression symbol_id_dict=",
+            symbol_id_dict,
+        )
         # example output: {'a': '5638458', 'b': '7152159'}
 
         print(
@@ -4604,7 +4659,7 @@ def to_add_symbols_and_operations_for_feed(
     # so I don't see how a class-based form could be used.
     web_form_no_options = NoOptionsForm(request.form)
     if request.method == "POST":
-        print("request.form = ", request.form)
+        print("pdg_app/symbols_and_operations_for_feed request.form = ", request.form)
 
         list_of_symbol_IDs_in_expression = []  # type: List[str]
         symbol_id_dict = {}  # type: Dict[str, str]
@@ -4632,7 +4687,7 @@ def to_add_symbols_and_operations_for_feed(
 
                 symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
 
-        print("symbol_id_dict=", symbol_id_dict)
+        print("pdg_app/symbols_and_operations_for_feed symbol_id_dict=", symbol_id_dict)
         # example output: {'a': '5638458', 'b': '7152159'}
 
         print(
@@ -4647,6 +4702,9 @@ def to_add_symbols_and_operations_for_feed(
             )
         )
 
+    print(
+        "[TRACE] func: pdg_app/to_add_symbols_and_operations_for_feed end " + trace_id
+    )
     return render_template(
         "property-graph/feed_create_symbols_and_operations.html",
         query_time_dict=query_time_dict,
@@ -4710,7 +4768,7 @@ def to_add_sympy_and_lean_for_feed(
         sympy_expr, symbol_id_dict
     )
 
-    print("revised_expr=", revised_expr)
+    print("pdg_app/to_add_sympy_and_lean_for_feed revised_expr=", revised_expr)
 
     revised_expr_with_str = re.sub(
         r"(pdg\d\d\d\d\d\d\d)", r"sympy.Symbol('\1')", str(revised_expr)
@@ -4718,16 +4776,19 @@ def to_add_sympy_and_lean_for_feed(
 
     revised_expr_with_str = re.sub(r"^Eq", "sympy.Eq", revised_expr_with_str)
 
-    print("revised_expr_with_str=", revised_expr_with_str)
+    print(
+        "pdg_app/to_add_sympy_and_lean_for_feed revised_expr_with_str=",
+        revised_expr_with_str,
+    )
 
     web_form = SpecifyNewFeedSympyLeanForm(request.form)
     if request.method == "POST":
-        print("request.form = ", request.form)
+        print("pdg_app/to_add_sympy_and_lean_for_feed request.form = ", request.form)
 
         sympy_str = str(web_form.sympy_str.data).strip()
         lean_str = str(web_form.lean_str.data).strip()
 
-        print("submitted sympy_str=", sympy_str)
+        print("pdg_app/to_add_sympy_and_lean_for_feed submitted sympy_str=", sympy_str)
 
         try:
             # CAVEAT: sympy_str must use single quotes (') since neo4j query uses (")
@@ -4757,8 +4818,11 @@ def to_add_sympy_and_lean_for_feed(
                     "to_add_sympy_and_lean_for_feed: edit_node_property, expression lean"
                 ] = round(time.time() - query_start_time, 3)
         except neo4j.exceptions.CypherSyntaxError as err:
-            print("ERROR:", str(err))
-            flash("ERROR:" + str(err))
+            print("pdg_app/to_add_sympy_and_lean_for_feed ERROR:", str(err))
+            flash("pdg_app/to_add_sympy_and_lean_for_feed ERROR:" + str(err))
+            print(
+                "[TRACE] func: pdg_app/to_add_sympy_and_lean_for_feed end " + trace_id
+            )
             return redirect(
                 url_for(
                     "to_add_symbols_and_operations_for_feed",
@@ -4770,6 +4834,7 @@ def to_add_sympy_and_lean_for_feed(
         return redirect(url_for("to_list_feeds"))
 
     web_form.sympy_str.data = revised_expr_with_str
+    print("[TRACE] func: pdg_app/to_add_sympy_and_lean_for_feed end " + trace_id)
     return render_template(
         "property-graph/feed_create_sympy_and_lean.html",
         query_time_dict=query_time_dict,
@@ -4807,7 +4872,7 @@ def to_add_inference_rule() -> str:
 
     web_form = SpecifyNewInferenceRuleForm(request.form)
     if request.method == "POST" and web_form.validate():
-        print("request.form = ", request.form)
+        print("pdg_app/to_add_inference_rule request.form = ", request.form)
 
         # request.form =  ImmutableMultiDict([('inference_rule_name', 'add x to both sides'),
         # ('inference_rule_latex', 'add _ to both sides'),
@@ -4839,16 +4904,24 @@ def to_add_inference_rule() -> str:
                 "inference_rule_dict['name_latex']", inference_rule_dict["name_latex"]
             )
             if inference_rule_name == inference_rule_dict["name_latex"]:
-                print("INVALID INPUT: inference rule with that name already exists")
+                print(
+                    "pdg_app/to_add_inference_rule INVALID INPUT: inference rule with that name already exists"
+                )
                 # TODO: a notice should be provided to the user
-                flash("INVALID INPUT: inference rule with that name already exists")
+                flash(
+                    "pdg_app/to_add_inference_rule INVALID INPUT: inference rule with that name already exists"
+                )
 
                 print("[TRACE] func: pdg_app/to_add_inference_rule end " + trace_id)
                 return redirect(url_for("to_add_inference_rule"))
             if inference_rule_latex == inference_rule_dict["latex"]:
-                print("INVALID INPUT: inference rule with that latex already exists")
+                print(
+                    "pdg_app/to_add_inference_rule INVALID INPUT: inference rule with that latex already exists"
+                )
                 # TODO: a notice should be provided to the user
-                flash("INVALID INPUT: inference rule with that latex already exists")
+                flash(
+                    "pdg_app/to_add_inference_rule INVALID INPUT: inference rule with that latex already exists"
+                )
 
                 print("[TRACE] func: pdg_app/to_add_inference_rule end " + trace_id)
                 return redirect(url_for("to_add_inference_rule"))
@@ -4951,9 +5024,16 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
     print("[TRACE] func: pdg_app/to_edit_inference_rule start " + trace_id)
     query_time_dict = {}  # type: Dict[str, float]
 
-    web_form = SpecifyNewInferenceRuleForm(request.form)
+    web_form_edit = SpecifyNewInferenceRuleForm(request.form)
+    web_form_delete = NoOptionsForm(request.form)
+    if request.method == "POST":
+        print("pdg_app/to_edit_inference_rule request.form = ", request.form)
+
+    # request.form =  ('inference_rule_name', 'mult both sides by'), ('inference_rule_latex', 'multiply both sides of Exp $1 by $2 to get Exp $3'), ('inference_rule_number_of_inputs', '1'), ('inference_rule_number_of_feeds', '1'), ('inference_rule_number_of_outputs', '1')])
+
     if request.method == "POST" and web_form.validate():
-        print("request.form = ", request.form)
+        print("pdg_app/to_edit_inference_rule validated")
+        print("pdg_app/to_edit_inference_rule request.form = ", request.form)
 
         # request.form =  ImmutableMultiDict(('inference_rule_name', 'asdfmmimimimim'), ('inference_rule_latex', 'mimimmkm'), ('inference_rule_number_of_inputs', '1'), ('inference_rule_number_of_feeds', '1'), ('inference_rule_number_of_outputs', '1')])
 
@@ -4977,9 +5057,16 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
             )
 
         for inference_rule_dict in list_of_inference_rule_dicts:
+            print(
+                "pdg_app/to_edit_inference_rule inference_rule_dict=",
+                inference_rule_dict,
+            )
             print("inference_rule_name", inference_rule_name)
-            print("inference_rule_dict['name']", inference_rule_dict["name"])
-            if inference_rule_name == inference_rule_dict["name"]:
+            print(
+                "inference_rule_dict['inference_rule_name']",
+                inference_rule_dict["inference_rule_name"],
+            )
+            if inference_rule_name == inference_rule_dict["inference_rule_name"]:
                 print("INVALID INPUT: inference rule with that name already exists")
                 # TODO: a notice should be provided to the user
                 flash("INVALID INPUT: inference rule with that name already exists")
@@ -4994,7 +5081,9 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
                 print("[TRACE] func: pdg_app/to_edit_inference_rule end " + trace_id)
                 return redirect(url_for("to_add_inference_rule"))
 
-        print("status: No conflicting name or latex detected")
+        print(
+            "pdg_app/to_edit_inference_rule status: No conflicting name or latex detected"
+        )
 
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
@@ -5031,13 +5120,14 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
             neo4j_query.get_node_properties, "inference_rule", inference_rule_id
         )
 
-    print("inference_rule_dict", inference_rule_dict)
+    print("pdg_app/to_edit_inference_rule inference_rule_dict", inference_rule_dict)
 
     print("[TRACE] func: pdg_app/to_edit_inference_rule end " + trace_id)
     return render_template(
         "property-graph/inference_rule_edit.html",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form_edit=web_form_edit,
+        form_delete=web_form_delete,
         inference_rule_dict=inference_rule_dict,
         list_of_derivation_dicts_that_use_this_inference_rule_id=list_of_derivation_dicts_that_use_this_inference_rule_id,
     )
@@ -5893,7 +5983,7 @@ def to_export_json() -> str:
     with graphDB_Driver.session() as session:
         res = session.read_transaction(neo4j_query.apoc_export_json, "pdg.json")
 
-    print("res=", res)
+    print("pdg_app/to_export_json res=", res)
     # <Record file='all.json' source='database: nodes(4), rels(0)' format='json' nodes=4 relationships=0 properties=16 time=123 rows=4 batchSize=-1 batches=0 done=True data=None>
 
     # "dumping_grounds" is a variable set in the docker-compose file using variable NEO4J_dbms_directories_import
