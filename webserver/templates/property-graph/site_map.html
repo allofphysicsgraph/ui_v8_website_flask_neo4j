@@ -9,7 +9,7 @@
   <LI><a href="{{ url_for('to_export_cypher') }}?referrer=main">export as Cypher</a>
    or <a href="{{ url_for('to_export_json') }}?referrer=main">  export as JSON</a></LI>
   <LI><a href="{{ url_for('to_list_derivations') }}?referrer=main">show {{ number_of_derivations }} derivations</a>, (which are comprised of steps)</LI>
-  <LI><a href="{{ url_for('to_list_inference_rules') }}?referrer=main">show {{ number_of_inference_rules }} inference rules</a></LI> (which are used in steps to relation expressions)
+  <LI><a href="{{ url_for('to_list_inference_rules') }}?referrer=main">show {{ number_of_inference_rules }} inference rules</a> (which are used in steps to relation expressions)</LI>
   <LI><a href="{{ url_for('to_list_expressions') }}?referrer=main">show {{ number_of_expressions }} expressions</a> (which have a relation, e.g., equality or inequality, as well as LHS and RHS each comprised of symbols)</LI>
   <LI><a href="{{ url_for('to_list_feeds') }}?referrer=main">show {{ number_of_feeds }} feeds</a> (which have one or more non-operation symbols; no equality or inequality)</LI>
   <LI>symbols</LI>
@@ -57,11 +57,16 @@
       <code>docker exec &lt;CONTAINER_ID&gt; bin/cypher-shell --file 
         dumping_grounds/pdg.cypher</code><BR>
       on the host to upload the file into Neo4j. The CONTAINER_ID comes from<BR>
-      <code>docker ps | grep "neo4j:.*community" | cut -d' ' -f1</code>
+      <code>docker ps | grep "neo4j:.*community" | cut -d' ' -f1</code><BR>
+      <code>docker exec `docker ps | grep -community | cut -d' ' -f1` bin/cypher-shell --file 
+        dumping_grounds/pdg.cypher</code>
 
     <P>Potential alternative: <a href="https://neo4j.com/labs/apoc/4.3/overview/apoc.load/apoc.load.json/">download/upload custom JSON</a>
   </fieldset>
 
 </fieldset>
+
+<P>To enter the container for debugging purposes,</P>
+  <code>docker exec -it `docker ps | grep ui_v8_website_flask_neo4j_webserver | cut -d' ' -f1` /bin/bash</code>
 
 {% endblock %}
