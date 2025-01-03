@@ -1148,8 +1148,28 @@ def to_add_derivation() -> str:
             web_form.derivation_reference_latex.data
         ).strip()
         abstract_latex = str(web_form.abstract_latex.data).strip()
-        print("       derivation:", derivation_name_latex)
-        print("       abstract:", abstract_latex)
+
+        derivation_name_latex_SAFE = latex.make_string_safe_for_latex(derivation_name_latex)
+        if derivation_name_latex_SAFE != derivation_name_latex:
+            print("   derivation name submitted:", derivation_name_latex)
+            print("   derivation name altered:", derivation_name_latex_SAFE)
+            flash("derivation name altered to "+str(derivation_name_latex_SAFE))
+        derivation_name_latex = derivation_name_latex_SAFE
+
+        abstract_latex_SAFE = latex.make_string_safe_for_latex(abstract_latex)
+        if abstract_latex_SAFE != abstract_latex:
+            print("   abstract submitted:", abstract_latex)
+            print("   abstract altered:", abstract_latex)
+            flash("   abstract altered to "+str(abstract_latex_SAFE))
+        abstract_latex = abstract_latex_SAFE
+
+        derivation_reference_latex_SAFE = latex.make_string_safe_for_latex(derivation_reference_latex)
+        if derivation_reference_latex_SAFE != derivation_reference_latex:
+            print("   reference submitted:",derivation_reference_latex)
+            print("   reference altered:",derivation_reference_latex)
+            flash("   reference altered to "+str(derivation_reference_latex_SAFE))
+        derivation_reference_latex = derivation_reference_latex_SAFE
+
         author_name_latex = "ben"
 
         derivation_id, query_time_dict = compute.generate_random_id(
@@ -1407,6 +1427,7 @@ def to_edit_derivation_metadata(derivation_id: unique_numeric_id_as_str) -> str:
         author_name_latex = "Ben"
 
         # sanitize Latex
+        # TODO: notify user if what they submitted has been altered.
         derivation_name_latex = latex.make_string_safe_for_latex(derivation_name_latex)
         abstract_latex = latex.make_string_safe_for_latex(abstract_latex)
         author_name_latex = latex.make_string_safe_for_latex(author_name_latex)
@@ -1644,6 +1665,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
         ).strip()
 
         # sanitize latex
+        # TODO: notify user if text was edited
         expression_latex_lhs = latex.make_string_safe_for_latex(expression_latex_lhs)
         expression_relation = latex.make_string_safe_for_latex(expression_relation)
         expression_latex_rhs = latex.make_string_safe_for_latex(expression_latex_rhs)
@@ -5039,6 +5061,7 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
 
         inference_rule_name = str(web_form.inference_rule_name.data).strip()
         inference_rule_latex = str(web_form.inference_rule_latex.data).strip()
+        print("pdg_app/to_edit_inference_rule: inference_rule_latex=",inference_rule_latex)
         number_of_inputs = int(
             str(web_form.inference_rule_number_of_inputs.data).strip()
         )

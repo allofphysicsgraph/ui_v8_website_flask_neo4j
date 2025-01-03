@@ -830,3 +830,5 @@ def remove_latex_presention_markings(latex_str: str) -> str:
 
     print("[TRACE] func: compute/remove_latex_presention_markings end " + trace_id)
     return latex_str
+
+#EOF

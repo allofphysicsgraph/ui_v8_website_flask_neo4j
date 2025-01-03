@@ -43,7 +43,16 @@ def make_string_safe_for_latex(unsafe_str: str) -> str:
         unsafe_str: strings that may cause Latex compilation to fail, e.g., "a_string" or "url#subsection"
     Returns:
         safe_str: a string that latex should be able to print, e.g., "a\_string" or "url\#subsection"
+
+    >>> make_string_safe_for_latex("hello world")
+    "hello world"
+
+    >>> make_string_safe_for_latex("hello_world")
+    "hello\_world"
     """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: latex/make_string_safe_for_latex start " + trace_id)
+
     # some derivation notes have valid underscores, like
     # \cite{yyyy_author}
     # while some underscores are invalid latex, like
@@ -75,6 +84,7 @@ def make_string_safe_for_latex(unsafe_str: str) -> str:
         fixed_underscore_str.replace("#", "\#").replace("$", "\$").replace("%", "\%")
     )
 
+    print("[TRACE] func: latex/make_string_safe_for_latex end " + trace_id)
     return no_hashtag_str
 
 
@@ -97,11 +107,10 @@ def generate_tex_file_for_derivation(
     Raises:
 
     >>> path_to_tex_file = "/code/static/"  # must end with /
-    >>> generate_tex_for_derivation("000001")
+    >>> generate_tex_for_derivation("000001", path_to_tex_file)
     """
-
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: latex/to_add_derivation start " + trace_id)
+    print("[TRACE] func: latex/generate_tex_file_for_derivation start " + trace_id)
 
     tex_filename = derivation_id
 
@@ -336,10 +345,7 @@ def generate_tex_file_for_derivation(
 
                         lat_file.write("{" + local_id + "}")
                     lat_file.write("\n")
-                    if len(step_dict["note_after_step_latex"]) > 0:
-                        lat_file.write(
-                            step_dict["note_after_step_latex"] + "\n"
-                        )  # TODO: if the note contains a $ or %, shenanigans arise
+
                     # write output expressions
                     for output_latex in list_of_output_expression_latex:
 
@@ -353,6 +359,11 @@ def generate_tex_file_for_derivation(
                         lat_file.write("\\label{eq:" + local_id + "}\n")
                         lat_file.write("\\end{equation}\n")
 
+                    if len(step_dict["note_after_step_latex"]) > 0:
+                        lat_file.write(
+                            step_dict["note_after_step_latex"] + "\n"
+                        )  # TODO: if the note contains a $ or %, shenanigans arise
+
         lat_file.write("\\bibliographystyle{plain}\n")
         lat_file.write("\\bibliography{pdg.bib}\n")
         lat_file.write("\\end{document}\n")
@@ -360,6 +371,8 @@ def generate_tex_file_for_derivation(
 
     shutil.copy(tex_filename + ".tex", path_to_tex_file + tex_filename + ".tex")
     # logger.info("[trace end " + trace_id + "]")
+
+    print("[TRACE] func: latex/generate_tex_file_for_derivation " + trace_id)
     return tex_filename  # pass back filename without extension because bibtex cannot handle .tex
 
 
@@ -377,9 +390,10 @@ def generate_pdf_for_derivation(
 
     >>> generate_pdf_for_derivation("000001", "myemail@address.com","pdg.db")
     """
-    trace_id = str(random.randint(1000000, 9999999))
     # logger.info("[trace start " + trace_id + "]")
-    # dat = clib.read_db(path_to_db)
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: latex/generate_pdf_for_derivation start " + trace_id)
+
 
     # to isolate the build process, create a temporary folder
     tmp_latex_folder = "tmp_latex_folder_" + str(random.randint(1000000, 9999999))
@@ -503,11 +517,16 @@ def generate_pdf_for_derivation(
     shutil.rmtree(tmp_latex_folder_full_path)
     # return True, pdf_filename + ".pdf"
     # logger.info("[trace end " + trace_id + "]")
+
+    print("[TRACE] func: latex/generate_pdf_for_derivation start " + trace_id)
     return pdf_filename + ".pdf"
 
 
-def create_png_from_expression_latex(input_latex_str: str, png_name: str) -> None:
+def create_png_from_latex(input_latex_str: str, destination_folder:str, png_filename_no_extension: str) -> None:
     """
+    Used for both d3js representation and for graphviz.
+    Relevant to both expressions and inference rules
+
     latex -halt-on-error file.tex
     dvipng file.dvi -T tight -o file.png
 
@@ -523,14 +542,15 @@ def create_png_from_expression_latex(input_latex_str: str, png_name: str) -> Non
 
     Raises:
 
-    >>> create_png_from_expression_latex('a \dot b \\nabla', 'a_filename')
+    >>> destination_folder = "/code/static/"
+    >>> create_png_from_latex('a \dot b \\nabla', 'a_filename')
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[trace start " + trace_id + "]")
+    print("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
+    # logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
 
-    destination_folder = "/code/static/"
 
-    #    logger.debug("png_name = %s", png_name)
+    #    logger.debug("png_filename_no_extension = %s", png_filename_no_extension)
     #    logger.debug("input latex str = %s", input_latex_str)
 
     # TODO: I'd like to have the latex build process take place in an isolated directory
@@ -547,7 +567,7 @@ def create_png_from_expression_latex(input_latex_str: str, png_name: str) -> Non
     logger.debug("latex = " + str(input_latex_str))
     create_tex_file_for_latex_expression(tmp_file, input_latex_str)
 
-    tex_filename_with_hash = png_name + "_" + md5_of_file(tmp_file + ".tex") + ".tex"
+    tex_filename_with_hash = png_filename_no_extension + "_" + md5_of_file(tmp_file + ".tex") + ".tex"
 
     # shutil.move(tmp_file + ".tex", tex_filename_with_hash)
     # logger.debug(str(os.listdir()))
@@ -573,7 +593,7 @@ def create_png_from_expression_latex(input_latex_str: str, png_name: str) -> Non
 
         if "Text line contains an invalid character" in latex_stdout:
             logging.error("tex input contains invalid charcter")
-            shutil.copy(destination_folder + "error.png", destination_folder + png_name)
+            shutil.copy(destination_folder + "error.png", destination_folder + png_filename_no_extension)
             raise Exception("no png generated due to invalid character in tex input.")
         #    remove_file_debris(["./"], [tmp_file], ["png"])
 
@@ -597,29 +617,30 @@ def create_png_from_expression_latex(input_latex_str: str, png_name: str) -> Non
         # logger.debug(str(os.listdir()))
 
         if "No such file or directory" in png_stderr:
-            logging.error("PNG creation failed for %s", png_name)
-            shutil.copy(destination_folder + "error.png", destination_folder + png_name)
+            logging.error("PNG creation failed for %s", png_filename_no_extension)
+            shutil.copy(destination_folder + "error.png", destination_folder + png_filename_no_extension)
             # return False, "no PNG created. Check usepackage in latex"
             raise Exception(
-                "no PNG created for " + png_name + ". Check 'usepackage' in latex"
+                "no PNG created for " + png_filename_no_extension + ". Check 'usepackage' in latex"
             )
 
         if not (os.path.isfile(tmp_file + ".png")):
-            logging.error("PNG creation failed for %s", png_name)
+            logging.error("PNG creation failed for %s", png_filename_no_extension)
 
-        shutil.move(tmp_file + ".png", destination_folder + png_name + ".png")
+        shutil.move(tmp_file + ".png", destination_folder + png_filename_no_extension + ".png")
 
-    logger.debug(destination_folder + png_name + ".png")
+    logger.debug(destination_folder + png_filename_no_extension + ".png")
 
     os.chdir(original_dir)
     shutil.rmtree(tmp_latex_folder_full_path)
 
-    #    if os.path.isfile(destination_folder + png_name):
+    #    if os.path.isfile(destination_folder + png_filename_no_extension):
     # os.remove('/code/static/'+name_of_png)
     #        logger.error("png already exists!")
 
     # return True, "success"
-    logger.info("[trace end " + trace_id + "]")
+    #logger.info("[trace end " + trace_id + "]")
+    print("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
     return
 
 
@@ -638,6 +659,7 @@ def create_tex_file_for_latex_expression(tmp_file: str, input_latex_str: str) ->
     """
     trace_id = str(random.randint(1000000, 9999999))
     # logger.info("[trace start " + trace_id + "]")
+    print("[TRACE] latex/create_tex_file_for_latex_expression start " + trace_id + "]")
 
     compute.remove_file_debris(["./"], [tmp_file], ["tex"])
 
@@ -670,42 +692,57 @@ def create_tex_file_for_latex_expression(tmp_file: str, input_latex_str: str) ->
         lat_file.write("\\end{document}\n")
     # logger.debug("wrote tex file")
     # logger.info("[trace end " + trace_id + "]")
+    print("[TRACE] latex/create_tex_file_for_latex_expression end " + trace_id + "]")
     return
 
 
-def create_derivation_png(deriv_id: str, path_to_db: str) -> str:
+def create_derivation_png(graphDB_Driver, query_time_dict: dict, deriv_id: str, path_to_output_png: str) -> str:
     """
     for a clear description of the graphviz language, see
     https://www.graphviz.org/doc/info/lang.html
 
     Args:
         deriv_id: numeric identifier of the derivation
-        path_to_db: filename of the SQL database containing
-                    a JSON entry that returns a nested dictionary
+        path_to_output_png: where should png be placed? Includes trailing slash
+
     Returns:
-        output_filename: name of file produced by graphviz
+        output_filename: name of file produced by graphviz; either `<deriv_id>.png` or `error.png`
     Raises:
 
 
     >>> create_derivation_png("000001", "pdg.db")
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[trace start " + trace_id + "]")
+    #logger.info("[trace start " + trace_id + "]")
+    print("[TRACE] latex/create_derivation_png start " + trace_id + "]")
 
-    dat = clib.read_db(path_to_db)
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        derivation_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "derivation", derivation_id
+        )
+    print("latex/create_derivation_png: derivation_dict=", derivation_dict)
 
-    dot_filename = "/code/static/derivation_" + deriv_id + ".dot"
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_step_dicts_in_this_derivation = session.read_transaction(
+            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+        )
+    print("latex/create_derivation_png: list_of_step_dicts_in_this_derivation=", list_of_step_dicts_in_this_derivation)
+
+    dot_filename = path_to_output_png+"derivation_" + deriv_id + ".dot"
     with open(dot_filename, "w") as file_handle:
         file_handle.write("digraph physicsDerivation { \n")
         file_handle.write("overlap = false;\n")
         file_handle.write(
             'label="derivation: '
-            + dat["derivations"][deriv_id]["name"]
+            + derivation_dict["name_latex"]
             + '\nhttps://derivationmap.net";\n'
         )
         file_handle.write("fontsize=12;\n")
 
-        for step_id, step_dict in dat["derivations"][deriv_id]["steps"].items():
+        for this_step_dict in list_of_step_dicts_in_this_derivation:
+            # TODO: following needs to be updated 
             write_step_to_graphviz_file(deriv_id, step_id, file_handle, path_to_db)
 
         file_handle.write("}\n")
@@ -719,7 +756,7 @@ def create_derivation_png(deriv_id: str, path_to_db: str) -> str:
 
     # force redraw when updating step
     # a better way would be to check the md5 hash of the .dot file
-    if not os.path.exists("/code/static/" + output_filename):
+    if not os.path.exists(path_to_output_png + output_filename):
         process = subprocess.run(
             ["neato", "-Tpng", dot_filename, "-o" + output_filename],
             stdout=PIPE,
@@ -734,9 +771,10 @@ def create_derivation_png(deriv_id: str, path_to_db: str) -> str:
         if len(neato_stderr) > 0:
             logger.debug(neato_stderr)
 
-        shutil.move(output_filename, "/code/static/" + output_filename)
+        shutil.move(output_filename, path_to_output_png + output_filename)
     # return True, "no invalid latex", output_filename
-    logger.info("[trace end " + trace_id + "]")
+    #logger.info("[trace end " + trace_id + "]")
+    print("[TRACE] latex/create_derivation_png end " + trace_id + "]")
     return output_filename
 
 
@@ -764,8 +802,8 @@ def create_step_graphviz_png(deriv_id: str, step_id: str, path_to_db: str) -> st
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[trace start " + trace_id + "]")
-    dat = clib.read_db(path_to_db)
+    #logger.info("[trace start " + trace_id + "]")
+    print("[TRACE] latex/create_step_graphviz_png start " + trace_id + "]")
 
     dot_filename = "/code/static/graphviz.dot"
     remove_file_debris(["/code/static/"], ["graphviz"], ["dot"])
@@ -810,21 +848,22 @@ def create_step_graphviz_png(deriv_id: str, step_id: str, path_to_db: str) -> st
 
         shutil.move(output_filename, "/code/static/" + output_filename)
     # return True, "no invalid latex", output_filename
-    logger.info("[trace end " + trace_id + "]")
+    #logger.info("[trace end " + trace_id + "]")
+    print("[TRACE] latex/create_step_graphviz_png end " + trace_id + "]")
     return output_filename
 
 
-def write_step_to_graphviz_file(
-    deriv_id: str, step_id: str, fil: TextIO, path_to_db: str
-) -> None:
+def write_step_to_graphviz_file(deriv_id: str, step_id: str, fil: TextIO) -> None:
     """
+
+    used by `create_derivation_png`
+    and `create_step_graphviz_png`
 
     Args:
         deriv_id: numeric identifier of the derivation
         step_id: numeric identifier of the step within the derivation
         fil:
-        path_to_db: filename of the SQL database containing
-                    a JSON entry that returns a nested dictionary
+
     Returns:
         None
 
@@ -834,12 +873,14 @@ def write_step_to_graphviz_file(
     >>> write_step_to_graphviz_file("000001", "1029890", file_handle, "pdg.db")
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[trace start " + trace_id + "]")
+    #logger.info("[trace start " + trace_id + "]")
+    print("[TRACE] latex/write_step_to_graphviz_file start " + trace_id + "]")
 
-    dat = clib.read_db(path_to_db)
 
     step_dict = dat["derivations"][deriv_id]["steps"][step_id]
-    logger.debug("step_dict = %s", step_dict)
+    print("step_dict = %s", step_dict)
+    #logger.debug("step_dict = %s", step_dict)
+
     #  step_dict = {'inf rule': 'begin derivation', 'inputs': [], 'feeds': [], 'outputs': ['526874110']}
     #    for global_id, latex_and_ast_dict in dat["expressions"].items():
     #        logger.debug(
@@ -849,13 +890,13 @@ def write_step_to_graphviz_file(
     #        )
 
     # inference rule
-    png_name = "".join(filter(str.isalnum, step_dict["inf rule"]))
-    if not os.path.isfile("/code/static/" + png_name + ".png"):
-        create_png_from_latex("\\text{" + step_dict["inf rule"] + "}", png_name)
+    png_filename_no_extension = "".join(filter(str.isalnum, step_dict["inf rule"]))
+    if not os.path.isfile("/code/static/" + png_filename_no_extension + ".png"):
+        create_png_from_latex("\\text{" + step_dict["inf rule"] + "}", png_filename_no_extension)
     file_handle.write(
         step_id
         + ' [shape=invtrapezium, color=blue, label="",image="/code/static/'
-        + png_name
+        + png_filename_no_extension
         + ".png"
         + '",labelloc=b];\n'
     )
@@ -863,14 +904,14 @@ def write_step_to_graphviz_file(
     # input expression
     for expr_local_id in step_dict["inputs"]:
         expr_global_id = dat["expr local to global"][expr_local_id]
-        png_name = expr_global_id
-        if not os.path.isfile("/code/static/" + png_name + ".png"):
-            create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_name)
+        png_filename_no_extension = expr_global_id
+        if not os.path.isfile("/code/static/" + png_filename_no_extension + ".png"):
+            create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_filename_no_extension)
         file_handle.write(expr_local_id + " -> " + step_id + ";\n")
         file_handle.write(
             expr_local_id
             + ' [shape=ellipse, color=black,label="",image="/code/static/'
-            + png_name
+            + png_filename_no_extension
             + ".png"
             + '",labelloc=b];\n'
         )
@@ -878,14 +919,14 @@ def write_step_to_graphviz_file(
     # output expressions
     for expr_local_id in step_dict["outputs"]:
         expr_global_id = dat["expr local to global"][expr_local_id]
-        png_name = expr_global_id
-        if not os.path.isfile("/code/static/" + png_name + ".png"):
-            create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_name)
+        png_filename_no_extension = expr_global_id
+        if not os.path.isfile("/code/static/" + png_filename_no_extension + ".png"):
+            create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_filename_no_extension)
         file_handle.write(step_id + " -> " + expr_local_id + ";\n")
         file_handle.write(
             expr_local_id
             + ' [shape=ellipse, color=black,label="",image="/code/static/'
-            + png_name
+            + png_filename_no_extension
             + ".png"
             + '",labelloc=b];\n'
         )
@@ -893,17 +934,20 @@ def write_step_to_graphviz_file(
     # feed expressions
     for expr_local_id in step_dict["feeds"]:
         expr_global_id = dat["expr local to global"][expr_local_id]
-        png_name = expr_global_id
-        if not os.path.isfile("/code/static/" + png_name + ".png"):
-            create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_name)
+        png_filename_no_extension = expr_global_id
+        if not os.path.isfile("/code/static/" + png_filename_no_extension + ".png"):
+            create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_filename_no_extension)
         file_handle.write(expr_local_id + " -> " + step_id + ";\n")
         file_handle.write(
             expr_local_id
             + ' [shape=box, color=red,label="",image="/code/static/'
-            + png_name
+            + png_filename_no_extension
             + ".png"
             + '",labelloc=b];\n'
         )
 
-    logger.info("[trace end " + trace_id + "]")
+    #logger.info("[trace end " + trace_id + "]")
+    print("[TRACE] latex/write_step_to_graphviz_file end " + trace_id + "]")
     return
+
+#EOF

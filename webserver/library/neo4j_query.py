@@ -1639,3 +1639,5 @@ def user_query(tx, query: str) -> list:
 
     print("[TRACE] func: neo4j_query/user_query end " + trace_id)
     return list_of_results
+
+#EOF
