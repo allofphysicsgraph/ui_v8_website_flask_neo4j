@@ -101,12 +101,12 @@ def generate_tex_file_for_derivation(
     """
 
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: app/to_add_derivation start " + trace_id)
+    print("[TRACE] func: latex/to_add_derivation start " + trace_id)
 
     tex_filename = derivation_id
 
     compute.remove_file_debris(
-        [path_to_tex_file, "./"], [tex_filename], ["tex", "log", "pdf", "aux"]
+        [path_to_tex_file], [tex_filename], ["tex", "log", "pdf", "aux"]
     )
 
     with graphDB_Driver.session() as session:
@@ -183,7 +183,7 @@ def generate_tex_file_for_derivation(
                         number_of_args  # macros are limited to 9 inputs;
                     )
                     + "]{"
-                    + infrule_dict["latex"]
+                    + infrule_dict["latex"].replace("\r", "\\r")
                     + "}\n"
                 )
             else:  # 10 or more args; see https://www.texfaq.org/FAQ-moren9
@@ -253,9 +253,9 @@ def generate_tex_file_for_derivation(
             for step_dict in list_of_step_dicts_in_this_derivation:
                 # print("step_dict=", step_dict)
 
-                inference_rule_latex = all_steps[step_dict["id"]][
-                    "inference rule dict"
-                ]["latex"]
+                inference_rule_name = all_steps[step_dict["id"]]["inference rule dict"][
+                    "name_latex"
+                ]
                 # print("inference_rule_latex = ", inference_rule_latex)
 
                 list_of_input_expression_latex = []
@@ -317,7 +317,7 @@ def generate_tex_file_for_derivation(
                     lat_file.write(
                         # digits cannot be used to name macros
                         "\\"
-                        + "".join(filter(str.isalpha, inference_rule_latex))
+                        + "".join(filter(str.isalpha, inference_rule_name))
                     )
                     for feed_latex in list_of_feed_latex:
                         lat_file.write("{" + feed_latex + "}")
@@ -389,9 +389,6 @@ def generate_pdf_for_derivation(
     # destination for the PDF once file is built
 
     pdf_filename = derivation_id
-
-    # no longer necessary since the temporary build folder is empty
-    # compute.remove_file_debris([path_to_pdf], [pdf_filename], ["log", "pdf"])
 
     tex_filename_without_extension = generate_tex_file_for_derivation(
         graphDB_Driver, query_time_dict, derivation_id, path_to_pdf
