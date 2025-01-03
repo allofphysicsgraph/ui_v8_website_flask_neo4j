@@ -99,9 +99,9 @@ def get_dict_of_node_type_for_every_id(
 
 
 def remove_file_debris(
-    list_of_paths_to_files: list,
-    list_of_file_names: list,
-    list_of_file_extensions: list,
+    list_of_paths_to_files: List[str],
+    list_of_file_names: List[str],
+    list_of_file_extensions: List[str],
 ) -> None:
     """
 
