@@ -20,6 +20,8 @@ import shutil
 from subprocess import PIPE  # https://docs.python.org/3/library/subprocess.html
 import subprocess  # https://stackoverflow.com/questions/39187886/what-is-the-difference-between-subprocess-popen-and-subprocess-run/39187984
 
+import hashlib
+
 # https://docs.python.org/3/library/typing.html
 # from typing import Tuple, TextIO, List  # mypy
 # TextIO is file handle assocaited with `open()`
@@ -94,7 +96,7 @@ def generate_tex_file_for_derivation(
         tex_filename: pass back filename without extension because bibtex cannot handle .tex
     Raises:
 
-    >>> path_to_tex_file = "/home/appuser/app/static/"  # must end with /
+    >>> path_to_tex_file = "/code/static/"  # must end with /
     >>> generate_tex_for_derivation("000001")
     """
 
@@ -241,12 +243,56 @@ def generate_tex_file_for_derivation(
             lat_file.write(derivation_dict["abstract_latex"] + "\n")
         lat_file.write("\\end{abstract}\n")
 
+        all_steps, query_time_dict = compute.all_steps_in_derivation(
+            graphDB_Driver, derivation_id, query_time_dict
+        )
+        # print("all_steps = ", all_steps)
+
         for linear_indx in list_of_sequence_values:
             # print("linear_indx=", linear_indx)
             for step_dict in list_of_step_dicts_in_this_derivation:
                 # print("step_dict=", step_dict)
+
+                inference_rule_latex = all_steps[step_dict["id"]][
+                    "inference rule dict"
+                ]["latex"]
+                # print("inference_rule_latex = ", inference_rule_latex)
+
+                list_of_input_expression_latex = []
+                for this_input_dict in all_steps[step_dict["id"]][
+                    "list of input dicts"
+                ]:
+                    # print("this_input_dict=", this_input_dict)
+                    # this_input_dict= {'m': {'sympy_lhs': "sympy.Symbol('pdg9592623')", 'reference_latex': '', 'latex_condition': '', 'sympy_rhs': "sympy.Symbol('pdg7689637')", 'description_latex': '', 'latex_lhs': 'a', 'name_latex': '', 'lean': '', 'latex_rhs': 'b', 'author_name_latex': 'ben', 'id': '3636307', 'sympy': "sympy.Eq(sympy.Symbol('pdg9592623'),sympy.Symbol('pdg7689637'))", 'latex_relation': '='}}
+                    list_of_input_expression_latex.append(
+                        this_input_dict["m"]["latex_lhs"]
+                        + this_input_dict["m"]["latex_relation"]
+                        + this_input_dict["m"]["latex_rhs"]
+                    )
+
+                list_of_feed_latex = []
+                for this_feed_dict in all_steps[step_dict["id"]]["list of feed dicts"]:
+                    list_of_feed_latex.append(this_feed_dict["m"]["latex"])
+
+                list_of_output_expression_latex = []
+                for this_output_dict in all_steps[step_dict["id"]][
+                    "list of output dicts"
+                ]:
+                    list_of_output_expression_latex.append(
+                        this_input_dict["m"]["latex_lhs"]
+                        + this_input_dict["m"]["latex_relation"]
+                        + this_input_dict["m"]["latex_rhs"]
+                    )
+
                 if step_dict["sequence_index"] == linear_indx:
-                    if "image" in step_dict.keys():
+
+                    lat_file.write("\n")
+                    if len(step_dict["note_before_step_latex"]) > 0:
+                        lat_file.write(step_dict["note_before_step_latex"] + "\n")
+
+                    if (
+                        "image" in step_dict.keys()
+                    ):  # as of 2025-01-02 `image` isn't a valid key in the schema
                         lat_file.write("\\begin{center}\n")
                         lat_file.write("\\begin{figure}\n")
                         #        shutil.copy(
@@ -271,33 +317,40 @@ def generate_tex_file_for_derivation(
                     lat_file.write(
                         # digits cannot be used to name macros
                         "\\"
-                        + "".join(filter(str.isalpha, step_dict["inference_rule"]))
+                        + "".join(filter(str.isalpha, inference_rule_latex))
                     )
-                    for expr_local_id in step_dict["feeds"]:
-                        #                        lat_file.write("{" + expr_local_id + "}")
-                        expr_global_id = dat["expr local to global"][expr_local_id]
-                        lat_file.write(
-                            "{" + dat["expressions"][expr_global_id]["latex"] + "}"
+                    for feed_latex in list_of_feed_latex:
+                        lat_file.write("{" + feed_latex + "}")
+                    for input_latex in list_of_input_expression_latex:
+
+                        this_str = str(input_latex) + str(derivation_dict["name_latex"])
+                        local_id = hashlib.md5(this_str.encode("utf-8")).hexdigest()
+
+                        lat_file.write("{" + local_id + "}")
+                    for output_latex in list_of_output_expression_latex:
+
+                        this_str = str(output_latex) + str(
+                            derivation_dict["name_latex"]
                         )
-                    for expr_local_id in step_dict["inputs"]:
-                        # expr_global_id = dat["expr local to global"][expr_local_id]
-                        lat_file.write("{" + expr_local_id + "}")
-                    for expr_local_id in step_dict["outputs"]:
-                        # expr_global_id = dat["expr local to global"][expr_local_id]
-                        lat_file.write("{" + expr_local_id + "}")
+                        local_id = hashlib.md5(this_str.encode("utf-8")).hexdigest()
+
+                        lat_file.write("{" + local_id + "}")
                     lat_file.write("\n")
-                    if len(step_dict["notes"]) > 0:
+                    if len(step_dict["note_after_step_latex"]) > 0:
                         lat_file.write(
-                            step_dict["notes"] + "\n"
+                            step_dict["note_after_step_latex"] + "\n"
                         )  # TODO: if the note contains a $ or %, shenanigans arise
                     # write output expressions
-                    for expr_local_id in step_dict["outputs"]:
-                        expr_global_id = dat["expr local to global"][expr_local_id]
-                        lat_file.write("\\begin{equation}\n")
-                        lat_file.write(
-                            dat["expressions"][expr_global_id]["latex"] + "\n"
+                    for output_latex in list_of_output_expression_latex:
+
+                        this_str = str(output_latex) + str(
+                            derivation_dict["name_latex"]
                         )
-                        lat_file.write("\\label{eq:" + expr_local_id + "}\n")
+                        local_id = hashlib.md5(this_str.encode("utf-8")).hexdigest()
+
+                        lat_file.write("\\begin{equation}\n")
+                        lat_file.write(output_latex + "\n")
+                        lat_file.write("\\label{eq:" + local_id + "}\n")
                         lat_file.write("\\end{equation}\n")
 
         lat_file.write("\\bibliographystyle{plain}\n")
@@ -310,14 +363,14 @@ def generate_tex_file_for_derivation(
     return tex_filename  # pass back filename without extension because bibtex cannot handle .tex
 
 
-def FROMv7_NOT_YET_CONVERTED_generate_pdf_for_derivation(
+def generate_pdf_for_derivation(
     graphDB_Driver, query_time_dict: dict, derivation_id: str, path_to_pdf: str
 ) -> str:
     """
 
     Args:
         deriv_id: numeric identifier of the derivation
-        path_to_pdf = "/home/appuser/app/static/"  # must end with /
+        path_to_pdf = "/code/static/"  # must end with /
     Returns:
         pdf_filename + ".pdf":
     Raises:
@@ -347,15 +400,15 @@ def FROMv7_NOT_YET_CONVERTED_generate_pdf_for_derivation(
 
     # copy the current pdg.bib from static to local for use with bibtex when compiling tex to PDF
     # https://docs.python.org/3/library/shutil.html
-    shutil.copy("/home/appuser/app/static/pdg.bib", tmp_latex_folder_full_path)
-    # shutil.copy("/home/appuser/app/static/pdg.bib", "/home/appuser/app/")
+    shutil.copy("/code/static/pdg.bib", tmp_latex_folder_full_path)
+    # shutil.copy("/code/static/pdg.bib", "/code/")
 
     # images need to be in the temporary folder to compile the .tex to PDF
     # https://docs.python.org/3/library/shutil.html#shutil.copytree
     # shutil.copytree(
-    #        "/home/appuser/app/static/diagrams/", tmp_latex_folder_full_path
+    #        "/code/static/diagrams/", tmp_latex_folder_full_path
     # )
-    for filename in glob.glob("/home/appuser/app/static/diagrams/*"):
+    for filename in glob.glob("/code/static/diagrams/*"):
         # logger.info("copied "+filename+" from "+filename+" to "+tmp_latex_folder_full_path)
         shutil.copy(filename, tmp_latex_folder_full_path)
 
@@ -463,7 +516,7 @@ def create_png_from_expression_latex(input_latex_str: str, png_name: str) -> Non
 
     this function relies on latex  being available on the command line
     this function relies on dvipng being available on the command line
-    this function assumes generated PNG should be placed in /home/appuser/app/static/
+    this function assumes generated PNG should be placed in /code/static/
 
     Args:
         path_to_db: filename of the SQL database containing
@@ -478,13 +531,13 @@ def create_png_from_expression_latex(input_latex_str: str, png_name: str) -> Non
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[trace start " + trace_id + "]")
 
-    destination_folder = "/home/appuser/app/static/"
+    destination_folder = "/code/static/"
 
     #    logger.debug("png_name = %s", png_name)
     #    logger.debug("input latex str = %s", input_latex_str)
 
     # TODO: I'd like to have the latex build process take place in an isolated directory
-    # instead of the /home/appuser/app/ location used now
+    # instead of the /code/ location used now
 
     tmp_latex_folder = "tmp_latex_folder_" + str(random.randint(1000000, 9999999))
     tmp_latex_folder_full_path = os.getcwd() + "/" + tmp_latex_folder + "/"
@@ -503,7 +556,7 @@ def create_png_from_expression_latex(input_latex_str: str, png_name: str) -> Non
     # logger.debug(str(os.listdir()))
 
     # only make PNG if .tex did not exist
-    if not os.path.exists("/home/appuser/app/static/" + tex_filename_with_hash):
+    if not os.path.exists("/code/static/" + tex_filename_with_hash):
         shutil.copy(tmp_file + ".tex", destination_folder + tex_filename_with_hash)
 
         process = subprocess.run(
@@ -565,7 +618,7 @@ def create_png_from_expression_latex(input_latex_str: str, png_name: str) -> Non
     shutil.rmtree(tmp_latex_folder_full_path)
 
     #    if os.path.isfile(destination_folder + png_name):
-    # os.remove('/home/appuser/app/static/'+name_of_png)
+    # os.remove('/code/static/'+name_of_png)
     #        logger.error("png already exists!")
 
     # return True, "success"
@@ -644,7 +697,7 @@ def create_derivation_png(deriv_id: str, path_to_db: str) -> str:
 
     dat = clib.read_db(path_to_db)
 
-    dot_filename = "/home/appuser/app/static/derivation_" + deriv_id + ".dot"
+    dot_filename = "/code/static/derivation_" + deriv_id + ".dot"
     with open(dot_filename, "w") as file_handle:
         file_handle.write("digraph physicsDerivation { \n")
         file_handle.write("overlap = false;\n")
@@ -664,12 +717,12 @@ def create_derivation_png(deriv_id: str, path_to_db: str) -> str:
     output_filename = (
         "derivation_" + deriv_id + "_" + md5_of_file(dot_filename) + ".png"
     )
-    # neato -Tpng graphviz.dot > /home/appuser/app/static/graphviz.png
-    #    process = Popen(['neato','-Tpng','graphviz.dot','>','/home/appuser/app/static/graphviz.png'], stdout=PIPE, stderr=PIPE)
+    # neato -Tpng graphviz.dot > /code/static/graphviz.png
+    #    process = Popen(['neato','-Tpng','graphviz.dot','>','/code/static/graphviz.png'], stdout=PIPE, stderr=PIPE)
 
     # force redraw when updating step
     # a better way would be to check the md5 hash of the .dot file
-    if not os.path.exists("/home/appuser/app/static/" + output_filename):
+    if not os.path.exists("/code/static/" + output_filename):
         process = subprocess.run(
             ["neato", "-Tpng", dot_filename, "-o" + output_filename],
             stdout=PIPE,
@@ -684,7 +737,7 @@ def create_derivation_png(deriv_id: str, path_to_db: str) -> str:
         if len(neato_stderr) > 0:
             logger.debug(neato_stderr)
 
-        shutil.move(output_filename, "/home/appuser/app/static/" + output_filename)
+        shutil.move(output_filename, "/code/static/" + output_filename)
     # return True, "no invalid latex", output_filename
     logger.info("[trace end " + trace_id + "]")
     return output_filename
@@ -717,8 +770,8 @@ def create_step_graphviz_png(deriv_id: str, step_id: str, path_to_db: str) -> st
     logger.info("[trace start " + trace_id + "]")
     dat = clib.read_db(path_to_db)
 
-    dot_filename = "/home/appuser/app/static/graphviz.dot"
-    remove_file_debris(["/home/appuser/app/static/"], ["graphviz"], ["dot"])
+    dot_filename = "/code/static/graphviz.dot"
+    remove_file_debris(["/code/static/"], ["graphviz"], ["dot"])
 
     with open(dot_filename, "w") as fil:
         file_handle.write("digraph physicsDerivation { \n")
@@ -742,9 +795,9 @@ def create_step_graphviz_png(deriv_id: str, step_id: str, path_to_db: str) -> st
     logger.debug("output_filename = %s", output_filename)
     remove_file_debris(["./"], ["graphviz"], ["png"])
 
-    # neato -Tpng graphviz.dot > /home/appuser/app/static/graphviz.png
-    #    process = Popen(['neato','-Tpng','graphviz.dot','>','/home/appuser/app/static/graphviz.png'], stdout=PIPE, stderr=PIPE)
-    if not os.path.exists("/home/appuser/app/static/" + output_filename):
+    # neato -Tpng graphviz.dot > /code/static/graphviz.png
+    #    process = Popen(['neato','-Tpng','graphviz.dot','>','/code/static/graphviz.png'], stdout=PIPE, stderr=PIPE)
+    if not os.path.exists("/code/static/" + output_filename):
         process = subprocess.run(
             ["neato", "-Tpng", dot_filename, "-o" + output_filename],
             stdout=PIPE,
@@ -758,7 +811,7 @@ def create_step_graphviz_png(deriv_id: str, step_id: str, path_to_db: str) -> st
         if len(neato_stderr) > 0:
             logger.debug(neato_stderr)
 
-        shutil.move(output_filename, "/home/appuser/app/static/" + output_filename)
+        shutil.move(output_filename, "/code/static/" + output_filename)
     # return True, "no invalid latex", output_filename
     logger.info("[trace end " + trace_id + "]")
     return output_filename
@@ -800,11 +853,11 @@ def write_step_to_graphviz_file(
 
     # inference rule
     png_name = "".join(filter(str.isalnum, step_dict["inf rule"]))
-    if not os.path.isfile("/home/appuser/app/static/" + png_name + ".png"):
+    if not os.path.isfile("/code/static/" + png_name + ".png"):
         create_png_from_latex("\\text{" + step_dict["inf rule"] + "}", png_name)
     file_handle.write(
         step_id
-        + ' [shape=invtrapezium, color=blue, label="",image="/home/appuser/app/static/'
+        + ' [shape=invtrapezium, color=blue, label="",image="/code/static/'
         + png_name
         + ".png"
         + '",labelloc=b];\n'
@@ -814,12 +867,12 @@ def write_step_to_graphviz_file(
     for expr_local_id in step_dict["inputs"]:
         expr_global_id = dat["expr local to global"][expr_local_id]
         png_name = expr_global_id
-        if not os.path.isfile("/home/appuser/app/static/" + png_name + ".png"):
+        if not os.path.isfile("/code/static/" + png_name + ".png"):
             create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_name)
         file_handle.write(expr_local_id + " -> " + step_id + ";\n")
         file_handle.write(
             expr_local_id
-            + ' [shape=ellipse, color=black,label="",image="/home/appuser/app/static/'
+            + ' [shape=ellipse, color=black,label="",image="/code/static/'
             + png_name
             + ".png"
             + '",labelloc=b];\n'
@@ -829,12 +882,12 @@ def write_step_to_graphviz_file(
     for expr_local_id in step_dict["outputs"]:
         expr_global_id = dat["expr local to global"][expr_local_id]
         png_name = expr_global_id
-        if not os.path.isfile("/home/appuser/app/static/" + png_name + ".png"):
+        if not os.path.isfile("/code/static/" + png_name + ".png"):
             create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_name)
         file_handle.write(step_id + " -> " + expr_local_id + ";\n")
         file_handle.write(
             expr_local_id
-            + ' [shape=ellipse, color=black,label="",image="/home/appuser/app/static/'
+            + ' [shape=ellipse, color=black,label="",image="/code/static/'
             + png_name
             + ".png"
             + '",labelloc=b];\n'
@@ -844,12 +897,12 @@ def write_step_to_graphviz_file(
     for expr_local_id in step_dict["feeds"]:
         expr_global_id = dat["expr local to global"][expr_local_id]
         png_name = expr_global_id
-        if not os.path.isfile("/home/appuser/app/static/" + png_name + ".png"):
+        if not os.path.isfile("/code/static/" + png_name + ".png"):
             create_png_from_latex(dat["expressions"][expr_global_id]["latex"], png_name)
         file_handle.write(expr_local_id + " -> " + step_id + ";\n")
         file_handle.write(
             expr_local_id
-            + ' [shape=box, color=red,label="",image="/home/appuser/app/static/'
+            + ' [shape=box, color=red,label="",image="/code/static/'
             + png_name
             + ".png"
             + '",labelloc=b];\n'

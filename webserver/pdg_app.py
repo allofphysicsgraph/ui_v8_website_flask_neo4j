@@ -100,7 +100,6 @@ from werkzeug.utils import secure_filename
 from wtforms import (
     StringField,  # one-line text input
     SelectField,  # dropdown
-    SubmitField,
     validators,
     FormField,
     IntegerField,
@@ -233,12 +232,17 @@ import pdg_api
 web_app.register_blueprint(pdg_api.bp)
 
 
-class DeleteButtonForm(FlaskForm):
+class NoOptionsForm(FlaskForm):
     """
-    TODO: not in use yet
+    This is used when the HTML form deviates from using the FlaskForm buttons
     """
+    pass
 
-    delete_button = SubmitField()
+# class DeleteButtonForm(FlaskForm):
+#     """
+#     not in use currently
+#     """
+#     delete_button = SubmitField("Delete")
 
 
 class SpecifyNewDerivationForm(FlaskForm):
@@ -841,13 +845,6 @@ class CypherQueryForm(FlaskForm):
     )
 
 
-class NoOptionsForm(FlaskForm):
-    """
-    no text input
-    """
-
-    pass
-
 
 @web_app.before_request
 def before_request():
@@ -1214,38 +1211,94 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     )
     # tex_filename is str(derivation_id)
 
-    web_form = NoOptionsForm(request.form)
+    path_to_pdf = path_to_tex_file
+    pdf_filname = latex.generate_pdf_for_derivation(
+        graphDB_Driver, query_time_dict, derivation_id, path_to_pdf
+    )
+
+    web_form_delete = NoOptionsForm(request.form)
+    web_form_tex_pdf = NoOptionsForm(request.form)
     # web_form = DeleteButtonForm(request.form)
     if request.method == "POST":
         print("request.form = ", request.form)
-        # delete derivation (yikes!). Here's how:
-        # 1) for each step, delete step node
-        # 2) delete derivation node
 
-        list_of_step_dicts = []
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_step_dicts = session.read_transaction(
-                neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+        if request.form["submit_button"] == "generate_pdf":
+            # request.form = ImmutableMultiDict([('derivation_selected', 'another deriv'), ('submit_button', 'generate_pdf')])
+
+            if current_user.is_anonymous:
+                email = "none"
+            else:
+                email = current_user.email
+            try:
+                pdf_filename = compute.generate_pdf_for_derivation(
+                    deriv_id, email, path_to_db
+                )
+            except Exception as err:
+                logger.error(str(err))
+                flash(str(err))
+                pdf_filename = "error.pdf"
+
+            logger.info("[trace page end " + trace_id + "]")
+            return redirect(
+                url_for(
+                    "static",
+                    filename="dumping_grounds/" + pdf_filename,
+                    referrer="select_from_existing_derivations",
+                )
             )
-            query_time_dict[
-                "to_review_derivation: get_list_of_step_dicts_in_this_derivation"
-            ] = round(time.time() - query_start_time, 3)
-        print("list_of_step_dicts (to delete)=", list_of_step_dicts)
 
-        for this_step_dict in list_of_step_dicts:
+        elif request.form["submit_button"] == "generate_tex":
+            # request.form = ImmutableMultiDict([('derivation_selected', 'another deriv'), ('submit_button', 'generate_tex')])
+            try:
+                tex_filename = compute.generate_tex_for_derivation(
+                    deriv_id, current_user.email, path_to_db
+                )
+            except Exception as err:
+                logger.error(str(err))
+                flash(str(err))
+                logger.info("[trace page end " + trace_id + "]")
+                return redirect(url_for("select_from_existing_derivations"))
+
+            logger.info("[trace page end " + trace_id + "]")
+            return redirect(
+                url_for(
+                    "static",
+                    filename="dumping_grounds/" + tex_filename,
+                    referrer="select_from_existing_derivations",
+                )
+            )
+
+        elif request.form["submit_button"] == "delete derivation and steps":
+            # delete derivation (yikes!). Here's how:
+            # 1) for each step, delete step node
+            # 2) delete derivation node
+
+            list_of_step_dicts = []
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                list_of_step_dicts = session.read_transaction(
+                    neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+                )
+                query_time_dict[
+                    "to_review_derivation: get_list_of_step_dicts_in_this_derivation"
+                ] = round(time.time() - query_start_time, 3)
+            print("list_of_step_dicts (to delete)=", list_of_step_dicts)
+
+            for this_step_dict in list_of_step_dicts:
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.delete_node, this_step_dict["id"], "step"
+                    )
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 session.write_transaction(
-                    neo4j_query.delete_node, this_step_dict["id"], "step"
+                    neo4j_query.delete_node, derivation_id, "derivation"
                 )
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.delete_node, derivation_id, "derivation"
-            )
-        print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
-        redirect(url_for("to_list_derivations"))
+            print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
+            redirect(url_for("to_list_derivations"))
+        else:
+            flash("unrecongized button in" + str(request.form))
 
     print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
     return render_template(
@@ -1253,7 +1306,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
         query_time_dict=query_time_dict,
         derivation_dict=derivation_dict,
         all_steps=all_steps,
-        form=web_form,
+        form_delete=web_form_delete,
+        form_tex_pdf=web_form_tex_pdf,
     )
 
 
