@@ -717,7 +717,7 @@ def all_steps_in_derivation(
             query_time_dict[
                 "compute/all_steps_in_derivation: step_has_inference_rule"
             ] = round(time.time() - query_start_time, 3)
-        print("inference_rule_dict=", inference_rule_dict)
+        # print("inference_rule_dict=", inference_rule_dict)
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_input_dicts = session.read_transaction(
@@ -728,7 +728,7 @@ def all_steps_in_derivation(
             query_time_dict[
                 "compute/all_steps_in_derivation: step_id_has_expressions, HAS_INPUT"
             ] = round(time.time() - query_start_time, 3)
-        print("list_of_input_dicts=", list_of_input_dicts)
+        # print("list_of_input_dicts=", list_of_input_dicts)
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_feed_dicts = session.read_transaction(
@@ -739,7 +739,7 @@ def all_steps_in_derivation(
             query_time_dict[
                 "compute/all_steps_in_derivation: step_id_has_expressions, HAS_FEED"
             ] = round(time.time() - query_start_time, 3)
-        print("list_of_feed_dicts=", list_of_feed_dicts)
+        # print("list_of_feed_dicts=", list_of_feed_dicts)
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_output_dicts = session.read_transaction(
@@ -750,7 +750,7 @@ def all_steps_in_derivation(
             query_time_dict[
                 "compute/all_steps_in_derivation: step_id_has_expressions, HAS_OUTPUT"
             ] = round(time.time() - query_start_time, 3)
-        print("list_of_output_dicts=", list_of_output_dicts)
+        # print("list_of_output_dicts=", list_of_output_dicts)
 
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -760,7 +760,7 @@ def all_steps_in_derivation(
             query_time_dict[
                 "compute/all_steps_in_derivation: step_has_sequence_index"
             ] = round(time.time() - query_start_time, 3)
-        print("sequence_index=", sequence_index)
+        # print("sequence_index=", sequence_index)
 
         all_steps[this_step_dict["id"]] = {
             "sequence index": sequence_index,

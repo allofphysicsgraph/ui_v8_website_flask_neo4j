@@ -236,7 +236,9 @@ class NoOptionsForm(FlaskForm):
     """
     This is used when the HTML form deviates from using the FlaskForm buttons
     """
+
     pass
+
 
 # class DeleteButtonForm(FlaskForm):
 #     """
@@ -845,7 +847,6 @@ class CypherQueryForm(FlaskForm):
     )
 
 
-
 @web_app.before_request
 def before_request():
     """
@@ -1203,19 +1204,6 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
 
     # TODO: display graph of derivation (e.g., graphviz, d3js)
 
-    # TODO: display tex, PDF
-
-    path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
-    tex_filename = latex.generate_tex_file_for_derivation(
-        graphDB_Driver, query_time_dict, derivation_id, path_to_tex_file
-    )
-    # tex_filename is str(derivation_id)
-
-    path_to_pdf = path_to_tex_file
-    pdf_filname = latex.generate_pdf_for_derivation(
-        graphDB_Driver, query_time_dict, derivation_id, path_to_pdf
-    )
-
     web_form_delete = NoOptionsForm(request.form)
     web_form_tex_pdf = NoOptionsForm(request.form)
     # web_form = DeleteButtonForm(request.form)
@@ -1225,20 +1213,19 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
         if request.form["submit_button"] == "generate_pdf":
             # request.form = ImmutableMultiDict([('derivation_selected', 'another deriv'), ('submit_button', 'generate_pdf')])
 
-            if current_user.is_anonymous:
-                email = "none"
-            else:
-                email = current_user.email
+            path_to_pdf = "/code/static/dumping_grounds/"  # should end with slash
+
             try:
-                pdf_filename = compute.generate_pdf_for_derivation(
-                    deriv_id, email, path_to_db
+                pdf_filename = latex.generate_pdf_for_derivation(
+                    graphDB_Driver, query_time_dict, derivation_id, path_to_pdf
                 )
             except Exception as err:
-                logger.error(str(err))
+                # logger.error(str(err))
                 flash(str(err))
+                print("error=" + str(err))
                 pdf_filename = "error.pdf"
 
-            logger.info("[trace page end " + trace_id + "]")
+            print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
             return redirect(
                 url_for(
                     "static",
@@ -1249,17 +1236,21 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
 
         elif request.form["submit_button"] == "generate_tex":
             # request.form = ImmutableMultiDict([('derivation_selected', 'another deriv'), ('submit_button', 'generate_tex')])
+
+            path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
+
             try:
-                tex_filename = compute.generate_tex_for_derivation(
-                    deriv_id, current_user.email, path_to_db
+                tex_filename = latex.generate_tex_file_for_derivation(
+                    graphDB_Driver, query_time_dict, derivation_id, path_to_tex_file
                 )
+                # tex_filename is str(derivation_id)
             except Exception as err:
-                logger.error(str(err))
+                # logger.error(str(err))
                 flash(str(err))
-                logger.info("[trace page end " + trace_id + "]")
+                print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
                 return redirect(url_for("select_from_existing_derivations"))
 
-            logger.info("[trace page end " + trace_id + "]")
+            print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
             return redirect(
                 url_for(
                     "static",
