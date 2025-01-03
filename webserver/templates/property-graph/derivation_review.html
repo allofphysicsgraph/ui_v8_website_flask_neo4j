@@ -69,7 +69,7 @@
 
 <fieldset>
 <legend>
-  <H2>Edit Derivation</h2>
+  <H2>Actions: Edit Derivation</h2>
 </legend>
 
 <UL>
@@ -86,14 +86,31 @@ the following two were removed because the user should click on step ID in table
 
 <fieldset>
   <legend>
+    <H2>Generate Tex file or PDF file</H2>
+  </legend>
+
+
+
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form_tex_pdf.csrf_token }}
+
+    <button type="submit" class="btn btn-default" name="submit_button" value="generate_pdf">generate PDF file</button>
+    <button type="submit" class="btn btn-default" name="submit_button" value="generate_tex">generate tex file</button>
+
+  </form>
+</fieldset>
+
+
+<fieldset>
+  <legend>
     <H2>Delete Derivation and all associated steps</H2>
   </legend>
 <P>This leaves expressions, symbols, and operations as-is. 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form.csrf_token }}
+    {{ form_delete.csrf_token }}
     <P>
 
-    <input type="submit" value="delete derivation and steps">
+    <input type="submit" name="submit_button" value="delete derivation and steps">
 
   </form>
 </fieldset>
