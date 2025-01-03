@@ -611,7 +611,7 @@ def get_list_of_expression_dicts_from_step_id_and_expr_type(
         # print(result.data())
         list_of_expression_dicts.append(result.data())
 
-    print("list_of_expression_dicts=", list_of_expression_dicts)
+    # print("list_of_expression_dicts=", list_of_expression_dicts)
 
     print(
         "[TRACE] func: neo4j_query/get_list_of_expression_dicts_from_step_id_and_expr_type end "
