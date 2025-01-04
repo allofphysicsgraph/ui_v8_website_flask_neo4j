@@ -1033,12 +1033,18 @@ def write_step_to_graphviz_file(
 
     # input expression
     for input_dict in list_of_input_dicts:
+        # TODO: account for input_dict['latex_condition']
+        input_latex = (
+            input_dict["m"]["latex_lhs"]
+            + input_dict["m"]["latex_relation"]
+            + input_dict["m"]["latex_rhs"]
+        )
         png_filename_no_extension = (
-            "expression_" + input_dict["id"] + "_" + hash_of_string(input_dict["latex"])
+            "expression_" + input_dict["m"]["id"] + "_" + hash_of_string(input_latex)
         )
         if not os.path.isfile(path_to_output_png + png_filename_no_extension + ".png"):
             create_png_from_latex(
-                input_dict["latex"], path_to_output_png, png_filename_no_extension
+                input_latex, path_to_output_png, png_filename_no_extension
             )
         file_handle.write(png_filename_no_extension + " -> " + step_dict["id"] + ";\n")
         file_handle.write(
@@ -1052,15 +1058,19 @@ def write_step_to_graphviz_file(
 
     # output expressions
     for output_dict in list_of_output_dicts:
+        # TODO: account for output_dict['latex_condition']
+        output_latex = (
+            output_dict["m"]["latex_lhs"]
+            + output_dict["m"]["latex_relation"]
+            + output_dict["m"]["latex_rhs"]
+        )
+
         png_filename_no_extension = (
-            "expression_"
-            + output_dict["id"]
-            + "_"
-            + hash_of_string(output_dict["latex"])
+            "expression_" + output_dict["m"]["id"] + "_" + hash_of_string(output_latex)
         )
         if not os.path.isfile(path_to_output_png + png_filename_no_extension + ".png"):
             create_png_from_latex(
-                output_dict["latex"], path_to_output_png, png_filename_no_extension
+                output_latex, path_to_output_png, png_filename_no_extension
             )
         file_handle.write(step_dict["id"] + " -> " + png_filename_no_extension + ";\n")
         file_handle.write(
@@ -1075,11 +1085,11 @@ def write_step_to_graphviz_file(
     # feed expressions
     for feed_dict in list_of_feed_dicts:
         png_filename_no_extension = (
-            "feed_" + feed_dict["id"] + "_" + hash_of_string(feed_dict["latex"])
+            "feed_" + feed_dict["m"]["id"] + "_" + hash_of_string(feed_dict["m"]["latex"])
         )
         if not os.path.isfile(path_to_output_png + png_filename_no_extension + ".png"):
             create_png_from_latex(
-                feed_dict["latex"], path_to_output_png, png_filename_no_extension
+                feed_dict["m"]["latex"], path_to_output_png, png_filename_no_extension
             )
         file_handle.write(png_filename_no_extension + " -> " + step_dict["id"] + ";\n")
         file_handle.write(
