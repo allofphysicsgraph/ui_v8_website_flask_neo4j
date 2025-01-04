@@ -652,8 +652,10 @@ def create_png_from_latex(
 
         #    logger.debug(str(os.listdir()))
 
-        logger.debug("latex std out:" + str(latex_stdout))
-        logger.debug("latex std err:" + str(latex_stderr))
+        # logger.debug("latex std out:" + str(latex_stdout))
+        # logger.debug("latex std err:" + str(latex_stderr))
+        print("latex std out:" + str(latex_stdout))
+        print("latex std err:" + str(latex_stderr))
 
         if "Text line contains an invalid character" in latex_stdout:
             logging.error("tex input contains invalid charcter")
@@ -684,14 +686,17 @@ def create_png_from_latex(
 
         if len(png_stdout) > 0:
             if "This is dvipng" not in png_stdout:
-                logger.debug("png std out %s", png_stdout)
+                # logger.debug("png std out %s", png_stdout)
+                print("png std out %s", png_stdout)
         if len(png_stderr) > 0:
-            logger.debug("png std err %s", png_stderr)
+            # logger.debug("png std err %s", png_stderr)
+            print("png std err %s", png_stderr)
 
         # logger.debug(str(os.listdir()))
 
         if "No such file or directory" in png_stderr:
-            logging.error("PNG creation failed for %s", png_filename_no_extension)
+            # logging.error("PNG creation failed for %s", png_filename_no_extension)
+            print("PNG creation failed for %s", png_filename_no_extension)
             shutil.copy(
                 destination_folder + "error.png",
                 destination_folder + png_filename_no_extension,
@@ -711,7 +716,8 @@ def create_png_from_latex(
             destination_folder + png_filename_no_extension + ".png",
         )
 
-    logger.debug(destination_folder + png_filename_no_extension + ".png")
+    # logger.debug(destination_folder + png_filename_no_extension + ".png")
+    print(destination_folder + png_filename_no_extension + ".png")
 
     os.chdir(original_dir)
     shutil.rmtree(tmp_latex_folder_full_path)
@@ -861,10 +867,12 @@ def create_derivation_png(
 
         neato_stdout = process.stdout.decode("utf-8")
         if len(neato_stdout) > 0:
-            logger.debug(neato_stdout)
+            # logger.debug(neato_stdout)
+            print(neato_stdout)
         neato_stderr = process.stderr.decode("utf-8")
         if len(neato_stderr) > 0:
-            logger.debug(neato_stderr)
+            # logger.debug(neato_stderr)
+            print(neato_stderr)
 
         shutil.move(output_filename, path_to_output_png + output_filename)
     # return True, "no invalid latex", output_filename
@@ -926,7 +934,8 @@ def create_step_graphviz_png(
     #       logger.debug(file_handle.read())
 
     output_filename = step_id + ".png"
-    logger.debug("output_filename = %s", output_filename)
+    # logger.debug("output_filename = %s", output_filename)
+    print("output_filename = %s", output_filename)
     remove_file_debris([destination_folder], ["graphviz"], ["png"])
 
     # neato -Tpng graphviz.dot > /code/static/graphviz.png
@@ -940,10 +949,12 @@ def create_step_graphviz_png(
         )
         neato_stdout = process.stdout.decode("utf-8")
         if len(neato_stdout) > 0:
-            logger.debug(neato_stdout)
+            # logger.debug(neato_stdout)
+            print(neato_stdout)
         neato_stderr = process.stderr.decode("utf-8")
         if len(neato_stderr) > 0:
-            logger.debug(neato_stderr)
+            # logger.debug(neato_stderr)
+            print(neato_stdout)
 
         shutil.move(output_filename, destination_folder + output_filename)
     # return True, "no invalid latex", output_filename
