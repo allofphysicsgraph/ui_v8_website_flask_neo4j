@@ -201,6 +201,8 @@ except neo4j.exceptions.ClientError as er:
 
 import importlib
 
+print("python", sys.version)
+print("neo4j", importlib.metadata.version("neo4j"), "- https://pypi.org/project/neo4j/")
 print(
     "flask",
     importlib.metadata.version("flask"),
@@ -224,8 +226,6 @@ print(
     importlib.metadata.version("flask_wtf"),
     "- https://flask-wtf.readthedocs.io/en/1.2.x/",
 )
-print("neo4j", importlib.metadata.version("neo4j"), "- https://pypi.org/project/neo4j/")
-print("python", sys.version)
 
 
 class Config(object):
@@ -1149,30 +1149,33 @@ def to_add_derivation() -> str:
         ).strip()
         abstract_latex = str(web_form.abstract_latex.data).strip()
 
-        derivation_name_latex_SAFE = latex.make_string_safe_for_latex(
-            derivation_name_latex
-        )
-        if derivation_name_latex_SAFE != derivation_name_latex:
-            print("   derivation name submitted:", derivation_name_latex)
-            print("   derivation name altered:", derivation_name_latex_SAFE)
-            flash("derivation name altered to " + str(derivation_name_latex_SAFE))
-        derivation_name_latex = derivation_name_latex_SAFE
+        # 2025-01-04, BHP: the following has been commented out
+        # because the safety of string should be applied on writing, not reading
+        #
+        # derivation_name_latex_SAFE = latex.make_string_safe_for_latex(
+        #     derivation_name_latex
+        # )
+        # if derivation_name_latex_SAFE != derivation_name_latex:
+        #     print("   derivation name submitted:", derivation_name_latex)
+        #     print("   derivation name altered:", derivation_name_latex_SAFE)
+        #     flash("derivation name altered to " + str(derivation_name_latex_SAFE))
+        # derivation_name_latex = derivation_name_latex_SAFE
 
-        abstract_latex_SAFE = latex.make_string_safe_for_latex(abstract_latex)
-        if abstract_latex_SAFE != abstract_latex:
-            print("   abstract submitted:", abstract_latex)
-            print("   abstract altered:", abstract_latex)
-            flash("   abstract altered to " + str(abstract_latex_SAFE))
-        abstract_latex = abstract_latex_SAFE
+        # abstract_latex_SAFE = latex.make_string_safe_for_latex(abstract_latex)
+        # if abstract_latex_SAFE != abstract_latex:
+        #     print("   abstract submitted:", abstract_latex)
+        #     print("   abstract altered:", abstract_latex)
+        #     flash("   abstract altered to " + str(abstract_latex_SAFE))
+        # abstract_latex = abstract_latex_SAFE
 
-        derivation_reference_latex_SAFE = latex.make_string_safe_for_latex(
-            derivation_reference_latex
-        )
-        if derivation_reference_latex_SAFE != derivation_reference_latex:
-            print("   reference submitted:", derivation_reference_latex)
-            print("   reference altered:", derivation_reference_latex)
-            flash("   reference altered to " + str(derivation_reference_latex_SAFE))
-        derivation_reference_latex = derivation_reference_latex_SAFE
+        # derivation_reference_latex_SAFE = latex.make_string_safe_for_latex(
+        #     derivation_reference_latex
+        # )
+        # if derivation_reference_latex_SAFE != derivation_reference_latex:
+        #     print("   reference submitted:", derivation_reference_latex)
+        #     print("   reference altered:", derivation_reference_latex)
+        #     flash("   reference altered to " + str(derivation_reference_latex_SAFE))
+        # derivation_reference_latex = derivation_reference_latex_SAFE
 
         author_name_latex = "ben"
 
@@ -1225,9 +1228,6 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
     * edit step in derivation
     * delete derivation
 
-    TODO: display graph of derivation (e.g., graphviz, d3js)
-    TODO: display tex, PDF
-
     https://derivationmap.net/static/property_graph_schema.png
 
     >>> to_review_derivation()
@@ -1251,6 +1251,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
         graphDB_Driver, derivation_id, query_time_dict
     )
 
+    print("pdg_app/to_review_derivation all_steps=", all_steps)
+
     web_form_delete = NoOptionsForm(request.form)
     web_form_tex_pdf = NoOptionsForm(request.form)
     # web_form = DeleteButtonForm(request.form)
@@ -1260,11 +1262,11 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
         if request.form["submit_button"] == "generate_pdf":
             # request.form = ImmutableMultiDict([('derivation_selected', 'another deriv'), ('submit_button', 'generate_pdf')])
 
-            path_to_pdf = "/code/static/dumping_grounds/"  # should end with slash
+            # path_to_pdf = "/code/static/dumping_grounds/"  # should end with slash
 
             try:
-                pdf_filename = latex.create_pdf_for_derivation(
-                    graphDB_Driver, query_time_dict, derivation_id, path_to_pdf
+                pdf_filename, query_time_dict = latex.create_pdf_for_derivation(
+                    graphDB_Driver, query_time_dict, derivation_id, "/code/static/"
                 )
             except Exception as err:
                 # logger.error(str(err))
@@ -1276,7 +1278,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
             return redirect(
                 url_for(
                     "static",
-                    filename="dumping_grounds/" + pdf_filename,
+                    # filename="dumping_grounds/" + pdf_filename,
+                    filename=pdf_filename,
                     referrer="select_from_existing_derivations",
                 )
             )
@@ -1284,13 +1287,13 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
         elif request.form["submit_button"] == "generate_tex":
             # request.form = ImmutableMultiDict([('derivation_selected', 'another deriv'), ('submit_button', 'generate_tex')])
 
-            path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
+            # path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
 
             try:
-                tex_filename = latex.create_tex_file_for_derivation(
-                    graphDB_Driver, query_time_dict, derivation_id, path_to_tex_file
+                query_time_dict = latex.create_tex_file_for_derivation(
+                    graphDB_Driver, query_time_dict, derivation_id, "/code/static/"
                 )
-                # tex_filename is str(derivation_id)
+                tex_filename = str(derivation_id)
             except Exception as err:
                 # logger.error(str(err))
                 flash(str(err))
@@ -1301,7 +1304,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
             return redirect(
                 url_for(
                     "static",
-                    filename="dumping_grounds/" + tex_filename + ".tex",
+                    # filename="dumping_grounds/" + tex_filename + ".tex",
+                    filename=tex_filename + ".tex",
                     referrer="select_from_existing_derivations",
                 )
             )
@@ -1341,10 +1345,36 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
                 + str(request.form)
             )
 
+    # only create d3js JSON if the HTML page is going to be rendered
+    query_time_dict = latex.create_d3js_json(
+        graphDB_Driver, query_time_dict, derivation_id, "/code/static/"
+    )
+    d3js_json_filename = derivation_id + ".json"
+
+    # try:
+    #     query_time_dict = latex.create_d3js_json(
+    #         graphDB_Driver, query_time_dict, derivation_id, "/code/static/"
+    #     )
+    #     d3js_json_filename = derivation_id + ".json"
+    # except Exception as err:
+    #     # logger.error(str(err))
+    #     print(str(err))
+    #     flash(str(err))
+    #     d3js_json_filename = ""
+    print("pdg_app/to_review_derivation d3js_json_filename=", d3js_json_filename)
+
     # only create graphviz PNG if the HTML page is going to be rendered
-    path_to_output_png = "/code/static/"
-    derivation_graphviz_png_filename = latex.create_derivation_png(
-        graphDB_Driver, query_time_dict, derivation_id, path_to_output_png
+    # SVG isn't available yet; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/14
+    (
+        derivation_graphviz_png_filename,
+        # derivation_graphviz_svg_filename,
+        query_time_dict,
+    ) = latex.create_derivation_png(
+        graphDB_Driver, query_time_dict, derivation_id, "/code/static/"
+    )
+    print(
+        "pdg_app/to_review_derivation derivation_graphviz_png_filename=",
+        derivation_graphviz_png_filename,
     )
 
     print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
@@ -1353,6 +1383,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
         query_time_dict=query_time_dict,
         derivation_dict=derivation_dict,
         derivation_graphviz_png_filename=derivation_graphviz_png_filename,
+        # derivation_graphviz_svg_filename=derivation_graphviz_svg_filename,
+        json_for_d3js=d3js_json_filename,
         all_steps=all_steps,
         form_delete=web_form_delete,
         form_tex_pdf=web_form_tex_pdf,
@@ -5062,24 +5094,26 @@ def to_edit_inference_rule(inference_rule_id: unique_numeric_id_as_str) -> str:
 
     # request.form =  ('inference_rule_name', 'mult both sides by'), ('inference_rule_latex', 'multiply both sides of Exp $1 by $2 to get Exp $3'), ('inference_rule_number_of_inputs', '1'), ('inference_rule_number_of_feeds', '1'), ('inference_rule_number_of_outputs', '1')])
 
-    if request.method == "POST" and web_form.validate():
+    if request.method == "POST" and web_form_edit.validate():
         print("pdg_app/to_edit_inference_rule validated")
         print("pdg_app/to_edit_inference_rule request.form = ", request.form)
 
         # request.form =  ImmutableMultiDict(('inference_rule_name', 'asdfmmimimimim'), ('inference_rule_latex', 'mimimmkm'), ('inference_rule_number_of_inputs', '1'), ('inference_rule_number_of_feeds', '1'), ('inference_rule_number_of_outputs', '1')])
 
-        inference_rule_name = str(web_form.inference_rule_name.data).strip()
-        inference_rule_latex = str(web_form.inference_rule_latex.data).strip()
+        inference_rule_name = str(web_form_edit.inference_rule_name.data).strip()
+        inference_rule_latex = str(web_form_edit.inference_rule_latex.data).strip()
         print(
             "pdg_app/to_edit_inference_rule: inference_rule_latex=",
             inference_rule_latex,
         )
         number_of_inputs = int(
-            str(web_form.inference_rule_number_of_inputs.data).strip()
+            str(web_form_edit.inference_rule_number_of_inputs.data).strip()
         )
-        number_of_feeds = int(str(web_form.inference_rule_number_of_feeds.data).strip())
+        number_of_feeds = int(
+            str(web_form_edit.inference_rule_number_of_feeds.data).strip()
+        )
         number_of_outputs = int(
-            str(web_form.inference_rule_number_of_outputs.data).strip()
+            str(web_form_edit.inference_rule_number_of_outputs.data).strip()
         )
         author_name_latex = "ben"
 

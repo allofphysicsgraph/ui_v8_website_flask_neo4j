@@ -24,11 +24,16 @@ import subprocess  # https://stackoverflow.com/questions/39187886/what-is-the-di
 import hashlib
 
 # https://docs.python.org/3/library/typing.html
-# from typing import Tuple, TextIO, List  # mypy
 # TextIO is file handle assocaited with `open()`
-from typing import TextIO
+from typing import TextIO, Tuple, List
+
+# image dimensions in pixels
+import cv2  # type: ignore
 
 import compute
+
+# ORDERING: this has to come before the functions that use this type
+from compute import unique_numeric_id_as_str
 import neo4j_query
 
 proc_timeout = 30
@@ -140,9 +145,222 @@ def make_string_safe_for_latex(unsafe_str: str) -> str:
     return no_hashtag_str
 
 
+def create_d3js_json(
+    graphDB_Driver,
+    query_time_dict: dict,
+    derivation_id: unique_numeric_id_as_str,
+    destination_folder: str,
+) -> dict:
+    """
+    Produce a JSON file that contains something like
+    {
+      "nodes": [
+        {"id": "Myriel", "group": 1, "img": "/static/test.png", "width": 138, "height": 39, "linear index": 1},
+        {"id": "Napoleon", "group": 1, "img": "/static/test.png", "width": 138, "height": 39, "linear index": 2}
+      ],
+      "links": [
+        {"source": "Napoleon", "target": "Myriel", "value": 1},
+        {"source": "Mlle.Baptistine", "target": "Myriel", "value": 8}
+      ]
+    }
+
+    for inspiration based on the last time I implemented this, see
+    v3_CSV/bin/create_json_per_derivation_from_connectionsDB.py
+    and then
+    v7/compute.py create_d3js_json
+
+    Args:
+        deriv_id: numeric identifier of the derivation
+        path_to_db: filename of the SQL database containing
+                    a JSON entry that returns a nested dictionary
+    Returns:
+        d3js_json_filename: name of JSON file to be read by d3js
+    Raises:
+
+    >>> destination_folder = "/code/static/"
+    >>> create_d3js_json("000001", "pdg.db")
+
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: latex/create_d3js_json start " + trace_id)
+
+    d3js_json_filename = derivation_id + ".json"
+
+    all_steps, query_time_dict = compute.all_steps_in_derivation(
+        graphDB_Driver, derivation_id, query_time_dict
+    )
+
+    json_str = "{\n"
+    json_str += '  "nodes": [\n'
+    list_of_nodes = []
+    for step_id, step_dict in all_steps.items():
+
+        print("latex/create_d3js_json  step_dict", step_dict)
+
+        # step_dict
+        # {'sequence index': 0,
+        #  'inference rule dict':
+        #     {'name_latex': 'add x to both sides', 'number_of_outputs': 1, 'number_of_inputs': 1, 'author_name_latex': 'ben', 'number_of_feeds': 1, 'id': '2585287', 'latex': 'Add $#1$ to both sides of Eq.~\ref{eq:#2}; yields Eq.~\ref{eq:#3}.'},
+        #  'list of input dicts': [
+        #     {'m':
+        #       {'sympy_lhs': "sympy.Symbol('pdg6101028')", 'reference_latex': 'ref to source', 'latex_condition': '', 'sympy_rhs': "sympy.Symbol('pdg6020501')", 'description_latex': 'a description of the expression', 'latex_lhs': 'a', 'name_latex': 'name of asdf', 'lean': '', 'latex_rhs': 'b', 'author_name_latex': 'ben', 'id': '3471224', 'sympy': "sympy.Eq(sympy.Symbol('pdg6101028'),sympy.Symbol('pdg6020501'))", 'latex_relation': '='}
+        #     }],
+        #  'list of feed dicts': [
+        #     {'m':
+        #         {'lean': '', 'author_name_latex': 'ben', 'id': '2175468', 'latex': 'c', 'sympy': "sympy.Symbol('pdg1921258')"}
+        #     }],
+        #  'list of output dicts': [
+        #      {'m':
+        #         {'sympy_lhs': "sympy.Symbol('pdg1921258') + sympy.Symbol('pdg6101028')", 'reference_latex': '', 'latex_condition': '', 'sympy_rhs': "sympy.Symbol('pdg1921258') + sympy.Symbol('pdg6020501')", 'description_latex': '', 'latex_lhs': 'a+c', 'name_latex': 'great name', 'lean': '', 'latex_rhs': 'b+c', 'author_name_latex': 'ben', 'id': '5309419', 'sympy': "sympy.Eq(sympy.Symbol('pdg1921258') + sympy.Symbol('pdg6101028'),sympy.Symbol('pdg1921258') + sympy.Symbol('pdg6020501'))", 'latex_relation': '='}
+        #      }]}
+
+        png_name = "".join(
+            filter(str.isalnum, step_dict["inference rule dict"]["name_latex"])
+        )
+        print("latex/create_d3js_json PNG name = " + png_name)
+
+        if not os.path.isfile(destination_folder + png_name + ".png"):
+            create_png_from_latex(
+                "\\text{" + step_dict["inference rule dict"]["name_latex"] + "}",
+                destination_folder,
+                png_name,
+            )
+            print("latex/create_d3js_json created PNG " + png_name)
+            # addxtobothsides
+
+        # purpose of reading image is to determine width and height; both are needed for d3js JSON
+        image = cv2.imread(destination_folder + png_name + ".png")
+        # logger.debug("type for cv2 image is " + str(type(image)))
+        print("type for cv2 image is " + str(type(image)))
+
+        # construct the node JSON content
+        list_of_nodes.append(
+            '    {"id": "'
+            + step_id
+            + '", "group": '
+            + str(step_dict["sequence index"])
+            + ", "
+            + '"img": "'
+            + destination_folder
+            + png_name
+            + '.png", '
+            + '"url": "https://derivationmap.net/list_all_inference_rules?referrer=d3js#'
+            + step_dict["inference rule dict"]["name_latex"]
+            + '", "width": '
+            + str(image.shape[1])
+            + ", "
+            + '"height": '
+            + str(image.shape[0])
+            + ", "
+            + '"sequence index": '
+            + str(step_dict["sequence index"])
+            + "},\n"
+        )
+
+    list_of_expressions = []
+    for this_input_dict in step_dict['list of input dicts']
+        list_of_expressions.append(this_input_dict['m'])
+
+    for this_expression_dict in list_of_expressions:
+        print("latex/create_d3js_json this_expression_dict",this_expression_dict)
+
+        # TODO: account for input_dict['latex_condition']
+        expression_latex = (
+            this_expression_dict["m"]["latex_lhs"]
+            + this_expression_dict["m"]["latex_relation"]
+            + this_expression_dict["m"]["latex_rhs"]
+        )
+
+        png_name = "expression_" + this_expression_dict["id"] + "_" + hash_of_string(expression_latex)
+        print("latex/create_d3js_json png_name",png_name)
+        # logger.debug("PNG name = " + png_name)
+
+        if not os.path.isfile(destination_folder + png_name + ".png"):
+            create_png_from_latex(
+                expression_latex,
+                destination_folder,
+                png_name,
+            )
+            # logger.debug("created PNG " + png_name)
+
+        image = cv2.imread(destination_folder + png_name + ".png")
+        # logger.debug("type for cv2 image is " + str(type(image)))
+
+        # construct the node JSON content
+        list_of_nodes.append(
+            '    {"id": "'
+            + this_expression_dict['id']
+            + '", "group": 0, '
+            + '"img": "'
+            + destination_folder
+            + png_name
+            + '.png", '
+            + '"url": "https://derivationmap.net/list_all_expressions?referrer=d3js#'
+            + this_expression_dict['id']
+            + '", "width": '
+            + str(image.shape[1])
+            + ", "
+            + '"height": '
+            + str(image.shape[0])
+            + ", "
+            + '"linear index": -1},\n'
+        )
+
+    list_of_nodes = list(set(list_of_nodes))
+    all_nodes = "".join(list_of_nodes)
+    all_nodes = (
+        all_nodes[:-2] + "\n"
+    )  # remove the trailing comma to be compliant with JSON
+    json_str += all_nodes
+
+    json_str += "  ],\n"
+    json_str += '  "links": [\n'
+
+    list_of_edges = edges_in_derivation_for_d3js(graphDB_Driver, query_time_dict, all_steps)
+    list_of_edge_str = []
+    for edge_tuple in list_of_edges:
+        list_of_edge_str.append(
+            '    {"source": "'
+            + edge_tuple[0]
+            + '", "target": "'
+            + edge_tuple[1]
+            + '", "value": 1},\n'
+        )
+    list_of_edge_str = list(set(list_of_edge_str))
+    # logger.debug('number of edges = %s', len(list_of_edge_str))
+    all_edges = "".join(list_of_edge_str)
+    all_edges = all_edges[:-2] + "\n"
+    # logger.debug('all edges = %s', all_edges)
+    json_str += all_edges
+    json_str += "  ]\n"
+    json_str += "}\n"
+    with open(destination_folder + d3js_json_filename, "w") as file_handle:
+        file_handle.write(json_str)
+
+    return query_time_dict
+
+def edges_in_derivation_for_d3js(graphDB_Driver, query_time_dict: dict, all_steps) -> List:
+    """
+    >>> edges_in_derivation_for_d3js()
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: latex/edges_in_derivation_for_d3js start " + trace_id)
+
+    list_of_edge_tuples = []
+
+    print("latex/edges_in_derivation_for_d3js all_steps",all_steps)
+
+    # TODO!
+
+    print("[TRACE] func: latex/edges_in_derivation_for_d3js end " + trace_id)
+    return list_of_edge_tuples
+
 def create_tex_file_for_derivation(
-    graphDB_Driver, query_time_dict: dict, derivation_id: str, path_to_tex_file: str
-) -> str:
+    graphDB_Driver,
+    query_time_dict: dict,
+    derivation_id: unique_numeric_id_as_str,
+    path_to_tex_file: str,
+) -> dict:
     """
     In v7 the PDG I started allowing inference rule names
     to have spaces. (In versions prior to 7 the inference rule names were
@@ -429,11 +647,14 @@ def create_tex_file_for_derivation(
     # logger.info("[trace end " + trace_id + "]")
 
     print("[TRACE] func: latex/create_tex_file_for_derivation " + trace_id)
-    return tex_filename  # pass back filename without extension because bibtex cannot handle .tex
+    return query_time_dict  # pass back filename without extension because bibtex cannot handle .tex
 
 
 def create_pdf_for_derivation(
-    graphDB_Driver, query_time_dict: dict, derivation_id: str, path_to_pdf: str
+    graphDB_Driver,
+    query_time_dict: dict,
+    derivation_id: unique_numeric_id_as_str,
+    path_to_pdf: str,
 ) -> str:
     """
 
@@ -459,7 +680,9 @@ def create_pdf_for_derivation(
 
     pdf_filename = derivation_id
 
-    tex_filename_without_extension = create_tex_file_for_derivation(
+    tex_filename_without_extension = derivation_id
+
+    query_time_dict = create_tex_file_for_derivation(
         graphDB_Driver, query_time_dict, derivation_id, path_to_pdf
     )
     shutil.move(tex_filename_without_extension + ".tex", tmp_latex_folder_full_path)
@@ -574,7 +797,7 @@ def create_pdf_for_derivation(
     # logger.info("[trace end " + trace_id + "]")
 
     print("[TRACE] func: latex/create_pdf_for_derivation start " + trace_id)
-    return pdf_filename + ".pdf"
+    return pdf_filename + ".pdf", query_time_dict
 
 
 def create_png_from_latex(
@@ -606,6 +829,11 @@ def create_png_from_latex(
     print("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
     # logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
 
+    print(
+        "latex/create_png_from_latex png_filename_no_extension",
+        png_filename_no_extension,
+    )
+
     #    logger.debug("png_filename_no_extension = %s", png_filename_no_extension)
     #    logger.debug("input latex str = %s", input_latex_str)
 
@@ -620,15 +848,11 @@ def create_png_from_latex(
     tmp_file_no_extension_full_path = "lat"
 
     # logger.debug("latex = " + str(input_latex_str))
-    print("latex = " + str(input_latex_str))
+    print("latex/create_png_from_latex latex = " + str(input_latex_str))
     create_tex_file_for_latex_string(tmp_file_no_extension_full_path, input_latex_str)
 
-    tex_filename_with_hash = (
-        png_filename_no_extension
-        + "_"
-        + hash_of_file(tmp_file_no_extension_full_path + ".tex")
-        + ".tex"
-    )
+    tex_filename_with_hash = png_filename_no_extension + ".tex"
+    print("latex/create_png_from_latex tex_filename_with_hash:", tex_filename_with_hash)
 
     # shutil.move(tmp_file_no_extension_full_path + ".tex", tex_filename_with_hash)
     # logger.debug(str(os.listdir()))
@@ -654,17 +878,18 @@ def create_png_from_latex(
 
         # logger.debug("latex std out:" + str(latex_stdout))
         # logger.debug("latex std err:" + str(latex_stderr))
-        print("latex std out:" + str(latex_stdout))
+        print("latex/create_png_from_latex latex std out:" + str(latex_stdout))
         print("latex std err:" + str(latex_stderr))
 
         if "Text line contains an invalid character" in latex_stdout:
-            logging.error("tex input contains invalid charcter")
+            # logging.error("tex input contains invalid charcter")
+            print("tex input contains invalid charcter")
             shutil.copy(
                 destination_folder + "error.png",
                 destination_folder + png_filename_no_extension,
             )
             raise Exception("no png generated due to invalid character in tex input.")
-        #    remove_file_debris(["./"], [tmp_file_no_extension_full_path], ["png"])
+        #    compute.remove_file_debris(["./"], [tmp_file_no_extension_full_path], ["png"])
 
         # dvipng file.dvi -T tight -o file.png
         process = subprocess.run(
@@ -696,7 +921,10 @@ def create_png_from_latex(
 
         if "No such file or directory" in png_stderr:
             # logging.error("PNG creation failed for %s", png_filename_no_extension)
-            print("PNG creation failed for %s", png_filename_no_extension)
+            print(
+                "latex/create_png_from_latex PNG creation failed for %s",
+                png_filename_no_extension,
+            )
             shutil.copy(
                 destination_folder + "error.png",
                 destination_folder + png_filename_no_extension,
@@ -709,7 +937,8 @@ def create_png_from_latex(
             )
 
         if not (os.path.isfile(tmp_file_no_extension_full_path + ".png")):
-            logging.error("PNG creation failed for %s", png_filename_no_extension)
+            # logging.error("PNG creation failed for %s", png_filename_no_extension)
+            print("PNG creation failed for %s", png_filename_no_extension)
 
         shutil.move(
             tmp_file_no_extension_full_path + ".png",
@@ -717,7 +946,13 @@ def create_png_from_latex(
         )
 
     # logger.debug(destination_folder + png_filename_no_extension + ".png")
-    print(destination_folder + png_filename_no_extension + ".png")
+    print(
+        "latex/create_png_from_latex: dest:"
+        + destination_folder
+        + png_filename_no_extension
+        + ".png"
+    )
+    # /code/static/addxtobothsides.png
 
     os.chdir(original_dir)
     shutil.rmtree(tmp_latex_folder_full_path)
@@ -750,6 +985,12 @@ def create_tex_file_for_latex_string(
     trace_id = str(random.randint(1000000, 9999999))
     # logger.info("[trace start " + trace_id + "]")
     print("[TRACE] latex/create_tex_file_for_latex_string start " + trace_id + "]")
+
+    print(
+        "latex/create_tex_file_for_latex_string tmp_file_no_extension_full_path:",
+        tmp_file_no_extension_full_path,
+    )
+    print("latex/create_tex_file_for_latex_string input_latex_str:", input_latex_str)
 
     # compute.remove_file_debris(["./"], [tmp_file_no_extension_full_path], ["tex"])
 
@@ -787,8 +1028,11 @@ def create_tex_file_for_latex_string(
 
 
 def create_derivation_png(
-    graphDB_Driver, query_time_dict: dict, derivation_id: str, path_to_output_png: str
-) -> str:
+    graphDB_Driver,
+    query_time_dict: dict,
+    derivation_id: unique_numeric_id_as_str,
+    path_to_output_png: str,
+) -> Tuple[str, dict]:
     """
     for a clear description of the graphviz language, see
     https://www.graphviz.org/doc/info/lang.html
@@ -838,7 +1082,7 @@ def create_derivation_png(
 
         for this_step_dict in list_of_step_dicts_in_this_derivation:
             print("latex/create_derivation_png step_dict=", this_step_dict)
-            write_step_to_graphviz_file(
+            query_time_dict = write_step_to_graphviz_file(
                 graphDB_Driver,
                 query_time_dict,
                 this_step_dict,
@@ -849,17 +1093,20 @@ def create_derivation_png(
         file_handle.write("}\n")
 
     # name the PNG file referencing the hash of the .dot so we can detect changes
-    output_filename = (
+    output_filename_png = (
         "derivation_" + derivation_id + "_" + hash_of_file(dot_filename) + ".png"
+    )
+    output_filename_svg = (
+        "derivation_" + derivation_id + "_" + hash_of_file(dot_filename) + ".svg"
     )
     # neato -Tpng graphviz.dot > /code/static/graphviz.png
     #    process = Popen(['neato','-Tpng','graphviz.dot','>','/code/static/graphviz.png'], stdout=PIPE, stderr=PIPE)
 
     # force redraw when updating step
     # a better way would be to check the md5 hash of the .dot file
-    if not os.path.exists(path_to_output_png + output_filename):
+    if not os.path.exists(path_to_output_png + output_filename_png):
         process = subprocess.run(
-            ["neato", "-Tpng", dot_filename, "-o" + output_filename],
+            ["neato", "-Tpng", dot_filename, "-o" + output_filename_png],
             stdout=PIPE,
             stderr=PIPE,
             timeout=proc_timeout,
@@ -874,11 +1121,43 @@ def create_derivation_png(
             # logger.debug(neato_stderr)
             print(neato_stderr)
 
-        shutil.move(output_filename, path_to_output_png + output_filename)
+        print("output_filename_png, ", output_filename_png)
+        print(
+            "path_to_output_png + output_filename_png",
+            path_to_output_png + output_filename_png,
+        )
+        shutil.move(output_filename_png, path_to_output_png + output_filename_png)
+
+    # See https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/14
+    # if not os.path.exists(path_to_output_png + output_filename_svg):
+    #     process = subprocess.run(
+    #         ["neato", "-Tsvg", dot_filename, "-o" + output_filename_svg],
+    #         stdout=PIPE,
+    #         stderr=PIPE,
+    #         timeout=proc_timeout,
+    #     )
+
+    #     neato_stdout = process.stdout.decode("utf-8")
+    #     if len(neato_stdout) > 0:
+    #         # logger.debug(neato_stdout)
+    #         print(neato_stdout)
+    #     neato_stderr = process.stderr.decode("utf-8")
+    #     if len(neato_stderr) > 0:
+    #         # logger.debug(neato_stderr)
+    #         print(neato_stderr)
+
+    #     print("output_filename_svg=", output_filename_svg)
+    #     print(
+    #         "path_to_output_png + output_filename_svg=",
+    #         path_to_output_png + output_filename_svg,
+    #     )
+    #     shutil.move(output_filename_svg, path_to_output_png + output_filename_svg)
+
     # return True, "no invalid latex", output_filename
     # logger.info("[trace end " + trace_id + "]")
     print("[TRACE] latex/create_derivation_png end " + trace_id + "]")
-    return output_filename
+    # return output_filename_png, output_filename_svg, query_time_dict
+    return output_filename_png, query_time_dict
 
 
 def create_step_graphviz_png(
@@ -911,9 +1190,9 @@ def create_step_graphviz_png(
     print("[TRACE] latex/create_step_graphviz_png start " + trace_id + "]")
 
     dot_filename = destination_folder + "graphviz.dot"
-    remove_file_debris([destination_folder], ["graphviz"], ["dot"])
+    compute.remove_file_debris([destination_folder], ["graphviz"], ["dot"])
 
-    with open(dot_filename, "w") as fil:
+    with open(dot_filename, "w") as file_handle:
         file_handle.write("digraph physicsDerivation { \n")
         file_handle.write("overlap = false;\n")
         file_handle.write(
@@ -925,7 +1204,7 @@ def create_step_graphviz_png(
         )
         file_handle.write("fontsize=12;\n")
 
-        write_step_to_graphviz_file(
+        query_time_dict = write_step_to_graphviz_file(
             graphDB_Driver, query_time_dict, step_dict, file_handle, path_to_output_png
         )
         file_handle.write("}\n")
@@ -936,7 +1215,7 @@ def create_step_graphviz_png(
     output_filename = step_id + ".png"
     # logger.debug("output_filename = %s", output_filename)
     print("output_filename = %s", output_filename)
-    remove_file_debris([destination_folder], ["graphviz"], ["png"])
+    compute.remove_file_debris([destination_folder], ["graphviz"], ["png"])
 
     # neato -Tpng graphviz.dot > /code/static/graphviz.png
     #    process = Popen(['neato','-Tpng','graphviz.dot','>','/code/static/graphviz.png'], stdout=PIPE, stderr=PIPE)
@@ -960,7 +1239,7 @@ def create_step_graphviz_png(
     # return True, "no invalid latex", output_filename
     # logger.info("[trace end " + trace_id + "]")
     print("[TRACE] latex/create_step_graphviz_png end " + trace_id + "]")
-    return output_filename
+    return output_filename, query_time_dict
 
 
 def write_step_to_graphviz_file(
@@ -969,7 +1248,7 @@ def write_step_to_graphviz_file(
     step_dict: str,
     file_handle: TextIO,
     path_to_output_png: str,
-) -> None:
+) -> dict:
     """
 
     used by `create_derivation_png`
@@ -1085,7 +1364,10 @@ def write_step_to_graphviz_file(
     # feed expressions
     for feed_dict in list_of_feed_dicts:
         png_filename_no_extension = (
-            "feed_" + feed_dict["m"]["id"] + "_" + hash_of_string(feed_dict["m"]["latex"])
+            "feed_"
+            + feed_dict["m"]["id"]
+            + "_"
+            + hash_of_string(feed_dict["m"]["latex"])
         )
         if not os.path.isfile(path_to_output_png + png_filename_no_extension + ".png"):
             create_png_from_latex(
@@ -1096,14 +1378,14 @@ def write_step_to_graphviz_file(
             png_filename_no_extension
             + ' [shape=box, color=red,label="",image="'
             + path_to_output_png
-            + +png_filename_no_extension
+            + png_filename_no_extension
             + ".png"
             + '",labelloc=b];\n'
         )
 
     # logger.info("[trace end " + trace_id + "]")
     print("[TRACE] latex/write_step_to_graphviz_file end " + trace_id + "]")
-    return
+    return query_time_dict
 
 
 # EOF
