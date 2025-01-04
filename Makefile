@@ -2,6 +2,8 @@
 # Physics Derivation Graph
 # https://allofphysics.com
 
+webserver_image=ui_v8_website_flask_neo4j_webserver
+
 container=docker
 #container=podman
 
@@ -38,8 +40,8 @@ up:
 	       	$(container) kill $$($(container) ps -q); \
 		fi
 	$(container) ps
-	$(container) run -it --rm -v `pwd`:/scratch ui_v8_website_flask_neo4j_webserver /bin/bash -c 'for filename in /scratch/webserver/*.py; do echo $$filename; done | xargs black'
-	$(container) run -it --rm -v `pwd`:/scratch ui_v8_website_flask_neo4j_webserver /bin/bash -c 'for filename in /scratch/webserver/library/*.py; do echo $$filename; done | xargs black'
+	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image) /bin/bash -c 'for filename in /scratch/webserver/*.py; do echo $$filename; done | xargs black'
+	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image) /bin/bash -c 'for filename in /scratch/webserver/library/*.py; do echo $$filename; done | xargs black'
 	# https://docs.docker.com/compose/reference/up/
 	$(container) compose up --build --remove-orphans
 
@@ -53,23 +55,23 @@ container: container_build container_live
 
 # https://docs.docker.com/build/building/multi-platform/
 container_build:
-	cd webserver && $(container) build --platform linux/amd64,linux/arm64 -t ui_v8_website_flask_neo4j_webserver .
+	cd webserver && $(container) build --platform linux/amd64,linux/arm64 -t $(webserver_image) .
 
 container_live:
 	$(container) run -it --rm \
                 -v `pwd`:/scratch -w /scratch/ \
                 --user $(id -u):$(id -g) \
-                ui_v8_website_flask_neo4j_webserver /bin/bash
+                $(webserver_image) /bin/bash
 
 black_out:
-	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ property_graph_webserver make black_in
+	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(webserver_image) make black_in
 
 black_in:
 	black webserver/*.py webserver/library/*.py
 #webserver/neo4j_query.py webserver/compute.py
 
 mypy_out:
-	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ property_graph_webserver mypy --check-untyped-defs webserver/pdg_app.py webserver/library
+	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(webserver_image) mypy --check-untyped-defs webserver/pdg_app.py webserver/library
 
 
 # keep the conf folder since that has the configuration
