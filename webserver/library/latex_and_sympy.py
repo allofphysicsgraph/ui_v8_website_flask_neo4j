@@ -140,4 +140,4 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
 #     print("[TRACE] func: latex_and_sympy/list_of_str_symbols_from_cleaned_latex_str end " + trace_id)
 #     return my_sym
 
-#EOF
+# EOF

@@ -708,49 +708,15 @@ def all_steps_in_derivation(
 
     all_steps = {}
     for this_step_dict in list_of_step_dicts:
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            inference_rule_dict = session.read_transaction(
-                neo4j_query.step_has_inference_rule, this_step_dict["id"]
-            )
-            query_time_dict[
-                "compute/all_steps_in_derivation: step_has_inference_rule"
-            ] = round(time.time() - query_start_time, 3)
-        # print("inference_rule_dict=", inference_rule_dict)
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_input_dicts = session.read_transaction(
-                neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
-                this_step_dict["id"],
-                "HAS_INPUT",
-            )
-            query_time_dict[
-                "compute/all_steps_in_derivation: step_id_has_expressions, HAS_INPUT"
-            ] = round(time.time() - query_start_time, 3)
-        # print("list_of_input_dicts=", list_of_input_dicts)
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_feed_dicts = session.read_transaction(
-                neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
-                this_step_dict["id"],
-                "HAS_FEED",
-            )
-            query_time_dict[
-                "compute/all_steps_in_derivation: step_id_has_expressions, HAS_FEED"
-            ] = round(time.time() - query_start_time, 3)
-        # print("list_of_feed_dicts=", list_of_feed_dicts)
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_output_dicts = session.read_transaction(
-                neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
-                this_step_dict["id"],
-                "HAS_OUTPUT",
-            )
-            query_time_dict[
-                "compute/all_steps_in_derivation: step_id_has_expressions, HAS_OUTPUT"
-            ] = round(time.time() - query_start_time, 3)
-        # print("list_of_output_dicts=", list_of_output_dicts)
+
+        (
+            inference_rule_dict,
+            list_of_input_dicts,
+            list_of_feed_dicts,
+            list_of_output_dicts,
+        ) = input_feed_output_infrule_for_step(
+            graphDB_Driver, query_time_dict, this_step_dict
+        )
 
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -771,6 +737,71 @@ def all_steps_in_derivation(
         }
     print("[TRACE] func: compute/all_steps_in_derivation end " + trace_id)
     return all_steps, query_time_dict
+
+
+def input_feed_output_infrule_for_step(graphDB_Driver, query_time_dict, this_step_dict):
+    """
+    >>> input_feed_output_infrule_for_step()
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    print("[TRACE] func: compute/input_feed_output_infrule_for_step start " + trace_id)
+
+    inference_rule_dict = {}
+    list_of_input_dicts = []
+    list_of_feed_dicts = []
+    list_of_output_dicts = []
+
+    # https://neo4j.com/docs/python-manual/current/session-api/
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        inference_rule_dict = session.read_transaction(
+            neo4j_query.step_has_inference_rule, this_step_dict["id"]
+        )
+        query_time_dict["compute/all_steps_in_derivation: step_has_inference_rule"] = (
+            round(time.time() - query_start_time, 3)
+        )
+    # print("inference_rule_dict=", inference_rule_dict)
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_input_dicts = session.read_transaction(
+            neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
+            this_step_dict["id"],
+            "HAS_INPUT",
+        )
+        query_time_dict[
+            "compute/all_steps_in_derivation: step_id_has_expressions, HAS_INPUT"
+        ] = round(time.time() - query_start_time, 3)
+    # print("list_of_input_dicts=", list_of_input_dicts)
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_feed_dicts = session.read_transaction(
+            neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
+            this_step_dict["id"],
+            "HAS_FEED",
+        )
+        query_time_dict[
+            "compute/all_steps_in_derivation: step_id_has_expressions, HAS_FEED"
+        ] = round(time.time() - query_start_time, 3)
+    # print("list_of_feed_dicts=", list_of_feed_dicts)
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_output_dicts = session.read_transaction(
+            neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
+            this_step_dict["id"],
+            "HAS_OUTPUT",
+        )
+        query_time_dict[
+            "compute/all_steps_in_derivation: step_id_has_expressions, HAS_OUTPUT"
+        ] = round(time.time() - query_start_time, 3)
+    # print("list_of_output_dicts=", list_of_output_dicts)
+
+    print("[TRACE] func: compute/input_feed_output_infrule_for_step end " + trace_id)
+    return (
+        inference_rule_dict,
+        list_of_input_dicts,
+        list_of_feed_dicts,
+        list_of_output_dicts,
+    )
 
 
 def remove_latex_presention_markings(latex_str: str) -> str:
@@ -831,4 +862,5 @@ def remove_latex_presention_markings(latex_str: str) -> str:
     print("[TRACE] func: compute/remove_latex_presention_markings end " + trace_id)
     return latex_str
 
-#EOF
+
+# EOF

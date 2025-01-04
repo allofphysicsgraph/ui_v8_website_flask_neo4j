@@ -7,7 +7,7 @@
 
 <H2>Review {{ derivation_dict['name_latex'] }}</H2>
 
-<P> Derivation dictionary: 
+<!--<P> Derivation dictionary: -->
   <UL>
     <LI>abstract: {{ derivation_dict['abstract_latex'] }}</LI>
     <LI>reference: {{ derivation_dict['reference_latex'] }}</LI>
@@ -38,10 +38,10 @@
           inference_rule_id=step_dict['inference rule dict']['id']) 
              }}">ID: {{ step_dict['inference rule dict']['id']}}; 
                      {{ step_dict['inference rule dict']['name_latex'] }}</a></li>
-        <LI>number of inputs: {{ step_dict['inference rule dict'] }};
-            feeds: {{ step_dict['inference rule dict'] }};
-            outputs: {{ step_dict['inference rule dict'] }}</LI>
-        <LI><pre>{{ step_dict['inference rule dict']['latex'] }}</pre></LI>
+        <LI>number of inputs: {{ step_dict['inference rule dict']['number_of_inputs'] }};
+            feeds:            {{ step_dict['inference rule dict']['number_of_feeds'] }};
+            outputs:          {{ step_dict['inference rule dict']['number_of_outputs'] }}</LI>
+        <LI>{{ step_dict['inference rule dict']['latex'] | safe }}</LI>
       </ul>
     </td> <!-- inference rule -->
     <td>{% for m_dict in step_dict['list of input dicts'] %}

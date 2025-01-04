@@ -60,4 +60,4 @@ dimension_luminous_intensity_units = ["candela"]
 # https://en.wikipedia.org/wiki/Equals_sign
 # https://en.wikipedia.org/wiki/Glossary_of_mathematical_symbols
 
-#EOF
+# EOF
