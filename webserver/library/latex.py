@@ -301,7 +301,7 @@ def create_tex_file_for_derivation(
         )
         if len(derivation_dict["abstract_latex"]) > 0:
             # fixed bug https://github.com/allofphysicsgraph/proofofconcept/issues/249
-            # safe_string = dat["derivations"][deriv_id]["notes"]
+            # safe_string = dat["derivations"][derivation_id]["notes"]
             #                latex_file_handle.write(safe_string + "\n")
             latex_file_handle.write(derivation_dict["abstract_latex"] + "\n")
         latex_file_handle.write("\\end{abstract}\n")
@@ -438,7 +438,7 @@ def create_pdf_for_derivation(
     """
 
     Args:
-        deriv_id: numeric identifier of the derivation
+        derivation_id: numeric identifier of the derivation
         path_to_pdf = "/code/static/"  # must end with /
     Returns:
         pdf_filename + ".pdf":
@@ -781,18 +781,18 @@ def create_tex_file_for_latex_string(
 
 
 def create_derivation_png(
-    graphDB_Driver, query_time_dict: dict, deriv_id: str, path_to_output_png: str
+    graphDB_Driver, query_time_dict: dict, derivation_id: str, path_to_output_png: str
 ) -> str:
     """
     for a clear description of the graphviz language, see
     https://www.graphviz.org/doc/info/lang.html
 
     Args:
-        deriv_id: numeric identifier of the derivation
+        derivation_id: numeric identifier of the derivation
         path_to_output_png: where should png be placed? Includes trailing slash
 
     Returns:
-        output_filename: name of file produced by graphviz; either `<deriv_id>.png` or `error.png`
+        output_filename: name of file produced by graphviz; either `<derivation_id>.png` or `error.png`
     Raises:
 
 
@@ -819,7 +819,7 @@ def create_derivation_png(
         list_of_step_dicts_in_this_derivation,
     )
 
-    dot_filename = path_to_output_png + "derivation_" + deriv_id + ".dot"
+    dot_filename = path_to_output_png + "derivation_" + derivation_id + ".dot"
     with open(dot_filename, "w") as file_handle:
         file_handle.write("digraph physicsDerivation { \n")
         file_handle.write("overlap = false;\n")
@@ -832,13 +832,19 @@ def create_derivation_png(
 
         for this_step_dict in list_of_step_dicts_in_this_derivation:
             print("latex/create_derivation_png step_dict=", this_step_dict)
-            write_step_to_graphviz_file(this_step_dict, file_handle, path_to_output_png)
+            write_step_to_graphviz_file(
+                graphDB_Driver,
+                query_time_dict,
+                this_step_dict,
+                file_handle,
+                path_to_output_png,
+            )
 
         file_handle.write("}\n")
 
     # name the PNG file referencing the hash of the .dot so we can detect changes
     output_filename = (
-        "derivation_" + deriv_id + "_" + hash_of_file(dot_filename) + ".png"
+        "derivation_" + derivation_id + "_" + hash_of_file(dot_filename) + ".png"
     )
     # neato -Tpng graphviz.dot > /code/static/graphviz.png
     #    process = Popen(['neato','-Tpng','graphviz.dot','>','/code/static/graphviz.png'], stdout=PIPE, stderr=PIPE)
@@ -868,14 +874,14 @@ def create_derivation_png(
 
 
 def create_step_graphviz_png(
-    deriv_id: str, step_id: str, destination_folder: str
+    graphDB_Driver, query_time_dict, step_dict: dict, destination_folder: str
 ) -> str:
     """
     for a clear description of the graphviz language, see
     https://www.graphviz.org/doc/info/lang.html
 
     Args:
-        deriv_id: numeric identifier of the derivation
+        derivation_id: numeric identifier of the derivation
         step_id: numeric identifier of the step within the derivation
         path_to_db: filename of the SQL database containing
                     a JSON entry that returns a nested dictionary
@@ -904,14 +910,16 @@ def create_step_graphviz_png(
         file_handle.write("overlap = false;\n")
         file_handle.write(
             'label="step '
-            + step_id
-            + " in "
-            + dat["derivations"][deriv_id]["name"]
+            + step_dict["id"]
+            # + " in "
+            # + dat["derivations"][derivation_id]["name"]
             + '\nhttps://derivationmap.net";\n'
         )
         file_handle.write("fontsize=12;\n")
 
-        write_step_to_graphviz_file(this_step_dict, file_handle, path_to_output_png)
+        write_step_to_graphviz_file(
+            graphDB_Driver, query_time_dict, step_dict, file_handle, path_to_output_png
+        )
         file_handle.write("}\n")
 
     #    with open(dot_filename,'r') as fil:
@@ -937,7 +945,7 @@ def create_step_graphviz_png(
         if len(neato_stderr) > 0:
             logger.debug(neato_stderr)
 
-        shutil.move(output_filename, "/code/static/" + output_filename)
+        shutil.move(output_filename, destination_folder + output_filename)
     # return True, "no invalid latex", output_filename
     # logger.info("[trace end " + trace_id + "]")
     print("[TRACE] latex/create_step_graphviz_png end " + trace_id + "]")
@@ -945,7 +953,11 @@ def create_step_graphviz_png(
 
 
 def write_step_to_graphviz_file(
-    step_dict: str, file_handle: TextIO, path_to_output_png: str
+    graphDB_Driver,
+    query_time_dict: dict,
+    step_dict: str,
+    file_handle: TextIO,
+    path_to_output_png: str,
 ) -> None:
     """
 
@@ -953,7 +965,7 @@ def write_step_to_graphviz_file(
     and `create_step_graphviz_png`
 
     Args:
-        deriv_id: numeric identifier of the derivation
+        derivation_id: numeric identifier of the derivation
         step_id: numeric identifier of the step within the derivation
         file_handle: file handle to open
         path_to_output_png: folder location (with trailing slash) to put PNG files in
@@ -979,7 +991,7 @@ def write_step_to_graphviz_file(
         list_of_feed_dicts,
         list_of_output_dicts,
     ) = compute.input_feed_output_infrule_for_step(
-        graphDB_Driver, query_time_dict, this_step_dict
+        graphDB_Driver, query_time_dict, step_dict
     )
 
     print("latex/write_step_to_graphviz_file inference_rule_dict", inference_rule_dict)
