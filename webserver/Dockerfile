@@ -49,6 +49,10 @@ RUN apt-get update && \
 RUN npm install mathjax@3
 #RUN npm install mathjax
 
+# type checking for Python
+# https://microsoft.github.io/pyright/#/installation
+RUN npm install -g pyright
+
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 

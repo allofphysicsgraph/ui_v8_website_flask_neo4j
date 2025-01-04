@@ -33,7 +33,7 @@ import cv2  # type: ignore
 import compute
 
 # ORDERING: this has to come before the functions that use this type
-from compute import unique_numeric_id_as_str
+from compute import unique_numeric_id_as_str, query_timing_result
 import neo4j_query
 
 proc_timeout = 30
@@ -150,7 +150,7 @@ def create_d3js_json(
     query_time_dict: dict,
     derivation_id: unique_numeric_id_as_str,
     destination_folder: str,
-) -> dict:
+) -> query_timing_result:
     """
     Produce a JSON file that contains something like
     {
@@ -240,8 +240,7 @@ def create_d3js_json(
             + '", "group": '
             + str(step_dict["sequence index"])
             + ", "
-            + '"img": "'
-            + destination_folder
+            + '"img": "/static/'
             + png_name
             + '.png", '
             + '"url": "https://derivationmap.net/list_all_inference_rules?referrer=d3js#'
@@ -258,21 +257,45 @@ def create_d3js_json(
         )
 
     list_of_expressions = []
-    for this_input_dict in step_dict['list of input dicts']
-        list_of_expressions.append(this_input_dict['m'])
+    for this_input_dict in step_dict["list of input dicts"]:
+        temp_dict = this_input_dict["m"]
+        temp_dict["type of math"] = "expression"
+        list_of_expressions.append(temp_dict)
+    for this_output_dict in step_dict["list of output dicts"]:
+        temp_dict = this_output_dict["m"]
+        temp_dict["type of math"] = "expression"
+        list_of_expressions.append(temp_dict)
+    for this_feed_dict in step_dict["list of feed dicts"]:
+        temp_dict = this_feed_dict["m"]
+        temp_dict["type of math"] = "feed"
+        list_of_expressions.append(temp_dict)
 
     for this_expression_dict in list_of_expressions:
-        print("latex/create_d3js_json this_expression_dict",this_expression_dict)
+        print("latex/create_d3js_json this_expression_dict", this_expression_dict)
 
-        # TODO: account for input_dict['latex_condition']
-        expression_latex = (
-            this_expression_dict["m"]["latex_lhs"]
-            + this_expression_dict["m"]["latex_relation"]
-            + this_expression_dict["m"]["latex_rhs"]
-        )
+        if this_expression_dict["type of math"] == "expression":
+            # TODO: account for input_dict['latex_condition']
+            expression_latex = (
+                this_expression_dict["latex_lhs"]
+                + this_expression_dict["latex_relation"]
+                + this_expression_dict["latex_rhs"]
+            )
+            png_name = (
+                "expression_"
+                + this_expression_dict["id"]
+                + "_"
+                + hash_of_string(expression_latex)
+            )
+        elif this_expression_dict["type of math"] == "feed":
+            expression_latex = this_expression_dict["latex"]
+            png_name = (
+                "feed_"
+                + this_expression_dict["id"]
+                + "_"
+                + hash_of_string(expression_latex)
+            )
 
-        png_name = "expression_" + this_expression_dict["id"] + "_" + hash_of_string(expression_latex)
-        print("latex/create_d3js_json png_name",png_name)
+        print("latex/create_d3js_json png_name", png_name)
         # logger.debug("PNG name = " + png_name)
 
         if not os.path.isfile(destination_folder + png_name + ".png"):
@@ -289,14 +312,13 @@ def create_d3js_json(
         # construct the node JSON content
         list_of_nodes.append(
             '    {"id": "'
-            + this_expression_dict['id']
+            + this_expression_dict["id"]
             + '", "group": 0, '
-            + '"img": "'
-            + destination_folder
+            + '"img": "/static/'
             + png_name
             + '.png", '
             + '"url": "https://derivationmap.net/list_all_expressions?referrer=d3js#'
-            + this_expression_dict['id']
+            + this_expression_dict["id"]
             + '", "width": '
             + str(image.shape[1])
             + ", "
@@ -316,7 +338,9 @@ def create_d3js_json(
     json_str += "  ],\n"
     json_str += '  "links": [\n'
 
-    list_of_edges = edges_in_derivation_for_d3js(graphDB_Driver, query_time_dict, all_steps)
+    list_of_edges = edges_in_derivation_for_d3js(
+        graphDB_Driver, query_time_dict, all_steps
+    )
     list_of_edge_str = []
     for edge_tuple in list_of_edges:
         list_of_edge_str.append(
@@ -339,7 +363,10 @@ def create_d3js_json(
 
     return query_time_dict
 
-def edges_in_derivation_for_d3js(graphDB_Driver, query_time_dict: dict, all_steps) -> List:
+
+def edges_in_derivation_for_d3js(
+    graphDB_Driver, query_time_dict: dict, all_steps
+) -> List:
     """
     >>> edges_in_derivation_for_d3js()
     """
@@ -348,19 +375,20 @@ def edges_in_derivation_for_d3js(graphDB_Driver, query_time_dict: dict, all_step
 
     list_of_edge_tuples = []
 
-    print("latex/edges_in_derivation_for_d3js all_steps",all_steps)
+    print("latex/edges_in_derivation_for_d3js all_steps", all_steps)
 
     # TODO!
 
     print("[TRACE] func: latex/edges_in_derivation_for_d3js end " + trace_id)
     return list_of_edge_tuples
 
+
 def create_tex_file_for_derivation(
     graphDB_Driver,
     query_time_dict: dict,
     derivation_id: unique_numeric_id_as_str,
     path_to_tex_file: str,
-) -> dict:
+) -> query_timing_result:
     """
     In v7 the PDG I started allowing inference rule names
     to have spaces. (In versions prior to 7 the inference rule names were
@@ -1205,14 +1233,14 @@ def create_step_graphviz_png(
         file_handle.write("fontsize=12;\n")
 
         query_time_dict = write_step_to_graphviz_file(
-            graphDB_Driver, query_time_dict, step_dict, file_handle, path_to_output_png
+            graphDB_Driver, query_time_dict, step_dict, file_handle, destination_folder
         )
         file_handle.write("}\n")
 
     #    with open(dot_filename,'r') as fil:
     #       logger.debug(file_handle.read())
 
-    output_filename = step_id + ".png"
+    output_filename = step_dict["id"] + ".png"
     # logger.debug("output_filename = %s", output_filename)
     print("output_filename = %s", output_filename)
     compute.remove_file_debris([destination_folder], ["graphviz"], ["png"])
@@ -1248,7 +1276,7 @@ def write_step_to_graphviz_file(
     step_dict: str,
     file_handle: TextIO,
     path_to_output_png: str,
-) -> dict:
+) -> query_timing_result:
     """
 
     used by `create_derivation_png`
