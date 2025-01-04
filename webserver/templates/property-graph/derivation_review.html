@@ -70,6 +70,17 @@
   {% endfor %}
 </table>
 
+<P>
+  <a href="{{ url_for('static', filename=derivation_graphviz_png_filename) }}">
+    <img src="{{ url_for('static', filename=derivation_graphviz_png_filename) }}">
+  </a>
+
+<!-- See https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/14 
+<P>
+  <a href="{ { url_for('static', filename=derivation_graphviz_svg_filename) } }">
+    <img src="{ { url_for('static', filename=derivation_graphviz_svg_filename) } }">
+  </a>
+-->
 
 <!--
 <ul>
@@ -78,8 +89,13 @@
 { % endfor % }
 </ul>
 -->
-<P>TODO: display graph of derivation (e.g., graphviz)
+<P>TODO: display graph of derivation using d3js
 
+  <center>
+    <svg id='viz'></svg> <!-- uses JSON from json_for_d3js -->
+<BR/>
+Hold the mouse over a node to highlight that node and its neighbors. You can zoom in/out. You can pan the image. You can move nodes by clicking and dragging.
+  </center>
 
 <fieldset>
 <legend>
@@ -133,5 +149,7 @@ the following two were removed because the user should click on step ID in table
 </fieldset>
 
 
+<!-- contains the reference to json_for_d3js -->
+{% include '_d3_js.html' %} 
 
 {% endblock %}
