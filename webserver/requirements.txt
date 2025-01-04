@@ -7,6 +7,9 @@ neo4j
 # https://github.com/allofphysicsgraph/proofofconcept/issues/157
 secure==0.3.0
 
+# image size
+opencv-python
+
 # code formatting and consistency checking
 #mypy==0.910
 mypy
