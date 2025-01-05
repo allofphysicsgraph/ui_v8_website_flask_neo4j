@@ -33,7 +33,7 @@ import cv2  # type: ignore
 import compute
 
 # ORDERING: this has to come before the functions that use this type
-from compute import unique_numeric_id_as_str, query_timing_result
+from compute import unique_numeric_id_as_str, query_timing_result_type
 import neo4j_query
 
 proc_timeout = 30
@@ -150,7 +150,7 @@ def create_d3js_json(
     query_time_dict: dict,
     derivation_id: unique_numeric_id_as_str,
     destination_folder: str,
-) -> query_timing_result:
+) -> query_timing_result_type:
     """
     Produce a JSON file that contains something like
     {
@@ -388,7 +388,7 @@ def create_tex_file_for_derivation(
     query_time_dict: dict,
     derivation_id: unique_numeric_id_as_str,
     path_to_tex_file: str,
-) -> query_timing_result:
+) -> query_timing_result_type:
     """
     In v7 the PDG I started allowing inference rule names
     to have spaces. (In versions prior to 7 the inference rule names were
@@ -1276,7 +1276,7 @@ def write_step_to_graphviz_file(
     step_dict: str,
     file_handle: TextIO,
     path_to_output_png: str,
-) -> query_timing_result:
+) -> query_timing_result_type:
     """
 
     used by `create_derivation_png`
