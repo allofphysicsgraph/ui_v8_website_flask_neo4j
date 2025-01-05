@@ -1377,6 +1377,12 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
         derivation_graphviz_png_filename,
     )
 
+    # only validate steps if HTML page is going to be rendered
+    derivation_step_validity_dict = {}
+    sympy_validate_step.validate_step(
+        graphDB_Driver, query_time_dict, derivation_id, step_id
+    )
+
     print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
     return render_template(
         "property-graph/derivation_review.html",
@@ -1385,6 +1391,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
         derivation_graphviz_png_filename=derivation_graphviz_png_filename,
         # derivation_graphviz_svg_filename=derivation_graphviz_svg_filename,
         json_for_d3js=d3js_json_filename,
+        derivation_step_validity_dict=derivation_step_validity_dict,
         all_steps=all_steps,
         form_delete=web_form_delete,
         form_tex_pdf=web_form_tex_pdf,

@@ -34,6 +34,49 @@ import sympy  # type: ignore
 # the following is only relevant for doctests
 from sympy.parsing.latex import parse_latex  # type: ignore
 
+from compute import query_timing_result_type
+
+
+def validate_step(
+    graphDB_Driver, query_time_dict, derivation_id: str, step_id: str
+) -> str:
+    """
+    The possible return strings from this function include:
+    * "no validation is available..." (e.g., for declarations)
+    * "no check performed" (the check is not implemented yet)
+    * "valid"
+    * "diff is ..."
+
+    >>> validate_step('4924823', '2500423', 'data.json')
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace start " + trace_id + "]")
+    logger.debug("step ID = " + step_id + " and deriv_id = " + deriv_id)
+
+    dat = clib.read_db(path_to_db)
+
+    step_dict = dat["derivations"][deriv_id]["steps"][step_id]
+    # logger.debug("validate_step; step_dict = %s", step_dict)
+
+    if step_dict["inf rule"] in [
+        "declare initial expr",
+        "declare final expr",
+        "declare identity",
+        "declare guess solution",
+        "declare assumption",
+    ]:
+        logger.info("[trace end " + trace_id + "]")
+        return "no validation is available for declarations"
+
+    if step_dict["inf rule"] in [
+        "assume N dimensions",
+        "normalization condition",
+        "boundary condition",
+        "boundary condition for expr",
+    ]:
+        logger.info("[trace end " + trace_id + "]")
+        return "no validation is available for assumptions"
+
 
 def add_X_to_both_sides(input_expr_sympy, feed_expr_sympy, output_expr_sympy) -> str:
     """
