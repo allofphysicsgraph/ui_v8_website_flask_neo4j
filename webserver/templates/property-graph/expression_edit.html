@@ -15,13 +15,12 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 
 <fieldset>
   <legend>
-    <H2>Symbols in Expression</h2>
+    <H2>Symbols in Expression \({{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}\)</h2>
   </legend>
 
-<P>\({{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}\)
-
+<!--
 <P>{{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}
-
+-->
 
 <table border="1" id="symbol_table">
   <tr>
@@ -101,10 +100,10 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 
 </fieldset>
 
-<!--
+
 <fieldset>
   <legend>
-    <H2>Operations in Expression</h2>
+    <H2>Operations in Expression \({{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}\)</h2>
   </legend>
 
 <P>See also <a href="{ { url_for('to_list_operations') }}?referrer=expession_edit">all operations</a>.</P>
@@ -126,9 +125,9 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   </tr>
   { % for symbol_id, symbol_dict in dict_of_operation_dicts_in_expression.items() %}
   <tr>
-    <td><a href="{ { url_for('to_edit_scalar_symbol', symbol_id=symbol_id) }}">{ { symbol_id }}</a></td> <!-- ID - ->
-    <td>{ { symbol_dict['latex'] }}</td> <!-- latex -- >
-    <td>{ { symbol_dict['name_latex'] }}</td> <!-- name - ->
+    <td><a href="{ { url_for('to_edit_scalar_symbol', symbol_id=symbol_id) }}">{ { symbol_id }}</a></td> <!-- ID -->
+    <td>{ { symbol_dict['latex'] }}</td> <!-- latex -->
+    <td>{ { symbol_dict['name_latex'] }}</td> <!-- name -->
     <td>{ { symbol_dict['number_of_arguments'] }}</td>
     <td>{ { symbol_dict['description_latex'] }}</td>
   </tr>
@@ -157,7 +156,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   </legend>
   <form method="post" action="" onsubmit="return checkForm(this);">
     { { form_no_options.csrf_token }}
-    <P><!-- operation count: { { list_of_operation_IDs|length } } - ->
+    <P><!-- operation count: { { list_of_operation_IDs|length } } -->
     <select name="symbol_select_id_to_remove" class="selectpicker form-control" id="symbol_select">
       { % for symbol_id, symbol_dict in dict_of_operation_dicts_in_expression.items() %}
       <option value="{ { symbol_id }}">{ { symbol_id }}, { { symbol_dict['latex'] }} </option>

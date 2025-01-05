@@ -18,7 +18,34 @@
   </legend>
 
   <!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
-  <P><input type="text" id="inf_rule_input" onkeyup="select_infrule()" placeholder="Select inference rule">
+
+Case-insensitive dynamic search of latex as plain text: <input type="text" id="inf_rule_input" onkeyup="latex_filter()" placeholder="Search latex (plain text)" size="50">
+
+<script>
+function latex_filter() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("select_infrule");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("inference_rule_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    console.log(td)
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
 
 
   <P>Clicking on the inference rule ID selects that inference rule for the step<BR>
@@ -63,27 +90,6 @@
   </P>
 </fieldset>
 
-<script>
-function select_infrule() {
-  // Declare variables
-  var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('inf_rule_input');
-  filter = input.value.toUpperCase();
-  ul = document.getElementById("inf_rules_UL");
-  li = ul.getElementsByTagName('li');
-
-  // Loop through all list items, and hide those who don't match the search query
-  for (i = 0; i < li.length; i++) {
-    a = li[i].getElementsByTagName("a")[0];
-    txtValue = a.textContent || a.innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      li[i].style.display = "";
-    } else {
-      li[i].style.display = "none";
-    }
-  }
-}
-</script>
 
 
 {% endblock %}

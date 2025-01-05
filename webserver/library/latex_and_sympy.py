@@ -18,9 +18,10 @@ import sympy  # type: ignore
 from sympy.parsing.latex import parse_latex  # type: ignore
 
 
-def sympy_to_latex_str(sympy_expr) -> str:
+def sympy_to_latex_str(sympy_expr: str) -> str:
     """
         TODO: this isn't working as desired.
+        https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/19
 
     latex_and_sympy/sympy_to_latex_str: SymPy to be converted to Latex: sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))
     latex_and_sympy/sympy_to_latex_str: latex_str= \mathtt{\text{sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))}}
@@ -34,7 +35,7 @@ def sympy_to_latex_str(sympy_expr) -> str:
         + str(sympy_expr)
     )
 
-    latex_str = sympy.latex(sympy_expr)
+    latex_str = sympy.latex(eval(sympy_expr))
 
     print("latex_and_sympy/sympy_to_latex_str: latex_str=", latex_str)
 

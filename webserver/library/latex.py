@@ -256,77 +256,77 @@ def create_d3js_json(
             + "},\n"
         )
 
-    list_of_expressions = []
-    for this_input_dict in step_dict["list of input dicts"]:
-        temp_dict = this_input_dict["m"]
-        temp_dict["type of math"] = "expression"
-        list_of_expressions.append(temp_dict)
-    for this_output_dict in step_dict["list of output dicts"]:
-        temp_dict = this_output_dict["m"]
-        temp_dict["type of math"] = "expression"
-        list_of_expressions.append(temp_dict)
-    for this_feed_dict in step_dict["list of feed dicts"]:
-        temp_dict = this_feed_dict["m"]
-        temp_dict["type of math"] = "feed"
-        list_of_expressions.append(temp_dict)
+        list_of_expressions = []
+        for this_input_dict in step_dict["list of input dicts"]:
+            temp_dict = this_input_dict["m"]
+            temp_dict["type of math"] = "expression"
+            list_of_expressions.append(temp_dict)
+        for this_output_dict in step_dict["list of output dicts"]:
+            temp_dict = this_output_dict["m"]
+            temp_dict["type of math"] = "expression"
+            list_of_expressions.append(temp_dict)
+        for this_feed_dict in step_dict["list of feed dicts"]:
+            temp_dict = this_feed_dict["m"]
+            temp_dict["type of math"] = "feed"
+            list_of_expressions.append(temp_dict)
 
-    for this_expression_dict in list_of_expressions:
-        print("latex/create_d3js_json this_expression_dict", this_expression_dict)
+        for this_expression_dict in list_of_expressions:
+            print("latex/create_d3js_json this_expression_dict", this_expression_dict)
 
-        if this_expression_dict["type of math"] == "expression":
-            # TODO: account for input_dict['latex_condition']
-            expression_latex = (
-                this_expression_dict["latex_lhs"]
-                + this_expression_dict["latex_relation"]
-                + this_expression_dict["latex_rhs"]
-            )
-            png_name = (
-                "expression_"
+            if this_expression_dict["type of math"] == "expression":
+                # TODO: account for input_dict['latex_condition']
+                expression_latex = (
+                    this_expression_dict["latex_lhs"]
+                    + this_expression_dict["latex_relation"]
+                    + this_expression_dict["latex_rhs"]
+                )
+                png_name = (
+                    "expression_"
+                    + this_expression_dict["id"]
+                    + "_"
+                    + hash_of_string(expression_latex)
+                )
+            elif this_expression_dict["type of math"] == "feed":
+                expression_latex = this_expression_dict["latex"]
+                png_name = (
+                    "feed_"
+                    + this_expression_dict["id"]
+                    + "_"
+                    + hash_of_string(expression_latex)
+                )
+
+            print("latex/create_d3js_json png_name", png_name)
+            # logger.debug("PNG name = " + png_name)
+
+            if not os.path.isfile(destination_folder + png_name + ".png"):
+                create_png_from_latex(
+                    expression_latex,
+                    destination_folder,
+                    png_name,
+                )
+                # logger.debug("created PNG " + png_name)
+
+            image = cv2.imread(destination_folder + png_name + ".png")
+            # logger.debug("type for cv2 image is " + str(type(image)))
+
+            # construct the node JSON content
+            list_of_nodes.append(
+                '    {"id": "'
                 + this_expression_dict["id"]
-                + "_"
-                + hash_of_string(expression_latex)
-            )
-        elif this_expression_dict["type of math"] == "feed":
-            expression_latex = this_expression_dict["latex"]
-            png_name = (
-                "feed_"
+                + '", "group": 0, '
+                + '"img": "/static/'
+                + png_name
+                + '.png", '
+                + '"url": "https://derivationmap.net/list_all_expressions?referrer=d3js#'
                 + this_expression_dict["id"]
-                + "_"
-                + hash_of_string(expression_latex)
+                + '", "width": '
+                + str(image.shape[1])
+                + ", "
+                + '"height": '
+                + str(image.shape[0])
+                + ", "
+                + '"linear index": -1},\n'
             )
-
-        print("latex/create_d3js_json png_name", png_name)
-        # logger.debug("PNG name = " + png_name)
-
-        if not os.path.isfile(destination_folder + png_name + ".png"):
-            create_png_from_latex(
-                expression_latex,
-                destination_folder,
-                png_name,
-            )
-            # logger.debug("created PNG " + png_name)
-
-        image = cv2.imread(destination_folder + png_name + ".png")
-        # logger.debug("type for cv2 image is " + str(type(image)))
-
-        # construct the node JSON content
-        list_of_nodes.append(
-            '    {"id": "'
-            + this_expression_dict["id"]
-            + '", "group": 0, '
-            + '"img": "/static/'
-            + png_name
-            + '.png", '
-            + '"url": "https://derivationmap.net/list_all_expressions?referrer=d3js#'
-            + this_expression_dict["id"]
-            + '", "width": '
-            + str(image.shape[1])
-            + ", "
-            + '"height": '
-            + str(image.shape[0])
-            + ", "
-            + '"linear index": -1},\n'
-        )
 
     list_of_nodes = list(set(list_of_nodes))
     all_nodes = "".join(list_of_nodes)

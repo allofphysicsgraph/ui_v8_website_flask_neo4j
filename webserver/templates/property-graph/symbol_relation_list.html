@@ -11,7 +11,33 @@
 </legend>
 
 <!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
-<input type="text" id="relation_input" onkeyup="select_relation()" placeholder="Select relation to review">
+Case-insensitive dynamic search of latex as plain text: <input type="text" id="latex_input" onkeyup="latex_filter()" placeholder="Search latex (plain text)" size="50">
+
+<script>
+function latex_filter() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("latex_input");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("relation_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    console.log(td)
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
 
 <P>The relation ID links to a page where you can edit the relation<BR>
 
@@ -26,6 +52,7 @@
 </UL>
 </fieldset>
 
+<!-- search unordered list
 <script>
 function select_relation() {
   // Declare variables
@@ -47,5 +74,6 @@ function select_relation() {
   }
 }
 </script>
+-->
 
 {% endblock %}

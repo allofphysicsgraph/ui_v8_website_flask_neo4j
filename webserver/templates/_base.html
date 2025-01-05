@@ -40,7 +40,7 @@
 
   {% endblock %}
 
-<P>timing of queries (in seconds):</P>
+<P>timing of Neo4j queries:</P>
   <UL>
   {% for what_is_being_timed,duration_in_seconds in query_time_dict.items() %}
   <LI>{{ duration_in_seconds }} seconds for <code>{{ what_is_being_timed }}</code></LI>

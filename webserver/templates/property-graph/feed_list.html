@@ -11,7 +11,33 @@
 </legend>
 
 <!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
-<input type="text" id="feed_input" onkeyup="select_expression()" placeholder="Select feed to review">
+Case-insensitive dynamic search of latex as plain text: <input type="text" id="feed_input" onkeyup="select_feed()" placeholder="Search latex (plain text)" size="50">
+
+<script>
+function select_feed() {
+  // Declare variables
+  var input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById('feed_input');
+  filter = input.value.toUpperCase();
+  // 2023-12-17: below was previously for UL/LI but I switched to TR/TD since the derivations are a table.
+  tr = document.getElementById("feed_table");
+  td = tr.getElementsByTagName('td');
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1]; // latex column
+    console.log(td)
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
 
 <P>The Feed ID links to a page where you can edit the feed<BR>
 
@@ -26,26 +52,6 @@
 <a href="{{ url_for('to_add_feed') }}?referrer=feed_list">add new feed</a>
 </fieldset>
 
-<script>
-function select_expression() {
-  // Declare variables
-  var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('feed_input');
-  filter = input.value.toUpperCase();
-  ul = document.getElementById("feed_UL");
-  li = ul.getElementsByTagName('li');
 
-  // Loop through all list items, and hide those who don't match the search query
-  for (i = 0; i < li.length; i++) {
-    a = li[i].getElementsByTagName("a")[0];
-    txtValue = a.textContent || a.innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      li[i].style.display = "";
-    } else {
-      li[i].style.display = "none";
-    }
-  }
-}
-</script>
 
 {% endblock %}

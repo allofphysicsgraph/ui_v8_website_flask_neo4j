@@ -17,7 +17,34 @@
 
 
 <!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
-TODO: this search box doesn't work as of 2024-05-11: <input type="text" id="inference_rule_input" onkeyup="select_inference_rule()" placeholder="Select Inference Rule">
+Case-insensitive dynamic search of latex as plain text: <input type="text" id="latex_input" onkeyup="latex_filter()" placeholder="Search latex (plain text)" size="50">
+
+
+<script>
+function latex_filter() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("latex_input");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("inference_rule_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    console.log(td)
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
 
 <P>The inference rule ID links to a page where you can edit the inference rule<BR>
 
@@ -32,26 +59,5 @@ TODO: this search box doesn't work as of 2024-05-11: <input type="text" id="infe
 
 <P><a href="{{ url_for('to_add_inference_rule')  }}?referrer=inference_rule_list">add inference rule</a>
 </fieldset>
-<script>
-function select_inference_rule() {
-  // Declare variables
-  var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('inference_rule_input');
-  filter = input.value.toUpperCase();
-  ul = document.getElementById("inference_rule_UL");
-  li = ul.getElementsByTagName('tr');
-
-  // Loop through all list items, and hide those who don't match the search query
-  for (i = 0; i < li.length; i++) {
-    a = li[i].getElementsByTagName("td")[0];
-    txtValue = a.textContent || a.innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      li[i].style.display = "";
-    } else {
-      li[i].style.display = "none";
-    }
-  }
-}
-</script>
 
 {% endblock %}
