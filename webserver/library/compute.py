@@ -21,12 +21,12 @@ from typing import NewType, Dict, List, Tuple
 
 # ORDERING: this has to come before the functions that use this type
 unique_numeric_id_as_str = NewType("unique_numeric_id_as_str", str)
-query_timing_result = NewType("query_timing_result", Dict[str, float])
+query_timing_result_type = NewType("query_timing_result", Dict[str, float])
 
 
 def generate_random_id(
     graphDB_Driver, query_time_dict: dict, node_type: str
-) -> Tuple[unique_numeric_id_as_str, query_timing_result]:
+) -> Tuple[unique_numeric_id_as_str, query_timing_result_type]:
     """
     create statically defined numeric IDs for nodes in the graph
 
@@ -487,7 +487,9 @@ def get_list_of_all_nonoperation_symbol_dicts(
     return list_of_nonoperation_symbol_dicts, query_time_dict
 
 
-def get_dict_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> dict:
+def get_dict_of_all_symbol_dicts(
+    graphDB_Driver, query_time_dict: dict
+) -> Tuple[dict, query_timing_result_type]:
     """
     a better Cypher query might make this function slimmer
 
@@ -531,7 +533,9 @@ def get_dict_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> dict:
     return dict_of_all_symbol_dicts, query_time_dict
 
 
-def get_dict_of_node_dicts(graphDB_Driver, query_time_dict: dict, node_type: str):
+def get_dict_of_node_dicts(
+    graphDB_Driver, query_time_dict: dict, node_type: str
+) -> Tuple[dict, query_timing_result_type]:
     """
     >>> get_dict_of_node_dicts()
     """
@@ -573,8 +577,8 @@ def get_dict_of_node_dicts(graphDB_Driver, query_time_dict: dict, node_type: str
 
 
 def get_dict_of_derivations_used_per_inference_rule(
-    graphDB_Driver, list_of_inference_rule_dicts: list
-) -> dict:
+    graphDB_Driver, query_time_dict, list_of_inference_rule_dicts: list
+) -> Tuple[dict, query_timing_result_type]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     print(
@@ -586,12 +590,16 @@ def get_dict_of_derivations_used_per_inference_rule(
     for this_inference_rule_dict in list_of_inference_rule_dicts:
         list_of_derivations_that_use_this_inference_rule_id = []
         with graphDB_Driver.session() as session:
+            query_start_time = time.time()
             list_of_derivations_that_use_this_inference_rule_id = (
                 session.read_transaction(
                     neo4j_query.derivations_that_use_inference_rule,
                     this_inference_rule_dict["id"],
                 )
             )
+            query_time_dict[
+                "compute/get_dict_of_derivations_used_per_inference_rule: derivations_that_use_inference_rule"
+            ] = round(time.time() - query_start_time, 3)
         print(
             "list_of_derivations_that_use_this_inference_rule_id=",
             list_of_derivations_that_use_this_inference_rule_id,
@@ -611,7 +619,7 @@ def get_dict_of_derivations_used_per_inference_rule(
         dict_of_derivations_used_per_inference_rule[this_inference_rule_dict["id"]] = (
             list_of_derivations_that_use_this_inference_rule_id
         )
-    return dict_of_derivations_used_per_inference_rule
+    return dict_of_derivations_used_per_inference_rule, query_time_dict
 
 
 # def symbols_per_expression_or_feed(
