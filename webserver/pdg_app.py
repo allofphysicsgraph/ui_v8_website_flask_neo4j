@@ -1109,7 +1109,7 @@ def to_add_derivation() -> str:
         list_of_derivation_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "derivation"
         )
-
+        query_time_dict["pdg_app/to_add_derivation: get_list_node_dicts_of_type derivation"] = round(time.time() - query_start_time, 3)
     number_of_steps_per_derivation = {}
     for derivation_dict in list_of_derivation_dicts:
         print("derivation_dict", derivation_dict)
@@ -1120,6 +1120,7 @@ def to_add_derivation() -> str:
                 neo4j_query.get_list_of_step_dicts_in_this_derivation,
                 derivation_dict["id"],
             )
+            query_time_dict["pdg_app/to_add_derivation: get_list_of_step_dicts_in_this_derivation"] = round(time.time() - query_start_time, 3)
         number_of_steps_per_derivation[derivation_dict["id"]] = len(list_of_steps)
 
     print("derivations in the database:")
@@ -1200,7 +1201,7 @@ def to_add_derivation() -> str:
                 derivation_reference_latex,
                 author_name_latex,
             )
-
+            query_time_dict["pdg_app/to_add_derivation: add_derivation"] = round(time.time() - query_start_time, 3)
         print("[TRACE] func: pdg_app/to_add_derivation end " + trace_id)
         return redirect(
             url_for(
@@ -1332,11 +1333,13 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> str:
                     session.write_transaction(
                         neo4j_query.delete_node, this_step_dict["id"], "step"
                     )
+                    query_time_dict["pdg_app/to_review_derivation: delete_node step"] = round(time.time() - query_start_time, 3)
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 session.write_transaction(
                     neo4j_query.delete_node, derivation_id, "derivation"
                 )
+                query_time_dict["pdg_app/to_review_derivation: delete_node derivation"] = round(time.time() - query_start_time, 3)
             print("[TRACE] func: pdg_app/to_review_derivation end " + trace_id)
             redirect(url_for("to_list_derivations"))
         else:
@@ -1555,7 +1558,7 @@ def to_add_step_select_inference_rule(
         list_of_inference_rule_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "inference_rule"
         )
-
+        query_time_dict["pdg_app/to_add_step_select_inference_rule: get_list_node_dicts_of_type inference_rule"] = round(time.time() - query_start_time, 3)
     print(
         "pdg_app/to_add_step_select_inference_rule: list_of_inference_rule_dicts=",
         list_of_inference_rule_dicts,
@@ -1579,6 +1582,7 @@ def to_add_step_select_inference_rule(
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
+        query_time_dict["pdg_app/to_add_step_select_inference_rule: get_node_properties derivation"] = round(time.time() - query_start_time, 3)
     print(
         "pdg_app/to_add_step_select_inference_rule: derivation_dict:", derivation_dict
     )
@@ -1619,6 +1623,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
         expression_dict = session.read_transaction(
             neo4j_query.get_node_properties, "expression", expression_id
         )
+        query_time_dict["pdg_app/to_edit_expression: get_node_properties expression"] = round(time.time() - query_start_time, 3)
     print("pdg_app/to_edit_expression: expression_dict:", expression_dict)
     # {'name_latex': '', 'reference_latex': '', 'latex_condition': '',
     #  'latex_rhs': 'b', 'author_name_latex': 'ben', 'description_latex': '',
@@ -1756,6 +1761,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> str:
                 now_str,
                 author_name_latex,
             )
+            query_time_dict["pdg_app/to_edit_expression: edit_expression"] = round(time.time() - query_start_time, 3)
 
     web_form_no_options = NoOptionsForm(request.form)
     # web_form_no_options = DeleteButtonForm(request.form)
@@ -1865,6 +1871,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
         feed_dict = session.read_transaction(
             neo4j_query.get_node_properties, "feed", feed_id
         )
+        query_time_dict["pdg_app/to_edit_feed: get_node_properties feed"] = round(time.time() - query_start_time, 3)
     print("pdg_app/to_edit_feed: feed_dict:", feed_dict)
 
     # editing the feed includes modifying the symbols present.
@@ -1963,6 +1970,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
                 session.write_transaction(
                     neo4j_query.edit_node_property, "feed", feed_id, "latex", feed_latex
                 )
+                query_time_dict["pdg_app/to_edit_feed: edit_node_property feed latex"] = round(time.time() - query_start_time, 3)
         if feed_dict["sympy"] != feed_sympy:
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
@@ -1970,6 +1978,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
                 session.write_transaction(
                     neo4j_query.edit_node_property, "feed", feed_id, "sympy", feed_sympy
                 )
+                query_time_dict["pdg_app/to_edit_feed: edit_node_property feed sympy"] = round(time.time() - query_start_time, 3)
         if feed_dict["lean"] != feed_lean:
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
@@ -1977,6 +1986,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> str:
                 session.write_transaction(
                     neo4j_query.edit_node_property, "feed", feed_id, "lean", feed_lean
                 )
+                query_time_dict["pdg_app/to_edit_feed: edit_node_property feed lean"] = round(time.time() - query_start_time, 3)
 
     web_form_no_options = NoOptionsForm(request.form)
     # web_form_no_options = DeleteButtonForm(request.form)
@@ -2224,6 +2234,7 @@ def to_add_expression() -> str:
                 expression_reference_latex,
                 author_name_latex,
             )
+            query_time_dict["pdg_app/to_add_expression: add_expression"] = round(time.time() - query_start_time, 3)
         query_time_dict["to_add_expression: add_expression"] = round(
             time.time() - query_start_time, 3
         )
@@ -2326,7 +2337,7 @@ def to_add_feed() -> str:
                 feed_lean,
                 author_name_latex,
             )
-        query_time_dict["to_add_feed: add_feed new multi-symbol"] = round(
+            query_time_dict["to_add_feed: add_feed new multi-symbol"] = round(
             time.time() - query_start_time, 3
         )
 
@@ -2360,7 +2371,7 @@ def to_add_feed() -> str:
                         feed_lean="",
                         author_name_latex="ben",
                     )
-                query_time_dict["to_add_feed: add_feed promoted symbol"] = round(
+                    query_time_dict["to_add_feed: add_feed promoted symbol"] = round(
                     time.time() - query_start_time, 3
                 )
 
@@ -2406,6 +2417,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> str:
             derivation_id = session.read_transaction(
                 neo4j_query.get_derivation_id_from_step_id, node_id
             )
+            query_time_dict["pdg_app/to_edit_node: get_derivation_id_from_step_id"] = round(time.time() - query_start_time, 3)
 
         print("[TRACE] func: pdg_app/to_edit_node end " + trace_id)
         return redirect(
@@ -5848,6 +5860,7 @@ def to_list_expressions() -> str:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: pdg_app/to_list_expressions start " + trace_id)
+
     query_time_dict = {}  # type: Dict[str, float]
 
     list_of_expression_dicts = []
@@ -5856,7 +5869,7 @@ def to_list_expressions() -> str:
         list_of_expression_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "expression"
         )
-
+        query_time_dict["pdg_app/to_list_expressions: get_list_node_dicts_of_type expression"] = round(time.time() - query_start_time, 3)
     print(
         "pdg_app/to_list_expressions: list_of_expression_dicts",
         list_of_expression_dicts,
@@ -5898,7 +5911,7 @@ def to_list_expressions() -> str:
                 this_expression_dict["id"],
                 "scalar",
             )
-
+            query_time_dict["pdg_app/to_list_expressions: get_list_of_symbol_IDs_per_category_in_expression_or_feed expression scalar"] = round(time.time() - query_start_time, 3)
         dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
             sympy_validate_expression.dimensional_consistency(
                 this_expression_dict,
@@ -5960,7 +5973,7 @@ def to_list_derivations() -> str:
         list_of_derivation_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "derivation"
         )
-
+        query_time_dict["pdg_app/to_list_derivations: get_list_node_dicts_of_type derivation"] = round(time.time() - query_start_time, 3)
     print("    list_of_derivation_dicts = ", list_of_derivation_dicts)
 
     number_of_steps_per_derivation = {}
@@ -5973,6 +5986,7 @@ def to_list_derivations() -> str:
                 neo4j_query.get_list_of_step_dicts_in_this_derivation,
                 derivation_dict["id"],
             )
+            query_time_dict["pdg_app/to_list_derivations: get_list_of_step_dicts_in_this_derivation"] = round(time.time() - query_start_time, 3)
         number_of_steps_per_derivation[derivation_dict["id"]] = len(list_of_steps)
 
     print("    number_of_steps_per_derivation = ", number_of_steps_per_derivation)
@@ -6003,7 +6017,7 @@ def to_list_inference_rules() -> str:
         list_of_inference_rule_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "inference_rule"
         )
-
+        query_time_dict["pdg_app/to_list_inference_rules: get_list_node_dicts_of_type inference_rule"] = round(time.time() - query_start_time, 3)
     dict_of_derivations_used_per_inference_rule = (
         compute.get_dict_of_derivations_used_per_inference_rule(
             graphDB_Driver, list_of_inference_rule_dicts
@@ -6012,7 +6026,7 @@ def to_list_inference_rules() -> str:
 
     print("inference rule list:")
     for inference_rule_dict in list_of_inference_rule_dicts:
-        print(inference_rule_dict)
+        print("pdg_app/to_list_inference_rules ",inference_rule_dict)
 
     print("[TRACE] func: pdg_app/to_list_inference_rules end " + trace_id)
     return render_template(
@@ -6035,11 +6049,11 @@ def to_delete_graph_content() -> str:
 
     # https://neo4j.com/docs/python-manual/current/session-api/
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         str_to_print = session.write_transaction(
             neo4j_query.delete_all_nodes_and_relationships
         )
-
+        # query_time_dict["pdg_app/: "] = round(time.time() - query_start_time, 3)
     print("[TRACE] func: pdg_app/to_delete_graph_content end " + trace_id)
     return redirect(url_for("main"))
 
@@ -6057,7 +6071,9 @@ def to_export_json() -> str:
     query_time_dict = {}  # type: Dict[str, float]
 
     with graphDB_Driver.session() as session:
+        # query_start_time = time.time()
         res = session.read_transaction(neo4j_query.apoc_export_json, "pdg.json")
+        # query_time_dict["pdg_app/: "] = round(time.time() - query_start_time, 3)
 
     print("pdg_app/to_export_json res=", res)
     # <Record file='all.json' source='database: nodes(4), rels(0)' format='json' nodes=4 relationships=0 properties=16 time=123 rows=4 batchSize=-1 batches=0 done=True data=None>
@@ -6086,7 +6102,9 @@ def to_export_cypher() -> str:
     query_time_dict = {}  # type: Dict[str, float]
 
     with graphDB_Driver.session() as session:
+        # query_start_time = time.time()
         res = session.read_transaction(neo4j_query.apoc_export_cypher, "pdg.cypher")
+        # query_time_dict["pdg_app/: "] = round(time.time() - query_start_time, 3)
 
     print("res=", str(res))
     # <Record file='all.cypher' batches=1 source='database: nodes(4), rels(0)' format='cypher' nodes=4 relationships=0 properties=16 time=13 rows=4 batchSize=20000>
