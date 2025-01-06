@@ -7,7 +7,7 @@
 
 import random
 
-import sympy
+import sympy  # type: ignore
 from sympy.physics.units import (
     mass,
     length,
@@ -16,7 +16,7 @@ from sympy.physics.units import (
     luminous_intensity,
     amount_of_substance,
     charge,
-)
+)  # type: ignore
 from sympy.physics.units.systems.si import dimsys_SI  # type: ignore
 
 

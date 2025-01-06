@@ -11,7 +11,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   <a href="{{ url_for('to_list_vectors') }}?referrer=expession_edit">vector symbols</a>,
   <a href="{{ url_for('to_list_matrices') }}?referrer=expession_edit">matrix symbols</a>.</P>
 
-<P>TODO: list derivations that use this expression. That could help provide context.
+<P>TODO: list derivations that use this expression. That Would provide context.
 
 <fieldset>
   <legend>
@@ -249,10 +249,15 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   </form>
 </fieldset>
 
+
+
   <fieldset>
     <legend>
       <H2>Delete Expression</h2>
     </legend>
+
+    <P>TODO: this should only be enabled if the expression is not used by any derivations
+
     <P color="red">WARNING: THERE IS NO UNDO</P>
     <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}

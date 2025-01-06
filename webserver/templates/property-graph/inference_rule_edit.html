@@ -6,12 +6,6 @@
 or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inference_rule_edit">list of inference rules</a>
 </P>
 
-<P>Used in the following derivations: 
-  {% for derivation_dict in list_of_derivation_dicts_that_use_this_inference_rule_id %}
-  <UL>
-    <LI>{{ derivation_dict }}</LI>
-  </UL>
-{% endfor %}
 
 <fieldset>
   <legend>
@@ -20,7 +14,7 @@ or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inferenc
 <!--
 <P>{ { inference_rule_dict } }
 -->
-<P>TODO: editing the inference rule could break derivations.
+
   
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_edit.csrf_token }}
@@ -30,6 +24,10 @@ or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inferenc
       {{form_edit.inference_rule_latex.label }}: {{ form_edit.inference_rule_latex(size=50, maxlength=1000, value=inference_rule_dict['latex']) }}
       Refer to feeds using <code>$#1$</code> and refer to expressions using <code>Eq.~\ref{eq:#2}</code>
       <BR/>
+
+
+     {% if list_of_derivation_dicts_that_use_this_inference_rule_id|length < 1 %}
+
       &nbsp;<BR/>
       {{form_edit.inference_rule_number_of_inputs.label }}: {{ form_edit.inference_rule_number_of_inputs(value=inference_rule_dict['number_of_inputs']) }} <BR/>
       &nbsp;<BR/>
@@ -37,6 +35,22 @@ or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inferenc
       &nbsp;<BR/>
       {{form_edit.inference_rule_number_of_outputs.label }}: {{ form_edit.inference_rule_number_of_outputs(value=inference_rule_dict['number_of_outputs']) }} <BR/>
       &nbsp;<BR/>
+
+      {% else %}
+
+      <P>Editing the number of inputs, feeds, and outputs is disabled because 
+        {{ inference_rule_dict['name_latex'] }}
+        is used in the following derivations: 
+        {% for derivation_dict in list_of_derivation_dicts_that_use_this_inference_rule_id %}
+        <UL>
+          <LI>{{ derivation_dict }}</LI>
+        </UL>
+        {% endfor %}
+
+
+      {% endif %}
+
+
       <input type="submit" name="submit_button" value="Update inference rule">
     </P>
   </form>
@@ -48,14 +62,31 @@ or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inferenc
     <H2>Delete Inference Rule</H2>
   </legend>
 
+     {% if list_of_derivation_dicts_that_use_this_inference_rule_id|length < 1 %}
+
   <!--<form method="post" action="" onsubmit="return checkForm(this);">-->
     <form method="post" action="">
     {{ form_delete.csrf_token }}
-    <P>
-
-    <input type="submit" name="submit_button" value="delete inference rule">
+    <!--<P><B>WARNING!!</B> This should only be enabled if the inference rule is not in use in any derivation.<BR>
+      Deleting an inference rule that is in use causes the graph to enter an invalid schema -- a step without an inference rule.
+    -->
+    <P><input type="submit" name="submit_button" value="delete inference rule">
 
   </form>
+
+
+      {% else %}
+      <P>Editing the number of inputs, feeds, and outputs is disabled because 
+        {{ inference_rule_dict['name_latex'] }}
+        is used in the following derivations: 
+        {% for derivation_dict in list_of_derivation_dicts_that_use_this_inference_rule_id %}
+        <UL>
+          <LI>{{ derivation_dict }}</LI>
+        </UL>
+        {% endfor %}
+
+      {% endif %}
+
 </fieldset>
 
 {% endblock %}

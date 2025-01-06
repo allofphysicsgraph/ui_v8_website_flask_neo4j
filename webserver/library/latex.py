@@ -385,7 +385,7 @@ def edges_in_derivation_for_d3js(
 
 def create_tex_file_for_derivation(
     graphDB_Driver,
-    query_time_dict: dict,
+    query_time_dict: query_timing_result_type,
     derivation_id: unique_numeric_id_as_str,
     path_to_tex_file: str,
 ) -> query_timing_result_type:
@@ -421,6 +421,10 @@ def create_tex_file_for_derivation(
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
+        query_time_dict[
+            "latex/create_tex_file_for_derivation: get_node_properties derivation"
+            + derivation_id
+        ] = round(time.time() - query_start_time, 3)
     print("latex/create_tex_file_for_derivation: derivation_dict=", derivation_dict)
 
     with graphDB_Driver.session() as session:
@@ -428,12 +432,20 @@ def create_tex_file_for_derivation(
         list_of_step_dicts_in_this_derivation = session.read_transaction(
             neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
         )
+        query_time_dict[
+            "latex/create_tex_file_for_derivation: get_list_of_step_dicts_in_this_derivation"
+            + derivation_id
+        ] = round(time.time() - query_start_time, 3)
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_sequence_values = session.read_transaction(
             neo4j_query.get_list_of_sequence_values_for_derivation_id, derivation_id
         )
+        query_time_dict[
+            "latex/create_tex_file_for_derivation: get_list_of_sequence_values_for_derivation_id"
+            + derivation_id
+        ] = round(time.time() - query_start_time, 3)
     print(
         "latex/create_tex_file_for_derivation: list_of_sequence_values=",
         list_of_sequence_values,
@@ -469,6 +481,9 @@ def create_tex_file_for_derivation(
             list_of_inference_rule_dicts = session.read_transaction(
                 neo4j_query.get_list_node_dicts_of_type, "inference_rule"
             )
+            query_time_dict[
+                "latex/create_tex_file_for_derivation: get_list_node_dicts_of_type inference_rule"
+            ] = round(time.time() - query_start_time, 3)
 
         # first, write the inference rules as newcommand at top of .tex file
         latex_file_handle.write("% inference rules as newcommand for use in the body\n")
@@ -588,9 +603,9 @@ def create_tex_file_for_derivation(
                     "list of output dicts"
                 ]:
                     list_of_output_expression_latex.append(
-                        this_input_dict["latex_lhs"]
-                        + this_input_dict["latex_relation"]
-                        + this_input_dict["latex_rhs"]
+                        this_output_dict["latex_lhs"]
+                        + this_output_dict["latex_relation"]
+                        + this_output_dict["latex_rhs"]
                     )
 
                 if step_dict["sequence_index"] == linear_indx:
@@ -665,6 +680,8 @@ def create_tex_file_for_derivation(
                         latex_file_handle.write(
                             step_dict["note_after_step_latex"] + "\n"
                         )  # TODO: if the note contains a $ or %, shenanigans arise
+
+        # TODO: only create a bibliography if the .tex file contains "cite"
 
         latex_file_handle.write("\\bibliographystyle{plain}\n")
         latex_file_handle.write("\\bibliography{pdg.bib}\n")
@@ -1085,6 +1102,10 @@ def create_derivation_png(
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
+        query_time_dict[
+            "latex/create_derivation_png: get_node_properties derivation"
+            + derivation_id
+        ] = round(time.time() - query_start_time, 3)
     print("latex/create_derivation_png: derivation_dict=", derivation_dict)
 
     with graphDB_Driver.session() as session:
@@ -1092,6 +1113,10 @@ def create_derivation_png(
         list_of_step_dicts_in_this_derivation = session.read_transaction(
             neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
         )
+        query_time_dict[
+            "latex/create_derivation_png: get_list_of_step_dicts_in_this_derivation"
+            + derivation_id
+        ] = round(time.time() - query_start_time, 3)
     print(
         "latex/create_derivation_png: list_of_step_dicts_in_this_derivation=",
         list_of_step_dicts_in_this_derivation,

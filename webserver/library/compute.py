@@ -21,7 +21,7 @@ from typing import NewType, Dict, List, Tuple
 
 # ORDERING: this has to come before the functions that use this type
 unique_numeric_id_as_str = NewType("unique_numeric_id_as_str", str)
-query_timing_result_type = NewType("query_timing_result", Dict[str, float])
+query_timing_result_type = NewType("query_timing_result_type", Dict[str, float])
 
 
 def generate_random_id(

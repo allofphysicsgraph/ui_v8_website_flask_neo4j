@@ -82,16 +82,25 @@ def validate_step(
         print("[TRACE] func: sympy_validate_step/validate_step end " + trace_id)
         return "no validation is available for assumptions"
 
+    elif inference_rule_dict["name_latex"] == "add X to both sides":
+        # logger.info("[trace end " + trace_id + "]")
+        print("[TRACE] func: sympy_validate_step/validate_step end " + trace_id)
+        return add_X_to_both_sides(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+
     else:
         # logger.error("unexpected inf rule:" + step_dict["inf rule"])
-        print("unexpected inf rule:" + step_dict["inf rule"])
-        raise Exception("Unexpected inf rule: " + step_dict["inf rule"])
+        print("unexpected inf rule:" + inference_rule_dict["name_latex"])
+        raise Exception("Unexpected inf rule: " + inference_rule_dict["name_latex"])
 
     print("[TRACE] func: sympy_validate_step/validate_step end " + trace_id)
     return "This message should not be seen"
 
 
-def add_X_to_both_sides(input_expr_sympy, feed_expr_sympy, output_expr_sympy) -> str:
+def add_X_to_both_sides(
+    list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+) -> str:
     """
     https://docs.sympy.org/latest/gotchas.html#double-equals-signs
     https://stackoverflow.com/questions/37112738/sympy-comparing-expressions
@@ -108,6 +117,10 @@ def add_X_to_both_sides(input_expr_sympy, feed_expr_sympy, output_expr_sympy) ->
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] func: sympy_validate_step/add_X_to_both_sides start " + trace_id)
+
+    print("list_of_input_dicts", list_of_input_dicts)
+    print("list_of_feed_dicts", list_of_feed_dicts)
+    print("list_of_output_dicts", list_of_output_dicts)
 
     delta_lhs = sympy.simplify(
         sympy.Add(input_expr_sympy.lhs, feed_expr_sympy) - output_expr_sympy.lhs
