@@ -20,10 +20,14 @@
     <P>
       {{ form.relation_latex.label}}: {{ form.relation_latex(size=50, maxlength=1000, value=relation_dict['latex']) }} <BR/>
       &nbsp;<BR/>
-      {{form.relation_name.label }}: {{ form.relation_name(size=50, maxlength=1000, value=relation_dict['name']) }}<BR/>
+      {{form.relation_name_latex.label }}: {{ form.relation_name_latex(size=50, maxlength=1000, value=relation_dict['name']) }}<BR/>
       &nbsp;<BR/>
-      {{form.relation_description.label }}: {{ form.relation_description(size=50, maxlength=1000, value=relation_dict['description']) }}<BR/>
+      {{form.relation_description_latex.label }}: {{ form.relation_description_latex(size=50, maxlength=1000, value=relation_dict['description']) }}<BR/>
       &nbsp;<BR/>
+
+      {{form.relation_reference_latex.label }}: {{ form.relation_reference_latex(size=50, maxlength=1000, value=relation_dict['reference']) }}<BR/>
+      &nbsp;<BR/>
+
       <input type="submit" value="Edit relation">
     </P>
   </form>

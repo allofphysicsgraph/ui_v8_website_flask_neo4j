@@ -609,7 +609,7 @@ def get_list_of_expression_dicts_from_step_id_and_expr_type(
         + ") RETURN m"
     ):
         # print(result.data())
-        list_of_expression_dicts.append(result.data())
+        list_of_expression_dicts.append(result.data()["m"])
 
     # print("list_of_expression_dicts=", list_of_expression_dicts)
 
@@ -864,6 +864,7 @@ def edit_derivation_metadata(
     tx,
     derivation_id: str,
     derivation_name_latex: str,
+    derivation_reference_latex: str,
     abstract_latex: str,
     now_str: str,
     author_name_latex: str,
@@ -880,6 +881,7 @@ def edit_derivation_metadata(
         'MERGE (d:derivation {id:"' + str(derivation_id) + '"})'
         'SET d = {id: "' + str(derivation_id) + '",'
         'name_latex: "' + str(derivation_name_latex) + '",'
+        'reference_latex: "' + str(derivation_reference_latex) + '",'
         'created_datetime:"' + now_str + '",'
         'author_name_latex:"' + author_name_latex + '",'
         'abstract_latex: "' + str(abstract_latex) + '"}'

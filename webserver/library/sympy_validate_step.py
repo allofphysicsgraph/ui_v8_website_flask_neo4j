@@ -34,11 +34,18 @@ import sympy  # type: ignore
 # the following is only relevant for doctests
 from sympy.parsing.latex import parse_latex  # type: ignore
 
+# https://docs.python.org/3/library/typing.html
+from typing import NewType, Dict, List, Tuple
+
+import compute
 from compute import query_timing_result_type
 
 
 def validate_step(
-    graphDB_Driver, query_time_dict, derivation_id: str, step_id: str
+    inference_rule_dict: dict,
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
 ) -> str:
     """
     The possible return strings from this function include:
@@ -50,32 +57,38 @@ def validate_step(
     >>> validate_step('4924823', '2500423', 'data.json')
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[trace start " + trace_id + "]")
-    logger.debug("step ID = " + step_id + " and deriv_id = " + deriv_id)
+    print("[TRACE] func: sympy_validate_step/validate_step start " + trace_id)
+    # logger.info("[trace start " + trace_id + "]")
+    # logger.debug("step ID = " + step_id + " and deriv_id = " + deriv_id)
 
-    dat = clib.read_db(path_to_db)
-
-    step_dict = dat["derivations"][deriv_id]["steps"][step_id]
-    # logger.debug("validate_step; step_dict = %s", step_dict)
-
-    if step_dict["inf rule"] in [
+    if inference_rule_dict["name_latex"] in [
         "declare initial expr",
         "declare final expr",
         "declare identity",
         "declare guess solution",
         "declare assumption",
     ]:
-        logger.info("[trace end " + trace_id + "]")
+        # logger.info("[trace end " + trace_id + "]")
+        print("[TRACE] func: sympy_validate_step/validate_step end " + trace_id)
         return "no validation is available for declarations"
 
-    if step_dict["inf rule"] in [
+    elif inference_rule_dict["name_latex"] in [
         "assume N dimensions",
         "normalization condition",
         "boundary condition",
         "boundary condition for expr",
     ]:
-        logger.info("[trace end " + trace_id + "]")
+        # logger.info("[trace end " + trace_id + "]")
+        print("[TRACE] func: sympy_validate_step/validate_step end " + trace_id)
         return "no validation is available for assumptions"
+
+    else:
+        # logger.error("unexpected inf rule:" + step_dict["inf rule"])
+        print("unexpected inf rule:" + step_dict["inf rule"])
+        raise Exception("Unexpected inf rule: " + step_dict["inf rule"])
+
+    print("[TRACE] func: sympy_validate_step/validate_step end " + trace_id)
+    return "This message should not be seen"
 
 
 def add_X_to_both_sides(input_expr_sympy, feed_expr_sympy, output_expr_sympy) -> str:

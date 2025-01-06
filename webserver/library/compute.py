@@ -25,7 +25,7 @@ query_timing_result_type = NewType("query_timing_result", Dict[str, float])
 
 
 def generate_random_id(
-    graphDB_Driver, query_time_dict: dict, node_type: str
+    graphDB_Driver, query_time_dict: query_timing_result_type, node_type: str
 ) -> Tuple[unique_numeric_id_as_str, query_timing_result_type]:
     """
     create statically defined numeric IDs for nodes in the graph
@@ -58,8 +58,8 @@ def generate_random_id(
 
 
 def get_dict_of_node_type_for_every_id(
-    graphDB_Driver, query_time_dict: dict
-) -> Tuple[dict, dict]:
+    graphDB_Driver, query_time_dict: query_timing_result_type
+) -> Tuple[dict, query_timing_result_type]:
     """
     >>> get_node_type_from_id()
     """
@@ -130,10 +130,10 @@ def remove_file_debris(
 
 def get_list_of_symbol_IDs_in_expression_or_feed(
     graphDB_Driver,
-    query_time_dict: dict,
+    query_time_dict: query_timing_result_type,
     expression_or_feed: str,
     expression_id: unique_numeric_id_as_str,
-):
+) -> Tuple[List[str], query_timing_result_type]:
     """
     >>> get_list_of_symbol_IDs_in_expression_or_feed()
     """
@@ -211,7 +211,7 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
 
 
 def get_list_of_expression_dicts_that_use_symbol_id(
-    graphDB_Driver, query_time_dict: dict, symbol_id: str
+    graphDB_Driver, query_time_dict: query_timing_result_type, symbol_id: str
 ) -> Tuple[List[dict], Dict[str, float]]:
     """
     This helper function returns all expressions for any category, unlike
@@ -280,7 +280,7 @@ def get_list_of_expression_dicts_that_use_symbol_id(
 
 
 def get_list_of_derivation_dicts_that_use_symbol_id(
-    graphDB_Driver, query_time_dict: dict, symbol_id: str
+    graphDB_Driver, query_time_dict: query_timing_result_type, symbol_id: str
 ):
     """
     >>>
@@ -352,7 +352,9 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
 #     return dict_of_derivation_dicts_that_use_feed, query_time_dict
 
 
-def get_list_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> list:
+def get_list_of_all_symbol_dicts(
+    graphDB_Driver, query_time_dict: query_timing_result_type
+) -> list:
     """
     a better Cypher query might make this function slimmer
 
@@ -421,7 +423,7 @@ def get_list_of_all_symbol_dicts(graphDB_Driver, query_time_dict: dict) -> list:
 
 
 def get_list_of_all_nonoperation_symbol_dicts(
-    graphDB_Driver, query_time_dict: dict
+    graphDB_Driver, query_time_dict: query_timing_result_type
 ) -> list:
     """
     use for "new feed" when promoting existing symbols to feed
@@ -488,7 +490,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
 
 
 def get_dict_of_all_symbol_dicts(
-    graphDB_Driver, query_time_dict: dict
+    graphDB_Driver, query_time_dict: query_timing_result_type
 ) -> Tuple[dict, query_timing_result_type]:
     """
     a better Cypher query might make this function slimmer
@@ -534,7 +536,7 @@ def get_dict_of_all_symbol_dicts(
 
 
 def get_dict_of_node_dicts(
-    graphDB_Driver, query_time_dict: dict, node_type: str
+    graphDB_Driver, query_time_dict: query_timing_result_type, node_type: str
 ) -> Tuple[dict, query_timing_result_type]:
     """
     >>> get_dict_of_node_dicts()
@@ -577,7 +579,9 @@ def get_dict_of_node_dicts(
 
 
 def get_dict_of_derivations_used_per_inference_rule(
-    graphDB_Driver, query_time_dict, list_of_inference_rule_dicts: list
+    graphDB_Driver,
+    query_time_dict: query_timing_result_type,
+    list_of_inference_rule_dicts: list,
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
@@ -716,14 +720,15 @@ def all_steps_in_derivation(
 
     all_steps = {}
     for this_step_dict in list_of_step_dicts:
-
+        print('this_step_dict["id"]:', this_step_dict["id"])
         (
             inference_rule_dict,
             list_of_input_dicts,
             list_of_feed_dicts,
             list_of_output_dicts,
+            query_time_dict,
         ) = input_feed_output_infrule_for_step(
-            graphDB_Driver, query_time_dict, this_step_dict
+            graphDB_Driver, query_time_dict, this_step_dict["id"]
         )
 
         with graphDB_Driver.session() as session:
@@ -747,7 +752,9 @@ def all_steps_in_derivation(
     return all_steps, query_time_dict
 
 
-def input_feed_output_infrule_for_step(graphDB_Driver, query_time_dict, this_step_dict):
+def input_feed_output_infrule_for_step(
+    graphDB_Driver, query_time_dict: query_timing_result_type, step_id: str
+):
     """
     >>> input_feed_output_infrule_for_step()
     """
@@ -763,7 +770,7 @@ def input_feed_output_infrule_for_step(graphDB_Driver, query_time_dict, this_ste
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         inference_rule_dict = session.read_transaction(
-            neo4j_query.step_has_inference_rule, this_step_dict["id"]
+            neo4j_query.step_has_inference_rule, step_id
         )
         query_time_dict["compute/all_steps_in_derivation: step_has_inference_rule"] = (
             round(time.time() - query_start_time, 3)
@@ -773,7 +780,7 @@ def input_feed_output_infrule_for_step(graphDB_Driver, query_time_dict, this_ste
         query_start_time = time.time()
         list_of_input_dicts = session.read_transaction(
             neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
-            this_step_dict["id"],
+            step_id,
             "HAS_INPUT",
         )
         query_time_dict[
@@ -784,7 +791,7 @@ def input_feed_output_infrule_for_step(graphDB_Driver, query_time_dict, this_ste
         query_start_time = time.time()
         list_of_feed_dicts = session.read_transaction(
             neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
-            this_step_dict["id"],
+            step_id,
             "HAS_FEED",
         )
         query_time_dict[
@@ -795,7 +802,7 @@ def input_feed_output_infrule_for_step(graphDB_Driver, query_time_dict, this_ste
         query_start_time = time.time()
         list_of_output_dicts = session.read_transaction(
             neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
-            this_step_dict["id"],
+            step_id,
             "HAS_OUTPUT",
         )
         query_time_dict[
@@ -809,6 +816,7 @@ def input_feed_output_infrule_for_step(graphDB_Driver, query_time_dict, this_ste
         list_of_input_dicts,
         list_of_feed_dicts,
         list_of_output_dicts,
+        query_time_dict,
     )
 
 

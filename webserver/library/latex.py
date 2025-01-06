@@ -258,15 +258,15 @@ def create_d3js_json(
 
         list_of_expressions = []
         for this_input_dict in step_dict["list of input dicts"]:
-            temp_dict = this_input_dict["m"]
+            temp_dict = this_input_dict
             temp_dict["type of math"] = "expression"
             list_of_expressions.append(temp_dict)
         for this_output_dict in step_dict["list of output dicts"]:
-            temp_dict = this_output_dict["m"]
+            temp_dict = this_output_dict
             temp_dict["type of math"] = "expression"
             list_of_expressions.append(temp_dict)
         for this_feed_dict in step_dict["list of feed dicts"]:
-            temp_dict = this_feed_dict["m"]
+            temp_dict = this_feed_dict
             temp_dict["type of math"] = "feed"
             list_of_expressions.append(temp_dict)
 
@@ -574,23 +574,23 @@ def create_tex_file_for_derivation(
                     # print("this_input_dict=", this_input_dict)
                     # this_input_dict= {'m': {'sympy_lhs': "sympy.Symbol('pdg9592623')", 'reference_latex': '', 'latex_condition': '', 'sympy_rhs': "sympy.Symbol('pdg7689637')", 'description_latex': '', 'latex_lhs': 'a', 'name_latex': '', 'lean': '', 'latex_rhs': 'b', 'author_name_latex': 'ben', 'id': '3636307', 'sympy': "sympy.Eq(sympy.Symbol('pdg9592623'),sympy.Symbol('pdg7689637'))", 'latex_relation': '='}}
                     list_of_input_expression_latex.append(
-                        this_input_dict["m"]["latex_lhs"]
-                        + this_input_dict["m"]["latex_relation"]
-                        + this_input_dict["m"]["latex_rhs"]
+                        this_input_dict["latex_lhs"]
+                        + this_input_dict["latex_relation"]
+                        + this_input_dict["latex_rhs"]
                     )
 
                 list_of_feed_latex = []
                 for this_feed_dict in all_steps[step_dict["id"]]["list of feed dicts"]:
-                    list_of_feed_latex.append(this_feed_dict["m"]["latex"])
+                    list_of_feed_latex.append(this_feed_dict["latex"])
 
                 list_of_output_expression_latex = []
                 for this_output_dict in all_steps[step_dict["id"]][
                     "list of output dicts"
                 ]:
                     list_of_output_expression_latex.append(
-                        this_input_dict["m"]["latex_lhs"]
-                        + this_input_dict["m"]["latex_relation"]
-                        + this_input_dict["m"]["latex_rhs"]
+                        this_input_dict["latex_lhs"]
+                        + this_input_dict["latex_relation"]
+                        + this_input_dict["latex_rhs"]
                     )
 
                 if step_dict["sequence_index"] == linear_indx:
@@ -1113,7 +1113,7 @@ def create_derivation_png(
             query_time_dict = write_step_to_graphviz_file(
                 graphDB_Driver,
                 query_time_dict,
-                this_step_dict,
+                this_step_dict["id"],
                 file_handle,
                 path_to_output_png,
             )
@@ -1233,7 +1233,11 @@ def create_step_graphviz_png(
         file_handle.write("fontsize=12;\n")
 
         query_time_dict = write_step_to_graphviz_file(
-            graphDB_Driver, query_time_dict, step_dict, file_handle, destination_folder
+            graphDB_Driver,
+            query_time_dict,
+            step_dict["id"],
+            file_handle,
+            destination_folder,
         )
         file_handle.write("}\n")
 
@@ -1273,7 +1277,7 @@ def create_step_graphviz_png(
 def write_step_to_graphviz_file(
     graphDB_Driver,
     query_time_dict: dict,
-    step_dict: str,
+    step_id: str,
     file_handle: TextIO,
     path_to_output_png: str,
 ) -> query_timing_result_type:
@@ -1300,16 +1304,17 @@ def write_step_to_graphviz_file(
     # logger.info("[trace start " + trace_id + "]")
     print("[TRACE] latex/write_step_to_graphviz_file start " + trace_id + "]")
 
-    print("step_dict = %s", step_dict)
-    # logger.debug("step_dict = %s", step_dict)
+    print("step_id =", step_id)
+    # logger.debug("step_id = %s", step_id)
 
     (
         inference_rule_dict,
         list_of_input_dicts,
         list_of_feed_dicts,
         list_of_output_dicts,
+        query_time_dict,
     ) = compute.input_feed_output_infrule_for_step(
-        graphDB_Driver, query_time_dict, step_dict
+        graphDB_Driver, query_time_dict, step_id
     )
 
     print("latex/write_step_to_graphviz_file inference_rule_dict", inference_rule_dict)
@@ -1330,7 +1335,7 @@ def write_step_to_graphviz_file(
             png_filename_no_extension,
         )
     file_handle.write(
-        step_dict["id"]
+        step_id
         + ' [shape=invtrapezium, color=blue, label="",image="'
         + path_to_output_png
         + png_filename_no_extension
@@ -1342,18 +1347,18 @@ def write_step_to_graphviz_file(
     for input_dict in list_of_input_dicts:
         # TODO: account for input_dict['latex_condition']
         input_latex = (
-            input_dict["m"]["latex_lhs"]
-            + input_dict["m"]["latex_relation"]
-            + input_dict["m"]["latex_rhs"]
+            input_dict["latex_lhs"]
+            + input_dict["latex_relation"]
+            + input_dict["latex_rhs"]
         )
         png_filename_no_extension = (
-            "expression_" + input_dict["m"]["id"] + "_" + hash_of_string(input_latex)
+            "expression_" + input_dict["id"] + "_" + hash_of_string(input_latex)
         )
         if not os.path.isfile(path_to_output_png + png_filename_no_extension + ".png"):
             create_png_from_latex(
                 input_latex, path_to_output_png, png_filename_no_extension
             )
-        file_handle.write(png_filename_no_extension + " -> " + step_dict["id"] + ";\n")
+        file_handle.write(png_filename_no_extension + " -> " + step_id + ";\n")
         file_handle.write(
             png_filename_no_extension
             + ' [shape=ellipse, color=black,label="",image="'
@@ -1367,19 +1372,19 @@ def write_step_to_graphviz_file(
     for output_dict in list_of_output_dicts:
         # TODO: account for output_dict['latex_condition']
         output_latex = (
-            output_dict["m"]["latex_lhs"]
-            + output_dict["m"]["latex_relation"]
-            + output_dict["m"]["latex_rhs"]
+            output_dict["latex_lhs"]
+            + output_dict["latex_relation"]
+            + output_dict["latex_rhs"]
         )
 
         png_filename_no_extension = (
-            "expression_" + output_dict["m"]["id"] + "_" + hash_of_string(output_latex)
+            "expression_" + output_dict["id"] + "_" + hash_of_string(output_latex)
         )
         if not os.path.isfile(path_to_output_png + png_filename_no_extension + ".png"):
             create_png_from_latex(
                 output_latex, path_to_output_png, png_filename_no_extension
             )
-        file_handle.write(step_dict["id"] + " -> " + png_filename_no_extension + ";\n")
+        file_handle.write(step_id + " -> " + png_filename_no_extension + ";\n")
         file_handle.write(
             png_filename_no_extension
             + ' [shape=ellipse, color=black,label="",image="'
@@ -1392,16 +1397,13 @@ def write_step_to_graphviz_file(
     # feed expressions
     for feed_dict in list_of_feed_dicts:
         png_filename_no_extension = (
-            "feed_"
-            + feed_dict["m"]["id"]
-            + "_"
-            + hash_of_string(feed_dict["m"]["latex"])
+            "feed_" + feed_dict["id"] + "_" + hash_of_string(feed_dict["latex"])
         )
         if not os.path.isfile(path_to_output_png + png_filename_no_extension + ".png"):
             create_png_from_latex(
-                feed_dict["m"]["latex"], path_to_output_png, png_filename_no_extension
+                feed_dict["latex"], path_to_output_png, png_filename_no_extension
             )
-        file_handle.write(png_filename_no_extension + " -> " + step_dict["id"] + ";\n")
+        file_handle.write(png_filename_no_extension + " -> " + step_id + ";\n")
         file_handle.write(
             png_filename_no_extension
             + ' [shape=box, color=red,label="",image="'

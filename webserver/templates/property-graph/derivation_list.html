@@ -14,8 +14,6 @@
   <P>To select a derivation click on a link in the table.
 
   <P>To filter the table of derivations enter a derivation ID or string in the form field.<BR>
-    
-
 
 <!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
 Case-insensitive dynamic search of latex as plain text: 
@@ -23,6 +21,7 @@ Case-insensitive dynamic search of latex as plain text:
 
 <script>
 function select_derivation() {
+  console.log('reached function')
   // Declare variables
   var input, filter, table, tr, td, i, txtValue;
   input = document.getElementById('derivation_input');

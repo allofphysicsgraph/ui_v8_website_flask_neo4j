@@ -37,7 +37,7 @@ or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inferenc
       &nbsp;<BR/>
       {{form_edit.inference_rule_number_of_outputs.label }}: {{ form_edit.inference_rule_number_of_outputs(value=inference_rule_dict['number_of_outputs']) }} <BR/>
       &nbsp;<BR/>
-      <input type="submit" value="Update inference rule">
+      <input type="submit" name="submit_button" value="Update inference rule">
     </P>
   </form>
 
@@ -48,11 +48,12 @@ or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inferenc
     <H2>Delete Inference Rule</H2>
   </legend>
 
-  <form method="post" action="" onsubmit="return checkForm(this);">
+  <!--<form method="post" action="" onsubmit="return checkForm(this);">-->
+    <form method="post" action="">
     {{ form_delete.csrf_token }}
     <P>
 
-    <input type="submit" value="delete inference rule">
+    <input type="submit" name="submit_button" value="delete inference rule">
 
   </form>
 </fieldset>
