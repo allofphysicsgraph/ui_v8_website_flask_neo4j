@@ -19,9 +19,15 @@ from flask import Blueprint, flash, g, redirect, render_template, jsonify, reque
 import sys
 from typing import NewType, Dict, List
 
+
+import logging
+
+logger = logging.getLogger(__name__)
+
 sys.path.append("library")
 
 import neo4j_query
+
 
 # the following creates a circular dependency since `app.py` imports this file.
 from pdg_app import graphDB_Driver
@@ -49,7 +55,12 @@ def api_list_derivations():
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_api/api_list_derivations start " + trace_id)
+    print(
+        "[TRACE] pdg_api/api_list_derivations start "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
     query_time_dict = {}  # type: Dict[str, float]
 
     with graphDB_Driver.session() as session:
@@ -61,7 +72,7 @@ def api_list_derivations():
             "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
         ] = (time.time() - query_start_time)
 
-    print("[TRACE] func: pdg_api/api_list_derivations end " + trace_id)
+    print("[TRACE] pdg_api/api_list_derivations end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -83,7 +94,7 @@ def api_list_inference_rules():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_api/api_list_inference_rules start " + trace_id)
+    print("[TRACE] pdg_api/api_list_inference_rules start " + trace_id)
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
@@ -91,7 +102,7 @@ def api_list_inference_rules():
         )
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] func: pdg_api/api_list_inference_rules end " + trace_id)
+    print("[TRACE] pdg_api/api_list_inference_rules end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -113,7 +124,7 @@ def api_list_operation_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_api/api_list_symbols start " + trace_id)
+    print("[TRACE] pdg_api/api_list_symbols start " + trace_id)
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
@@ -121,7 +132,7 @@ def api_list_operation_symbols():
         )
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] func: pdg_api/api_list_symbols end " + trace_id)
+    print("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -143,7 +154,7 @@ def api_list_scalar_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_api/api_list_symbols start " + trace_id)
+    print("[TRACE] pdg_api/api_list_symbols start " + trace_id)
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
@@ -151,7 +162,7 @@ def api_list_scalar_symbols():
         )
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] func: pdg_api/api_list_symbols end " + trace_id)
+    print("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -173,7 +184,7 @@ def api_list_vector_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_api/api_list_symbols start " + trace_id)
+    print("[TRACE] pdg_api/api_list_symbols start " + trace_id)
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
@@ -181,7 +192,7 @@ def api_list_vector_symbols():
         )
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] func: pdg_api/api_list_symbols end " + trace_id)
+    print("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -203,7 +214,7 @@ def api_list_matrix_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_api/api_list_symbols start " + trace_id)
+    print("[TRACE] pdg_api/api_list_symbols start " + trace_id)
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
@@ -211,7 +222,7 @@ def api_list_matrix_symbols():
         )
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] func: pdg_api/api_list_symbols end " + trace_id)
+    print("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -230,7 +241,7 @@ def api_list_expressions():
     ]
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_api/api_list_expressions start " + trace_id)
+    print("[TRACE] pdg_api/api_list_expressions start " + trace_id)
 
     with graphDB_Driver.session() as session:
         list_of_dicts = session.read_transaction(
@@ -238,7 +249,7 @@ def api_list_expressions():
         )
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] func: pdg_api/api_list_expressions end " + trace_id)
+    print("[TRACE] pdg_api/api_list_expressions end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -256,7 +267,7 @@ def api_derivation_metadata():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_api/api_derivation_metadata start " + trace_id)
+    print("[TRACE] pdg_api/api_derivation_metadata start " + trace_id)
 
     if "derivation_id" in request.args:
         derivation_id = str(request.args["derivation_id"])
@@ -272,7 +283,7 @@ def api_derivation_metadata():
         )
     print("derivation_dict=", derivation_dict)
 
-    print("[TRACE] func: pdg_api/api_derivation_metadata end " + trace_id)
+    print("[TRACE] pdg_api/api_derivation_metadata end " + trace_id)
     return jsonify(derivation_dict)
 
 
@@ -292,7 +303,7 @@ def api_derivation_steps():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_api/api_derivation_steps start " + trace_id)
+    print("[TRACE] pdg_api/api_derivation_steps start " + trace_id)
 
     if "derivation_id" in request.args:
         derivation_id = str(request.args["derivation_id"])
@@ -309,7 +320,7 @@ def api_derivation_steps():
 
     print("list_of_steps=", list_of_steps)
 
-    print("[TRACE] func: pdg_api/api_derivation_steps end " + trace_id)
+    print("[TRACE] pdg_api/api_derivation_steps end " + trace_id)
     return jsonify(list_of_steps)
 
 

@@ -31,12 +31,12 @@ can be contructed using md5hash(<derivation_id>_<expression_id>).
 # convention: every Python function starts with
 ```
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_app/main start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] pdg_app/main start " + trace_id + " " + str(time.time()))
     query_time_dict = {}  # type: query_timing_result_type
 ```
 and exits with
 ```
-    print("[TRACE] func: pdg_app/main start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] pdg_app/main start " + trace_id + " " + str(time.time()))
     return
 ```
 # reason: This enables creation of a flamegraph <https://www.brendangregg.com/flamegraphs.html>
@@ -85,8 +85,6 @@ from typing import NewType, Dict, List
 # https://docs.python.org/3/library/re.html
 import re
 
-# https://docs.python.org/3/howto/logging.html
-import logging
 
 # https://gist.github.com/ibeex/3257877
 from logging.handlers import RotatingFileHandler
@@ -169,6 +167,8 @@ uri = "bolt://neo4j_docker:7687"
 # userName        = "neo4j"
 # password        = "test"
 
+# https://docs.python.org/3/howto/logging.html
+import logging
 
 # maxBytes=10000 = 10kB
 # maxBytes=100000 = 100kB
@@ -177,12 +177,13 @@ uri = "bolt://neo4j_docker:7687"
 log_size = 10000000
 # maxBytes=100000000 = 100MB
 # https://gist.github.com/ibeex/3257877
-handler_debug = RotatingFileHandler(
-    "flask_critical_and_error_and_warning_and_info_and_debug.log",
-    maxBytes=log_size,
-    backupCount=2,
-)
-handler_debug.setLevel(logging.DEBUG)
+
+# handler_debug = RotatingFileHandler(
+#     "flask_critical_and_error_and_warning_and_info_and_debug.log",
+#     maxBytes=log_size,
+#     backupCount=2,
+# )
+# handler_debug.setLevel(logging.DEBUG)
 handler_info = RotatingFileHandler(
     "flask_critical_and_error_and_warning_and_info.log",
     maxBytes=log_size,
@@ -194,18 +195,19 @@ handler_warning = RotatingFileHandler(
     maxBytes=log_size,
     backupCount=2,
 )
-handler_warning.setLevel(logging.WARNING)
+handler_warning.setLevel(logging.INFO)
 
 # https://docs.python.org/3/howto/logging.html
 logging.basicConfig(
     # either (filename + filemode) XOR handlers
     # filename="test.log", # to save entries to file instead of displaying to stderr
     # filemode="w", # https://docs.python.org/dev/library/functions.html#filemodes
-    handlers=[handler_debug, handler_info, handler_warning],
+    #   handlers=[handler_debug, handler_info, handler_warning],
+    handlers=[handler_info],
     # if the severity level is INFO,
     # the logger will handle only INFO, WARNING, ERROR, and CRITICAL messages
     # and will ignore DEBUG messages
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s|%(filename)-13s|%(levelname)-5s|%(lineno)-4d|%(funcName)-20s|%(message)s",  # ,
     # https://stackoverflow.com/questions/6290739/python-logging-use-milliseconds-in-time-format/7517430#7517430
     # datefmt="%m/%d/%Y %I:%M:%S %f %p", # https://strftime.org/
@@ -244,30 +246,36 @@ except neo4j.exceptions.ClientError as er:
 
 import importlib
 
-print("python", sys.version)
-print("neo4j", importlib.metadata.version("neo4j"), "- https://pypi.org/project/neo4j/")
-print(
-    "flask",
-    importlib.metadata.version("flask"),
-    "- https://flask.palletsprojects.com/en/3.0.x/",
+logger.info("python" + str(sys.version))
+logger.info(
+    "neo4j "
+    + str(importlib.metadata.version("neo4j"))
+    + " - https://pypi.org/project/neo4j/"
 )
-print(
-    "secure", importlib.metadata.version("secure"), "- https://pypi.org/project/secure/"
+logger.info(
+    "flask "
+    + str(importlib.metadata.version("flask"))
+    + " - https://flask.palletsprojects.com/en/3.0.x/"
 )
-print(
-    "wtforms",
-    importlib.metadata.version("wtforms"),
-    "- https://wtforms.readthedocs.io/en/3.1.x/",
+logger.info(
+    "secure "
+    + str(importlib.metadata.version("secure"))
+    + " - https://pypi.org/project/secure/"
 )
-print(
-    "werkzeug",
-    importlib.metadata.version("werkzeug"),
-    "- https://werkzeug.palletsprojects.com/en/3.0.x/",
+logger.info(
+    "wtforms "
+    + str(importlib.metadata.version("wtforms"))
+    + " - https://wtforms.readthedocs.io/en/3.1.x/"
 )
-print(
-    "flask_wtf",
-    importlib.metadata.version("flask_wtf"),
-    "- https://flask-wtf.readthedocs.io/en/1.2.x/",
+logger.info(
+    "werkzeug "
+    + str(importlib.metadata.version("werkzeug"))
+    + " - https://werkzeug.palletsprojects.com/en/3.0.x/"
+)
+logger.info(
+    "flask_wtf "
+    + str(importlib.metadata.version("flask_wtf"))
+    + " - https://flask-wtf.readthedocs.io/en/1.2.x/"
 )
 
 
@@ -932,8 +940,7 @@ def before_request():
     """
     g.start = time.time()
     g.request_start_time = time.time()
-    print("[TRACE] func: pdg_app/before_request: created elapsed_time function")
-    # logger.debug("created elapsed_time function")
+    logger.info("[TRACE] pdg_app/before_request: created elapsed_time function")
     elapsed_time = lambda: round(time.time() - g.request_start_time, 3)
     g.request_time = elapsed_time
     return
@@ -949,7 +956,7 @@ def main() -> werkzeug.Response:
     >>> main()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_app/main start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] pdg_app/main start " + trace_id + " " + str(time.time()))
     query_time_dict = {}  # type: query_timing_result_type
 
     if request.method == "POST":
@@ -959,7 +966,7 @@ def main() -> werkzeug.Response:
         if "file" not in request.files:
             error_message_for_user = "ERROR: file not in request files"
             print("pdg_app/main: ERROR: file not in request files")
-            print("[TRACE] func: pdg_app/main end " + trace_id + " " + str(time.time()))
+            logger.info("[TRACE] pdg_app/main end " + trace_id + " " + str(time.time()))
             return redirect(request.url)
         file_obj = request.files["file"]
 
@@ -969,12 +976,12 @@ def main() -> werkzeug.Response:
         if file_obj.filename == "":
             error_message_for_user = "WARN: no selected file"
             print("pdg_app/main: WARN: no selected file")
-            print("[TRACE] func: pdg_app/main end " + trace_id + " " + str(time.time()))
+            logger.info("[TRACE] pdg_app/main end " + trace_id + " " + str(time.time()))
             return redirect(request.url)
         if "upload_cypher" in request.form.keys():
             allowed_bool = True
         else:
-            print("[TRACE] func: pdg_app/main end " + trace_id + " " + str(time.time()))
+            logger.info("[TRACE] pdg_app/main end " + trace_id + " " + str(time.time()))
             raise Exception("unrecognized button")
 
         if file_obj and allowed_bool:
@@ -1113,7 +1120,7 @@ def main() -> werkzeug.Response:
             time.time() - query_start_time, 3
         )
 
-    print("[TRACE] func: pdg_app/main end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] pdg_app/main end " + trace_id + " " + str(time.time()))
     return render_template(
         "property-graph/site_map.html",
         title="site map",
@@ -1140,11 +1147,8 @@ def to_add_derivation() -> werkzeug.Response:
     http://localhost:5000/new_derivation?derivation_name=asdf123&derivation_abstract=4924858miminginasf
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_add_derivation start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_add_derivation start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1189,10 +1193,15 @@ def to_add_derivation() -> werkzeug.Response:
     #     print("derivation_abstract_from_URL:", derivation_abstract_from_URL)
 
     print("pdg_app/to_add_derivation: request.form=", request.form)
+    # request.form= ('derivation_name_latex', 'this is a new derivation'),
+    #               ('derivation_reference_latex', ''), ('abstract_latex', 'my summary')])
+
     web_form = SpecifyNewDerivationForm(request.form)
 
-    print("pdg_app/to_add_derivation: request.method=", request.method)
-    print("pdg_app/to_add_derivation: web_form.validate()=", web_form.validate())
+    print("pdg_app/to_add_derivation: request.method=", request.method)  # POST
+    print(
+        "pdg_app/to_add_derivation: web_form.validate()=", web_form.validate()
+    )  # True
 
     if request.method == "POST" and web_form.validate():
         print("pdg_app/to_add_derivation: request.form =", request.form)
@@ -1257,10 +1266,7 @@ def to_add_derivation() -> werkzeug.Response:
                 time.time() - query_start_time, 3
             )
         print(
-            "[TRACE] func: pdg_app/to_add_derivation end "
-            + trace_id
-            + " "
-            + str(time.time())
+            "[TRACE] pdg_app/to_add_derivation end " + trace_id + " " + str(time.time())
         )
         return redirect(
             url_for(
@@ -1269,11 +1275,8 @@ def to_add_derivation() -> werkzeug.Response:
             )
         )
 
-    print(
-        "[TRACE] func: pdg_app/to_add_derivation end "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_add_derivation end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/derivation_create.html",
@@ -1299,7 +1302,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_review_derivation start "
+        "[TRACE] pdg_app/to_review_derivation start "
         + trace_id
         + " "
         + str(time.time())
@@ -1341,11 +1344,11 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             except Exception as err:
                 # logger.error(str(err))
                 flash(str(err))
-                print("error=" + str(err))
+                print("ERROR pdg_app/to_review_derivation: " + str(err))
                 pdf_filename = "error.pdf"
 
             print(
-                "[TRACE] func: pdg_app/to_review_derivation end "
+                "[TRACE] pdg_app/to_review_derivation end "
                 + trace_id
                 + " "
                 + str(time.time())
@@ -1372,8 +1375,9 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             except Exception as err:
                 # logger.error(str(err))
                 flash(str(err))
+                print("ERROR: pdg_app/to_review_derivation:", err)
                 print(
-                    "[TRACE] func: pdg_app/to_review_derivation end "
+                    "[TRACE] pdg_app/to_review_derivation end "
                     + trace_id
                     + " "
                     + str(time.time())
@@ -1381,7 +1385,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                 return redirect(url_for("select_from_existing_derivations"))
 
             print(
-                "[TRACE] func: pdg_app/to_review_derivation end "
+                "[TRACE] pdg_app/to_review_derivation end "
                 + trace_id
                 + " "
                 + str(time.time())
@@ -1429,7 +1433,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                     "pdg_app/to_review_derivation: delete_node derivation"
                 ] = round(time.time() - query_start_time, 3)
             print(
-                "[TRACE] func: pdg_app/to_review_derivation end "
+                "[TRACE] pdg_app/to_review_derivation end "
                 + trace_id
                 + " "
                 + str(time.time())
@@ -1487,29 +1491,24 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             graphDB_Driver, query_time_dict, step_id
         )
 
-        print(inference_rule_dict)
-        print(list_of_input_dicts)
-        print(list_of_feed_dicts)
-        print(list_of_output_dicts)
+        print("pdg_app/to_review_derivation inference_rule_dict", inference_rule_dict)
+        print("pdg_app/to_review_derivation list_of_input_dicts", list_of_input_dicts)
+        print("pdg_app/to_review_derivation list_of_feed_dicts", list_of_feed_dicts)
+        print("pdg_app/to_review_derivation list_of_output_dicts", list_of_output_dicts)
 
-        try:
-            derivation_step_validity_dict[step_id], query_time_dict = (
-                sympy_validate_step.validate_step(
-                    inference_rule_dict,
-                    list_of_input_dicts,
-                    list_of_feed_dicts,
-                    list_of_output_dicts,
-                )
-            )
-        except Exception as err:
-            flash(str(err))
-            print("ERROR: pdg_app/to_review_derivation", err)
+        # try:
+        derivation_step_validity_dict[step_id] = sympy_validate_step.validate_step(
+            inference_rule_dict,
+            list_of_input_dicts,
+            list_of_feed_dicts,
+            list_of_output_dicts,
+        )
+        # except Exception as err:
+        #     flash(str(err))
+        #     print("ERROR: pdg_app/to_review_derivation ", err)
 
     print(
-        "[TRACE] func: pdg_app/to_review_derivation end "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_review_derivation end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/derivation_review.html",
@@ -1531,11 +1530,8 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
     User wants to delete step or edit step
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_select_step start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_select_step start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1574,8 +1570,8 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
         graphDB_Driver, derivation_id, query_time_dict
     )
 
-    print(
-        "[TRACE] func: pdg_app/to_select_step end " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_select_step end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/derivation_select_step.html",
@@ -1593,7 +1589,7 @@ def to_edit_derivation_metadata(
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_edit_derivation_metadata start "
+        "[TRACE] pdg_app/to_edit_derivation_metadata start "
         + trace_id
         + " "
         + str(time.time())
@@ -1642,7 +1638,7 @@ def to_edit_derivation_metadata(
                 round(time.time() - query_start_time, 3)
             )
         print(
-            "[TRACE] func: pdg_app/to_edit_derivation_metadata end "
+            "[TRACE] pdg_app/to_edit_derivation_metadata end "
             + trace_id
             + " "
             + str(time.time())
@@ -1662,7 +1658,7 @@ def to_edit_derivation_metadata(
     print("pdg_app/to_edit_derivation_metadata: derivation_dict:", derivation_dict)
 
     print(
-        "[TRACE] func: pdg_app/to_edit_derivation_metadata end "
+        "[TRACE] pdg_app/to_edit_derivation_metadata end "
         + trace_id
         + " "
         + str(time.time())
@@ -1688,7 +1684,7 @@ def to_add_step_select_inference_rule(
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_add_step_select_inference_rule start "
+        "[TRACE] pdg_app/to_add_step_select_inference_rule start "
         + trace_id
         + " "
         + str(time.time())
@@ -1705,7 +1701,7 @@ def to_add_step_select_inference_rule(
     #     # inference_rule_id =
     #     print(inference_rule_id)
 
-    #     print("[TRACE] func: pdg_app/to_add_step_select_inference_rule end " + trace_id + " " + str(time.time()))
+    #     logger.info("[TRACE] pdg_app/to_add_step_select_inference_rule end " + trace_id + " " + str(time.time()))
     #     redirect(
     #         url_for(
     #             "to_add_step_select_expressions",
@@ -1754,7 +1750,7 @@ def to_add_step_select_inference_rule(
     )
 
     print(
-        "[TRACE] func: pdg_app/to_add_step_select_inference_rule end "
+        "[TRACE] pdg_app/to_add_step_select_inference_rule end "
         + trace_id
         + " "
         + str(time.time())
@@ -1766,10 +1762,10 @@ def to_add_step_select_inference_rule(
         derivation_dict=derivation_dict,
     )
     # # workflow shouldn't reach this condition, but if it does,
-    # print("[TRACE] func: pdg_app/to_add_step_select_inference_rule end " + trace_id + " " + str(time.time()))
+    # logger.info("[TRACE] pdg_app/to_add_step_select_inference_rule end " + trace_id + " " + str(time.time()))
     # raise Exception("How did you reach this?")
 
-    # print("[TRACE] func: pdg_app/to_add_step_select_inference_rule end " + trace_id + " " + str(time.time()))
+    # logger.info("[TRACE] pdg_app/to_add_step_select_inference_rule end " + trace_id + " " + str(time.time()))
     # return redirect(url_for("to_review_derivation", derivation_id=derivation_id))
 
 
@@ -1784,10 +1780,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_edit_expression start "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_edit_expression start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2019,11 +2012,8 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
                     time.time() - query_start_time, 3
                 )
 
-    print(
-        "[TRACE] func: pdg_app/to_edit_expression end "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_expression end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/expression_edit.html",
@@ -2045,8 +2035,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     edit feed
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_edit_feed start " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_feed start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2182,11 +2172,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 query_time_dict[
                     "pdg_app/to_edit_feed: edit_node_property feed lean"
                 ] = round(time.time() - query_start_time, 3)
-        print(
-            "[TRACE] func: pdg_app/to_edit_feed end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_feed end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_list_feeds"))
 
@@ -2259,15 +2246,12 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 query_time_dict["to_edit_feed: add_symbol_to_feed"] = round(
                     time.time() - query_start_time, 3
                 )
-        print(
-            "[TRACE] func: pdg_app/to_edit_feed end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_feed end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_list_feeds"))
 
-    print("[TRACE] func: pdg_app/to_edit_feed end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] pdg_app/to_edit_feed end " + trace_id + " " + str(time.time()))
     return render_template(
         "property-graph/feed_edit.html",
         query_time_dict=query_time_dict,
@@ -2289,10 +2273,7 @@ def to_add_expression() -> werkzeug.Response:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_add_expression start "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_add_expression start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2456,7 +2437,7 @@ def to_add_expression() -> werkzeug.Response:
         )
 
         # after user provides latex for expression have them provide symbol count
-        print("[TRACE] func: pdg_app/ end " + trace_id + " " + str(time.time()))
+        logger.info("[TRACE] pdg_app/ end " + trace_id + " " + str(time.time()))
         return redirect(
             url_for(
                 "to_add_symbols_and_operations_for_expression",
@@ -2464,11 +2445,8 @@ def to_add_expression() -> werkzeug.Response:
             )
         )
 
-    print(
-        "[TRACE] func: pdg_app/to_add_expression end "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_add_expression end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/expression_create.html",
@@ -2489,8 +2467,8 @@ def to_add_feed() -> werkzeug.Response:
     novel feed
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_add_feed start " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_add_feed start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2565,7 +2543,7 @@ def to_add_feed() -> werkzeug.Response:
             )
 
         # after user provides latex for feed have them provide symbol count
-        print("[TRACE] func: pdg_app/ end " + trace_id + " " + str(time.time()))
+        logger.info("[TRACE] pdg_app/ end " + trace_id + " " + str(time.time()))
         return redirect(
             url_for(
                 "to_add_symbols_and_operations_for_feed",
@@ -2598,7 +2576,7 @@ def to_add_feed() -> werkzeug.Response:
                         time.time() - query_start_time, 3
                     )
 
-    print("[TRACE] func: pdg_app/to_add_feed end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] pdg_app/to_add_feed end " + trace_id + " " + str(time.time()))
     return render_template(
         "property-graph/feed_create.html",
         query_time_dict=query_time_dict,
@@ -2616,10 +2594,11 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
     """
     edit any node -- actually redirect to respective subcategory
 
+    >>> to_edit_node()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_edit_node start " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_node start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2633,15 +2612,13 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
     print("dict_of_symbol_id_and_type=", dict_of_symbol_id_and_type)
 
     if dict_of_symbol_id_and_type[node_id] == "derivation":
-        print(
-            "[TRACE] func: pdg_app/to_edit_node end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_node end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_review_derivation", derivation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "step":
         # which derivation is this step in?
+        print("node_id=", node_id)
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             derivation_id = session.read_transaction(
@@ -2651,84 +2628,59 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 round(time.time() - query_start_time, 3)
             )
 
-        print(
-            "[TRACE] func: pdg_app/to_edit_node end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_node end " + trace_id + " " + str(time.time())
         )
         return redirect(
             url_for("to_edit_step", derivation_id=derivation_id, step_id=node_id)
         )
     elif dict_of_symbol_id_and_type[node_id] == "inference_rule":
-        print(
-            "[TRACE] func: pdg_app/to_edit_node end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_node end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_edit_inference_rule", inference_rule_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "feed":
-        print(
-            "[TRACE] func: pdg_app/to_edit_node end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_node end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_edit_feed", feed_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "operation":
-        print(
-            "[TRACE] func: pdg_app/to_edit_node end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_node end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_edit_operation", operation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "relation":
-        print(
-            "[TRACE] func: pdg_app/to_edit_node end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_node end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_edit_relation", relation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "scalar":
-        print(
-            "[TRACE] func: pdg_app/to_edit_node end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_node end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_edit_scalar", scalar_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "vector":
-        print(
-            "[TRACE] func: pdg_app/to_edit_node end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_node end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_edit_vector", vector_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "matrix":
-        print(
-            "[TRACE] func: pdg_app/to_edit_node end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_node end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_edit_matrix", matrix_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "value_with_units":
-        print(
-            "[TRACE] func: pdg_app/to_edit_node end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_node end " + trace_id + " " + str(time.time())
         )
         return redirect(
             url_for("to_edit_constant_value_and_units", value_with_units=node_id)
         )
     else:
         print("ERROR: shouldn't reach here")
-        raise Exception("ERROR: shouldn't reach here")
+        raise Exception("ERROR: shouldn't reach here 9942892424")
+
+    raise Exception("ERROR: shouldn't reach here 01948138481")
     return "ERROR: definitely shouldn't get here"
 
 
@@ -2739,10 +2691,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_edit_operation start "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_edit_operation start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2789,11 +2738,8 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
 
     # print("operation_dict:", operation_dict)
 
-    print(
-        "[TRACE] func: pdg_app/to_edit_operation end "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_operation end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_operation_edit.html",
@@ -2809,11 +2755,8 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
     edit relation
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_edit_relation start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_relation start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2857,11 +2800,8 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
 
         return redirect(url_for("to_list_relations"))
 
-    print(
-        "[TRACE] func: pdg_app/to_edit_relation end "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_relation end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_relation_edit.html",
@@ -2883,11 +2823,8 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
     >>> to_edit_scalar()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_edit_scalar start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_scalar start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2969,7 +2906,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
     # elif request.method == "POST" and web_form_symbol_properties_vector.validate():
     #     print("request.form = ", request.form)
 
-    #     print("[TRACE] func: pdg_app/to_edit_scalar_symbol end " + trace_id + " " + str(time.time()))
+    #     logger.info("[TRACE] pdg_app/to_edit_scalar_symbol end " + trace_id + " " + str(time.time()))
     #     return redirect(url_for("to_list_symbols"))
 
     elif request.method == "POST":
@@ -2981,16 +2918,13 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
         # TODO: delete symbol
 
-        print(
-            "[TRACE] func: pdg_app/to_edit_scalar end "
-            + trace_id
-            + " "
-            + str(time.time())
+        logger.info(
+            "[TRACE] pdg_app/to_edit_scalar end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_list_scalars"))
 
-    print(
-        "[TRACE] func: pdg_app/to_edit_scalar end " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_scalar end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_scalar_edit.html",
@@ -3009,11 +2943,8 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
     >>> to_edit_vector()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_edit_vector start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_vector start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -3026,8 +2957,8 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     web_form = ""
 
-    print(
-        "[TRACE] func: pdg_app/to_edit_vector end " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_vector end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_vector_edit.html",
@@ -3045,11 +2976,8 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
     >>> to_edit_matrix()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_edit_matrix start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_matrix start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -3062,8 +2990,8 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     web_form = ""
 
-    print(
-        "[TRACE] func: pdg_app/to_edit_matrix end " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_matrix end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_matrix_edit.html",
@@ -3079,7 +3007,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
 def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_add_value_and_units start "
+        "[TRACE] pdg_app/to_add_value_and_units start "
         + trace_id
         + " "
         + str(time.time())
@@ -3151,7 +3079,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
             )
 
         print(
-            "[TRACE] func: pdg_app/to_add_value_and_units end "
+            "[TRACE] pdg_app/to_add_value_and_units end "
             + trace_id
             + " "
             + str(time.time())
@@ -3205,7 +3133,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
     dict_of_derivation_dicts_that_use_scalar = dict_of_derivations_that_use_scalar
 
     print(
-        "[TRACE] func: pdg_app/to_add_value_and_units end "
+        "[TRACE] pdg_app/to_add_value_and_units end "
         + trace_id
         + " "
         + str(time.time())
@@ -3235,7 +3163,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_add_symbol_scalar start "
+        "[TRACE] pdg_app/to_add_symbol_scalar start "
         + trace_id
         + " "
         + str(time.time())
@@ -3358,10 +3286,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
     dict_of_derivation_dicts_that_use_scalar = dict_of_derivations_that_use_scalar
 
     print(
-        "[TRACE] func: pdg_app/to_add_symbol_scalar end "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_add_symbol_scalar end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_scalar_create.html",
@@ -3380,7 +3305,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_add_symbol_vector start "
+        "[TRACE] pdg_app/to_add_symbol_vector start "
         + trace_id
         + " "
         + str(time.time())
@@ -3471,10 +3396,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
         return redirect(url_for("to_list_vectors"))
 
     print(
-        "[TRACE] func: pdg_app/to_add_symbol_vector end "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_add_symbol_vector end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_vector_create.html",
@@ -3493,7 +3415,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_add_symbol_matrix start "
+        "[TRACE] pdg_app/to_add_symbol_matrix start "
         + trace_id
         + " "
         + str(time.time())
@@ -3586,7 +3508,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
                 author_name_latex,
             )
         print(
-            "[TRACE] func: pdg_app/to_add_symbol_matrix end "
+            "[TRACE] pdg_app/to_add_symbol_matrix end "
             + trace_id
             + " "
             + str(time.time())
@@ -3594,10 +3516,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
         return redirect(url_for("to_list_matrices"))
 
     print(
-        "[TRACE] func: pdg_app/to_add_symbol_matrix end "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_add_symbol_matrix end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_matrix_create.html",
@@ -3615,7 +3534,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #     novel symbol
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     print("[TRACE] func: pdg_app/to_add_symbol start " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] pdg_app/to_add_symbol start " + trace_id + " " + str(time.time()))
 #     query_time_dict = {}  # type: query_timing_result_type
 
 #     web_form_symbol_properties = SpecifyNewSymbolForm(request.form)
@@ -3670,7 +3589,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #                 # dimension_luminous_intensity,
 #             )
 
-#         print("[TRACE] func: pdg_app/to_add_symbol end " + trace_id + " " + str(time.time()))
+#         logger.info("[TRACE] pdg_app/to_add_symbol end " + trace_id + " " + str(time.time()))
 #         if symbol_requires_arguments:
 #             return redirect(
 #                 url_for("to_add_symbol_required_argument_count", symbol_id=symbol_id)
@@ -3768,7 +3687,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #         graphDB_Driver, query_time_dict, list_of_dimension2ormore_symbol_dicts
 #     )
 
-#     print("[TRACE] func: pdg_app/to_add_symbol end " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] pdg_app/to_add_symbol end " + trace_id + " " + str(time.time()))
 #     return render_template(
 #         "symbol_create.html",
 #         query_time_dict=query_time_dict,
@@ -3797,7 +3716,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     print("[TRACE] func: pdg_app/to_add_symbol_required_argument_count start " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] pdg_app/to_add_symbol_required_argument_count start " + trace_id + " " + str(time.time()))
 #     query_time_dict = {}  # type: query_timing_result_type
 
 #     symbol_dict = {}
@@ -3853,7 +3772,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #         graphDB_Driver, query_time_dict, list_of_operation_dicts
 #     )
 
-#     print("[TRACE] func: pdg_app/to_add_symbol_required_argument_count end " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] pdg_app/to_add_symbol_required_argument_count end " + trace_id + " " + str(time.time()))
 #     return render_template(
 #         "symbol_create_required_argument_count.html",
 #         form_symbol_properties=web_form_symbol_properties,
@@ -3874,7 +3793,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     print("[TRACE] func: pdg_app/to_add_symbol_dimension_count start " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] pdg_app/to_add_symbol_dimension_count start " + trace_id + " " + str(time.time()))
 #     query_time_dict = {}  # type: query_timing_result_type
 
 #     symbol_dict = {}
@@ -3911,7 +3830,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 
 #         if symbol_dimension_count == 0:  # scalar
 #             print(
-#                 "[TRACE] func: pdg_app/to_add_symbol_dimension_count end; redirect to to_add_symbol_dimension0_properties"
+#                 "[TRACE] pdg_app/to_add_symbol_dimension_count end; redirect to to_add_symbol_dimension0_properties"
 #                 + trace_id
 #             )
 #             return redirect(
@@ -3919,7 +3838,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #             )
 #         elif symbol_dimension_count == 1:  # vector
 #             print(
-#                 "[TRACE] func: pdg_app/to_add_symbol_dimension_count end; redirect to to_add_symbol_dimension1_properties"
+#                 "[TRACE] pdg_app/to_add_symbol_dimension_count end; redirect to to_add_symbol_dimension1_properties"
 #                 + trace_id
 #             )
 #             return redirect(
@@ -3927,7 +3846,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #             )
 #         elif symbol_dimension_count == 2:  # vector
 #             print(
-#                 "[TRACE] func: pdg_app/to_add_symbol_dimension_count end; redirect to to_add_symbol_dimension2_properties"
+#                 "[TRACE] pdg_app/to_add_symbol_dimension_count end; redirect to to_add_symbol_dimension2_properties"
 #                 + trace_id
 #             )
 #             return redirect(
@@ -3935,7 +3854,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #             )
 
 #     print(
-#         "[TRACE] func: pdg_app/to_add_symbol_dimension_count end; render template "
+#         "[TRACE] pdg_app/to_add_symbol_dimension_count end; render template "
 #         + trace_id
 #     )
 #     return render_template(
@@ -3956,7 +3875,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     print("[TRACE] func: pdg_app/to_add_symbol_dimension0_properties start " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] pdg_app/to_add_symbol_dimension0_properties start " + trace_id + " " + str(time.time()))
 #     query_time_dict = {}  # type: query_timing_result_type
 
 #     symbol_dict = {}
@@ -4135,7 +4054,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #             round(time.time() - query_start_time,3)
 #         )
 
-#     print("[TRACE] func: pdg_app/to_add_symbol_dimension0_properties end " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] pdg_app/to_add_symbol_dimension0_properties end " + trace_id + " " + str(time.time()))
 #     return render_template(
 #         "symbol_create_dimension0.html",
 #         form_symbol_properties=web_form_symbol_properties,
@@ -4152,7 +4071,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     print("[TRACE] func: pdg_app/to_add_symbol_dimension1_properties start " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] pdg_app/to_add_symbol_dimension1_properties start " + trace_id + " " + str(time.time()))
 #     query_time_dict = {}  # type: query_timing_result_type
 
 #     symbol_dict = {}
@@ -4175,7 +4094,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 
 #         return redirect(url_for("to_list_vectors"))
 
-#     print("[TRACE] func: pdg_app/to_add_symbol_dimension1_properties end " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] pdg_app/to_add_symbol_dimension1_properties end " + trace_id + " " + str(time.time()))
 #     return render_template(
 #         "symbol_create_dimension1.html",
 #         form_symbol_properties=web_form_symbol_properties,
@@ -4191,7 +4110,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 #     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     print("[TRACE] func: pdg_app/to_add_symbol_dimension2_properties start " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] pdg_app/to_add_symbol_dimension2_properties start " + trace_id + " " + str(time.time()))
 #     query_time_dict = {}  # type: query_timing_result_type
 
 #     symbol_dict = {}
@@ -4214,7 +4133,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 
 #         return redirect(url_for("to_list_matrices"))
 
-#     print("[TRACE] func: pdg_app/to_add_symbol_dimension2_properties end " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] pdg_app/to_add_symbol_dimension2_properties end " + trace_id + " " + str(time.time()))
 #     return render_template(
 #         "symbol_create_dimension2.html",
 #         form_symbol_properties=web_form_symbol_properties,
@@ -4229,11 +4148,8 @@ def to_add_operation() -> werkzeug.Response:
     novel operation
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_add_operation start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_add_operation start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -4303,18 +4219,12 @@ def to_add_operation() -> werkzeug.Response:
                 author_name_latex,
             )
         print(
-            "[TRACE] func: pdg_app/to_add_operation end "
-            + trace_id
-            + " "
-            + str(time.time())
+            "[TRACE] pdg_app/to_add_operation end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_list_operations"))
 
-    print(
-        "[TRACE] func: pdg_app/to_add_operation end "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_add_operation end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_operation_create.html",
@@ -4332,11 +4242,8 @@ def to_add_relation() -> werkzeug.Response:
     novel relation
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_add_relation start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_add_relation start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -4406,15 +4313,12 @@ def to_add_relation() -> werkzeug.Response:
                 author_name_latex,
             )
         print(
-            "[TRACE] func: pdg_app/to_add_relation end "
-            + trace_id
-            + " "
-            + str(time.time())
+            "[TRACE] pdg_app/to_add_relation end " + trace_id + " " + str(time.time())
         )
         return redirect(url_for("to_list_relations"))
 
-    print(
-        "[TRACE] func: pdg_app/to_add_relation end " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_add_relation end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_relation_create.html",
@@ -4441,7 +4345,7 @@ def to_add_step_select_expressions(
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_add_step_select_expressions start "
+        "[TRACE] pdg_app/to_add_step_select_expressions start "
         + trace_id
         + " "
         + str(time.time())
@@ -4563,6 +4467,23 @@ def to_add_step_select_expressions(
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
+        try:
+            assert (
+                (len(list_of_input_expression_IDs) > 0)
+                or (len(list_of_feed_expression_IDs) > 0)
+                or (len(list_of_output_expression_IDs) > 0)
+            )
+        except AssertionError as err:
+            flash(str(err))
+            print(str(err))
+            return redirect(
+                url_for(
+                    "to_add_step_select_expressions",
+                    derivation_id=derivation_id,
+                    inference_rule_id=inference_rule_id,
+                )
+            )
+
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -4598,7 +4519,7 @@ def to_add_step_select_expressions(
 
     # first visit to this page
     print(
-        "[TRACE] func: pdg_app/to_add_step_select_expressions end "
+        "[TRACE] pdg_app/to_add_step_select_expressions end "
         + trace_id
         + " "
         + str(time.time())
@@ -4634,8 +4555,8 @@ def to_add_symbols_and_operations_for_expression(
     r_{\rm Earth} = 6
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/symbols_and_operations_for_expression start " + trace_id
+    logger.info(
+        "[TRACE] pdg_app/symbols_and_operations_for_expression start " + trace_id
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -4826,7 +4747,7 @@ def to_add_symbols_and_operations_for_expression(
         # example output: {'a': '5638458', 'b': '7152159'}
 
         print(
-            "[TRACE] func: pdg_app/to_add_symbols_and_operations_for_expression end "
+            "[TRACE] pdg_app/to_add_symbols_and_operations_for_expression end "
             + trace_id
         )
         return redirect(
@@ -4860,8 +4781,8 @@ def to_add_sympy_and_lean_for_expression(
     derivation_id is the numeric ID of the derivation being edited
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_add_sympy_and_lean_for_expression start " + trace_id
+    logger.info(
+        "[TRACE] pdg_app/to_add_sympy_and_lean_for_expression start " + trace_id
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5019,8 +4940,8 @@ def to_add_sympy_and_lean_for_expression(
                 ] = round(time.time() - query_start_time, 3)
 
         except neo4j.exceptions.CypherSyntaxError as err:
-            print("ERROR:", str(err))
-            flash("ERROR:" + str(err))
+            print("ERROR to_add_sympy_and_lean_for_expression:", str(err))
+            flash("ERROR to_add_sympy_and_lean_for_expression:" + str(err))
             return redirect(
                 url_for(
                     "to_add_sympy_and_lean_for_expression",
@@ -5028,8 +4949,8 @@ def to_add_sympy_and_lean_for_expression(
                 )
             )
 
-        print(
-            "[TRACE] func: pdg_app/to_add_sympy_and_lean_for_expression end " + trace_id
+        logger.info(
+            "[TRACE] pdg_app/to_add_sympy_and_lean_for_expression end " + trace_id
         )
         return redirect(url_for("to_list_expressions"))
 
@@ -5069,7 +4990,7 @@ def to_add_symbols_and_operations_for_feed(
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/symbols_and_operations_for_feed start "
+        "[TRACE] pdg_app/symbols_and_operations_for_feed start "
         + trace_id
         + " "
         + str(time.time())
@@ -5213,9 +5134,8 @@ def to_add_symbols_and_operations_for_feed(
         print("pdg_app/symbols_and_operations_for_feed symbol_id_dict=", symbol_id_dict)
         # example output: {'a': '5638458', 'b': '7152159'}
 
-        print(
-            "[TRACE] func: pdg_app/to_add_symbols_and_operations_for_feed end "
-            + trace_id
+        logger.info(
+            "[TRACE] pdg_app/to_add_symbols_and_operations_for_feed end " + trace_id
         )
         return redirect(
             url_for(
@@ -5225,8 +5145,8 @@ def to_add_symbols_and_operations_for_feed(
             )
         )
 
-    print(
-        "[TRACE] func: pdg_app/to_add_symbols_and_operations_for_feed end " + trace_id
+    logger.info(
+        "[TRACE] pdg_app/to_add_symbols_and_operations_for_feed end " + trace_id
     )
     return render_template(
         "property-graph/feed_create_symbols_and_operations.html",
@@ -5252,7 +5172,7 @@ def to_add_sympy_and_lean_for_feed(
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_add_sympy_and_lean_for_feed start "
+        "[TRACE] pdg_app/to_add_sympy_and_lean_for_feed start "
         + trace_id
         + " "
         + str(time.time())
@@ -5348,8 +5268,8 @@ def to_add_sympy_and_lean_for_feed(
         except neo4j.exceptions.CypherSyntaxError as err:
             print("pdg_app/to_add_sympy_and_lean_for_feed ERROR:", str(err))
             flash("pdg_app/to_add_sympy_and_lean_for_feed ERROR:" + str(err))
-            print(
-                "[TRACE] func: pdg_app/to_add_sympy_and_lean_for_feed end " + trace_id
+            logger.info(
+                "[TRACE] pdg_app/to_add_sympy_and_lean_for_feed end " + trace_id
             )
             return redirect(
                 url_for(
@@ -5359,7 +5279,7 @@ def to_add_sympy_and_lean_for_feed(
             )
 
         print(
-            "[TRACE] func: pdg_app/to_add_sympy_and_lean_for_feed end "
+            "[TRACE] pdg_app/to_add_sympy_and_lean_for_feed end "
             + trace_id
             + " "
             + str(time.time())
@@ -5368,7 +5288,7 @@ def to_add_sympy_and_lean_for_feed(
 
     web_form.sympy_str.data = revised_expr_with_str
     print(
-        "[TRACE] func: pdg_app/to_add_sympy_and_lean_for_feed end "
+        "[TRACE] pdg_app/to_add_sympy_and_lean_for_feed end "
         + trace_id
         + " "
         + str(time.time())
@@ -5393,7 +5313,7 @@ def to_add_inference_rule() -> werkzeug.Response:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_add_inference_rule start "
+        "[TRACE] pdg_app/to_add_inference_rule start "
         + trace_id
         + " "
         + str(time.time())
@@ -5456,7 +5376,7 @@ def to_add_inference_rule() -> werkzeug.Response:
                 )
 
                 print(
-                    "[TRACE] func: pdg_app/to_add_inference_rule end "
+                    "[TRACE] pdg_app/to_add_inference_rule end "
                     + trace_id
                     + " "
                     + str(time.time())
@@ -5472,7 +5392,7 @@ def to_add_inference_rule() -> werkzeug.Response:
                 )
 
                 print(
-                    "[TRACE] func: pdg_app/to_add_inference_rule end "
+                    "[TRACE] pdg_app/to_add_inference_rule end "
                     + trace_id
                     + " "
                     + str(time.time())
@@ -5485,6 +5405,20 @@ def to_add_inference_rule() -> werkzeug.Response:
             graphDB_Driver, query_time_dict, "inference_rule"
         )
         print("new inference_rule_id:", inference_rule_id)
+
+        try:
+            assert (
+                (int(number_of_inputs) > 0)
+                or (int(number_of_feeds) > 0)
+                or (int(number_of_outputs) > 0)
+            )
+            assert int(number_of_inputs) >= 0
+            assert int(number_of_feeds) >= 0
+            assert int(number_of_outputs) >= 0
+        except AssertionError as err:
+            flash(str(err))
+            print(str(err))
+            return redirect(url_for("to_add_inference_rule"))
 
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
@@ -5500,7 +5434,7 @@ def to_add_inference_rule() -> werkzeug.Response:
                 author_name_latex=author_name_latex,
             )
         print(
-            "[TRACE] func: pdg_app/to_add_inference_rule end "
+            "[TRACE] pdg_app/to_add_inference_rule end "
             + trace_id
             + " "
             + str(time.time())
@@ -5508,10 +5442,7 @@ def to_add_inference_rule() -> werkzeug.Response:
         return redirect(url_for("to_list_inference_rules"))
 
     print(
-        "[TRACE] func: pdg_app/to_add_inference_rule end "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_add_inference_rule end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/inference_rule_create.html",
@@ -5528,8 +5459,8 @@ def to_edit_step(
 ) -> werkzeug.Response:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_edit_step start " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_edit_step start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5573,7 +5504,7 @@ def to_edit_step(
                 note_after_step_latex,
             )
 
-    print("[TRACE] func: pdg_app/to_edit_step end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] pdg_app/to_edit_step end " + trace_id + " " + str(time.time()))
     return render_template(
         "property-graph/step_edit.html",
         query_time_dict=query_time_dict,
@@ -5589,7 +5520,7 @@ def to_edit_inference_rule(
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_edit_inference_rule start "
+        "[TRACE] pdg_app/to_edit_inference_rule start "
         + trace_id
         + " "
         + str(time.time())
@@ -5664,7 +5595,7 @@ def to_edit_inference_rule(
                 flash("INVALID INPUT: inference rule with that name already exists")
 
                 print(
-                    "[TRACE] func: pdg_app/to_edit_inference_rule end "
+                    "[TRACE] pdg_app/to_edit_inference_rule end "
                     + trace_id
                     + " "
                     + str(time.time())
@@ -5676,7 +5607,7 @@ def to_edit_inference_rule(
                 flash("INVALID INPUT: inference rule with that latex already exists")
 
                 print(
-                    "[TRACE] func: pdg_app/to_edit_inference_rule end "
+                    "[TRACE] pdg_app/to_edit_inference_rule end "
                     + trace_id
                     + " "
                     + str(time.time())
@@ -5725,7 +5656,7 @@ def to_edit_inference_rule(
     print("pdg_app/to_edit_inference_rule inference_rule_dict", inference_rule_dict)
 
     print(
-        "[TRACE] func: pdg_app/to_edit_inference_rule end "
+        "[TRACE] pdg_app/to_edit_inference_rule end "
         + trace_id
         + " "
         + str(time.time())
@@ -5755,7 +5686,7 @@ def to_query() -> werkzeug.Response:
     When there is no pipe then the string is converted to HTML safe text
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: pdg_app/to_query start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] pdg_app/to_query start " + trace_id + " " + str(time.time()))
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_records_with_hyperlinks = ["nothing returned from Neo4j"]  # type:List[str]
@@ -5879,7 +5810,10 @@ def to_query() -> werkzeug.Response:
 
             # print("revised_record=", revised_record)
 
-            list_of_records_with_hyperlinks.append(revised_record)
+            if list_of_records_with_hyperlinks[0] == "nothing returned from Neo4j":
+                list_of_records_with_hyperlinks = [revised_record]
+            else:
+                list_of_records_with_hyperlinks.append(revised_record)
 
     if query:
         # render with links to API reference
@@ -5957,7 +5891,7 @@ def to_query() -> werkzeug.Response:
     else:
         step_id = "THEREARENOSTEPS"
 
-    print("[TRACE] func: pdg_app/to_query end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] pdg_app/to_query end " + trace_id + " " + str(time.time()))
     return render_template(
         "property-graph/query.html",
         query_time_dict=query_time_dict,
@@ -5976,8 +5910,8 @@ def to_list_feeds() -> werkzeug.Response:
     >>> to_list_feeds()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_list_feeds start " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_list_feeds start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6027,8 +5961,8 @@ def to_list_feeds() -> werkzeug.Response:
         graphDB_Driver, query_time_dict
     )
 
-    print(
-        "[TRACE] func: pdg_app/to_list_feeds end " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_list_feeds end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/feed_list.html",
@@ -6048,10 +5982,7 @@ def to_list_operations() -> werkzeug.Response:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_list_operations start "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_list_operations start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6083,11 +6014,8 @@ def to_list_operations() -> werkzeug.Response:
             graphDB_Driver, query_time_dict, this_operation_dict["id"]
         )
 
-    print(
-        "[TRACE] func: pdg_app/to_list_operations end "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_list_operations end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_operation_list.html",
@@ -6105,10 +6033,7 @@ def to_list_relations() -> werkzeug.Response:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_list_relations start "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_list_relations start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6140,11 +6065,8 @@ def to_list_relations() -> werkzeug.Response:
             graphDB_Driver, query_time_dict, this_relation_dict["id"]
         )
 
-    print(
-        "[TRACE] func: pdg_app/to_list_relations end "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_list_relations end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_relation_list.html",
@@ -6162,7 +6084,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> werkzeug.Res
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_list_constant_values start "
+        "[TRACE] pdg_app/to_list_constant_values start "
         + trace_id
         + " "
         + str(time.time())
@@ -6188,7 +6110,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> werkzeug.Res
         )
 
     print(
-        "[TRACE] func: pdg_app/to_list_constant_values end "
+        "[TRACE] pdg_app/to_list_constant_values end "
         + trace_id
         + " "
         + str(time.time())
@@ -6214,7 +6136,7 @@ def to_edit_constant_value_and_units(
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_edit_constant_value_and_units start "
+        "[TRACE] pdg_app/to_edit_constant_value_and_units start "
         + trace_id
         + " "
         + str(time.time())
@@ -6254,7 +6176,7 @@ def to_edit_constant_value_and_units(
         ] = round(time.time() - query_start_time, 3)
 
     print(
-        "[TRACE] func: pdg_app/to_edit_constant_value_and_units start "
+        "[TRACE] pdg_app/to_edit_constant_value_and_units start "
         + trace_id
         + " "
         + str(time.time())
@@ -6276,11 +6198,8 @@ def to_list_scalars() -> werkzeug.Response:
     >>> to_list_scalars()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_list_scalars start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_list_scalars start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6332,8 +6251,8 @@ def to_list_scalars() -> werkzeug.Response:
         dict_of_derivations_that_use_scalar[scalar_id] = list_of_derivation_names
     dict_of_derivation_dicts_that_use_scalar = dict_of_derivations_that_use_scalar
 
-    print(
-        "[TRACE] func: pdg_app/to_list_scalars end " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_list_scalars end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_scalar_list.html",
@@ -6350,11 +6269,8 @@ def to_list_vectors() -> str:
     >>> to_list_vectors()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_list_vectors start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_list_vectors start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6385,8 +6301,8 @@ def to_list_vectors() -> str:
             graphDB_Driver, query_time_dict, this_vector_dict["id"]
         )
 
-    print(
-        "[TRACE] func: pdg_app/to_list_vectors end " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_list_vectors end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_vector_list.html",
@@ -6403,11 +6319,8 @@ def to_list_matrices() -> str:
     >>> to_list_matrices()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_list_matrices start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_list_matrices start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6438,11 +6351,8 @@ def to_list_matrices() -> str:
             graphDB_Driver, query_time_dict, this_matrix_dict["id"]
         )
 
-    print(
-        "[TRACE] func: pdg_app/to_list_matrices end "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_list_matrices end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/symbol_matrix_list.html",
@@ -6460,10 +6370,7 @@ def to_list_expressions() -> str:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_list_expressions start "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_list_expressions start " + trace_id + " " + str(time.time())
     )
 
     query_time_dict = {}  # type: query_timing_result_type
@@ -6543,10 +6450,7 @@ def to_list_expressions() -> str:
             sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
 
     print(
-        "[TRACE] func: pdg_app/to_list_expressions end "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_list_expressions end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/expression_list.html",
@@ -6568,10 +6472,7 @@ def to_list_derivations() -> str:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_list_derivations start "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_list_derivations start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6582,7 +6483,7 @@ def to_list_derivations() -> str:
     #     # TODO: this derivation_id should come from request.form; I just don't know the field yet
     #     derivation_id = "5389624"
     #
-    #     print("[TRACE] func: pdg_app/to_list_derivations end " + trace_id + " " + str(time.time()))
+    #     logger.info("[TRACE] pdg_app/to_list_derivations end " + trace_id + " " + str(time.time()))
     #     return redirect(url_for(to_review_derivation, derivation_id))
 
     # https://neo4j.com/docs/python-manual/current/session-api/
@@ -6617,10 +6518,7 @@ def to_list_derivations() -> str:
     # TODO: convert derivation_dict['abstract_latex'] to HTML using pandoc
 
     print(
-        "[TRACE] func: pdg_app/to_list_derivations end "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] pdg_app/to_list_derivations end " + trace_id + " " + str(time.time())
     )
     return render_template(
         "property-graph/derivation_list.html",
@@ -6637,7 +6535,7 @@ def to_list_inference_rules() -> str:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_list_inference_rules start "
+        "[TRACE] pdg_app/to_list_inference_rules start "
         + trace_id
         + " "
         + str(time.time())
@@ -6664,7 +6562,7 @@ def to_list_inference_rules() -> str:
         print("pdg_app/to_list_inference_rules ", inference_rule_dict)
 
     print(
-        "[TRACE] func: pdg_app/to_list_inference_rules end "
+        "[TRACE] pdg_app/to_list_inference_rules end "
         + trace_id
         + " "
         + str(time.time())
@@ -6685,7 +6583,7 @@ def to_delete_graph_content() -> werkzeug.Response:
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: pdg_app/to_delete_graph_content start "
+        "[TRACE] pdg_app/to_delete_graph_content start "
         + trace_id
         + " "
         + str(time.time())
@@ -6700,7 +6598,7 @@ def to_delete_graph_content() -> werkzeug.Response:
         )
         # query_time_dict["pdg_app/: "] = round(time.time() - query_start_time, 3)
     print(
-        "[TRACE] func: pdg_app/to_delete_graph_content end "
+        "[TRACE] pdg_app/to_delete_graph_content end "
         + trace_id
         + " "
         + str(time.time())
@@ -6717,11 +6615,8 @@ def to_export_json() -> werkzeug.Response:
     TODO: export "graph to JSON" as file via web interface
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_export_json start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_export_json start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6734,8 +6629,8 @@ def to_export_json() -> werkzeug.Response:
     # <Record file='all.json' source='database: nodes(4), rels(0)' format='json' nodes=4 relationships=0 properties=16 time=123 rows=4 batchSize=-1 batches=0 done=True data=None>
 
     # "dumping_grounds" is a variable set in the docker-compose file using variable NEO4J_dbms_directories_import
-    print(
-        "[TRACE] func: pdg_app/to_export_json end " + trace_id + " " + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_export_json end " + trace_id + " " + str(time.time())
     )
     return redirect(url_for("static", filename="dumping_grounds/pdg.json"))
 
@@ -6755,11 +6650,8 @@ def to_export_cypher() -> werkzeug.Response:
     # https://stackoverflow.com/a/20894360/1164295
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] func: pdg_app/to_export_cypher start "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_export_cypher start " + trace_id + " " + str(time.time())
     )
     # query_time_dict = {}  # type: query_timing_result_type
 
@@ -6771,11 +6663,8 @@ def to_export_cypher() -> werkzeug.Response:
     print("res=", str(res))
     # <Record file='all.cypher' batches=1 source='database: nodes(4), rels(0)' format='cypher' nodes=4 relationships=0 properties=16 time=13 rows=4 batchSize=20000>
 
-    print(
-        "[TRACE] func: pdg_app/to_export_cypher end "
-        + trace_id
-        + " "
-        + str(time.time())
+    logger.info(
+        "[TRACE] pdg_app/to_export_cypher end " + trace_id + " " + str(time.time())
     )
     return redirect(url_for("static", filename="dumping_grounds/pdg.cypher"))
 

@@ -36,6 +36,11 @@ import compute
 from compute import unique_numeric_id_as_str, query_timing_result_type
 import neo4j_query
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 proc_timeout = 30
 
 
@@ -56,7 +61,7 @@ def hash_of_file(filename_with_full_path: str) -> str:
     d41d8cd98f00b204e9800998ecf8427e
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: latex/hash_of_file start " + trace_id)
+    logger.info("[TRACE] latex/hash_of_file start " + trace_id)
 
     # TODO: exception handling
     with open(filename_with_full_path, "rb") as file_handle:
@@ -64,7 +69,7 @@ def hash_of_file(filename_with_full_path: str) -> str:
 
     hashed_file = hashlib.md5(file_content).hexdigest()
 
-    print("[TRACE] func: latex/hash_of_file end " + trace_id)
+    logger.info("[TRACE] latex/hash_of_file end " + trace_id)
     return hashed_file
 
 
@@ -82,11 +87,15 @@ def hash_of_string(str_to_hash: str) -> str:
     >>> hash_of_string('a_string')
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: latex/hash_of_string start " + trace_id)
+    logger.info(
+        "[TRACE] latex/hash_of_string start " + trace_id + " " + str(time.time())
+    )
 
     hashed_str = hashlib.md5(str_to_hash.encode("utf-8")).hexdigest()
 
-    print("[TRACE] func: latex/hash_of_string start " + trace_id)
+    logger.info(
+        "[TRACE] latex/hash_of_string start " + trace_id + " " + str(time.time())
+    )
     return hashed_str
 
 
@@ -108,7 +117,12 @@ def make_string_safe_for_latex(unsafe_str: str) -> str:
     "hello\_world"
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: latex/make_string_safe_for_latex start " + trace_id)
+    print(
+        "[TRACE] latex/make_string_safe_for_latex start "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
 
     # some derivation notes have valid underscores, like
     # \cite{yyyy_author}
@@ -141,7 +155,7 @@ def make_string_safe_for_latex(unsafe_str: str) -> str:
         fixed_underscore_str.replace("#", "\#").replace("$", "\$").replace("%", "\%")
     )
 
-    print("[TRACE] func: latex/make_string_safe_for_latex end " + trace_id)
+    logger.info("[TRACE] latex/make_string_safe_for_latex end " + trace_id)
     return no_hashtag_str
 
 
@@ -182,7 +196,7 @@ def create_d3js_json(
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: latex/create_d3js_json start " + trace_id)
+    logger.info("[TRACE] latex/create_d3js_json start " + trace_id)
 
     d3js_json_filename = derivation_id + ".json"
 
@@ -371,7 +385,7 @@ def edges_in_derivation_for_d3js(
     >>> edges_in_derivation_for_d3js()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: latex/edges_in_derivation_for_d3js start " + trace_id)
+    logger.info("[TRACE] latex/edges_in_derivation_for_d3js start " + trace_id)
 
     list_of_edge_tuples = []
 
@@ -379,7 +393,7 @@ def edges_in_derivation_for_d3js(
 
     # TODO!
 
-    print("[TRACE] func: latex/edges_in_derivation_for_d3js end " + trace_id)
+    logger.info("[TRACE] latex/edges_in_derivation_for_d3js end " + trace_id)
     return list_of_edge_tuples
 
 
@@ -408,7 +422,7 @@ def create_tex_file_for_derivation(
     >>> generate_tex_for_derivation("000001", path_to_tex_file)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: latex/create_tex_file_for_derivation start " + trace_id)
+    logger.info("[TRACE] latex/create_tex_file_for_derivation start " + trace_id)
 
     tex_filename = derivation_id
 
@@ -691,7 +705,7 @@ def create_tex_file_for_derivation(
     shutil.copy(tex_filename + ".tex", path_to_tex_file + tex_filename + ".tex")
     # logger.info("[trace end " + trace_id + "]")
 
-    print("[TRACE] func: latex/create_tex_file_for_derivation " + trace_id)
+    logger.info("[TRACE] latex/create_tex_file_for_derivation " + trace_id)
     return query_time_dict  # pass back filename without extension because bibtex cannot handle .tex
 
 
@@ -714,7 +728,7 @@ def create_pdf_for_derivation(
     """
     # logger.info("[trace start " + trace_id + "]")
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: latex/create_pdf_for_derivation start " + trace_id)
+    logger.info("[TRACE] latex/create_pdf_for_derivation start " + trace_id)
 
     # to isolate the build process, create a temporary folder
     tmp_latex_folder = "tmp_latex_folder_" + str(random.randint(1000000, 9999999))
@@ -841,7 +855,7 @@ def create_pdf_for_derivation(
     # return True, pdf_filename + ".pdf"
     # logger.info("[trace end " + trace_id + "]")
 
-    print("[TRACE] func: latex/create_pdf_for_derivation start " + trace_id)
+    logger.info("[TRACE] latex/create_pdf_for_derivation start " + trace_id)
     return pdf_filename + ".pdf", query_time_dict
 
 
@@ -871,7 +885,7 @@ def create_png_from_latex(
     >>> create_png_from_latex('a \dot b \\nabla', 'a_filename')
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
+    logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
     # logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
 
     print(
@@ -1008,7 +1022,7 @@ def create_png_from_latex(
 
     # return True, "success"
     # logger.info("[trace end " + trace_id + "]")
-    print("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
+    logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
     return
 
 
@@ -1029,7 +1043,9 @@ def create_tex_file_for_latex_string(
     """
     trace_id = str(random.randint(1000000, 9999999))
     # logger.info("[trace start " + trace_id + "]")
-    print("[TRACE] latex/create_tex_file_for_latex_string start " + trace_id + "]")
+    logger.info(
+        "[TRACE] latex/create_tex_file_for_latex_string start " + trace_id + "]"
+    )
 
     print(
         "latex/create_tex_file_for_latex_string tmp_file_no_extension_full_path:",
@@ -1068,7 +1084,7 @@ def create_tex_file_for_latex_string(
         latex_file_handle.write("\\end{document}\n")
     # logger.debug("wrote tex file")
     # logger.info("[trace end " + trace_id + "]")
-    print("[TRACE] latex/create_tex_file_for_latex_string end " + trace_id + "]")
+    logger.info("[TRACE] latex/create_tex_file_for_latex_string end " + trace_id + "]")
     return
 
 
@@ -1095,7 +1111,7 @@ def create_derivation_png(
     """
     trace_id = str(random.randint(1000000, 9999999))
     # logger.info("[trace start " + trace_id + "]")
-    print("[TRACE] latex/create_derivation_png start " + trace_id + "]")
+    logger.info("[TRACE] latex/create_derivation_png start " + trace_id + "]")
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -1208,7 +1224,7 @@ def create_derivation_png(
 
     # return True, "no invalid latex", output_filename
     # logger.info("[trace end " + trace_id + "]")
-    print("[TRACE] latex/create_derivation_png end " + trace_id + "]")
+    logger.info("[TRACE] latex/create_derivation_png end " + trace_id + "]")
     # return output_filename_png, output_filename_svg, query_time_dict
     return output_filename_png, query_time_dict
 
@@ -1240,7 +1256,7 @@ def create_step_graphviz_png(
     """
     trace_id = str(random.randint(1000000, 9999999))
     # logger.info("[trace start " + trace_id + "]")
-    print("[TRACE] latex/create_step_graphviz_png start " + trace_id + "]")
+    logger.info("[TRACE] latex/create_step_graphviz_png start " + trace_id + "]")
 
     dot_filename = destination_folder + "graphviz.dot"
     compute.remove_file_debris([destination_folder], ["graphviz"], ["dot"])
@@ -1295,7 +1311,7 @@ def create_step_graphviz_png(
         shutil.move(output_filename, destination_folder + output_filename)
     # return True, "no invalid latex", output_filename
     # logger.info("[trace end " + trace_id + "]")
-    print("[TRACE] latex/create_step_graphviz_png end " + trace_id + "]")
+    logger.info("[TRACE] latex/create_step_graphviz_png end " + trace_id + "]")
     return output_filename, query_time_dict
 
 
@@ -1327,7 +1343,7 @@ def write_step_to_graphviz_file(
     """
     trace_id = str(random.randint(1000000, 9999999))
     # logger.info("[trace start " + trace_id + "]")
-    print("[TRACE] latex/write_step_to_graphviz_file start " + trace_id + "]")
+    logger.info("[TRACE] latex/write_step_to_graphviz_file start " + trace_id + "]")
 
     print("step_id =", step_id)
     # logger.debug("step_id = %s", step_id)
@@ -1439,7 +1455,7 @@ def write_step_to_graphviz_file(
         )
 
     # logger.info("[trace end " + trace_id + "]")
-    print("[TRACE] latex/write_step_to_graphviz_file end " + trace_id + "]")
+    logger.info("[TRACE] latex/write_step_to_graphviz_file end " + trace_id + "]")
     return query_time_dict
 
 

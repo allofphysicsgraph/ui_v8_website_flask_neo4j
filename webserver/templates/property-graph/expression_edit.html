@@ -22,7 +22,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 <P>{{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}
 -->
 
-<table border="1" id="symbol_table">
+<table border="1" id="symbol_table" class="sortable">
   <tr>
     <th>ID</th>
     <th>latex</th>
@@ -115,7 +115,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
      { % endfor %}
 
 
-<table border="1" id="operation_table">
+<table border="1" id="operation_table" class="sortable">
   <tr>
     <th>ID</th>
     <th>latex</th>

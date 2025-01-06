@@ -19,7 +19,7 @@ or return to <a href="{{ url_for('to_list_symbols') }}?referrer=operation_create
     {{ form_symbol_properties.csrf_token }}
 
 <table>
-<table border="0" id="scope_table">
+<table border="0" id="scope_table" class="sortable">
   <tr>
     <td>{{ form_symbol_properties.symbol_scope.label }}: {{ form_symbol_properties.symbol_scope }}</td>
 
@@ -33,7 +33,7 @@ or return to <a href="{{ url_for('to_list_symbols') }}?referrer=operation_create
     <!-- https://en.wikipedia.org/wiki/International_System_of_Quantities#Base_quantities -->
     <P><a href="https://www.ldeo.columbia.edu/~martins/hydro/case_studies/units_dimensions.html">dimensions</a>: 
 <table>
-<table border="0" id="dimension_table">
+<table border="0" id="dimension_table" class="sortable">
   <tr>
     <td>{{ form_symbol_properties.dimension_length.label }} (<B>required</B>): {{ form_symbol_properties.dimension_length() }}</P>
     <P>{{ form_symbol_properties.dimension_time.label }} (<B>required</B>): {{ form_symbol_properties.dimension_time() }}</P>

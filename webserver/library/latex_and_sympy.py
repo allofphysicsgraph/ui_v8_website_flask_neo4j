@@ -16,6 +16,11 @@ In the situation where another CAS like Sage is used, a separate "latex_and_sage
 import random
 import sympy  # type: ignore
 from sympy.parsing.latex import parse_latex  # type: ignore
+import time
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def sympy_to_latex_str(sympy_expr: str) -> str:
@@ -28,7 +33,12 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: latex_and_sympy/sympy_to_latex_str start " + trace_id)
+    print(
+        "[TRACE] latex_and_sympy/sympy_to_latex_str start "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
 
     print(
         "latex_and_sympy/sympy_to_latex_str: SymPy to be converted to Latex: "
@@ -39,7 +49,12 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
 
     print("latex_and_sympy/sympy_to_latex_str: latex_str=", latex_str)
 
-    print("[TRACE] func: latex_and_sympy/sympy_to_latex_str end " + trace_id)
+    print(
+        "[TRACE] latex_and_sympy/sympy_to_latex_str end "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
     return latex_str
 
 
@@ -57,8 +72,10 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: latex_and_sympy/cleaned_latex_str_to_sympy_expression start "
+        "[TRACE] latex_and_sympy/cleaned_latex_str_to_sympy_expression start "
         + trace_id
+        + " "
+        + str(time.time())
     )
 
     print("latex to be converted to SymPy: " + expr_latex)
@@ -67,19 +84,21 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
         symp_expr = parse_latex(expr_latex)
     except sympy.SympifyError as err:
         # logger.error(err)
-        print(err)
+        print("ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression", err)
         raise Exception("Sympy unable to parse latex (1): " + expr_latex)
     except sympy.parsing.latex.errors.LaTeXParsingError as err:
         # logger.error(err)
-        print(err)
+        print("ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression", err)
         raise Exception("Sympy unable to parse latex (2): " + expr_latex)
     except sympy.core.sympify.SympifyError as err:
-        print(err)
+        print("ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression", err)
         raise Exception("Sympy unable to parse latex (3): " + expr_latex)
 
     print(
-        "[TRACE] func: latex_and_sympy/cleaned_latex_str_to_sympy_expression start "
+        "[TRACE] latex_and_sympy/cleaned_latex_str_to_sympy_expression start "
         + trace_id
+        + " "
+        + str(time.time())
     )
     return symp_expr
     # >>> type(symp_expr)
@@ -94,8 +113,10 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: latex_and_sympy/list_of_sympy_symbols_in_sympy_expression start "
+        "[TRACE] latex_and_sympy/list_of_sympy_symbols_in_sympy_expression start "
         + trace_id
+        + " "
+        + str(time.time())
     )
     # list_of_symbols = []
     # for symb in sympy_expr.atoms(sympy.Symbol):
@@ -110,8 +131,10 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     # <class 'sympy.core.symbol.Symbol'>
 
     print(
-        "[TRACE] func: latex_and_sympy/list_of_sympy_symbols_in_sympy_expression end "
+        "[TRACE] latex_and_sympy/list_of_sympy_symbols_in_sympy_expression end "
         + trace_id
+        + " "
+        + str(time.time())
     )
     return list(list_of_sympy_symbols)
 
@@ -134,11 +157,11 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
 #     {x, nabla, y, vec}
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     print("[TRACE] func: latex_and_sympy/list_of_str_symbols_from_cleaned_latex_str start " + trace_id)
+#     logger.info("[TRACE] latex_and_sympy/list_of_str_symbols_from_cleaned_latex_str start " + trace_id)
 #
 #     my_sym = list(sympy_expr.free_symbols)
 #
-#     print("[TRACE] func: latex_and_sympy/list_of_str_symbols_from_cleaned_latex_str end " + trace_id)
+#     logger.info("[TRACE] latex_and_sympy/list_of_str_symbols_from_cleaned_latex_str end " + trace_id)
 #     return my_sym
 
 # EOF

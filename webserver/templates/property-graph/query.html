@@ -50,14 +50,14 @@ For the query <BR>
 
   <tr>
     <td>list all distinct node labels <!--(<a href="https://stackoverflow.com/a/24058571/1164295">citation</a>)--></td>
-    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n) RETURN distinct labels(n)">
-                                                  MATCH (n) RETURN distinct labels(n)</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n) RETURN DISTINCT labels(n)">
+                                                  MATCH (n) RETURN DISTINCT labels(n)</a></td>
     <td>what is the schema for nodes?</td>
   </tr>
   <tr>
     <td>list all distinct edge labels <!--(<a href="https://stackoverflow.com/a/42439326/1164295">citation</a>)--></td>
-    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (a)-[r]->(b) RETURN distinct type(r)">
-                                                  MATCH (a)-[r]->(b) RETURN distinct type(r)</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (a)-[r]->(b) RETURN DISTINCT type(r)">
+                                                  MATCH (a)-[r]->(b) RETURN DISTINCT type(r)</a></td>
     <td>what is the schema for edges?</td>
   </tr>
 
@@ -65,8 +65,8 @@ For the query <BR>
 
   <tr>
     <td>list the node count for each label <!--(<a href="https://stackoverflow.com/a/24058571/1164295">citation</a>)--></td>
-    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n) RETURN distinct labels(n), count(*)">
-                                                  MATCH (n) RETURN distinct labels(n), count(*)</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n) RETURN DISTINCT labels(n), count(*)">
+                                                  MATCH (n) RETURN DISTINCT labels(n), count(*)</a></td>
     <td>how many nodes of each type?</td>
   </tr>
 
@@ -175,8 +175,8 @@ MATCH (n:expression), (m:inference_rule) WHERE m.id='{{inference_rule_id}}' RETU
   </tr>
   <tr>
     <td>list properties for a specific derivation</td>
-    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (d:derivation) WHERE d.id ='{{derivation_id}}' RETURN n">
-                                                  MATCH (d:derivation) WHERE d.id = '{{derivation_id}}' RETURN n</a><BR>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (d:derivation) WHERE d.id ='{{derivation_id}}' RETURN d">
+                                                  MATCH (d:derivation) WHERE d.id = '{{derivation_id}}' RETURN d</a><BR>
     or<BR>
     <a href="{{ url_for('to_query') }}?cypher=MATCH (n:derivation {id:'{{ derivation_id }}'}) RETURN n">
                                               MATCH (n:derivation {id:'{{ derivation_id }}'}) RETURN n</a></td>
@@ -184,17 +184,17 @@ MATCH (n:expression), (m:inference_rule) WHERE m.id='{{inference_rule_id}}' RETU
   </tr>
   <tr>
     <td>an inference rule is in which derivations?</td>
-    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (d:derivation),(s:step),(i:inference_rule) WHERE i.id ='{{inference_rule_id}}' RETURN d">
-                                                  MATCH (d:derivation),(s:step),(i:inference_rule) WHERE i.id='{{inference_rule_id}}' RETURN d
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (d:derivation),(s:step),(i:inference_rule) WHERE i.id ='{{inference_rule_id}}' RETURN DISTINCT d">
+                                                  MATCH (d:derivation),(s:step),(i:inference_rule) WHERE i.id='{{inference_rule_id}}' RETURN DISTINCT d
     </a></td>
     <td></td>
   </tr>
   <tr>
     <td>regex search for text in a node's property</td>
-    <td><a href="{{ url_for('to_query') }}?cypher=match (m:scalar) where (any(prop in keys(m) where m[prop] =~ '.*ddd.*')) return m">
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (m:scalar) WHERE (any(prop in keys(m) WHERE m[prop] =~ '.*ddd.*')) RETURN m">
       match (m:scalar) where (any(prop in keys(m) where m[prop] =~ '.*ddd.*')) return m
     </a></td>
-    <td></td>
+    <td>replace 'ddd' with your desired text</td>
 
 </table>
 <P>

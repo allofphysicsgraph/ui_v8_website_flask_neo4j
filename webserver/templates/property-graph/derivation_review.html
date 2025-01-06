@@ -16,14 +16,14 @@
 <P> all_steps: { { all_steps } } 
 -->
 
-<table border="1" id="derivation_steps_table">
+<table border="1" id="derivation_steps_table" class="sortable">
   <tr>
     <th>step</th>
     <th>inference rule</th>
     <th>input</th>
     <th>feed</th>
     <th>output</th>
-    <th>valid</th>
+    <th>validity (as per <a href="https://www.sympy.org/">SymPy</a>)</th>
   </tr>
   {% for step_id, step_dict in all_steps.items() %}
   <tr>

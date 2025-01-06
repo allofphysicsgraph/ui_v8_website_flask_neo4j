@@ -28,6 +28,7 @@ testmod(name ='split_expr_into_lhs_rhs', verbose = True)
 """
 
 import random
+import time
 
 import sympy  # type: ignore
 
@@ -37,8 +38,15 @@ from sympy.parsing.latex import parse_latex  # type: ignore
 # https://docs.python.org/3/library/typing.html
 from typing import NewType, Dict, List, Tuple
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 import compute
 from compute import query_timing_result_type
+
+import time
 
 
 def validate_step(
@@ -57,44 +65,71 @@ def validate_step(
     >>> validate_step('4924823', '2500423', 'data.json')
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: sympy_validate_step/validate_step start " + trace_id)
+    logger.info(
+        "[TRACE] sympy_validate_step/validate_step start "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
     # logger.info("[trace start " + trace_id + "]")
     # logger.debug("step ID = " + step_id + " and deriv_id = " + deriv_id)
 
     if inference_rule_dict["name_latex"] in [
-        "declare initial expr",
-        "declare final expr",
+        "declare initial expression",
+        "declare final expression",
         "declare identity",
         "declare guess solution",
         "declare assumption",
     ]:
         # logger.info("[trace end " + trace_id + "]")
-        print("[TRACE] func: sympy_validate_step/validate_step end " + trace_id)
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "no validation is available for declarations"
 
     elif inference_rule_dict["name_latex"] in [
         "assume N dimensions",
         "normalization condition",
         "boundary condition",
-        "boundary condition for expr",
+        "boundary condition for expression",
     ]:
         # logger.info("[trace end " + trace_id + "]")
-        print("[TRACE] func: sympy_validate_step/validate_step end " + trace_id)
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "no validation is available for assumptions"
 
     elif inference_rule_dict["name_latex"] == "add X to both sides":
         # logger.info("[trace end " + trace_id + "]")
-        print("[TRACE] func: sympy_validate_step/validate_step end " + trace_id)
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return add_X_to_both_sides(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
 
     else:
         # logger.error("unexpected inf rule:" + step_dict["inf rule"])
-        print("unexpected inf rule:" + inference_rule_dict["name_latex"])
-        raise Exception("Unexpected inf rule: " + inference_rule_dict["name_latex"])
+        print(
+            "sympy_validate_step/validate_step unexpected inf rule:"
+            + inference_rule_dict["name_latex"]
+        )
+        # raise Exception(
+        #     "sympy_validate_step/validate_step Unexpected inf rule: "
+        #     + inference_rule_dict["name_latex"]
+        # )
+        return "unrecognized inference rule"
 
-    print("[TRACE] func: sympy_validate_step/validate_step end " + trace_id)
+    logger.info("[TRACE] sympy_validate_step/validate_step end " + trace_id)
     return "This message should not be seen"
 
 
@@ -116,24 +151,55 @@ def add_X_to_both_sides(
     'valid'
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: sympy_validate_step/add_X_to_both_sides start " + trace_id)
+    print(
+        "[TRACE] sympy_validate_step/add_X_to_both_sides start "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
 
     print("list_of_input_dicts", list_of_input_dicts)
+
+    # list_of_input_dicts [{'sympy_lhs': "sympy.Symbol('pdg9906071')", 'reference_latex': 'ref to source', 'latex_condition': '', 'sympy_rhs': "sympy.Symbol('pdg7880077')", 'description_latex': '', 'latex_lhs': 'a', 'name_latex': 'great name', 'lean': '', 'latex_rhs': 'b', 'author_name_latex': 'ben', 'id': '2922355', 'sympy': "sympy.Eq(sympy.Symbol('pdg9906071'),sympy.Symbol('pdg7880077'))", 'latex_relation': '='}]
+
     print("list_of_feed_dicts", list_of_feed_dicts)
     print("list_of_output_dicts", list_of_output_dicts)
 
-    delta_lhs = sympy.simplify(
-        sympy.Add(input_expr_sympy.lhs, feed_expr_sympy) - output_expr_sympy.lhs
-    )
-    delta_rhs = sympy.simplify(
-        sympy.Add(input_expr_sympy.rhs, feed_expr_sympy) - output_expr_sympy.rhs
-    )
+    print(type(list_of_input_dicts[0]["sympy_lhs"]))  # str
+
+    input_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed = eval(list_of_feed_dicts[0]["sympy"])
+    output_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    delta_lhs = sympy.simplify(sympy.Add(input_lhs, feed) - output_lhs)
+
+    difference_str = ""
+    if delta_lhs != 0:
+        difference_str += "LHS diff is " + str(delta_lhs)
+    delta_rhs = sympy.simplify(sympy.Add(input_rhs, feed) - output_rhs)
+    if delta_rhs != 0:
+        if len(difference_str) > 0:
+            difference_str += "\n"
+        difference_str += "RHS diff is " + str(delta_rhs)
     if (delta_lhs == 0) and (delta_rhs == 0):
-        print("[TRACE] func: sympy_validate_step/add_X_to_both_sides end " + trace_id)
-        return "valid"
+        print(
+            "[TRACE] sympy_validate_step/add_X_to_both_sides end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
+        return "valid (as per SymPy)"
     else:
-        print("[TRACE] func: sympy_validate_step/add_X_to_both_sides end " + trace_id)
-        return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
+        print(
+            "[TRACE] sympy_validate_step/add_X_to_both_sides end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
+        return difference_str
+    return "ERROR: sympy_validate_step/add_X_to_both_sides should not reach here"
 
 
 def subtract_X_from_both_sides(
@@ -159,7 +225,10 @@ def subtract_X_from_both_sides(
     """
     trace_id = str(random.randint(1000000, 9999999))
     print(
-        "[TRACE] func: sympy_validate_step/subtract_X_from_both_sides start " + trace_id
+        "[TRACE] sympy_validate_step/subtract_X_from_both_sides start "
+        + trace_id
+        + " "
+        + str(time.time())
     )
 
     delta_lhs = sympy.simplify(
@@ -171,15 +240,13 @@ def subtract_X_from_both_sides(
         - output_expr_sympy.rhs
     )
     if (delta_lhs == 0) and (delta_rhs == 0):
-        print(
-            "[TRACE] func: sympy_validate_step/subtract_X_from_both_sides end "
-            + trace_id
+        logger.info(
+            "[TRACE] sympy_validate_step/subtract_X_from_both_sides end " + trace_id
         )
         return "valid"
     else:
-        print(
-            "[TRACE] func: sympy_validate_step/subtract_X_from_both_sides end "
-            + trace_id
+        logger.info(
+            "[TRACE] sympy_validate_step/subtract_X_from_both_sides end " + trace_id
         )
         return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
 
@@ -200,7 +267,7 @@ def multiply_both_sides_by(input_expr_sympy, feed_expr_sympy, output_expr_sympy)
     'valid'
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: sympy_validate_step/multiply_both_sides_by start " + trace_id)
+    logger.info("[TRACE] sympy_validate_step/multiply_both_sides_by start " + trace_id)
 
     delta_lhs = sympy.simplify(
         sympy.Mul(input_expr_sympy.lhs, feed_expr_sympy) - output_expr_sympy.rhs
@@ -209,13 +276,13 @@ def multiply_both_sides_by(input_expr_sympy, feed_expr_sympy, output_expr_sympy)
         sympy.Mul(input_expr_sympy.rhs, feed_expr_sympy) - output_expr_sympy.rhs
     )
     if (delta_lhs == 0) and (delta_rhs == 0):
-        print(
-            "[TRACE] func: sympy_validate_step/multiply_both_sides_by end " + trace_id
+        logger.info(
+            "[TRACE] sympy_validate_step/multiply_both_sides_by end " + trace_id
         )
         return "valid"
     else:
-        print(
-            "[TRACE] func: sympy_validate_step/multiply_both_sides_by end " + trace_id
+        logger.info(
+            "[TRACE] sympy_validate_step/multiply_both_sides_by end " + trace_id
         )
         return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
 
@@ -238,7 +305,7 @@ def divide_both_sides_by(input_expr_sympy, feed_expr_sympy, output_expr_sympy) -
     'valid'
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] func: sympy_validate_step/divide_both_sides_by start " + trace_id)
+    logger.info("[TRACE] sympy_validate_step/divide_both_sides_by start " + trace_id)
 
     delta_lhs = sympy.simplify(
         sympy.Mul(input_expr_sympy.lhs, sympy.Pow(feed_expr_sympy, -1))
@@ -249,10 +316,10 @@ def divide_both_sides_by(input_expr_sympy, feed_expr_sympy, output_expr_sympy) -
         - output_expr_sympy.rhs
     )
     if (delta_lhs == 0) and (delta_rhs == 0):
-        print("[TRACE] func: sympy_validate_step/divide_both_sides_by end " + trace_id)
+        logger.info("[TRACE] sympy_validate_step/divide_both_sides_by end " + trace_id)
         return "valid"
     else:
-        print("[TRACE] func: sympy_validate_step/divide_both_sides_by end " + trace_id)
+        logger.info("[TRACE] sympy_validate_step/divide_both_sides_by end " + trace_id)
         return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
 
 

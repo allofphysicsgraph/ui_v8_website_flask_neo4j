@@ -5,6 +5,8 @@
   Return to <a href="{{ url_for('main') }}?referrer=derivation_list">main page</a>
 </P>
 
+{% if list_of_derivation_dicts|length > 0 %}
+
 <fieldset>
   <legend>
     <H2>List of Derivations</h2>
@@ -45,12 +47,13 @@ function select_derivation() {
 }
 </script>
 
-
   <P>The derivation ID below links to a page where you can review that derivation.
 
   <P>{% include '_table_of_derivations.html' %}
 
 </fieldset>
+
+{% endif %}
 
 <fieldset>
   <legend>
