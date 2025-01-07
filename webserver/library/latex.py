@@ -160,11 +160,10 @@ def make_string_safe_for_latex(unsafe_str: str) -> str:
 
 
 def create_d3js_json(
-    graphDB_Driver,
-    query_time_dict: dict,
     derivation_id: unique_numeric_id_as_str,
+    all_steps: dict,
     destination_folder: str,
-) -> query_timing_result_type:
+):
     """
     Produce a JSON file that contains something like
     {
@@ -199,10 +198,6 @@ def create_d3js_json(
     logger.info("[TRACE] latex/create_d3js_json start " + trace_id)
 
     d3js_json_filename = derivation_id + ".json"
-
-    all_steps, query_time_dict = compute.all_steps_in_derivation(
-        graphDB_Driver, derivation_id, query_time_dict
-    )
 
     json_str = "{\n"
     json_str += '  "nodes": [\n'
@@ -352,9 +347,7 @@ def create_d3js_json(
     json_str += "  ],\n"
     json_str += '  "links": [\n'
 
-    list_of_edges = edges_in_derivation_for_d3js(
-        graphDB_Driver, query_time_dict, all_steps
-    )
+    list_of_edges = edges_in_derivation_for_d3js(all_steps)
     list_of_edge_str = []
     for edge_tuple in list_of_edges:
         list_of_edge_str.append(
@@ -375,19 +368,17 @@ def create_d3js_json(
     with open(destination_folder + d3js_json_filename, "w") as file_handle:
         file_handle.write(json_str)
 
-    return query_time_dict
+    return
 
 
-def edges_in_derivation_for_d3js(
-    graphDB_Driver, query_time_dict: dict, all_steps
-) -> List:
+def edges_in_derivation_for_d3js(all_steps) -> List:
     """
     >>> edges_in_derivation_for_d3js()
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] latex/edges_in_derivation_for_d3js start " + trace_id)
 
-    list_of_edge_tuples = []
+    list_of_edge_tuples = []  # type: List[Tuple]
 
     print("latex/edges_in_derivation_for_d3js all_steps", all_steps)
 
@@ -398,11 +389,14 @@ def edges_in_derivation_for_d3js(
 
 
 def create_tex_file_for_derivation(
-    graphDB_Driver,
-    query_time_dict: query_timing_result_type,
     derivation_id: unique_numeric_id_as_str,
+    all_steps: dict,
+    derivation_dict: dict,
+    list_of_step_dicts_in_this_derivation: list,
+    list_of_inference_rule_dicts: list,
+    list_of_sequence_values: list,
     path_to_tex_file: str,
-) -> query_timing_result_type:
+):
     """
     In v7 the PDG I started allowing inference rule names
     to have spaces. (In versions prior to 7 the inference rule names were
@@ -412,7 +406,6 @@ def create_tex_file_for_derivation(
     Therefore, I remove all spaces from the inference rule name.
 
     Args:
-        query_time_dict:
         derivation_id: numeric identifier of the derivation
     Returns:
         tex_filename: pass back filename without extension because bibtex cannot handle .tex
@@ -430,40 +423,7 @@ def create_tex_file_for_derivation(
         [path_to_tex_file], [tex_filename], ["tex", "log", "pdf", "aux"]
     )
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        derivation_dict = session.read_transaction(
-            neo4j_query.get_node_properties, "derivation", derivation_id
-        )
-        query_time_dict[
-            "latex/create_tex_file_for_derivation: get_node_properties derivation"
-            + derivation_id
-        ] = round(time.time() - query_start_time, 3)
     print("latex/create_tex_file_for_derivation: derivation_dict=", derivation_dict)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_step_dicts_in_this_derivation = session.read_transaction(
-            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
-        )
-        query_time_dict[
-            "latex/create_tex_file_for_derivation: get_list_of_step_dicts_in_this_derivation"
-            + derivation_id
-        ] = round(time.time() - query_start_time, 3)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_sequence_values = session.read_transaction(
-            neo4j_query.get_list_of_sequence_values_for_derivation_id, derivation_id
-        )
-        query_time_dict[
-            "latex/create_tex_file_for_derivation: get_list_of_sequence_values_for_derivation_id"
-            + derivation_id
-        ] = round(time.time() - query_start_time, 3)
-    print(
-        "latex/create_tex_file_for_derivation: list_of_sequence_values=",
-        list_of_sequence_values,
-    )
 
     with open(tex_filename + ".tex", "w") as latex_file_handle:
         latex_file_handle.write(
@@ -489,15 +449,6 @@ def create_tex_file_for_derivation(
         # latex_file_handle.write(
         #    "\\newcommand{\\rowContravariantColumnCovariant}[3]{#1^{#2}_{\\ \\ #3}} % left-upper, right-bottom\n"
         # )
-
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_inference_rule_dicts = session.read_transaction(
-                neo4j_query.get_list_node_dicts_of_type, "inference_rule"
-            )
-            query_time_dict[
-                "latex/create_tex_file_for_derivation: get_list_node_dicts_of_type inference_rule"
-            ] = round(time.time() - query_start_time, 3)
 
         # first, write the inference rules as newcommand at top of .tex file
         latex_file_handle.write("% inference rules as newcommand for use in the body\n")
@@ -580,11 +531,6 @@ def create_tex_file_for_derivation(
             #                latex_file_handle.write(safe_string + "\n")
             latex_file_handle.write(derivation_dict["abstract_latex"] + "\n")
         latex_file_handle.write("\\end{abstract}\n")
-
-        all_steps, query_time_dict = compute.all_steps_in_derivation(
-            graphDB_Driver, derivation_id, query_time_dict
-        )
-        # print("all_steps = ", all_steps)
 
         for linear_indx in list_of_sequence_values:
             # print("linear_indx=", linear_indx)
@@ -706,13 +652,16 @@ def create_tex_file_for_derivation(
     # logger.info("[trace end " + trace_id + "]")
 
     logger.info("[TRACE] latex/create_tex_file_for_derivation " + trace_id)
-    return query_time_dict  # pass back filename without extension because bibtex cannot handle .tex
+    return
 
 
 def create_pdf_for_derivation(
-    graphDB_Driver,
-    query_time_dict: dict,
     derivation_id: unique_numeric_id_as_str,
+    all_steps,
+    derivation_dict,
+    list_of_step_dicts,
+    list_of_inference_rule_dicts,
+    list_of_sequence_values,
     path_to_pdf: str,
 ) -> str:
     """
@@ -741,9 +690,16 @@ def create_pdf_for_derivation(
 
     tex_filename_without_extension = derivation_id
 
-    query_time_dict = create_tex_file_for_derivation(
-        graphDB_Driver, query_time_dict, derivation_id, path_to_pdf
+    create_tex_file_for_derivation(
+        derivation_id,
+        all_steps,
+        derivation_dict,
+        list_of_step_dicts,
+        list_of_inference_rule_dicts,
+        list_of_sequence_values,
+        path_to_pdf,
     )
+
     shutil.move(tex_filename_without_extension + ".tex", tmp_latex_folder_full_path)
 
     # copy the current pdg.bib from static to local for use with bibtex when compiling tex to PDF
@@ -856,7 +812,7 @@ def create_pdf_for_derivation(
     # logger.info("[trace end " + trace_id + "]")
 
     logger.info("[TRACE] latex/create_pdf_for_derivation start " + trace_id)
-    return pdf_filename + ".pdf", query_time_dict
+    return pdf_filename + ".pdf"
 
 
 def create_png_from_latex(
@@ -1090,10 +1046,12 @@ def create_tex_file_for_latex_string(
 
 def create_derivation_png(
     graphDB_Driver,
-    query_time_dict: dict,
+    query_time_dict: query_timing_result_type,
     derivation_id: unique_numeric_id_as_str,
+    derivation_dict: dict,
+    list_of_step_dicts_in_this_derivation: dict,
     path_to_output_png: str,
-) -> Tuple[str, dict]:
+) -> Tuple[str, query_timing_result_type]:
     """
     for a clear description of the graphviz language, see
     https://www.graphviz.org/doc/info/lang.html
@@ -1113,30 +1071,8 @@ def create_derivation_png(
     # logger.info("[trace start " + trace_id + "]")
     logger.info("[TRACE] latex/create_derivation_png start " + trace_id + "]")
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        derivation_dict = session.read_transaction(
-            neo4j_query.get_node_properties, "derivation", derivation_id
-        )
-        query_time_dict[
-            "latex/create_derivation_png: get_node_properties derivation"
-            + derivation_id
-        ] = round(time.time() - query_start_time, 3)
-    print("latex/create_derivation_png: derivation_dict=", derivation_dict)
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_step_dicts_in_this_derivation = session.read_transaction(
-            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
-        )
-        query_time_dict[
-            "latex/create_derivation_png: get_list_of_step_dicts_in_this_derivation"
-            + derivation_id
-        ] = round(time.time() - query_start_time, 3)
-    print(
-        "latex/create_derivation_png: list_of_step_dicts_in_this_derivation=",
-        list_of_step_dicts_in_this_derivation,
-    )
+    # print("latex/create_derivation_png: list_of_step_dicts_in_this_derivation=",
+    #     list_of_step_dicts_in_this_derivation)
 
     dot_filename = path_to_output_png + "derivation_" + derivation_id + ".dot"
     with open(dot_filename, "w") as file_handle:
@@ -1151,10 +1087,23 @@ def create_derivation_png(
 
         for this_step_dict in list_of_step_dicts_in_this_derivation:
             print("latex/create_derivation_png step_dict=", this_step_dict)
-            query_time_dict = write_step_to_graphviz_file(
-                graphDB_Driver,
+
+            (
+                inference_rule_dict,
+                list_of_input_dicts,
+                list_of_feed_dicts,
+                list_of_output_dicts,
                 query_time_dict,
+            ) = compute.input_feed_output_infrule_for_step(
+                graphDB_Driver, query_time_dict, this_step_dict["id"]
+            )
+
+            write_step_to_graphviz_file(
                 this_step_dict["id"],
+                inference_rule_dict,
+                list_of_input_dicts,
+                list_of_feed_dicts,
+                list_of_output_dicts,
                 file_handle,
                 path_to_output_png,
             )
@@ -1230,7 +1179,12 @@ def create_derivation_png(
 
 
 def create_step_graphviz_png(
-    graphDB_Driver, query_time_dict, step_dict: dict, destination_folder: str
+    step_dict: dict,
+    inference_rule_dict,
+    list_of_input_dicts,
+    list_of_feed_dicts,
+    list_of_output_dicts,
+    destination_folder: str,
 ) -> str:
     """
     for a clear description of the graphviz language, see
@@ -1273,13 +1227,16 @@ def create_step_graphviz_png(
         )
         file_handle.write("fontsize=12;\n")
 
-        query_time_dict = write_step_to_graphviz_file(
-            graphDB_Driver,
-            query_time_dict,
+        write_step_to_graphviz_file(
             step_dict["id"],
+            inference_rule_dict,
+            list_of_input_dicts,
+            list_of_feed_dicts,
+            list_of_output_dicts,
             file_handle,
             destination_folder,
         )
+
         file_handle.write("}\n")
 
     #    with open(dot_filename,'r') as fil:
@@ -1312,16 +1269,18 @@ def create_step_graphviz_png(
     # return True, "no invalid latex", output_filename
     # logger.info("[trace end " + trace_id + "]")
     logger.info("[TRACE] latex/create_step_graphviz_png end " + trace_id + "]")
-    return output_filename, query_time_dict
+    return output_filename
 
 
 def write_step_to_graphviz_file(
-    graphDB_Driver,
-    query_time_dict: dict,
     step_id: str,
+    inference_rule_dict,
+    list_of_input_dicts,
+    list_of_feed_dicts,
+    list_of_output_dicts,
     file_handle: TextIO,
     path_to_output_png: str,
-) -> query_timing_result_type:
+) -> None:
     """
 
     used by `create_derivation_png`
@@ -1347,16 +1306,6 @@ def write_step_to_graphviz_file(
 
     print("step_id =", step_id)
     # logger.debug("step_id = %s", step_id)
-
-    (
-        inference_rule_dict,
-        list_of_input_dicts,
-        list_of_feed_dicts,
-        list_of_output_dicts,
-        query_time_dict,
-    ) = compute.input_feed_output_infrule_for_step(
-        graphDB_Driver, query_time_dict, step_id
-    )
 
     print("latex/write_step_to_graphviz_file inference_rule_dict", inference_rule_dict)
     print("latex/write_step_to_graphviz_file list_of_input_dicts", list_of_input_dicts)
@@ -1456,7 +1405,7 @@ def write_step_to_graphviz_file(
 
     # logger.info("[trace end " + trace_id + "]")
     logger.info("[TRACE] latex/write_step_to_graphviz_file end " + trace_id + "]")
-    return query_time_dict
+    return
 
 
 # EOF
