@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 sys.path.append("library")
 
 import neo4j_query
-
+from compute import query_timing_result_type
 
 # the following creates a circular dependency since `app.py` imports this file.
 from pdg_app import graphDB_Driver
