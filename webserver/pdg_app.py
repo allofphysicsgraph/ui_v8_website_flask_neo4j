@@ -1326,6 +1326,39 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
 
     print("pdg_app/to_review_derivation all_steps=", all_steps)
 
+    list_of_step_dicts = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_step_dicts = session.read_transaction(
+            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+        )
+        query_time_dict[
+            "pdg_app/to_review_derivation: get_list_of_step_dicts_in_this_derivation"
+        ] = round(time.time() - query_start_time, 3)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_sequence_values = session.read_transaction(
+            neo4j_query.get_list_of_sequence_values_for_derivation_id, derivation_id
+        )
+        query_time_dict[
+            "pdg_app/to_review_derivation: get_list_of_sequence_values_for_derivation_id"
+            + derivation_id
+        ] = round(time.time() - query_start_time, 3)
+    print(
+        "pdg_app/to_review_derivation: list_of_sequence_values=",
+        list_of_sequence_values,
+    )
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_inference_rule_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "inference_rule"
+        )
+        query_time_dict[
+            "pdg_app/to_review_derivation: get_list_node_dicts_of_type inference_rule"
+        ] = round(time.time() - query_start_time, 3)
+
     web_form_delete = NoOptionsForm(request.form)
     web_form_tex_pdf = NoOptionsForm(request.form)
     # web_form = DeleteButtonForm(request.form)
@@ -1338,8 +1371,14 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             # path_to_pdf = "/code/static/dumping_grounds/"  # should end with slash
 
             try:
-                pdf_filename, query_time_dict = latex.create_pdf_for_derivation(
-                    graphDB_Driver, query_time_dict, derivation_id, "/code/static/"
+                pdf_filename = latex.create_pdf_for_derivation(
+                    derivation_id,
+                    all_steps,
+                    derivation_dict,
+                    list_of_step_dicts,
+                    list_of_inference_rule_dicts,
+                    list_of_sequence_values,
+                    "/code/static/",
                 )
             except Exception as err:
                 # logger.error(str(err))
@@ -1368,8 +1407,14 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             # path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
 
             try:
-                query_time_dict = latex.create_tex_file_for_derivation(
-                    graphDB_Driver, query_time_dict, derivation_id, "/code/static/"
+                latex.create_tex_file_for_derivation(
+                    derivation_id,
+                    all_steps,
+                    derivation_dict,
+                    list_of_step_dicts,
+                    list_of_inference_rule_dicts,
+                    list_of_sequence_values,
+                    "/code/static/",
                 )
                 tex_filename = str(derivation_id)
             except Exception as err:
@@ -1404,15 +1449,6 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             # 1) for each step, delete step node
             # 2) delete derivation node
 
-            list_of_step_dicts = []
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                list_of_step_dicts = session.read_transaction(
-                    neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
-                )
-                query_time_dict[
-                    "to_review_derivation: get_list_of_step_dicts_in_this_derivation"
-                ] = round(time.time() - query_start_time, 3)
             print("list_of_step_dicts (to delete)=", list_of_step_dicts)
 
             for this_step_dict in list_of_step_dicts:
@@ -1446,9 +1482,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             )
 
     # only create d3js JSON if the HTML page is going to be rendered
-    query_time_dict = latex.create_d3js_json(
-        graphDB_Driver, query_time_dict, derivation_id, "/code/static/"
-    )
+    latex.create_d3js_json(derivation_id, all_steps, "/code/static/")
     d3js_json_filename = derivation_id + ".json"
 
     # try:
@@ -1465,13 +1499,20 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
 
     # only create graphviz PNG if the HTML page is going to be rendered
     # SVG isn't available yet; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/14
+
     (
         derivation_graphviz_png_filename,
         # derivation_graphviz_svg_filename,
         query_time_dict,
     ) = latex.create_derivation_png(
-        graphDB_Driver, query_time_dict, derivation_id, "/code/static/"
+        graphDB_Driver,
+        query_time_dict,
+        derivation_id,
+        derivation_dict,
+        list_of_step_dicts,
+        "/code/static/",
     )
+
     print(
         "pdg_app/to_review_derivation derivation_graphviz_png_filename=",
         derivation_graphviz_png_filename,
@@ -5543,7 +5584,7 @@ def to_edit_inference_rule(
                     neo4j_query.delete_node, inference_rule_id, "inference_rule"
                 )
                 query_time_dict[
-                    "pdg_app/to_review_derivation: delete_node inference_rule"
+                    "pdg_app/to_edit_inference_rule: delete_node inference_rule"
                 ] = round(time.time() - query_start_time, 3)
 
             return redirect(url_for("to_list_inference_rules"))
@@ -5578,6 +5619,9 @@ def to_edit_inference_rule(
             list_of_inference_rule_dicts = session.read_transaction(
                 neo4j_query.get_list_node_dicts_of_type, "inference_rule"
             )
+            query_time_dict[
+                "pdg_app/to_edit_inference_rule: get_list_node_dicts_of_type inference_rule"
+            ] = round(time.time() - query_start_time, 3)
 
         for inference_rule_dict in list_of_inference_rule_dicts:
             print(
@@ -5631,6 +5675,9 @@ def to_edit_inference_rule(
                 number_of_outputs=number_of_outputs,
                 author_name_latex=author_name_latex,
             )
+            query_time_dict["pdg_app/to_edit_inference_rule: add_inference_rule"] = (
+                round(time.time() - query_start_time, 3)
+            )
 
     list_of_derivation_dicts_that_use_this_inference_rule_id = []
     with graphDB_Driver.session() as session:
@@ -5651,6 +5698,9 @@ def to_edit_inference_rule(
         query_start_time = time.time()
         inference_rule_dict = session.read_transaction(
             neo4j_query.get_node_properties, "inference_rule", inference_rule_id
+        )
+        query_time_dict["pdg_app/to_edit_inference_rule: get_node_properties"] = round(
+            time.time() - query_start_time, 3
         )
 
     print("pdg_app/to_edit_inference_rule inference_rule_dict", inference_rule_dict)
@@ -6078,7 +6128,7 @@ def to_list_relations() -> werkzeug.Response:
 
 
 @web_app.route("/list_constant_values/<scalar_id>", methods=["GET", "POST"])
-def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
     """
     >>> to_list_constant_values()
     """
@@ -6128,7 +6178,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> werkzeug.Res
 )
 def to_edit_constant_value_and_units(
     value_and_units_id: unique_numeric_id_as_str,
-) -> werkzeug.Response:
+) -> str:
     """
     edit value and units for a constant
 
@@ -6191,7 +6241,7 @@ def to_edit_constant_value_and_units(
 
 
 @web_app.route("/list_scalars", methods=["GET", "POST"])
-def to_list_scalars() -> werkzeug.Response:
+def to_list_scalars() -> str:
     """
     a table
 
