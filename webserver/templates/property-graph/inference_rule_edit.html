@@ -19,8 +19,7 @@ or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inferenc
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_edit.csrf_token }}
     <P>
-      {{ form_edit.inference_rule_name.label}}: {{ form_edit.inference_rule_name(size=50, maxlength=1000, value=inference_rule_dict['name_latex']) }} <BR/>
-      &nbsp;Must be unique compared to all other inference rule names.<BR/>
+      {{ form_edit.inference_rule_name.label}}: {{ form_edit.inference_rule_name(size=50, maxlength=1000, value=inference_rule_dict['name_latex']) }} Must be unique compared to all other inference rule names.<BR/>
       {{form_edit.inference_rule_latex.label }}: {{ form_edit.inference_rule_latex(size=50, maxlength=1000, value=inference_rule_dict['latex']) }}
       Refer to feeds using <code>$#1$</code> and refer to expressions using <code>Eq.~\ref{eq:#2}</code>
       <BR/>
@@ -41,12 +40,26 @@ or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inferenc
       <P>Editing the number of inputs, feeds, and outputs is disabled because 
         {{ inference_rule_dict['name_latex'] }}
         is used in the following derivations: 
-        {% for derivation_dict in list_of_derivation_dicts_that_use_this_inference_rule_id %}
-        <UL>
-          <LI>{{ derivation_dict }}</LI>
-        </UL>
-        {% endfor %}
-
+        <table border="1" id="derivation_use_edit_io_table" class="sortable">
+          <tr>
+            <th>name</th>
+            <th>abstract</th>
+            <th>reference</th>
+            <th>author</th>
+          </tr>
+          {% for derivation_dict in list_of_derivation_dicts_that_use_this_inference_rule_id %}
+          <tr>
+            <td>
+              <a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id'] ) }}">
+                {{ derivation_dict['name_latex'] }}
+              </a>
+            </td>
+            <td>{{ derivation_dict['abstract_latex']}}</td>
+            <td>{{ derivation_dict['reference_latex'] }}</td>
+            <td>{{ derivation_dict['author_name_latex'] }}</td>
+          </tr>
+          {% endfor %}
+        </table>
 
       {% endif %}
 
@@ -79,11 +92,26 @@ or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inferenc
       <P>Editing the number of inputs, feeds, and outputs is disabled because 
         {{ inference_rule_dict['name_latex'] }}
         is used in the following derivations: 
-        {% for derivation_dict in list_of_derivation_dicts_that_use_this_inference_rule_id %}
-        <UL>
-          <LI>{{ derivation_dict }}</LI>
-        </UL>
-        {% endfor %}
+        <table border="1" id="derivation_use_edit_io_table" class="sortable">
+          <tr>
+            <th>name</th>
+            <th>abstract</th>
+            <th>reference</th>
+            <th>author</th>
+          </tr>
+          {% for derivation_dict in list_of_derivation_dicts_that_use_this_inference_rule_id %}
+          <tr>
+            <td>
+              <a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id'] ) }}">
+                {{ derivation_dict['name_latex'] }}
+              </a>
+            </td>
+            <td>{{ derivation_dict['abstract_latex']}}</td>
+            <td>{{ derivation_dict['reference_latex'] }}</td>
+            <td>{{ derivation_dict['author_name_latex'] }}</td>
+          </tr>
+          {% endfor %}
+        </table>
 
       {% endif %}
 
