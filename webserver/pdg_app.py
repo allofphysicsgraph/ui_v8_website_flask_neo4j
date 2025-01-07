@@ -185,17 +185,17 @@ log_size = 10000000
 # )
 # handler_debug.setLevel(logging.DEBUG)
 handler_info = RotatingFileHandler(
-    "flask_critical_and_error_and_warning_and_info.log",
+    "static/dumping_grounds/flask_critical_and_error_and_warning_and_info.log",
     maxBytes=log_size,
     backupCount=2,
 )
 handler_info.setLevel(logging.INFO)
-handler_warning = RotatingFileHandler(
-    "flask_critical_and_error_and_warning.log",
-    maxBytes=log_size,
-    backupCount=2,
-)
-handler_warning.setLevel(logging.INFO)
+# handler_warning = RotatingFileHandler(
+#     "flask_critical_and_error_and_warning.log",
+#     maxBytes=log_size,
+#     backupCount=2,
+# )
+# handler_warning.setLevel(logging.INFO)
 
 # https://docs.python.org/3/howto/logging.html
 logging.basicConfig(
@@ -6667,6 +6667,12 @@ def to_export_cypher() -> werkzeug.Response:
         "[TRACE] pdg_app/to_export_cypher end " + trace_id + " " + str(time.time())
     )
     return redirect(url_for("static", filename="dumping_grounds/pdg.cypher"))
+
+
+# exploration pages
+@web_app.route("/api_via_js")
+def to_api_via_js() -> str:
+    return render_template("exploration/example.html")
 
 
 # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask

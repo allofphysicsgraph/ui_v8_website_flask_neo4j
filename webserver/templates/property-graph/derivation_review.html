@@ -41,7 +41,10 @@
         <LI>number of inputs: {{ step_dict['inference rule dict']['number_of_inputs'] }};
             feeds:            {{ step_dict['inference rule dict']['number_of_feeds'] }};
             outputs:          {{ step_dict['inference rule dict']['number_of_outputs'] }}</LI>
-        <LI>{{ step_dict['inference rule dict']['latex'] | safe }}</LI>
+        <LI>{{ step_dict['inference rule dict']['latex'] }}<BR>
+          {{ step_dict['inference rule dict']['latex'].replace('#','&#35;').replace('\r','&#92;') }}<BR>
+            {{ step_dict['inference rule dict']['latex'] | safe }}<BR>
+            {{ step_dict['inference rule dict']['latex'] | e }}</LI>
       </ul>
     </td> <!-- inference rule -->
     <td>{% for m_dict in step_dict['list of input dicts'] %}
