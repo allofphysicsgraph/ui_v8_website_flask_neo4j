@@ -327,8 +327,7 @@ def api_derivation_steps():
 @bp.route("/v1/resources/cypher/", methods=["GET"])
 def api_cypher_query():
     """
-    curl -s http://localhost:5000/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\)
- | python3 -m json.tool
+    curl -s http://localhost:5000/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
     """
     trace_id = str(random.randint(1000000, 9999999))
     print("[TRACE] pdg_api/api_cypher_query start " + trace_id)

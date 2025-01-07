@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+</head>
+
+<body>
+
+<P>Derivation list as JSON:</P>
+  <pre id="derivation_list_as_json"><!-- This gives us a way to find this specific paragraph in the javascript code so we can change its content. --></pre>
+
+  <!-- from https://stackoverflow.com/a/43175774/1164295 -->
+  <script type="text/javascript">
+    let url = 'http://localhost:5000/api/v1/resources/derivation/list';
+
+    fetch(url) // `fetch()` is an asynchronous operation, meaning it doesn't happen instantly
+      .then(res => res.json()) // `then` uses the result of the `fetch()` request once `fetch()` is successful.
+                         // assign `res` to be the output of the `fetch(url)`. 
+                         // `=>` is an arrow function; `res` is the parameter to the function.
+                         // `res.json()` returns a Javascript object`
+      // .then(out => console.log('Checkout this JSON! ', out))
+      .then(out => {
+        // Get the paragraph element where we want to display the JSON
+        const outputElement = document.getElementById('derivation_list_as_json'); // `getElementById` is a built-in JavaScript method that looks for an HTML element with the id we've defined which is `jsonOutput` and then returns the HTML paragraph element.
+        
+        // Convert the JSON object to a string, and then assign it to the paragraph element.
+        outputElement.textContent = JSON.stringify(out, null, 2); // The '2' is for pretty-printing with 2 spaces of indentation.
+      })
+      .catch(err => console.log(err));
+  </script>
+
+
+
+
+<!-- from https://reqbin.com/code/javascript/wc3qbk0b/javascript-fetch-json-example -->
+<script type="text/javascript">
+fetch('http://localhost:5000/api/v1/resources/inference_rule/list', {
+    method: 'GET',
+    headers: {'Accept': 'application/json'},
+})
+   .then(response => response.json())
+   .then(response => console.log('and ',JSON.stringify(response)))
+
+</script>
+
+
+</body>  

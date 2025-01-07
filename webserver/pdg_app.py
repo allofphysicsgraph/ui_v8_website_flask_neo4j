@@ -6672,7 +6672,7 @@ def to_export_cypher() -> werkzeug.Response:
 # exploration pages
 @web_app.route("/api_via_js")
 def to_api_via_js() -> str:
-    return render_template("exploration/example.html")
+    return render_template("exploration/api_js.html")
 
 
 # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
