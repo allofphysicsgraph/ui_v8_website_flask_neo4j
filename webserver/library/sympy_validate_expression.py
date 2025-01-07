@@ -6,7 +6,8 @@
 # Attribution 4.0 International (CC BY 4.0)
 
 import random
-import time
+
+# import time  # this creates a conflict with sympy's `time`
 
 import sympy  # type: ignore
 from sympy.physics.units import (
@@ -45,8 +46,6 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
     print(
         "[TRACE] sympy_validate_expression/convert_sympy_expr_to_pdg_symbols start "
         + trace_id
-        + " "
-        + str(time.time())
     )
     print(
         "sympy_validate_expression/convert_sympy_expr_to_pdg_symbols: sympy_expr=",
@@ -79,12 +78,10 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
 
             revised_expr = revised_expr.subs(this_symb, sympy.Symbol(pdg_id))
 
-    prin("type(revised_expr)=", type(revised_expr))
+    print("type(revised_expr)=", type(revised_expr))
     print(
         "[TRACE] sympy_validate_expression/convert_sympy_expr_to_pdg_symbols end "
         + trace_id
-        + " "
-        + str(time.time())
     )
     return revised_expr
 
@@ -104,12 +101,7 @@ def dimensional_consistency(
     unknown
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
-        "[TRACE] sympy_validate_expression/dimensional_consistency start "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    print("[TRACE] sympy_validate_expression/dimensional_consistency start " + trace_id)
     print("expression_dict=", expression_dict)
     print("list_of_symbol_IDs_in_expression", list_of_symbol_IDs_in_expression)
 
