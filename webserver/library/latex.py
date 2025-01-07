@@ -245,7 +245,7 @@ def create_d3js_json(
         # construct the node JSON content
         list_of_nodes.append(
             '    {"id": "'
-            + step_id
+            + step_dict["inference rule dict"]["id"]
             + '", "group": '
             + str(step_dict["sequence index"])
             + ", "
@@ -334,7 +334,8 @@ def create_d3js_json(
                 + '"height": '
                 + str(image.shape[0])
                 + ", "
-                + '"linear index": -1},\n'
+                + '"linear index": -1},\n'  # TODO: what is the difference between 'sequence index' and 'linear index'?
+                # TODO: does d3js care about the 'linear sequence' field?
             )
 
     list_of_nodes = list(set(list_of_nodes))
@@ -371,18 +372,32 @@ def create_d3js_json(
     return
 
 
-def edges_in_derivation_for_d3js(all_steps) -> List:
+def edges_in_derivation_for_d3js(all_steps) -> List[Tuple[str, str]]:
     """
+
+    str in the Tuples:
+    - step_id
+    - expression_dict["id"]
+
     >>> edges_in_derivation_for_d3js()
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] latex/edges_in_derivation_for_d3js start " + trace_id)
 
-    list_of_edge_tuples = []  # type: List[Tuple]
-
     print("latex/edges_in_derivation_for_d3js all_steps", all_steps)
 
-    # TODO!
+    list_of_edge_tuples = []  # type: List[Tuple[str,str]]
+    for step_id, step_dict in all_steps.items():
+
+        for input_dict in step_dict["list of input dicts"]:
+            edge_tuple = (input_dict["id"], step_dict["inference rule dict"]["id"])
+            list_of_edge_tuples.append(edge_tuple)
+        for feed_dict in step_dict["list of feed dicts"]:
+            edge_tuple = (feed_dict["id"], step_dict["inference rule dict"]["id"])
+            list_of_edge_tuples.append(edge_tuple)
+        for output_dict in step_dict["list of output dicts"]:
+            edge_tuple = (step_dict["inference rule dict"]["id"], output_dict["id"])
+            list_of_edge_tuples.append(edge_tuple)
 
     logger.info("[TRACE] latex/edges_in_derivation_for_d3js end " + trace_id)
     return list_of_edge_tuples

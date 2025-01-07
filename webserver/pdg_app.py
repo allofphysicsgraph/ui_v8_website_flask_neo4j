@@ -6662,7 +6662,6 @@ def to_export_json() -> werkzeug.Response:
     https://github.com/neo4j/apoc
     https://neo4j.com/labs/apoc/4.1/installation/
 
-    TODO: export "graph to JSON" as file via web interface
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
@@ -6688,7 +6687,6 @@ def to_export_json() -> werkzeug.Response:
 @web_app.route("/export_to_cypher")
 def to_export_cypher() -> werkzeug.Response:
     """
-    TODO: export "graph to CYPHER" as file via web interface
 
     # apoc.export.cypherQuery()
     # https://stackoverflow.com/questions/44688194/efficient-importing-of-cypher-statements
