@@ -28,7 +28,7 @@ Three ways to submit a read-only query:
 {% if submitted_query is defined %}
   {% if submitted_query|length > 0 %}
 For the query <BR>
-  {{ submitted_query | safe }}<BR> <!-- https://stackoverflow.com/a/35215981/1164295 -->
+  {{ submitted_query.replace('\r','\\\\r') | safe }}<BR> <!-- https://stackoverflow.com/a/35215981/1164295 -->
   the results are
 {% endif %}
 {% endif %}
@@ -192,9 +192,28 @@ MATCH (n:expression), (m:inference_rule) WHERE m.id='{{inference_rule_id}}' RETU
   <tr>
     <td>regex search for text in a node's property</td>
     <td><a href="{{ url_for('to_query') }}?cypher=MATCH (m:scalar) WHERE (any(prop in keys(m) WHERE m[prop] =~ '.*ddd.*')) RETURN m">
-      match (m:scalar) where (any(prop in keys(m) where m[prop] =~ '.*ddd.*')) return m
+      MATCH (m:scalar) WHERE (any(prop in keys(m) WHERE m[prop] =~ '.*ddd.*')) RETURN m
     </a></td>
     <td>replace 'ddd' with your desired text</td>
+  </tr>
+  <tr>
+    <td>shortest path length between two inference rules</td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH p = shortestPath((n:inference_rule)-[*..]-(m:inference_rule)) WHERE n.id = '8208125' AND m.id = '7208176' RETURN length(p)">
+      MATCH p = shortestPath((n:inference_rule)-[*..]-(m:inference_rule)) WHERE n.id = '8208125' AND m.id = '7208176' RETURN length(p)
+    </a></td>
+    <td>replace ID values with your desired nodes</td>
+  </tr>
+  <tr>
+    <td>shortest path between two inference rules</td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH p = shortestPath((n:inference_rule)-[*..]-(m:inference_rule)) WHERE n.id = '{{inference_rule_id}}' AND m.id = '7208176' RETURN length(p)">
+      MATCH p = shortestPath((n:inference_rule)-[*..]-(m:inference_rule)) WHERE n.id = '{{inference_rule_id}}' AND m.id = '7208176' RETURN p
+    </a></td>
+    <td>replace ID values with your desired nodes</td>
+  </tr>
+
+
+
+
 
 </table>
 <P>
