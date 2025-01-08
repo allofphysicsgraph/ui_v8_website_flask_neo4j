@@ -1,6 +1,7 @@
 
 .env
 dumping_grounds
+neo4j_graph_datascience_library
 neo4j_pdg/plugins/
 neo4j_pdg/logs
 neo4j_pdg/data
