@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-# Physics Derivation Graph
-# Ben Payne, 2024
-# http://creativecommons.org/licenses/by/4.0/
-# Attribution 4.0 International (CC BY 4.0)
-
 """
+Physics Derivation Graph
+Ben Payne, 2024
+http://creativecommons.org/licenses/by/4.0/
+Attribution 4.0 International (CC BY 4.0)
+
+
 this file separates the API routes from `pdg_app.py`
 
 http://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
@@ -34,9 +35,10 @@ import sys
 from typing import NewType, Dict, List
 import neo4j
 
-import logging
 
 from flask_wtf.csrf import generate_csrf
+
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -1284,22 +1286,84 @@ def api_delete_derivation():
         print("data_from_user = " + str(data_from_user))
 
         # required
-        if "_latex" in data_from_user.keys():
-            _latex = data_from_user[""]
+        if "derivation_id" in data_from_user.keys():
+            derivation_id = data_from_user["derivation_id"]
         else:
-            return jsonify({"ERROR": "need to provide _latex"})
+            return jsonify({"ERROR": "need to provide derivation_id"})
 
     else:  # "Content-Type: application/x-www-form-urlencoded"
         print("request.args=" + str(request.args))  # returns a dict
         # required
-        _latex = request.args.get("_latex")
-        if _latex:
-            print("_latex =" + _latex)
+        derivation_id = request.args.get("derivation_id")
+        if derivation_id:
+            print("derivation_id =" + derivation_id)
         else:
-            return jsonify({"ERROR": "need to provide _latex"})
+            return jsonify({"ERROR": "need to provide derivation_id"})
 
-            
-    return jsonify({"STATUS": "TODO"})
+    # does this derivation_id exist?
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "derivation"
+        )
+        query_time_dict[
+            "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
+        ] = (time.time() - query_start_time)
+
+    list_of_id = []
+    for derivation_dict in list_of_dicts:
+        list_of_id.append(derivation_dict["id"])
+    if derivation_id not in list_of_id:
+        return jsonify(
+            {"ERROR": derivation_id + " not found in list of derivation IDs"}
+        )
+
+    # at this point inputs have been validated
+
+    list_of_step_dicts = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_step_dicts = session.read_transaction(
+            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+        )
+        query_time_dict[
+            "pdg_app/to_review_derivation: get_list_of_step_dicts_in_this_derivation"
+        ] = round(time.time() - query_start_time, 3)
+
+    for this_step_dict in list_of_step_dicts:
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            session.write_transaction(
+                neo4j_query.delete_node, this_step_dict["id"], "step"
+            )
+            query_time_dict["pdg_app/to_review_derivation: delete_node step"] = round(
+                time.time() - query_start_time, 3
+            )
+
+    derivation_dict = {}
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        derivation_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "derivation", derivation_id
+        )
+        query_time_dict["to_review_derivation: node_properties, derivation"] = round(
+            time.time() - query_start_time, 3
+        )
+    print("derivation_dict:", derivation_dict)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        session.write_transaction(neo4j_query.delete_node, derivation_id, "derivation")
+        query_time_dict["pdg_app/to_review_derivation: delete_node derivation"] = round(
+            time.time() - query_start_time, 3
+        )
+    print(
+        "[TRACE] pdg_app/to_review_derivation end " + trace_id + " " + str(time.time())
+    )
+
+    return jsonify({"STATUS": "successfully deleted" + derivation_id})
+
 
 @bp.route("/v1/resources/expression/delete", methods=["POST"])
 def api_delete_expression():
