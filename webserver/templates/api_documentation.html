@@ -1,0 +1,253 @@
+
+{% extends "_base.html" %}
+{% block content %}
+
+<!-- this file was created using
+cat library/pdg_api.py  | grep route | sed 's/@bp\.route("\///g' | sed 's/", methods=\[\(.*\)\]/\1/g' | sort
+-->
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/do_nothing">http://localhost:5000/api/v1/resources/do_nothing</a></H3>
+<P>Returns nothing</P>
+<P>Required parameters: None</P>
+<P>Optional parameters: None</P>
+
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/cypher/">http://localhost:5000/api/v1/resources/cypher/</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: Cypher query text</P>
+<P><B>Example</B>: <code>curl -s http://localhost:5000/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool</code></P>
+<P>Optional parameters: None</P>
+
+
+<H3>POST <a href="http://localhost:5000/api/v1/resources/derivation/create">http://localhost:5000/api/v1/resources/derivation/create</a></H3>
+<P>Returns JSON of status</P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>POST <a href="http://localhost:5000/api/v1/resources/derivation/delete">http://localhost:5000/api/v1/resources/derivation/delete</a></H3>
+<P>Returns JSON of status</P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/derivation/list">http://localhost:5000/api/v1/resources/derivation/list</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/derivation/metadata">http://localhost:5000/api/v1/resources/derivation/metadata</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/derivation/step/list">http://localhost:5000/api/v1/resources/derivation/step/list</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>POST <a href="http://localhost:5000/api/v1/resources/expression/create">http://localhost:5000/api/v1/resources/expression/create</a></H3>
+<P>Returns JSON of status</P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>POST <a href="http://localhost:5000/api/v1/resources/expression/delete">http://localhost:5000/api/v1/resources/expression/delete</a></H3>
+<P>Returns JSON of status</P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/expression/list">http://localhost:5000/api/v1/resources/expression/list</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>POST <a href="http://localhost:5000/api/v1/resources/inference_rule/create">http://localhost:5000/api/v1/resources/inference_rule/create</a></H3>
+<P>Returns JSON of status</P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/inference_rule/list">http://localhost:5000/api/v1/resources/inference_rule/list</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/register_csrf">http://localhost:5000/api/v1/resources/register_csrf</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>POST <a href="http://localhost:5000/api/v1/resources/symbol/matrix/create">http://localhost:5000/api/v1/resources/symbol/matrix/create</a></H3>
+<P>Returns JSON of status</P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/symbol/matrix/list">http://localhost:5000/api/v1/resources/symbol/matrix/list</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>POST <a href="http://localhost:5000/api/v1/resources/symbol/operation/create">http://localhost:5000/api/v1/resources/symbol/operation/create</a></H3>
+<P>Returns JSON of status</P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/symbol/operation/list">http://localhost:5000/api/v1/resources/symbol/operation/list</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>POST <a href="http://localhost:5000/api/v1/resources/symbol/relation/create">http://localhost:5000/api/v1/resources/symbol/relation/create</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/symbol/relation/list">http://localhost:5000/api/v1/resources/symbol/relation/list</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>POST <a href="http://localhost:5000/api/v1/resources/symbol/scalar/create">http://localhost:5000/api/v1/resources/symbol/scalar/create</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/symbol/scalar/list">http://localhost:5000/api/v1/resources/symbol/scalar/list</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>POST <a href="http://localhost:5000/api/v1/resources/symbol/vector/create">http://localhost:5000/api/v1/resources/symbol/vector/create</a></H3>
+<P>Returns JSON of status</P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+<H3>GET <a href="http://localhost:5000/api/v1/resources/symbol/vector/list">http://localhost:5000/api/v1/resources/symbol/vector/list</a></H3>
+<P>Returns JSON of </P>
+<P>Required parameters: </P>
+<UL>
+	<LI>: </LI>
+</UL>
+<P>Optional parameters:</P>
+<UL>
+	<LI>: </LI>
+</UL>
+
+{% endblock %}
