@@ -43,6 +43,22 @@ from pdg_app import graphDB_Driver
 # http://flask.palletsprojects.com/en/1.1.x/tutorial/views/
 bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 
+# BHP, 2025-01-09: I am not dealing with log-in requirements,
+# so I am disabling csrf for the APIs as per
+# https://flask-wtf.readthedocs.io/en/0.15.x/csrf/#exclude-views-from-protection
+csrf.exempt(bp)
+# also, CSRF isn't how API authentication is done. See
+# https://www.google.com/search?q=how+flask+json+api+authentication+works
+
+
+@bp.route("/v1/resources/register", methods=["GET"])
+def api_list_derivations():
+    """
+    curl -s http://localhost:5000/api/v1/resources/register | python3 -m json.tool
+    """
+    csrf_token = csrf.generate_csrf()
+    return jsonify({"csrf token": csrf_token})
+
 
 @bp.route("/v1/resources/derivation/list", methods=["GET"])
 def api_list_derivations():
@@ -299,19 +315,30 @@ def api_list_expressions():
     return jsonify(list_of_dicts)
 
 
-@bp.route("/v1/resources/derivation/create", methods=["GET"])
+@bp.route("/v1/resources/derivation/create", methods=["POST"])
 def api_create_derivation():
     """
     required inputs:
     - derivation name as latex
-    - derivation reference as latex
     - derivation abstract as latex
+    optional input:
+    - derivation reference as latex
+    unexposed inputs:
     - author name
-
+    - current time
 
     see `pdg_app/to_add_derivation` for the web UI implementation
 
-    curl -s http://localhost:5000/api/v1/resources/derivation/create?derivation_name_latex=hello\&derivation_reference_latex=this_is\&derivation_abstract_latex=mine
+    curl --request POST \
+    --header "Content-Type: application/x-www-form-urlencoded" \
+    --show-error --silent \
+     http://localhost:5000/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
+
+    curl --request POST \
+    --header "Content-Type: application/json" \
+    --show-error --silent \
+    --data '{"derivation_name_latex":"hello again", "derivation_reference_latex":"this was", "derivation_abstract_latex": "yes no"}' \
+     http://localhost:5000/api/v1/resources/derivation/create
 
 
     """
@@ -319,7 +346,14 @@ def api_create_derivation():
     logger.info("[TRACE] pdg_api/api_create_derivation start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
-    # TODO: reject input if derivation name is already in the database
+    print("request=" + str(request))
+    print("request.args=" + str(request.args))
+
+    if request.is_json:
+        data = request.get_json()
+    else:
+        Print("not JSON")
+
     list_of_derivation_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -330,7 +364,7 @@ def api_create_derivation():
             "pdg_api/api_create_derivation: get_list_node_dicts_of_type derivation"
         ] = round(time.time() - query_start_time, 3)
 
-    print("list_of_derivation_dicts=", list_of_derivation_dicts)
+    # print("list_of_derivation_dicts=", list_of_derivation_dicts)
 
     derivation_name_latex = request.args.get("derivation_name_latex")
     if derivation_name_latex:
@@ -338,11 +372,22 @@ def api_create_derivation():
     else:
         return jsonify({"ERROR": "need to provide derivation_name_latex"})
 
+    # reject input if derivation name is already in the database
+    for derivation_dict in list_of_derivation_dicts:
+        if derivation_dict["name_latex"] == derivation_name_latex:
+            return jsonify(
+                {
+                    "ERROR:": "derivation name '"
+                    + str(derivation_name_latex)
+                    + "' already exists"
+                }
+            )
+
     derivation_reference_latex = request.args.get("derivation_reference_latex")
     if derivation_reference_latex:
         print("derivation_reference_latex " + str(derivation_reference_latex))
     else:
-        return jsonify({"ERROR": "need to provide derivation_reference_latex"})
+        derivation_reference_latex = ""
 
     derivation_abstract_latex = request.args.get("derivation_abstract_latex")
     if derivation_abstract_latex:
@@ -382,7 +427,7 @@ def api_create_derivation():
     )
 
 
-@bp.route("/v1/resources/expression/create", methods=["GET"])
+@bp.route("/v1/resources/expression/create", methods=["POST"])
 def api_create_expression():
     """
     curl -s http://localhost:5000/api/v1/resources/expression/create
@@ -393,42 +438,59 @@ def api_create_expression():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_create_expression start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
+    print(request.method)
+
+    # required
     expression_latex_lhs = request.args.get("expression_latex_lhs")
     if expression_latex_lhs:
         print("expression_latex_lhs =" + expression_latex_lhs)
     else:
         return jsonify({"ERROR": "need to provide expression_latex_lhs"})
 
-    expression_relation = request.args.get("")
+    # required
+    expression_relation = request.args.get("expression_relation")
     if expression_relation:
         print("expression_relation =" + expression_relation)
     else:
         return jsonify({"ERROR": "need to provide expression_relation"})
 
-    expression_latex_rhs = request.args.get("")
+    # required
+    expression_latex_rhs = request.args.get("expression_latex_rhs")
     if expression_latex_rhs:
         print("expression_latex_rhs =" + expression_latex_rhs)
     else:
         return jsonify({"ERROR": "need to provide expression_latex_rhs"})
 
-    expression_latex_condition = request.args.get("")
+    # optional
+    expression_latex_condition = request.args.get("expression_latex_condition")
     if expression_latex_condition:
         print("expression_latex_condition =" + expression_latex_condition)
+    else:
+        expression_latex_condition = ""
 
-    expression_name_latex = request.args.get("")
+    # optional
+    expression_name_latex = request.args.get("expression_name_latex")
     if expression_name_latex:
         print("expression_name_latex =" + expression_name_latex)
+    else:
+        expression_name_latex = ""
 
-    expression_reference_latex = request.args.get("")
+    # optional
+    expression_reference_latex = request.args.get("expression_reference_latex")
     if expression_reference_latex:
         print("expression_reference_latex =" + expression_reference_latex)
+    else:
+        expression_reference_latex = ""
 
-    expression_description_latex = request.args.get("")
+    # optional
+    expression_description_latex = request.args.get("expression_description_latex")
     if expression_description_latex:
         print("expression_description_latex =" + expression_description_latex)
+    else:
+        expression_description_latex = ""
 
     list_of_expression_dicts = []
     with graphDB_Driver.session() as session:
@@ -440,10 +502,40 @@ def api_create_expression():
             time.time() - query_start_time, 3
         )
 
-    return
+    print("list_of_expression_dicts=", list_of_expression_dicts)
+    # if lhs and relation and rhs are same, then reject
+
+    author_name_latex = "ben"
+
+    expression_id, query_time_dict = compute.generate_random_id(
+        graphDB_Driver, query_time_dict, "expression"
+    )
+
+    # https://neo4j.com/docs/python-manual/current/session-api/
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        session.write_transaction(
+            neo4j_query.add_expression,
+            expression_id,
+            expression_name_latex,
+            expression_latex_lhs,
+            expression_relation,
+            expression_latex_rhs,
+            expression_latex_condition,
+            expression_description_latex,
+            expression_reference_latex,
+            author_name_latex,
+        )
+        query_time_dict["pdg_app/to_add_expression: add_expression"] = round(
+            time.time() - query_start_time, 3
+        )
+
+    # return jsonify({"STATUS": "expression added successfully"})
+    query_time_dict["STATUS"] = "expression added successfully"
+    return query_time_dict
 
 
-@bp.route("/v1/resources/symbol/scalar/create", methods=["GET"])
+@bp.route("/v1/resources/symbol/scalar/create", methods=["POST"])
 def api_create_scalar_symbol():
     """
     curl -s http://localhost:5000/api/v1/resources/symbol/scalar/create
@@ -456,7 +548,7 @@ def api_create_scalar_symbol():
     return
 
 
-@bp.route("/v1/resources/symbol/vector/create", methods=["GET"])
+@bp.route("/v1/resources/symbol/vector/create", methods=["POST"])
 def api_create_vector_symbol():
     """
     curl -s http://localhost:5000/api/v1/resources/symbol/vector/create
@@ -469,7 +561,7 @@ def api_create_vector_symbol():
     return
 
 
-@bp.route("/v1/resources/symbol/matrix/create", methods=["GET"])
+@bp.route("/v1/resources/symbol/matrix/create", methods=["POST"])
 def api_create_matrix_symbol():
     """
     curl -s http://localhost:5000/api/v1/resources/symbol/matrix/create
@@ -482,7 +574,7 @@ def api_create_matrix_symbol():
     return
 
 
-@bp.route("/v1/resources/symbol/operation/create", methods=["GET"])
+@bp.route("/v1/resources/symbol/operation/create", methods=["POST"])
 def api_create_operation_symbol():
     """
     curl -s http://localhost:5000/api/v1/resources/symbol/operation/create
@@ -495,7 +587,7 @@ def api_create_operation_symbol():
     return
 
 
-@bp.route("/v1/resources/symbol/relation/create", methods=["GET"])
+@bp.route("/v1/resources/symbol/relation/create", methods=["POST"])
 def api_create_relation_symbol():
     """
     curl -s http://localhost:5000/api/v1/resources/symbol/relation/create
@@ -509,7 +601,7 @@ def api_create_relation_symbol():
     return
 
 
-@bp.route("/v1/resources/inference_rule/create", methods=["GET"])
+@bp.route("/v1/resources/inference_rule/create", methods=["POST"])
 def api_create_inference_rule():
     """
     curl -s http://localhost:5000/api/v1/resources/inference_rule/create
