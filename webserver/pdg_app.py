@@ -2347,7 +2347,6 @@ def to_add_expression() -> werkzeug.Response:
 
     dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
     for this_expression_dict in list_of_expression_dicts:
-
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             list_of_symbol_scalar_IDs_in_expression = session.read_transaction(
@@ -2473,12 +2472,9 @@ def to_add_expression() -> werkzeug.Response:
             query_time_dict["pdg_app/to_add_expression: add_expression"] = round(
                 time.time() - query_start_time, 3
             )
-        query_time_dict["to_add_expression: add_expression"] = round(
-            time.time() - query_start_time, 3
-        )
 
         # after user provides latex for expression have them provide symbol count
-        logger.info("[TRACE] pdg_app/ end " + trace_id + " " + str(time.time()))
+        logger.info("[TRACE] pdg_app/to_add_expression end " + trace_id + " " + str(time.time()))
         return redirect(
             url_for(
                 "to_add_symbols_and_operations_for_expression",
