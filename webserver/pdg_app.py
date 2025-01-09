@@ -241,6 +241,8 @@ import initialize_flask
 from initialize_flask import web_app
 
 
+import pdg_other_routes
+
 # the following import has to happen after web_app is configured because pdg_app uses graphDB_Driver
 import pdg_api
 
@@ -1061,7 +1063,7 @@ def main() -> werkzeug.Response:
 
     logger.info("[TRACE] pdg_app/main end " + trace_id + " " + str(time.time()))
     return render_template(
-        "property-graph/site_map.html",
+        "jinja2_pages/user_workflow/site_map.html",
         title="site map",
         query_time_dict=query_time_dict,
         number_of_derivations=number_of_derivations,
@@ -1218,7 +1220,7 @@ def to_add_derivation() -> werkzeug.Response:
         "[TRACE] pdg_app/to_add_derivation end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/derivation_create.html",
+        "jinja2_pages/user_workflow/derivation_create.html",
         query_time_dict=query_time_dict,
         form=web_form,
         list_of_derivation_dicts=list_of_derivation_dicts,
@@ -1491,7 +1493,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
         "[TRACE] pdg_app/to_review_derivation end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/derivation_review.html",
+        "jinja2_pages/user_workflow/derivation_review.html",
         query_time_dict=query_time_dict,
         derivation_dict=derivation_dict,
         derivation_graphviz_png_filename=derivation_graphviz_png_filename,
@@ -1554,7 +1556,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
         "[TRACE] pdg_app/to_select_step end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/derivation_select_step.html",
+        "jinja2_pages/user_workflow/derivation_select_step.html",
         derivation_dict=derivation_dict,
         list_of_step_dicts=list_of_step_dicts,
         all_steps=all_steps,
@@ -1644,7 +1646,7 @@ def to_edit_derivation_metadata(
         + str(time.time())
     )
     return render_template(
-        "property-graph/derivation_edit_metadata.html",
+        "jinja2_pages/user_workflow/derivation_edit_metadata.html",
         query_time_dict=query_time_dict,
         form=web_form,
         derivation_dict=derivation_dict,
@@ -1736,7 +1738,7 @@ def to_add_step_select_inference_rule(
         + str(time.time())
     )
     return render_template(
-        "property-graph/new_step_select_inference_rule.html",
+        "jinja2_pages/user_workflow/new_step_select_inference_rule.html",
         query_time_dict=query_time_dict,
         list_of_inference_rule_dicts=list_of_inference_rule_dicts,
         derivation_dict=derivation_dict,
@@ -1996,7 +1998,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         "[TRACE] pdg_app/to_edit_expression end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/expression_edit.html",
+        "jinja2_pages/user_workflow/expression_edit.html",
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
         form_new_expression=web_form_new_expression,
@@ -2233,7 +2235,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     logger.info("[TRACE] pdg_app/to_edit_feed end " + trace_id + " " + str(time.time()))
     return render_template(
-        "property-graph/feed_edit.html",
+        "jinja2_pages/user_workflow/feed_edit.html",
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
         form_new_feed=web_form_new_feed,
@@ -2427,7 +2429,7 @@ def to_add_expression() -> werkzeug.Response:
         "[TRACE] pdg_app/to_add_expression end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/expression_create.html",
+        "jinja2_pages/user_workflow/expression_create.html",
         query_time_dict=query_time_dict,
         form=web_form,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
@@ -2556,7 +2558,7 @@ def to_add_feed() -> werkzeug.Response:
 
     logger.info("[TRACE] pdg_app/to_add_feed end " + trace_id + " " + str(time.time()))
     return render_template(
-        "property-graph/feed_create.html",
+        "jinja2_pages/user_workflow/feed_create.html",
         query_time_dict=query_time_dict,
         form=web_form,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
@@ -2720,7 +2722,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
         "[TRACE] pdg_app/to_edit_operation end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_operation_edit.html",
+        "jinja2_pages/user_workflow/symbol_operation_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
         operation_dict=operation_dict,
@@ -2782,7 +2784,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
         "[TRACE] pdg_app/to_edit_relation end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_relation_edit.html",
+        "jinja2_pages/user_workflow/symbol_relation_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
         relation_dict=relation_dict,
@@ -2905,7 +2907,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
         "[TRACE] pdg_app/to_edit_scalar end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_scalar_edit.html",
+        "jinja2_pages/user_workflow/symbol_scalar_edit.html",
         query_time_dict=query_time_dict,
         form=web_form_symbol_properties,
         form_no_options=web_form_no_options,
@@ -2939,7 +2941,7 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
         "[TRACE] pdg_app/to_edit_vector end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_vector_edit.html",
+        "jinja2_pages/user_workflow/symbol_vector_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
         vector_dict=vector_dict,
@@ -2972,7 +2974,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
         "[TRACE] pdg_app/to_edit_matrix end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_matrix_edit.html",
+        "jinja2_pages/user_workflow/symbol_matrix_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
         matrix_dict=matrix_dict,
@@ -3117,7 +3119,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
         + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_scalar_constant_values_create.html",
+        "jinja2_pages/user_workflow/symbol_scalar_constant_values_create.html",
         query_time_dict=query_time_dict,
         form_constant_properties=web_form_constant_properties,
         scalar_dict=scalar_dict,
@@ -3267,7 +3269,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
         "[TRACE] pdg_app/to_add_symbol_scalar end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_scalar_create.html",
+        "jinja2_pages/user_workflow/symbol_scalar_create.html",
         query_time_dict=query_time_dict,
         form_scalar_properties=web_form_scalar_properties,
         list_of_scalar_dicts=list_of_scalar_dicts,
@@ -3377,7 +3379,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
         "[TRACE] pdg_app/to_add_symbol_vector end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_vector_create.html",
+        "jinja2_pages/user_workflow/symbol_vector_create.html",
         query_time_dict=query_time_dict,
         form_vector_properties=web_form_vector_properties,
         dict_of_expression_dicts_that_use_vector=dict_of_expression_dicts_that_use_vector,
@@ -3497,7 +3499,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
         "[TRACE] pdg_app/to_add_symbol_matrix end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_matrix_create.html",
+        "jinja2_pages/user_workflow/symbol_matrix_create.html",
         query_time_dict=query_time_dict,
         form_matrix_properties=web_form_matrix_properties,
         list_of_matrix_dicts=list_of_matrix_dicts,
@@ -4208,7 +4210,7 @@ def to_add_operation() -> werkzeug.Response:
         "[TRACE] pdg_app/to_add_operation end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_operation_create.html",
+        "jinja2_pages/user_workflow/symbol_operation_create.html",
         query_time_dict=query_time_dict,
         form_operation_properties=web_form,
         list_of_operation_dicts=list_of_operation_dicts,
@@ -4305,7 +4307,7 @@ def to_add_relation() -> werkzeug.Response:
         "[TRACE] pdg_app/to_add_relation end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_relation_create.html",
+        "jinja2_pages/user_workflow/symbol_relation_create.html",
         query_time_dict=query_time_dict,
         form_relation_properties=web_form,
         list_of_relation_dicts=list_of_relation_dicts,
@@ -4509,7 +4511,7 @@ def to_add_step_select_expressions(
         + str(time.time())
     )
     return render_template(
-        "property-graph/new_step_select_expressions_for_inference_rule.html",
+        "jinja2_pages/user_workflow/new_step_select_expressions_for_inference_rule.html",
         query_time_dict=query_time_dict,
         form=web_form,
         list_of_expression_IDs=list_of_expression_IDs,
@@ -4743,7 +4745,7 @@ def to_add_symbols_and_operations_for_expression(
         )
 
     return render_template(
-        "property-graph/expression_create_symbols_and_operations.html",
+        "jinja2_pages/user_workflow/expression_create_symbols_and_operations.html",
         query_time_dict=query_time_dict,
         form=web_form_no_options,
         expression_dict=expression_dict,
@@ -4943,7 +4945,7 @@ def to_add_sympy_and_lean_for_expression(
     web_form.sympy_str_rhs.data = revised_expr_rhs_with_str
 
     return render_template(
-        "property-graph/expression_create_sympy_and_lean.html",
+        "jinja2_pages/user_workflow/expression_create_sympy_and_lean.html",
         query_time_dict=query_time_dict,
         sympy_expr_lhs=sympy_expr_lhs,
         sympy_expr_rhs=sympy_expr_rhs,
@@ -5133,7 +5135,7 @@ def to_add_symbols_and_operations_for_feed(
         "[TRACE] pdg_app/to_add_symbols_and_operations_for_feed end " + trace_id
     )
     return render_template(
-        "property-graph/feed_create_symbols_and_operations.html",
+        "jinja2_pages/user_workflow/feed_create_symbols_and_operations.html",
         query_time_dict=query_time_dict,
         form=web_form_no_options,
         feed_dict=feed_dict,
@@ -5278,7 +5280,7 @@ def to_add_sympy_and_lean_for_feed(
         + str(time.time())
     )
     return render_template(
-        "property-graph/feed_create_sympy_and_lean.html",
+        "jinja2_pages/user_workflow/feed_create_sympy_and_lean.html",
         query_time_dict=query_time_dict,
         sympy_expr=sympy_expr,
         revised_expr=revised_expr,
@@ -5429,7 +5431,7 @@ def to_add_inference_rule() -> werkzeug.Response:
         "[TRACE] pdg_app/to_add_inference_rule end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/inference_rule_create.html",
+        "jinja2_pages/user_workflow/inference_rule_create.html",
         query_time_dict=query_time_dict,
         form=web_form,
         list_of_inference_rule_dicts=list_of_inference_rule_dicts,
@@ -5490,7 +5492,7 @@ def to_edit_step(
 
     logger.info("[TRACE] pdg_app/to_edit_step end " + trace_id + " " + str(time.time()))
     return render_template(
-        "property-graph/step_edit.html",
+        "jinja2_pages/user_workflow/step_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
         step_dict=this_step_dict,
@@ -5655,7 +5657,7 @@ def to_edit_inference_rule(
         + str(time.time())
     )
     return render_template(
-        "property-graph/inference_rule_edit.html",
+        "jinja2_pages/user_workflow/inference_rule_edit.html",
         query_time_dict=query_time_dict,
         form_edit=web_form_edit,
         form_delete=web_form_delete,
@@ -5886,7 +5888,7 @@ def to_query() -> werkzeug.Response:
 
     logger.info("[TRACE] pdg_app/to_query end " + trace_id + " " + str(time.time()))
     return render_template(
-        "property-graph/query.html",
+        "jinja2_pages/user_workflow/query.html",
         query_time_dict=query_time_dict,
         form=web_form,
         submitted_query=query,
@@ -5958,7 +5960,7 @@ def to_list_feeds() -> werkzeug.Response:
         "[TRACE] pdg_app/to_list_feeds end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/feed_list.html",
+        "jinja2_pages/user_workflow/feed_list.html",
         query_time_dict=query_time_dict,
         list_of_feed_dicts=list_of_feed_dicts,
         symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,
@@ -6011,7 +6013,7 @@ def to_list_operations() -> werkzeug.Response:
         "[TRACE] pdg_app/to_list_operations end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_operation_list.html",
+        "jinja2_pages/user_workflow/symbol_operation_list.html",
         query_time_dict=query_time_dict,
         list_of_operation_dicts=list_of_operation_dicts,
         dict_of_expression_dicts_that_use_operation=dict_of_expression_dicts_that_use_operation,
@@ -6062,7 +6064,7 @@ def to_list_relations() -> werkzeug.Response:
         "[TRACE] pdg_app/to_list_relations end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_relation_list.html",
+        "jinja2_pages/user_workflow/symbol_relation_list.html",
         query_time_dict=query_time_dict,
         list_of_relation_dicts=list_of_relation_dicts,
         dict_of_expression_dicts_that_use_relation=dict_of_expression_dicts_that_use_relation,
@@ -6109,7 +6111,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
         + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_scalar_constant_values_list.html",
+        "jinja2_pages/user_workflow/symbol_scalar_constant_values_list.html",
         query_time_dict=query_time_dict,
         list_of_value_dicts=list_of_value_dicts,
         scalar_dict=scalar_dict,
@@ -6175,7 +6177,7 @@ def to_edit_constant_value_and_units(
         + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_scalar_constant_values_edit.html",
+        "jinja2_pages/user_workflow/symbol_scalar_constant_values_edit.html",
         query_time_dict=query_time_dict,
         value_and_units_dict=value_and_units_dict,
         list_of_value_dicts=list_of_value_dicts,
@@ -6248,7 +6250,7 @@ def to_list_scalars() -> str:
         "[TRACE] pdg_app/to_list_scalars end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_scalar_list.html",
+        "jinja2_pages/user_workflow/symbol_scalar_list.html",
         query_time_dict=query_time_dict,
         list_of_scalar_dicts=list_of_scalar_dicts,
         dict_of_expression_dicts_that_use_scalar=dict_of_expression_dicts_that_use_scalar,
@@ -6298,7 +6300,7 @@ def to_list_vectors() -> str:
         "[TRACE] pdg_app/to_list_vectors end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_vector_list.html",
+        "jinja2_pages/user_workflow/symbol_vector_list.html",
         query_time_dict=query_time_dict,
         list_of_vector_dicts=list_of_vector_dicts,
         dict_of_expression_dicts_that_use_vector=dict_of_expression_dicts_that_use_vector,
@@ -6348,7 +6350,7 @@ def to_list_matrices() -> str:
         "[TRACE] pdg_app/to_list_matrices end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/symbol_matrix_list.html",
+        "jinja2_pages/user_workflow/symbol_matrix_list.html",
         query_time_dict=query_time_dict,
         list_of_matrix_dicts=list_of_matrix_dicts,
         dict_of_expression_dicts_that_use_matrix=dict_of_expression_dicts_that_use_matrix,
@@ -6446,7 +6448,7 @@ def to_list_expressions() -> str:
         "[TRACE] pdg_app/to_list_expressions end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/expression_list.html",
+        "jinja2_pages/user_workflow/expression_list.html",
         query_time_dict=query_time_dict,
         list_of_expression_dicts=list_of_expression_dicts,
         symbol_IDs_per_expression_id=symbol_IDs_per_expression_id,
@@ -6514,7 +6516,7 @@ def to_list_derivations() -> str:
         "[TRACE] pdg_app/to_list_derivations end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "property-graph/derivation_list.html",
+        "jinja2_pages/user_workflow/derivation_list.html",
         query_time_dict=query_time_dict,
         list_of_derivation_dicts=list_of_derivation_dicts,
         number_of_steps_per_derivation=number_of_steps_per_derivation,
@@ -6561,7 +6563,7 @@ def to_list_inference_rules() -> str:
         + str(time.time())
     )
     return render_template(
-        "property-graph/inference_rule_list.html",
+        "jinja2_pages/user_workflow/inference_rule_list.html",
         query_time_dict=query_time_dict,
         list_of_inference_rule_dicts=list_of_inference_rule_dicts,
         dict_of_derivations_used_per_inference_rule=dict_of_derivations_used_per_inference_rule,
@@ -6658,12 +6660,6 @@ def to_export_cypher() -> werkzeug.Response:
         "[TRACE] pdg_app/to_export_cypher end " + trace_id + " " + str(time.time())
     )
     return redirect(url_for("static", filename="dumping_grounds/pdg.cypher"))
-
-
-# exploration pages
-@web_app.route("/api_via_js")
-def to_api_via_js() -> str:
-    return render_template("exploration/api_js.html")
 
 
 # # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
