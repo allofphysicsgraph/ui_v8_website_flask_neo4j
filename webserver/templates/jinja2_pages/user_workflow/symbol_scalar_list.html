@@ -1,0 +1,113 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<P>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_scalar_list">main page</a>
+</P>
+
+<P>See also Wikipedia's <a href="https://en.wikipedia.org/wiki/Glossary_of_mathematical_symbols">list of symbols</a></P>
+
+<!--
+<P>All symbols:
+{ % for symbol_dict in list_of_symbol_dicts %}
+<UL>
+  <LI>{ { symbol_dict }}</LI>
+</UL>
+{ % endfor %}
+-->
+
+
+
+
+<fieldset>
+<legend>
+  <H2 id="scalar">There are {{ list_of_scalar_dicts|length }} Scalars, aka symbols of dimension 0</h2>
+</legend>
+
+<P>The symbol ID links to a page where you can edit the symbol<BR>
+
+<!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
+Case-insensitive dynamic search of latex as plain text: 
+<input type="text" id="latex_input" onkeyup="latex_filter()" placeholder="Search latex (plain text)" size="30">
+XOR
+<input type="text" id="name_input" onkeyup="name_filter()" placeholder="Search name and description (plain text)" size="30">
+
+<script>
+function latex_filter() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("latex_input");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("scalar_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1]; // latex column
+    console.log(td)
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+function name_filter() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("name_input");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("scalar_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td_name = tr[i].getElementsByTagName("td")[2]; // name column
+    td_desc = tr[i].getElementsByTagName("td")[2]; // name column
+    //console.log(td)
+    if (td_name) {
+      txtValue_name = td_name.textContent || td_name.innerText;
+      txtValue_desc = td_desc.textContent || td_desc.innerText;
+      if ((txtValue_name.toUpperCase().indexOf(filter) > -1) || 
+          (txtValue_desc.toUpperCase().indexOf(filter) > -1)) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
+
+
+{% include 'jinja2_pages/reusable_components/_table_of_symbols_scalar.html' %}
+
+
+</fieldset>
+
+
+<fieldset>
+<legend>
+  <H2 id="action">Actions for Scalar Symbols</h2>
+</legend>
+
+<P><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=list_symbols">add new scalar symbol</a>
+
+<!--
+  <P><a href="{ { url_for('to_add_symbol') }}?referrer=list_symbols">add new symbol</a> -- not clear which categorey; guide needed</P>
+-->
+</UL>
+
+
+
+</fieldset>
+
+
+
+
+{% endblock %}

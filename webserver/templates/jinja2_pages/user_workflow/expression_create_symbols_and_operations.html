@@ -1,0 +1,67 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<P>
+  Return to <a href="{{ url_for('main') }}?referrer=expression_create_symbols_and_operations">main page</a>
+</P>
+
+<P>list_of_potential_matching_symbols_from_sympy: {{ list_of_potential_matching_symbols_from_sympy }}
+
+<!--
+<P>potential_symbols_found_in_Latex_expression: { { potential_symbols_found_in_Latex_expression } }
+-->
+
+<fieldset>
+  <legend>
+    <H2>Specify Symbols and Operations for Latex expression</H2>
+  </legend>
+Associating expressions with symbols enables the validation of expressions and steps.
+
+<H3>\({{ expression_dict['latex_lhs'] }} {{ expression_dict['latex_relation'] }} {{ expression_dict['latex_rhs'] }}\)</H3>
+
+<H3>{{ expression_dict['latex_lhs'] }} 
+    {{ expression_dict['latex_relation'] }} 
+    {{ expression_dict['latex_rhs'] }}</H3>
+
+  <form method="post" action="">
+  {{ form.csrf_token }}
+
+<!--
+{ % for symbol_dict in list_of_symbol_dicts % }
+-->
+{% if potential_symbols_found_in_Latex_expression|length==0 %}
+<P>No matching symbols were identified. That's bad. See 
+<a href="{{ url_for('to_list_scalars') }}">list of scalars</a> or 
+<a href="{{ url_for('to_list_vectors') }}">list of vectors</a> or 
+<a href="{{ url_for('to_list_matrices') }}">list of matrices</a> to review what should have been detected.
+Or maybe symbol detection is having a bad day.
+
+{% else %}
+
+{% for symbol_dict in potential_symbols_found_in_Latex_expression %}
+<UL>
+  <LI><input type="checkbox" name="symbol_id_to_connect_to_expression-{{ loop.index }}" value="{{ symbol_dict['id'] }}_{{ symbol_dict['symbol_category'] }}">\({{ symbol_dict['latex'] }}\), aka {{ symbol_dict['latex'] }}<BR>{{ symbol_dict }}<BR>
+  TODO: used in which derivations?</LI>
+</UL>
+{% endfor %}
+  <P><input type="submit" name="submit_button" value="update expressions">
+
+{% endif %}
+
+  </form>
+
+</fieldset>
+
+
+<fieldset>
+  <legend>Actions</legend>
+<UL>
+  <LI><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=new_step_select_expressions_for_inference_rule">add new scalar</a></LI>
+  <LI><a href="{{ url_for('to_add_symbol_vector') }}?referrer=new_step_select_expressions_for_inference_rule">add new vector</a></LI>
+  <LI><a href="{{ url_for('to_add_symbol_matrix') }}?referrer=new_step_select_expressions_for_inference_rule">add new matrix</a></LI>
+  <LI><a href="{{ url_for('to_add_operation') }}?referrer=new_step_select_expressions_for_inference_rule">add new operation</a></LI>
+  <LI><a href="{{ url_for('to_add_relation') }}?referrer=new_step_select_expressions_for_inference_rule">add new relation</a></LI>
+</UL>
+
+</fieldset>
+{% endblock %}

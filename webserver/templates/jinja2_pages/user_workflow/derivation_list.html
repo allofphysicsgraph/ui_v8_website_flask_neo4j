@@ -1,0 +1,66 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<P>
+  Return to <a href="{{ url_for('main') }}?referrer=derivation_list">main page</a>
+</P>
+
+{% if list_of_derivation_dicts|length > 0 %}
+
+<fieldset>
+  <legend>
+    <H2>List of Derivations</h2>
+  </legend>
+
+
+  <P>To select a derivation click on a link in the table.
+
+  <P>To filter the table of derivations enter a derivation ID or string in the form field.<BR>
+
+<!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
+Case-insensitive dynamic search of latex as plain text: 
+<input type="text" id="derivation_input" onkeyup="select_derivation()" placeholder="Search name (plain text)" size="50">
+
+<script>
+function select_derivation() {
+  console.log('reached function')
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById('derivation_input');
+  filter = input.value.toUpperCase();
+  // 2023-12-17: below was previously for UL/LI but I switched to TR/TD since the derivations are a table.
+  tr = document.getElementById("derivation_table");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0]; // name column
+    console.log(td)
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
+  <P>The derivation ID below links to a page where you can review that derivation.
+
+  <P>{% include 'jinja2_pages/reusable_components/_table_of_derivations.html' %}
+
+</fieldset>
+
+{% endif %}
+
+<fieldset>
+  <legend>
+    <H2>Actions for Derivations</h2>
+  </legend>
+<a href="{{ url_for('to_add_derivation') }}?referrer=main">add new derivation</a>
+</fieldset>
+
+
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<P>
+  Return to <a href="{{ url_for('main') }}?referrer=symbol_relation_edit">main page</a>
+  or return to <a href="{{ url_for('to_list_scalars') }}?referrer=symbol_relation_edit">list of all relations</a>
+</P>
+
+<P>relation dict: {{ relation_dict }}
+
+<P>TODO: list of derivations that use this relation
+
+<fieldset>
+  <legend>
+    <H2>Edit relation</h2>
+  </legend>
+
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form.csrf_token }}
+    <P>
+      {{ form.relation_latex.label}}: {{ form.relation_latex(size=50, maxlength=1000, value=relation_dict['latex']) }} <BR/>
+      &nbsp;<BR/>
+      {{form.relation_name_latex.label }}: {{ form.relation_name_latex(size=50, maxlength=1000, value=relation_dict['name']) }}<BR/>
+      &nbsp;<BR/>
+      {{form.relation_description_latex.label }}: {{ form.relation_description_latex(size=50, maxlength=1000, value=relation_dict['description']) }}<BR/>
+      &nbsp;<BR/>
+
+      {{form.relation_reference_latex.label }}: {{ form.relation_reference_latex(size=50, maxlength=1000, value=relation_dict['reference']) }}<BR/>
+      &nbsp;<BR/>
+
+      <input type="submit" value="Edit relation">
+    </P>
+  </form>
+
+TODO: edit dimension
+
+</fieldset>
+
+<fieldset>
+  <legend>
+    <H2>Delete relation</H2>
+  </legend>
+
+<form method="post" action="" onsubmit="return checkForm(this);">
+  {{ form_no_options.csrf_token }}
+  <P>
+
+  <input type="submit" value="Delete relation">
+
+</form>
+</fieldset>
+
+
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<P>
+  Return to <a href="{{ url_for('main') }}?referrer=feed_create">main page</a>
+  or <a href="{{ url_for('to_list_feeds') }}?referrer=feed_create">list of feeds</a>.
+</P>
+
+<fieldset>
+  <legend>
+    <H2>Create new multi-symbol feed</H2>
+  </legend>
+
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form.csrf_token }}
+    <P>{{ form.feed_latex.label}} (<B>required</B>): 
+       {{ form.feed_latex(size=50, 
+                                maxlength=1000,
+                                id="input_latex", 
+                                onchange="onChangeFunction();") }} </P>
+
+    <P><input type="checkbox" 
+              id="display_input_latex" 
+              checked="" 
+              onchange="convert('input_latex',
+                                'display_input_latex', 
+                                'preview_input_latex',
+                                'output_input_latex')">
+       <small><label id="display_input_latex">Display style</label></small>
+       <input type="button" 
+              value="optional preview of TeX before submitting form" 
+              id="preview_input_latex" 
+              onclick="convert('input_latex',
+                               'display_input_latex', 
+                               'preview_input_latex',
+                               'output_input_latex')">
+              <br clear="all">
+        <div id="output_input_latex"></div>
+
+
+    <P><input type="submit" value="add multi-symbol feed">
+    </P>
+  </form>
+
+<fieldset>
+  <legend>actions</legend>
+<ul>
+  <LI><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=new_step_select_expressions_for_inference_rule">add new scalar</a></LI>
+  <LI><a href="{{ url_for('to_add_symbol_vector') }}?referrer=new_step_select_expressions_for_inference_rule">add new vector</a></LI>
+  <LI><a href="{{ url_for('to_add_symbol_matrix') }}?referrer=new_step_select_expressions_for_inference_rule">add new matrix</a></LI>
+  <LI><a href="{{ url_for('to_add_operation') }}?referrer=new_step_select_expressions_for_inference_rule">add new operation</a></LI>
+  <LI><a href="{{ url_for('to_add_relation') }}?referrer=new_step_select_expressions_for_inference_rule">add new relation</a></LI>
+</ul>
+</fieldset>
+
+</fieldset>
+xor
+<fieldset>
+  <legend>
+    <H2>Promote existing symbol to feed</H2>
+  </legend>
+
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form.csrf_token }}
+
+    <select name="symbol_select_id_to_add" class="selectpicker form-control" id="symbol_select">
+      {% for this_symbol_dict in list_of_nonoperation_symbol_dicts %}
+      <option value="{{ this_symbol_dict['id'] }}">{{ this_symbol_dict['id'] }}, {{ this_symbol_dict['latex'] }} </option>
+      {% endfor %}
+    </select>
+    <input type="submit" value="promote symbol to feed">
+
+  </form>
+</fieldset>
+
+
+TODO: as user is entering expression, filter the list of existing feeds
+
+{% include 'jinja2_pages/reusable_components/_table_of_feeds.html' %}
+
+<script>
+function select_expression() {
+  // Declare variables
+  var input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById('expression_input');
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("expression_UL");
+  li = ul.getElementsByTagName('li');
+
+  // Loop through all list items, and hide those who don't match the search query
+  for (i = 0; i < li.length; i++) {
+    a = li[i].getElementsByTagName("a")[0];
+    txtValue = a.textContent || a.innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
+</script>
+
+
+
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<P>
+  Return to <a href="{{ url_for('main') }}?referrer=derivation_review">main page</a> or 
+            <a href="{{ url_for('to_list_derivations') }}?referrer=derivation_review">list derivations</a>
+</P>
+
+<H2>Review {{ derivation_dict['name_latex'] }}</H2>
+
+<!--<P> Derivation dictionary: -->
+  <UL>
+    <LI>abstract: {{ derivation_dict['abstract_latex'] }}</LI>
+    <LI>reference: {{ derivation_dict['reference_latex'] }}</LI>
+</UL>
+<!--
+<P> all_steps: { { all_steps } } 
+-->
+
+<table border="1" id="derivation_steps_table" class="sortable">
+  <tr>
+    <th>step</th>
+    <th>inference rule</th>
+    <th>input</th>
+    <th>feed</th>
+    <th>output</th>
+    <th>validity (as per <a href="https://www.sympy.org/">SymPy</a>)</th>
+  </tr>
+  {% for step_id, step_dict in all_steps.items() %}
+  <tr>
+    <td>
+      <a href="{{ url_for('to_edit_step', derivation_id=derivation_dict['id'], step_id=step_id ) }}">
+        {{ step_dict['sequence index'] }}
+      </a>
+    </td><!-- step 0,1,2... -->
+    <td>
+      <UL>
+        <LI><a href="{{ url_for('to_edit_inference_rule', 
+          inference_rule_id=step_dict['inference rule dict']['id']) 
+             }}">ID: {{ step_dict['inference rule dict']['id']}}</a>; 
+                     {{ step_dict['inference rule dict']['name_latex'] }}</li>
+        <LI>number of inputs: {{ step_dict['inference rule dict']['number_of_inputs'] }};
+            feeds:            {{ step_dict['inference rule dict']['number_of_feeds'] }};
+            outputs:          {{ step_dict['inference rule dict']['number_of_outputs'] }}</LI>
+        <LI>{{ step_dict['inference rule dict']['latex'].replace('\r','\\\\r') }}</LI>
+      </ul>
+    </td> <!-- inference rule -->
+    <td>{% for m_dict in step_dict['list of input dicts'] %}
+      <OL>
+        <LI><a href="{{ url_for('to_edit_expression', expression_id=m_dict['id']) }}">{{m_dict['id']}}</a><BR>
+        \({{ m_dict['latex_lhs'] }}{{ m_dict['latex_relation'] }}{{ m_dict['latex_rhs'] }}\)</LI>
+      </OL>
+        {% endfor %}
+    </td>
+    <td>{% for m_dict in step_dict['list of feed dicts'] %}
+      <OL>
+        <LI><a href="{{ url_for('to_edit_feed', feed_id=m_dict['id']) }}">{{m_dict['id']}}</a><BR>
+        \({{ m_dict['latex'] }}\)</LI>
+      </OL>
+        {% endfor %}
+    </td>
+    <td>{% for m_dict in step_dict['list of output dicts'] %}
+      <OL>
+        <LI><a href="{{ url_for('to_edit_expression', expression_id=m_dict['id']) }}">{{m_dict['id']}}</a><BR>
+        \({{ m_dict['latex_lhs'] }}{{ m_dict['latex_relation'] }}{{ m_dict['latex_rhs'] }}\)</LI>
+      </OL>
+        {% endfor %}
+    </td>
+    <td>{{ derivation_step_validity_dict[step_id] }}</td> <!-- valid -->
+  </tr>
+  {% endfor %}
+</table>
+
+<P>
+  <a href="{{ url_for('static', filename=derivation_graphviz_png_filename) }}">
+    <img src="{{ url_for('static', filename=derivation_graphviz_png_filename) }}">
+  </a>
+
+<!-- See https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/14 
+<P>
+  <a href="{ { url_for('static', filename=derivation_graphviz_svg_filename) } }">
+    <img src="{ { url_for('static', filename=derivation_graphviz_svg_filename) } }">
+  </a>
+-->
+
+<!--
+<ul>
+{ % for this_step in list_of_steps % }
+<li>{ { this_step } }</li>
+{ % endfor % }
+</ul>
+-->
+<P>
+
+  <center>
+    <svg id='viz'></svg> <!-- uses JSON from json_for_d3js -->
+<BR/>
+Hold the mouse over a node to highlight that node and its neighbors. You can zoom in/out. You can pan the image. You can move nodes by clicking and dragging.
+  </center>
+
+<fieldset>
+<legend>
+  <H2>Actions: Edit Derivation</h2>
+</legend>
+
+<UL>
+<LI> <a href="{{ url_for('to_add_step_select_inference_rule', derivation_id=derivation_dict['id']) }}">add step to this derivation</a></LI>
+<!--
+the following two were removed because the user should click on step ID in table
+<LI> <a href="{ { url_for('to_select_step', derivation_id=derivation_dict['id']) } }">delete step from this derivation</a></LI>
+<LI> <a href="{ { url_for('to_select_step', derivation_id=derivation_dict['id']) } }">edit step in this derivation</a></LI>-->
+<LI> <a href="{{ url_for('to_edit_derivation_metadata', derivation_id=derivation_dict['id']) }}">rename this derivation</a></LI>
+<LI> <a href="{{ url_for('to_edit_derivation_metadata', derivation_id=derivation_dict['id']) }}">edit abstract for this derivation</a></LI>
+  </UL>
+
+</fieldset>
+
+<fieldset>
+  <legend>
+    <H2>Generate Tex file or PDF file</H2>
+  </legend>
+
+
+
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form_tex_pdf.csrf_token }}
+
+
+    <button type="submit" class="btn btn-default" name="submit_button" value="generate_tex">generate tex file</button>
+    &nbsp;&nbsp; xor &nbsp;&nbsp;
+    <button type="submit" class="btn btn-default" name="submit_button" value="generate_pdf">generate PDF file</button>
+  </form>
+</fieldset>
+
+
+<fieldset>
+  <legend>
+    <H2>Delete Derivation and all associated steps</H2>
+  </legend>
+<P>This does not remove expressions, symbols, and operations. 
+  <!--<form method="post" action="" onsubmit="return checkForm(this);">-->
+    <form method="post" action="">
+    {{ form_delete.csrf_token }}
+
+<!--    <button type="submit" class="btn btn-default" name="submit_button" value="delete derivation and steps">delete derivation and steps</button>-->
+
+<input type="submit" name="submit_button" value="delete derivation and steps">
+
+  </form>
+</fieldset>
+
+
+<!-- contains the reference to json_for_d3js -->
+{% include 'jinja2_pages/reusable_components/_d3_js.html' %} 
+
+{% endblock %}
