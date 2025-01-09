@@ -1,5 +1,9 @@
 symbol_categories = ["operation", "relation", "scalar", "vector", "matrix"]
 
+scalar_scope = ["real", "complex", "integer", "arbitrary"]
+
+scalar_domain = ["any", "positive", "negative", "non-negative"]
+
 node_types = [
     "derivation",
     "step",

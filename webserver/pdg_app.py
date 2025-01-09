@@ -89,7 +89,6 @@ import re
 # https://gist.github.com/ibeex/3257877
 from logging.handlers import RotatingFileHandler
 import neo4j
-from neo4j import GraphDatabase
 
 
 # https://hplgit.github.io/web4sciapps/doc/pub/._web4sa_flask004.html
@@ -159,13 +158,6 @@ import list_of_valid
 # ORDERING: this has to come before the functions that use this type
 from compute import unique_numeric_id_as_str, query_timing_result_type
 
-# unique_numeric_id_as_str = NewType("unique_numeric_id_as_str", str)
-
-# Database Credentials
-# "bolt" vs "neo4j" https://community.neo4j.com/t/different-between-neo4j-and-bolt/18498
-uri = "bolt://neo4j_docker:7687"
-# userName        = "neo4j"
-# password        = "test"
 
 # https://docs.python.org/3/howto/logging.html
 import logging
@@ -216,91 +208,38 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# ORDERING: must come after constrain_id_to_be_unique
-# Connect to the neo4j database server
-neo4j_available = False
-while not neo4j_available:
-    print("TRACE: started while loop")
-    try:
-        graphDB_Driver = GraphDatabase.driver(uri)
-        neo4j_available = True
-        time.sleep(1)
-    except ValueError:
-        print("waiting 5 seconds for neo4j connection")
-        time.sleep(5)
-
-try:
-    with graphDB_Driver.session() as session:
-        # NO TIMING NEEDED HERE
-        list_of_derivation_IDs = session.write_transaction(
-            neo4j_query.constrain_unique_id
-        )
-        if list_of_derivation_IDs:
-            number_of_derivations = len(list_of_derivation_IDs)
-        else:  # list_of_derivation_IDs was "None"
-            number_of_derivations = 0
-
-except neo4j.exceptions.ClientError as er:
-    print("Neo4j exception: " + str(er))
+import initialize_neo4j
+from initialize_neo4j import graphDB_Driver
 
 
-import importlib
+import initialize_version_log
 
-logger.info("python" + str(sys.version))
-logger.info(
-    "neo4j "
-    + str(importlib.metadata.version("neo4j"))
-    + " - https://pypi.org/project/neo4j/"
-)
-logger.info(
-    "flask "
-    + str(importlib.metadata.version("flask"))
-    + " - https://flask.palletsprojects.com/en/3.0.x/"
-)
-logger.info(
-    "secure "
-    + str(importlib.metadata.version("secure"))
-    + " - https://pypi.org/project/secure/"
-)
-logger.info(
-    "wtforms "
-    + str(importlib.metadata.version("wtforms"))
-    + " - https://wtforms.readthedocs.io/en/3.1.x/"
-)
-logger.info(
-    "werkzeug "
-    + str(importlib.metadata.version("werkzeug"))
-    + " - https://werkzeug.palletsprojects.com/en/3.0.x/"
-)
-logger.info(
-    "flask_wtf "
-    + str(importlib.metadata.version("flask_wtf"))
-    + " - https://flask-wtf.readthedocs.io/en/1.2.x/"
-)
+# class Config(object):
+#     """
+#     https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
+#     """
+
+#     SECRET_KEY = os.environ.get("SECRET_KEY")
 
 
-class Config(object):
-    """
-    https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
-    """
+# # ORDERING: this has to come before using the function wrapper
+# # ORDERING: this has to be after the class "Config" is specified
+# web_app = Flask(__name__, static_folder="static")
+# web_app.config.from_object(
+#     Config
+# )  # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
+# web_app.config["UPLOAD_FOLDER"] = (
+#     # the following folder on the host is accessible to both flask and neo4j
+#     "/scratch/dumping_grounds/"  # https://flask.palletsprojects.com/en/3.0.x/patterns/fileuploads/
+# )
+# web_app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
+#     0  # https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
+# )
+# web_app.config["DEBUG"] = True
 
-    SECRET_KEY = os.environ.get("SECRET_KEY")
+import initialize_flask
+from initialize_flask import web_app
 
-
-# ORDERING: this has to come before using the function wrapper
-# ORDERING: this has to be after the class "Config" is specified
-web_app = Flask(__name__, static_folder="static")
-web_app.config.from_object(
-    Config
-)  # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
-web_app.config["UPLOAD_FOLDER"] = (
-    # the following folder on the host is accessible to both flask and neo4j
-    "/scratch/dumping_grounds/"  # https://flask.palletsprojects.com/en/3.0.x/patterns/fileuploads/
-)
-web_app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
-    0  # https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
-)
-web_app.config["DEBUG"] = True
 
 # the following import has to happen after web_app is configured because pdg_app uses graphDB_Driver
 import pdg_api
@@ -565,14 +504,14 @@ class SpecifyNewSymbolScalarForm(FlaskForm):
     )
     scalar_reference_latex = StringField("reference")
 
+    list_of_scope_tuples = []
+    for this_domain in list_of_valid.scalar_scope:
+        tup = (this_domain, this_domain)
+        list_of_scope_tuples.append(tup)
+
     scalar_scope = RadioField(
         label="scope",
-        choices=[
-            ("real", "real"),
-            ("complex", "complex"),
-            ("integer", "integer"),
-            ("arbitrary", "arbitrary"),
-        ],
+        choices=list_of_scope_tuples,
         default="real",
         validators=[validators.InputRequired()],
     )
@@ -584,15 +523,15 @@ class SpecifyNewSymbolScalarForm(FlaskForm):
         validators=[validators.InputRequired()],
     )
 
+    list_of_domain_tuples = []
+    for this_domain in list_of_valid.scalar_domain:
+        tup = (this_domain, this_domain)
+        list_of_domain_tuples.append(tup)
+
     # domain = input; range = output
     scalar_domain = RadioField(
         label="domain",
-        choices=[
-            ("any", "any"),
-            ("positive", "positive"),
-            ("negative", "negative"),
-            ("non-negative", "non-negative"),
-        ],
+        choices=list_of_domain_tuples,
         default="any",
         validators=[validators.InputRequired()],
     )
@@ -1474,7 +1413,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                 + " "
                 + str(time.time())
             )
-            redirect(url_for("to_list_derivations"))
+            return redirect(url_for("to_list_derivations"))
         else:
             flash(
                 "pdg_app/to_review_derivation: unrecongized button in"
@@ -2474,7 +2413,9 @@ def to_add_expression() -> werkzeug.Response:
             )
 
         # after user provides latex for expression have them provide symbol count
-        logger.info("[TRACE] pdg_app/to_add_expression end " + trace_id + " " + str(time.time()))
+        logger.info(
+            "[TRACE] pdg_app/to_add_expression end " + trace_id + " " + str(time.time())
+        )
         return redirect(
             url_for(
                 "to_add_symbols_and_operations_for_expression",
@@ -4255,9 +4196,12 @@ def to_add_operation() -> werkzeug.Response:
                 operation_argument_count,
                 author_name_latex,
             )
-        print(
-            "[TRACE] pdg_app/to_add_operation end " + trace_id + " " + str(time.time())
-        )
+            print(
+                "[TRACE] pdg_app/to_add_operation end "
+                + trace_id
+                + " "
+                + str(time.time())
+            )
         return redirect(url_for("to_list_operations"))
 
     logger.info(
@@ -4349,9 +4293,12 @@ def to_add_relation() -> werkzeug.Response:
                 relation_reference_latex,
                 author_name_latex,
             )
-        print(
-            "[TRACE] pdg_app/to_add_relation end " + trace_id + " " + str(time.time())
-        )
+            print(
+                "[TRACE] pdg_app/to_add_relation end "
+                + trace_id
+                + " "
+                + str(time.time())
+            )
         return redirect(url_for("to_list_relations"))
 
     logger.info(
@@ -6580,7 +6527,7 @@ def to_list_inference_rules() -> str:
     >>> to_show_all_inference_rules()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] pdg_app/to_list_inference_rules start "
         + trace_id
         + " "
@@ -6607,7 +6554,7 @@ def to_list_inference_rules() -> str:
     for inference_rule_dict in list_of_inference_rule_dicts:
         print("pdg_app/to_list_inference_rules ", inference_rule_dict)
 
-    print(
+    logger.info(
         "[TRACE] pdg_app/to_list_inference_rules end "
         + trace_id
         + " "
@@ -6719,15 +6666,15 @@ def to_api_via_js() -> str:
     return render_template("exploration/api_js.html")
 
 
-# https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
-csrf = CSRFProtect()
+# # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
+# csrf = CSRFProtect()
 
-# https://secure.readthedocs.io/en/latest/frameworks.html#flask
-secure_headers = secure.Secure()
+# # https://secure.readthedocs.io/en/latest/frameworks.html#flask
+# secure_headers = secure.Secure()
 
 
-# https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
-csrf.init_app(web_app)
+# # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
+# csrf.init_app(web_app)
 
 
 # EOF
