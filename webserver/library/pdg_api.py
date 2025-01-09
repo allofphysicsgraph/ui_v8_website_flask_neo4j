@@ -13,6 +13,7 @@ http://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 
 import time
 import random
+import datetime
 
 from flask import Blueprint, flash, g, redirect, render_template, jsonify, request
 
@@ -24,13 +25,18 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# sys.path.append("library")
-
 import neo4j_query
+import compute
 from compute import query_timing_result_type
 
-# the following creates a circular dependency since `app.py` imports this file.
+# the following creates a circular dependency since `pdg_app.py` imports this file.
 from pdg_app import graphDB_Driver
+
+# a fix that BHP hasn't enacted would be to create a new file, `initialization.py`
+# which contains the creation of `graphDB_Driver`
+# Then both `pdg_app.py` and `pdg_api.py` could import that common variable.
+# Since this circular dependency isn't causing a problem as of 2025-01-09,
+# BHP is going to leave the circular dependency in place.
 
 # this works because app.py loads this file first
 
@@ -72,7 +78,7 @@ def api_list_derivations():
             "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
         ] = (time.time() - query_start_time)
 
-    print("[TRACE] pdg_api/api_list_derivations end " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_derivations end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -94,7 +100,7 @@ def api_list_inference_rules():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/api_list_inference_rules start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_inference_rules start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -102,12 +108,10 @@ def api_list_inference_rules():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "inference_rule"
         )
-        query_time_dict[
-            "pdg_api/: "
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/: "] = time.time() - query_start_time
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] pdg_api/api_list_inference_rules end " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_inference_rules end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -129,21 +133,18 @@ def api_list_operation_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/api_list_symbols start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_symbols start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
-
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "operation"
         )
-        query_time_dict[
-            "pdg_api/: "
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/: "] = time.time() - query_start_time
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] pdg_api/api_list_symbols end " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -154,7 +155,7 @@ def api_list_relation_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/api_list_relation_symbols start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_relation_symbols start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -162,12 +163,10 @@ def api_list_relation_symbols():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "relation"
         )
-        query_time_dict[
-            "pdg_api/: "
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/: "] = time.time() - query_start_time
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] pdg_api/api_list_relation_symbols end " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_relation_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -189,7 +188,7 @@ def api_list_scalar_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/api_list_symbols start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_symbols start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -197,12 +196,10 @@ def api_list_scalar_symbols():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "scalar"
         )
-        query_time_dict[
-            "pdg_api/: "
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/: "] = time.time() - query_start_time
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] pdg_api/api_list_symbols end " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -224,7 +221,7 @@ def api_list_vector_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/api_list_symbols start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_symbols start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -232,12 +229,10 @@ def api_list_vector_symbols():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "vector"
         )
-        query_time_dict[
-            "pdg_api/: "
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/: "] = time.time() - query_start_time
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] pdg_api/api_list_symbols end " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -259,7 +254,7 @@ def api_list_matrix_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/api_list_symbols start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_symbols start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -267,12 +262,10 @@ def api_list_matrix_symbols():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "matrix"
         )
-        query_time_dict[
-            "pdg_api/: "
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/: "] = time.time() - query_start_time
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] pdg_api/api_list_symbols end " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
@@ -291,7 +284,7 @@ def api_list_expressions():
     ]
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/api_list_expressions start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_expressions start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -299,26 +292,95 @@ def api_list_expressions():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "expression"
         )
-        query_time_dict[
-            "pdg_api/: "
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/: "] = time.time() - query_start_time
     print("list_of_dicts=", list_of_dicts)
 
-    print("[TRACE] pdg_api/api_list_expressions end " + trace_id)
+    logger.info("[TRACE] pdg_api/api_list_expressions end " + trace_id)
     return jsonify(list_of_dicts)
 
 
 @bp.route("/v1/resources/derivation/create", methods=["GET"])
 def api_create_derivation():
     """
-    curl -s http://localhost:5000/api/v1/resources/derivation/create
+    required inputs:
+    - derivation name as latex
+    - derivation reference as latex
+    - derivation abstract as latex
+    - author name
+
+
+    see `pdg_app/to_add_derivation` for the web UI implementation
+
+    curl -s http://localhost:5000/api/v1/resources/derivation/create?derivation_name_latex=hello\&derivation_reference_latex=this_is\&derivation_abstract_latex=mine
+
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_create_derivation start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
-    return
+    # TODO: reject input if derivation name is already in the database
+    list_of_derivation_dicts = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_derivation_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "derivation"
+        )
+        query_time_dict[
+            "pdg_api/api_create_derivation: get_list_node_dicts_of_type derivation"
+        ] = round(time.time() - query_start_time, 3)
+
+    print("list_of_derivation_dicts=", list_of_derivation_dicts)
+
+    derivation_name_latex = request.args.get("derivation_name_latex")
+    if derivation_name_latex:
+        print("derivation_name:" + str(derivation_name_latex))
+    else:
+        return jsonify({"ERROR": "need to provide derivation_name_latex"})
+
+    derivation_reference_latex = request.args.get("derivation_reference_latex")
+    if derivation_reference_latex:
+        print("derivation_reference_latex " + str(derivation_reference_latex))
+    else:
+        return jsonify({"ERROR": "need to provide derivation_reference_latex"})
+
+    derivation_abstract_latex = request.args.get("derivation_abstract_latex")
+    if derivation_abstract_latex:
+        print("derivation_abstract_latex " + str(derivation_abstract_latex))
+    else:
+        return jsonify({"ERROR": "need to provide derivation_abstract_latex"})
+
+    author_name_latex = "ben"
+
+    derivation_id, query_time_dict = compute.generate_random_id(
+        graphDB_Driver, query_time_dict, "derivation"
+    )
+    print("pdg_app/api_create_derivation: derivation_id=", derivation_id)
+
+    # as per https://strftime.org/
+    # %f = Microsecond as a decimal number, zero-padded on the left.
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
+    # https://neo4j.com/docs/python-manual/current/session-api/
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        session.write_transaction(
+            neo4j_query.add_derivation,
+            derivation_id,
+            now_str,
+            derivation_name_latex,
+            derivation_abstract_latex,
+            derivation_reference_latex,
+            author_name_latex,
+        )
+        query_time_dict["pdg_api/api_create_derivation: add_derivation"] = round(
+            time.time() - query_start_time, 3
+        )
+
+    return jsonify(
+        {"STATUS": "derivation " + str(derivation_name_latex) + " added successfully"}
+    )
+
 
 @bp.route("/v1/resources/expression/create", methods=["GET"])
 def api_create_expression():
@@ -327,12 +389,59 @@ def api_create_expression():
 
     user-provided dictionary is required to have latex and name
 
+    see `to_add_expression`
+
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE] pdg_api/ start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
+    expression_latex_lhs = request.args.get("expression_latex_lhs")
+    if expression_latex_lhs:
+        print("expression_latex_lhs =" + expression_latex_lhs)
+    else:
+        return jsonify({"ERROR": "need to provide expression_latex_lhs"})
+
+    expression_relation = request.args.get("")
+    if expression_relation:
+        print("expression_relation =" + expression_relation)
+    else:
+        return jsonify({"ERROR": "need to provide expression_relation"})
+
+    expression_latex_rhs = request.args.get("")
+    if expression_latex_rhs:
+        print("expression_latex_rhs =" + expression_latex_rhs)
+    else:
+        return jsonify({"ERROR": "need to provide expression_latex_rhs"})
+
+    expression_latex_condition = request.args.get("")
+    if expression_latex_condition:
+        print("expression_latex_condition =" + expression_latex_condition)
+
+    expression_name_latex = request.args.get("")
+    if expression_name_latex:
+        print("expression_name_latex =" + expression_name_latex)
+
+    expression_reference_latex = request.args.get("")
+    if expression_reference_latex:
+        print("expression_reference_latex =" + expression_reference_latex)
+
+    expression_description_latex = request.args.get("")
+    if expression_description_latex:
+        print("expression_description_latex =" + expression_description_latex)
+
+    list_of_expression_dicts = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_expression_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "expression"
+        )
+        query_time_dict["to_add_expression: list_nodes_of_type"] = round(
+            time.time() - query_start_time, 3
+        )
+
     return
+
 
 @bp.route("/v1/resources/symbol/scalar/create", methods=["GET"])
 def api_create_scalar_symbol():
@@ -341,10 +450,11 @@ def api_create_scalar_symbol():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE] pdg_api/ start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     return
+
 
 @bp.route("/v1/resources/symbol/vector/create", methods=["GET"])
 def api_create_vector_symbol():
@@ -353,10 +463,11 @@ def api_create_vector_symbol():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE] pdg_api/ start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     return
+
 
 @bp.route("/v1/resources/symbol/matrix/create", methods=["GET"])
 def api_create_matrix_symbol():
@@ -365,10 +476,11 @@ def api_create_matrix_symbol():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE] pdg_api/ start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     return
+
 
 @bp.route("/v1/resources/symbol/operation/create", methods=["GET"])
 def api_create_operation_symbol():
@@ -377,37 +489,38 @@ def api_create_operation_symbol():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE] pdg_api/ start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     return
+
 
 @bp.route("/v1/resources/symbol/relation/create", methods=["GET"])
 def api_create_relation_symbol():
     """
     curl -s http://localhost:5000/api/v1/resources/symbol/relation/create
 
-    >>> 
+    >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE] pdg_api/ start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     return
+
 
 @bp.route("/v1/resources/inference_rule/create", methods=["GET"])
 def api_create_inference_rule():
     """
     curl -s http://localhost:5000/api/v1/resources/inference_rule/create
 
-    >>> 
+    >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE] pdg_api/ start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     return
-
 
 
 @bp.route("/v1/resources/derivation/metadata", methods=["GET"])
@@ -424,7 +537,7 @@ def api_derivation_metadata():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/api_derivation_metadata start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_derivation_metadata start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     if "derivation_id" in request.args:
@@ -440,12 +553,10 @@ def api_derivation_metadata():
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
-        query_time_dict[
-            "pdg_api/: "
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/: "] = time.time() - query_start_time
     print("derivation_dict=", derivation_dict)
 
-    print("[TRACE] pdg_api/api_derivation_metadata end " + trace_id)
+    logger.info("[TRACE] pdg_api/api_derivation_metadata end " + trace_id)
     return jsonify(derivation_dict)
 
 
@@ -465,7 +576,7 @@ def api_derivation_steps():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/api_derivation_steps start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_derivation_steps start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     if "derivation_id" in request.args:
@@ -481,12 +592,10 @@ def api_derivation_steps():
         list_of_steps = session.read_transaction(
             neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
         )
-        query_time_dict[
-            "pdg_api/: "
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/: "] = time.time() - query_start_time
     print("list_of_steps=", list_of_steps)
 
-    print("[TRACE] pdg_api/api_derivation_steps end " + trace_id)
+    logger.info("[TRACE] pdg_api/api_derivation_steps end " + trace_id)
     return jsonify(list_of_steps)
 
 
@@ -496,7 +605,7 @@ def api_cypher_query():
     curl -s http://localhost:5000/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] pdg_api/api_cypher_query start " + trace_id)
+    logger.info("[TRACE] pdg_api/api_cypher_query start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     user_query = request.args.get("query")
@@ -524,7 +633,7 @@ def api_cypher_query():
             "use: curl -s http://localhost:5000/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\)"
         ]
 
-    print("[TRACE] pdg_api/api_cypher_query end " + trace_id)
+    logger.info("[TRACE] pdg_api/api_cypher_query end " + trace_id)
     return jsonify(list_of_records)
 
 
