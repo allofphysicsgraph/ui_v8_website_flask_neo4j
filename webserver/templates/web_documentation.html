@@ -1,0 +1,226 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<!-- this file was created using
+
+BHP used https://aistudio.google.com/ on 2025-01-09 with Gemini 2.0 Flash, all .py and .html files, and the following prompt:
+
+<<<PROMPT START>>>
+Document the public APIs and web interfaces exposed by the software, 
+including input/output formats and usage examples. Provide the answer 
+as a single HTML file.
+<<<PROMPT END>>>
+-->
+
+
+
+<h1>Physics Derivation Graph API & Interface Documentation</h1>
+
+
+<h3>Main Page with Site Map</h3>
+    <p><a href="http://localhost:5000">http://localhost:5000</a></p>
+    <p><I>Description:</I> A central hub page to navigate all the different functions of the software</p>
+
+<h3>Create a new derivation</h3>
+    <P><a href="http://localhost:5000/new_derivation">http://localhost:5000/new_derivation</a></P>
+    <p><I>Description:</I> Creates a new derivation by requesting:
+    <UL><LI> derivation name (latex)
+    <LI> derivation abstract (latex)
+    <LI> derivation reference (latex)
+    </UL>
+    </p>
+
+<h3>Review an existing derivation</h3>
+    <P><a href="http://localhost:5000/review_derivation/&lt;derivation_id&gt;">http://localhost:5000/review_derivation/&lt;derivation_id&gt;</a></P>
+    <p><I>Description:</I> View the details of an existing derivation (list of steps), and options to:
+       <UL><LI> add steps
+       <LI> delete steps
+       <LI> edit steps
+       <LI> delete the derivation and all its steps
+       <LI> generate PDF or TeX file.
+       </uL>
+    </p>
+
+<h3>Select a Step (for editing or deleting)</h3>
+    <P><a href="http://localhost:5000/select_step/&lt;derivation_id&gt;">http://localhost:5000/select_step/&lt;derivation_id&gt;</a></P>
+    <p><I>Description:</I> Provides a list of the steps within a specific derivation. Used for editing a specific step.</p>
+
+<h3>Edit Derivation Metadata</h3>
+    <P><a href="http://localhost:5000/edit_derivation_metadata/&lt;derivation_id&gt;">http://localhost:5000/edit_derivation_metadata/&lt;derivation_id&gt;</a></P>
+     <p><I>Description:</I> Modifies derivation metadata, such as the name and abstract.</p>
+
+<h3>New step: select the inference rule</h3>
+    <P><a href="http://localhost:5000/new_step_select_inference_rule/&lt;derivation_id&gt;">http://localhost:5000/new_step_select_inference_rule/&lt;derivation_id&gt;</a></P>
+    <p><I>Description:</I>  Specifies which inference rule is used when inserting a new step in a derivation.</p>
+
+<h3>Edit Expression</h3>
+    <P><a href="http://localhost:5000/edit_expression/&lt;expression_id&gt;">http://localhost:5000/edit_expression/&lt;expression_id&gt;</a></P>
+    <p><I>Description:</I>  Modifies an expression, including assigning symbols to it or deleting it.</p>
+
+<h3>Edit Feed</h3>
+    <P><a href="http://localhost:5000/edit_feed/&lt;feed_id&gt;">http://localhost:5000/edit_feed/&lt;feed_id&gt;</a></P>
+    <p><I>Description:</I>  Modifies a feed, including assigning symbols to it or deleting it.</p>
+
+<h3>New Expression</h3>
+    <P><a href="http://localhost:5000/new_expression/">http://localhost:5000/new_expression/</a></P>
+    <p><I>Description:</I>  Creates a new expression, allowing to specify the LHS, RHS, relation, and name.
+    </p>
+
+    <h3>New Feed</h3>
+    <P><a href="http://localhost:5000/new_feed/">http://localhost:5000/new_feed/</a></P>
+    <p><I>Description:</I>  Creates a new feed.
+    </p>
+
+<h3>Edit Node</h3>
+    <P><a href="http://localhost:5000/edit_node/&lt;node_id&gt;">http://localhost:5000/edit_node/&lt;node_id&gt;</a></P>
+    <p><I>Description:</I> A gateway for editing a node, which redirects to the appropriate sub-page depending on the node type (e.g., a scalar, matrix, vector).
+   </p>
+
+<h3>Edit Operation</h3>
+     <P><a href="http://localhost:5000/edit_operation/&lt;operation_id&gt;">http://localhost:5000/edit_operation/&lt;operation_id&gt;</a></P>
+      <p><I>Description:</I> Edit an operation symbol.
+     </p>
+
+<h3>Edit Relation</h3>
+     <P><a href="http://localhost:5000/edit_relation/&lt;relation_id&gt;">http://localhost:5000/edit_relation/&lt;relation_id&gt;</a></P>
+      <p><I>Description:</I> Edit a relation symbol.
+     </p>
+
+<h3>Edit Scalar</h3>
+     <P><a href="http://localhost:5000/edit_scalar/&lt;scalar_id&gt;">http://localhost:5000/edit_scalar/&lt;scalar_id&gt;</a></P>
+     <p><I>Description:</I> Edit a scalar symbol.
+     </p>
+
+<h3>Edit Vector</h3>
+     <P><a href="http://localhost:5000/edit_vector/&lt;vector_id&gt;">http://localhost:5000/edit_vector/&lt;vector_id&gt;</a></P>
+    <p><I>Description:</I> Edit a vector symbol.
+    </p>
+
+<h3>Edit Matrix</h3>
+     <P><a href="http://localhost:5000/edit_matrix/&lt;matrix_id&gt;">http://localhost:5000/edit_matrix/&lt;matrix_id&gt;</a></P>
+      <p><I>Description:</I> Edit a matrix symbol.
+     </p>
+
+<h3>New scalar value and unit</h3>
+    <P><a href="http://localhost:5000/new_symbol_scalar_constant_value_and_units/&lt;scalar_id&gt;/">http://localhost:5000/new_symbol_scalar_constant_value_and_units/&lt;scalar_id&gt;/</a></P>
+     <p><I>Description:</I>  Specifies the units and value for constant scalar symbols.
+   </p>
+
+<h3>New scalar symbol</h3>
+    <P><a href="http://localhost:5000/new_symbol_scalar/">http://localhost:5000/new_symbol_scalar/</a></P>
+     <p><I>Description:</I>  Creates a scalar symbol, optionally adding a value to it.
+   </p>
+
+   <h3>New Vector symbol</h3>
+   <P><a href="http://localhost:5000/new_symbol_vector/">http://localhost:5000/new_symbol_vector/</a></P>
+   <p><I>Description:</I>  Creates a vector symbol.
+  </p>
+
+    <h3>New Matrix symbol</h3>
+   <P><a href="http://localhost:5000/new_symbol_matrix/">http://localhost:5000/new_symbol_matrix/</a></P>
+   <p><I>Description:</I>  Creates a matrix symbol.
+  </p>
+
+    <h3>New operation symbol</h3>
+      <P><a href="http://localhost:5000/new_operation/">http://localhost:5000/new_operation/</a></P>
+      <p><I>Description:</I> Creates a new operation symbol, for use in expressions.
+      </p>
+
+      <h3>New relation symbol</h3>
+        <P><a href="http://localhost:5000/new_relation/">http://localhost:5000/new_relation/</a></P>
+        <p><I>Description:</I> Creates a new relation symbol, for use in expressions.
+        </p>
+
+
+<h3>New step: select expressions</h3>
+     <P><a href="http://localhost:5000/new_step_expressions/&lt;derivation_id&gt;/&lt;inference_rule_id&gt;">http://localhost:5000/new_step_expressions/&lt;derivation_id&gt;/&lt;inference_rule_id&gt;</a></P>
+      <p><I>Description:</I>  Specifies which expressions and feeds are used when inserting a new step into a derivation.
+     </p>
+
+<h3>Symbols and Operations in an Expression</h3>
+     <P><a href="http://localhost:5000/symbols_and_operations_for_expression/&lt;expression_id&gt;">http://localhost:5000/symbols_and_operations_for_expression/&lt;expression_id&gt;</a></P>
+      <p><I>Description:</I> Specifies which symbols are used by an expression.
+     </p>
+
+ <h3>Sympy and Lean strings for an Expression</h3>
+     <P><a href="http://localhost:5000/sympy_and_latex_for_expression/&lt;expression_id&gt;/&lt;symbol_id_dict&gt;">http://localhost:5000/sympy_and_latex_for_expression/&lt;expression_id&gt;/&lt;symbol_id_dict&gt;</a></P>
+     <p><I>Description:</I> Provides a form to edit the SymPy and Lean representations of an expression.
+      </p>
+
+<h3>Symbols and Operations in a feed</h3>
+    <P><a href="http://localhost:5000/symbols_and_operations_for_feed/&lt;feed_id&gt;">http://localhost:5000/symbols_and_operations_for_feed/&lt;feed_id&gt;</a></P>
+    <p><I>Description:</I> Specifies which symbols are used by a feed.
+    </p>
+
+<h3>Sympy and Lean strings for a feed</h3>
+    <P><a href="http://localhost:5000/sympy_and_latex_for_feed/&lt;feed_id&gt;/&lt;symbol_id_dict&gt;">http://localhost:5000/sympy_and_latex_for_feed/&lt;feed_id&gt;/&lt;symbol_id_dict&gt;</a></P>
+    <p><I>Description:</I> Provides a form to edit the SymPy and Lean representations of a feed.
+     </p>
+
+<h3>List of Derivations</h3>
+    <P><a href="http://localhost:5000/list_derivations">http://localhost:5000/list_derivations</a></P>
+     <p><I>Description:</I> Shows a list of all derivations.</p>
+<h3>List of Inference Rules</h3>
+    <P><a href="http://localhost:5000/list_inference_rules">http://localhost:5000/list_inference_rules</a></P>
+    <p><I>Description:</I> Shows a list of all inference rules.
+   </p>
+<h3>List of Expressions</h3>
+    <P><a href="http://localhost:5000/list_expressions">http://localhost:5000/list_expressions</a></P>
+    <p><I>Description:</I> Shows a list of all expressions.
+    </p>
+ <h3>List of Feeds</h3>
+   <P><a href="http://localhost:5000/list_feeds">http://localhost:5000/list_feeds</a></P>
+   <p><I>Description:</I> Shows a list of all feeds.
+   </p>
+
+<h3>List of Operations</h3>
+    <P><a href="http://localhost:5000/list_operations">http://localhost:5000/list_operations</a></P>
+     <p><I>Description:</I> Shows a list of all operations.</p>
+
+<h3>List of Relations</h3>
+    <P><a href="http://localhost:5000/list_relations">http://localhost:5000/list_relations</a></P>
+     <p><I>Description:</I> Shows a list of all relation symbols.</p>
+
+<h3>List of Scalars</h3>
+  <P><a href="http://localhost:5000/list_scalars">http://localhost:5000/list_scalars</a></P>
+   <p><I>Description:</I> Shows a list of all scalar symbols.
+   </p>
+
+<h3>List of Vectors</h3>
+ <P><a href="http://localhost:5000/list_vectors">http://localhost:5000/list_vectors</a></P>
+  <p><I>Description:</I> Shows a list of all vector symbols.
+   </p>
+
+<h3>List of Matrices</h3>
+ <P><a href="http://localhost:5000/list_matrices">http://localhost:5000/list_matrices</a></P>
+  <p><I>Description:</I> Shows a list of all matrix symbols.
+   </p>
+
+<h3>List of all constant values for a scalar</h3>
+  <P><a href="http://localhost:5000/new_symbol_scalar_constant_value_and_units/&lt;scalar_id&gt;/">http://localhost:5000/new_symbol_scalar_constant_value_and_units/&lt;scalar_id&gt;/</a></P>
+  <p><I>Description:</I> View and edit value associated with a particular scalar</p>
+
+<h3>View a Cypher file</h3>
+  <P><a href="http://localhost:5000/view_cypher/">http://localhost:5000/view_cypher/</a></P>
+  <p><I>Description:</I> View the most recent database export in Cypher format.</p>
+
+<h3>Query Neo4j via Cypher</h3>
+<P><a href="http://localhost:5000/query">http://localhost:5000/query</a></P>
+<p><I>Description:</I> An interface for running Cypher queries, either from the user or pre-defined. Provides some help and links for creating a Cypher query.</p>
+
+<h3>API documenation</h3>
+<P><a href="http://localhost:5000/api_documentation">http://localhost:5000/api_documentation</a></P>
+<p><I>Description:</I> A list of all available API routes and the corresponding data formats.</p>
+
+<h3>Delete All Content</h3>
+<P><a href="http://localhost:5000/delete_all">http://localhost:5000/delete_all</a></P>
+ <p><I>Description:</I> A button for deletion of all database content, not just the derivations.
+</p>
+
+<h3>API via Javascript</h3>
+  <P><a href="http://localhost:5000/api_via_js">http://localhost:5000/api_via_js</a></P>
+  <p><I>Description:</I> Demonstrates how to use the APIs from Javascript</p>
+
+
+{% endblock %}
+

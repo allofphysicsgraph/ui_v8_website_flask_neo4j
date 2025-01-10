@@ -1,12 +1,17 @@
-The Physics Derivation Graph focuses on the following:
-- Claim: a directed graph exists which describes all of mathematical Physics.
-- Claim: the graph representation is machine parsable
+The Physics Derivation Graph is web server for building, managing, and exploring mathematical derivations in physics (and potentially other fields). Knowledge management software tailored for structured mathematical reasoning.
 
-This repo contains a new web UI (still using flask) and a new backend -- Neo4j. The previous version that is currently used for <https://allofphysics.com/> is <https://github.com/allofphysicsgraph/ui_v7_website_flask_json>
+The Physics Derivation Graph combines a user-friendly interface with rigorous mathematical capabilities. The intended audience includes physicists, mathematicians, and other researchers who need to create, manage, and validate derivations.
+
+
+The Physics Derivation Graph supports investigation of the following claims:
+- Claim: a directed graph exists which describes all of mathematical Physics.
+- Claim: the graph representation is machine parsable.
+
+This repo contains a new web interface and a new API and a new backend -- Neo4j property graph. The previous version that is currently used for <https://allofphysics.com/> is <https://github.com/allofphysicsgraph/ui_v7_website_flask_json>
 
 # Status
 
-The website and back-end work locally. The docker images in this repo are not currently in use for <https://allofphysics.com/>
+The website and back-end work. The Docker images are not currently in use for <https://allofphysics.com/>
 
 # Quickstart
 
@@ -23,10 +28,10 @@ Because software is in Docker containers (for reproducibility), the versions of 
 * `docker --version` yeilds "Docker Engine release 20.10.11"
 See <https://docs.docker.com/compose/compose-file/compose-versioning/> for compatibility of versions.
 
-# Project contents
-Two containers: Neo4j (port 7474) and a Flask-based Python web server (port 5000)
+## Project contents
+Two containers managed using docker compose: Neo4j (port 7474) and a Flask-based Python web server (port 5000)
 
-# Neo4j for newbies
+## Neo4j for newbies
 
 A graph has "nodes" and "edges". A property graph extends that
 data structure to allow "properties" for both the nodes and the edges.
@@ -39,6 +44,12 @@ where the key-value pairs are properties.
 
 "Node labels, relationship types, and properties (the key part) are case sensitive." [citation](https://neo4j.com/docs/getting-started/current/appendix/graphdb-concepts/)
 
+# Goals
+
+[x] Document Derivations. Provide a structured way to represent mathematical derivations by breaking them into steps, expressions, and symbols.
+[x] Facilitate Collaboration and Sharing by using open source and publicly accessible information.
+[x] Enable programmatic interaction with the data using both a web interface and API.
+
 # Licensing
 
 The content of this repo is covered by the 
@@ -49,6 +60,15 @@ The content of this repo is covered by the
 
 * Docker
 * a web browser
+
+## Key features
+
+The Docker images include the software needed for the webserver (Python Flask) and everything else 
+* Latex for rendering equations as PNG and PDF
+* SymPy for validating steps in derivations
+* TODO: Lean
+* Graphviz for static visualization of graphs
+* d3js for interactive visualizations of graphs
 
 # Contributing
 
