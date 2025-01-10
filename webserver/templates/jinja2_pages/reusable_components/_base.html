@@ -40,12 +40,15 @@
 
   {% endblock %}
 
+<!-- https://stackoverflow.com/a/3842745/1164295 -->
+{% if query_time_dict is defined %}
 <P>timing of Neo4j queries:</P>
   <UL>
   {% for what_is_being_timed,duration_in_seconds in query_time_dict.items() %}
   <LI>{{ duration_in_seconds }} seconds for <code>{{ what_is_being_timed }}</code></LI>
   {% endfor %}
 </UL>
+{% endif %}
 
   
 {% include 'jinja2_pages/reusable_components/_footer.html' %}
