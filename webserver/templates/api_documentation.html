@@ -1,253 +1,508 @@
-
-{% extends "_base.html" %}
+{% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
 <!-- this file was created using
 cat library/pdg_api.py  | grep route | sed 's/@bp\.route("\///g' | sed 's/", methods=\[\(.*\)\]/\1/g' | sort
+
+Also, BHP used https://aistudio.google.com/ on 2025-01-09 with Gemini 2.0 Flash and the following prompt:
+
+<<<PROMPT START>>>
+The following is a set of API endpoints for Flask. Please create documentation for the API user. The user will be calling the API using curl. Write the documentation for the API using HTML syntax as a single webpage. Assume the reader is familiar with curl.
+```python
+(file contents of pdg_api.py, which was 21,459 tokens)
+```
+<<<PROMPT END>>>
 -->
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/do_nothing">http://localhost:5000/api/v1/resources/do_nothing</a></H3>
-<P>Returns nothing</P>
-<P>Required parameters: None</P>
-<P>Optional parameters: None</P>
+
+    <h1>Physics Derivation Graph API Documentation</h1>
+
+    <p>This document provides information on how to use the Physics Derivation Graph API using <code>curl</code>. All API endpoints are prefixed with <code>/api</code>. </p>
+
+    <h2>API Endpoints: GET</h2>
+
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/do_nothing">http://localhost:5000/api/v1/resources/do_nothing</a></h3>
+    <p>
+        This endpoint does nothing. It can be used to test if the API is running.
+    </p>
+    <p>
+        Example usage to use session cookies:
+    </p>
+    <pre><code>
+        curl --head -c cookies.txt http://localhost:5000/api/v1/resources/do_nothing
+        curl -b cookies.txt http://localhost:5000/api/v1/resources/derivation/create
+    </code></pre>
 
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/cypher/">http://localhost:5000/api/v1/resources/cypher/</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: Cypher query text</P>
-<P><B>Example</B>: <code>curl -s http://localhost:5000/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool</code></P>
-<P>Optional parameters: None</P>
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/register_csrf">http://localhost:5000/api/v1/resources/register_csrf</a></h3>
+     <p>This endpoint generates a CSRF token. However, CSRF is disabled for the API endpoints. This endpoint should not be necessary for API use, see <a href="https://www.google.com/search?q=how+flask+json+api+authentication+works">here</a> for API authentication.</p>
+
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/register_csrf | python3 -m json.tool</code></pre>
+    <p>Response:</p>
+    <pre><code>
+    {
+        "csrf token": "some token"
+    }
+    </code></pre>
+
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/derivation/list">http://localhost:5000/api/v1/resources/derivation/list</a></h3>
+    <p>This endpoint retrieves a list of all derivations.</p>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/derivation/list | python3 -m json.tool</code></pre>
+    <p>Response:</p>
+    <pre><code>
+    [
+        {
+            "abstract_latex": "my summary",
+            "author_name_latex": "ben",
+            "created_datetime": "2024-05-19_21-16-29-085813",
+            "id": "3445848",
+            "name_latex": "this is a new derivation"
+        }
+    ]
+    </code></pre>
+
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/inference_rule/list">http://localhost:5000/api/v1/resources/inference_rule/list</a></h3>
+    <p>This endpoint retrieves a list of all inference rules.</p>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/inference_rule/list | python3 -m json.tool</code></pre>
+    <p>Response:</p>
+    <pre><code>
+    [
+        {
+            "author_name_latex": "ben",
+            "id": "7681529",
+            "latex": "ADD _ to BOTH sides",
+            "name_latex": "add x to both sides",
+            "number_of_feeds": 1,
+            "number_of_inputs": 1,
+            "number_of_outputs": 1
+        }
+    ]
+    </code></pre>
+
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/symbol/operation/list">http://localhost:5000/api/v1/resources/symbol/operation/list</a></h3>
+    <p>This endpoint retrieves a list of all operation symbols.</p>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/operation/list | python3 -m json.tool</code></pre>
+    <p>Response:</p>
+    <pre><code>
+    [
+        {
+            "argument_count": 2,
+            "author_name_latex": "ben",
+            "description_latex": "",
+            "id": "7052411",
+            "latex": "=",
+            "name_latex": "equals",
+            "requires_arguments": true
+        }
+    ]
+    </code></pre>
+
+   <h3>GET <a href="http://localhost:5000/api/v1/resources/symbol/relation/list">http://localhost:5000/api/v1/resources/symbol/relation/list</a></h3>
+    <p>This endpoint retrieves a list of all relation symbols.</p>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/relation/list | python3 -m json.tool</code></pre>
+    <p>Response:</p>
+    <pre><code>
+    [
+        {
+            "author_name_latex": "ben",
+            "description_latex": "...",
+            "id": "7052411",
+            "latex": "=",
+            "name_latex": "equals",
+        }
+    ]
+    </code></pre>
+
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/symbol/scalar/list">http://localhost:5000/api/v1/resources/symbol/scalar/list</a></h3>
+    <p>This endpoint retrieves a list of all scalar symbols.</p>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/scalar/list | python3 -m json.tool</code></pre>
+    <p>Response:</p>
+    <pre><code>
+    [
+        {
+            "argument_count": 2,
+            "author_name_latex": "ben",
+            "description_latex": "",
+            "id": "7052411",
+            "latex": "=",
+            "name_latex": "equals",
+            "requires_arguments": true
+        }
+    ]
+    </code></pre>
+
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/symbol/vector/list">http://localhost:5000/api/v1/resources/symbol/vector/list</a></h3>
+    <p>This endpoint retrieves a list of all vector symbols.</p>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/vector/list | python3 -m json.tool</code></pre>
+    <p>Response:</p>
+    <pre><code>
+    [
+        {
+            "argument_count": 2,
+            "author_name_latex": "ben",
+            "description_latex": "",
+            "id": "7052411",
+            "latex": "=",
+            "name_latex": "equals",
+            "requires_arguments": true
+        }
+    ]
+    </code></pre>
 
 
-<H3>POST <a href="http://localhost:5000/api/v1/resources/derivation/create">http://localhost:5000/api/v1/resources/derivation/create</a></H3>
-<P>Returns JSON of status</P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/symbol/matrix/list">http://localhost:5000/api/v1/resources/symbol/matrix/list</a></h3>
+    <p>This endpoint retrieves a list of all matrix symbols.</p>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/matrix/list | python3 -m json.tool</code></pre>
+    <p>Response:</p>
+    <pre><code>
+    [
+        {
+            "argument_count": 2,
+            "author_name_latex": "ben",
+            "description_latex": "",
+            "id": "7052411",
+            "latex": "=",
+            "name_latex": "equals",
+            "requires_arguments": true
+        }
+    ]
+    </code></pre>
 
-<H3>POST <a href="http://localhost:5000/api/v1/resources/derivation/delete">http://localhost:5000/api/v1/resources/derivation/delete</a></H3>
-<P>Returns JSON of status</P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/derivation/list">http://localhost:5000/api/v1/resources/derivation/list</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/expression/list">http://localhost:5000/api/v1/resources/expression/list</a></h3>
+    <p>This endpoint retrieves a list of all expressions.</p>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/expression/list | python3 -m json.tool</code></pre>
+     <p>Response:</p>
+    <pre><code>
+    [
+        {
+            "author_name_latex": "ben",
+            "description_latex": "",
+            "id": "1852486",
+            "latex": "a+b=2",
+            "name_latex": ""
+        },
+    ]
+    </code></pre>
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/derivation/metadata">http://localhost:5000/api/v1/resources/derivation/metadata</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/derivation/metadata">http://localhost:5000/api/v1/resources/derivation/metadata</a></h3>
+    <p>This endpoint retrieves the metadata of a specified derivation.</p>
+     <p>Required parameter:</p>
+      <ul>
+        <li><code>derivation_id</code>: The ID of the derivation to retrieve.</li>
+      </ul>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/derivation/metadata?derivation_id=3445848 | python3 -m json.tool</code></pre>
+    <p>Response:</p>
+    <pre><code>
+    {
+        "abstract_latex": "my summary",
+        "author_name_latex": "ben",
+        "created_datetime": "2024-05-19_21-16-29-085813",
+        "id": "3445848",
+        "name_latex": "this is a new derivation"
+    }
+    </code></pre>
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/derivation/step/list">http://localhost:5000/api/v1/resources/derivation/step/list</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/derivation/step/list">http://localhost:5000/api/v1/resources/derivation/step/list</a></h3>
+    <p>This endpoint retrieves a list of steps in a specified derivation.</p>
+    <p>Required parameter:</p>
+      <ul>
+        <li><code>derivation_id</code>: The ID of the derivation whose steps to retrieve.</li>
+      </ul>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/derivation/step/list?derivation_id=3445848 | python3 -m json.tool</code></pre>
+     <p>Response:</p>
+    <pre><code>
+    [
+        {
+            "author_name_latex": "benno",
+            "created_datetime": "2024-05-19_23-23-11-337900",
+            "id": "1800596",
+            "note_after_step_latex": "",
+            "note_before_step_latex": ""
+        }
+    ]
+    </code></pre>
+    <h3>GET <a href="http://localhost:5000/api/v1/resources/cypher/">http://localhost:5000/api/v1/resources/cypher/</a></h3>
+        <p>This endpoint allows users to send arbitrary Cypher queries. Use this endpoint with caution.</p>
+    <p>Required parameter:</p>
+      <ul>
+        <li><code>query</code>: The Cypher query to run.</li>
+      </ul>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool</code></pre>
 
-<H3>POST <a href="http://localhost:5000/api/v1/resources/expression/create">http://localhost:5000/api/v1/resources/expression/create</a></H3>
-<P>Returns JSON of status</P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
 
-<H3>POST <a href="http://localhost:5000/api/v1/resources/expression/delete">http://localhost:5000/api/v1/resources/expression/delete</a></H3>
-<P>Returns JSON of status</P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+    <h3>POST <a href="http://localhost:5000/api/v1/resources/derivation/create">http://localhost:5000/api/v1/resources/derivation/create</a></h3>
+    <p>This endpoint creates a new derivation.</p>
+     <p>Required parameters:</p>
+        <ul>
+            <li><code>derivation_name_latex</code>: Name of the derivation in LaTeX format.</li>
+            <li><code>derivation_abstract_latex</code>: Abstract of the derivation in LaTeX format.</li>
+        </ul>
+    <p>Optional parameters:</p>
+        <ul>
+             <li><code>derivation_reference_latex</code>: A reference for the derivation in LaTeX format.</li>
+        </ul>
+    <p>Example usage (x-www-form-urlencoded):</p>
+    <pre><code>
+    curl --request POST \
+    --header "Content-Type: application/x-www-form-urlencoded" \
+    --show-error --silent \
+     http://localhost:5000/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
+    </code></pre>
+    <p>Example usage (application/json):</p>
+    <pre><code>
+    curl --request POST \
+    --header "Content-Type: application/json" \
+    --show-error --silent \
+    --data '{"derivation_name_latex":"hello again", "derivation_reference_latex":"this was", "derivation_abstract_latex": "yes no"}' \
+     http://localhost:5000/api/v1/resources/derivation/create
+    </code></pre>
+    <p>Response:</p>
+    <pre><code>
+    {
+        "STATUS": "derivation 'derivation_name' added successfully"
+    }
+    </code></pre>
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/expression/list">http://localhost:5000/api/v1/resources/expression/list</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+     <h3>POST <a href="http://localhost:5000/api/v1/resources/expression/create">http://localhost:5000/api/v1/resources/expression/create</a></h3>
+    <p>This endpoint creates a new expression.</p>
+    <p>Required parameters:</p>
+         <ul>
+            <li><code>expression_latex_lhs</code>: The left-hand side of the expression in LaTeX format.</li>
+             <li><code>expression_relation_latex</code>: The relation symbol of the expression in LaTeX format.</li>
+            <li><code>expression_latex_rhs</code>: The right-hand side of the expression in LaTeX format.</li>
+        </ul>
+     <p>Optional parameters:</p>
+        <ul>
+            <li><code>expression_latex_condition</code>: A conditional statement of the expression in LaTeX format.</li>
+             <li><code>expression_name_latex</code>: Name of the expression in LaTeX format.</li>
+            <li><code>expression_reference_latex</code>: A reference for the expression in LaTeX format.</li>
+             <li><code>expression_description_latex</code>: Description of the expression in LaTeX format.</li>
+         </ul>
+    <p>Example usage (x-www-form-urlencoded):</p>
+    <pre><code>
+    curl --request POST \
+    --header "Content-Type: application/x-www-form-urlencoded" \
+    --show-error --silent \
+    http://localhost:5000/api/v1/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9
+    </code></pre>
+    <p>Example usage (application/json):</p>
+      <pre><code>
+      curl --request POST \
+    --header "Content-Type: application/json" \
+    --show-error --silent \
+    --data '{"expression_latex_lhs": "4^3", "expression_relation_latex": "=", "expression_latex_rhs": "k"}' \
+     http://localhost:5000/api/v1/resources/expression/create | python3 -m json.tool
+    </code></pre>
+    <p>Response:</p>
+    <pre><code>
+    {
+        "STATUS": "expression added successfully",
+        "query times": {
+            "to_add_expression: list_nodes_of_type": 0.011,
+            "pdg_app/to_add_expression: add_expression": 0.002
+        }
+    }
+    </code></pre>
 
-<H3>POST <a href="http://localhost:5000/api/v1/resources/inference_rule/create">http://localhost:5000/api/v1/resources/inference_rule/create</a></H3>
-<P>Returns JSON of status</P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/inference_rule/list">http://localhost:5000/api/v1/resources/inference_rule/list</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+   <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/scalar/create">http://localhost:5000/api/v1/resources/symbol/scalar/create</a></h3>
+    <p>This endpoint creates a new scalar symbol.</p>
+    <p>Required parameters:</p>
+        <ul>
+            <li><code>scalar_latex</code>: The symbol's LaTeX representation.</li>
+            <li><code>scalar_scope</code>: The scope of the scalar. Choose from 'arbitrary', 'local', 'global'.</li>
+        </ul>
+   <p>Optional parameters:</p>
+        <ul>
+            <li><code>scalar_name_latex</code>: The name of the scalar in LaTeX format.</li>
+             <li><code>scalar_description_latex</code>: A description of the scalar in LaTeX format.</li>
+            <li><code>scalar_reference_latex</code>: A reference for the scalar in LaTeX format.</li>
+            <li><code>scalar_variable_or_constant</code>: Choose from 'variable' or 'constant' (default is 'variable')</li>
+             <li><code>scalar_domain</code>: The domain of the scalar. Choose from 'any', 'positive', 'negative', 'integer', 'real', 'natural' (default is 'any').</li>
+             <li><code>dimension_length</code>: The length dimension exponent (default 0).</li>
+             <li><code>dimension_time</code>: The time dimension exponent (default 0).</li>
+             <li><code>dimension_mass</code>: The mass dimension exponent (default 0).</li>
+              <li><code>dimension_temperature</code>: The temperature dimension exponent (default 0).</li>
+            <li><code>dimension_electric_charge</code>: The electric charge dimension exponent (default 0).</li>
+            <li><code>dimension_amount_of_substance</code>: The amount of substance dimension exponent (default 0).</li>
+             <li><code>dimension_luminous_intensity</code>: The luminous intensity dimension exponent (default 0).</li>
+        </ul>
+    <p>Example usage (x-www-form-urlencoded):</p>
+     <pre><code>
+    curl --request POST \
+    --header "Content-Type: application/x-www-form-urlencoded" \
+    --show-error --silent \
+    http://localhost:5000/api/v1/resources/symbol/scalar/create?scalar_latex=a&scalar_scope=arbitrary&dimension_length=1&dimension_time=-2
+    </code></pre>
+     <p>Example usage (application/json):</p>
+    <pre><code>
+    curl --request POST \
+    --header "Content-Type: application/json" \
+    --show-error --silent \
+    --data '{"scalar_latex": "b", "scalar_scope":"local", "dimension_mass":1}' \
+     http://localhost:5000/api/v1/resources/symbol/scalar/create | python3 -m json.tool
+    </code></pre>
+    <p>Response:</p>
+     <pre><code>
+     {
+        "STATUS": "scalar symbol added successfully",
+        "query times": {}
+    }
+     </code></pre>
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/register_csrf">http://localhost:5000/api/v1/resources/register_csrf</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+    <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/vector/create">http://localhost:5000/api/v1/resources/symbol/vector/create</a></h3>
+    <p>This endpoint creates a new vector symbol. Not implemented.</p>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/vector/create</code></pre>
+    <p>Response:</p>
+    <pre><code>
+        {
+            "STATUS": "TODO"
+        }
+    </code></pre>
 
-<H3>POST <a href="http://localhost:5000/api/v1/resources/symbol/matrix/create">http://localhost:5000/api/v1/resources/symbol/matrix/create</a></H3>
-<P>Returns JSON of status</P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+    <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/matrix/create">http://localhost:5000/api/v1/resources/symbol/matrix/create</a></h3>
+    <p>This endpoint creates a new matrix symbol. Not implemented.</p>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/matrix/create</code></pre>
+     <p>Response:</p>
+    <pre><code>
+        {
+            "STATUS": "TODO"
+        }
+    </code></pre>
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/symbol/matrix/list">http://localhost:5000/api/v1/resources/symbol/matrix/list</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+    <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/operation/create">http://localhost:5000/api/v1/resources/symbol/operation/create</a></h3>
+    <p>This endpoint creates a new operation symbol.</p>
+    <p>Required parameters:</p>
+         <ul>
+             <li><code>operation_name_latex</code>: The name of the operation in LaTeX format.</li>
+             <li><code>operation_latex</code>: The symbol of the operation in LaTeX format.</li>
+             <li><code>operation_description_latex</code>: Description of the operation in LaTeX format.</li>
+             <li><code>operation_argument_count</code>: The number of arguments for this operation.</li>
+         </ul>
+    <p>Optional parameters:</p>
+         <ul>
+             <li><code>operation_reference_latex</code>: A reference for the operation in LaTeX format.</li>
+          </ul>
+    <p>Example usage:</p>
+    <pre><code>
+    curl --request POST \
+    --header "Content-Type: application/x-www-form-urlencoded" \
+    --show-error --silent \
+     http://localhost:5000/api/v1/resources/symbol/operation/create?operation_name_latex=equals&operation_latex==&operation_description_latex=equality&operation_argument_count=2
+    </code></pre>
+      <pre><code>
+      curl --request POST \
+    --header "Content-Type: application/json" \
+    --show-error --silent \
+    --data '{"operation_name_latex":"equals", "operation_latex":"=", "operation_description_latex": "equality", "operation_argument_count": 2}' \
+     http://localhost:5000/api/v1/resources/symbol/operation/create | python3 -m json.tool
+    </code></pre>
+    <p>Response:</p>
+    <pre><code>
+    {
+        "STATUS": "operation symbol added successfully",
+        "query times": {}
+    }
+    </code></pre>
 
-<H3>POST <a href="http://localhost:5000/api/v1/resources/symbol/operation/create">http://localhost:5000/api/v1/resources/symbol/operation/create</a></H3>
-<P>Returns JSON of status</P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/symbol/operation/list">http://localhost:5000/api/v1/resources/symbol/operation/list</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+    <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/relation/create">http://localhost:5000/api/v1/resources/symbol/relation/create</a></h3>
+    <p>This endpoint creates a new relation symbol.</p>
+    <p>Required parameters:</p>
+       <ul>
+            <li><code>relation_name_latex</code>: The name of the relation in LaTeX format.</li>
+             <li><code>relation_latex</code>: The symbol of the relation in LaTeX format.</li>
+            <li><code>relation_description_latex</code>: Description of the relation in LaTeX format.</li>
+        </ul>
+   <p>Optional parameters:</p>
+      <ul>
+         <li><code>relation_reference_latex</code>: A reference for the relation in LaTeX format.</li>
+      </ul>
+    <p>Example usage:</p>
+    <pre><code>
+    curl --request POST \
+    --header "Content-Type: application/x-www-form-urlencoded" \
+    --show-error --silent \
+     http://localhost:5000/api/v1/resources/symbol/relation/create?relation_name_latex=equal&relation_latex==&relation_description_latex=equality
+    </code></pre>
+      <pre><code>
+      curl --request POST \
+    --header "Content-Type: application/json" \
+    --show-error --silent \
+    --data '{"relation_name_latex":"equal", "relation_latex":"=", "relation_description_latex": "equality"}' \
+     http://localhost:5000/api/v1/resources/symbol/relation/create | python3 -m json.tool
+    </code></pre>
+    <p>Response:</p>
+    <pre><code>
+    {
+        "STATUS": "relation symbol added successfully",
+        "query times": {}
+    }
+    </code></pre>
 
-<H3>POST <a href="http://localhost:5000/api/v1/resources/symbol/relation/create">http://localhost:5000/api/v1/resources/symbol/relation/create</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/symbol/relation/list">http://localhost:5000/api/v1/resources/symbol/relation/list</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+     <h3>POST <a href="http://localhost:5000/api/v1/resources/inference_rule/create">http://localhost:5000/api/v1/resources/inference_rule/create</a></h3>
+    <p>This endpoint creates a new inference rule. Not implemented.</p>
+    <p>Example usage:</p>
+    <pre><code>curl -s http://localhost:5000/api/v1/resources/inference_rule/create</code></pre>
+    <p>Response:</p>
+    <pre><code>
+        {
+            "STATUS": "inference rule added successfully",
+            "query times": {}
+        }
+    </code></pre>
 
-<H3>POST <a href="http://localhost:5000/api/v1/resources/symbol/scalar/create">http://localhost:5000/api/v1/resources/symbol/scalar/create</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
 
-<H3>GET <a href="http://localhost:5000/api/v1/resources/symbol/scalar/list">http://localhost:5000/api/v1/resources/symbol/scalar/list</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+    <h3>POST <a href="http://localhost:5000/api/v1/resources/derivation/delete">http://localhost:5000/api/v1/resources/derivation/delete</a></h3>
+    <p>This endpoint deletes a specified derivation and all its steps.</p>
+    <p>Required parameters:</p>
+        <ul>
+             <li><code>derivation_id</code>: The ID of the derivation to delete.</li>
+        </ul>
+    <p>Example usage:</p>
+    <pre><code>
+     curl --request POST \
+    --header "Content-Type: application/x-www-form-urlencoded" \
+    --show-error --silent \
+    http://localhost:5000/api/v1/resources/derivation/delete?derivation_id=3445848
+    </code></pre>
+     <pre><code>
+    curl --request POST \
+    --header "Content-Type: application/json" \
+    --show-error --silent \
+    --data '{"derivation_id":"3445848"}' \
+    http://localhost:5000/api/v1/resources/derivation/delete
+    </code></pre>
+     <p>Response:</p>
+     <pre><code>
+        {
+            "STATUS": "successfully deleted"
+        }
+    </code></pre>
 
-<H3>POST <a href="http://localhost:5000/api/v1/resources/symbol/vector/create">http://localhost:5000/api/v1/resources/symbol/vector/create</a></H3>
-<P>Returns JSON of status</P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
-
-<H3>GET <a href="http://localhost:5000/api/v1/resources/symbol/vector/list">http://localhost:5000/api/v1/resources/symbol/vector/list</a></H3>
-<P>Returns JSON of </P>
-<P>Required parameters: </P>
-<UL>
-	<LI>: </LI>
-</UL>
-<P>Optional parameters:</P>
-<UL>
-	<LI>: </LI>
-</UL>
+    <h3>POST <a href="http://localhost:5000/api/v1/resources/expression/delete">http://localhost:5000/api/v1/resources/expression/delete</a></h3>
+    <p>This endpoint deletes an expression. Not implemented.</p>
+     <p>Response:</p>
+    <pre><code>
+        {
+            "STATUS": "TODO"
+        }
+    </code></pre>
 
 {% endblock %}
