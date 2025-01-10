@@ -70,6 +70,8 @@ The Docker images include the software needed for the webserver (Python Flask) a
 * Graphviz for static visualization of graphs
 * d3js for interactive visualizations of graphs
 
+See VERSIONS.md for details
+
 # Contributing
 
 Before submitting code via a pull request, please [open an issue](https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues) (whether to report a bug or ask for a feature) and describe your question or intent.
