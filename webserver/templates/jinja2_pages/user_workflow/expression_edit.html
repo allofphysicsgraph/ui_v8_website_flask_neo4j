@@ -108,13 +108,15 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 
 <P>See also <a href="{ { url_for('to_list_operations') }}?referrer=expession_edit">all operations</a>.</P>
 
+  <!--
   <P>{ % for symbol_id, symbol_dict in dict_of_operation_dicts_in_expression.items() %}
     <UL>
       <LI>{ { symbol_dict }}</LI>
     </UL>
      { % endfor %}
+   -->
 
-
+<!--
 <table border="1" id="operation_table" class="sortable">
   <tr>
     <th>ID</th>
@@ -123,28 +125,29 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     <th>number of arguments</th>
     <th>description</th>
   </tr>
-  { % for symbol_id, symbol_dict in dict_of_operation_dicts_in_expression.items() %}
+  { % for symbol_id, symbol_dict in dict_of_operation_dicts_in_expression.items() % }
   <tr>
-    <td><a href="{ { url_for('to_edit_scalar_symbol', symbol_id=symbol_id) }}">{ { symbol_id }}</a></td> <!-- ID -->
-    <td>{ { symbol_dict['latex'] }}</td> <!-- latex -->
-    <td>{ { symbol_dict['name_latex'] }}</td> <!-- name -->
+    <td><a href="{ { url_for('to_edit_scalar_symbol', symbol_id=symbol_id) }}">{ { symbol_id }}</a></td> <!-- ID -- >
+    <td>{ { symbol_dict['latex'] }}</td> <!-- latex -- >
+    <td>{ { symbol_dict['name_latex'] }}</td> <!-- name -- >
     <td>{ { symbol_dict['number_of_arguments'] }}</td>
     <td>{ { symbol_dict['description_latex'] }}</td>
   </tr>
-  { % endfor %}
+  {% endfor %}
 </table>
+-->
 
 <fieldset>
   <legend>
     <H2>Add operation used in Expression</h2>
   </legend>
   <form method="post" action="" onsubmit="return checkForm(this);">
-    { { form_no_options.csrf_token }}
+    {{ form_no_options.csrf_token }}
     <P>
     <select name="symbol_select_id_to_add" class="selectpicker form-control" id="symbol_select">
-      { % for symbol_id, symbol_dict in dict_of_operation_dicts_not_in_expression.items() %}
+      {% for symbol_id, symbol_dict in dict_of_operation_dicts_not_in_expression.items() %}
       <option value="{ { symbol_id }}">{ { symbol_id }}, { { symbol_dict['latex'] }} </option>
-      { % endfor %}
+      {% endfor %}
     </select>
     <input type="submit" value="add operation to expression">
   </form>
@@ -155,18 +158,18 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     <H2>Remove operation used in Expression</h2>
   </legend>
   <form method="post" action="" onsubmit="return checkForm(this);">
-    { { form_no_options.csrf_token }}
+    {{ form_no_options.csrf_token }}
     <P><!-- operation count: { { list_of_operation_IDs|length } } -->
     <select name="symbol_select_id_to_remove" class="selectpicker form-control" id="symbol_select">
-      { % for symbol_id, symbol_dict in dict_of_operation_dicts_in_expression.items() %}
+      {% for symbol_id, symbol_dict in dict_of_operation_dicts_in_expression.items() %}
       <option value="{ { symbol_id }}">{ { symbol_id }}, { { symbol_dict['latex'] }} </option>
-      { % endfor %}
+      {% endfor %}
     </select>
     <input type="submit" value="remove operation from expression">
   </form>
 </fieldset>
 </fieldset>
--->
+
 
   <fieldset>
     <legend>
