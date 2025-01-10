@@ -1940,6 +1940,8 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
         # the "delete" button returns a dict with only the csrf token, so len==1
         if len(request.form.keys()) == 1:
+            print("request.form=" + str(request.form))
+
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
@@ -1951,6 +1953,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
                 query_time_dict["to_edit_expression: delete_node"] = round(
                     time.time() - query_start_time, 3
                 )
+            return redirect(url_for("to_list_expressions"))
 
         if "symbol_select_id_to_disconnect" in request.form.keys():
             symbol_id_to_disconnect = str(
