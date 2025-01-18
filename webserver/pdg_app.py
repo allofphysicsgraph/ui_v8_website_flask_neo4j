@@ -2070,9 +2070,14 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
     for this_feed_dict in list_of_feed_dicts:
         if "sympy" in this_feed_dict.keys():
-            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = (
-                latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
-            )
+            try:
+                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = (
+                    latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
+                )
+            except Exception as err:
+                flash("ERROR converting to Sympy: " + str(err))
+                print("ERROR converting to Sympy: " + str(err))
+                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
         else:
             sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
 
@@ -2328,8 +2333,8 @@ def to_add_expression() -> werkzeug.Response:
                     latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
                 )
             except Exception as err:
-                flash("ERROR converting to Sympy: "+str(err))
-                print("ERROR converting to Sympy: "+str(err))
+                flash("ERROR converting to Sympy: " + str(err))
+                print("ERROR converting to Sympy: " + str(err))
                 sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
         else:
             sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
@@ -2485,9 +2490,14 @@ def to_add_feed() -> werkzeug.Response:
     sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
     for this_feed_dict in list_of_feed_dicts:
         if "sympy" in this_feed_dict.keys():
-            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = (
-                latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
-            )
+            try:
+                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = (
+                    latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
+                )
+            except Exception as err:
+                flash("ERROR converting to Sympy: " + str(err))
+                print("ERROR converting to Sympy: " + str(err))
+                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
         else:
             sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
 
@@ -5954,9 +5964,14 @@ def to_list_feeds() -> werkzeug.Response:
     sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
     for this_feed_dict in list_of_feed_dicts:
         if "sympy" in this_feed_dict.keys():
-            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = (
-                latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
-            )
+            try:
+                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = (
+                    latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
+                )
+            except Exception as err:
+                flash("ERROR converting to Sympy: " + str(err))
+                print("ERROR converting to Sympy: " + str(err))
+                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
         else:
             sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
 
@@ -6446,9 +6461,14 @@ def to_list_expressions() -> str:
     sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
     for this_expression_dict in list_of_expression_dicts:
         if "sympy" in this_expression_dict.keys():
-            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
-                latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
-            )
+            try:
+                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
+                    latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
+                )
+            except Exception as err:
+                flash("ERROR converting to Sympy: " + str(err))
+                print("ERROR converting to Sympy: " + str(err))
+                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
         else:
             sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
 
