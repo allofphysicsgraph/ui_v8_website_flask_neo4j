@@ -61,10 +61,33 @@
     <td>{{ form_scalar_properties.scalar_variable_or_constant.label }}: 
     {{ form_scalar_properties.scalar_variable_or_constant }}</td>
 
-    <td>{{ form_scalar_properties.scalar_domain.label}}: 
+    <td>{{ form_scalar_properties.scalar_domain.label}} (if variable): 
     {{ form_scalar_properties.scalar_domain }}</td>
   </tr>
 </table>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const variableRadio = document.getElementById('scalar_variable_or_constant-0');
+  const constantRadio = document.getElementById('scalar_variable_or_constant-1');
+  const domainRadiosContainer = document.getElementById('scalar_domain');
+
+  function toggleDomainVisibility() {
+    if (variableRadio.checked) {
+      domainRadiosContainer.style.display = 'block';
+    } else if (constantRadio.checked) {
+      domainRadiosContainer.style.display = 'none';
+    }
+  }
+
+  // Initial check on page load
+  toggleDomainVisibility();
+
+  // Add event listeners to the variable and constant radio buttons
+  variableRadio.addEventListener('change', toggleDomainVisibility);
+  constantRadio.addEventListener('change', toggleDomainVisibility);
+});
+</script>
 
 <P>These dimensions are relevant for checking dimensional consistency of expressions.
 <table border="0" id="dimension_table">
