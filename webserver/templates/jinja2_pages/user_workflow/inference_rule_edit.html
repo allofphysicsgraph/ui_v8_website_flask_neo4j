@@ -20,7 +20,7 @@ or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inferenc
     {{ form_edit.csrf_token }}
     <P>
       {{ form_edit.inference_rule_name.label}}: {{ form_edit.inference_rule_name(size=50, maxlength=1000, value=inference_rule_dict['name_latex']) }} Must be unique compared to all other inference rule names.<BR/>
-      {{form_edit.inference_rule_latex.label }}: {{ form_edit.inference_rule_latex(size=50, maxlength=1000, value=inference_rule_dict['latex']) }}
+      {{form_edit.inference_rule_latex.label }}: {{ form_edit.inference_rule_latex(size=50, maxlength=1000, value=inference_rule_dict['latex']).replace('\r','\\r') }}
       Refer to feeds using <code>$#1$</code> and refer to expressions using <code>Eq.~\ref{eq:#2}</code>
       <BR/>
 
