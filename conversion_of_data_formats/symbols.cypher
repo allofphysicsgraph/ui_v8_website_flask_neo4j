@@ -18,7 +18,7 @@ UNWIND [{id:"0001054",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"635339",
+UNWIND [{id:"699159",
 // [{'units': 'meter^2 kilogram second^-1', 'value': '1.0545718*10^{-34}'}]
          properties:{number_power:,
                      number_decimal:,
@@ -27,7 +27,7 @@ UNWIND [{id:"635339",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0001054"}, end: {id:"635339"}, properties:{}}] AS row
+UNWIND [{start: {id:"0001054"}, end: {id:"699159"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -113,7 +113,7 @@ UNWIND [{id:"0001157",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"382137",
+UNWIND [{id:"134167",
 // [{'units': 'meter^2 kilogram second^-2 Kelvin^-1', 'value': '1.38064852 10^{-23}'}]
          properties:{number_power:,
                      number_decimal:,
@@ -122,7 +122,7 @@ UNWIND [{id:"382137",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0001157"}, end: {id:"382137"}, properties:{}}] AS row
+UNWIND [{start: {id:"0001157"}, end: {id:"134167"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -228,7 +228,7 @@ UNWIND [{id:"0001370",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"240113",
+UNWIND [{id:"549722",
 // [{'units': 'dimensionless', 'value': '1/137.03599999'}]
          properties:{number_power:,
                      number_decimal:,
@@ -237,7 +237,7 @@ UNWIND [{id:"240113",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0001370"}, end: {id:"240113"}, properties:{}}] AS row
+UNWIND [{start: {id:"0001370"}, end: {id:"549722"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -803,7 +803,7 @@ UNWIND [{id:"0001999",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"820499",
+UNWIND [{id:"606002",
 // [{'units': 'Columb', 'value': '1.602*10^{-19}'}]
          properties:{number_power:,
                      number_decimal:,
@@ -812,7 +812,7 @@ UNWIND [{id:"820499",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0001999"}, end: {id:"820499"}, properties:{}}] AS row
+UNWIND [{start: {id:"0001999"}, end: {id:"606002"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -1118,7 +1118,7 @@ UNWIND [{id:"0002515",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"682708",
+UNWIND [{id:"706172",
 // [{'units': 'kg', 'value': '9.1093837015E^{-31}'}]
          properties:{number_power:,
                      number_decimal:,
@@ -1127,7 +1127,7 @@ UNWIND [{id:"682708",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0002515"}, end: {id:"682708"}, properties:{}}] AS row
+UNWIND [{start: {id:"0002515"}, end: {id:"706172"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -1193,7 +1193,7 @@ UNWIND [{id:"0002718",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"428563",
+UNWIND [{id:"115552",
 // [{'units': 'unitless', 'value': '2.71828'}]
          properties:{number_power:,
                      number_decimal:,
@@ -1202,7 +1202,7 @@ UNWIND [{id:"428563",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0002718"}, end: {id:"428563"}, properties:{}}] AS row
+UNWIND [{start: {id:"0002718"}, end: {id:"115552"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -1308,7 +1308,7 @@ UNWIND [{id:"0002875",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"106001",
+UNWIND [{id:"316109",
 // [{'units': 'm', 'value': '5.29E^{-11}'}]
          properties:{number_power:,
                      number_decimal:,
@@ -1317,7 +1317,7 @@ UNWIND [{id:"106001",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0002875"}, end: {id:"106001"}, properties:{}}] AS row
+UNWIND [{start: {id:"0002875"}, end: {id:"316109"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -1463,7 +1463,7 @@ UNWIND [{id:"0003141",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"338194",
+UNWIND [{id:"585050",
 // [{'units': 'dimensionless', 'value': '3.1415'}]
          properties:{number_power:,
                      number_decimal:,
@@ -1472,7 +1472,7 @@ UNWIND [{id:"338194",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0003141"}, end: {id:"338194"}, properties:{}}] AS row
+UNWIND [{start: {id:"0003141"}, end: {id:"585050"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -1518,7 +1518,7 @@ UNWIND [{id:"0003236",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"775269",
+UNWIND [{id:"952829",
 // [{'units': 'm', 'value': '6.3781*10^{6}'}]
          properties:{number_power:,
                      number_decimal:,
@@ -1527,7 +1527,7 @@ UNWIND [{id:"775269",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0003236"}, end: {id:"775269"}, properties:{}}] AS row
+UNWIND [{start: {id:"0003236"}, end: {id:"952829"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -2193,7 +2193,7 @@ UNWIND [{id:"0004567",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"423599",
+UNWIND [{id:"615161",
 // [{'units': 'meters/second', 'value': '299792458'}]
          properties:{number_power:,
                      number_decimal:,
@@ -2202,7 +2202,7 @@ UNWIND [{id:"423599",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0004567"}, end: {id:"423599"}, properties:{}}] AS row
+UNWIND [{start: {id:"0004567"}, end: {id:"615161"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -2288,7 +2288,7 @@ UNWIND [{id:"0004635",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"772970",
+UNWIND [{id:"963595",
 // [{'units': 'm/s', 'value': '36100'}]
          properties:{number_power:,
                      number_decimal:,
@@ -2297,7 +2297,7 @@ UNWIND [{id:"772970",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0004635"}, end: {id:"772970"}, properties:{}}] AS row
+UNWIND [{start: {id:"0004635"}, end: {id:"963595"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -2843,7 +2843,7 @@ UNWIND [{id:"0005458",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"830730",
+UNWIND [{id:"391001",
 // [{'units': 'kg', 'value': '5.97237*10^24'}]
          properties:{number_power:,
                      number_decimal:,
@@ -2852,7 +2852,7 @@ UNWIND [{id:"830730",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0005458"}, end: {id:"830730"}, properties:{}}] AS row
+UNWIND [{start: {id:"0005458"}, end: {id:"391001"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -3158,7 +3158,7 @@ UNWIND [{id:"0005916",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"387265",
+UNWIND [{id:"785215",
 // [{'units': 'kg', 'value': '1.67262192369E^{-27}'}]
          properties:{number_power:,
                      number_decimal:,
@@ -3167,7 +3167,7 @@ UNWIND [{id:"387265",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0005916"}, end: {id:"387265"}, properties:{}}] AS row
+UNWIND [{start: {id:"0005916"}, end: {id:"785215"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -3193,7 +3193,7 @@ UNWIND [{id:"0006022",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"822029",
+UNWIND [{id:"949995",
 // [{'units': 'mol^-1', 'value': '6.02214086*10^{23}'}]
          properties:{number_power:,
                      number_decimal:,
@@ -3202,7 +3202,7 @@ UNWIND [{id:"822029",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0006022"}, end: {id:"822029"}, properties:{}}] AS row
+UNWIND [{start: {id:"0006022"}, end: {id:"949995"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -3248,7 +3248,7 @@ UNWIND [{id:"0006081",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"703753",
+UNWIND [{id:"268012",
 // [{'units': 'km', 'value': '1.496*10^8'}]
          properties:{number_power:,
                      number_decimal:,
@@ -3257,7 +3257,7 @@ UNWIND [{id:"703753",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0006081"}, end: {id:"703753"}, properties:{}}] AS row
+UNWIND [{start: {id:"0006081"}, end: {id:"268012"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -3323,7 +3323,7 @@ UNWIND [{id:"0006197",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"918101",
+UNWIND [{id:"136074",
 // [{'units': 'N/A^2', 'value': '1.25663706212E^{-6}'}]
          properties:{number_power:,
                      number_decimal:,
@@ -3332,7 +3332,7 @@ UNWIND [{id:"918101",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0006197"}, end: {id:"918101"}, properties:{}}] AS row
+UNWIND [{start: {id:"0006197"}, end: {id:"136074"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -3398,7 +3398,7 @@ UNWIND [{id:"0006277",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"333932",
+UNWIND [{id:"645961",
 // [{'units': 'm^3 * kg^-1 * s^-2', 'value': '6.67430*10^{-11}'}]
          properties:{number_power:,
                      number_decimal:,
@@ -3407,7 +3407,7 @@ UNWIND [{id:"333932",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0006277"}, end: {id:"333932"}, properties:{}}] AS row
+UNWIND [{start: {id:"0006277"}, end: {id:"645961"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -3873,7 +3873,7 @@ UNWIND [{id:"0007557",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"324064",
+UNWIND [{id:"613891",
 // [{'units': 'm * s^-2', 'value': '9.80665'}]
          properties:{number_power:,
                      number_decimal:,
@@ -3882,7 +3882,7 @@ UNWIND [{id:"324064",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0007557"}, end: {id:"324064"}, properties:{}}] AS row
+UNWIND [{start: {id:"0007557"}, end: {id:"613891"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -4008,7 +4008,7 @@ UNWIND [{id:"0007940",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"761768",
+UNWIND [{id:"443694",
 // [{'units': 'F/m', 'value': '8.8541878128E-{12}'}]
          properties:{number_power:,
                      number_decimal:,
@@ -4017,7 +4017,7 @@ UNWIND [{id:"761768",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0007940"}, end: {id:"761768"}, properties:{}}] AS row
+UNWIND [{start: {id:"0007940"}, end: {id:"443694"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;
@@ -4103,7 +4103,7 @@ UNWIND [{id:"0008179",
 CREATE (n:scalar{id: row.id}) SET n += row.properties SET n:symbol;
 :commit
 CALL db.awaitIndexes(300);
-UNWIND [{id:"105376",
+UNWIND [{id:"179785",
 // [{'units': 'J⋅K^{−1} mol^{−1}', 'value': '8.31446261815324'}]
          properties:{number_power:,
                      number_decimal:,
@@ -4112,7 +4112,7 @@ UNWIND [{id:"105376",
                      dimension__unit:""}}] AS row
 CREATE (n:value_with_units{id: row.id}) SET n += row.properties;
 :begin
-UNWIND [{start: {id:"0008179"}, end: {id:"105376"}, properties:{}}] AS row
+UNWIND [{start: {id:"0008179"}, end: {id:"179785"}, properties:{}}] AS row
 MATCH (start:scalar{id: row.start.id})
 MATCH (end:value_with_units{id: row.end.id})
 CREATE (start)-[r:HAS_VALUE]->(end) SET r += row.properties;

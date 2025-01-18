@@ -1,5 +1,5 @@
 :begin
-UNWIND [{id:"2222558",
+UNWIND [{id:"2222764",
          properties:{name_latex:"addition",
                      reference_latex:"",
                      argument_count:2,
@@ -12,7 +12,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222578",
+UNWIND [{id:"2222940",
          properties:{name_latex:"cosine",
                      reference_latex:"",
                      argument_count:1,
@@ -25,7 +25,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222622",
+UNWIND [{id:"2222278",
          properties:{name_latex:"cross product",
                      reference_latex:"",
                      argument_count:2,
@@ -38,7 +38,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222448",
+UNWIND [{id:"2222896",
          properties:{name_latex:"curl",
                      reference_latex:"",
                      argument_count:1,
@@ -51,7 +51,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222293",
+UNWIND [{id:"2222280",
          properties:{name_latex:"definite integral",
                      reference_latex:"",
                      argument_count:4,
@@ -64,7 +64,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222361",
+UNWIND [{id:"2222591",
          properties:{name_latex:"divergence",
                      reference_latex:"",
                      argument_count:1,
@@ -77,7 +77,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222960",
+UNWIND [{id:"2222891",
          properties:{name_latex:"division",
                      reference_latex:"",
                      argument_count:2,
@@ -90,7 +90,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222302",
+UNWIND [{id:"2222455",
          properties:{name_latex:"dot product",
                      reference_latex:"",
                      argument_count:2,
@@ -103,7 +103,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222867",
+UNWIND [{id:"2222435",
          properties:{name_latex:"element-wise addition",
                      reference_latex:"",
                      argument_count:2,
@@ -116,7 +116,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222187",
+UNWIND [{id:"2222545",
          properties:{name_latex:"equals",
                      reference_latex:"",
                      author_name_latex:"ben",
@@ -128,7 +128,7 @@ CREATE (n:relation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222177",
+UNWIND [{id:"2222329",
          properties:{name_latex:"function",
                      reference_latex:"",
                      argument_count:1,
@@ -141,7 +141,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222306",
+UNWIND [{id:"2222105",
          properties:{name_latex:"gradient",
                      reference_latex:"",
                      argument_count:1,
@@ -154,7 +154,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222573",
+UNWIND [{id:"2222657",
          properties:{name_latex:"indefinite intergral",
                      reference_latex:"",
                      argument_count:2,
@@ -167,7 +167,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222171",
+UNWIND [{id:"2222829",
          properties:{name_latex:"multiplication",
                      reference_latex:"",
                      argument_count:2,
@@ -180,7 +180,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222762",
+UNWIND [{id:"2222144",
          properties:{name_latex:"sine",
                      reference_latex:"",
                      argument_count:1,
@@ -193,7 +193,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222657",
+UNWIND [{id:"2222439",
          properties:{name_latex:"spatial vector differential",
                      reference_latex:"",
                      argument_count:2,
@@ -206,7 +206,7 @@ CREATE (n:operation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"2222747",
+UNWIND [{id:"2222427",
          properties:{name_latex:"subtraction",
                      reference_latex:"",
                      argument_count:2,

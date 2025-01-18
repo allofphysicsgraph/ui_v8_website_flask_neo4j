@@ -1,5 +1,5 @@
 :begin
-UNWIND [{id:"111876",
+UNWIND [{id:"111355",
          properties:{name_latex:"LHS of expr 1 equals LHS of expr 2",
                      number_of_inputs:2,
                      number_of_feeds:0,
@@ -12,7 +12,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111373",
+UNWIND [{id:"111863",
          properties:{name_latex:"RHS of expr 1 equals RHS of expr 2",
                      number_of_inputs:2,
                      number_of_feeds:0,
@@ -25,7 +25,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111981",
+UNWIND [{id:"111469",
          properties:{name_latex:"X cross both sides by",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -38,7 +38,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111193",
+UNWIND [{id:"111145",
          properties:{name_latex:"X dot both sides",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -51,7 +51,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111900",
+UNWIND [{id:"111530",
          properties:{name_latex:"add X to both sides",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -64,7 +64,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111761",
+UNWIND [{id:"111980",
          properties:{name_latex:"add expr 1 to expr 2",
                      number_of_inputs:2,
                      number_of_feeds:0,
@@ -77,7 +77,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111237",
+UNWIND [{id:"111242",
          properties:{name_latex:"add zero to LHS",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -90,7 +90,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111723",
+UNWIND [{id:"111717",
          properties:{name_latex:"add zero to RHS",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -103,7 +103,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111404",
+UNWIND [{id:"111463",
          properties:{name_latex:"apply divergence",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -116,7 +116,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111892",
+UNWIND [{id:"111490",
          properties:{name_latex:"apply function to both sides of expression",
                      number_of_inputs:1,
                      number_of_feeds:2,
@@ -129,7 +129,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111679",
+UNWIND [{id:"111531",
          properties:{name_latex:"apply gradient to scalar function",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -142,7 +142,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111732",
+UNWIND [{id:"111390",
          properties:{name_latex:"apply operator to bra",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -155,7 +155,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111650",
+UNWIND [{id:"111946",
          properties:{name_latex:"apply operator to ket",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -168,7 +168,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111197",
+UNWIND [{id:"111791",
          properties:{name_latex:"assume N dimensions",
                      number_of_inputs:0,
                      number_of_feeds:1,
@@ -181,7 +181,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111753",
+UNWIND [{id:"111368",
          properties:{name_latex:"both sides cross X",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -194,7 +194,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111308",
+UNWIND [{id:"111567",
          properties:{name_latex:"both sides dot X",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -207,7 +207,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111200",
+UNWIND [{id:"111278",
          properties:{name_latex:"boundary condition",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -220,7 +220,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111499",
+UNWIND [{id:"111802",
          properties:{name_latex:"boundary condition for expr",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -233,7 +233,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111230",
+UNWIND [{id:"111410",
          properties:{name_latex:"change five variables in expr",
                      number_of_inputs:1,
                      number_of_feeds:10,
@@ -246,7 +246,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111210",
+UNWIND [{id:"111777",
          properties:{name_latex:"change four variables in expr",
                      number_of_inputs:1,
                      number_of_feeds:8,
@@ -259,7 +259,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111481",
+UNWIND [{id:"111471",
          properties:{name_latex:"change six variables in expr",
                      number_of_inputs:1,
                      number_of_feeds:12,
@@ -272,7 +272,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111120",
+UNWIND [{id:"111236",
          properties:{name_latex:"change three variables in expr",
                      number_of_inputs:1,
                      number_of_feeds:6,
@@ -285,7 +285,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111945",
+UNWIND [{id:"111984",
          properties:{name_latex:"change two variables in expr",
                      number_of_inputs:1,
                      number_of_feeds:4,
@@ -298,7 +298,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111625",
+UNWIND [{id:"111886",
          properties:{name_latex:"change variable X to Y",
                      number_of_inputs:1,
                      number_of_feeds:2,
@@ -311,7 +311,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111496",
+UNWIND [{id:"111345",
          properties:{name_latex:"claim LHS equals RHS",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -324,7 +324,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111691",
+UNWIND [{id:"111550",
          properties:{name_latex:"claim expr 1 equals expr 2",
                      number_of_inputs:2,
                      number_of_feeds:0,
@@ -337,7 +337,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111840",
+UNWIND [{id:"111728",
          properties:{name_latex:"combine like terms",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -350,7 +350,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111514",
+UNWIND [{id:"111484",
          properties:{name_latex:"conjugate both sides",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -363,7 +363,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111508",
+UNWIND [{id:"111996",
          properties:{name_latex:"conjugate function X",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -376,7 +376,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111576",
+UNWIND [{id:"111696",
          properties:{name_latex:"conjugate transpose both sides",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -389,7 +389,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111304",
+UNWIND [{id:"111104",
          properties:{name_latex:"declare assumption",
                      number_of_inputs:0,
                      number_of_feeds:0,
@@ -402,7 +402,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111701",
+UNWIND [{id:"111341",
          properties:{name_latex:"declare final expr",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -415,7 +415,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111495",
+UNWIND [{id:"111237",
          properties:{name_latex:"declare guess solution",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -428,7 +428,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111337",
+UNWIND [{id:"111299",
          properties:{name_latex:"declare identity",
                      number_of_inputs:0,
                      number_of_feeds:0,
@@ -441,7 +441,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111896",
+UNWIND [{id:"111981",
          properties:{name_latex:"declare initial expr",
                      number_of_inputs:0,
                      number_of_feeds:0,
@@ -454,7 +454,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111266",
+UNWIND [{id:"111649",
          properties:{name_latex:"differentiate with respect to",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -467,7 +467,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111345",
+UNWIND [{id:"111474",
          properties:{name_latex:"distribute conjugate to factors",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -480,7 +480,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111473",
+UNWIND [{id:"111890",
          properties:{name_latex:"distribute conjugate transpose to factors",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -493,7 +493,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111539",
+UNWIND [{id:"111975",
          properties:{name_latex:"divide both sides by",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -506,7 +506,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111490",
+UNWIND [{id:"111421",
          properties:{name_latex:"divide expr 1 by expr 2",
                      number_of_inputs:2,
                      number_of_feeds:0,
@@ -519,7 +519,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111604",
+UNWIND [{id:"111782",
          properties:{name_latex:"drop non-dominant term",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -532,7 +532,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111174",
+UNWIND [{id:"111662",
          properties:{name_latex:"evaluate definite integral",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -545,7 +545,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111437",
+UNWIND [{id:"111561",
          properties:{name_latex:"expand LHS",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -558,7 +558,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111806",
+UNWIND [{id:"111546",
          properties:{name_latex:"expand RHS",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -571,7 +571,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111425",
+UNWIND [{id:"111581",
          properties:{name_latex:"expand integrand",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -584,7 +584,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111752",
+UNWIND [{id:"111166",
          properties:{name_latex:"expand magnitude to conjugate",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -597,7 +597,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111570",
+UNWIND [{id:"111768",
          properties:{name_latex:"expr 1 is equivalent to expr 2 under the condition",
                      number_of_inputs:2,
                      number_of_feeds:0,
@@ -610,7 +610,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111548",
+UNWIND [{id:"111698",
          properties:{name_latex:"expr 1 is true under condition expr 2",
                      number_of_inputs:2,
                      number_of_feeds:0,
@@ -623,7 +623,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111817",
+UNWIND [{id:"111432",
          properties:{name_latex:"factor out X",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -636,7 +636,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111914",
+UNWIND [{id:"111613",
          properties:{name_latex:"factor out X from LHS",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -649,7 +649,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111206",
+UNWIND [{id:"111260",
          properties:{name_latex:"factor out X from RHS",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -662,7 +662,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111883",
+UNWIND [{id:"111329",
          properties:{name_latex:"function is even",
                      number_of_inputs:1,
                      number_of_feeds:3,
@@ -675,7 +675,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111673",
+UNWIND [{id:"111522",
          properties:{name_latex:"function is odd",
                      number_of_inputs:1,
                      number_of_feeds:3,
@@ -688,7 +688,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111598",
+UNWIND [{id:"111344",
          properties:{name_latex:"indefinite integral over",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -701,7 +701,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111915",
+UNWIND [{id:"111137",
          properties:{name_latex:"indefinite integrate LHS over",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -714,7 +714,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111403",
+UNWIND [{id:"111132",
          properties:{name_latex:"indefinite integrate RHS over",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -727,7 +727,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111910",
+UNWIND [{id:"111608",
          properties:{name_latex:"indefinite integration",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -740,7 +740,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111270",
+UNWIND [{id:"111408",
          properties:{name_latex:"integrate",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -753,7 +753,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111468",
+UNWIND [{id:"111937",
          properties:{name_latex:"integrate over from to",
                      number_of_inputs:1,
                      number_of_feeds:3,
@@ -766,7 +766,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111737",
+UNWIND [{id:"111721",
          properties:{name_latex:"make expr power",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -779,7 +779,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111588",
+UNWIND [{id:"111773",
          properties:{name_latex:"maximum of expr",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -792,7 +792,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111790",
+UNWIND [{id:"111173",
          properties:{name_latex:"multiply LHS by unity",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -805,7 +805,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111853",
+UNWIND [{id:"111646",
          properties:{name_latex:"multiply RHS by unity",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -818,7 +818,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111172",
+UNWIND [{id:"111182",
          properties:{name_latex:"multiply both sides by",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -831,7 +831,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111485",
+UNWIND [{id:"111253",
          properties:{name_latex:"multiply expr 1 by expr 2",
                      number_of_inputs:2,
                      number_of_feeds:0,
@@ -844,7 +844,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111413",
+UNWIND [{id:"111493",
          properties:{name_latex:"normalization condition",
                      number_of_inputs:0,
                      number_of_feeds:0,
@@ -857,7 +857,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111921",
+UNWIND [{id:"111680",
          properties:{name_latex:"partially differentiate with respect to",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -870,7 +870,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111529",
+UNWIND [{id:"111483",
          properties:{name_latex:"raise both sides to power",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -883,7 +883,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111291",
+UNWIND [{id:"111715",
          properties:{name_latex:"replace constant with value",
                      number_of_inputs:1,
                      number_of_feeds:3,
@@ -896,7 +896,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111842",
+UNWIND [{id:"111935",
          properties:{name_latex:"replace curl with LeviCevita summation contravariant",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -909,7 +909,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111310",
+UNWIND [{id:"111215",
          properties:{name_latex:"replace scalar with vector",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -922,7 +922,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111232",
+UNWIND [{id:"111894",
          properties:{name_latex:"replace summation notation with vector notation",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -935,7 +935,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111628",
+UNWIND [{id:"111891",
          properties:{name_latex:"select imaginary parts",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -948,7 +948,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111905",
+UNWIND [{id:"111198",
          properties:{name_latex:"select real parts",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -961,7 +961,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111594",
+UNWIND [{id:"111552",
          properties:{name_latex:"separate three vector components",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -974,7 +974,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111694",
+UNWIND [{id:"111270",
          properties:{name_latex:"separate two vector components",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -987,7 +987,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111251",
+UNWIND [{id:"111295",
          properties:{name_latex:"separate vector into two trigonometric ratios",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -1000,7 +1000,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111965",
+UNWIND [{id:"111457",
          properties:{name_latex:"simplify",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -1013,7 +1013,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111247",
+UNWIND [{id:"111543",
          properties:{name_latex:"solve for X",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -1026,7 +1026,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111614",
+UNWIND [{id:"111524",
          properties:{name_latex:"square root both sides",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -1039,7 +1039,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111202",
+UNWIND [{id:"111556",
          properties:{name_latex:"substitute LHS of expr 1 into expr 2",
                      number_of_inputs:2,
                      number_of_feeds:0,
@@ -1052,7 +1052,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111798",
+UNWIND [{id:"111351",
          properties:{name_latex:"substitute LHS of five expressions into expr",
                      number_of_inputs:6,
                      number_of_feeds:0,
@@ -1065,7 +1065,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111966",
+UNWIND [{id:"111797",
          properties:{name_latex:"substitute LHS of four expressions into expr",
                      number_of_inputs:5,
                      number_of_feeds:0,
@@ -1078,7 +1078,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111317",
+UNWIND [{id:"111381",
          properties:{name_latex:"substitute LHS of six expressions into expr",
                      number_of_inputs:7,
                      number_of_feeds:0,
@@ -1091,7 +1091,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111854",
+UNWIND [{id:"111246",
          properties:{name_latex:"substitute LHS of three expressions into expr",
                      number_of_inputs:4,
                      number_of_feeds:0,
@@ -1104,7 +1104,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111483",
+UNWIND [{id:"111732",
          properties:{name_latex:"substitute LHS of two expressions into expr",
                      number_of_inputs:3,
                      number_of_feeds:0,
@@ -1117,7 +1117,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111523",
+UNWIND [{id:"111634",
          properties:{name_latex:"substitute RHS of expr 1 into expr 2",
                      number_of_inputs:2,
                      number_of_feeds:0,
@@ -1130,7 +1130,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111575",
+UNWIND [{id:"111282",
          properties:{name_latex:"subtract X from both sides",
                      number_of_inputs:1,
                      number_of_feeds:1,
@@ -1143,7 +1143,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111160",
+UNWIND [{id:"111222",
          properties:{name_latex:"subtract expr 1 from expr 2",
                      number_of_inputs:2,
                      number_of_feeds:0,
@@ -1156,7 +1156,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111764",
+UNWIND [{id:"111373",
          properties:{name_latex:"sum exponents",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -1169,7 +1169,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111294",
+UNWIND [{id:"111566",
          properties:{name_latex:"sum exponents LHS",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -1182,7 +1182,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111244",
+UNWIND [{id:"111409",
          properties:{name_latex:"sum exponents RHS",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -1195,7 +1195,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111379",
+UNWIND [{id:"111268",
          properties:{name_latex:"swap LHS with RHS",
                      number_of_inputs:1,
                      number_of_feeds:0,
@@ -1208,7 +1208,7 @@ CREATE (n:inference_rule{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
-UNWIND [{id:"111199",
+UNWIND [{id:"111776",
          properties:{name_latex:"take curl of both sides",
                      number_of_inputs:1,
                      number_of_feeds:0,
