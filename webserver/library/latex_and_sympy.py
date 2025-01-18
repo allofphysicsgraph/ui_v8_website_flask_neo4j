@@ -47,6 +47,9 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
 
     latex_str = sympy.latex(eval(sympy_expr))
 
+    # TODO: sometimes the above files, like on a string with no SymPy formatting:
+    #    NameError: name 'b' is not defined
+
     print("latex_and_sympy/sympy_to_latex_str: latex_str=", latex_str)
 
     print(
