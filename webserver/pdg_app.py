@@ -5785,6 +5785,14 @@ def to_query() -> werkzeug.Response:
                 '&#39;<a href="list_feeds">feed</a>&#39;',
             )
             revised_record = revised_record.replace(
+                "&#39;expression&#39;",
+                '&#39;<a href="list_expressions">expression</a>&#39;',
+            )
+            revised_record = revised_record.replace(
+                "&#39;inference_rule&#39;",
+                '&#39;<a href="list_inference_rules">inference_rule</a>&#39;',
+            )
+            revised_record = revised_record.replace(
                 "&#39;scalar&#39;",
                 '&#39;<a href="../list_scalars">scalar</a>&#39;',
             )
