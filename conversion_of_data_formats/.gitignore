@@ -1,0 +1,7 @@
+data.json
+*.cypher
+.cache
+.ipython
+.ipynb_checkpoints
+.jupyter
+.local
