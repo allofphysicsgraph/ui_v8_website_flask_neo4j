@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 from initialize_flask import web_app
 
-from flask import render_template
+from flask import (render_template, 
+                   make_response) # https://stackoverflow.com/a/35672990/1164295
 
 
 @web_app.route("/api_via_js")
@@ -24,3 +25,12 @@ def to_api_via_js() -> str:
 @web_app.route("/api_documentation")
 def to_api_documenation() -> str:
     return render_template("api_documentation.html")
+
+from flask import 
+
+
+@app.route('/rss/<path:path>')
+def serve(path):
+    response = make_response(render_template('rss.xml'))
+    response.headers['Content-Type'] = 'application/rss+xml'
+    return response
