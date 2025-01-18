@@ -1,0 +1,301 @@
+:begin
+UNWIND [{id:"0006029",
+         properties:{reference_latex:"https://en.wikipedia.org/wiki/Momentum",
+                     dimension_time: -1,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:1,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:1,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{p}_1",
+                     name_latex:"momentum 1",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+
+:begin
+UNWIND [{id:"0006091",
+         properties:{reference_latex:"https://en.wikipedia.org/wiki/Velocity",
+                     dimension_time: -1,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:1,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:0,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{v}_0",
+                     name_latex:"initial velocity",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+
+:begin
+UNWIND [{id:"0006373",
+         properties:{reference_latex:"",
+                     dimension_time: -1,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:1,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:0,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{v}",
+                     name_latex:"velocity",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+:begin
+UNWIND [{id:"0006777",
+         properties:{reference_latex:"https://en.wikipedia.org/wiki/Force and https://www.wikidata.org/wiki/Q11402",
+                     dimension_time: 0,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:0,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:0,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{F}",
+                     name_latex:"force",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+
+:begin
+UNWIND [{id:"0007394",
+         properties:{reference_latex:"https://en.wikipedia.org/wiki/Wavenumber",
+                     dimension_time: 0,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:-1,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:0,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{k}",
+                     name_latex:"wavenumber",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+:begin
+UNWIND [{id:"0009472",
+         properties:{reference_latex:"",
+                     dimension_time: 0,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:1,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:0,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{r}",
+                     name_latex:"radius vector",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+
+:begin
+UNWIND [{id:"0001302",
+         properties:{reference_latex:"https://en.wikipedia.org/wiki/Momentum",
+                     dimension_time: -1,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:1,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:1,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{p}_{\rm before}",
+                     name_latex:"momentum before collision",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+
+:begin
+UNWIND [{id:"0002069",
+         properties:{reference_latex:"https://en.wikipedia.org/wiki/Magnetic_field",
+                     dimension_time: 0,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:0,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:0,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{H}",
+                     name_latex:"magnetic field",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+:begin
+UNWIND [{id:"0002097",
+         properties:{reference_latex:"https://en.wikipedia.org/wiki/Momentum",
+                     dimension_time: -1,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:1,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:1,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{p}_2",
+                     name_latex:"momentum 2",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+:begin
+UNWIND [{id:"0002423",
+         properties:{reference_latex:"",
+                     dimension_time: -2,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:1,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:0,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{a}",
+                     name_latex:"acceleration",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+:begin
+UNWIND [{id:"0002911",
+         properties:{reference_latex:"",
+                     dimension_time: 0,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:1,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:0,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{x}",
+                     name_latex:"position",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"vector",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+
+:begin
+UNWIND [{id:"0004299",
+         properties:{reference_latex:"https://en.wikipedia.org/wiki/Momentum",
+                     dimension_time: -1,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:1,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:1,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{p}_{\rm electron}",
+                     name_latex:"momentum of electron",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+:begin
+UNWIND [{id:"0004326",
+         properties:{reference_latex:"https://en.wikipedia.org/wiki/Electric_field",
+                     dimension_time: 0,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:0,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:0,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{E}",
+                     name_latex:"electric field",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"complex",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
+
+:begin
+UNWIND [{id:"0005493",
+         properties:{reference_latex:"https://en.wikipedia.org/wiki/Momentum",
+                     dimension_time: -1,
+                     dimension_electric_charge:0,
+                     dimension_luminous_intensity:0,
+                     dimension_length:1,
+                     dimension_amount_of_substance:0,
+                     dimension_mass:1,
+                     dimension_temperature:0,
+                     description_latex:"",
+                     is_composite:false,orientation:"arbitrary",size:"arbitrary",
+                     latex:"\\vec{p}_{\rm after}",
+                     name_latex:"momentum after collision",
+                     variable_or_constant:"variable",
+                     author_name_latex:"ben",
+                     scope:"real",
+                     domain:"any"}}] AS row
+CREATE (n:vector{id: row.id}) SET n += row.properties SET n:symbol;
+:commit
+CALL db.awaitIndexes(300);
