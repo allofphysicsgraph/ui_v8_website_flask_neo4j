@@ -58,7 +58,7 @@
         dumping_grounds/pdg.cypher</code><BR>
       on the host to upload the file into Neo4j. The CONTAINER_ID comes from<BR>
       <code>docker ps | grep "neo4j:.*community" | cut -d' ' -f1</code><BR>
-      <code>docker exec `docker ps | grep -community | cut -d' ' -f1` bin/cypher-shell --file 
+      <code>docker exec `docker ps | grep community | cut -d' ' -f1` bin/cypher-shell --file 
         dumping_grounds/pdg.cypher</code>
 
     <P>Potential alternative: <a href="https://neo4j.com/labs/apoc/4.3/overview/apoc.load/apoc.load.json/">download/upload custom JSON</a>
