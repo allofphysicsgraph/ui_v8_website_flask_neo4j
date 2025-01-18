@@ -1,0 +1,195 @@
+{% extends "_base.html" %}
+{% block content %}
+
+<P>
+  <em>Recommendation</em>: Read the
+  <a href="{{ url_for('user_documentation') }}?referrer=design_documentation">user documentation</a>
+  and <a href="{{ url_for('faq') }}?referrer=design_documentation">FAQ</a> first.
+  This page assumes familiarity with the jargon used in the Physics Derivation Graph.
+</P>
+
+<P>
+  This page compares databases that could be used for the Physics Derivation Graph (PDG).
+
+
+
+
+
+<H2><a name="historical evolution">Historical design evolution</a></H2>
+<P>
+  The Physics Derivation Graph has progressed through multiple architectures, with data structure changes keeping pace with the developer's knowledge.
+  <OL>
+    <LI>
+      <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v1_plain_text">plain text</a>:
+         databases for comments, connections, equations, operators. Perl script to convert database content to images.
+      One line per entry in each database.
+    </LI>
+    <LI>
+      <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v2_XML">XML</a>:
+    </LI>
+    <LI>
+      <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v3_CSV">CSV</a>:
+    </LI>
+    <LI>
+      <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v4_file_per_expression">file per expression</a>:
+    </LI>
+    <LI>
+      <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v5_property_graph">property graph</a>:
+      a very limited exploration.
+      Written in Cypher/Neo4j but could also use Gremlin/<a href="https://tinkerpop.apache.org/">TinkerPop</a>.
+      No significant code base.
+      Schema: <BR/>
+      <img src="{{ url_for('static', filename='property_graph_schema.png') }}">
+      <BR/>
+      <center>
+        Schema for property graph representation.
+      </center>
+
+    </LI>
+    <LI>
+      <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v6_sqlite">sqlite</a>:
+      a very limited exploration.
+      No significant code base.
+      Schema: <!-- see https://physicsderivationgraph.blogspot.com/2020/04/schema-for-tables.html -->
+      <UL>
+        <LI><em>Table</em>: derivations; <em>columns</em>: derivation_ID, name, notes, creation date, author
+        <LI><em>Table</em>: expressions; <em>columns</em>: expr_global_ID, latex, creation date, author, AST_as_string, note, name
+        <LI><em>Table</em>: inference_rules; <em>columns</em>: name, creation date, author, latex, number of inputs, number of feeds, number of outputs,
+        <LI><em>Table</em>: symbols; <em>columns</em>: symbol_id, creation date, author, latex, scope, value, references
+        <LI><em>Table</em>: operators; <em>columns</em>: latex, creation date, author, scope, macro, references
+        <LI><em>Table</em>: step; <em>columns</em>: step_id, creation date, author, inference_rule, derivation_ID, linear_index
+        <LI><em>Table</em>: step_inputs; <em>columns</em>: step_id, expr_local_ID, index
+        <LI><em>Table</em>: step_feeds; <em>columns</em>: step_id, expr_local_ID, index
+        <LI><em>Table</em>: step_outputs; <em>columns</em>: step_id, expr_local_ID, index
+        <LI><em>Table</em>: local_to_global; <em>columns</em>: expr_local_ID, expr_global_ID
+      </UL>
+      TODO: is this schema in <a href="https://en.wikipedia.org/wiki/Third_normal_form">3NF</a>?
+    </LI>
+    <LI>
+      <a href="https://github.com/allofphysicsgraph/ui_v7_website_flask_json/tree/gh-pages/">web interface</a>:
+      the current implementation.
+      Uses Python, <a href="https://flask.palletsprojects.com/">Flask</a>, Docker.
+      Data is stored in a JSON file.
+      Limited support for checking inference rules using Sympy.
+      Storage formats evolved:
+      <OL>
+        <LI>nested Python dictionaries and lists stored as a Python Pickle
+        <LI>nested Python dictionaries and lists stored as a JSON file. With this approach the schema can be validated
+        <LI>nested Python dictionaries and lists stored as a JSON file stored in Redis. Retains the schema validation of JSON while preventing concurrent writes to file; see https://redis.io/topics/transactions
+        <LI>nested Python dictionaries and lists stored as a JSON file stored in SQLite3. Part of the migration towards table-based implementation. SQLite3 is better than Redis because Redis requires a Redis server to be running whereas SQLite3 is a file.
+      </OL>
+    </LI>
+  </OL>
+Each of these have required a rewrite of the code from scratch, as well as transfer code (to move from n to n+1).
+The author didn't know about property graphs when implementing v1, v2, and v3.
+</p>
+
+<P>
+  Within a given implementation, there are design decisions with trade-offs to evaluate.
+  Knowing all the options or consequences is not feasible until one or more are implemented.
+  Then the inefficiencies can be observed.
+  Knowledge gained through evolutionary iteration is expensive and takes a lot of time.
+</P>
+
+<P>
+  A few storage methods were considered and then rejected without a full implementation.
+
+<H3><a name="other avenues">Other approaches</a></H3>
+<H4><a name="networkx">Networkx</a></H4>
+<!-- from https://allofphysicsgraph.github.io/proofofconcept/site/more_aspects/example_T_f_networkx.html -->
+<pre><code>
+import networkx as nx
+G=nx.digraph()
+G.add_edge([8332941,8482459])
+G.add_edge([8482459,6822583])
+G.add_edge([5749291,6822583])
+G.add_edge([6822583,8341200])
+G.add_edge([8341200,9483715])
+G.add_edge([8837284,9483715])
+G.add_edge([9483715,9380032])
+G.add_edge([9380032,8345721])
+nx.plot()
+plt.show()
+</code></pre>
+
+<H4><a name="graphml">GraphML</a></H4>
+
+<!-- from https://allofphysicsgraph.github.io/proofofconcept/site/more_aspects/example_T_f_graphml.html -->
+
+<P>
+  See <a href="http://graphml.graphdrawing.org/">GraphML file format</a>.
+
+<!-- the following didn't work:
+  <pre lang="xml">
+based on https://stackoverflow.com/a/35648278/1164295
+see https://www.w3.org/MarkUp/html3/literal.html
+and https://stackoverflow.com/questions/5134242/semantics-standards-and-using-the-lang-attribute-for-source-code-in-markup
+which points to https://www.w3.org/TR/html401/struct/dirlang.html#langcodes
+-->
+<P>
+<textarea rows="20" cols="90" style="border:none;">
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<graph id="G" edgedefault="directed">
+<node id="8332941"/>
+<node id="3131111133"/>
+<edge source="8332941" target="3131111133"/>
+<node id="6822583"/>
+<edge source="3131111133" target="6822583"/>
+<node id="574929"/>
+<edge source="5749291" target="6822583"/>
+<node id="2131616531"/>
+<edge source="6822583" target="2131616531"/>
+<node id="9483715"/>
+<edge source="2131616531" target="9483715"/>
+<node id="8837284"/>
+<edge source="8837284" target="9483715"/>
+<node id="2113211456"/>
+<edge source="9483715" target="2113211456"/>
+<node id="8345721"/>
+<edge source="2113211456" target="8345721"/>
+<edge source="7473895" target="4938429483"/>
+<node id="3848927"/>
+<node id="2393922"/>
+<edge source="2393922" target="3848927"/>
+<node id="2384942"/>
+<node id="2103023049"/>
+<edge source="2103023049" target="2384942"/>
+</graph>
+</graphml>
+</textarea>
+
+
+<H4><a name="rdf">RDF/OWL</a></H4>
+
+<P>
+  The Physics Derivation Graph can be expressed in <a href="https://en.wikipedia.org/wiki/Resource_Description_Framework">RDF</a>.
+
+<P>
+  Each step in a derivation could be put in the subject–predicate–object triple form. For example, suppose the step is
+<Pre>
+Input 1: y=mx+b
+inference rule: multiply both sides by
+feed: 2
+output 2: 2*y = 2*m*x + 2*b
+</Pre>
+Putting this in RDF,
+<pre>
+step 1 | has input | y=mx+b
+step 1 | has inference rule | multiply both sides by
+step 1 | has feed | 2
+step 1 | has output | 2*y = 2*m*x + 2*b
+</pre>
+  While it's easy to convert, I am unaware of the advantages of using RDF.
+  The Physics Derivation Graph is oriented towards visualization.
+  SPARQL is the query language for RDF. I don't see much use for querying the graph.
+  Using RDF doesn't help with using a computer algebra system for validation of the step.
+</P>
+
+
+
+
+{% endblock %}

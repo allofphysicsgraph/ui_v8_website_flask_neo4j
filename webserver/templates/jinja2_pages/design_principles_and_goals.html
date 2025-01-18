@@ -1,0 +1,26 @@
+{% extends "_base.html" %}
+{% block content %}
+
+<P>
+  <em>Recommendation</em>: Read the
+  <a href="{{ url_for('user_documentation') }}?referrer=design_documentation">user documentation</a>
+  and <a href="{{ url_for('faq') }}?referrer=design_documentation">FAQ</a> first.
+  This page assumes familiarity with the jargon used in the Physics Derivation Graph.
+</P>
+
+<P>This page enumerates design principles and goals for the Physics Derivation Graph (PDG).<BR>
+  The list is unordered.
+
+
+<UL>
+  <LI>Technology used should be free to improve accessibility.</LI>
+  <LI>Technology used should be open source to improve ability to inspect the implementation.</LI>
+  <LI>Technology used should be durable and stable to decrease the maintenance burden.</LI>
+  <LI>Rendered HTML pages should have a single scope. (As opposed to a single-page website.)</LI>
+  <LI>HTML tag "Fieldset" is used to denote actions available to the user.</LI>
+</UL>
+
+
+
+
+{% endblock %}

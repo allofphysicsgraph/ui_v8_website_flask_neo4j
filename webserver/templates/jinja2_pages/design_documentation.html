@@ -1,0 +1,198 @@
+{% extends "_base.html" %}
+{% block content %}
+
+<P>
+  <em>Recommendation</em>: Read the
+  <a href="{{ url_for('user_documentation') }}?referrer=design_documentation">user documentation</a>
+  and <a href="{{ url_for('faq') }}?referrer=design_documentation">FAQ</a> first.
+  This page assumes familiarity with the jargon used in the Physics Derivation Graph.
+</P>
+
+<P>
+  This page provides background context for design decisions and implementation choices associated with the Physics Derivation Graph (PDG).
+  Contributions to the project are welcome; see <a href="https://github.com/allofphysicsgraph/ui_v7_website_flask_json/blob/gh-pages/CONTRIBUTING.md">CONTRIBUTING.md</a> on how to get started.
+  The Physics Derivation Graph is covered by the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>, so if you don't like a choice that was made you are welcome to <a href="https://github.com/allofphysicsgraph/ui_v7_website_flask_json/fork">fork the Physics Derivation Graph project</a>.
+
+
+<div id="toc_container">
+<p class="toc_title">Contents</p>
+<!-- the following table was generated on the command line using
+cat developer_documentation.html |\
+     grep "<H" |\
+     sed 's/<\/H.*>/<\/a><\/LI>/' |\
+     sed 's/<H2><a name="/  <LI><a href="#/' |\
+     sed 's/<H3><a name="/    <LI><a href="#/' |\
+     sed 's/<H4><a name="/      <LI><a href="#/'
+-->
+<OL class="toc_list">
+  <LI><a href="#design decisions">Design Decisions</a></LI>
+  <LI><a href="#indices">Numeric indices are the core enabling concept for the PDG</a></LI>
+  <LI><a href="#data structure">Data structure used in the PDG</a></LI>
+  <LI><a href="#latex for expressions">\(\rm\LaTeX\) representation of expressions</a></LI>
+  <OL>
+    <LI><a href="#other avenues">Other approaches</a></LI>
+    <OL>
+      <LI><a href="#networkx">Networkx</a></LI>
+      <LI><a href="#graphml">GraphML</a></LI>
+      <LI><a href="#rdf">RDF/OWL</a></LI>
+    </OL>
+  </OL>
+  <LI><small>[Appendix] </small><a href="#not in scope">Outside of Current Scope</a></LI>
+</OL>
+</div>
+
+<P>&nbsp;</P>
+
+<H2><a name="design decisions">Design Decisions</a></H2>
+
+<P>
+  The objective for the Physics Derivation Graph project is to write down
+  all known mathematical physics in a way that can be both read by humans and
+  checked by a computer algebra system. To do that, primary design considerations
+  include how to represent the objects
+  (e.g., <a href="{{ url_for('user_documentation')}}?referrer=design_documentation#inference rules">inference rules</a>
+  and <a href="{{ url_for('user_documentation')}}?referrer=design_documentation#expressions">expressions</a>
+  and symbols) and what data structure is sufficient.
+</P><P>
+  This page describes the current status and historical evoluation of design
+  decisions critical to the Physics Derivation Graph.
+</P>
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+
+
+<H2><a name="indices">Numeric indices are the core enabling concept for the Physics Derivation Graph</a></H2>
+<P>
+  The visualization of a graph with expressions and inference rules as nodes
+  relies on each node having a distinct index.
+  Each expression, symbol, and inference rule appears only once in the database.
+  This is made possible through use of unique IDs associated with every facet of the visualization.
+  To see what this means in terms of the "period and frequency"
+  example on <a href="{{ url_for('index') }}?referrer=design_documentation">the homepage</a>,
+  here is a view of the indices supporting that visualization for two sequential steps:
+</P>
+<img src="{{ url_for('static', filename='frequency_and_period_exploded_steps.png') }}">
+<BR/>
+<center>
+  Figure 1. Two steps with all numeric IDs shown.
+</center>
+
+<P>
+  Manipulating these indices underlies all other tasks in the Physics Derivation Graph.
+  Access to these indices is performed through a single data structure.
+</P>
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+
+
+<H2><a name="data structure">Data structure used in the Physics Derivation Graph</a></H2>
+<P>
+  The Physics Derivation Graph is currently stored in a single JSON file. <a href="https://github.com/allofphysicsgraph/ui_v7_website_flask_json/blob/gh-pages/flask/data.json">The JSON file</a> is read into Python as a dictionary.
+</P>
+<P>
+  JSON is convenient because it is plain text and the ease of detailed validation available using schemas.
+  The many alternatives to JSON (e.g., SQLite, Redis, Python Pickle, CSV, GraphML) offer trade-offs, a few of which <a href="{{ url_for('comparison_of_design_options_database') }}?referrer=design_documentation">have been explored</a>.
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2><a name="latex for expressions">\(\rm\LaTeX\) representation of expressions</a></H2>
+<P>
+  There are multiple choices of how to represent a mathematical expression.
+  The choices feature trade-offs between conciseness, ability to express the range of notations necessary for Physics, symantic meaning, and ability to use the expression in a computer algebra system (CAS).
+  See the <a href="{{ url_for('comparison_of_design_options_syntax') }}?referrer=design_documentation">comparison of syntax</a> below.
+  \(\rm\LaTeX\) was selected primarily because of the common use in Physics, display of complex math, conciseness, and expressiveness.
+  The use of \(\rm\LaTeX\) means other tasks like parsing symbols and resolving ambiguity are harder.
+</p>
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+
+<H2><a name="not in scope">Outside of Current Scope</a></H2>
+
+<P>Although the Physics Derivation Graph is intended to be comprehensive
+  across domains, there are aspect of Physics not within the current scope of the project:
+<UL>
+  <LI>inclusion of graphics, e.g. free body diagrams, Feynman diagrams, geometrical diagrams.
+  <LI>explanatory text,
+  <LI>animations of concepts,
+  <LI>experimental processes,
+  <LI>interactive models.
+</UL>
+These aspects could be included if the data structure and workflow were adapted
+to an expanded scope.
+
+<!--
+<h2 id="bibliography">Citations</a></H2>
+
+<a name="cite:xml"/>
+<pre>
+@misc{2008_XML,
+url = {http://www.w3.org/TR/REC-xml/},
+title = {Extensible Markup Language (XML) 1.0 (Fifth Edition)},
+version = {W3C Recommendation 26 November 2008},
+year={2008}
+}
+</pre>
+
+<a name="cite:mathematica"/>
+<pre>
+@manual{2014_mathematica,
+title = {Mathematica},
+author = {Wolfram Research, Inc.},
+edition = {Version 10.0},
+publisher = {Wolfram Research, Inc.},
+address = {Champaign, Illinois},
+year = {2014},
+url = {http://support.wolfram.com/kb/472}
+}
+</pre>
+
+<a name="cite:sympy"/>
+<pre>
+@manual{2014_SymPy,
+title = {SymPy: Python library for symbolic mathematics},
+author = {SymPy Development Team},
+year = {2014},
+url = {http://www.sympy.org}
+}
+</pre>
+
+<a name="cite:ascii"/>
+<pre>
+@misc{1968_ASCII,
+title = {American Standard Code for Information Interchange},
+url={http://www.itl.nist.gov/History%20Documents/FIPS%201.pdf},
+year = {1968}
+}
+</pre>
+
+<a name="cite:html"/>
+<pre>
+@misc{1999_HTML,
+title = {HTML 4.01 Specification},
+url = {http://www.w3.org/TR/html4/},
+version = {W3C Recommendation 24 December 1999},
+year={1999}
+}
+</pre>
+
+<a name="cite:mathml"/>
+<pre>
+@misc{2014_MathML,
+url = {http://www.w3.org/TR/MathML/},
+title = {Mathematical Markup Language (MathML) Version 3.0 2nd Edition},
+version = {W3C Recommendation 10 April 2014},
+year = {2014}
+}
+</pre>
+-->
+
+{% endblock %}

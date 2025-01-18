@@ -1,0 +1,26 @@
+{% extends "_base.html" %}
+{% block content %}
+
+<P>
+  <em>Recommendation</em>: Read the
+  <a href="{{ url_for('user_documentation') }}?referrer=design_documentation">user documentation</a>
+  and <a href="{{ url_for('faq') }}?referrer=design_documentation">FAQ</a> first.
+  This page assumes familiarity with the jargon used in the Physics Derivation Graph.
+</P>
+
+<P>
+  This page compares Computer Algebra Systems (CAS) for use with the Physics Derivation Graph (PDG).
+
+
+
+
+<H2><a name="comparison:computer algebra systems">Comparison of <a href="https://en.wikipedia.org/wiki/Proof_assistant">Proof Assistants</a></a></H2>
+
+<H3><a name="Lean">Lean</a></H3>
+
+<H3><a name="HOLLight">HOL Light theorem prover</a></H3>
+
+<a href="https://www.cl.cam.ac.uk/~jrh13/hol-light/tutorial.pdf">HOL Light tutorial</a>
+
+
+{% endblock %}

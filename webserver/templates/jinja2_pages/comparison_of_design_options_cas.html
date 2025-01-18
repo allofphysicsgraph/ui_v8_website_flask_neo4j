@@ -1,0 +1,109 @@
+{% extends "_base.html" %}
+{% block content %}
+
+<P>
+  <em>Recommendation</em>: Read the
+  <a href="{{ url_for('user_documentation') }}?referrer=design_documentation">user documentation</a>
+  and <a href="{{ url_for('faq') }}?referrer=design_documentation">FAQ</a> first.
+  This page assumes familiarity with the jargon used in the Physics Derivation Graph.
+</P>
+
+<P>
+  This page compares Computer Algebra Systems (CAS) for use with the Physics Derivation Graph (PDG).
+
+
+
+
+<H2><a name="comparison:computer algebra systems">Comparison of <a href="https://en.wikipedia.org/wiki/Computer_algebra_system">Computer Algebra Systems</a></a></H2>
+
+<P>
+  Sage, Mathematica, and SymPy are candidates capable of checking the correctness of derivations.
+
+<H3><a name="cas:sage">Sage</a></H3>
+
+<P>
+  The following Sage code checks that the claimed step as stated by the inference rule is carried out correctly:
+<pre>
+T=var('T')
+f=var('f')
+# latex input: T = 1/f
+input_expr = (1)/(f) == (T)
+# latex output: T f = 1
+expected_output_expr = T * f == 1
+# latex feed: f
+feed = f
+input_expr * feed == expected_output_expr
+</pre>
+The output is
+<pre>
+True
+</pre>
+which means that the claimed step in the derivation was implemented consistent with the inference rule applied.
+
+<P>
+  Sage code can be run in <a href="https://sagecell.sagemath.org/">https://sagecell.sagemath.org/</a>.
+
+<P>
+  In this <a href="https://physicsderivationgraph.blogspot.com/2015/12/sage-isnt-robust-computer-algebra.html">analysis of Sage</a> the support for standard operations wasn't sufficient.
+
+<H3><a name="cas:mathematica">Mathematica</a></H3>
+<!-- from https://allofphysicsgraph.github.io/proofofconcept/site/more_aspects/example_T_f_mathematica.html -->
+<P>
+  A computer algebra system like Mathematica can validate the steps of a derivation.
+<pre>
+Input:
+
+multiplyBothSidesOfExpression[LHS_, relation_, RHS_, feed_] := {LHSout = LHS*feed, relationOut = relation, RHSout = RHS*feed}
+divideBothSidesOfExpression[LHS_, relation_, RHS_, feed_] := {LHSout = LHS/feed, relationOut = relation, RHSout = RHS/feed}
+
+LHS = T;
+RHS = 1/f;
+relation = "=";
+{LHS, relation, RHS}
+
+result = multiplyBothSidesOfExpression[LHS, relation, RHS, f]; (* should yield T*f=1 *)
+result = divideBothSidesOfExpression[result[[1]], result[[2]], result[[3]], T]; (* should yield f=1/T *)
+
+{result[[1]], result[[2]], result[[3]]}
+
+Output:
+
+{T,=,1/f}
+
+{f,=,1/T}
+</pre>
+
+Quadratic equation derivation<BR/>
+First, set up the inference rules:
+<pre>
+dividebothsidesby[expr_, x_] := Apart[First[expr]/x] == Apart[Last[expr]/x];
+subtractXfromBothSides [expr_, x_] := First[expr]-x == Last[expr]-x;
+addXtoBothSides[expr_, x_] := First[expr]+x == Last[expr]+x;
+subXforY[expr_, x_, y_] := expr /. x -> y
+raiseBothSidesToPower[expr_, pwr_] = First[expr]^pwr == Last[expr]^pwr
+simplifyLHS [expr_, condition_] := FullSimplify [First[expr], condition] == Last[expr]
+</pre>
+Next, use the inference rules
+<pre>
+func = a*x^2+b*x+c == 0
+func = dividebothsidesby[func, a]
+func = subtractXfromBothSides [func, c/a]
+func = addXtoBothSides[func, (b/(2 a))^2]
+func = subXforY[func, First[func], (x+b/(2 a))^2]
+func = subXforY[func, Last[func], (b^2-4 ac)/(4 a^2)]
+func = raiseBothSidesToPower[func, (1/2)]
+func = simplifyLHS [func, (x+b/(2 a)) > 0]
+func = subXforY[func, Last[func], ±Last[func]]
+func = subtractXfromBothSides [func, b/(2 a)]
+</pre>
+
+<H3><a name="cas:sympy">Sympy</a></H3>
+<P>
+  The motives for using Sympy are the cost (free), the code (open source), the integration (Python), support for Physics, and the support for parsing Latex.
+
+<P>
+  The snippets of SymPy can be run in <a href="http://live.sympy.org/">http://live.sympy.org/</a>
+
+
+
+{% endblock %}
