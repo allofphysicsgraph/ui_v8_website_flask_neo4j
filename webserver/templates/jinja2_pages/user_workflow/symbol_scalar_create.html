@@ -18,8 +18,32 @@
     {{ form_scalar_properties.csrf_token }}
 
     <P>{{ form_scalar_properties.scalar_latex.label}} (<B>required</B>): 
-    {{ form_scalar_properties.scalar_latex(size=50, minlength=1, maxlength=1000) }}</P>
+    {{ form_scalar_properties.scalar_latex(size=50, 
+                                           minlength=1, 
+                                           maxlength=1000,
+                                           id="inputID_symbol_latex",
+                                           onchange="onChangeFunction();") }}</P>
     
+<P>
+<input type="checkbox" 
+              id="display_symbol_latex" 
+              checked="" 
+              onchange="convert('inputID_symbol_latex',
+                                'display_symbol_latex', 
+                                'previewID_symbol_latex',
+                                'outputID_symbol_latex')">
+       <small><label id="display_symbol_latex">Display style</label></small>
+       <input type="button" 
+              value="optional preview of TeX before submitting" 
+              id="previewID_symbol_latex" 
+              onclick="convert('inputID_symbol_latex',
+                               'display_symbol_latex', 
+                               'previewID_symbol_latex',
+                               'outputID_symbol_latex')">
+              <br clear="all">
+        <div id="outputID_symbol_latex"></div>
+
+
     <P>{{ form_scalar_properties.scalar_name_latex.label }} (<small><em>optional</em></small>): 
        {{ form_scalar_properties.scalar_name_latex(size=50, maxlength=1000) }}</p>
     
