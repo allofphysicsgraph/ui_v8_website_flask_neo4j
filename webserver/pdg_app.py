@@ -2323,9 +2323,14 @@ def to_add_expression() -> werkzeug.Response:
     sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
     for this_expression_dict in list_of_expression_dicts:
         if "sympy" in this_expression_dict.keys():
-            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
-                latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
-            )
+            try:
+                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
+                    latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
+                )
+            except Exception as err:
+                flash("ERROR converting to Sympy: "+str(err))
+                print("ERROR converting to Sympy: "+str(err))
+                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
         else:
             sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
 
