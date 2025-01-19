@@ -1265,7 +1265,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
         graphDB_Driver, derivation_id, query_time_dict
     )
 
-    print("pdg_app/to_review_derivation all_steps=", all_steps)
+    # print("pdg_app/to_review_derivation all_steps=", all_steps)
 
     list_of_step_dicts = []
     with graphDB_Driver.session() as session:
@@ -1821,10 +1821,13 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             dict_of_symbol_dicts_not_in_expression[this_symbol_id] = (
                 dict_of_all_symbol_dicts[this_symbol_id]
             )
-    print(
-        "pdg_app/to_edit_expression: dict_of_symbol_dicts_not_in_expression=",
-        dict_of_symbol_dicts_not_in_expression,
-    )
+    # print(
+    #     "pdg_app/to_edit_expression: dict_of_symbol_dicts_not_in_expression=",
+    #     dict_of_symbol_dicts_not_in_expression,
+    # )
+
+    # TODO: how important is creating this variable?
+    dict_of_all_operation_dicts = {}
 
     # create new dict of operations NOT used in expression
     dict_of_operation_dicts_not_in_expression = {}
@@ -2314,13 +2317,18 @@ def to_add_expression() -> werkzeug.Response:
             list_of_symbol_scalar_IDs_in_expression,
         )
 
-        dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
-            sympy_validate_expression.dimensional_consistency(
-                this_expression_dict,
-                list_of_symbol_scalar_IDs_in_expression,
-                dict_of_all_symbol_dicts,
+        try:
+            dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
+                sympy_validate_expression.dimensional_consistency(
+                    this_expression_dict,
+                    list_of_symbol_scalar_IDs_in_expression,
+                    dict_of_all_symbol_dicts,
+                )
             )
-        )
+        except Exception as err:
+            dimensional_consistency_per_expression_id[this_expression_dict["id"]] = str(
+                err
+            )
     print(
         "dimensional_consistency_per_expression_id=",
         dimensional_consistency_per_expression_id,
@@ -6390,6 +6398,9 @@ def to_list_matrices() -> str:
     )
 
 
+@web_app.route(
+    "/edit_expression/", methods=["GET", "POST"]
+)  # this is here so that if someone tries to edit an expression without specifying the ID they get to the list of expressions
 @web_app.route("/list_expressions", methods=["GET", "POST"])
 def to_list_expressions() -> str:
     """
@@ -6495,6 +6506,9 @@ def to_list_expressions() -> str:
     )
 
 
+@web_app.route(
+    "/edit_derivation_metadata", methods=["GET", "POST"]
+)  # this is here so that if someone tries to edit metadata without specifying the ID they are directed to the list of derivations
 @web_app.route("/list_derivations", methods=["GET", "POST"])
 def to_list_derivations() -> str:
     """
