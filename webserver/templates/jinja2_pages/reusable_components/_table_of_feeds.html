@@ -40,19 +40,21 @@
     <td>{{ feed_dict['name_latex'] }}</td>
     <td>{{ feed_dict['description_latex'] }}</td>
     <td>TODO</td> <!-- derivation -->
-    <td>{% for symbol_id in symbol_IDs_per_feed_id[feed_dict['id']] %}
-      <UL>
+    <td><UL>{% for symbol_id in symbol_IDs_per_feed_id[feed_dict['id']] %}
+      
         <LI><a href="{{ url_for('to_edit_node', node_id=symbol_id) }}" title="see more about this symbol">{{ dict_of_all_symbol_dicts[symbol_id]['id'] }}</a>: 
             {{ dict_of_all_symbol_dicts[symbol_id]['latex'] }}</LI>
-      </UL>
+      
       {% endfor %}
+      </UL>
     </td> <!-- symbols -->
-    <!--<td>{ % for operation_id in operations_per_feed[feed_dict['id']] %}
-      <UL>
+    <!--<td><UL>{ % for operation_id in operations_per_feed[feed_dict['id']] %}
+      
         <LI><a href="{ { url_for('to_edit_operation', operation_id=operation_id) }}">{ { dict_of_all_operation_dicts[operation_id]['id'] }}</a>: 
             { { dict_of_all_operation_dicts[operation_id]['latex'] }}</LI>
-      </UL>
+      
       { % endfor %}
+      </UL>
     </td> <!-- operations -->
     <td>
       <P>{{ feed_dict['sympy'] }}
