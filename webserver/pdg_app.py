@@ -1478,16 +1478,17 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
         print("pdg_app/to_review_derivation list_of_feed_dicts", list_of_feed_dicts)
         print("pdg_app/to_review_derivation list_of_output_dicts", list_of_output_dicts)
 
-        # try:
-        derivation_step_validity_dict[step_id] = sympy_validate_step.validate_step(
-            inference_rule_dict,
-            list_of_input_dicts,
-            list_of_feed_dicts,
-            list_of_output_dicts,
-        )
-        # except Exception as err:
-        #     flash(str(err))
-        #     print("ERROR: pdg_app/to_review_derivation ", err)
+        try:
+            derivation_step_validity_dict[step_id] = sympy_validate_step.validate_step(
+                inference_rule_dict,
+                list_of_input_dicts,
+                list_of_feed_dicts,
+                list_of_output_dicts,
+            )
+        except Exception as err:
+            flash(str(err))
+            print("ERROR: pdg_app/to_review_derivation ", err)
+            derivation_step_validity_dict[step_id] = err
 
     print(
         "[TRACE] pdg_app/to_review_derivation end " + trace_id + " " + str(time.time())
@@ -1825,14 +1826,13 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         dict_of_symbol_dicts_not_in_expression,
     )
 
-    # the following isn't necessary because operations are included in symbols
-    # # create new dict of operations NOT used in expression
-    # dict_of_operation_dicts_not_in_expression = {}
-    # for this_operation_id in dict_of_all_operation_dicts.keys():
-    #     if this_operation_id not in dict_of_operation_dicts_in_expression.keys():
-    #         dict_of_operation_dicts_not_in_expression[this_operation_id] = (
-    #             dict_of_all_operation_dicts[this_operation_id]
-    #         )
+    # create new dict of operations NOT used in expression
+    dict_of_operation_dicts_not_in_expression = {}
+    for this_operation_id in dict_of_all_operation_dicts.keys():
+        if this_operation_id not in dict_of_operation_dicts_in_expression.keys():
+            dict_of_operation_dicts_not_in_expression[this_operation_id] = (
+                dict_of_all_operation_dicts[this_operation_id]
+            )
 
     # when the expression is edited, the altered content is equivalent to
     # deleting the old expression and creating a new expression
@@ -2007,6 +2007,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         form_new_expression=web_form_new_expression,
         dict_of_symbol_dicts_in_expression=dict_of_symbol_dicts_in_expression,
         dict_of_symbol_dicts_not_in_expression=dict_of_symbol_dicts_not_in_expression,
+        dict_of_operation_dicts_not_in_expression=dict_of_operation_dicts_not_in_expression,
         expression_dict=expression_dict,
         # sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
