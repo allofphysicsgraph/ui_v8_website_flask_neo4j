@@ -112,7 +112,14 @@ def dimensional_consistency(
         sympy_expr = eval(expression_dict["sympy"])
     except NameError as err:
         return (
-            "unable to parse "
+            "NE: unable to parse "
+            + expression_dict["sympy"]
+            + " as SymPy; error="
+            + str(err)
+        )  # ths is what shows up in the HTML table
+    except SyntaxError as err:
+        return (
+            "SE: unable to parse "
             + expression_dict["sympy"]
             + " as SymPy; error="
             + str(err)
