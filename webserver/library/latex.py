@@ -204,7 +204,7 @@ def create_d3js_json(
     list_of_nodes = []
     for step_id, step_dict in all_steps.items():
 
-        print("latex/create_d3js_json  step_dict", step_dict)
+        # print("latex/create_d3js_json  step_dict", step_dict)
 
         # step_dict
         # {'sequence index': 0,
@@ -384,7 +384,7 @@ def edges_in_derivation_for_d3js(all_steps) -> List[Tuple[str, str]]:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] latex/edges_in_derivation_for_d3js start " + trace_id)
 
-    print("latex/edges_in_derivation_for_d3js all_steps", all_steps)
+    # print("latex/edges_in_derivation_for_d3js all_steps", all_steps)
 
     list_of_edge_tuples = []  # type: List[Tuple[str,str]]
     for step_id, step_dict in all_steps.items():
