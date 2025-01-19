@@ -90,9 +90,9 @@ CREATE (n:derivation{id: row.id}) SET n += row.properties;
 CALL db.awaitIndexes(300);
 :begin
 UNWIND [{id:"000011",
-         properties:{abstract_latex:"https://en.wikipedia.org/wiki/Quadratic_formula#Derivations_of_the_formula",
+         properties:{abstract_latex:"",
                      name_latex:"quadratic equation derivation",
-                     reference_latex:"",
+                     reference_latex:"https://en.wikipedia.org/wiki/Quadratic_formula#Derivations_of_the_formula",
                      author_name_latex:"ben"}}] AS row
 CREATE (n:derivation{id: row.id}) SET n += row.properties;
 :commit
@@ -171,18 +171,18 @@ CREATE (n:derivation{id: row.id}) SET n += row.properties;
 CALL db.awaitIndexes(300);
 :begin
 UNWIND [{id:"142831",
-         properties:{abstract_latex:"https://en.wikipedia.org/wiki/Derivation_of_the_Schwarzschild_solution",
+         properties:{abstract_latex:"",
                      name_latex:"Schwarzschild radius for non-rotating black hole",
-                     reference_latex:"",
+                     reference_latex:"https://en.wikipedia.org/wiki/Derivation_of_the_Schwarzschild_solution",
                      author_name_latex:"ben"}}] AS row
 CREATE (n:derivation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
 UNWIND [{id:"146432",
-         properties:{abstract_latex:"https://notendur.hi.is/hj/EE2/HD1lausn.pdf",
+         properties:{abstract_latex:"",
                      name_latex:"coefficient of thermal expansion using the equation of state for an ideal gas",
-                     reference_latex:"",
+                     reference_latex:"https://notendur.hi.is/hj/EE2/HD1lausn.pdf",
                      author_name_latex:"ben"}}] AS row
 CREATE (n:derivation{id: row.id}) SET n += row.properties;
 :commit
@@ -216,18 +216,18 @@ CREATE (n:derivation{id: row.id}) SET n += row.properties;
 CALL db.awaitIndexes(300);
 :begin
 UNWIND [{id:"282755",
-         properties:{abstract_latex:"https://en.wikipedia.org/wiki/Geostationary_orbit#Derivation_of_geostationary_altitude",
+         properties:{abstract_latex:"",
                      name_latex:"radius for satellite in geostationary orbit",
-                     reference_latex:"",
+                     reference_latex:"https://en.wikipedia.org/wiki/Geostationary_orbit#Derivation_of_geostationary_altitude",
                      author_name_latex:"ben"}}] AS row
 CREATE (n:derivation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
 UNWIND [{id:"332170",
-         properties:{abstract_latex:"https://en.wikipedia.org/wiki/Equations_of_motion",
+         properties:{abstract_latex:"",
                      name_latex:"equations of motion in 1D with constant acceleration - SUVAT (algebra)",
-                     reference_latex:"",
+                     reference_latex:"https://en.wikipedia.org/wiki/Equations_of_motion",
                      author_name_latex:"ben"}}] AS row
 CREATE (n:derivation{id: row.id}) SET n += row.properties;
 :commit
@@ -243,9 +243,9 @@ CREATE (n:derivation{id: row.id}) SET n += row.properties;
 CALL db.awaitIndexes(300);
 :begin
 UNWIND [{id:"375160",
-         properties:{abstract_latex:"https://notendur.hi.is/hj/EE2/HD1lausn.pdf",
+         properties:{abstract_latex:"",
                      name_latex:"coefficient of isothermal compressibility using the equation of state for an ideal gas",
-                     reference_latex:"",
+                     reference_latex:"https://notendur.hi.is/hj/EE2/HD1lausn.pdf",
                      author_name_latex:"ben"}}] AS row
 CREATE (n:derivation{id: row.id}) SET n += row.properties;
 :commit
@@ -306,9 +306,9 @@ CREATE (n:derivation{id: row.id}) SET n += row.properties;
 CALL db.awaitIndexes(300);
 :begin
 UNWIND [{id:"608598",
-         properties:{abstract_latex:"https://arxiv.org/pdf/2004.04818.pdf",
+         properties:{abstract_latex:"",
                      name_latex:"upper limit on velocity in condensed matter",
-                     reference_latex:"",
+                     reference_latex:"https://arxiv.org/pdf/2004.04818.pdf",
                      author_name_latex:"ben"}}] AS row
 CREATE (n:derivation{id: row.id}) SET n += row.properties;
 :commit
@@ -324,18 +324,18 @@ CREATE (n:derivation{id: row.id}) SET n += row.properties;
 CALL db.awaitIndexes(300);
 :begin
 UNWIND [{id:"681943",
-         properties:{abstract_latex:"http://www.dfcd.net/articles/derivations/resistors.html",
+         properties:{abstract_latex:"",
                      name_latex:"total electrical resistance for circuit with two resistors in parallel",
-                     reference_latex:"",
+                     reference_latex:"http://www.dfcd.net/articles/derivations/resistors.html",
                      author_name_latex:"ben"}}] AS row
 CREATE (n:derivation{id: row.id}) SET n += row.properties;
 :commit
 CALL db.awaitIndexes(300);
 :begin
 UNWIND [{id:"713234",
-         properties:{abstract_latex:"http://www.physics.miami.edu/~nearing/mathmethods/mathematical_methods-one.pdf",
+         properties:{abstract_latex:"",
                      name_latex:"hyperbolic trigonometric identities",
-                     reference_latex:"",
+                     reference_latex:"http://www.physics.miami.edu/~nearing/mathmethods/mathematical_methods-one.pdf",
                      author_name_latex:"ben"}}] AS row
 CREATE (n:derivation{id: row.id}) SET n += row.properties;
 :commit
@@ -351,9 +351,9 @@ CREATE (n:derivation{id: row.id}) SET n += row.properties;
 CALL db.awaitIndexes(300);
 :begin
 UNWIND [{id:"820976",
-         properties:{abstract_latex:"https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion#Third_law",
+         properties:{abstract_latex:"",
                      name_latex:"Kepler's Third Law: period squared propto distance cubed",
-                     reference_latex:"",
+                     reference_latex:"https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion#Third_law",
                      author_name_latex:"ben"}}] AS row
 CREATE (n:derivation{id: row.id}) SET n += row.properties;
 :commit
@@ -369,9 +369,9 @@ CREATE (n:derivation{id: row.id}) SET n += row.properties;
 CALL db.awaitIndexes(300);
 :begin
 UNWIND [{id:"909006",
-         properties:{abstract_latex:"http://www.dfcd.net/articles/derivations/resistors.html",
+         properties:{abstract_latex:"",
                      name_latex:"total electrical resistance for circuit with two resistors in series",
-                     reference_latex:"",
+                     reference_latex:"http://www.dfcd.net/articles/derivations/resistors.html",
                      author_name_latex:"ben"}}] AS row
 CREATE (n:derivation{id: row.id}) SET n += row.properties;
 :commit
