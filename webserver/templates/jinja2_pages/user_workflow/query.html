@@ -34,7 +34,7 @@ For the query <BR>
 {% endif %}
 <UL>
 {% for record in list_of_records %}
-    <LI>{{ record | safe }}</LI>
+    <LI>{{ record.replace('\r','\\\\r') | safe }}</LI>
 {% endfor %}
 </UL>
 
