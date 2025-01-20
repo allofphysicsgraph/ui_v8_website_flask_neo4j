@@ -1423,7 +1423,13 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             )
 
     # only create d3js JSON if the HTML page is going to be rendered
-    latex.create_d3js_json(derivation_id, all_steps, "/code/static/")
+    try:
+        latex.create_d3js_json(derivation_id, all_steps, "/code/static/")
+        # if that function fails then there's no JSON file for d3js
+    except Exception as err:
+        flash(str(err))
+        print("ERROR: pdg_app/to_review_derivation ", err)
+
     d3js_json_filename = derivation_id + ".json"
 
     # try:
@@ -1539,7 +1545,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
         query_time_dict["to_select_step: get_list_of_step_dicts_in_this_derivation"] = (
             round(time.time() - query_start_time, 3)
         )
-    print("list_of_step_dicts=", list_of_step_dicts)
+    #print("list_of_step_dicts=", list_of_step_dicts)
 
     # inference_rule_per_step = {}
     # for this_step_dict in list_of_step_dicts:
@@ -5919,7 +5925,7 @@ def to_query() -> werkzeug.Response:
         query_time_dict["to_query: list_nodes_of_type, derivation"] = round(
             time.time() - query_start_time, 3
         )
-    print("list_of_derivation_dicts=", list_of_derivation_dicts)
+    # print("list_of_derivation_dicts=", list_of_derivation_dicts)
     if len(list_of_derivation_dicts) > 0:
         derivation_id = list_of_derivation_dicts[0]["id"]
     else:
@@ -5951,7 +5957,7 @@ def to_query() -> werkzeug.Response:
         query_time_dict["to_query: list_nodes_of_type, step"] = round(
             time.time() - query_start_time, 3
         )
-    print("list_of_step_dicts=", list_of_step_dicts)
+    #print("list_of_step_dicts=", list_of_step_dicts)
     if len(list_of_step_dicts) > 0:
         step_id = list_of_step_dicts[0]["id"]
     else:
