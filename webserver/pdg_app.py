@@ -131,8 +131,14 @@ from wtforms import (
     BooleanField,
 )  # type: ignore
 
-# type: ignore
 # from wtforms import PasswordField, FieldList
+
+from flask_login import (
+    login_required,
+    login_user,
+    logout_user,
+    current_user,
+)  # type: ignore
 
 
 # https://stackoverflow.com/questions/6323860/sibling-package-imports/50193944
@@ -214,28 +220,6 @@ from initialize_neo4j import graphDB_Driver
 
 import initialize_version_log
 
-# class Config(object):
-#     """
-#     https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
-#     """
-
-#     SECRET_KEY = os.environ.get("SECRET_KEY")
-
-
-# # ORDERING: this has to come before using the function wrapper
-# # ORDERING: this has to be after the class "Config" is specified
-# web_app = Flask(__name__, static_folder="static")
-# web_app.config.from_object(
-#     Config
-# )  # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
-# web_app.config["UPLOAD_FOLDER"] = (
-#     # the following folder on the host is accessible to both flask and neo4j
-#     "/scratch/dumping_grounds/"  # https://flask.palletsprojects.com/en/3.0.x/patterns/fileuploads/
-# )
-# web_app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
-#     0  # https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
-# )
-# web_app.config["DEBUG"] = True
 
 import initialize_flask
 from initialize_flask import web_app
@@ -901,6 +885,9 @@ def to_index():
     """
     placeholder for landing page that provides context before user goes to_navigation
     """
+    print(current_user.name)
+    print(current_user.is_anonymous)
+
     return render_template("jinja2_pages/index.html")
 
 

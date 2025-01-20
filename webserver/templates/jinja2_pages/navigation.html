@@ -17,7 +17,7 @@
     <td colspan=2>
       <UL>
         <LI>
-          <a href="{{ url_for('list_all_derivations', referrer='navigation') }}">show all {{ dat['derivations']|length }} derivations</a>
+          <a href="{{ url_for('to_list_derivations', referrer='navigation') }}">show all {{ dat['derivations']|length }} derivations</a>
         </LI>
         <LI>
           <a href="{{ url_for('start_new_derivation', referrer='navigation') }}">start a new derivation</a>
@@ -48,7 +48,7 @@
     <td>&nbsp;</td>
     <td colspan=2>
       <UL>
-        <LI><a href="{{ url_for('list_all_steps') }}?referrer=navigation">list all steps</a></LI>
+        <LI><a href="{{ url_for('to_list_steps') }}?referrer=navigation">list all steps</a></LI>
       </UL>
     </td>
   </tr>
@@ -63,10 +63,10 @@
     <td>
       <UL>
         <LI>
-      <a href="{{ url_for('list_all_inference_rules') }}?referrer=navigation">list all {{ dat["inference rules"]|length }} inference rules</a>;
+      <a href="{{ url_for('to_list_inference_rules') }}?referrer=navigation">list all {{ dat["inference rules"]|length }} inference rules</a>;
       also edit inference rules
       {% if current_user.is_anonymous %}
-        if you are <a href="{{ url_for('login') }}?referrer=navigation">signed in</a>
+        if you are <a href="{{ url_for('to_login') }}?referrer=navigation">signed in</a>
       {% endif %}
         </LI>
       </UL>
@@ -85,7 +85,7 @@
      <UL>
     {% if dat['expressions']|length > 0 %}
       <LI>
-        <a href="{{ url_for('list_all_expressions') }}?referrer=navigation">list all {{ dat['expressions']|length }} expressions</a>;
+        <a href="{{ url_for('to_list_expressions') }}?referrer=navigation">list all {{ dat['expressions']|length }} expressions</a>;
         also edit expressions
       {% if current_user.is_anonymous %}
         if you are <a href="{{ url_for('login') }}?referrer=navigation">signed in</a>
@@ -113,7 +113,7 @@
       <a href="{{ url_for('to_list_symbols') }}?referrer=navigation">list all {{ dat['symbols']|length }} symbols</a> (variables and constants)
     </LI>
     <LI>
-      <a href="{{ url_for('list_all_operators') }}?referrer=navigation">list all {{ dat['operators']|length }} operators</a>
+      <a href="{{ url_for('to_list_operators') }}?referrer=navigation">list all {{ dat['operators']|length }} operators</a>
     </LI>
       </UL>
     </td>

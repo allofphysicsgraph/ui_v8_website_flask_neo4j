@@ -7,6 +7,7 @@ http://creativecommons.org/licenses/by/4.0/
 Attribution 4.0 International (CC BY 4.0)
 """
 
+import os
 import logging
 import random
 
@@ -34,6 +35,29 @@ from flask_login import (
     logout_user,
     current_user,
 )  # type: ignore
+
+# in support of Google Sign-in
+# from https://realpython.com/flask-google-login/
+from google_auth_sql_db import init_db
+from google_auth_user_account import User
+
+# https://realpython.com/flask-google-login/
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
+GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
+
+from oauthlib.oauth2 import WebApplicationClient  # type: ignore
+
+# https://flask-login.readthedocs.io/en/latest/#flask_login.LoginManager.user_loader
+login_manager = LoginManager()
+login_manager.init_app(web_app)
+
+# https://realpython.com/flask-google-login/
+# OAuth 2 client setup
+client = WebApplicationClient(GOOGLE_CLIENT_ID)
+
+# https://stackoverflow.com/a/24226084/1164295
+web_app.config["GOOGLE_LOGIN_REDIRECT_SCHEME"] = "https"
 
 
 def get_google_provider_cfg():

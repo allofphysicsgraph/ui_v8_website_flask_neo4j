@@ -361,19 +361,6 @@ def to_site_map():
 ###########################################################################
 
 
-@web_app.route("/login")
-def to_login():
-    """
-    https://realpython.com/flask-google-login/
-    """
-    # This is a placeholder
-
-    return render_template("jinja2_pages/user_workflow/site_map.html", title="site map")
-
-
-###########################################################################
-
-
 @web_app.route("/comparison_of_design_options/cas", methods=["GET", "POST"])
 def to_comparison_of_design_options_cas():
     """

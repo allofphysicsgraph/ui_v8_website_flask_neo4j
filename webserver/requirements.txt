@@ -1,11 +1,23 @@
 flask
 Flask-WTF
+Flask-Login
 
 # native driver; see https://neo4j.com/docs/api/python-driver/current/api.html
 neo4j
 
 # https://github.com/allofphysicsgraph/proofofconcept/issues/157
 secure==0.3.0
+
+# Sign in with Google
+google-api-python-client
+# https://google-auth.readthedocs.io/en/latest/reference/google.auth.transport.requests.html
+google-auth-httplib2
+google-auth-oauthlib
+
+# only necessary for localhost
+# from https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https
+#pyOpenSSL==24.2.1
+pyOpenSSL
 
 # image size
 opencv-python
