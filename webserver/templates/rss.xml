@@ -1,1 +1,20 @@
-test
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+  <title>Physics Derivation Graph</title>
+  <link>https://allofphysics.com</link>
+  <description>Mathematical Physics as a Graph</description>
+  <item>
+    <title>what I though about</title>
+    <link>https://allofphysics.com/blog/1982/10/29</link>
+    <description>New idea</description>
+  </item>
+  <item>
+    <title>more stuff</title>
+    <link>https://allofphysics.com/blog/1982/11/02</link>
+    <description>another idea</description>
+  </item>
+</channel>
+
+</rss>
