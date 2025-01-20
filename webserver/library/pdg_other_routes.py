@@ -9,6 +9,8 @@ Attribution 4.0 International (CC BY 4.0)
 
 import random
 import logging
+import time
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -117,15 +119,17 @@ def search_form_redirect_to_google():
         + " "
         + str(time.time())
     )
-    logger.debug(
+    print(
         "request.url: " + str(request.url)
     )  # https://stackoverflow.com/a/46176337/1164295
+
+    print("request.args=" + str(request.args))
 
     # request.args are embedded in the URL
     # logger.debug("search term is " + str(request.args.get("search")))
     # logger.debug("request.args =" + str(request.args))
-    logger.debug("request.form =" + str(request.form))
-    logger.debug("request.form.keys() =" + str(request.form.keys()))
+    print("request.form =" + str(request.form))
+    print("request.form.keys() =" + str(request.form.keys()))
 
     return redirect(
         "https://www.google.com/search?&q=site%3Aderivationmap.net+"
@@ -329,15 +333,13 @@ def to_login():
     """
     # This is a placeholder
 
-    return redirect(
-        url_for("jinja2_pages/user_workflow/site_map.html", title="site map")
-    )
+    return render_template("jinja2_pages/user_workflow/site_map.html", title="site map")
 
 
 ###########################################################################
 
 
-@web_app.route("/comparison_of_design_options_cas", methods=["GET", "POST"])
+@web_app.route("/comparison_of_design_options/cas", methods=["GET", "POST"])
 def to_comparison_of_design_options_cas():
     """
     a static page
@@ -345,11 +347,11 @@ def to_comparison_of_design_options_cas():
     logger.info("[TRACE] pdg_other_routes/")
     return render_template(
         "jinja2_pages/comparison_of_design_options_cas.html",
-        title="Comparison of Design Options Documentation",
+        title="Comparison of Design Options: Computer Algebra System (CAS)",
     )
 
 
-@web_app.route("/comparison_of_design_options_proofs", methods=["GET", "POST"])
+@web_app.route("/comparison_of_design_options/proofs", methods=["GET", "POST"])
 def to_comparison_of_design_options_proofs():
     """
     a static page
@@ -357,11 +359,11 @@ def to_comparison_of_design_options_proofs():
     logger.info("[TRACE] pdg_other_routes/")
     return render_template(
         "jinja2_pages/comparison_of_design_options_proofs.html",
-        title="Comparison of Design Options Documentation",
+        title="Comparison of Design Options: Proofs",
     )
 
 
-@web_app.route("/comparison_of_design_options_syntax", methods=["GET", "POST"])
+@web_app.route("/comparison_of_design_options/syntax", methods=["GET", "POST"])
 def to_comparison_of_design_options_syntax():
     """
     a static page
@@ -369,11 +371,11 @@ def to_comparison_of_design_options_syntax():
     logger.info("[TRACE] pdg_other_routes/")
     return render_template(
         "jinja2_pages/comparison_of_design_options_syntax.html",
-        title="Comparison of Design Options Documentation",
+        title="Comparison of Design Options: Syntax",
     )
 
 
-@web_app.route("/comparison_of_design_options_database", methods=["GET", "POST"])
+@web_app.route("/comparison_of_design_options/database", methods=["GET", "POST"])
 def to_comparison_of_design_options_database():
     """
     a static page
@@ -381,11 +383,14 @@ def to_comparison_of_design_options_database():
     logger.info("[TRACE] pdg_other_routes/")
     return render_template(
         "jinja2_pages/comparison_of_design_options_database.html",
-        title="Comparison of Design Options Documentation",
+        title="Comparison of Design Options: Database",
     )
 
 
 ###########################################################################
+
+
+# This page appears to be statically generated. Probably remove?
 
 
 @web_app.route("/list_named_expressions", methods=["GET", "POST"])
@@ -426,14 +431,14 @@ def to_blog(YYYY: str, MM: str, blog_title: str):
 
 ###########################################################################
 
-# This page appears to be statically generated. Probably remove?
-
 
 @web_app.route("/clickable_layers", methods=["GET", "POST"])
 def to_clickable_layers():
     """ """
     logger.info("[TRACE] pdg_other_routes/clickable_layers")
-    return render_template("clickable_layers.html", title="clickable_layers")
+    return render_template(
+        "jinja2_pages/clickable_layers.html", title="clickable_layers"
+    )
 
 
 ###########################################################################
@@ -445,7 +450,7 @@ def to_class_notes_overview():
     class notes from school
     """
     logger.info("[TRACE] pdg_other_routes/class_notes]")
-    return render_template("class_notes_overview.html", title="class notes overview")
+    return render_template("class_notes/overview.html", title="class notes overview")
 
 
 @web_app.route("/class_notes/<which_class>", methods=["GET", "POST"])
@@ -459,12 +464,12 @@ def to_class_notes_subpage(which_class: str):
     if which_class == "overview":
         logger.info("URL is overview")
         logger.info("[TRACE] pdg_other_routes/end " + trace_id + "]")
-        return render_template("class_notes_overview.html", title="overview")
+        return render_template("class_notes/overview.html", title="overview")
     elif which_class == "math402_mathematical_physics_hale":
         logger.info("URL is 402")
         logger.info("[TRACE] pdg_other_routes/end " + trace_id + "]")
         return render_template(
-            "class_notes_math402_mathematical_physics_hale.html", title="Math 402"
+            "class_notes/math402_mathematical_physics_hale.html", title="Math 402"
         )
 
     logger.info("[TRACE] pdg_other_routes/end " + trace_id + "]")
@@ -481,7 +486,7 @@ def to_spectrum_of_precision():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision: Overview"
-    return render_template("layers_overview.html", title=page_title)
+    return render_template("jinja2_pages/layers_overview.html", title=page_title)
 
 
 @web_app.route("/spectrum_of_precision/lecture", methods=["GET", "POST"])
@@ -490,7 +495,7 @@ def to_spectrum_of_precision_layer_lecture():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_lecture_video.html", title=page_title)
+    return render_template("jinja2_pages/layers_lecture_video.html", title=page_title)
 
 
 @web_app.route("/spectrum_of_precision/handwritten", methods=["GET", "POST"])
@@ -499,7 +504,9 @@ def to_spectrum_of_precision_layer_handwritten():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_handwritten_notes.html", title=page_title)
+    return render_template(
+        "jinja2_pages/layers_handwritten_notes.html", title=page_title
+    )
 
 
 @web_app.route("/spectrum_of_precision/latex", methods=["GET", "POST"])
@@ -508,7 +515,9 @@ def to_spectrum_of_precision_layer_latex():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_document_without_decorations.html", title=page_title)
+    return render_template(
+        "jinja2_pages/layers_document_without_decorations.html", title=page_title
+    )
 
 
 @web_app.route("/spectrum_of_precision/tag_sections", methods=["GET", "POST"])
@@ -517,7 +526,9 @@ def to_spectrum_of_precision_layer_tag_sections():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_section_document_structure.html", title=page_title)
+    return render_template(
+        "jinja2_pages/layers_section_document_structure.html", title=page_title
+    )
 
 
 @web_app.route("/spectrum_of_precision/tag_words", methods=["GET", "POST"])
@@ -527,7 +538,7 @@ def to_spectrum_of_precision_layer_tag_words():
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template(
-        "layers_words_named_entity_recognition.html", title=page_title
+        "jinja2_pages/layers_words_named_entity_recognition.html", title=page_title
     )
 
 
@@ -537,7 +548,7 @@ def to_spectrum_of_precision_layer_tag_expressions():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_contentML.html", title=page_title)
+    return render_template("jinja2_pages/layers_contentML.html", title=page_title)
 
 
 @web_app.route("/spectrum_of_precision/tag_all", methods=["GET", "POST"])
@@ -546,7 +557,9 @@ def to_spectrum_of_precision_layer_tag_all():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_sections_words_contentML.html", title=page_title)
+    return render_template(
+        "jinja2_pages/layers_sections_words_contentML.html", title=page_title
+    )
 
 
 @web_app.route("/spectrum_of_precision/variables", methods=["GET", "POST"])
@@ -555,7 +568,9 @@ def to_spectrum_of_precision_layer_variables():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_concepts_to_variables.html", title=page_title)
+    return render_template(
+        "jinja2_pages/layers_concepts_to_variables.html", title=page_title
+    )
 
 
 @web_app.route("/spectrum_of_precision/all_steps", methods=["GET", "POST"])
@@ -564,7 +579,7 @@ def to_spectrum_of_precision_layer_all_steps():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_all_steps.html", title=page_title)
+    return render_template("jinja2_pages/layers_all_steps.html", title=page_title)
 
 
 @web_app.route("/spectrum_of_precision/pdg", methods=["GET", "POST"])
@@ -573,7 +588,9 @@ def to_spectrum_of_precision_layer_pdg():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_derivation_graph.html", title=page_title)
+    return render_template(
+        "jinja2_pages/layers_derivation_graph.html", title=page_title
+    )
 
 
 @web_app.route("/spectrum_of_precision/CAS_validation", methods=["GET", "POST"])
@@ -582,7 +599,7 @@ def to_spectrum_of_precision_layer_CAS_validation():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_validate_steps.html", title=page_title)
+    return render_template("jinja2_pages/layers_validate_steps.html", title=page_title)
 
 
 @web_app.route("/spectrum_of_precision/numeric_id", methods=["GET", "POST"])
@@ -592,7 +609,7 @@ def to_spectrum_of_precision_layer_numeric_id():
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template(
-        "layers_replace_variables_with_numeric_id.html", title=page_title
+        "jinja2_pages/layers_replace_variables_with_numeric_id.html", title=page_title
     )
 
 
@@ -602,7 +619,9 @@ def to_spectrum_of_precision_layer_dimensional_validation():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_dimensional_validation.html", title=page_title)
+    return render_template(
+        "jinja2_pages/layers_dimensional_validation.html", title=page_title
+    )
 
 
 @web_app.route("/spectrum_of_precision/proof", methods=["GET", "POST"])
@@ -611,7 +630,9 @@ def to_spectrum_of_precision_layer_proof():
     exploration of layering formalization
     """
     page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("layers_proof_of_inference_rule.html", title=page_title)
+    return render_template(
+        "jinja2_pages/layers_proof_of_inference_rule.html", title=page_title
+    )
 
 
 ###########################################################################
