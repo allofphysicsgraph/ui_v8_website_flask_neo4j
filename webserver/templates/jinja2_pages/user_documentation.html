@@ -1,4 +1,4 @@
-{% extends "_base.html" %}
+{% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
 <P>
@@ -54,7 +54,7 @@ the project is provided.
 <P>
   The Physics Derivation Graph is an effort to document knowledge about mathematical physics.
 </P><P>
-  The project uses free and open source software (see <a href="{{ url_for('developer_documentation') }}?referrer=user_documentation#software">dependencies</a>) and the content is free and open source.
+  The project uses free and open source software (see <a href="{{ url_for('to_developer_documentation') }}?referrer=user_documentation#software">dependencies</a>) and the content is free and open source.
   This content is free because it is intended to be accessible to anyone; cost should not be a barrier to access.
   The content is open source so that other researchers can build upon what exists.
   There is no intent to profit from the work.
@@ -97,7 +97,7 @@ is designed to be read sequentially.
   A Physics-focused machine-oriented
   <a href="https://en.wikipedia.org/wiki/Controlled_natural_language">controlled natural language</a>
   is defined by
-  <a href="{{ url_for('developer_documentation') }}?referrer=user_documentation#CNL grammar">grammar</a>
+  <a href="{{ url_for('to_developer_documentation') }}?referrer=user_documentation#CNL grammar">grammar</a>
   and vocabulary.  The jargon for concepts in the Physics Derivation Graph are
   related by the following graph:
   </P><P>&nbsp;</P>
