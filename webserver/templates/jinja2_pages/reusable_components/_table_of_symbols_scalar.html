@@ -36,8 +36,8 @@
           {{ scalar_dict['id'] }}
       </a>
     </td>
-    <td>\({{ scalar_dict['latex']}}\)<BR>
-          {{ scalar_dict['latex']}}</td>
+    <td>\({{ scalar_dict['latex'].replace('\r','\\r') }}\)<BR>
+          {{ scalar_dict['latex'].replace('\r','\\\\r') }}</td>
     <td>{{ scalar_dict['name_latex'] }}</td>
     <td>{{ scalar_dict['description_latex'] }}</td>
     <td>{{ scalar_dict['scope'] }}</td>
