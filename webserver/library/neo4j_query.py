@@ -797,10 +797,11 @@ def add_inference_rule(
     inference_rule_id: str,
     inference_rule_name: str,
     inference_rule_latex: str,
-    author_name_latex: str,
     number_of_inputs: int,
     number_of_feeds: int,
     number_of_outputs: int,
+    now_str: str,
+    author_name_latex: str,
 ):
     """
     the "number_of_" are passed in as integers,
@@ -831,6 +832,7 @@ def add_inference_rule(
         "merge (:inference_rule "
         '{name_latex:"' + inference_rule_name + '", '
         ' latex:"' + inference_rule_latex + '", '
+        ' created_datetime:"' + now_str + '",'
         ' author_name_latex:"' + author_name_latex + '", '
         ' id:"' + inference_rule_id + '", '
         " number_of_inputs:" + str(number_of_inputs) + ", "
@@ -884,7 +886,6 @@ def edit_expression(
     expression_name_latex: str,
     expression_description_latex: str,
     expression_reference_latex: str,
-    now_str: str,
     author_name_latex: str,
 ) -> None:
     """
@@ -903,7 +904,6 @@ def edit_expression(
         'name_latex: "' + str(expression_name_latex) + '",'
         'description_latex: "' + str(expression_description_latex) + '",'
         'reference_latex: "' + str(expression_reference_latex) + '",'
-        'created_datetime:"' + now_str + '",'
         'author_name_latex:"' + author_name_latex + '",'
         'latex_lhs: "' + str(expression_latex_lhs) + '",'
         'latex_relation: "' + str(expression_latex_relation) + '",'
@@ -1000,7 +1000,6 @@ def edit_derivation_metadata(
     derivation_name_latex: str,
     derivation_reference_latex: str,
     abstract_latex: str,
-    now_str: str,
     author_name_latex: str,
 ) -> None:
     """
@@ -1021,7 +1020,6 @@ def edit_derivation_metadata(
         'SET d = {id: "' + str(derivation_id) + '",'
         'name_latex: "' + str(derivation_name_latex) + '",'
         'reference_latex: "' + str(derivation_reference_latex) + '",'
-        'created_datetime:"' + now_str + '",'
         'author_name_latex:"' + author_name_latex + '",'
         'abstract_latex: "' + str(abstract_latex) + '"}'
     )
@@ -1422,6 +1420,7 @@ def add_expression(
     expression_latex_condition: str,
     expression_description_latex: str,
     expression_reference_latex: str,
+    now_str: str,
     author_name_latex: str,
 ) -> None:
     """
@@ -1441,6 +1440,7 @@ def add_expression(
         ' latex_relation:"' + str(expression_latex_relation) + '", '
         ' latex_rhs:"' + str(expression_latex_rhs) + '", '
         ' latex_condition: "' + str(expression_latex_condition) + '", '
+        ' created_datetime:"' + now_str + '",'
         #' lean:"' + str(expression_lean) + '", '
         #' sympy:"' + str(expression_sympy) + '", '
         ' description_latex:"' + str(expression_description_latex) + '", '
@@ -1461,6 +1461,7 @@ def add_feed(
     feed_latex: str,
     feed_sympy: str,
     feed_lean: str,
+    now_str:str,
     author_name_latex: str,
 ) -> None:
     """
@@ -1477,6 +1478,7 @@ def add_feed(
         "merge (:feed "
         '{latex:"' + str(feed_latex) + '", '
         ' author_name_latex:"' + str(author_name_latex) + '", '
+        ' created_datetime:"' + now_str + '",'
         ' sympy:"' + str(feed_sympy) + '", '
         ' lean:"' + str(feed_lean) + '", '
         ' id:"' + str(feed_id) + '"})'
@@ -1494,6 +1496,7 @@ def add_quantum_operator_symbol(
     symbol_description: str,
     symbol_requires_arguments: bool,
     symbol_reference: str,
+    now_str: str,
     author_name_latex: str,
 ) -> None:
     """
@@ -1514,6 +1517,7 @@ def add_quantum_operator_symbol(
         '{name_latex:"' + str(symbol_name) + '", '
         ' latex:"' + str(symbol_latex) + '", '
         ' description_latex:"' + str(symbol_description) + '", '
+        ' created_datetime:"' + now_str + '",'
         ' author_name_latex:"' + str(author_name_latex) + '", '
         " requires_arguments:" + str(symbol_requires_arguments) + ", "
         ' reference_latex:"' + str(symbol_reference) + '", '
@@ -1536,6 +1540,7 @@ def add_constant_value_with_units(
     number_decimal: float,
     number_power: float,
     dict_of_units: dict,
+    now_str: str,
     author_name_latex: str,
 ) -> None:
     """
@@ -1560,6 +1565,7 @@ def add_constant_value_with_units(
         "merge (:value_with_units "
         "{number_decimal:" + str(number_decimal) + ", "
         " number_power: " + str(number_power) + ", "
+        ' created_datetime:"' + now_str + '",'
         ' id:"'
         + str(value_with_units_id)
         + '", '
@@ -1606,6 +1612,7 @@ def add_scalar_symbol(
     dimension_electric_charge: int,
     dimension_amount_of_substance: int,
     dimension_luminous_intensity: int,
+    now_str: str,
     author_name_latex: str,
 ):
     """
@@ -1640,6 +1647,7 @@ def add_scalar_symbol(
         " dimension_electric_charge: " + str(dimension_electric_charge) + ", "
         " dimension_amount_of_substance: " + str(dimension_amount_of_substance) + ", "
         " dimension_luminous_intensity: " + str(dimension_luminous_intensity) + ", "
+        ' created_datetime:"' + now_str + '",'
         ' author_name_latex:"' + str(author_name_latex) + '", '
         ' id:"' + str(symbol_id) + '"})'
     )
@@ -1661,6 +1669,7 @@ def add_vector_symbol(
     symbol_size: str,
     symbol_orientation: str,
     symbol_number_of_entries: str,
+    now_str: str
     author_name_latex: str,
 ):
     """
@@ -1687,6 +1696,7 @@ def add_vector_symbol(
             'orientation:"' + str(symbol_orientation) + '", '
             " size: '" + str(symbol_size) + "',"
             "is_composite:" + str(symbol_is_composite) + ","
+            ' created_datetime:"' + now_str + '",'
             ' author_name_latex:"' + str(author_name_latex) + '", '
             ' id:"' + str(symbol_id) + '"})'
         )
@@ -1701,6 +1711,7 @@ def add_vector_symbol(
             " size: '" + str(symbol_size) + "',"
             'number_of_entries:"' + str(symbol_number_of_entries) + '", '
             "is_composite:" + str(symbol_is_composite) + ","
+            ' created_datetime:"' + now_str + '",'
             ' author_name_latex:"' + str(author_name_latex) + '", '
             ' id:"' + str(symbol_id) + '"})'
         )
@@ -1722,6 +1733,7 @@ def add_matrix_symbol(
     symbol_size: str,
     symbol_number_of_rows: str,
     symbol_number_of_columns: str,
+    now_str: str,
     author_name_latex: str,
 ):
     """
@@ -1747,6 +1759,7 @@ def add_matrix_symbol(
             ' reference_latex:"' + str(symbol_reference) + '", '
             " size: '" + str(symbol_size) + "',"
             "is_composite:" + str(symbol_is_composite) + ","
+            ' created_datetime:"' + now_str + '",'
             ' author_name_latex:"' + str(author_name_latex) + '", '
             ' id:"' + str(symbol_id) + '"})'
         )
@@ -1761,6 +1774,7 @@ def add_matrix_symbol(
             'number_of_rows:"' + str(symbol_number_of_rows) + '", '
             'number_of_columns:"' + str(symbol_number_of_columns) + '", '
             "is_composite:" + str(symbol_is_composite) + ","
+            ' created_datetime:"' + now_str + '",'
             ' author_name_latex:"' + str(author_name_latex) + '", '
             ' id:"' + str(symbol_id) + '"})'
         )
@@ -1779,6 +1793,7 @@ def add_operation_symbol(
     operation_description_latex: str,
     operation_reference_latex: str,
     operation_argument_count: int,
+    now_str: str,
     author_name_latex: str,
 ) -> None:
     """
@@ -1806,6 +1821,7 @@ def add_operation_symbol(
         ' description_latex:"' + str(operation_description_latex) + '", '
         ' reference_latex:"' + str(operation_reference_latex) + '", '
         " argument_count:" + str(operation_argument_count) + ", "
+        ' created_datetime:"' + now_str + '",'
         ' author_name_latex:"' + str(author_name_latex) + '", '
         ' id:"' + str(operation_id) + '"})'
     )
@@ -1826,6 +1842,7 @@ def add_relation_symbol(
     relation_latex: str,
     relation_description_latex: str,
     relation_reference_latex: str,
+    now_str: str,
     author_name_latex: str,
 ) -> None:
     """
@@ -1851,6 +1868,7 @@ def add_relation_symbol(
         ' latex:"' + str(relation_latex) + '", '
         ' description_latex:"' + str(relation_description_latex) + '", '
         ' reference_latex:"' + str(relation_reference_latex) + '", '
+        ' created_datetime:"' + now_str + '",'
         ' author_name_latex:"' + str(author_name_latex) + '", '
         ' id:"' + str(relation_id) + '"})'
     )

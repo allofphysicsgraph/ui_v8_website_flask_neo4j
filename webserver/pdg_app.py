@@ -1614,7 +1614,6 @@ def to_edit_derivation_metadata(
                 derivation_name_latex,
                 derivation_reference_latex,
                 abstract_latex,
-                now_str,
                 author_name_latex,
             )
             query_time_dict["to_edit_derivation_metadata: edit_derivation_metadata"] = (
@@ -1896,8 +1895,6 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             expression_latex_condition,
         )
 
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
         author_name_latex = "ben"
 
@@ -1914,7 +1911,6 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
                 expression_name_latex,
                 expression_description_latex,
                 expression_reference_latex,
-                now_str,
                 author_name_latex,
             )
             query_time_dict["pdg_app/to_edit_expression: edit_expression"] = round(
@@ -2413,6 +2409,10 @@ def to_add_expression() -> werkzeug.Response:
 
         author_name_latex = "ben"
 
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
+
         expression_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "expression"
         )
@@ -2430,6 +2430,7 @@ def to_add_expression() -> werkzeug.Response:
                 expression_latex_condition,
                 expression_description_latex,
                 expression_reference_latex,
+                now_str,
                 author_name_latex,
             )
             query_time_dict["pdg_app/to_add_expression: add_expression"] = round(
@@ -2530,6 +2531,9 @@ def to_add_feed() -> werkzeug.Response:
 
         author_name_latex = "ben"
 
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
         feed_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "feed"
         )
@@ -2543,6 +2547,7 @@ def to_add_feed() -> werkzeug.Response:
                 feed_latex,
                 feed_sympy,
                 feed_lean,
+                now_str,
                 author_name_latex,
             )
             query_time_dict["to_add_feed: add_feed new multi-symbol"] = round(
@@ -2728,6 +2733,9 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
 
         author_name_latex = "ben"
 
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -2739,6 +2747,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
                 operation_description_latex,
                 operation_reference_latex,
                 operation_number_of_arguments,
+                now_str,
                 author_name_latex,
             )
         return redirect(url_for("to_list_operations"))
@@ -3072,6 +3081,9 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
         author_name_latex = "ben"
 
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -3082,6 +3094,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
                 number_decimal,
                 number_power,
                 dict_of_units,
+                now_str,
                 author_name_latex,
             )
 
@@ -3217,6 +3230,9 @@ def to_add_symbol_scalar() -> werkzeug.Response:
 
         author_name_latex = "ben"
 
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
         scalar_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "scalar"
         )
@@ -3241,6 +3257,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
                 dimension_electric_charge,
                 dimension_amount_of_substance,
                 dimension_luminous_intensity,
+                now_str,
                 author_name_latex,
             )
 
@@ -3380,6 +3397,9 @@ def to_add_symbol_vector() -> werkzeug.Response:
 
         author_name_latex = "ben"
 
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
         vector_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "vector"
         )
@@ -3398,6 +3418,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
                 vector_size,
                 vector_orientation,
                 vector_number_of_entries,
+                now_str,
                 author_name_latex,
             )
         return redirect(url_for("to_list_vectors"))
@@ -3494,6 +3515,9 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 
         author_name_latex = "ben"
 
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
         matrix_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "matrix"
         )
@@ -3512,6 +3536,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
                 matrix_size,
                 matrix_number_of_rows,
                 matrix_number_of_columns,
+                now_str,
                 author_name_latex,
             )
         print(
@@ -4306,6 +4331,9 @@ def to_add_relation() -> werkzeug.Response:
 
         author_name_latex = "ben"
 
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
         relation_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "relation"
         )
@@ -4320,6 +4348,7 @@ def to_add_relation() -> werkzeug.Response:
                 relation_latex,
                 relation_description_latex,
                 relation_reference_latex,
+                now_str,
                 author_name_latex,
             )
             print(
@@ -5433,6 +5462,10 @@ def to_add_inference_rule() -> werkzeug.Response:
             print(str(err))
             return redirect(url_for("to_add_inference_rule"))
 
+        # as per https://strftime.org/
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -5444,6 +5477,7 @@ def to_add_inference_rule() -> werkzeug.Response:
                 number_of_inputs=number_of_inputs,
                 number_of_feeds=number_of_feeds,
                 number_of_outputs=number_of_outputs,
+                now_str=now_str,
                 author_name_latex=author_name_latex,
             )
         print(
