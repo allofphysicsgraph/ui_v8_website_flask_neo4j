@@ -398,7 +398,9 @@ def to_central_expressions():
     >>> central_expressions()
     """
     logger.info("[TRACE] pdg_other_routes/")
-    return render_template("jinja2_pages/central_expressions.html", title="central expressions")
+    return render_template(
+        "jinja2_pages/central_expressions.html", title="central expressions"
+    )
 
 
 ###########################################################################
