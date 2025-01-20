@@ -3,8 +3,8 @@
 
 <P>
   <em>Recommendation</em>: Read the
-  <a href="{{ url_for('user_documentation') }}?referrer=design_documentation">user documentation</a>
-  and <a href="{{ url_for('faq') }}?referrer=design_documentation">FAQ</a> first.
+  <a href="{{ url_for('to_user_documentation') }}?referrer=design_documentation">user documentation</a>
+  and <a href="{{ url_for('to_faq') }}?referrer=design_documentation">FAQ</a> first.
   This page assumes familiarity with the jargon used in the Physics Derivation Graph.
 </P>
 
@@ -50,8 +50,8 @@ cat developer_documentation.html |\
   all known mathematical physics in a way that can be both read by humans and
   checked by a computer algebra system. To do that, primary design considerations
   include how to represent the objects
-  (e.g., <a href="{{ url_for('user_documentation')}}?referrer=design_documentation#inference rules">inference rules</a>
-  and <a href="{{ url_for('user_documentation')}}?referrer=design_documentation#expressions">expressions</a>
+  (e.g., <a href="{{ url_for('to_user_documentation')}}?referrer=design_documentation#inference rules">inference rules</a>
+  and <a href="{{ url_for('to_user_documentation')}}?referrer=design_documentation#expressions">expressions</a>
   and symbols) and what data structure is sufficient.
 </P><P>
   This page describes the current status and historical evoluation of design
@@ -95,7 +95,7 @@ cat developer_documentation.html |\
 </P>
 <P>
   JSON is convenient because it is plain text and the ease of detailed validation available using schemas.
-  The many alternatives to JSON (e.g., SQLite, Redis, Python Pickle, CSV, GraphML) offer trade-offs, a few of which <a href="{{ url_for('comparison_of_design_options_database') }}?referrer=design_documentation">have been explored</a>.
+  The many alternatives to JSON (e.g., SQLite, Redis, Python Pickle, CSV, GraphML) offer trade-offs, a few of which <a href="{{ url_for('to_comparison_of_design_options_database') }}?referrer=design_documentation">have been explored</a>.
 
 <P>&nbsp;</P>
 <HR/>
@@ -105,7 +105,7 @@ cat developer_documentation.html |\
 <P>
   There are multiple choices of how to represent a mathematical expression.
   The choices feature trade-offs between conciseness, ability to express the range of notations necessary for Physics, symantic meaning, and ability to use the expression in a computer algebra system (CAS).
-  See the <a href="{{ url_for('comparison_of_design_options_syntax') }}?referrer=design_documentation">comparison of syntax</a> below.
+  See the <a href="{{ url_for('to_comparison_of_design_options_syntax') }}?referrer=design_documentation">comparison of syntax</a> below.
   \(\rm\LaTeX\) was selected primarily because of the common use in Physics, display of complex math, conciseness, and expressiveness.
   The use of \(\rm\LaTeX\) means other tasks like parsing symbols and resolving ambiguity are harder.
 </p>
