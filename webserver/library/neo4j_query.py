@@ -1461,7 +1461,7 @@ def add_feed(
     feed_latex: str,
     feed_sympy: str,
     feed_lean: str,
-    now_str:str,
+    now_str: str,
     author_name_latex: str,
 ) -> None:
     """
@@ -1669,7 +1669,7 @@ def add_vector_symbol(
     symbol_size: str,
     symbol_orientation: str,
     symbol_number_of_entries: str,
-    now_str: str
+    now_str: str,
     author_name_latex: str,
 ):
     """
