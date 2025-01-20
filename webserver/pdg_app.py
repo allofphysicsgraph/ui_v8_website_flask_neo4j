@@ -887,6 +887,17 @@ def before_request():
     return
 
 
+@web_app.route(
+    "/navigation", methods=["GET", "POST"]
+)  # on allofphysics.com the index and navigation are separate
+def to_navigation():
+    """
+    placeholder
+    """
+    return redirect(url_for("main"))
+
+
+@web_app.route("/index", methods=["GET", "POST"])
 @web_app.route("/", methods=["GET", "POST"])
 def main() -> werkzeug.Response:
     """
@@ -5941,7 +5952,7 @@ def to_query() -> werkzeug.Response:
         query_time_dict["to_query: list_nodes_of_type, inference_rule"] = round(
             time.time() - query_start_time, 3
         )
-    print("list_of_inference_rule_dicts=", list_of_inference_rule_dicts)
+    # print("list_of_inference_rule_dicts=", list_of_inference_rule_dicts)
     if len(list_of_inference_rule_dicts) > 0:
         inference_rule_id = list_of_inference_rule_dicts[0]["id"]
     else:
