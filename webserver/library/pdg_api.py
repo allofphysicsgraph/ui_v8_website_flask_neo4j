@@ -187,8 +187,10 @@ def api_list_inference_rules():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "inference_rule"
         )
-        query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    print("list_of_dicts=", list_of_dicts)
+        query_time_dict[
+            "pdg_api/api_list_inference_rules: get_list_node_dicts_of_type"
+        ] = (time.time() - query_start_time)
+    # print("list_of_dicts=", list_of_dicts)
 
     logger.info("[TRACE] pdg_api/api_list_inference_rules end " + trace_id)
     return jsonify(list_of_dicts)
@@ -220,8 +222,10 @@ def api_list_operation_symbols():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "operation"
         )
-        query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    print("list_of_dicts=", list_of_dicts)
+        query_time_dict[
+            "pdg_api/api_list_operation_symbols: get_list_node_dicts_of_type"
+        ] = (time.time() - query_start_time)
+    # print("list_of_dicts=", list_of_dicts)
 
     logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
@@ -242,8 +246,10 @@ def api_list_relation_symbols():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "relation"
         )
-        query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    print("list_of_dicts=", list_of_dicts)
+        query_time_dict[
+            "pdg_api/api_list_relation_symbols: api_list_relation_symbols"
+        ] = (time.time() - query_start_time)
+    # print("list_of_dicts=", list_of_dicts)
 
     logger.info("[TRACE] pdg_api/api_list_relation_symbols end " + trace_id)
     return jsonify(list_of_dicts)
@@ -275,8 +281,10 @@ def api_list_scalar_symbols():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "scalar"
         )
-        query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    print("list_of_dicts=", list_of_dicts)
+        query_time_dict[
+            "pdg_api/api_list_scalar_symbols: get_list_node_dicts_of_type"
+        ] = (time.time() - query_start_time)
+    # print("list_of_dicts=", list_of_dicts)
 
     logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
@@ -308,8 +316,10 @@ def api_list_vector_symbols():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "vector"
         )
-        query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    print("list_of_dicts=", list_of_dicts)
+        query_time_dict[
+            "pdg_api/api_list_vector_symbols: get_list_node_dicts_of_type"
+        ] = (time.time() - query_start_time)
+    # print("list_of_dicts=", list_of_dicts)
 
     logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
@@ -341,8 +351,10 @@ def api_list_matrix_symbols():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "matrix"
         )
-        query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    print("list_of_dicts=", list_of_dicts)
+        query_time_dict[
+            "pdg_api/api_list_matrix_symbols: get_list_node_dicts_of_type"
+        ] = (time.time() - query_start_time)
+    # print("list_of_dicts=", list_of_dicts)
 
     logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
@@ -371,8 +383,10 @@ def api_list_expressions():
         list_of_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "expression"
         )
-        query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    print("list_of_dicts=", list_of_dicts)
+        query_time_dict["pdg_api/api_list_expressions: get_list_node_dicts_of_type"] = (
+            time.time() - query_start_time
+        )
+    # print("list_of_dicts=", list_of_dicts)
 
     logger.info("[TRACE] pdg_api/api_list_expressions end " + trace_id)
     return jsonify(list_of_dicts)
@@ -498,6 +512,7 @@ def api_create_derivation():
             derivation_name_latex,
             derivation_abstract_latex,
             derivation_reference_latex,
+            now_str,
             author_name_latex,
         )
         query_time_dict["pdg_api/api_create_derivation: add_derivation"] = round(
@@ -670,6 +685,9 @@ def api_create_expression():
 
     author_name_latex = "ben"
 
+    # %f = Microsecond as a decimal number, zero-padded on the left.
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
     expression_id, query_time_dict = compute.generate_random_id(
         graphDB_Driver, query_time_dict, "expression"
     )
@@ -687,6 +705,7 @@ def api_create_expression():
             expression_latex_condition,
             expression_description_latex,
             expression_reference_latex,
+            now_str,
             author_name_latex,
         )
         query_time_dict["pdg_app/to_add_expression: add_expression"] = round(
@@ -967,6 +986,9 @@ def api_create_scalar_symbol():
 
     author_name_latex = "ben"
 
+    # %f = Microsecond as a decimal number, zero-padded on the left.
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
     scalar_id, query_time_dict = compute.generate_random_id(
         graphDB_Driver, query_time_dict, "scalar"
     )
@@ -991,6 +1013,7 @@ def api_create_scalar_symbol():
             dimension_electric_charge,
             dimension_amount_of_substance,
             dimension_luminous_intensity,
+            now_str,
             author_name_latex,
         )
 
@@ -1009,6 +1032,9 @@ def api_create_vector_symbol():
     logger.info("[TRACE] pdg_api/ start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
+    # %f = Microsecond as a decimal number, zero-padded on the left.
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
     return jsonify({"STATUS": "TODO"})
 
 
@@ -1021,6 +1047,9 @@ def api_create_matrix_symbol():
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] pdg_api/ start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
+
+    # %f = Microsecond as a decimal number, zero-padded on the left.
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
     return jsonify({"STATUS": "TODO"})
 
@@ -1110,6 +1139,9 @@ def api_create_operation_symbol():
 
     author_name_latex = "ben"
 
+    # %f = Microsecond as a decimal number, zero-padded on the left.
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
     operation_id, query_time_dict = compute.generate_random_id(
         graphDB_Driver, query_time_dict, "operation"
     )
@@ -1125,6 +1157,7 @@ def api_create_operation_symbol():
             operation_description_latex,
             operation_reference_latex,
             operation_argument_count,
+            now_str,
             author_name_latex,
         )
         print(
@@ -1210,6 +1243,9 @@ def api_create_relation_symbol():
 
     author_name_latex = "ben"
 
+    # %f = Microsecond as a decimal number, zero-padded on the left.
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
     relation_id, query_time_dict = compute.generate_random_id(
         graphDB_Driver, query_time_dict, "relation"
     )
@@ -1224,6 +1260,7 @@ def api_create_relation_symbol():
             relation_latex,
             relation_description_latex,
             relation_reference_latex,
+            now_str,
             author_name_latex,
         )
         print(

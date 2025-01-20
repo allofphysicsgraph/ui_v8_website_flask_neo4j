@@ -1895,7 +1895,6 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             expression_latex_condition,
         )
 
-
         author_name_latex = "ben"
 
         # https://neo4j.com/docs/python-manual/current/session-api/
@@ -2412,7 +2411,6 @@ def to_add_expression() -> werkzeug.Response:
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-
         expression_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "expression"
         )
@@ -2801,6 +2799,9 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
 
         author_name_latex = "ben"
 
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -2811,6 +2812,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
                 relation_latex,
                 relation_description_latex,
                 relation_reference_latex,
+                now_str,
                 author_name_latex,
             )
 
