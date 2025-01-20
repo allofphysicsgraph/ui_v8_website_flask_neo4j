@@ -887,19 +887,19 @@ def before_request():
     return
 
 
+@web_app.route("/", methods=["GET", "POST"])
 @web_app.route(
-    "/navigation", methods=["GET", "POST"]
+    "/index", methods=["GET", "POST"]
 )  # on allofphysics.com the index and navigation are separate
-def to_navigation():
+def to_index():
     """
     placeholder
     """
-    return redirect(url_for("main"))
+    return redirect(url_for("to_navigation"))
 
 
-@web_app.route("/index", methods=["GET", "POST"])
-@web_app.route("/", methods=["GET", "POST"])
-def main() -> werkzeug.Response:
+@web_app.route("/navigation", methods=["GET", "POST"])
+def to_navigation():
     """
     initial page
 
@@ -6702,7 +6702,7 @@ def to_delete_graph_content() -> werkzeug.Response:
         + " "
         + str(time.time())
     )
-    return redirect(url_for("main"))
+    return redirect(url_for("to_navigation"))
 
 
 @web_app.route("/export_to_json")
