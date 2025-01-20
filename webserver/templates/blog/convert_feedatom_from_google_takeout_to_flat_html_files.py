@@ -18,7 +18,7 @@ for this_entry_dict in file_content['feed']['entry']:
         blog_title = this_entry_dict['title']
         #print(YYYY,MM,blog_title)
         str_to_write  = ""
-        str_to_write += '{% extends "_base.html" %}\n'
+        str_to_write += '{% extends "jinja2_pages/reusable_components/_base.html" %}\n'
         str_to_write += '{% block content %}\n\n'
         str_to_write += "<H1>"+blog_title+"</H1>\n\n"
         str_to_write += "<P><small>Published "+this_entry_dict['published']+" by Physics Derivation Graph</small></P>\n\n"
