@@ -1,0 +1,34 @@
+    <div>
+      <table width="100%">
+        <tr>
+          <td>
+            <a href="{{ url_for('to_index', referrer='_base.html') }}">Physics Derivation Graph</a> /
+            <a href="{{ url_for('to_navigation', referrer='_base.html') }}">navigation</a>
+          </td>
+          <td align="right">
+          <!-- https://github.com/allofphysicsgraph/proofofconcept/issues/110 -->
+          {% if not current_user.is_anonymous %}
+            Logged in as {{ current_user.name }} |
+            <!--
+              <a href="{{ url_for('to_logout') }}">Log out locally</a>
+            -->
+            <!-- https://developers.google.com/identity/sign-in/web/sign-in#before_you_begin -->
+            <a href="{{ url_for('to_logout') }}" onclick="signOut();">Sign out</a>
+            <script>
+              function signOut() {
+                var auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                  console.log('User signed out.');
+                });
+              }
+            </script>
+
+          {% else %}
+            <a href="{{ url_for('to_login') }}">Sign in</a>
+          {% endif %}
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <HR/>
