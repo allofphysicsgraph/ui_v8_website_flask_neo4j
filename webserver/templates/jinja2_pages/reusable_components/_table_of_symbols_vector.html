@@ -31,8 +31,8 @@
           {{ vector_dict['id'] }}
       </a>
     </td>
-    <td>\({{ vector_dict['latex']}}\)<BR>
-          {{ vector_dict['latex']}}</td>
+    <td>\({{ vector_dict['latex'].replace('\r','\\r') }}\)<BR>
+          {{ vector_dict['latex'].replace('\r','\\\\r') }}</td>
     <td>{{ vector_dict['name_latex'] }}</td>
     <td>{{ vector_dict['description_latex'] }}</td>
     <td>{{ vector_dict['orientation'] }}</td>

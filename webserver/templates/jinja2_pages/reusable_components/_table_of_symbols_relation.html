@@ -32,8 +32,8 @@
           {{ symbol_dict['id'] }}
       </a>
     </td>
-    <td>\({{ symbol_dict['latex']}}\)<BR>
-          {{ symbol_dict['latex']}}</td>
+    <td>\({{ symbol_dict['latex'].replace('\t','\\t').replace('\n','\\n') }}\)<BR>
+          {{ symbol_dict['latex'].replace('\t','\\\\t').replace('\n','\\\\n') }}</td>
     <td>{{ symbol_dict['name_latex'] }}</td>
     <td>{{ symbol_dict['description_latex'] }}</td>
     <td><UL>{% for expression_dict in dict_of_expression_dicts_that_use_relation[symbol_dict['id']] %}
