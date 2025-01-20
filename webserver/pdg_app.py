@@ -242,6 +242,7 @@ from initialize_flask import web_app
 
 
 import pdg_other_routes
+import pdg_login
 
 # the following import has to happen after web_app is configured because pdg_app uses graphDB_Driver
 import pdg_api
@@ -887,15 +888,23 @@ def before_request():
     return
 
 
+@web_app.route("/nav_old_TEMP", methods=["GET", "POST"])
+def to_old_nav():
+    return render_template("jinja2_pages/navigation.html")
+
+
 @web_app.route("/", methods=["GET", "POST"])
 @web_app.route(
     "/index", methods=["GET", "POST"]
 )  # on allofphysics.com the index and navigation are separate
 def to_index():
     """
-    placeholder
+    placeholder for landing page that provides context before user goes to_navigation
     """
-    return redirect(url_for("to_navigation"))
+    return render_template("jinja2_pages/index.html")
+
+
+#    return redirect(url_for("to_navigation"))
 
 
 @web_app.route("/navigation", methods=["GET", "POST"])
@@ -905,20 +914,22 @@ def to_navigation():
 
     file upload: see https://flask.palletsprojects.com/en/3.0.x/patterns/fileuploads/
 
-    >>> main()
+    >>> to_navigation()
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] pdg_app/main start " + trace_id + " " + str(time.time()))
     query_time_dict = {}  # type: query_timing_result_type
 
     if request.method == "POST":
-        print("pdg_app/main: request.form = %s", request.form)
+        print("pdg_app/to_navigation: request.form = %s", request.form)
 
         # check if the post request has the file part
         if "file" not in request.files:
             error_message_for_user = "ERROR: file not in request files"
-            print("pdg_app/main: ERROR: file not in request files")
-            logger.info("[TRACE] pdg_app/main end " + trace_id + " " + str(time.time()))
+            print("pdg_app/to_navigation: ERROR: file not in request files")
+            logger.info(
+                "[TRACE] pdg_app/to_navigation end " + trace_id + " " + str(time.time())
+            )
             return redirect(request.url)
         file_obj = request.files["file"]
 
@@ -927,19 +938,23 @@ def to_navigation():
         # submit an empty part without filename
         if file_obj.filename == "":
             error_message_for_user = "WARN: no selected file"
-            print("pdg_app/main: WARN: no selected file")
-            logger.info("[TRACE] pdg_app/main end " + trace_id + " " + str(time.time()))
+            print("pdg_app/to_navigation: WARN: no selected file")
+            logger.info(
+                "[TRACE] pdg_app/to_navigation end " + trace_id + " " + str(time.time())
+            )
             return redirect(request.url)
         if "upload_cypher" in request.form.keys():
             allowed_bool = True
         else:
-            logger.info("[TRACE] pdg_app/main end " + trace_id + " " + str(time.time()))
+            logger.info(
+                "[TRACE] pdg_app/to_navigation end " + trace_id + " " + str(time.time())
+            )
             raise Exception("unrecognized button")
 
         if file_obj and allowed_bool:
             print("file_obj.filename=", file_obj.filename)
             filename = secure_filename(file_obj.filename)
-            print("pdg_app/main: filename = ", filename)
+            print("pdg_app/to_navigation: filename = ", filename)
             path_to_uploaded_file = os.path.join(
                 web_app.config["UPLOAD_FOLDER"], filename
             )
@@ -1072,7 +1087,9 @@ def to_navigation():
             time.time() - query_start_time, 3
         )
 
-    logger.info("[TRACE] pdg_app/main end " + trace_id + " " + str(time.time()))
+    logger.info(
+        "[TRACE] pdg_app/to_navigation end " + trace_id + " " + str(time.time())
+    )
     return render_template(
         "jinja2_pages/user_workflow/site_map.html",
         title="site map",
