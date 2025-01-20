@@ -1545,7 +1545,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
         query_time_dict["to_select_step: get_list_of_step_dicts_in_this_derivation"] = (
             round(time.time() - query_start_time, 3)
         )
-    #print("list_of_step_dicts=", list_of_step_dicts)
+    # print("list_of_step_dicts=", list_of_step_dicts)
 
     # inference_rule_per_step = {}
     # for this_step_dict in list_of_step_dicts:
@@ -5957,7 +5957,7 @@ def to_query() -> werkzeug.Response:
         query_time_dict["to_query: list_nodes_of_type, step"] = round(
             time.time() - query_start_time, 3
         )
-    #print("list_of_step_dicts=", list_of_step_dicts)
+    # print("list_of_step_dicts=", list_of_step_dicts)
     if len(list_of_step_dicts) > 0:
         step_id = list_of_step_dicts[0]["id"]
     else:
