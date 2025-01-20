@@ -1,0 +1,8 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+
+List of named expressions from query <code>MATCH (n) WHERE exists(n.name_latex) AND n.name_latex &lt;&gt; '' RETURN n</code>
+
+{% endblock %}
+

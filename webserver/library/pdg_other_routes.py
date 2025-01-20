@@ -390,21 +390,35 @@ def to_comparison_of_design_options_database():
 ###########################################################################
 
 
-# This page appears to be statically generated. Probably remove?
-
-
 @web_app.route("/list_named_expressions", methods=["GET", "POST"])
-def to_central_expressions():
+def to_list_named_expressions():
     """
-    "central expressions" is a static page
+    TODO:
+    https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/53
 
-    TODO: convert this to a Cypher query
+    Create a table that provides the results from the query
+    ```
+    MATCH (n) WHERE exists(n.name_latex) AND n.name_latex <> '' RETURN n
+    ```
 
-    >>> central_expressions()
+    >>> to_list_named_expressions()
     """
-    logger.info("[TRACE] pdg_other_routes/")
+    logger.info("[TRACE] pdg_other_routes/to_list_named_expressions")
     return render_template(
-        "jinja2_pages/central_expressions.html", title="central expressions"
+        "jinja2_pages/named_expressions_list.html", title="central expressions"
+    )
+
+
+@web_app.route("/survey_of_named_expressions", methods=["GET", "POST"])
+def to_survey_of_named_expressions():
+    """
+    This is a static page; content that hasn't been integrated into the PDG
+
+    >>> to_survey_of_named_expressions()
+    """
+    logger.info("[TRACE] pdg_other_routes/to_survey_of_named_expressions")
+    return render_template(
+        "jinja2_pages/central_expressions_survey.html", title="central expressions"
     )
 
 
