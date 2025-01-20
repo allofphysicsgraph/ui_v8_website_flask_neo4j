@@ -231,7 +231,23 @@ def to_evaluation_of_LLM_prompts():
 ###########################################################################
 
 
+@web_app.route("/documentation/overview", methods=["GET", "POST"])
+def to_documentation_overview():
+    """
+    What documentation is available?
+    - user
+    - developer
+    - design
+    - API
+    - workflow
+    """
+    return render_template(
+        "jinja2_pages/documentation_overview.html", title="Overview of Documentation"
+    )
+
+
 @web_app.route("/user_documentation", methods=["GET", "POST"])
+@web_app.route("/documentation/user", methods=["GET", "POST"])
 def to_user_documentation():
     """
     a static page with documentation aimed at users (not developers)
@@ -240,11 +256,12 @@ def to_user_documentation():
     """
     logger.info("[TRACE] pdg_other_routes/")
     return render_template(
-        "jinja2_pages/user_documentation.html", title="User Documentation"
+        "jinja2_pages/documentation_for_user.html", title="User Documentation"
     )
 
 
 @web_app.route("/developer_documentation", methods=["GET", "POST"])
+@web_app.route("/documentation/developer", methods=["GET", "POST"])
 def to_developer_documentation():
     """
     a static page aimed at people interested in contributed code changes
@@ -253,7 +270,7 @@ def to_developer_documentation():
     """
     logger.info("[TRACE] pdg_other_routes/")
     return render_template(
-        "jinja2_pages/developer_documentation.html", title="Developer Documentation"
+        "jinja2_pages/documentation_for_developer.html", title="Developer Documentation"
     )
 
 
@@ -267,7 +284,8 @@ def to_design_documentation():
     """
     logger.info("[TRACE] pdg_other_routes/")
     return render_template(
-        "jinja2_pages/design_documentation.html", title="Design Decisions Documentation"
+        "jinja2_pages/documentation_of_design.html",
+        title="Design Decisions Documentation",
     )
 
 
