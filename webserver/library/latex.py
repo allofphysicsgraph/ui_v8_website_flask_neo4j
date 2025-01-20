@@ -505,7 +505,8 @@ def create_tex_file_for_derivation(
                     + "Relay["
                     + str(number_of_args - 9)
                     + "]{"
-                    + infrule_dict["latex"].replace("\r", "\\r")
+                    + infrule_dict["latex"]
+                    .replace("\r", "\\r")
                     .replace("#1", "ArgOne")
                     .replace("#2", "ArgTwo")
                     .replace("#3", "ArgThree")
