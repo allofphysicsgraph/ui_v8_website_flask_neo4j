@@ -111,7 +111,12 @@ def search_form_redirect_to_google():
     This search only works via webform since the value is grabbed from form value "search"
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_other_routes/search_form_redirect_to_google start " + trace_id + " " + str(time.time()))
+    logger.info(
+        "[TRACE] pdg_other_routes/search_form_redirect_to_google start "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
     logger.debug(
         "request.url: " + str(request.url)
     )  # https://stackoverflow.com/a/46176337/1164295
@@ -317,6 +322,21 @@ def to_site_map():
 ###########################################################################
 
 
+@web_app.route("/login")
+def to_login():
+    """
+    https://realpython.com/flask-google-login/
+    """
+    # This is a placeholder
+
+    return redirect(
+        url_for("jinja2_pages/user_workflow/site_map.html", title="site map")
+    )
+
+
+###########################################################################
+
+
 @web_app.route("/comparison_of_design_options_cas", methods=["GET", "POST"])
 def to_comparison_of_design_options_cas():
     """
@@ -373,10 +393,12 @@ def to_central_expressions():
     """
     "central expressions" is a static page
 
+    TODO: convert this to a Cypher query
+
     >>> central_expressions()
     """
     logger.info("[TRACE] pdg_other_routes/")
-    return render_template("central_expressions.html", title="central expressions")
+    return render_template("jinja2_pages/central_expressions.html", title="central expressions")
 
 
 ###########################################################################
@@ -450,142 +472,143 @@ def to_class_notes_subpage(which_class: str):
 ###########################################################################
 
 
-@web_app.route("/roadmap", methods=["GET", "POST"])
-@web_app.route("/roadmap/overview", methods=["GET", "POST"])
-def to_roadmap():
+@web_app.route("/spectrum_of_precision", methods=["GET", "POST"])
+@web_app.route("/spectrum_of_precision/overview", methods=["GET", "POST"])
+def to_spectrum_of_precision():
     """
     exploration of layering formalization
     """
-    return render_template("layers_overview.html", title="Roadmap Overview")
+    page_title = "Spectrum of Precision: Overview"
+    return render_template("layers_overview.html", title=page_title)
 
 
-@web_app.route("/roadmap/lecture", methods=["GET", "POST"])
-def to_roadmap_layer_lecture():
+@web_app.route("/spectrum_of_precision/lecture", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_lecture():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_lecture_video.html", title=page_title)
 
 
-@web_app.route("/roadmap/handwritten", methods=["GET", "POST"])
-def to_roadmap_layer_handwritten():
+@web_app.route("/spectrum_of_precision/handwritten", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_handwritten():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_handwritten_notes.html", title=page_title)
 
 
-@web_app.route("/roadmap/latex", methods=["GET", "POST"])
-def to_roadmap_layer_latex():
+@web_app.route("/spectrum_of_precision/latex", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_latex():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_document_without_decorations.html", title=page_title)
 
 
-@web_app.route("/roadmap/tag_sections", methods=["GET", "POST"])
-def to_roadmap_layer_tag_sections():
+@web_app.route("/spectrum_of_precision/tag_sections", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_tag_sections():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_section_document_structure.html", title=page_title)
 
 
-@web_app.route("/roadmap/tag_words", methods=["GET", "POST"])
-def to_roadmap_layer_tag_words():
+@web_app.route("/spectrum_of_precision/tag_words", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_tag_words():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template(
         "layers_words_named_entity_recognition.html", title=page_title
     )
 
 
-@web_app.route("/roadmap/tag_expressions", methods=["GET", "POST"])
-def to_roadmap_layer_tag_expressions():
+@web_app.route("/spectrum_of_precision/tag_expressions", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_tag_expressions():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_contentML.html", title=page_title)
 
 
-@web_app.route("/roadmap/tag_all", methods=["GET", "POST"])
-def to_roadmap_layer_tag_all():
+@web_app.route("/spectrum_of_precision/tag_all", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_tag_all():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_sections_words_contentML.html", title=page_title)
 
 
-@web_app.route("/roadmap/variables", methods=["GET", "POST"])
-def to_roadmap_layer_variables():
+@web_app.route("/spectrum_of_precision/variables", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_variables():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_concepts_to_variables.html", title=page_title)
 
 
-@web_app.route("/roadmap/all_steps", methods=["GET", "POST"])
-def to_roadmap_layer_all_steps():
+@web_app.route("/spectrum_of_precision/all_steps", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_all_steps():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_all_steps.html", title=page_title)
 
 
-@web_app.route("/roadmap/pdg", methods=["GET", "POST"])
-def to_roadmap_layer_pdg():
+@web_app.route("/spectrum_of_precision/pdg", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_pdg():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_derivation_graph.html", title=page_title)
 
 
-@web_app.route("/roadmap/CAS_validation", methods=["GET", "POST"])
-def to_roadmap_layer_CAS_validation():
+@web_app.route("/spectrum_of_precision/CAS_validation", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_CAS_validation():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_validate_steps.html", title=page_title)
 
 
-@web_app.route("/roadmap/numeric_id", methods=["GET", "POST"])
-def to_roadmap_layer_numeric_id():
+@web_app.route("/spectrum_of_precision/numeric_id", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_numeric_id():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template(
         "layers_replace_variables_with_numeric_id.html", title=page_title
     )
 
 
-@web_app.route("/roadmap/dimensional_validation", methods=["GET", "POST"])
-def to_roadmap_layer_dimensional_validation():
+@web_app.route("/spectrum_of_precision/dimensional_validation", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_dimensional_validation():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_dimensional_validation.html", title=page_title)
 
 
-@web_app.route("/roadmap/proof", methods=["GET", "POST"])
-def to_roadmap_layer_proof():
+@web_app.route("/spectrum_of_precision/proof", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer_proof():
     """
     exploration of layering formalization
     """
-    page_title = "Roadmap for Formal Mathematical Physics Content"
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
     return render_template("layers_proof_of_inference_rule.html", title=page_title)
 
 
