@@ -169,7 +169,7 @@ Yes! Or, even better, a separate platform could serve this purpose.
   <UL>
     <LI>If you are a physicist, mathematician, or logician of any type, <a href="#contact">feedback</a> would be useful.</LI>
     <LI>If you are a student, <a href="https://github.com/allofphysicsgraph/proofofconcept/issues/new/choose">let us know what features you would find useful</a>.</LI>
-    <LI>If you have derivations to add, you will need to <a href="{{ url_for('login') }}?referrer=faq">log in.</a> To create an account, <a href="#contact">contact us</a>.</LI>
+    <LI>If you have derivations to add, you will need to <a href="{{ url_for('to_login') }}?referrer=faq">log in.</a> To create an account, <a href="#contact">contact us</a>.</LI>
     <LI>If you are a researcher in another field (biology, computer science, chemistry, linguistics, etc), do you think this approach applies to your field?</LI>
     <LI>If you are a programmer and would like to review the code, comments are welcome. See the <a href="https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/CONTRIBUTING.md">guide for contributing</a>.
       Pulls and merges are also possible.
@@ -487,9 +487,9 @@ Separate from that, a unique identifier is also need for inference rules to dist
   <a name="who is audience">
   <em>Who is the audience for the Physics Derivation Graph?</em>
   </a><BR/>
-  <a href="{{ url_for('user_documentation')}}?referrer=faq#audience:students">Students</a>,
-  <a href="{{ url_for('user_documentation')}}?referrer=faq#audience:teachers">teachers</a>,
-  <a href="{{ url_for('user_documentation')}}?referrer=faq#audience:researchers">researchers</a>.
+  <a href="{{ url_for('to_user_documentation')}}?referrer=faq#audience:students">Students</a>,
+  <a href="{{ url_for('to_user_documentation')}}?referrer=faq#audience:teachers">teachers</a>,
+  <a href="{{ url_for('to_user_documentation')}}?referrer=faq#audience:researchers">researchers</a>.
   <P>
   <center>
     <img src="{{ url_for('static', filename='teacher_and_students.jpg') }}">
@@ -601,7 +601,7 @@ The graph output can be visualized in a web browser, a static GraphViz output, a
 <em>How is the content of the Physics Derivation Graph stored?</em>
 </a><BR/>
 The expressions, symbols, and connections are stored Latex in a JSON file.
-This decision was based on a <a href="{{ url_for('developer_documentation')}}?referrer=faq#historical evolution">comparative analysis of other options</a>, including MathML and Mathematica.</P>
+This decision was based on a <a href="{{ url_for('to_developer_documentation')}}?referrer=faq#historical evolution">comparative analysis of other options</a>, including MathML and Mathematica.</P>
 
 <HR/> <!-- ************************************************** -->
 <P>
@@ -668,7 +668,7 @@ The difference between a derivation and proving an identity is that when proving
 <P>
   <a name="comparison">
   <em>How does the Physics Derivation Graph compare with other projects?</em><BR/>
-  See the <a href="{{ url_for('other_projects') }}?referrer=faq">list of other projects</a>
+  See the <a href="{{ url_for('to_other_projects') }}?referrer=faq">list of other projects</a>
 </P>
 
 <HR/> <!-- ************************************************** -->
