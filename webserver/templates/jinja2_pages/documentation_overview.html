@@ -1,0 +1,19 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<P><a href="{{ url_for('to_navigation') }}">navigation</a> / documentation overview
+
+<H3>By audience</H3>
+<UL>
+<LI><a href="{{ url_for('to_user_documentation') }}?referrer=documentation_overview">user</a></LI>
+<LI><a href="{{ url_for('to_developer_documentation') }}?referrer=documentation_overview">developer</a></LI>
+</UL>
+
+<H3>By interface</H3>
+<UL>
+<LI><a href="{{ url_for('to_api_documentation') }}?referrer=documentation_overview">API</a></LI>
+<LI><a href="{{ url_for('to_workflow_documenation') }}?referrer=documentation_overview">web UI</a></LI>
+</UL>
+
+
+{% endblock %}
