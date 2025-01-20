@@ -163,7 +163,7 @@ def create_d3js_json(
     derivation_id: unique_numeric_id_as_str,
     all_steps: dict,
     destination_folder: str,
-):
+) -> None:
     """
     Produce a JSON file that contains something like
     {
