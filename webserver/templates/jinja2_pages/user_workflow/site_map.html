@@ -11,7 +11,13 @@
   <LI><a href="{{ url_for('to_query') }}?referrer=main">query graph using Cypher</a></LI>
   <LI><a href="{{ url_for('to_export_cypher') }}?referrer=main">export as Cypher</a>
    or <a href="{{ url_for('to_export_json') }}?referrer=main">  export as JSON</a></LI>
-  <LI><a href="{{ url_for('to_list_derivations') }}?referrer=main">show {{ number_of_derivations }} derivations</a>, (which are comprised of steps)</LI>
+  <LI><a href="{{ url_for('to_list_derivations') }}?referrer=main">show {{ number_of_derivations }} derivations</a>, (which are comprised of steps); 
+{% if current_user.is_anonymous %}
+you have to <a href="{{ url_for('to_login') }}?referrer=navigation">sign in</a> to create new derivations
+{% else %}
+or create a new derivation.
+{% endif %}
+  </LI>
   <LI><a href="{{ url_for('to_list_inference_rules') }}?referrer=main">show {{ number_of_inference_rules }} inference rules</a> (which are used in steps to relation expressions)</LI>
   <LI><a href="{{ url_for('to_list_expressions') }}?referrer=main">show {{ number_of_expressions }} expressions</a> (which have a relation, e.g., equality or inequality, as well as LHS and RHS each comprised of symbols)</LI>
   <LI><a href="{{ url_for('to_list_feeds') }}?referrer=main">show {{ number_of_feeds }} feeds</a> (which have one or more non-operation symbols; no equality or inequality)</LI>
@@ -34,6 +40,9 @@
 <P>&nbsp;</P>
 <P>&nbsp;</P>
 
+{% if current_user.is_anonymous %}
+<P>You have to <a href="{{ url_for('to_login') }}?referrer=navigation">sign in</a> to upload Cypher files or delete all content.
+{% else %}
 <fieldset>
   <legend>
     <h2>Danger zone!</h2>
@@ -68,6 +77,7 @@
   </fieldset>
 
 </fieldset>
+{% endif %}
 
 <P>To enter the container for debugging purposes,</P>
   <code>docker exec -it `docker ps | grep ui_v8_website_flask_neo4j_webserver | cut -d' ' -f1` /bin/bash</code>
