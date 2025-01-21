@@ -2,9 +2,69 @@
     <P>&nbsp;</P>
     <P>&nbsp;</P>
     <P>&nbsp;</P>
+
+<div align="center">
+    <hr width="50%" align="center">
+    <P>
+       <a href="{{ url_for('to_index', referrer='_footer.html') }}">Physics Derivation Graph homepage</a> |
+       <a href="{{ url_for('to_site_map', referrer='_footer.html') }}">site map</a> |
+       <a href="{{ url_for('to_faq', referrer='_footer.html') }}">FAQ</a> |
+       <a href="{{ url_for('to_documentation_overview', referrer='_footer.html') }}">documentation</a> 
+
+    <P>
+      <a href="https://physicsderivationgraph.blogspot.com/">blog</a> |
+      <a href="{{ url_for('to_index', referrer='_footer.html') }}">website</a> |
+      <a href="https://github.com/allofphysicsgraph/allofphysics.com/wiki">wiki</a> |
+      <a href="https://github.com/allofphysicsgraph/allofphysics.com/issues">issues</a> |
+      <a href="https://app.gitter.im/#/room/#allofphysicsgraph_Lobby:gitter.im">discuss on Gitter</a> or
+      <a href="https://groups.google.com/g/physics-derivation-graph">Google Groups</a> |
+    <!--
+      <a href="https://creativecommons.org/licenses/by/4.0/">License</a> |
+    -->
+      <a href="mailto:ben.is.located@gmail.com?subject=Physics Derivation Graph">Contact</a>
+    </P>
+    <P>
+      <table>
+        <tr>
+     <td valign="middle" width="100">
+       <a href="https://github.com/allofphysicsgraph/allofphysics.com">
+         <img src="{{ url_for('static', filename='GitHub-icon.png')}}" align="left" alt="source code on GitHub">
+       </a>
+     </td>
+     <td valign="middle" width="100">
+       <a href="https://www.facebook.com/physicsderivationgraph/">
+         <img src="{{ url_for('static', filename='facebook_icon.svg')}}" width="40" align="left" alt="Facebook"/>
+       </a>
+     </td>
+     <td>
+       <form method="post" action="search">
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <!-- this "action" is not consisten with the MVC paradigm since control is not
+      passed back to controller.py.
+      The reason for using action instead of a form class in controller.py
+        consistent the MVC is because the footer appears on every page and I don't want to
+        include the class in every page of the MVC -->
+       <input type="text" id="search" name="search">
+       <input type="submit" value="Search">
+       </form>
+     </td>
+     <td valign="middle" width="100">
+       <a href="https://www.youtube.com/channel/UCBSInUAbtBkYDYKNc_iauVQ/">
+         <img src="{{ url_for('static', filename='Youtube_icon.png')}}" width="40" align="left" alt="YouTube Channel"/>
+       </a>
+     </td>
+     <td valign="middle" width="100">
+       <a href="https://www.reddit.com/r/physicsderivations/">
+         <img src="{{ url_for('static', filename='reddit_icon.png')}}" align="left" alt="Reddit"/>
+       </a>
+     </td>
+     </tr>
+   </table>
+    </P>
+
     <P>
       <small>
-        Site content, the project software, and data are covered by the <a href="https://creativecommons.org/licenses/by/4. 0/">Creative Commons Attribution 4.0 International License</a>
+        Site content, the project software, and data are covered by the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
       </small>
     </P>
     </div>
