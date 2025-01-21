@@ -94,7 +94,7 @@ import neo4j
 # https://hplgit.github.io/web4sciapps/doc/pub/._web4sa_flask004.html
 from flask import (
     Flask,
-    g,  # request timing
+    g,  # request timing; also for login
     redirect,
     render_template,
     request,
@@ -885,10 +885,24 @@ def to_index():
     """
     placeholder for landing page that provides context before user goes to_navigation
     """
-    print(current_user.name)
-    print(current_user.is_anonymous)
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] pdg_app/to_index start " + trace_id + " " + str(time.time()))
 
-    return render_template("jinja2_pages/index.html")
+    query_time_dict = {}  # type: query_timing_result_type
+    T_and_f_derivation_ID = "884319"
+    all_steps, query_time_dict = compute.all_steps_in_derivation(
+        graphDB_Driver, T_and_f_derivation_ID, query_time_dict
+    )
+    try:
+        latex.create_d3js_json(T_and_f_derivation_ID, all_steps, "/code/static/")
+        d3js_json_filename = T_and_f_derivation_ID + ".json"
+    except Exception as err:
+        logger.error(str(err))
+        flash(str(err))
+        d3js_json_filename = ""
+
+    logger.info("[TRACE] pdg_app/to_index end " + trace_id + " " + str(time.time()))
+    return render_template("jinja2_pages/index.html", json_for_d3js=d3js_json_filename)
 
 
 #    return redirect(url_for("to_navigation"))
@@ -906,6 +920,15 @@ def to_navigation():
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] pdg_app/main start " + trace_id + " " + str(time.time()))
     query_time_dict = {}  # type: query_timing_result_type
+
+    # print(current_user.is_anonymous) # True or False
+    # print(type(current_user.is_anonymous)) # <class 'bool'>
+
+    # if current_user.is_anonymous:
+    #     pass
+    #     #print(current_user) # <flask_login.mixins.AnonymousUserMixin object at 0x7fd47a0c5550>
+    # else:
+    #     print(current_user.name)
 
     if request.method == "POST":
         print("pdg_app/to_navigation: request.form = %s", request.form)
@@ -1094,6 +1117,7 @@ def to_navigation():
 
 
 @web_app.route("/new_derivation", methods=["GET", "POST"])
+@login_required
 def to_add_derivation() -> werkzeug.Response:
     """
     create new derivation
@@ -1587,6 +1611,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
 
 
 @web_app.route("/edit_derivation_metadata/<derivation_id>/", methods=["GET", "POST"])
+@login_required
 def to_edit_derivation_metadata(
     derivation_id: unique_numeric_id_as_str,
 ) -> werkzeug.Response:
@@ -1773,6 +1798,7 @@ def to_add_step_select_inference_rule(
 
 
 @web_app.route("/edit_expression/<expression_id>", methods=["GET", "POST"])
+@login_required
 def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Response:
     """
     edit expression by
@@ -2035,6 +2061,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
 
 @web_app.route("/edit_feed/<feed_id>", methods=["GET", "POST"])
+@login_required
 def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     """
     edit feed
@@ -2277,6 +2304,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
 
 @web_app.route("/new_expression/", methods=["GET", "POST"])
+@login_required
 def to_add_expression() -> werkzeug.Response:
     """
     novel expression
@@ -2484,6 +2512,7 @@ def to_add_expression() -> werkzeug.Response:
 
 
 @web_app.route("/new_feed/", methods=["GET", "POST"])
+@login_required
 def to_add_feed() -> werkzeug.Response:
     """
     novel feed
@@ -2621,6 +2650,7 @@ def to_add_feed() -> werkzeug.Response:
 
 
 @web_app.route("/edit_node/<node_id>", methods=["GET", "POST"])
+@login_required
 def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
     """
     edit any node -- actually redirect to respective subcategory
@@ -2716,6 +2746,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
 
 @web_app.route("/edit_operation/<operation_id>", methods=["GET", "POST"])
+@login_required
 def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Response:
     """
     edit operation
@@ -2785,6 +2816,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
 
 
 @web_app.route("/edit_relation/<relation_id>", methods=["GET", "POST"])
+@login_required
 def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response:
     """
     edit relation
@@ -2851,6 +2883,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
 
 
 @web_app.route("/edit_scalar/<scalar_id>", methods=["GET", "POST"])
+@login_required
 def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
     """
     edit symbol:
@@ -2975,6 +3008,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
 
 @web_app.route("/edit_vector/<vector_id>", methods=["GET", "POST"])
+@login_required
 def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
     """
     edit vector
@@ -3008,6 +3042,7 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
 
 @web_app.route("/edit_matrix/<matrix_id>", methods=["GET", "POST"])
+@login_required
 def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
     """
     edit matrix
@@ -3200,6 +3235,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
 
 @web_app.route("/new_symbol_scalar/", methods=["GET", "POST"])
+@login_required
 def to_add_symbol_scalar() -> werkzeug.Response:
     """
     novel scalar symbol
@@ -3346,6 +3382,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
 
 
 @web_app.route("/new_symbol_vector/", methods=["GET", "POST"])
+@login_required
 def to_add_symbol_vector() -> werkzeug.Response:
     """
     novel vector
@@ -3460,6 +3497,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
 
 
 @web_app.route("/new_symbol_matrix/", methods=["GET", "POST"])
+@login_required
 def to_add_symbol_matrix() -> werkzeug.Response:
     """
     novel matrix
@@ -4198,6 +4236,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 
 
 @web_app.route("/new_operation/", methods=["GET", "POST"])
+@login_required
 def to_add_operation() -> werkzeug.Response:
     """
     novel operation
@@ -4295,6 +4334,7 @@ def to_add_operation() -> werkzeug.Response:
 
 
 @web_app.route("/new_relation/", methods=["GET", "POST"])
+@login_required
 def to_add_relation() -> werkzeug.Response:
     """
     novel relation
@@ -5371,6 +5411,7 @@ def to_add_sympy_and_lean_for_feed(
 
 
 @web_app.route("/new_inference_rule/", methods=["GET", "POST"])
+@login_required
 def to_add_inference_rule() -> werkzeug.Response:
     """
     create inference rule
@@ -5524,6 +5565,7 @@ def to_add_inference_rule() -> werkzeug.Response:
 
 
 @web_app.route("/edit_step/<derivation_id>/<step_id>", methods=["GET", "POST"])
+@login_required
 def to_edit_step(
     derivation_id: unique_numeric_id_as_str, step_id: unique_numeric_id_as_str
 ) -> werkzeug.Response:
@@ -5584,6 +5626,7 @@ def to_edit_step(
 
 
 @web_app.route("/edit_inference_rule/<inference_rule_id>", methods=["GET", "POST"])
+@login_required
 def to_edit_inference_rule(
     inference_rule_id: unique_numeric_id_as_str,
 ) -> werkzeug.Response:
@@ -6679,6 +6722,7 @@ def to_list_inference_rules() -> str:
 
 
 @web_app.route("/delete_all")
+@login_required
 def to_delete_graph_content() -> werkzeug.Response:
     """
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
