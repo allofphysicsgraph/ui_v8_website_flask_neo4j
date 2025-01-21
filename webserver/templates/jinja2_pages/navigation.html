@@ -11,27 +11,27 @@
 
 <P>From the Physics Derivation Graph navigation, you can
 
-<table width=900 class="navtable" border="0">
+<table width=900 class="navtable" border="1">
   <tr>
     <td width=160>&nbsp;</td>
     <td colspan=2>
       <UL>
         <LI>
-          <a href="{{ url_for('to_list_derivations', referrer='navigation') }}">show all {{ dat['derivations']|length }} derivations</a>
+          <a href="{{ url_for('to_list_derivations', referrer='navigation') }}">show all XXX derivations</a>
         </LI>
         <LI>
-          <a href="{{ url_for('start_new_derivation', referrer='navigation') }}">start a new derivation</a>
+          <a href="{{ url_for('to_add_derivation', referrer='navigation') }}">start a new derivation</a>
            {% if current_user.is_anonymous %}
-             -- requires being <a href="{{ url_for('login', referrer='navigation') }}">signed in</a>
+             -- requires being <a href="{{ url_for('to_login', referrer='navigation') }}">signed in</a>
            {% endif %}
         </LI>
 <!--
     { % if dat['derivations']|length > 0 %}
     <LI>
-      <a href="{{ url_for('select_from_existing_derivations') }}?referrer=navigation">view one of the existing {{ dat['derivations']|length }} derivations</a>;
+      <a href="{ { url_for('select_from_existing_derivations') } }?referrer=navigation">view one of the existing { { dat['derivations']|length } } derivations</a>;
       also edit an existing derivation
       { % if current_user.is_anonymous %}
-        if you are <a href="{{ url_for('login') }}?referrer=navigation">signed in</a>
+        if you are <a href="{ { url_for('to_login') } }?referrer=navigation">signed in</a>
       { % endif %}
     </LI>
     { % endif %}
@@ -48,7 +48,7 @@
     <td>&nbsp;</td>
     <td colspan=2>
       <UL>
-        <LI><a href="{{ url_for('to_list_steps') }}?referrer=navigation">list all steps</a></LI>
+        <LI><a href="{ { url_for('to_list_steps') } }?referrer=navigation">list all steps</a></LI>
       </UL>
     </td>
   </tr>
@@ -63,7 +63,7 @@
     <td>
       <UL>
         <LI>
-      <a href="{{ url_for('to_list_inference_rules') }}?referrer=navigation">list all {{ dat["inference rules"]|length }} inference rules</a>;
+      <a href="{{ url_for('to_list_inference_rules') }}?referrer=navigation">list all XXX inference rules</a>;
       also edit inference rules
       {% if current_user.is_anonymous %}
         if you are <a href="{{ url_for('to_login') }}?referrer=navigation">signed in</a>
@@ -83,15 +83,15 @@
     <td>&nbsp;</td>
     <td colspan=2>
      <UL>
-    {% if dat['expressions']|length > 0 %}
+    { % if dat['expressions']|length > 0 % }
       <LI>
-        <a href="{{ url_for('to_list_expressions') }}?referrer=navigation">list all {{ dat['expressions']|length }} expressions</a>;
+        <a href="{{ url_for('to_list_expressions') }}?referrer=navigation">list all XXX expressions</a>;
         also edit expressions
-      {% if current_user.is_anonymous %}
-        if you are <a href="{{ url_for('login') }}?referrer=navigation">signed in</a>
-      {% endif %}
+      { % if current_user.is_anonymous % }
+        if you are <a href="{{ url_for('to_login') }}?referrer=navigation">signed in</a>
+      { % endif % }
      </LI>
-      {% endif %}
+      { % endif % }
     </UL>
 </td>
   </tr>
@@ -110,10 +110,10 @@
     <td colspan=2>
       <UL>
     <LI>
-      <a href="{{ url_for('to_list_symbols') }}?referrer=navigation">list all {{ dat['symbols']|length }} symbols</a> (variables and constants)
+      <a href="{{ url_for('to_list_scalars') }}?referrer=navigation">list all XXX symbols</a> (variables and constants)
     </LI>
     <LI>
-      <a href="{{ url_for('to_list_operators') }}?referrer=navigation">list all {{ dat['operators']|length }} operators</a>
+      <a href="{{ url_for('to_list_operators') }}?referrer=navigation">list all XXX operators</a>
     </LI>
       </UL>
     </td>
@@ -149,7 +149,7 @@
 
     <P>
     {% if current_user.is_anonymous %}
-      Upload database file if you are <a href="{{ url_for('login') }}?referrer=navigation">signed in</a>
+      Upload database file if you are <a href="{{ url_for('to_login') }}?referrer=navigation">signed in</a>
     {% else %}
       <!-- https://www.google.com/search?q=flask+upload+file -->
       Upload database file (.json only):
@@ -179,7 +179,7 @@
 
     <P>
     {% if current_user.is_anonymous %}
-      Upload the bibliography file if you are <a href="{{ url_for('login') }}?referrer=navigation">signed in</a>
+      Upload the bibliography file if you are <a href="{{ url_for('to_login') }}?referrer=navigation">signed in</a>
     {% else %}
       <!-- https://www.google.com/search?q=flask+upload+file -->
       Upload the bibliography file (Bibtex .bib only):
