@@ -21,6 +21,7 @@ from flask import (
     render_template,
     request,
     url_for,
+    g,
     flash,
 )
 
@@ -77,7 +78,7 @@ def unauthorized():
     >>>
     """
     logger.info("[TRACE] pdg_login/unauthorized")
-    return redirect(url_for("login", referrer="unauthorized"))
+    return redirect(url_for("to_login", referrer="unauthorized"))
 
 
 @login_manager.user_loader
@@ -194,7 +195,7 @@ def callback():
 
     # Send user back to homepage
     logger.info("[TRACE] pdg_login/callback end " + trace_id + "]")
-    return redirect(url_for("navigation", referrer="login"))
+    return redirect(url_for("to_navigation", referrer="login"))
 
 
 @web_app.route("/logout", methods=["GET", "POST"])
@@ -207,4 +208,4 @@ def to_logout():
     logger.info("[TRACE] pdg_login/to_logout")
     #        flash("username not available")
     logout_user()
-    return redirect(url_for("index", referrer="logout"))
+    return redirect(url_for("to_index", referrer="logout"))
