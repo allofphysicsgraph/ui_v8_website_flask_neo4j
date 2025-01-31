@@ -42,6 +42,11 @@ from flask_login import (
 from google_auth_sql_db import init_db
 from google_auth_user_account import User
 
+# https://github.com/googleapis/google-auth-library-python/issues/1069
+# https://stackoverflow.com/questions/51006382/no-module-named-requests-when-trying-to-use-google-oauth2-with-docker
+# https://pypi.org/project/requests/
+import requests
+
 # https://realpython.com/flask-google-login/
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
