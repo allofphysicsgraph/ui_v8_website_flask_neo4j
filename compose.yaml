@@ -8,18 +8,40 @@
 # https://docs.docker.com/compose/compose-file/
 
 services:
-  webserver:
+  flask-webserver:
     build:
-      context: ./webserver
+      context: ./webserver_for_pdg
       dockerfile: Dockerfile
     restart: unless-stopped
-    environment:
-     - SECRET_KEY=${SECRET_KEY}
+    # https://stackoverflow.com/questions/29377853/how-can-i-use-environment-variables-in-docker-compose
+    # https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/
+    env_file: ".env.google"
+    #environment:
+    # - SECRET_KEY=${SECRET_KEY}
     expose:
       - 5000
-# using "ports" makes flask/gunicorn accessible without going through nginx
-    ports:
-     - "5000:5000"
+    # using "ports" makes flask/gunicorn accessible without going through nginx
+    # ports:
+    #  - "5000:5000"
+# https://docs.gunicorn.org/en/stable/settings.html
+# https://pythonspeed.com/articles/gunicorn-in-docker/
+    command: >
+      gunicorn
+      --reload
+      --bind 0.0.0.0:5000
+      --forwarded-allow-ips="*"
+      --log-level debug
+      wsgi:web_app
+      --capture-output
+      --log-file=gunicorn_logs.log
+      --access-logformat='{"ip":"%({X-Forwarded-For}i)s", "reqtime":"%(L)s", "uname":"%(u)s", "date":"%(t)s", "statline":"%(r)s", "stat":  "%(s)s", "resplen":"%(b)s", "ref":"%(f)s", "ua":"%(a)s"}'
+      --access-logfile=gunicorn_access.log
+      --error-logfile=gunicorn_error.log
+      --worker-tmp-dir /dev/shm
+      --workers=2 
+      --threads=4 
+      --worker-class=gthread 
+#      --enable-stdio-inheritance
     depends_on:
       neo4j_docker:
 # https://docs.docker.com/compose/compose-file/05-services/#healthcheck
@@ -30,7 +52,31 @@ services:
           - neo4j-network
     volumes:
      - ${PWD}/:/scratch
-     - './dumping_grounds:/code/static/dumping_grounds'
+     # - './dumping_grounds:/code/static/dumping_grounds'
+    # healthcheck:
+    #   test: wget http://localhost:5000 || exit 1
+    #   interval: 3s      # The health check will first run interval seconds after the container is started, and then again interval seconds after each previous check completes.
+    #   timeout: 5s      # If a single run of the check takes longer than timeout seconds then the check is considered to have failed.
+    #   retries: 20       # It takes retries consecutive failures of the health check for the container to be considered unhealthy.
+    #   start_period: 10s # provides initialization time for containers that need time to bootstrap. Probe failure during that period will not be counted towards the maximum number of retries. However, if a health check succeeds during the start period, the container is considered started and all consecutive failures will be counted towards the maximum number of retries.
+
+  nginx:
+    build: ./nginx_for_pdg
+    # https://docs.docker.com/reference/compose-file/services/#depends_on
+    depends_on: 
+      flask-webserver:
+        condition: service_started
+    restart: on-failure
+    ports:
+     - "80:80"
+     - "443:443"
+    volumes:
+    - ${PWD}/logs_nginx/:/logs/
+    - ${PWD}/certs/:/certs/
+    networks:
+      neo4j-internal:
+        aliases:
+          - neo4j-network
 
 
   # see https://neo4j.com/docs/operations-manual/current/docker/introduction/

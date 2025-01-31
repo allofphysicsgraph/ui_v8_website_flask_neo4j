@@ -14,10 +14,16 @@ google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
 
+# https://pypi.org/project/requests/
+requests
+
 # only necessary for localhost
 # from https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https
 #pyOpenSSL==24.2.1
 pyOpenSSL
+
+
+gunicorn
 
 # image size
 opencv-python
