@@ -1,0 +1,14 @@
+digraph G {
+rankdir="LR";
+
+pdg_essental_demo_docker -> pdg_essental_demo_flask_website;
+
+pdg_essental_demo_flask_website -> pdg_essental_demo_api;
+
+pdg_essental_demo_flask_website -> pdg_essental_demo_jinja2;
+
+pdg_essental_demo_flask_website -> pdg_essental_demo_flask_google_auth
+
+pdg_essental_demo_flask_website -> pdg_essental_demo_neo4j_and_flask;
+}
+
