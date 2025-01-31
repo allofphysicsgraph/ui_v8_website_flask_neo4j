@@ -43,9 +43,5 @@ pylint
 sympy
 antlr4-python3-runtime==4.11
 
-# only necessary for localhost
-# from https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https
-#pyOpenSSL==20.0.1
-pyOpenSSL
 
 #EOF
