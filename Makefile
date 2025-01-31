@@ -40,8 +40,8 @@ up:
 	       	$(container) kill $$($(container) ps -q); \
 		fi
 	$(container) ps
-	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image) /bin/bash -c 'for filename in /scratch/webserver/*.py; do echo $$filename; done | xargs black'
-	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image) /bin/bash -c 'for filename in /scratch/webserver/library/*.py; do echo $$filename; done | xargs black'
+	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image) /bin/bash -c 'for filename in /scratch/webserver_for_pdg/*.py; do echo $$filename; done | xargs black'
+	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image) /bin/bash -c 'for filename in /scratch/webserver_for_pdg/library/*.py; do echo $$filename; done | xargs black'
 	# https://docs.docker.com/compose/reference/up/
 	$(container) compose up --build --remove-orphans
 
@@ -55,7 +55,7 @@ container: container_build container_live
 
 # https://docs.docker.com/build/building/multi-platform/
 container_build:
-	cd webserver && $(container) build --platform linux/amd64,linux/arm64 -t $(webserver_image) .
+	cd webserver_for_pdg && $(container) build --platform linux/amd64,linux/arm64 -t $(webserver_image) .
 
 container_live:
 	$(container) run -it --rm \
@@ -67,8 +67,7 @@ black_out:
 	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(webserver_image) make black_in
 
 black_in:
-	black webserver/*.py webserver/library/*.py
-#webserver/neo4j_query.py webserver/compute.py
+	black webserver_for_pdg/*.py webserver_for_pdg/library/*.py
 
 mypy_out:
 	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(webserver_image) mypy --check-untyped-defs webserver/pdg_app.py webserver/library
