@@ -1,5 +1,6 @@
 
 .env
+.env.google
 dumping_grounds
 neo4j_graph_datascience_library
 neo4j_pdg/plugins/
