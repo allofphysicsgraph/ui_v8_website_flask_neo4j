@@ -70,7 +70,7 @@ RUN curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -
 # --default-toolchain leanprover/lean4:nightly
 # as per https://leanprover-community.github.io/archive/stream/270676-lean4/topic/elan.20update.html
 
-ENV PATH "/root/.elan/bin:$PATH"
+ENV PATH="/root/.elan/bin:$PATH"
 
 # References:
 # - https://github.com/allofphysicsgraph/lean-in-docker/blob/main/lean_v4/Dockerfile
