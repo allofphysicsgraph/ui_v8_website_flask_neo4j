@@ -2,7 +2,23 @@
 # Physics Derivation Graph
 # https://allofphysics.com
 
+# Get the machine architecture.
+# On arm64 (Apple Silicon M1/M2/etc.), `uname -m` outputs "arm64".
+# On amd64 (Intel), `uname -m` outputs "x86_64".
+ARCH := $(shell uname -m)
+
+ifeq ($(ARCH), arm64)
+        this_arch=arm64
+else ifeq ($(ARCH), x86_64)
+        this_arch=amd64
+else
+        @echo "Unknown architecture: $(ARCH). Cannot determine if Mac is new or old."
+endif
+
+
 webserver_image=ui_v8_website_flask_neo4j_webserver
+
+my_tag=latest-$(this_arch)
 
 container=docker
 #container=podman
@@ -40,8 +56,8 @@ up:
 	       	$(container) kill $$($(container) ps -q); \
 		fi
 	$(container) ps
-	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image) /bin/bash -c 'for filename in /scratch/webserver_for_pdg/*.py; do echo $$filename; done | xargs black'
-	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image) /bin/bash -c 'for filename in /scratch/webserver_for_pdg/library/*.py; do echo $$filename; done | xargs black'
+	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image):$(my_tag) /bin/bash -c 'for filename in /scratch/webserver_for_pdg/*.py; do echo $$filename; done | xargs black'
+	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image):$(my_tag) /bin/bash -c 'for filename in /scratch/webserver_for_pdg/library/*.py; do echo $$filename; done | xargs black'
 	# https://docs.docker.com/compose/reference/up/
 	$(container) compose up --build --remove-orphans
 
@@ -55,16 +71,16 @@ container: container_build container_live
 
 # https://docs.docker.com/build/building/multi-platform/
 container_build:
-	cd webserver_for_pdg && $(container) build --platform linux/amd64,linux/arm64 -t $(webserver_image) .
+	cd webserver_for_pdg && $(container) build -t $(webserver_image):$(my_tag) .
 
 container_live:
 	$(container) run -it --rm \
                 -v `pwd`:/scratch -w /scratch/ \
                 --user $(id -u):$(id -g) \
-                $(webserver_image) /bin/bash
+                $(webserver_image):$(my_tag) /bin/bash
 
 black_out:
-	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(webserver_image) make black_in
+	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(webserver_image):$(my_tag) make black_in
 
 black_in:
 	black webserver_for_pdg/*.py webserver_for_pdg/library/*.py
