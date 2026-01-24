@@ -92,7 +92,7 @@ RUN npm install -g pyright
 ################# end start npm; start pip #################################
 
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --no-cache-dir -vvv --ignore-installed blinker
 
 # TODO: don't be root!
 
