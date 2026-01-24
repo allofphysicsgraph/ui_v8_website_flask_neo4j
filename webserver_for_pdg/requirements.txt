@@ -3,7 +3,7 @@ Flask-WTF
 Flask-Login
 
 # native driver; see https://neo4j.com/docs/api/python-driver/current/api.html
-neo4j
+neo4j<5.0.0
 
 # https://github.com/allofphysicsgraph/proofofconcept/issues/157
 secure==0.3.0
