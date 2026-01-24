@@ -16,15 +16,15 @@ else
 endif
 
 
-webserver_image=ui_v8_website_flask_neo4j_webserver
+webserver_image=ui_v8_flask_webserver
 
 my_tag=latest-$(this_arch)
 
 container=docker
 #container=podman
 
-#
-.PHONY: help docker
+# .PHONY is special target used to declare that a target name does not correspond to an actual file to be built.
+.PHONY: help docker up down container container_live container_build black_in black_out mypy_out delete_neo4j_file
 
 help:
 	@echo "make help"
@@ -56,10 +56,10 @@ up:
 	       	$(container) kill $$($(container) ps -q); \
 		fi
 	$(container) ps
-	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image):$(my_tag) /bin/bash -c 'for filename in /scratch/webserver_for_pdg/*.py; do echo $$filename; done | xargs black'
-	$(container) run -it --rm -v `pwd`:/scratch $(webserver_image):$(my_tag) /bin/bash -c 'for filename in /scratch/webserver_for_pdg/library/*.py; do echo $$filename; done | xargs black'
+	$(container) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(webserver_image):$(my_tag) 'black /scratch/webserver_for_pdg/*.py'
+	$(container) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(webserver_image):$(my_tag) 'black /scratch/webserver_for_pdg/library/*.py'
 	# https://docs.docker.com/compose/reference/up/
-	$(container) compose up --build --remove-orphans
+	$(container) compose up --build --force-recreate --remove-orphans
 
 
 down:
