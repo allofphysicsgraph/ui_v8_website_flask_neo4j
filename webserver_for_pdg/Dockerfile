@@ -1,10 +1,13 @@
 # Physics Derivation Graph
-# Ben Payne, 2025
+# Ben Payne, 2026
 # https://creativecommons.org/licenses/by/4.0/
 # Attribution 4.0 International (CC BY 4.0)
 
+# https://docs.docker.com/build/building/best-practices/
+
 # https://docs.docker.com/engine/reference/builder/#from
 # https://github.com/phusion/baseimage-docker
+# https://hub.docker.com/r/phusion/baseimage/tags
 FROM phusion/baseimage:jammy-1.0.4
 
 WORKDIR /code
