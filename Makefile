@@ -1,6 +1,7 @@
-# Ben Payne
+
 # Physics Derivation Graph
 # https://allofphysics.com
+# Ben Payne, 2026
 
 # Get the machine architecture.
 # On arm64 (Apple Silicon M1/M2/etc.), `uname -m` outputs "arm64".
@@ -12,7 +13,7 @@ ifeq ($(ARCH), arm64)
 else ifeq ($(ARCH), x86_64)
         this_arch=amd64
 else
-        @echo "Unknown architecture: $(ARCH). Cannot determine if Mac is new or old."
+        @echo "Unknown architecture: $(ARCH). Cannot determine if Mac is new (arm64) or old (amd64)."
 endif
 
 
