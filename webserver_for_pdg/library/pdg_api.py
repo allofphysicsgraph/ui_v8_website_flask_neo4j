@@ -46,7 +46,7 @@ import neo4j_query
 import compute
 import list_of_valid
 
-from initialize_flask import csrf  # imported so that we can set .exempt(bp)
+# from initialize_flask import csrf  # imported so that we can set .exempt(bp)
 
 from compute import query_timing_result_type
 
@@ -62,18 +62,18 @@ from pdg_app import graphDB_Driver
 # this works because app.py loads this file first
 
 # http://flask.palletsprojects.com/en/1.1.x/tutorial/views/
-bp = Blueprint("pdg_api", __name__, url_prefix="/api")
+api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 
 # BHP, 2025-01-09: I am not dealing with log-in requirements,
 # so I am disabling csrf for the APIs as per
 # https://flask-wtf.readthedocs.io/en/0.15.x/csrf/#exclude-views-from-protection
 # https://flask-wtf.readthedocs.io/en/0.15.x/api/
-csrf.exempt(bp)
+# csrf.exempt(bp)
 # also, CSRF isn't how API authentication is done. See
 # https://www.google.com/search?q=how+flask+json+api+authentication+works
 
 
-@bp.route("/v1/resources/do_nothing", methods=["GET"])
+@api_bp.route("/v1/resources/do_nothing", methods=["GET"])
 def api_do_nothing():
     """
     to use session cookies,
@@ -93,7 +93,7 @@ def api_do_nothing():
     return
 
 
-@bp.route("/v1/resources/register_csrf", methods=["GET"])
+@api_bp.route("/v1/resources/register_csrf", methods=["GET"])
 def api_register():
     """
     a CSRF token can be generated manually as per
@@ -123,7 +123,7 @@ def api_register():
     return jsonify({"csrf token": csrf_token})
 
 
-@bp.route("/v1/resources/derivation/list", methods=["GET"])
+@api_bp.route("/v1/resources/derivation/list", methods=["GET"])
 def api_list_derivations():
     """
     curl -s http://localhost:5000/api/v1/resources/derivation/list | python3 -m json.tool
@@ -161,7 +161,7 @@ def api_list_derivations():
     return jsonify(list_of_dicts)
 
 
-@bp.route("/v1/resources/inference_rule/list", methods=["GET"])
+@api_bp.route("/v1/resources/inference_rule/list", methods=["GET"])
 def api_list_inference_rules():
     """
     curl -s http://localhost:5000/api/v1/resources/inference_rule/list | python3 -m json.tool
@@ -196,7 +196,7 @@ def api_list_inference_rules():
     return jsonify(list_of_dicts)
 
 
-@bp.route("/v1/resources/symbol/operation/list", methods=["GET"])
+@api_bp.route("/v1/resources/symbol/operation/list", methods=["GET"])
 def api_list_operation_symbols():
     """
     curl -s http://localhost:5000/api/v1/resources/operation/list | python3 -m json.tool
@@ -231,7 +231,7 @@ def api_list_operation_symbols():
     return jsonify(list_of_dicts)
 
 
-@bp.route("/v1/resources/symbol/relation/list", methods=["GET"])
+@api_bp.route("/v1/resources/symbol/relation/list", methods=["GET"])
 def api_list_relation_symbols():
     """
     curl -s http://localhost:5000/api/v1/resources/symbol/relation/list | python3 -m json.tool
@@ -255,7 +255,7 @@ def api_list_relation_symbols():
     return jsonify(list_of_dicts)
 
 
-@bp.route("/v1/resources/symbol/scalar/list", methods=["GET"])
+@api_bp.route("/v1/resources/symbol/scalar/list", methods=["GET"])
 def api_list_scalar_symbols():
     """
     curl -s http://localhost:5000/api/v1/resources/scalar/list | python3 -m json.tool
@@ -290,7 +290,7 @@ def api_list_scalar_symbols():
     return jsonify(list_of_dicts)
 
 
-@bp.route("/v1/resources/symbol/vector/list", methods=["GET"])
+@api_bp.route("/v1/resources/symbol/vector/list", methods=["GET"])
 def api_list_vector_symbols():
     """
     curl -s http://localhost:5000/api/v1/resources/vector/list | python3 -m json.tool
@@ -325,7 +325,7 @@ def api_list_vector_symbols():
     return jsonify(list_of_dicts)
 
 
-@bp.route("/v1/resources/symbol/matrix/list", methods=["GET"])
+@api_bp.route("/v1/resources/symbol/matrix/list", methods=["GET"])
 def api_list_matrix_symbols():
     """
     curl -s http://localhost:5000/api/v1/resources/matrix/list | python3 -m json.tool
@@ -360,7 +360,7 @@ def api_list_matrix_symbols():
     return jsonify(list_of_dicts)
 
 
-@bp.route("/v1/resources/expression/list", methods=["GET"])
+@api_bp.route("/v1/resources/expression/list", methods=["GET"])
 def api_list_expressions():
     """
     curl -s http://localhost:5000/api/v1/resources/expression/list | python3 -m json.tool
@@ -392,7 +392,7 @@ def api_list_expressions():
     return jsonify(list_of_dicts)
 
 
-@bp.route("/v1/resources/derivation/create", methods=["POST"])
+@api_bp.route("/v1/resources/derivation/create", methods=["POST"])
 def api_create_derivation():
     """
     required inputs:
@@ -524,7 +524,7 @@ def api_create_derivation():
     )
 
 
-@bp.route("/v1/resources/expression/create", methods=["POST"])
+@api_bp.route("/v1/resources/expression/create", methods=["POST"])
 def api_create_expression():
     """
 
@@ -717,7 +717,7 @@ def api_create_expression():
     )
 
 
-@bp.route("/v1/resources/symbol/scalar/create", methods=["POST"])
+@api_bp.route("/v1/resources/symbol/scalar/create", methods=["POST"])
 def api_create_scalar_symbol():
     """
 
@@ -1022,7 +1022,7 @@ def api_create_scalar_symbol():
     )
 
 
-@bp.route("/v1/resources/symbol/vector/create", methods=["POST"])
+@api_bp.route("/v1/resources/symbol/vector/create", methods=["POST"])
 def api_create_vector_symbol():
     """
     curl -s http://localhost:5000/api/v1/resources/symbol/vector/create
@@ -1038,7 +1038,7 @@ def api_create_vector_symbol():
     return jsonify({"STATUS": "TODO"})
 
 
-@bp.route("/v1/resources/symbol/matrix/create", methods=["POST"])
+@api_bp.route("/v1/resources/symbol/matrix/create", methods=["POST"])
 def api_create_matrix_symbol():
     """
     curl -s http://localhost:5000/api/v1/resources/symbol/matrix/create
@@ -1054,7 +1054,7 @@ def api_create_matrix_symbol():
     return jsonify({"STATUS": "TODO"})
 
 
-@bp.route("/v1/resources/symbol/operation/create", methods=["POST"])
+@api_bp.route("/v1/resources/symbol/operation/create", methods=["POST"])
 def api_create_operation_symbol():
     """
     curl -s http://localhost:5000/api/v1/resources/symbol/operation/create
@@ -1172,7 +1172,7 @@ def api_create_operation_symbol():
     )
 
 
-@bp.route("/v1/resources/symbol/relation/create", methods=["POST"])
+@api_bp.route("/v1/resources/symbol/relation/create", methods=["POST"])
 def api_create_relation_symbol():
     """
     curl -s http://localhost:5000/api/v1/resources/symbol/relation/create
@@ -1272,7 +1272,7 @@ def api_create_relation_symbol():
     )
 
 
-@bp.route("/v1/resources/inference_rule/create", methods=["POST"])
+@api_bp.route("/v1/resources/inference_rule/create", methods=["POST"])
 def api_create_inference_rule():
     """
     curl -s http://localhost:5000/api/v1/resources/inference_rule/create
@@ -1307,7 +1307,7 @@ def api_create_inference_rule():
     )
 
 
-@bp.route("/v1/resources/derivation/delete", methods=["POST"])
+@api_bp.route("/v1/resources/derivation/delete", methods=["POST"])
 def api_delete_derivation():
     """
     derivation and all steps
@@ -1402,7 +1402,7 @@ def api_delete_derivation():
     return jsonify({"STATUS": "successfully deleted" + derivation_id})
 
 
-@bp.route("/v1/resources/expression/delete", methods=["POST"])
+@api_bp.route("/v1/resources/expression/delete", methods=["POST"])
 def api_delete_expression():
     """
     derivation and all steps
@@ -1410,7 +1410,7 @@ def api_delete_expression():
     return jsonify({"STATUS": "TODO"})
 
 
-@bp.route("/v1/resources/derivation/metadata", methods=["GET"])
+@api_bp.route("/v1/resources/derivation/metadata", methods=["GET"])
 def api_derivation_metadata():
     """
     curl -s http://localhost:5000/api/v1/resources/derivation/metadata?derivation_id=3445848 | python3 -m json.tool
@@ -1447,7 +1447,7 @@ def api_derivation_metadata():
     return jsonify(derivation_dict)
 
 
-@bp.route("/v1/resources/derivation/step/list", methods=["GET"])
+@api_bp.route("/v1/resources/derivation/step/list", methods=["GET"])
 def api_derivation_steps():
     """
     curl -s http://localhost:5000/api/v1/resources/derivation/step/list?derivation_id=3445848 | python3 -m json.tool
@@ -1486,7 +1486,7 @@ def api_derivation_steps():
     return jsonify(list_of_steps)
 
 
-@bp.route("/v1/resources/cypher/", methods=["GET"])
+@api_bp.route("/v1/resources/cypher/", methods=["GET"])
 def api_cypher_query():
     """
     curl -s http://localhost:5000/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
