@@ -11,9 +11,9 @@ To contribute, you can
  * [modify the code](https://github.com/allofphysicsgraph/proofofconcept/fork) and create alternative implementations
  * ask a question that is not posted on [the FAQ](https://allofphysicsgraph.github.io/proofofconcept/site/faq.html)
 
-Before submitting code via a pull request, please open an issue (feature or bug) and describe your question or intent.
+Before submitting code via a pull request, please [open an issue](https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues) (whether to report a bug or ask for a feature) and describe your question or intent.
 
-Python code is formatted using Black.
+Python code is formatted using Black. 
 
 Development is done in Docker containers. Changes to the code should run in a Docker container. Novel architecture suggestions should run in a container.  If you can create a minimal Dockerfile and Makefile that shows what your demo does, then I can reliably recreate the demo.
 

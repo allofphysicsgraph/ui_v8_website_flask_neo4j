@@ -23,9 +23,9 @@ and then, in a web browser, go to <http://localhost:5000>
 
 
 Because software is in Docker containers (for reproducibility), the versions of the Docker software you're using matter. The software in this repo has been tested with
-* `docker compose version` yields "2.34.0-desktop.1" on a Mac Airbook arm64; "" on a Mac Airbook amd64
+* `docker compose version` yields "2.34.0-desktop.1" on a Mac Airbook arm64; "v2.2.1" on a Mac Airbook amd64
 * Compose file format 3.6
-* `docker --version` yields "Docker version 28.0.4, build b8034c0" on a Mac Airbook arm64; "" on a Mac Airbook amd64
+* `docker --version` yields "Docker version 28.0.4, build b8034c0" on a Mac Airbook arm64; "Docker version 20.10.11" on a Mac Airbook amd64
 See <https://docs.docker.com/compose/compose-file/compose-versioning/> for compatibility of versions.
 
 ## Project contents
@@ -59,6 +59,8 @@ The content of this repo is covered by the
 # Software Requirements
 
 * Docker
+* `git`
+* `make`
 * a web browser
 
 ## Key features
@@ -74,6 +76,6 @@ See VERSIONS.md for details
 
 # Contributing
 
-Before submitting code via a pull request, please [open an issue](https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues) (whether to report a bug or ask for a feature) and describe your question or intent.
+See CONTRIBUTING.md for guidance.
 
-Python code is formatted using Black. 
+#EOF
