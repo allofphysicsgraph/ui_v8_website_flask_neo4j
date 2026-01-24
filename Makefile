@@ -16,12 +16,12 @@ else
 endif
 
 
-webserver_image=ui_v8_flask_webserver
+WEBSERVER_IMAGE=ui_v8_flask_webserver
 
-my_tag=latest-$(this_arch)
+CONTAINER_TAG=latest-$(this_arch)
 
-container=docker
-#container=podman
+DOCKER_OR_PODMAN=docker
+#DOCKER_OR_PODMAN=podman
 
 # .PHONY is special target used to declare that a target name does not correspond to an actual file to be built.
 .PHONY: help docker up down container container_live container_build black_in black_out mypy_out delete_neo4j_file
@@ -32,7 +32,7 @@ help:
 	@echo "==== Targets outside container ===="
 	@echo ""
 	@echo "make up"
-	@echo "      build and run $(container)"
+	@echo "      build and run container"
 	@echo ""
 	@echo "make mypy_out"
 	@echo "      run mypy type checking for all .py files"
@@ -50,43 +50,43 @@ help:
 # create and start the webserver. This will build the Docker image if that's needed
 up:
 	cd neo4j_pdg && chmod -R g+rwx * && chmod -R o+rwx * 
-	#if (! $(container) stats --no-stream ); then  open /Applications/Docker.app; while (! $(container) stats --no-stream ); do    echo "Waiting for Docker to launch...";  sleep 1; done; fi; 
-	$(container) ps
-	if [ `$(container) ps | wc -l` -gt 1 ]; then \
-	       	$(container) kill $$($(container) ps -q); \
+	#if (! $(DOCKER_OR_PODMAN) stats --no-stream ); then  open /Applications/Docker.app; while (! $(DOCKER_OR_PODMAN) stats --no-stream ); do    echo "Waiting for Docker to launch...";  sleep 1; done; fi; 
+	$(DOCKER_OR_PODMAN) ps
+	if [ `$(DOCKER_OR_PODMAN) ps | wc -l` -gt 1 ]; then \
+	       	$(DOCKER_OR_PODMAN) kill $$($(DOCKER_OR_PODMAN) ps -q); \
 		fi
-	$(container) ps
-	$(container) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(webserver_image):$(my_tag) 'black /scratch/webserver_for_pdg/*.py'
-	$(container) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(webserver_image):$(my_tag) 'black /scratch/webserver_for_pdg/library/*.py'
+	$(DOCKER_OR_PODMAN) ps
+	$(DOCKER_OR_PODMAN) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) 'black /scratch/webserver_for_pdg/*.py'
+	$(DOCKER_OR_PODMAN) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) 'black /scratch/webserver_for_pdg/library/*.py'
 	# https://docs.docker.com/compose/reference/up/
-	$(container) compose up --build --force-recreate --remove-orphans
+	$(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans
 
 
 down:
 	# https://docs.docker.com/compose/reference/down/
-	$(container) compose down --volumes --remove-orphans
+	$(DOCKER_OR_PODMAN) compose down --volumes --remove-orphans
 
 
 container: container_build container_live
 
 # https://docs.docker.com/build/building/multi-platform/
 container_build:
-	cd webserver_for_pdg && $(container) build -t $(webserver_image):$(my_tag) .
+	cd webserver_for_pdg && $(DOCKER_OR_PODMAN) build -t $(WEBSERVER_IMAGE):$(CONTAINER_TAG) .
 
 container_live:
-	$(container) run -it --rm \
+	$(DOCKER_OR_PODMAN) run -it --rm \
                 -v `pwd`:/scratch -w /scratch/ \
                 --user $(id -u):$(id -g) \
-                $(webserver_image):$(my_tag) /bin/bash
+                $(WEBSERVER_IMAGE):$(CONTAINER_TAG) /bin/bash
 
 black_out:
-	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(webserver_image):$(my_tag) make black_in
+	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) make black_in
 
 black_in:
 	black webserver_for_pdg/*.py webserver_for_pdg/library/*.py
 
 mypy_out:
-	$(container) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(webserver_image) mypy --check-untyped-defs webserver/pdg_app.py webserver/library
+	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(WEBSERVER_IMAGE) mypy --check-untyped-defs webserver/pdg_app.py webserver/library
 
 
 # keep the conf folder since that has the configuration
