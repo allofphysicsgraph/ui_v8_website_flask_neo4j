@@ -56,8 +56,8 @@ up:
 	       	$(DOCKER_OR_PODMAN) kill $$($(DOCKER_OR_PODMAN) ps -q); \
 		fi
 	$(DOCKER_OR_PODMAN) ps
-	$(DOCKER_OR_PODMAN) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) 'black /scratch/webserver_for_pdg/*.py'
-	$(DOCKER_OR_PODMAN) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) 'black /scratch/webserver_for_pdg/library/*.py'
+	$(DOCKER_OR_PODMAN) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) -c 'black /scratch/webserver_for_pdg/*.py'
+	$(DOCKER_OR_PODMAN) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) -c 'black /scratch/webserver_for_pdg/library/*.py'
 	# https://docs.docker.com/compose/reference/up/
 	$(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans
 
