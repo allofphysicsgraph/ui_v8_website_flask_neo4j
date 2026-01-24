@@ -18,6 +18,7 @@ services:
     # https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/
     env_file: ".env.google"
 
+    # gunicorn is a production-grade WSGI HTTP Server for Python
     # https://docs.gunicorn.org/en/stable/settings.html
     # https://pythonspeed.com/articles/gunicorn-in-docker/
     command: >
@@ -26,17 +27,39 @@ services:
       --bind 0.0.0.0:5000
       --forwarded-allow-ips="*"
       --log-level debug
-      wsgi:pdg_app
+      wsgi:web_app
       --capture-output
-      --log-file=gunicorn_logs.log
       --access-logformat='{"ip":"%({X-Forwarded-For}i)s", "reqtime":"%(L)s", "uname":"%(u)s", "date":"%(t)s", "statline":"%(r)s", "stat":  "%(s)s", "resplen":"%(b)s", "ref":"%(f)s", "ua":"%(a)s"}'
-      --access-logfile=gunicorn_access.log
-      --error-logfile=gunicorn_error.log
       --worker-tmp-dir /dev/shm
       --workers=2 
       --threads=4 
       --worker-class=gthread 
+#      --access-logfile=gunicorn_access.log
+#      --error-logfile=gunicorn_error.log
 #      --enable-stdio-inheritance
+# EXPLANATIONS OF GUNICORN FLAGS:
+#     --reload: Restarts the worker processes whenever code changes are detected.
+#               Intended for development and should generally be avoided in production as it consumes extra resources.
+#     --bind 0.0.0.0:5000: Tells Gunicorn which IP address and port to listen on. 
+#               0.0.0.0 means it will listen on all available network interfaces (external and internal), and 5000 is the port.
+#     --forwarded-allow-ips="*": Tells Gunicorn which front-end proxy IPs (like Nginx or HAProxy) to trust. 
+#               Setting it to "*" means it will trust the "Forwarded-For" headers from any IP.
+#     --access-logformat
+#               %({X-Forwarded-For}i)s: The real IP of the user (passed from the proxy).
+#               %(L)s: Request time in decimal seconds.
+#               %(s)s: HTTP status code.
+#               %(a)s: User Agent (browser info).
+#     --worker-class=gthread: Tells Gunicorn to use the "Threaded" worker type.
+#               Well-suited for applications that spend a lot of time waiting on external APIs or database queries.
+#      --workers=2: The number of separate process "workers" to spawn. 
+#               Usually set to (2 x $num_cores) + 1.
+#      --threads=4: The number of threads each worker process will handle. 
+#               With 2 workers and 4 threads, your app can handle 8 concurrent requests.
+#      --worker-tmp-dir /dev/shm: points Gunicorn's temporary heartbeat files to a memory-based file system (Shared Memory).
+# 		A common fix for Gunicorn "freezing" or slowing down in Docker containers, 
+#               where the default disk-based /tmp can be slow or experience blocking.
+#      Levels for "--log-level" are 
+#      --capture-output ensures Python stdout/stderr is redirected to logs
     expose:
       - 5000
     # using "ports" makes flask/gunicorn accessible without going through nginx
@@ -44,7 +67,7 @@ services:
     #  - "5000:5000"
     depends_on:
       neo4j_docker:
-# https://docs.docker.com/compose/compose-file/05-services/#healthcheck
+    # https://docs.docker.com/compose/compose-file/05-services/#healthcheck
         condition: service_healthy
     networks:
       neo4j-internal:
