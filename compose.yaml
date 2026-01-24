@@ -1,6 +1,7 @@
-# Ben Payne
+
 # Physics Derivation Graph
 # https://allofphysics.com
+# Ben Payne
 
 # Creative Commons Attribution 4.0 International License
 # https://creativecommons.org/licenses/by/4.0/
@@ -16,11 +17,7 @@ services:
     # https://stackoverflow.com/questions/29377853/how-can-i-use-environment-variables-in-docker-compose
     # https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/
     env_file: ".env.google"
-    expose:
-      - 5000
-    # using "ports" makes flask/gunicorn accessible without going through nginx
-    # ports:
-    #  - "5000:5000"
+
     # https://docs.gunicorn.org/en/stable/settings.html
     # https://pythonspeed.com/articles/gunicorn-in-docker/
     command: >
@@ -40,6 +37,11 @@ services:
       --threads=4 
       --worker-class=gthread 
 #      --enable-stdio-inheritance
+    expose:
+      - 5000
+    # using "ports" makes flask/gunicorn accessible without going through nginx
+    # ports:
+    #  - "5000:5000"
     depends_on:
       neo4j_docker:
 # https://docs.docker.com/compose/compose-file/05-services/#healthcheck
