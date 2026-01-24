@@ -54,7 +54,7 @@ def list_IDs(tx, node_type: str) -> List[str]:
     print("neo4j_query/list_IDs: node_type=", node_type)
     assert node_type in list_of_valid.node_types
 
-    list_of_IDs = []  # type:List[str]
+    list_of_IDs = []  # type: List[str]
     for result in tx.run("MATCH (n:" + node_type + ") RETURN n.id"):
         # print(result.data())
         list_of_IDs.append(result.data()["n.id"])
@@ -226,7 +226,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     print("neo4j_query/list_IDs: symbol_category=", symbol_category)
     assert symbol_category in list_of_valid.symbol_categories
 
-    symbol_list = []  # type:List[str]
+    symbol_list = []  # type: List[str]
     for result in tx.run(
         "MATCH (e:"
         + expression_or_feed
@@ -297,7 +297,7 @@ def get_list_node_dicts_of_type(tx, node_type: str) -> list:
     print("neo4j_query/get_list_node_dicts_of_type:  node type:", node_type)
     assert node_type in list_of_valid.node_types
 
-    node_list = []  # type:List[dict]
+    node_list = []  # type: List[dict]
     for result in tx.run("MATCH (n:" + node_type + ") RETURN n"):
         # print(result.data()["n"])
         node_list.append(result.data()["n"])
@@ -323,7 +323,7 @@ def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
     print("neo4j_query/get_derivation_dicts_that_use_feed: feed_id=", feed_id)
 
     # TODO: this should be derivation->step->feed
-    list_of_derivation_dicts = []  # type:List[dict]
+    list_of_derivation_dicts = []  # type: List[dict]
     for result in tx.run(
         'MATCH (d:derivation)-[]->(s:step)-[]->(f:feed) WHERE f.id = "'
         + str(feed_id)
@@ -359,7 +359,7 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
         inference_rule_id,
     )
 
-    list_of_derivation_dicts = []  # type:List[dict]
+    list_of_derivation_dicts = []  # type: List[dict]
     for result in tx.run(
         'MATCH (d:derivation)-[]->(s:step)-[]->(i:inference_rule) WHERE i.id = "'
         + str(inference_rule_id)
@@ -681,7 +681,7 @@ def get_list_of_expression_dicts_from_step_id_and_expr_type(
     #     + "]->(m:expression) RETURN m"
     # )
 
-    list_of_expression_dicts = []  # type:List[dict]
+    list_of_expression_dicts = []  # type: List[dict]
 
     if expression_type == "HAS_FEED":
         destination_node_type = "feed"
@@ -1244,7 +1244,7 @@ def get_list_of_sequence_values_for_derivation_id(tx, derivation_id: str) -> lis
         + str(time.time())
     )
 
-    list_of_sequence_values = []  # type:List[int]
+    list_of_sequence_values = []  # type: List[int]
 
     print("derivation_id=", derivation_id)
     print(

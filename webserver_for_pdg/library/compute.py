@@ -6,8 +6,7 @@
 # Creative Commons Attribution 4.0 International License
 # https://creativecommons.org/licenses/by/4.0/
 
-"""
-"""
+""" """
 
 import os
 import random
@@ -106,7 +105,7 @@ def get_dict_of_node_type_for_every_id(
     #  {'n.id': '8047316', 'labels(n)': ['vector', 'symbol']},
     #  {'n.id': '2587054', 'labels(n)': ['vector']}, {'n.id': '7688226', 'labels(n)': ['feed']}, {'n.id': '6529449', 'labels(n)': ['feed']}, {'n.id': '6529458', 'labels(n)': ['feed']}]
 
-    dict_of_symbol_id_and_type = {}  # type:Dict[str,str]
+    dict_of_symbol_id_and_type = {}  # type: Dict[str,str]
     for this_dict in list_of_records:
         if len(this_dict["labels(n)"]) > 1:
             for symbol_category in this_dict["labels(n)"]:

@@ -17,7 +17,7 @@ HTTP methods supported by the APIs in this file:
 
 
 
-When sending data via a POST or PUT request, two common formats 
+When sending data via a POST or PUT request, two common formats
 (specified via the Content-Type header) are:
 - application/json
 - application/x-www-form-urlencoded
@@ -1499,7 +1499,7 @@ def api_cypher_query():
 
     print("user_query:", user_query)
 
-    list_of_records = []  # type:List[str]
+    list_of_records = []  # type: List[str]
     if user_query:
         try:
             # https://neo4j.com/docs/python-manual/current/session-api/
