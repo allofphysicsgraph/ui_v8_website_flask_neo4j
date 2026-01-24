@@ -54,11 +54,10 @@ up:
 	#if (! $(DOCKER_OR_PODMAN) stats --no-stream ); then  open /Applications/Docker.app; while (! $(DOCKER_OR_PODMAN) stats --no-stream ); do    echo "Waiting for Docker to launch...";  sleep 1; done; fi; 
 	$(DOCKER_OR_PODMAN) ps
 	if [ `$(DOCKER_OR_PODMAN) ps | wc -l` -gt 1 ]; then \
-	       	$(DOCKER_OR_PODMAN) kill $$($(DOCKER_OR_PODMAN) ps -q); \
-		fi
+	      $(DOCKER_OR_PODMAN) kill $$($(DOCKER_OR_PODMAN) ps -q); \
+	fi
 	$(DOCKER_OR_PODMAN) ps
-	$(DOCKER_OR_PODMAN) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) -c 'black /scratch/webserver_for_pdg/*.py'
-	$(DOCKER_OR_PODMAN) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) -c 'black /scratch/webserver_for_pdg/library/*.py'
+	$(DOCKER_OR_PODMAN) run -it --rm --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) -c 'black /scratch/webserver_for_pdg/*.py /scratch/webserver_for_pdg/library/*.py'
 	# https://docs.docker.com/compose/reference/up/
 	$(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans
 
