@@ -16,22 +16,20 @@ services:
     # https://stackoverflow.com/questions/29377853/how-can-i-use-environment-variables-in-docker-compose
     # https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/
     env_file: ".env.google"
-    #environment:
-    # - SECRET_KEY=${SECRET_KEY}
     expose:
       - 5000
     # using "ports" makes flask/gunicorn accessible without going through nginx
     # ports:
     #  - "5000:5000"
-# https://docs.gunicorn.org/en/stable/settings.html
-# https://pythonspeed.com/articles/gunicorn-in-docker/
+    # https://docs.gunicorn.org/en/stable/settings.html
+    # https://pythonspeed.com/articles/gunicorn-in-docker/
     command: >
       gunicorn
       --reload
       --bind 0.0.0.0:5000
       --forwarded-allow-ips="*"
       --log-level debug
-      wsgi:web_app
+      wsgi:pdg_app
       --capture-output
       --log-file=gunicorn_logs.log
       --access-logformat='{"ip":"%({X-Forwarded-For}i)s", "reqtime":"%(L)s", "uname":"%(u)s", "date":"%(t)s", "statline":"%(r)s", "stat":  "%(s)s", "resplen":"%(b)s", "ref":"%(f)s", "ua":"%(a)s"}'
@@ -85,8 +83,8 @@ services:
   # https://stackoverflow.com/questions/48465046/run-neo4j-with-docker-compose-neo4j-not-accessible-from-localhost7474
   # https://medium.com/@faaizhussain/neo4j-4-0-docker-compose-9bead6634c8
   neo4j_docker:
-    image: neo4j:4.4.4-community   # https://hub.docker.com/_/neo4j/tags
-    platform: "linux/amd64"
+    image: neo4j:4.4.45-community   # https://hub.docker.com/_/neo4j/tags
+#    platform: "linux/amd64"
 #    platform: "linux/arm64"
     restart: unless-stopped
     hostname: neo4j_host
