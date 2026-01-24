@@ -12,7 +12,7 @@ this file is for gunicorn
 If the app uses Flask, the entry point is at the bottom of pdg_app.py
 """
 
-from initialize_flask import web_app
+from pdg_app import web_app
 
 print("hello from wsgi")
 

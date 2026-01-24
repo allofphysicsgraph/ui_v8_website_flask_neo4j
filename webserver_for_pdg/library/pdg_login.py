@@ -13,7 +13,6 @@ import random
 
 logger = logging.getLogger(__name__)
 
-from initialize_flask import web_app
 
 # https://hplgit.github.io/web4sciapps/doc/pub/._web4sa_flask004.html
 from flask import (
