@@ -445,9 +445,8 @@ def to_logout():
 
 ######################## BEGIN importing blueprints (aka routes in other files) ##################
 
-from pdg_other_routes import other_routes_bp
-
-web_app.register_blueprint(other_routes_bp)
+# from pdg_other_routes import other_routes_bp
+# web_app.register_blueprint(other_routes_bp)
 
 
 # the following import has to happen after web_app is configured because pdg_app uses graphDB_Driver
@@ -7037,6 +7036,7 @@ def to_export_cypher() -> werkzeug.Response:
     )
     return redirect(url_for("static", filename="dumping_grounds/pdg.cypher"))
 
+
 ###########################################################################
 
 
@@ -7203,7 +7203,7 @@ def static_file_from_root():
     """
     https://stackoverflow.com/a/14625619/1164295
     """
-    return send_from_directory(static_folder, request.path[1:])
+    return send_from_directory(web_app.static_folder, request.path[1:])
 
 
 ###########################################################################
@@ -7409,9 +7409,7 @@ def to_comparison_of_design_options_syntax():
     )
 
 
-@web_app.route(
-    "/comparison_of_design_options/database", methods=["GET", "POST"]
-)
+@web_app.route("/comparison_of_design_options/database", methods=["GET", "POST"])
 def to_comparison_of_design_options_database():
     """
     a static page
@@ -7592,9 +7590,7 @@ def to_spectrum_of_precision_layer_tag_words():
     )
 
 
-@web_app.route(
-    "/spectrum_of_precision/tag_expressions", methods=["GET", "POST"]
-)
+@web_app.route("/spectrum_of_precision/tag_expressions", methods=["GET", "POST"])
 def to_spectrum_of_precision_layer_tag_expressions():
     """
     exploration of layering formalization
@@ -7665,9 +7661,7 @@ def to_spectrum_of_precision_layer_numeric_id():
     )
 
 
-@web_app.route(
-    "/spectrum_of_precision/dimensional_validation", methods=["GET", "POST"]
-)
+@web_app.route("/spectrum_of_precision/dimensional_validation", methods=["GET", "POST"])
 def to_spectrum_of_precision_layer_dimensional_validation():
     """
     exploration of layering formalization
@@ -7694,8 +7688,6 @@ def to_spectrum_of_precision_layer_proof():
 ###########################################################################
 
 ###########################################################################
-
-
 
 
 # EOF
