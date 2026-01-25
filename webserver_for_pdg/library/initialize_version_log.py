@@ -67,12 +67,15 @@ stdout = process.stdout.decode("utf-8")
 stderr = process.stderr.decode("utf-8")
 logger.info("latex: " + str(stdout))
 
-process = subprocess.run(
-    ["elan", "--version"], stdout=PIPE, stderr=PIPE, timeout=proc_timeout
-)
-stdout = process.stdout.decode("utf-8")
-stderr = process.stderr.decode("utf-8")
-logger.info("elan: " + str(stdout))
+try:
+    process = subprocess.run(
+        ["elan", "--version"], stdout=PIPE, stderr=PIPE, timeout=proc_timeout
+    )
+    stdout = process.stdout.decode("utf-8")
+    stderr = process.stderr.decode("utf-8")
+    logger.info("elan: " + str(stdout))
+except subprocess.TimeoutExpired as e:
+    logger.error("elan timed out")
 
 # subprocess.TimeoutExpired: Command '['lean', '--version']' timed out after 20 seconds
 try:
@@ -82,19 +85,25 @@ try:
     stdout = process.stdout.decode("utf-8")
     stderr = process.stderr.decode("utf-8")
     logger.info("lean: " + str(stdout))
-except:
+except subprocess.TimeoutExpired as e:
     logger.error("lean timed out")
 
-process = subprocess.run(
-    ["leanc", "--version"], stdout=PIPE, stderr=PIPE, timeout=proc_timeout
-)
-stdout = process.stdout.decode("utf-8")
-stderr = process.stderr.decode("utf-8")
-logger.info("leanc: " + str(stdout))
+try:
+    process = subprocess.run(
+        ["leanc", "--version"], stdout=PIPE, stderr=PIPE, timeout=proc_timeout
+    )
+    stdout = process.stdout.decode("utf-8")
+    stderr = process.stderr.decode("utf-8")
+    logger.info("leanc: " + str(stdout))
+except subprocess.TimeoutExpired as e:
+    logger.error("leanc timed out")
 
-process = subprocess.run(
-    ["lake", "--version"], stdout=PIPE, stderr=PIPE, timeout=proc_timeout
-)
-stdout = process.stdout.decode("utf-8")
-stderr = process.stderr.decode("utf-8")
-logger.info("lake: " + str(stdout))
+try:
+    process = subprocess.run(
+        ["lake", "--version"], stdout=PIPE, stderr=PIPE, timeout=proc_timeout
+    )
+    stdout = process.stdout.decode("utf-8")
+    stderr = process.stderr.decode("utf-8")
+    logger.info("lake: " + str(stdout))
+except subprocess.TimeoutExpired as e:
+    logger.error("lake timed out")
