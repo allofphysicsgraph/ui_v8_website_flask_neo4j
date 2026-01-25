@@ -1325,7 +1325,7 @@ def to_navigation():
         "[TRACE] pdg_app/to_navigation end " + trace_id + " " + str(time.time())
     )
     return render_template(
-        "jinja2_pages/user_workflow/site_map.html",
+        "jinja2_pages/site_map.html",
         title="site map",
         query_time_dict=query_time_dict,
         number_of_derivations=number_of_derivations,
