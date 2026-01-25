@@ -1,4 +1,3 @@
-
 # Physics Derivation Graph
 # https://allofphysics.com
 # Ben Payne, 2026
@@ -7,16 +6,14 @@
 # https://creativecommons.org/licenses/by/4.0/
 
 # https://docs.docker.com/compose/compose-file/
+# this file can be linted using `docker compose config`
 
+name: ui_v8
 services:
   flask-webserver:
     build:
       context: ./webserver_for_pdg
       dockerfile: Dockerfile
-    restart: unless-stopped
-    # https://stackoverflow.com/questions/29377853/how-can-i-use-environment-variables-in-docker-compose
-    # https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/
-    env_file: ".env.google"
 
     # gunicorn is a production-grade WSGI HTTP Server for Python
     # https://docs.gunicorn.org/en/stable/settings.html
@@ -29,13 +26,14 @@ services:
       --log-level debug
       wsgi:web_app
       --capture-output
+      --log-file=gunicorn_logs.log
       --access-logformat='{"ip":"%({X-Forwarded-For}i)s", "reqtime":"%(L)s", "uname":"%(u)s", "date":"%(t)s", "statline":"%(r)s", "stat":  "%(s)s", "resplen":"%(b)s", "ref":"%(f)s", "ua":"%(a)s"}'
       --worker-tmp-dir /dev/shm
       --workers=2 
       --threads=4 
       --worker-class=gthread 
-#      --access-logfile=gunicorn_access.log
-#      --error-logfile=gunicorn_error.log
+      --access-logfile=gunicorn_access.log
+      --error-logfile=gunicorn_error.log
 #      --enable-stdio-inheritance
 # EXPLANATIONS OF GUNICORN FLAGS:
 #     --reload: Restarts the worker processes whenever code changes are detected.
@@ -60,8 +58,6 @@ services:
 #               where the default disk-based /tmp can be slow or experience blocking.
 #      Levels for "--log-level" are 
 #      --capture-output ensures Python stdout/stderr is redirected to logs
-    expose:
-      - 5000
     # using "ports" makes flask/gunicorn accessible without going through nginx
     # ports:
     #  - "5000:5000"
@@ -69,37 +65,27 @@ services:
       neo4j_docker:
     # https://docs.docker.com/compose/compose-file/05-services/#healthcheck
         condition: service_healthy
+        required: true
+    # https://stackoverflow.com/questions/29377853/how-can-i-use-environment-variables-in-docker-compose
+    # https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/
+    env_file: ".env.google"
+    expose:
+      - "5000"
     networks:
       neo4j-internal:
         aliases:
           - neo4j-network
+    restart: unless-stopped
     volumes:
-     - ${PWD}/:/scratch
-     # - './dumping_grounds:/code/static/dumping_grounds'
+      - ${PWD}/:/scratch
+      - './dumping_grounds:/code/static/dumping_grounds'
+    # - ${PWD}/flask/logs/:/logs/
     # healthcheck:
     #   test: wget http://localhost:5000 || exit 1
     #   interval: 3s      # The health check will first run interval seconds after the container is started, and then again interval seconds after each previous check completes.
     #   timeout: 5s      # If a single run of the check takes longer than timeout seconds then the check is considered to have failed.
     #   retries: 20       # It takes retries consecutive failures of the health check for the container to be considered unhealthy.
     #   start_period: 10s # provides initialization time for containers that need time to bootstrap. Probe failure during that period will not be counted towards the maximum number of retries. However, if a health check succeeds during the start period, the container is considered started and all consecutive failures will be counted towards the maximum number of retries.
-
-  nginx:
-    build: ./nginx_for_pdg
-    # https://docs.docker.com/reference/compose-file/services/#depends_on
-    depends_on: 
-      flask-webserver:
-        condition: service_started
-    restart: on-failure
-    ports:
-     - "80:80"
-     - "443:443"
-    volumes:
-    - ${PWD}/logs_nginx/:/logs/
-    - ${PWD}/certs/:/certs/
-    networks:
-      neo4j-internal:
-        aliases:
-          - neo4j-network
 
 
   # see https://neo4j.com/docs/operations-manual/current/docker/introduction/
@@ -108,12 +94,34 @@ services:
   # https://stackoverflow.com/questions/48465046/run-neo4j-with-docker-compose-neo4j-not-accessible-from-localhost7474
   # https://medium.com/@faaizhussain/neo4j-4-0-docker-compose-9bead6634c8
   neo4j_docker:
-    image: neo4j:4.4.45-community   # https://hub.docker.com/_/neo4j/tags
-#    platform: "linux/amd64"
-#    platform: "linux/arm64"
-    restart: unless-stopped
+    # https://docs.docker.com/compose/compose-file/compose-file-v3/#environment
+    # see https://neo4j.com/docs/operations-manual/current/docker/ref-settings/
+    # https://community.neo4j.com/t/docker-compose-setting-for-apoc-installation/11621/9
+    # https://linuxtut.com/en/a37f1ee0e486658d10de/
+    # https://neo4j.com/labs/apoc/4.1/installation/
+    environment:
+      NEO4J_AUTH: none
+      NEO4J_apoc_export_file_enabled: "true"
+      NEO4J_apoc_import_file_enabled: "true"
+      NEO4J_apoc_import_file_use__neo4j__config: "true"
+      NEO4J_dbms_allow__upgrade: "true"
+      NEO4J_dbms_directories_import: dumping_grounds # relative to /var/lib/neo4j
+      NEO4J_dbms_security_procedures_allowlist: gds.*, apoc.*
+#      - NEO4JLABS_PLUGINS=["apoc"] # downloads from gitlab everytime the container is started
     hostname: neo4j_host
-    #network_mode: "bridge"
+    
+    # https://docs.docker.com/reference/dockerfile/#healthcheck -- official documentation
+    # https://stackoverflow.com/a/74689805/1164295 -- a concise and relevant example
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget http://localhost:7474 || exit 1
+      interval: 3s      # The health check will first run interval seconds after the container is started, and then again interval seconds after each previous check completes.
+      timeout: 5s       # If a single run of the check takes longer than timeout seconds then the check is considered to have failed.
+      retries: 20       # It takes retries consecutive failures of the health check for the container to be considered unhealthy.
+      start_period: 10s # provides initialization time for containers that need time to bootstrap. Probe failure during that period will not be counted towards the maximum number of retries. However, if a health check succeeds during the start period, the container is considered started and all consecutive failures will be counted towards the maximum number of retries.
+    image: neo4j:4.4.45-community   # https://hub.docker.com/_/neo4j/tags
+
     # https://stackoverflow.com/a/48637671/1164295
     networks:
       neo4j-internal:
@@ -125,6 +133,7 @@ services:
       - "7474:7474"
       - "7473:7473"
       - "7687:7687"
+    restart: unless-stopped
     # as per https://neo4j.com/docs/operations-manual/current/docker/clustering/
     volumes:
       - './neo4j_pdg/data:/var/lib/neo4j/data'
@@ -132,28 +141,27 @@ services:
       - './neo4j_pdg/conf:/var/lib/neo4j/conf'
       - './neo4j_pdg/plugins:/var/lib/neo4j/plugins'
       - './dumping_grounds:/var/lib/neo4j/dumping_grounds'
-    # https://docs.docker.com/compose/compose-file/compose-file-v3/#environment
-    # see https://neo4j.com/docs/operations-manual/current/docker/ref-settings/
-    # https://community.neo4j.com/t/docker-compose-setting-for-apoc-installation/11621/9
-    # https://linuxtut.com/en/a37f1ee0e486658d10de/
-    # https://neo4j.com/labs/apoc/4.1/installation/
-    environment:
-      - NEO4J_dbms_allow__upgrade=true
-      - NEO4J_AUTH=none
-      - NEO4J_apoc_export_file_enabled=true
-      - NEO4J_apoc_import_file_enabled=true
-      - NEO4J_apoc_import_file_use__neo4j__config=true
-      - NEO4J_dbms_directories_import=dumping_grounds # relative to /var/lib/neo4j
-      - NEO4J_dbms_security_procedures_allowlist=gds.*, apoc.*
-#      - NEO4JLABS_PLUGINS=["apoc"] # downloads from gitlab everytime the container is started
-    # https://docs.docker.com/reference/dockerfile/#healthcheck -- official documentation
-    # https://stackoverflow.com/a/74689805/1164295 -- a concise and relevant example
-    healthcheck:
-      test: wget http://localhost:7474 || exit 1
-      interval: 3s      # The health check will first run interval seconds after the container is started, and then again interval seconds after each previous check completes.
-      timeout: 5s      # If a single run of the check takes longer than timeout seconds then the check is considered to have failed.
-      retries: 20       # It takes retries consecutive failures of the health check for the container to be considered unhealthy.
-      start_period: 10s # provides initialization time for containers that need time to bootstrap. Probe failure during that period will not be counted towards the maximum number of retries. However, if a health check succeeds during the start period, the container is considered started and all consecutive failures will be counted towards the maximum number of retries.
+
+  nginx:
+    build:
+      context: ./nginx_for_pdg
+      dockerfile: Dockerfile
+    # https://docs.docker.com/reference/compose-file/services/#depends_on
+    depends_on:
+      flask-webserver:
+        condition: service_started
+        required: true
+    networks:
+      neo4j-internal:
+        aliases:
+          - neo4j-network
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: on-failure
+    volumes:
+      - ${PWD}/logs_nginx/:/logs/
+      - ${PWD}/certs/:/certs/
 
 networks:
   neo4j-internal:
