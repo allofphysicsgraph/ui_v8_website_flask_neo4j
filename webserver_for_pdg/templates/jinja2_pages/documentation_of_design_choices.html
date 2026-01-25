@@ -1,9 +1,12 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
-<h1>Design Documentation for the Physics Derivation Graph</h1>
+<h1>Design Choices Documentation for the Physics Derivation Graph</h1>
 
-<P><a href="{{ url_for('to_navigation') }}">navigation</a> / design documentation
+<P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}">documentation overview</a> / 
+   design documentation
+</P>
 
 <P>
   <em>Recommendation</em>: Read the
@@ -95,11 +98,10 @@ cat developer_documentation.html |\
 
 <H2><a name="data structure">Data structure used in the Physics Derivation Graph</a></H2>
 <P>
-  The Physics Derivation Graph is currently stored in a single JSON file. <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/flask/data.json">The JSON file</a> is read into Python as a dictionary.
+  The Physics Derivation Graph is stored in a Neo4j Property Graph database.
 </P>
 <P>
-  JSON is convenient because it is plain text and the ease of detailed validation available using schemas.
-  The many alternatives to JSON (e.g., SQLite, Redis, Python Pickle, CSV, GraphML) offer trade-offs, a few of which <a href="{{ url_for('to_comparison_of_design_options_database') }}?referrer=design_documentation">have been explored</a>.
+  The many alternatives data storage options (e.g., SQLite, Redis, Python Pickle, CSV, GraphML) offer trade-offs, a few of which <a href="{{ url_for('to_comparison_of_design_options_database') }}?referrer=design_documentation">have been explored</a>.
 
 <P>&nbsp;</P>
 <HR/>

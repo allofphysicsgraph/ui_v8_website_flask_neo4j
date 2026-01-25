@@ -1,14 +1,16 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
-<h1>Design Documentation for the Physics Derivation Graph</h1>
+<h1>Design Principles Documentation for the Physics Derivation Graph</h1>
 
-<P><a href="{{ url_for('to_navigation') }}">navigation</a> / design documentation
+<P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}">documentation overview</a> / 
+   design documentation
 
 <P>
   <em>Recommendation</em>: Read the
-  <a href="{{ url_for('user_documentation') }}?referrer=design_documentation">user documentation</a>
-  and <a href="{{ url_for('faq') }}?referrer=design_documentation">FAQ</a> first.
+  <a href="{{ url_for('to_user_documentation') }}?referrer=design_documentation">user documentation</a>
+  and <a href="{{ url_for('to_faq') }}?referrer=design_documentation">FAQ</a> first.
   This page assumes familiarity with the jargon used in the Physics Derivation Graph.
 </P>
 
@@ -17,14 +19,18 @@
 
 
 <UL>
-  <LI>Technology used should be free to improve accessibility.</LI>
-  <LI>Technology used should be open source to improve ability to inspect the implementation.</LI>
-  <LI>Technology used should be durable and stable to decrease the maintenance burden.</LI>
-  <LI>Rendered HTML pages should have a single scope. (As opposed to a single-page website.)</LI>
-  <LI>HTML tag "Fieldset" is used to denote actions available to the user.</LI>
+  <LI>Long-term durability (as measured by financial and temporal costs of maintenance)
+  <LI>Easy for users to leverage (accessibility)
+  <LI>Easy for developers to contribute (accessibility)
+  <LI>Reproducibility
 </UL>
-
-
+<P>Therefore
+<UL>
+  <LI>Stable code base (therefore avoid dependencies). Should decrease the maintenance burden
+  <LI>Use free software (e.g., Latex, SymPy, Linux, Python, Docker, HTML) - saves money for developers and users
+  <LI>Use Open source software (e.g., Latex, SymPy, Linux, Python, Docker, HTML) - enables inspection of implementation
+  <LI>Containers (reproducibility)
+</UL>
 
 
 {% endblock %}
