@@ -5,7 +5,6 @@
 # Creative Commons Attribution 4.0 International License
 # https://creativecommons.org/licenses/by/4.0/
 
-
 # Get the machine architecture.
 # On arm64 (Apple Silicon M1/M2/etc.), `uname -m` outputs "arm64".
 # On amd64 (Intel), `uname -m` outputs "x86_64".
@@ -52,7 +51,7 @@ help:
 	@echo ""
 
 # create and start the webserver. This will build the Docker image if that's needed
-up:
+launch_webserver:
 	cd neo4j_pdg && chmod -R g+rwx * && chmod -R o+rwx * 
 	#if (! $(DOCKER_OR_PODMAN) stats --no-stream ); then  open /Applications/Docker.app; while (! $(DOCKER_OR_PODMAN) stats --no-stream ); do    echo "Waiting for Docker to launch...";  sleep 1; done; fi; 
 	$(DOCKER_OR_PODMAN) ps
@@ -103,7 +102,7 @@ delete_neo4j_file:
 #  - all networks not used by at least one container
 #  - all dangling images
 #  - unused build cache
-clear:
+clear_containers:
 	docker system prune
 
 
