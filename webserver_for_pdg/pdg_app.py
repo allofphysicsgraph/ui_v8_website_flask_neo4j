@@ -1098,9 +1098,7 @@ def before_request():
 
 
 @web_app.route("/", methods=["GET", "POST"])
-@web_app.route(
-    "/index", methods=["GET", "POST"]
-)
+@web_app.route("/index", methods=["GET", "POST"])
 def to_index():
     """
     placeholder for landing page that provides context before user goes to_navigation
@@ -7234,8 +7232,8 @@ def static_dir():
 @web_app.route("/documentation/evaluation_of_LLM_prompts", methods=["GET", "POST"])
 def to_evaluation_of_LLM_prompts():
     """ """
-    logger.info("[TRACE] pdg_app/evaluation_of_LLM_prompts")
-    return render_template("jinja2_pages/evaluation_of_LLM_prompts.html")
+    logger.info("[TRACE] pdg_app/to_evaluation_of_LLM_prompts")
+    return render_template("jinja2_pages/documentation_evaluation_of_LLM_prompts.html")
 
 
 ###########################################################################
@@ -7342,7 +7340,7 @@ def to_faq():
     >>> faq()
     """
     logger.info("[TRACE] pdg_app/")
-    return render_template("jinja2_pages/faq.html", title="Frequently Asked Questions")
+    return render_template("jinja2_pages/documentation_faq.html", title="Frequently Asked Questions")
 
 
 @web_app.route("/other_projects", methods=["GET", "POST"])
@@ -7354,7 +7352,7 @@ def to_other_projects():
     >>> other_projects()
     """
     logger.info("[TRACE] pdg_app/")
-    return render_template("jinja2_pages/other_projects.html", title="Other projects")
+    return render_template("jinja2_pages/documentation_other_projects.html", title="Other projects")
 
 
 @web_app.route("/literature_review", methods=["GET", "POST"])
@@ -7367,7 +7365,7 @@ def to_literature_review():
     """
     logger.info("[TRACE] pdg_app/")
     return render_template(
-        "jinja2_pages/literature_review.html", title="Literature Review"
+        "jinja2_pages/documentation_literature_review.html", title="Literature Review"
     )
 
 
@@ -7379,7 +7377,7 @@ def to_historical_precedents():
     """
     logger.info("[TRACE] pdg_app/")
     return render_template(
-        "jinja2_pages/historical_precedents.html", title="historical precedents"
+        "jinja2_pages/documentation_historical_precedents.html", title="historical precedents"
     )
 
 
