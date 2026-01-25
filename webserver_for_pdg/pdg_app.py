@@ -7118,7 +7118,7 @@ def my_profile():
 ###########################################################################
 
 
-@web_app.route("/search", methods=["GET"])
+@web_app.route("/search", methods=["GET", "POST"]) # user shouldn't go directly to this page; the purpose of this route is to get to Google
 def search_redirect_to_google():
     """
     rather than search local content, rely on Google's index
@@ -7127,7 +7127,7 @@ def search_redirect_to_google():
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] pdg_app/search_form_redirect_to_google start "
+        "[TRACE] pdg_app/search_redirect_to_google start "
         + trace_id
         + " "
         + str(time.time())
@@ -7135,8 +7135,9 @@ def search_redirect_to_google():
     print(
         "request.url: " + str(request.url)
     )  # https://stackoverflow.com/a/46176337/1164295
-
-    # request.url: http://localhost:5000/search?hello=bye
+    
+    # Here's what the URL should look like:
+    # request.url: http://localhost/search?q=hello
 
     if len(request.form.keys()) > 0:
         print("request.form =" + str(request.form))
@@ -7156,11 +7157,11 @@ def search_redirect_to_google():
 
         return redirect(
             "https://www.google.com/search?&q=site%3Aallofphysics.com+"
-            + str(request.form.get("q"))
+            + str(request.args.get("q"))
         )
 
     else:
-        print("invalid use")
+        print("invalid use; URL should be something like http://localhost/search?q=hello ")
         return redirect(url_for("to_navigation"))
 
     return redirect(url_for("to_navigation"))
@@ -7234,7 +7235,7 @@ def static_dir():
 ###########################################################################
 
 
-@web_app.route("/evaluation_of_LLM_prompts", methods=["GET", "POST"])
+@web_app.route("/documentation/evaluation_of_LLM_prompts", methods=["GET", "POST"])
 def to_evaluation_of_LLM_prompts():
     """ """
     logger.info("[TRACE] pdg_app/evaluation_of_LLM_prompts")
@@ -7244,6 +7245,7 @@ def to_evaluation_of_LLM_prompts():
 ###########################################################################
 
 
+@web_app.route("/documentation/", methods=["GET", "POST"])
 @web_app.route("/documentation/overview", methods=["GET", "POST"])
 def to_documentation_overview():
     """
@@ -7259,8 +7261,8 @@ def to_documentation_overview():
     )
 
 
-@web_app.route("/user_documentation", methods=["GET", "POST"])
-@web_app.route("/documentation/user", methods=["GET", "POST"])
+@web_app.route("/user_documentation", methods=["GET", "POST"]) # backwards compatibility with previous versions of the site
+@web_app.route("/documentation/user", methods=["GET", "POST"]) # preferred
 def to_user_documentation():
     """
     a static page with documentation aimed at users (not developers)
@@ -7273,8 +7275,8 @@ def to_user_documentation():
     )
 
 
-@web_app.route("/developer_documentation", methods=["GET", "POST"])
-@web_app.route("/documentation/developer", methods=["GET", "POST"])
+@web_app.route("/developer_documentation", methods=["GET", "POST"]) # backwards compatibility with previous versions of the site
+@web_app.route("/documentation/developer", methods=["GET", "POST"]) # preferred
 def to_developer_documentation():
     """
     a static page aimed at people interested in contributed code changes
@@ -7288,6 +7290,7 @@ def to_developer_documentation():
 
 
 @web_app.route("/conventions_documentation", methods=["GET", "POST"])
+@web_app.route("/documentation/conventions", methods=["GET", "POST"])
 def to_conventions_documentation():
     """
     a static page aimed at people interested in understanding
@@ -7303,6 +7306,7 @@ def to_conventions_documentation():
 
 
 @web_app.route("/design_documentation", methods=["GET", "POST"])
+@web_app.route("/documentation/design_choices", methods=["GET", "POST"])
 def to_design_documentation():
     """
     a static page aimed at people interested in understanding
@@ -7317,7 +7321,7 @@ def to_design_documentation():
     )
 
 
-@web_app.route("/design_principles_and_goals", methods=["GET", "POST"])
+@web_app.route("/documentation/design_principles", methods=["GET", "POST"])
 def to_design_principles_and_goals():
     """
     a static page
@@ -7330,6 +7334,7 @@ def to_design_principles_and_goals():
 
 
 @web_app.route("/faq", methods=["GET", "POST"])
+@web_app.route("/documentation/faq", methods=["GET", "POST"])
 def to_faq():
     """
     "frequently asked questions" is a static page
@@ -7341,6 +7346,7 @@ def to_faq():
 
 
 @web_app.route("/other_projects", methods=["GET", "POST"])
+@web_app.route("/documentation/other_projects", methods=["GET", "POST"])
 def to_other_projects():
     """
     "other projects" is a static page
@@ -7352,6 +7358,7 @@ def to_other_projects():
 
 
 @web_app.route("/literature_review", methods=["GET", "POST"])
+@web_app.route("/documentation/literature_review", methods=["GET", "POST"])
 def to_literature_review():
     """
     "literature_review" is a static page
@@ -7365,6 +7372,7 @@ def to_literature_review():
 
 
 @web_app.route("/historical_precedents", methods=["GET", "POST"])
+@web_app.route("/documentation/historical_precedents", methods=["GET", "POST"])
 def to_historical_precedents():
     """
     a static page
@@ -7376,6 +7384,7 @@ def to_historical_precedents():
 
 
 @web_app.route("/site_map", methods=["GET", "POST"])
+@web_app.route("/documentation/site_map", methods=["GET", "POST"])
 def to_site_map():
     """
     a static page for site content
@@ -7389,7 +7398,7 @@ def to_site_map():
 ###########################################################################
 
 
-@web_app.route("/comparison_of_design_options/cas", methods=["GET", "POST"])
+@web_app.route("/documentation/developer/comparison_of_design_options/cas", methods=["GET", "POST"])
 def to_comparison_of_design_options_cas():
     """
     a static page
@@ -7401,7 +7410,7 @@ def to_comparison_of_design_options_cas():
     )
 
 
-@web_app.route("/comparison_of_design_options/proofs", methods=["GET", "POST"])
+@web_app.route("/documentation/developer/comparison_of_design_options/proofs", methods=["GET", "POST"])
 def to_comparison_of_design_options_proofs():
     """
     a static page
@@ -7413,7 +7422,7 @@ def to_comparison_of_design_options_proofs():
     )
 
 
-@web_app.route("/comparison_of_design_options/syntax", methods=["GET", "POST"])
+@web_app.route("/documentation/developer/comparison_of_design_options/syntax", methods=["GET", "POST"])
 def to_comparison_of_design_options_syntax():
     """
     a static page
@@ -7425,7 +7434,7 @@ def to_comparison_of_design_options_syntax():
     )
 
 
-@web_app.route("/comparison_of_design_options/database", methods=["GET", "POST"])
+@web_app.route("/documentation/developer/comparison_of_design_options/database", methods=["GET", "POST"])
 def to_comparison_of_design_options_database():
     """
     a static page
