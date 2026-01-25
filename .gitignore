@@ -1,10 +1,7 @@
-
-.env
+logs/*.log
 .env.google
 certs/*.pem
 dumping_grounds
-logs_gunicorn/*.log
-logs_nginx/*.log
 neo4j_graph_datascience_library
 neo4j_pdg/plugins/
 neo4j_pdg/logs
