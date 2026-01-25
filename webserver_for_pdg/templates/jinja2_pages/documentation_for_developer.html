@@ -1,6 +1,10 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
+<h1>Developer Documentation for the Physics Derivation Graph</h1>
+
+<P><a href="{{ url_for('to_navigation') }}">navigation</a> / developer documentation
+
 <P>
   <em>Recommendation</em>: Read the
   <a href="{{ url_for('to_user_documentation') }}?referrer=developer_documentation">user documentation</a>,
@@ -270,7 +274,8 @@ Figure 3. State diagram for the web interface.
   There are a set of repositories (<a href="https://github.com/orgs/allofphysicsgraph/repositories?q=pdg_">https://github.com/orgs/allofphysicsgraph/repositories?q=pdg_</a>) that contain the relevant source code.
 
 <P>Those repos are to be worked through in sequence: <BR>
-  <img src="{{ 'static/tutorial_sequence.png' }}">
+  
+<img src="{{ url_for('static', filename='tutorial_sequence.png') }}">
 
 <H3><a name="Docker and Make">Initial infrastructure: Docker and Make</a></H3>
 
