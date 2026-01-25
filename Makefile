@@ -1,7 +1,10 @@
-
 # Physics Derivation Graph
 # https://allofphysics.com
 # Ben Payne, 2026
+
+# Creative Commons Attribution 4.0 International License
+# https://creativecommons.org/licenses/by/4.0/
+
 
 # Get the machine architecture.
 # On arm64 (Apple Silicon M1/M2/etc.), `uname -m` outputs "arm64".
@@ -95,5 +98,13 @@ delete_neo4j_file:
 	rm -rf neo4j_pdg/data/
 	rm -rf neo4j_pdg/logs/
 
+# This will remove:
+#  - all stopped containers
+#  - all networks not used by at least one container
+#  - all dangling images
+#  - unused build cache
+clear:
+	docker system prune
 
-#EOF
+
+# EOF
