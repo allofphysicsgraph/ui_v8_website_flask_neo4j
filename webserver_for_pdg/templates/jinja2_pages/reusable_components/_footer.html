@@ -26,40 +26,43 @@
     <P>
       <table>
         <tr>
-     <td valign="middle" width="100">
-       <a href="https://github.com/allofphysicsgraph/allofphysics.com">
-         <img src="{{ url_for('static', filename='GitHub-icon.png')}}" align="left" alt="source code on GitHub">
-       </a>
-     </td>
-     <td valign="middle" width="100">
-       <a href="https://www.facebook.com/physicsderivationgraph/">
-         <img src="{{ url_for('static', filename='facebook_icon.svg')}}" width="40" align="left" alt="Facebook"/>
-       </a>
-     </td>
-     <td>
-       <form method="post" action="search">
-         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <!-- this "action" is not consisten with the MVC paradigm since control is not
-      passed back to controller.py.
-      The reason for using action instead of a form class in controller.py
-        consistent the MVC is because the footer appears on every page and I don't want to
-        include the class in every page of the MVC -->
-       <input type="text" id="search" name="search">
-       <input type="submit" value="Search">
-       </form>
-     </td>
-     <td valign="middle" width="100">
-       <a href="https://www.youtube.com/channel/UCBSInUAbtBkYDYKNc_iauVQ/">
-         <img src="{{ url_for('static', filename='Youtube_icon.png')}}" width="40" align="left" alt="YouTube Channel"/>
-       </a>
-     </td>
-     <td valign="middle" width="100">
-       <a href="https://www.reddit.com/r/physicsderivations/">
-         <img src="{{ url_for('static', filename='reddit_icon.png')}}" align="left" alt="Reddit"/>
-       </a>
-     </td>
-     </tr>
-   </table>
+         <td valign="middle" width="100">
+           <a href="https://github.com/allofphysicsgraph/allofphysics.com">
+             <img src="{{ url_for('static', filename='GitHub-icon.png')}}" align="left" alt="source code on GitHub">
+           </a>
+         </td>
+         <td valign="middle" width="100">
+           <a href="https://www.facebook.com/physicsderivationgraph/">
+             <img src="{{ url_for('static', filename='facebook_icon.svg')}}" width="40" align="left" alt="Facebook"/>
+           </a>
+         </td>
+         <td>
+           <form method="post" action="search">
+             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <!-- this "action" is not consisten with the MVC paradigm since control is not
+          passed back to controller.py.
+          The reason for using action instead of a form class in controller.py
+            consistent the MVC is because the footer appears on every page and I don't want to
+            include the class in every page of the MVC -->
+           <input type="text" id="search" name="search">
+           <input type="submit" value="Search">
+           </form>
+         </td>
+         <td valign="middle" width="50">
+           &nbsp;
+         </td>
+         <td valign="middle" width="100">
+           <a href="https://www.youtube.com/channel/UCBSInUAbtBkYDYKNc_iauVQ/">
+             <img src="{{ url_for('static', filename='Youtube_icon.png')}}" width="40" align="left" alt="YouTube Channel"/>
+           </a>
+         </td>
+         <td valign="middle" width="100">
+           <a href="https://www.reddit.com/r/physicsderivations/">
+             <img src="{{ url_for('static', filename='reddit_icon.png')}}" align="left" alt="Reddit"/>
+           </a>
+         </td>
+        </tr>
+      </table>
     </P>
 
     <P>
