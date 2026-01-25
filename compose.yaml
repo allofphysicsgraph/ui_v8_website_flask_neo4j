@@ -26,14 +26,13 @@ services:
       --log-level debug
       wsgi:web_app
       --capture-output
-      --log-file=gunicorn_logs.log
       --access-logformat='{"ip":"%({X-Forwarded-For}i)s", "reqtime":"%(L)s", "uname":"%(u)s", "date":"%(t)s", "statline":"%(r)s", "stat":  "%(s)s", "resplen":"%(b)s", "ref":"%(f)s", "ua":"%(a)s"}'
       --worker-tmp-dir /dev/shm
       --workers=2 
       --threads=4 
       --worker-class=gthread 
-      --access-logfile=gunicorn_access.log
-      --error-logfile=gunicorn_error.log
+      --access-logfile=logs/gunicorn_access.log
+      --error-logfile=logs/gunicorn_error.log
 #      --enable-stdio-inheritance
 # EXPLANATIONS OF GUNICORN FLAGS:
 #     --reload: Restarts the worker processes whenever code changes are detected.
@@ -79,7 +78,8 @@ services:
     volumes:
       - ${PWD}/:/scratch
       - './dumping_grounds:/code/static/dumping_grounds'
-      - ${PWD}/logs/:/logs/
+      - ${PWD}/logs:/code/logs/
+ 
     # healthcheck:
     #   test: wget http://localhost:5000 || exit 1
     #   interval: 3s      # The health check will first run interval seconds after the container is started, and then again interval seconds after each previous check completes.
@@ -160,7 +160,7 @@ services:
       - "443:443"
     restart: on-failure
     volumes:
-      - ${PWD}/logs_nginx/:/logs/
+      - ${PWD}/logs/:/logs/
       - ${PWD}/certs/:/certs/
 
 networks:
