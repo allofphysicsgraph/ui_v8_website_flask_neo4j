@@ -74,12 +74,16 @@ stdout = process.stdout.decode("utf-8")
 stderr = process.stderr.decode("utf-8")
 logger.info("elan: " + str(stdout))
 
-process = subprocess.run(
-    ["lean", "--version"], stdout=PIPE, stderr=PIPE, timeout=proc_timeout
-)
-stdout = process.stdout.decode("utf-8")
-stderr = process.stderr.decode("utf-8")
-logger.info("lean: " + str(stdout))
+# subprocess.TimeoutExpired: Command '['lean', '--version']' timed out after 20 seconds
+try:
+    process = subprocess.run(
+        ["lean", "--version"], stdout=PIPE, stderr=PIPE, timeout=proc_timeout
+    )
+    stdout = process.stdout.decode("utf-8")
+    stderr = process.stderr.decode("utf-8")
+    logger.info("lean: " + str(stdout))
+except:
+    logger.error("lean timed out")
 
 process = subprocess.run(
     ["leanc", "--version"], stdout=PIPE, stderr=PIPE, timeout=proc_timeout
