@@ -7281,9 +7281,24 @@ def to_developer_documentation():
 
     >>> developer_documentation()
     """
-    logger.info("[TRACE] pdg_app/")
+    logger.info("[TRACE] pdg_app/to_developer_documentation")
     return render_template(
         "jinja2_pages/documentation_for_developer.html", title="Developer Documentation"
+    )
+
+
+@web_app.route("/conventions_documentation", methods=["GET", "POST"])
+def to_conventions_documentation():
+    """
+    a static page aimed at people interested in understanding
+    design decisions
+
+    >>> to_conventions_documentation()
+    """
+    logger.info("[TRACE] pdg_app/to_conventions_documentation")
+    return render_template(
+        "jinja2_pages/documentation_of_conventions.html",
+        title="Conventions Documentation",
     )
 
 
@@ -7295,10 +7310,22 @@ def to_design_documentation():
 
     >>> design_documentation()
     """
-    logger.info("[TRACE] pdg_app/")
+    logger.info("[TRACE] pdg_app/to_design_documentation")
     return render_template(
-        "jinja2_pages/documentation_of_design.html",
+        "jinja2_pages/documentation_of_design_choices.html",
         title="Design Decisions Documentation",
+    )
+
+
+@web_app.route("/design_principles_and_goals", methods=["GET", "POST"])
+def to_design_principles_and_goals():
+    """
+    a static page
+    """
+    logger.info("[TRACE] pdg_app/to_design_principles_and_goals")
+    return render_template(
+        "jinja2_pages/documentation_of_design_principles_and_goals.html",
+        title="Design Principles and Goals Documentation",
     )
 
 
@@ -7311,18 +7338,6 @@ def to_faq():
     """
     logger.info("[TRACE] pdg_app/")
     return render_template("jinja2_pages/faq.html", title="Frequently Asked Questions")
-
-
-@web_app.route("/design_principles_and_goals", methods=["GET", "POST"])
-def to_design_principles_and_goals():
-    """
-    a static page
-    """
-    logger.info("[TRACE] pdg_app/")
-    return render_template(
-        "jinja2_pages/design_principles_and_goals.html",
-        title="Design Principles and Goals",
-    )
 
 
 @web_app.route("/other_projects", methods=["GET", "POST"])
