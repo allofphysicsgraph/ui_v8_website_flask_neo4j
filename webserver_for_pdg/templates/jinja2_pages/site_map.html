@@ -7,33 +7,33 @@
 <H1>Navigating the Physics Derivation Graph website</H1>
 
 <UL>
-  <LI><a href="{{ url_for('to_navigation') }}?referrer=main">site map</a> (this page)</LI>
-  <LI><a href="{{ url_for('to_query') }}?referrer=main">query graph using Cypher</a></LI>
-  <LI><a href="{{ url_for('to_export_cypher') }}?referrer=main">export as Cypher</a>
-   or <a href="{{ url_for('to_export_json') }}?referrer=main">  export as JSON</a></LI>
-  <LI><a href="{{ url_for('to_list_derivations') }}?referrer=main">show {{ number_of_derivations }} derivations</a>, (which are comprised of steps); 
+  <LI><a href="{{ url_for('to_navigation') }}?referrer=navigation">site map</a> (this page)</LI>
+  <LI><a href="{{ url_for('to_query') }}?referrer=navigation">query graph using Cypher</a></LI>
+  <LI><a href="{{ url_for('to_export_cypher') }}?referrer=navigation">export as Cypher</a>
+   or <a href="{{ url_for('to_export_json') }}?referrer=navigation">  export as JSON</a></LI>
+  <LI><a href="{{ url_for('to_list_derivations') }}?referrer=navigation">show {{ number_of_derivations }} derivations</a>, (which are comprised of steps); 
 {% if current_user.is_anonymous %}
 you have to <a href="{{ url_for('to_login') }}?referrer=navigation">sign in</a> to create new derivations
 {% else %}
 or create a new derivation.
 {% endif %}
   </LI>
-  <LI><a href="{{ url_for('to_list_inference_rules') }}?referrer=main">show {{ number_of_inference_rules }} inference rules</a> (which are used in steps to relation expressions)</LI>
-  <LI><a href="{{ url_for('to_list_expressions') }}?referrer=main">show {{ number_of_expressions }} expressions</a> (which have a relation, e.g., equality or inequality, as well as LHS and RHS each comprised of symbols)</LI>
-  <LI><a href="{{ url_for('to_list_feeds') }}?referrer=main">show {{ number_of_feeds }} feeds</a> (which have one or more non-operation symbols; no equality or inequality)</LI>
+  <LI><a href="{{ url_for('to_list_inference_rules') }}?referrer=navigation">show {{ number_of_inference_rules }} inference rules</a> (which are used in steps to relation expressions)</LI>
+  <LI><a href="{{ url_for('to_list_expressions') }}?referrer=navigation">show {{ number_of_expressions }} expressions</a> (which have a relation, e.g., equality or inequality, as well as LHS and RHS each comprised of symbols)</LI>
+  <LI><a href="{{ url_for('to_list_feeds') }}?referrer=navigation">show {{ number_of_feeds }} feeds</a> (which have one or more non-operation symbols; no equality or inequality)</LI>
   <LI>symbols</LI>
   <UL>
-    <LI><a href="{{ url_for('to_list_operations') }}?referrer=main">show {{ number_of_operations }} operations</a> (which require arguments; separate terms within one side of an expression)</LI>
-    <LI><a href="{{ url_for('to_list_relations') }}?referrer=main">show {{ number_of_relations }} relations</a> (which separate LHS and RHS of expression)</LI>
-    <LI><a href="{{ url_for('to_list_scalars') }}?referrer=main">show {{ number_of_scalars }} scalars</a> (which have dimensionality)</LI>
-    <LI><a href="{{ url_for('to_list_vectors') }}?referrer=main">show {{ number_of_vectors }} vectors</a> (of size 1xn or nx1). Includes bra, ket.</LI>
-    <LI><a href="{{ url_for('to_list_matrices') }}?referrer=main">show {{ number_of_matrices }} matrices</a> (of size nxm)</LI>
+    <LI><a href="{{ url_for('to_list_operations') }}?referrer=navigation">show {{ number_of_operations }} operations</a> (which require arguments; separate terms within one side of an expression)</LI>
+    <LI><a href="{{ url_for('to_list_relations') }}?referrer=navigation">show {{ number_of_relations }} relations</a> (which separate LHS and RHS of expression)</LI>
+    <LI><a href="{{ url_for('to_list_scalars') }}?referrer=navigation">show {{ number_of_scalars }} scalars</a> (which have dimensionality)</LI>
+    <LI><a href="{{ url_for('to_list_vectors') }}?referrer=navigation">show {{ number_of_vectors }} vectors</a> (of size 1xn or nx1). Includes bra, ket.</LI>
+    <LI><a href="{{ url_for('to_list_matrices') }}?referrer=navigation">show {{ number_of_matrices }} matrices</a> (of size nxm)</LI>
   </UL>
-
-  <!--<LI><a href="{ { url_for('to_list_operations') }}?referrer=main">show { { number_of_operations } } operations</a> (<small>positive number of arguments required</small>)</LI>-->
+ <LI><a href="{{ url_for('to_documentation_overview', referrer=navigation) }}">documentation</a></LI>
+  <!--<LI><a href="{ { url_for('to_list_operations') }}?referrer=navigation">show { { number_of_operations } } operations</a> (<small>positive number of arguments required</small>)</LI>-->
   <!--
-  <LI><a href="{ { url _for('to_list_all_nodes') }}?referrer=main">show all nodes</a>            (status: TODO)</LI>
-  <LI><a href="{ { url _for('to_list_all_edges') }}?referrer=main">show all edges</a>            (status: TODO)</LI>
+  <LI><a href="{ { url _for('to_list_all_nodes') }}?referrer=navigation">show all nodes</a>            (status: TODO)</LI>
+  <LI><a href="{ { url _for('to_list_all_edges') }}?referrer=navigation">show all edges</a>            (status: TODO)</LI>
   -->
 </UL>
 
@@ -47,7 +47,7 @@ or create a new derivation.
   <legend>
     <h2>Danger zone!</h2>
   </legend>
-  <P><a href="{{ url_for('to_delete_graph_content') }}?referrer=main">delete all content</a></P>
+  <P><a href="{{ url_for('to_delete_graph_content') }}?referrer=navigation">delete all content</a></P>
 
   <fieldset>
     <legend>
@@ -73,7 +73,7 @@ or create a new derivation.
       <code>docker exec `docker ps | grep community | cut -d' ' -f1` bin/cypher-shell --file 
         dumping_grounds/pdg.cypher</code>
 
-    <P>Potential alternative: <a href="https://neo4j.com/labs/apoc/4.3/overview/apoc.load/apoc.load.json/">download/upload custom JSON</a>
+   <P>See <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/64">https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/64</a>
   </fieldset>
 
 </fieldset>
