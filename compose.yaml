@@ -79,7 +79,7 @@ services:
     volumes:
       - ${PWD}/:/scratch
       - './dumping_grounds:/code/static/dumping_grounds'
-    # - ${PWD}/flask/logs/:/logs/
+      - ${PWD}/logs/:/logs/
     # healthcheck:
     #   test: wget http://localhost:5000 || exit 1
     #   interval: 3s      # The health check will first run interval seconds after the container is started, and then again interval seconds after each previous check completes.
