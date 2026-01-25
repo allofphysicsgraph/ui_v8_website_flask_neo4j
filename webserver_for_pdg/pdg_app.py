@@ -403,8 +403,8 @@ def callback():
     else:
         return "User email not available or not verified by Google.", 400
 
-    logger.debug(users_name)
-    logger.debug(users_email)
+    logger.info(users_name)
+    logger.info(users_email)
     # Create a user in your db with the information provided
     # by Google
     user = User(id_=unique_id, name=users_name, email=users_email, profile_pic=picture)
@@ -1096,7 +1096,6 @@ def before_request():
     return
 
 
-
 @web_app.route("/", methods=["GET", "POST"])
 @web_app.route(
     "/index", methods=["GET", "POST"]
@@ -1127,13 +1126,13 @@ def to_index():
 
 #    return redirect(url_for("to_navigation"))
 
+
 @web_app.route("/nav_old_NOT_IN_USE", methods=["GET", "POST"])
 def to_old_nav():
     """
     TODO!
     """
     return render_template("jinja2_pages/navigation.html")
-
 
 
 @web_app.route("/navigation", methods=["GET", "POST"])
@@ -1149,8 +1148,8 @@ def to_navigation():
     logger.info("[TRACE] pdg_app/main start " + trace_id + " " + str(time.time()))
     query_time_dict = {}  # type: query_timing_result_type
 
-    # print(current_user.is_anonymous) # True or False
-    # print(type(current_user.is_anonymous)) # <class 'bool'>
+    print("Is user anonymous?")
+    print(current_user.is_anonymous) # True or False
 
     # if current_user.is_anonymous:
     #     pass
@@ -1449,7 +1448,7 @@ def to_add_derivation() -> werkzeug.Response:
         #     flash("   reference altered to " + str(derivation_reference_latex_SAFE))
         # derivation_reference_latex = derivation_reference_latex_SAFE
 
-        author_name_latex = "ben"
+        author_name_latex = current_user.name
 
         derivation_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "derivation"
@@ -4523,11 +4522,15 @@ def to_add_operation() -> werkzeug.Response:
         print("operation_description_latex", operation_description_latex)
         print("operation_argument_count", operation_argument_count)
 
-        author_name_latex = "ben"
+        author_name_latex = current_user.name
 
         operation_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "operation"
         )
+
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
 
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
@@ -4540,6 +4543,7 @@ def to_add_operation() -> werkzeug.Response:
                 operation_description_latex,
                 operation_reference_latex,
                 operation_argument_count,
+                now_str,
                 author_name_latex,
             )
             print(
@@ -7123,10 +7127,9 @@ def my_profile():
 
 ###########################################################################
 
+
 # user shouldn't go directly to this page; the purpose of this route is to get to Google
-@web_app.route(
-    "/search", methods=["GET", "POST"]
-)  
+@web_app.route("/search", methods=["GET", "POST"])
 def search_redirect_to_google():
     """
     rather than search local content, rely on Google's index
