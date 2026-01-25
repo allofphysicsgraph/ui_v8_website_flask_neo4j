@@ -419,6 +419,7 @@ def callback():
     login_user(user)
 
     # logger.debug(str(current_user))
+    logger.debug(str(User.get(unique_id)))
     logger.debug(str(current_user.name))
     logger.debug(str(current_user.email))
     flash("logged in")
@@ -1099,7 +1100,7 @@ def before_request():
 @web_app.route("/", methods=["GET", "POST"])
 @web_app.route(
     "/index", methods=["GET", "POST"]
-)  # on allofphysics.com the index and navigation are separate
+)
 def to_index():
     """
     placeholder for landing page that provides context before user goes to_navigation
@@ -1860,21 +1861,23 @@ def to_edit_derivation_metadata(
 
         # request.form =  ImmutableMultiDict(('derivation_name_latex', 'this isa'), ('abstract_latex', 'heresasdf00')])
 
-
         # sanitize Latex
         # TODO: notify user if what they submitted has been altered.
-        derivation_name_latex = latex.make_string_safe_for_latex(str(web_form.derivation_name_latex.data).strip())
-        derivation_reference_latex = latex.make_string_safe_for_latex(str(
-            web_form.derivation_reference_latex.data
-        ).strip())
-        abstract_latex = latex.make_string_safe_for_latex(str(web_form.abstract_latex.data).strip())
+        derivation_name_latex = latex.make_string_safe_for_latex(
+            str(web_form.derivation_name_latex.data).strip()
+        )
+        derivation_reference_latex = latex.make_string_safe_for_latex(
+            str(web_form.derivation_reference_latex.data).strip()
+        )
+        abstract_latex = latex.make_string_safe_for_latex(
+            str(web_form.abstract_latex.data).strip()
+        )
 
         # as per https://strftime.org/
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
         author_name_latex = latex.make_string_safe_for_latex(current_user.name)
-
 
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -2117,7 +2120,6 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             request.form,
         )
 
-
         # sanitize latex
         # TODO: notify user if text was edited
         expression_latex_lhs = latex.make_string_safe_for_latex(
@@ -2136,16 +2138,15 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             .strip()
             .replace("\\", "\\\\")  # due to Neo4j
         )
-        expression_name_latex = latex.make_string_safe_for_latex(str(
-            web_form_new_expression.expression_name_latex.data
-        ).strip())
-        expression_reference_latex = latex.make_string_safe_for_latex(str(
-            web_form_new_expression.expression_name_latex.data
-        ).strip())
-        expression_description_latex = latex.make_string_safe_for_latex(str(
-            web_form_new_expression.expression_description_latex.data
-        ).strip())
-
+        expression_name_latex = latex.make_string_safe_for_latex(
+            str(web_form_new_expression.expression_name_latex.data).strip()
+        )
+        expression_reference_latex = latex.make_string_safe_for_latex(
+            str(web_form_new_expression.expression_name_latex.data).strip()
+        )
+        expression_description_latex = latex.make_string_safe_for_latex(
+            str(web_form_new_expression.expression_description_latex.data).strip()
+        )
 
         print("pdg_app/to_edit_expression: expression_latex_lhs=", expression_latex_lhs)
         print("pdg_app/to_edit_expression: expression_latex_rhs=", expression_latex_rhs)
