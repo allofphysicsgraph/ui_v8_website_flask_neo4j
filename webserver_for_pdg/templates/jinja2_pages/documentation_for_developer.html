@@ -11,9 +11,9 @@
 
 <P>
   This page provides developer guidance for the Physics Derivation Graph (PDG).
-  Contributions to the project are welcome; see <a href="https://github.com/allofphysicsgraph/ui_v7_website_flask_json/blob/gh-pages/CONTRIBUTING.md">CONTRIBUTING.md</a> on how to get started.
+  Contributions to the project are welcome; see <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/CONTRIBUTING.md">CONTRIBUTING.md</a> on how to get started.
   The Physics Derivation Graph is covered by the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>,
-  so if you don't like a choice that was made you are welcome to <a href="https://github.com/allofphysicsgraph/ui_v7_website_flask_json/fork">fork the Physics Derivation Graph project</a>.
+  so if you don't like a choice that was made you are welcome to <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/fork">fork the Physics Derivation Graph project</a>.
 
 <P>
   Looking for the API? See <a href="{{ url_for('to_api_documentation') }}?referrer=developer_documentation">API documentation</a>.
@@ -143,8 +143,8 @@ Figure 2.
 <P>
   Quick start on the command line:
   <pre>
-  git clone https://github.com/allofphysicsgraph/ui_v7_website_flask_json.git
-  cd ui_v7_website_flask_json/flask/
+  git clone https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j.git
+  cd ui_v8_website_flask_neo4j/flask/
   docker build -t flask_ub .
   docker run -it --rm -v`pwd`/data.json:/home/appuser/app/data.json \
              -v`pwd`/logs/:/home/appuser/app/logs/ \
@@ -174,8 +174,8 @@ Figure 2.
 <P>
   Quick start on the command line:
   <pre>
-  git clone https://github.com/allofphysicsgraph/ui_v7_website_flask_json.git
-  cd ui_v7_website_flask_json/flask/
+  git clone https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j.git
+  cd ui_v8_website_flask_neo4j/flask/
   docker build -t gunicorn_ub --file Dockerfile.gunicorn .
   docker run -it --rm -v`pwd`:/scratch \
              -v`pwd`/data.json:/home/appuser/app/data.json \
@@ -206,7 +206,7 @@ Figure 2.
 
 <P>
   After checking out the github repo, I navigate to
-  <code>ui_v7_website_flask_json/flask</code> and then run
+  <code>ui_v8_website_flask_neo4j/flask</code> and then run
   <code>make dockerlive</code> and then open Firefox to <code>https://localhost:5000</code>.<BR/>
   The purpose of this section is to address the question,  <em>What happened when that docker container ran and the webpage was opened?</em><BR/>
   Understanding the answer relies on knowing Python, <a href="https://flask.palletsprojects.com/">Flask</a>, and the Model-View-Controller paradigm.
@@ -228,7 +228,7 @@ Figure 2.
   When errors occur, there's a Flask function <code>flash</code> used to convey the error summary to the user (displayed at the bottom of the webpage).
 
 <P>
-  The website <a href="http://derivationmap.net">derivationmap.net</a> is run using docker-compose; see <code>ui_v7_website_flask_json</code>
+  The website <a href="http://derivationmap.net">derivationmap.net</a> is run using docker-compose; see <code>ui_v8_website_flask_neo4j</code>
 
 <center>
 <P>
@@ -248,12 +248,12 @@ Figure 3. State diagram for the web interface.
   When a web browser requests the page
   <a href="{{ url_for('to_developer_documentation') }}?referrer=developer_documentation">https://derivationmap.net/developer_documentation</a>
   nginx calls gunicorn calls
-  <a href="https://github.com/allofphysicsgraph/ui_v7_website_flask_json/blob/gh-pages/flask/controller.py">controller.py</a>
+  <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/flask/controller.py">controller.py</a>
   with the URL string. The Python flask package uses the URL information to
   call the relevant Python function. For example, requesting <code>list_all_derivations</code>
   invokes the function <code>def list_all_derivations():</code>. That
   Python function relies on functions in
-  <a href="https://github.com/allofphysicsgraph/ui_v7_website_flask_json/blob/gh-pages/flask/compute.py">computer.py</a>
+  <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/flask/compute.py">computer.py</a>
   to get data from the <code>data.json</code> database.
 
 <P>&nbsp;</P>
@@ -264,28 +264,34 @@ Figure 3. State diagram for the web interface.
 
 <H2><a name="build pdg code from scratch">Build the Physics Derivation Graph software from scratch</a></H2>
 
-This section tackles incremental construction of software used in the Physics Derivation Graph.
+
+
+<P>This section tackles incremental construction of software used in the Physics Derivation Graph.
+  There are a set of repositories (<a href="https://github.com/orgs/allofphysicsgraph/repositories?q=pdg_">https://github.com/orgs/allofphysicsgraph/repositories?q=pdg_</a>) that contain the relevant source code.
+
+<P>Those repos are to be worked through in sequence: <BR>
+  <img src="{{ 'static/tutorial_sequence.png' }}">
 
 <H3><a name="Docker and Make">Initial infrastructure: Docker and Make</a></H3>
 
-Before running any project-specific code, I invest in reproducibility.<BR/>
-First, Docker containers make software dependencies explicit.
+<P>Before running any project-specific code, investing in reproducibility enables future success.<BR/>
+Docker containers make software dependencies explicit.
 <P>
-<a href="{{ 'from_scratch_tutorial/docker_and_make/Dockerfile' }}">Dockerfile</a>
+The <a href="{{ 'from_scratch_tutorial/docker_and_make/Dockerfile' }}">Dockerfile</a> contains
 <!-- include reads from templates -->
 <pre>
   {% include 'from_scratch_tutorial/docker_and_make/Dockerfile.html' %}
 </pre>
-Second, I use a <a href="{{ 'from_scratch_tutorial/docker_and_make/Makefile' }}">Makefile</a>
- to ensure the commands required to run Docker are documented.
+Similarly, to improve reproducibility of Docker commands, use a <a href="{{ 'from_scratch_tutorial/docker_and_make/Makefile' }}">Makefile</a> containing
 <pre>
   {% include 'from_scratch_tutorial/docker_and_make/Makefile.html' %}
 </pre>
 
+<P>See <a href="https://github.com/allofphysicsgraph/pdg_essential_demo_docker">https://github.com/allofphysicsgraph/pdg_essential_demo_docker</a>
+
 <H3><a name="Python and Flask">Initial infrastructure: Python and Flask</a></H3>
 
-
-<img src="{{ 'static/template_sequence.png' }}">
+<P>See <a href="https://github.com/allofphysicsgraph/pdg_essential_demo_flask_website">https://github.com/allofphysicsgraph/pdg_essential_demo_flask_website</a>
 
 <P>
 <a href="{{ 'from_scratch_tutorial/python_and_flask/Dockerfile' }}">Dockerfile</a>
