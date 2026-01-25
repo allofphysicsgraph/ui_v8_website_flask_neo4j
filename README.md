@@ -74,6 +74,11 @@ The Docker images include the software needed for the webserver (Python Flask) a
 
 See VERSIONS.md for details
 
+# Licensing
+
+Unless otherwise noted, all source code is covered by the [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/)
+
+
 # Contributing
 
 See CONTRIBUTING.md for guidance.
