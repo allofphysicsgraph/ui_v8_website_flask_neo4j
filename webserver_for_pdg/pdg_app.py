@@ -1096,10 +1096,6 @@ def before_request():
     return
 
 
-@web_app.route("/nav_old_TEMP", methods=["GET", "POST"])
-def to_old_nav():
-    return render_template("jinja2_pages/navigation.html")
-
 
 @web_app.route("/", methods=["GET", "POST"])
 @web_app.route(
@@ -1130,6 +1126,14 @@ def to_index():
 
 
 #    return redirect(url_for("to_navigation"))
+
+@web_app.route("/nav_old_NOT_IN_USE", methods=["GET", "POST"])
+def to_old_nav():
+    """
+    TODO!
+    """
+    return render_template("jinja2_pages/navigation.html")
+
 
 
 @web_app.route("/navigation", methods=["GET", "POST"])
@@ -1324,6 +1328,8 @@ def to_navigation():
     logger.info(
         "[TRACE] pdg_app/to_navigation end " + trace_id + " " + str(time.time())
     )
+
+    # TODO: site_map.html is a place-holder until I update navigation.html
     return render_template(
         "jinja2_pages/site_map.html",
         title="site map",
@@ -7117,8 +7123,10 @@ def my_profile():
 
 ###########################################################################
 
-
-@web_app.route("/search", methods=["GET", "POST"]) # user shouldn't go directly to this page; the purpose of this route is to get to Google
+# user shouldn't go directly to this page; the purpose of this route is to get to Google
+@web_app.route(
+    "/search", methods=["GET", "POST"]
+)  
 def search_redirect_to_google():
     """
     rather than search local content, rely on Google's index
@@ -7135,7 +7143,7 @@ def search_redirect_to_google():
     print(
         "request.url: " + str(request.url)
     )  # https://stackoverflow.com/a/46176337/1164295
-    
+
     # Here's what the URL should look like:
     # request.url: http://localhost/search?q=hello
 
@@ -7161,7 +7169,9 @@ def search_redirect_to_google():
         )
 
     else:
-        print("invalid use; URL should be something like http://localhost/search?q=hello ")
+        print(
+            "invalid use; URL should be something like http://localhost/search?q=hello "
+        )
         return redirect(url_for("to_navigation"))
 
     return redirect(url_for("to_navigation"))
@@ -7261,8 +7271,10 @@ def to_documentation_overview():
     )
 
 
-@web_app.route("/user_documentation", methods=["GET", "POST"]) # backwards compatibility with previous versions of the site
-@web_app.route("/documentation/user", methods=["GET", "POST"]) # preferred
+@web_app.route(
+    "/user_documentation", methods=["GET", "POST"]
+)  # backwards compatibility with previous versions of the site
+@web_app.route("/documentation/user", methods=["GET", "POST"])  # preferred
 def to_user_documentation():
     """
     a static page with documentation aimed at users (not developers)
@@ -7275,8 +7287,10 @@ def to_user_documentation():
     )
 
 
-@web_app.route("/developer_documentation", methods=["GET", "POST"]) # backwards compatibility with previous versions of the site
-@web_app.route("/documentation/developer", methods=["GET", "POST"]) # preferred
+@web_app.route(
+    "/developer_documentation", methods=["GET", "POST"]
+)  # backwards compatibility with previous versions of the site
+@web_app.route("/documentation/developer", methods=["GET", "POST"])  # preferred
 def to_developer_documentation():
     """
     a static page aimed at people interested in contributed code changes
@@ -7398,7 +7412,9 @@ def to_site_map():
 ###########################################################################
 
 
-@web_app.route("/documentation/developer/comparison_of_design_options/cas", methods=["GET", "POST"])
+@web_app.route(
+    "/documentation/developer/comparison_of_design_options/cas", methods=["GET", "POST"]
+)
 def to_comparison_of_design_options_cas():
     """
     a static page
@@ -7410,7 +7426,10 @@ def to_comparison_of_design_options_cas():
     )
 
 
-@web_app.route("/documentation/developer/comparison_of_design_options/proofs", methods=["GET", "POST"])
+@web_app.route(
+    "/documentation/developer/comparison_of_design_options/proofs",
+    methods=["GET", "POST"],
+)
 def to_comparison_of_design_options_proofs():
     """
     a static page
@@ -7422,7 +7441,10 @@ def to_comparison_of_design_options_proofs():
     )
 
 
-@web_app.route("/documentation/developer/comparison_of_design_options/syntax", methods=["GET", "POST"])
+@web_app.route(
+    "/documentation/developer/comparison_of_design_options/syntax",
+    methods=["GET", "POST"],
+)
 def to_comparison_of_design_options_syntax():
     """
     a static page
@@ -7434,7 +7456,10 @@ def to_comparison_of_design_options_syntax():
     )
 
 
-@web_app.route("/documentation/developer/comparison_of_design_options/database", methods=["GET", "POST"])
+@web_app.route(
+    "/documentation/developer/comparison_of_design_options/database",
+    methods=["GET", "POST"],
+)
 def to_comparison_of_design_options_database():
     """
     a static page
