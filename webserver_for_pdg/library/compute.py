@@ -873,17 +873,7 @@ def get_dict_of_node_dicts(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] compute/get_dict_of_node_dicts start " + trace_id)
 
-    assert node_type in [
-        "derivation",
-        "inference_rule",
-        "operation",
-        "feed",
-        "scalar",
-        "vector",
-        "matrix",
-        "step",
-        "expression",
-    ]
+    assert node_type in list_of_valid.node_types
     # print("compute/get_dict_of_node_dicts: node type=", node_type)
 
     list_of_all_node_dicts = []
