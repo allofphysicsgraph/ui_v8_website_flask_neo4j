@@ -121,6 +121,41 @@ cat developer_documentation.html |\
 <P>&nbsp;</P>
 
 
+
+
+<H2><a name="supported math features">Supported Mathematical features</a></H2>
+
+Many but not all symbols are supported. Here are some categories of supported symbols. (Symbols exist on the left side or right side of an expression and can also appear in a feed.)
+<UL>
+<LI>Scalars (Rank 0): Single values. Includes constants (e.g., pi, e, 42) and variables (e.g., x, y, c)
+<LI>Vectors (Rank 1): Ordered lists of scalars (1xn or nx1)
+<LI>Matrices (Rank 2): Grids of scalars (mxn)
+<LI>Tensors (Rank n)</LI>
+<LI>Sets: real, integer, complex
+</UL>
+
+Operators. These act on symbols (listed above) and are part of either the left side or right side of an expression. Operators can also appear in feeds.
+<UL>
+<LI>arithmetic: +, -, multiply, divide, mod
+<LI>Unary Operators: factorial, negation, square root, bar (mean)
+<LI>Linear Algebra Operators: Transpose, Determinant, Trace 
+<LI>Calculus/Differential Operators: differential, nabla/del, laplacian
+<LI>Integrals
+<LI>Iterative Operators: Operations over a range (product, sum)
+<LI>Set operations, e.g., "is member of"
+</UL>
+
+Relations. These evaluate to True for an expression. Relations do not appear in a feed.
+<UL>
+<LI>Equality/Equivalence: =
+<LI>Ordering (Inequalities): greater than, less than, greater than or equal to, less than or equal to
+<LI>Proportionality
+</UL>
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+
 <H2><a name="not in scope">Outside of Current Scope</a></H2>
 
 <P>Although the Physics Derivation Graph is intended to be comprehensive
@@ -131,6 +166,8 @@ cat developer_documentation.html |\
   <LI>animations of concepts,
   <LI>experimental processes,
   <LI>interactive models.
+  <LI>Set operations, e.g., union, intersection
+  <LI>Logic operations, e.g., "for all", "implies", AND, OR, XOR
 </UL>
 These aspects could be included if the data structure and workflow were adapted
 to an expanded scope.
