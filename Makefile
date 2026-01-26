@@ -53,6 +53,8 @@ help:
 # create and start the webserver. This will build the Docker image if that's needed
 launch_webserver:
 	cd neo4j_pdg && chmod -R g+rwx * && chmod -R o+rwx * 
+	cd logs && rm -rf *.log
+	cd dumping_grounds && rm -rf *.json && rm -rf *.cypher
 	#if (! $(DOCKER_OR_PODMAN) stats --no-stream ); then  open /Applications/Docker.app; while (! $(DOCKER_OR_PODMAN) stats --no-stream ); do    echo "Waiting for Docker to launch...";  sleep 1; done; fi; 
 	$(DOCKER_OR_PODMAN) ps
 	if [ `$(DOCKER_OR_PODMAN) ps | wc -l` -gt 1 ]; then \
