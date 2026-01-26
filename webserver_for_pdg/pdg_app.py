@@ -1784,7 +1784,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             "pdg_app/to_review_derivation list_of_feed_dicts" + str(list_of_feed_dicts)
         )
         logger.info(
-            "pdg_app/to_review_derivation list_of_output_dicts"+ str(list_of_output_dicts)
+            "pdg_app/to_review_derivation list_of_output_dicts"
+            + str(list_of_output_dicts)
         )
 
         try:
@@ -2104,50 +2105,65 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     #  'latex_rhs': 'b', 'author_name_latex': 'ben', 'description_latex': '',
     #  'id': '9295979', 'latex_lhs': 'a', 'latex_relation': '='}
 
-    # editing the expression includes modifying the symbols present.
+    # # editing the expression includes modifying the symbols present.
 
-    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
-        graphDB_Driver, query_time_dict
-    )
-
-    list_of_symbol_IDs_in_expression, query_time_dict = (
-        compute.get_list_of_symbol_IDs_in_expression_or_feed(
-            graphDB_Driver, query_time_dict, "expression", expression_id
-        )
-    )
-
-    logger.info("pdg_app/to_edit_expression: expression_id=" + str(expression_id))
-    logger.info(
-        "list_of_symbol_IDs_in_expression=" + str(list_of_symbol_IDs_in_expression)
-    )
-
-    dict_of_symbol_dicts_in_expression = {}
-    for this_symbol_ID in list_of_symbol_IDs_in_expression:
-        logger.info("pdg_app/to_edit_expression: this_symbol_ID=" + str(this_symbol_ID))
-        logger.info(
-            "dict_of_all_symbol_dicts.keys()=" + str(dict_of_all_symbol_dicts.keys())
-        )
-        dict_of_symbol_dicts_in_expression[this_symbol_ID] = dict_of_all_symbol_dicts[
-            this_symbol_ID
-        ]
-    logger.info(
-        "pdg_app/to_edit_expression: dict_of_symbol_dicts_in_expression="
-        + str(dict_of_symbol_dicts_in_expression)
-    )
-
-    # create new dict of symbols NOT used in expression
-    dict_of_symbol_dicts_not_in_expression = {}
-    for this_symbol_id in dict_of_all_symbol_dicts.keys():
-        if this_symbol_id not in dict_of_symbol_dicts_in_expression.keys():
-            dict_of_symbol_dicts_not_in_expression[this_symbol_id] = (
-                dict_of_all_symbol_dicts[this_symbol_id]
-            )
-    # logger.info(
-    #     "pdg_app/to_edit_expression: dict_of_symbol_dicts_not_in_expression=" +
-    #     str(dict_of_symbol_dicts_not_in_expression),
+    # dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
+    #     graphDB_Driver, query_time_dict
     # )
 
-    # dict_of_all_operation_dicts = {}
+    # list_of_symbol_IDs_in_expression, query_time_dict = (
+    #     compute.get_list_of_symbol_IDs_in_expression_or_feed(
+    #         graphDB_Driver, query_time_dict, "expression", expression_id
+    #     )
+    # )
+
+    # logger.info("pdg_app/to_edit_expression: expression_id=" + str(expression_id))
+    # logger.info(
+    #     "list_of_symbol_IDs_in_expression=" + str(list_of_symbol_IDs_in_expression)
+    # )
+
+    # dict_of_symbol_dicts_in_expression = {}
+    # for this_symbol_ID in list_of_symbol_IDs_in_expression:
+    #     logger.info("pdg_app/to_edit_expression: this_symbol_ID=" + str(this_symbol_ID))
+    #     logger.info(
+    #         "dict_of_all_symbol_dicts.keys()=" + str(dict_of_all_symbol_dicts.keys())
+    #     )
+    #     dict_of_symbol_dicts_in_expression[this_symbol_ID] = dict_of_all_symbol_dicts[
+    #         this_symbol_ID
+    #     ]
+    # logger.info(
+    #     "pdg_app/to_edit_expression: dict_of_symbol_dicts_in_expression="
+    #     + str(dict_of_symbol_dicts_in_expression)
+    # )
+
+    # # create new dict of symbols NOT used in expression
+    # dict_of_symbol_dicts_not_in_expression = {}
+    # for this_symbol_id in dict_of_all_symbol_dicts.keys():
+    #     if this_symbol_id not in dict_of_symbol_dicts_in_expression.keys():
+    #         dict_of_symbol_dicts_not_in_expression[this_symbol_id] = (
+    #             dict_of_all_symbol_dicts[this_symbol_id]
+    #         )
+    # # logger.info(
+    # #     "pdg_app/to_edit_expression: dict_of_symbol_dicts_not_in_expression=" +
+    # #     str(dict_of_symbol_dicts_not_in_expression),
+    # # )
+
+    # dict_of_operation_dicts_in_expression = {}
+    # for this_operation_ID in list_of_symbol_IDs_in_expression:
+    #     logger.info(
+    #         "pdg_app/to_edit_expression: this_operation_ID=" + str(this_operation_ID)
+    #     )
+    #     logger.info(
+    #         "dict_of_all_operation_dicts.keys()="
+    #         + str(dict_of_all_operation_dicts.keys())
+    #     )
+    #     dict_of_operation_dicts_in_expression[this_operation_ID] = (
+    #         dict_of_all_symbol_dicts[this_operation_ID]
+    #     )
+    # logger.info(
+    #     "pdg_app/to_edit_expression: dict_of_operation_dicts_in_expression="
+    #     + str(dict_of_operation_dicts_in_expression)
+    # )
 
     # # create new dict of operations NOT used in expression
     # dict_of_operation_dicts_not_in_expression = {}
@@ -2246,71 +2262,71 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             + str(len(request.form.keys()))
         )
 
-        # user was provided all the symbols as an optional disconnect
-        # but the function only handles disconnects of specific types (e.g., scalar, vector)
-        dict_of_symbol_id_and_type, query_time_dict = (
-            compute.get_dict_of_node_type_for_every_id(graphDB_Driver, query_time_dict)
-        )
+        # # user was provided all the symbols as an optional disconnect
+        # # but the function only handles disconnects of specific types (e.g., scalar, vector)
+        # dict_of_symbol_id_and_type, query_time_dict = (
+        #     compute.get_dict_of_node_type_for_every_id(graphDB_Driver, query_time_dict)
+        # )
 
-        # the "delete" button returns a dict with only the csrf token, so len==1
-        if len(request.form.keys()) == 1:
-            logger.info("request.form=" + str(request.form))
+        # # the "delete" button returns a dict with only the csrf token, so len==1
+        # if len(request.form.keys()) == 1:
+        #     logger.info("request.form=" + str(request.form))
 
-            # https://neo4j.com/docs/python-manual/current/session-api/
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.delete_node,
-                    expression_id,
-                    "expression",
-                )
-                query_time_dict["to_edit_expression: delete_node"] = round(
-                    time.time() - query_start_time, 3
-                )
-            return redirect(url_for("to_list_expressions"))
+        #     # https://neo4j.com/docs/python-manual/current/session-api/
+        #     with graphDB_Driver.session() as session:
+        #         query_start_time = time.time()
+        #         session.write_transaction(
+        #             neo4j_query.delete_node,
+        #             expression_id,
+        #             "expression",
+        #         )
+        #         query_time_dict["to_edit_expression: delete_node"] = round(
+        #             time.time() - query_start_time, 3
+        #         )
+        #     return redirect(url_for("to_list_expressions"))
 
-        if "symbol_select_id_to_disconnect" in request.form.keys():
-            symbol_id_to_disconnect = str(
-                request.form["symbol_select_id_to_disconnect"]
-            )
-            logger.info(
-                "to_edit_expression: symbol_id_to_disconnect="
-                + str(symbol_id_to_disconnect)
-            )
+        # if "symbol_select_id_to_disconnect" in request.form.keys():
+        #     symbol_id_to_disconnect = str(
+        #         request.form["symbol_select_id_to_disconnect"]
+        #     )
+        #     logger.info(
+        #         "to_edit_expression: symbol_id_to_disconnect="
+        #         + str(symbol_id_to_disconnect)
+        #     )
 
-            # https://neo4j.com/docs/python-manual/current/session-api/
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.disconnect_symbol_from_expression,
-                    symbol_id_to_disconnect,
-                    expression_id,
-                    dict_of_symbol_id_and_type[symbol_id_to_disconnect],
-                )
-                query_time_dict[
-                    "to_edit_expression: disconnect_symbol_from_expression"
-                ] = round(time.time() - query_start_time, 3)
+        #     # https://neo4j.com/docs/python-manual/current/session-api/
+        #     with graphDB_Driver.session() as session:
+        #         query_start_time = time.time()
+        #         session.write_transaction(
+        #             neo4j_query.disconnect_symbol_from_expression,
+        #             symbol_id_to_disconnect,
+        #             expression_id,
+        #             dict_of_symbol_id_and_type[symbol_id_to_disconnect],
+        #         )
+        #         query_time_dict[
+        #             "to_edit_expression: disconnect_symbol_from_expression"
+        #         ] = round(time.time() - query_start_time, 3)
 
-        if "symbol_select_id_to_add" in request.form.keys():
-            symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
-            logger.info("to_edit_expression: symbol_id_to_add=" + str(symbol_id_to_add))
+        # if "symbol_select_id_to_add" in request.form.keys():
+        #     symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
+        #     logger.info("to_edit_expression: symbol_id_to_add=" + str(symbol_id_to_add))
 
-            # TODO: user provided a symbol, but adding is per-category
-            # FAULT EXPECTED for non-scalar add
+        #     # TODO: user provided a symbol, but adding is per-category
+        #     # FAULT EXPECTED for non-scalar add
 
-            # https://neo4j.com/docs/python-manual/current/session-api/
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.add_symbol_to_expression_or_feed,
-                    "expression",
-                    symbol_id_to_add,
-                    expression_id,
-                    dict_of_symbol_id_and_type[symbol_id_to_add],
-                )
-                query_time_dict["to_edit_expression: add_symbol_to_expression"] = round(
-                    time.time() - query_start_time, 3
-                )
+        #     # https://neo4j.com/docs/python-manual/current/session-api/
+        #     with graphDB_Driver.session() as session:
+        #         query_start_time = time.time()
+        #         session.write_transaction(
+        #             neo4j_query.add_symbol_to_expression_or_feed,
+        #             "expression",
+        #             symbol_id_to_add,
+        #             expression_id,
+        #             dict_of_symbol_id_and_type[symbol_id_to_add],
+        #         )
+        #         query_time_dict["to_edit_expression: add_symbol_to_expression"] = round(
+        #             time.time() - query_start_time, 3
+        #         )
 
     logger.info(
         "[TRACE] pdg_app/to_edit_expression end "
@@ -2323,12 +2339,13 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
         form_new_expression=web_form_new_expression,
-        dict_of_symbol_dicts_in_expression=dict_of_symbol_dicts_in_expression,
-        dict_of_symbol_dicts_not_in_expression=dict_of_symbol_dicts_not_in_expression,
-        dict_of_operation_dicts_not_in_expression=dict_of_operation_dicts_not_in_expression,
+        dict_of_symbol_dicts_in_expression={},  # dict_of_symbol_dicts_in_expression,
+        dict_of_symbol_dicts_not_in_expression={},  # dict_of_symbol_dicts_not_in_expression,
+        dict_of_operation_dicts_in_expression={},
+        dict_of_operation_dicts_not_in_expression={},  # dict_of_operation_dicts_not_in_expression,
         expression_dict=expression_dict,
         # sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
-        dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
+        dict_of_all_symbol_dicts={},  # dict_of_all_symbol_dicts,
     )
     # return redirect(url_for("to_list_expressions"))
 
@@ -3947,6 +3964,14 @@ def to_add_symbol_matrix() -> werkzeug.Response:
         dict_of_expression_dicts_that_use_matrix=dict_of_expression_dicts_that_use_matrix,
         dict_of_derivation_dicts_that_use_matrix=dict_of_derivation_dicts_that_use_matrix,
     )
+
+
+@web_app.route("/new_symbol/", methods=["GET", "POST"])
+def to_add_symbol() -> werkzeug.Response:
+    """
+    novel symbol
+    """
+    return render_template("jinja2_pages/user_workflow/symbol_create_pick_type.html")
 
 
 # @web_app.route("/new_symbol/", methods=["GET", "POST"])
@@ -6918,7 +6943,7 @@ def to_list_matrices() -> str:
 
 
 @web_app.route(
-    "/edit_expression/", methods=["GET", "POST"]
+    "/list_expressions/", methods=["GET", "POST"]
 )  # this is here so that if someone tries to edit an expression without specifying the ID they get to the list of expressions
 @web_app.route("/list_expressions", methods=["GET", "POST"])
 def to_list_expressions() -> str:
