@@ -48,10 +48,10 @@ def list_IDs(tx, node_type: str) -> List[str]:
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] neo4j_query/list_IDs start " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/list_IDs start " + str(trace_id) + " " + str(time.time())
     )
 
-    print("neo4j_query/list_IDs: node_type=", node_type)
+    logger.info("neo4j_query/list_IDs: node_type=" + str(node_type))
     assert node_type in list_of_valid.node_types
 
     list_of_IDs = []  # type: List[str]
@@ -59,7 +59,7 @@ def list_IDs(tx, node_type: str) -> List[str]:
         # print(result.data())
         list_of_IDs.append(result.data()["n.id"])
 
-    logger.info("[TRACE] neo4j_query/list_IDs end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] neo4j_query/list_IDs end " + str(trace_id) + " " + str(time.time()))
     return list_of_IDs
 
 
@@ -76,7 +76,7 @@ def apoc_export_json(tx, output_filename: str):
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/apoc_export_json start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -87,7 +87,7 @@ def apoc_export_json(tx, output_filename: str):
         pass
 
     logger.info(
-        "[TRACE] neo4j_query/apoc_export_json end " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/apoc_export_json end " + str(trace_id) + " " + str(time.time())
     )
     return result
 
@@ -106,7 +106,7 @@ def apoc_export_cypher(tx, output_filename: str):
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/apoc_export_cypher start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -129,7 +129,7 @@ def apoc_export_cypher(tx, output_filename: str):
 
     logger.info(
         "[TRACE] neo4j_query/apoc_export_cypher end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -145,7 +145,7 @@ def constrain_unique_id(tx) -> None:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/constrain_unique_id start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -164,7 +164,7 @@ def constrain_unique_id(tx) -> None:
 
     logger.info(
         "[TRACE] neo4j_query/constrain_unique_id end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -178,7 +178,7 @@ def get_scalar_id_that_has_value_and_units_id(tx, value_and_units_id: str):
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/get_scalar_id_that_has_value_and_units_id start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -189,10 +189,10 @@ def get_scalar_id_that_has_value_and_units_id(tx, value_and_units_id: str):
     )
 
     scalar_id = result.data()
-    print("neo4j_query/get_scalar_id_that_has_value_and_units_id: scalar_id", scalar_id)
+    print("neo4j_query/get_scalar_id_that_has_value_and_units_id: scalar_id"+ scalar_id)
 
     logger.info(
-        "[TRACE] neo4j_query/get_scalar_id_that_has_value_and_units_id end " + trace_id
+        "[TRACE] neo4j_query/get_scalar_id_that_has_value_and_units_id end " + str(trace_id)
     )
     return scalar_id
 
@@ -211,14 +211,14 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/get_list_of_symbol_IDs_in_expression_or_feed start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
 
     print(
-        "neo4j_query/get_list_of_symbol_IDs_in_expression_or_feed: symbol_category=",
-        symbol_category,
+        "neo4j_query/get_list_of_symbol_IDs_in_expression_or_feed: symbol_category="+
+        symbol_category
     )
 
     print("neo4j_query/list_IDs: expression_or_feed=", expression_or_feed)
@@ -241,7 +241,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
 
     logger.info(
         "[TRACE] neo4j_query/get_list_of_symbol_IDs_in_expression_or_feed end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -257,7 +257,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
 
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] neo4j_query/symbols_in_feed start " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] neo4j_query/symbols_in_feed start " + str(trace_id) + " " + str(time.time()))
 
 #     print("neo4j_query/symbols_in_feed: symbol_category=", symbol_category)
 
@@ -274,7 +274,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
 #         symbol_list.append(result.data()["s.id"])
 #     print("feed_id=", feed_id, "symbol_list=", symbol_list)
 
-#     logger.info("[TRACE] neo4j_query/symbols_in_feed end " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] neo4j_query/symbols_in_feed end " + str(trace_id) + " " + str(time.time()))
 #     return symbol_list
 
 
@@ -288,7 +288,7 @@ def get_list_node_dicts_of_type(tx, node_type: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/get_list_node_dicts_of_type start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -304,7 +304,7 @@ def get_list_node_dicts_of_type(tx, node_type: str) -> list:
 
     logger.info(
         "[TRACE] neo4j_query/get_list_node_dicts_of_type end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -316,7 +316,7 @@ def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/get_derivation_dicts_that_use_feed start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -333,7 +333,7 @@ def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
 
     logger.info(
         "[TRACE] neo4j_query/get_derivation_dicts_that_use_feed end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -349,7 +349,7 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/derivations_that_use_inference_rule start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -377,7 +377,7 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
 
     logger.info(
         "[TRACE] neo4j_query/derivations_that_use_inference_rule end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -395,7 +395,7 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -427,7 +427,7 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(
 
     logger.info(
         "[TRACE] neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -445,7 +445,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id_by_category(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -472,7 +472,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id_by_category(
 
     logger.info(
         "[TRACE] neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -485,7 +485,7 @@ def get_list_of_value_dicts_for_constant_id(tx, scalar_id: str) -> list:
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] neo4j_query/get_list_of_value_dicts_for_constant_id start " + trace_id
+        "[TRACE] neo4j_query/get_list_of_value_dicts_for_constant_id start " + str(trace_id)
     )
     print("neo4j_query/get_list_of_value_dicts_for_constant_id: scalar_id=", scalar_id)
 
@@ -495,7 +495,7 @@ def get_list_of_value_dicts_for_constant_id(tx, scalar_id: str) -> list:
     ):
         list_of_value_dicts.append(result.data()["v"])
     logger.info(
-        "[TRACE] neo4j_query/get_list_of_value_dicts_for_constant_id start " + trace_id
+        "[TRACE] neo4j_query/get_list_of_value_dicts_for_constant_id start " + str(trace_id)
     )
     return list_of_value_dicts
 
@@ -509,7 +509,7 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/get_list_of_step_dicts_in_this_derivation start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -543,7 +543,7 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
         list_of_step_dicts.append(this_step_dict)
 
     logger.info(
-        "[TRACE] neo4j_query/get_list_of_step_dicts_in_this_derivation end " + trace_id
+        "[TRACE] neo4j_query/get_list_of_step_dicts_in_this_derivation end " + str(trace_id)
     )
     return list_of_step_dicts
 
@@ -555,7 +555,7 @@ def step_has_sequence_index(tx, step_id: str) -> int:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/step_has_sequence_index start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -569,7 +569,7 @@ def step_has_sequence_index(tx, step_id: str) -> int:
 
     logger.info(
         "[TRACE] neo4j_query/step_has_sequence_index end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -585,7 +585,7 @@ def step_has_inference_rule(tx, step_id: str):
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/step_has_inference_rule start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -604,7 +604,7 @@ def step_has_inference_rule(tx, step_id: str):
 
     logger.info(
         "[TRACE] neo4j_query/step_has_inference_rule end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -618,7 +618,7 @@ def get_derivation_id_from_step_id(tx, step_id: str) -> str:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/get_derivation_id_from_step_id start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -637,7 +637,7 @@ def get_derivation_id_from_step_id(tx, step_id: str) -> str:
 
     logger.info(
         "[TRACE] neo4j_query/get_derivation_id_from_step_id end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -655,7 +655,7 @@ def get_list_of_expression_dicts_from_step_id_and_expr_type(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/get_list_of_expression_dicts_from_step_id_and_expr_type start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -714,7 +714,7 @@ def get_list_of_expression_dicts_from_step_id_and_expr_type(
 
     logger.info(
         "[TRACE] neo4j_query/get_list_of_expression_dicts_from_step_id_and_expr_type end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -729,7 +729,7 @@ def get_node_properties(tx, node_type: str, node_id: str) -> dict:
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] neo4j_query/node_properties start " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/node_properties start " + str(trace_id) + " " + str(time.time())
     )
 
     print("neo4j_query/node_properties: node_type=", node_type)
@@ -744,7 +744,7 @@ def get_node_properties(tx, node_type: str, node_id: str) -> dict:
     print("neo4j_query/node_properties: node_data=", node_data)
 
     logger.info(
-        "[TRACE] neo4j_query/node_properties end " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/node_properties end " + str(trace_id) + " " + str(time.time())
     )
     return node_data
 
@@ -765,7 +765,7 @@ def add_derivation(
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] neo4j_query/add_derivation start " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/add_derivation start " + str(trace_id) + " " + str(time.time())
     )
 
     # print(
@@ -787,7 +787,7 @@ def add_derivation(
     )
 
     logger.info(
-        "[TRACE] neo4j_query/add_derivation end " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/add_derivation end " + str(trace_id) + " " + str(time.time())
     )
     return
 
@@ -814,7 +814,7 @@ def add_inference_rule(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/add_inference_rule start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -842,7 +842,7 @@ def add_inference_rule(
 
     logger.info(
         "[TRACE] neo4j_query/add_inference_rule end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -860,7 +860,7 @@ def edit_step_notes(
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] neo4j_query/edit_step_notes start " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/edit_step_notes start " + str(trace_id) + " " + str(time.time())
     )
 
     result = tx.run(
@@ -871,7 +871,7 @@ def edit_step_notes(
     )
 
     logger.info(
-        "[TRACE] neo4j_query/edit_step_notes end " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/edit_step_notes end " + str(trace_id) + " " + str(time.time())
     )
     return
 
@@ -895,7 +895,7 @@ def edit_expression(
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] neo4j_query/edit_expression start " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/edit_expression start " + str(trace_id) + " " + str(time.time())
     )
 
     result = tx.run(
@@ -912,7 +912,7 @@ def edit_expression(
     )
 
     logger.info(
-        "[TRACE] neo4j_query/edit_expression end " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/edit_expression end " + str(trace_id) + " " + str(time.time())
     )
     return
 
@@ -930,7 +930,7 @@ def edit_expression(
 #     >>> edit_feed()
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] neo4j_query/edit_feed start " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] neo4j_query/edit_feed start " + str(trace_id) + " " + str(time.time()))
 
 #     result = tx.run(
 #         'MERGE (e:feed {id:"' + str(feed_id) + '"})'
@@ -942,7 +942,7 @@ def edit_expression(
 #         'latex: "' + str(feed_latex) + '"}'
 #     )
 
-#     logger.info("[TRACE] neo4j_query/edit_feed end " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] neo4j_query/edit_feed end " + str(trace_id) + " " + str(time.time()))
 #     return
 
 
@@ -957,7 +957,7 @@ def edit_node_property(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/edit_node_property start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -989,7 +989,7 @@ def edit_node_property(
         )
 
     logger.info(
-        "[TRACE] neo4j_query/edit_node_property end" + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/edit_node_property end " + str(trace_id) + " " + str(time.time())
     )
     return
 
@@ -1010,7 +1010,7 @@ def edit_derivation_metadata(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/edit_derivation_metadata start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1028,7 +1028,7 @@ def edit_derivation_metadata(
 
     logger.info(
         "[TRACE] neo4j_query/edit_derivation_metadata end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1052,7 +1052,7 @@ def disconnect_step_from_inference_rule(tx, step_id: str) -> None:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/disconnect_step_from_inference_rule start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1060,7 +1060,7 @@ def disconnect_step_from_inference_rule(tx, step_id: str) -> None:
     print("not doing anything yet")
     logger.info(
         "[TRACE] neo4j_query/disconnect_step_from_inference_rule end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1080,7 +1080,7 @@ def delete_node(tx, node_id: str, node_type) -> None:
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] neo4j_query/delete_node start " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/delete_node start " + str(trace_id) + " " + str(time.time())
     )
 
     # must be one of these node types. See also 'schema.log' file
@@ -1093,7 +1093,7 @@ def delete_node(tx, node_id: str, node_type) -> None:
     print("result.data=", result.data())
 
     logger.info(
-        "[TRACE] neo4j_query/delete_node end " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/delete_node end " + str(trace_id) + " " + str(time.time())
     )
     return
 
@@ -1109,7 +1109,7 @@ def disconnect_symbol_from_expression(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/disconnect_symbol_from_expression start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1134,7 +1134,7 @@ def disconnect_symbol_from_expression(
 
     logger.info(
         "[TRACE] neo4j_query/disconnect_symbol_from_expression end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1152,7 +1152,7 @@ def disconnect_symbol_from_feed(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/disconnect_symbol_from_feed start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1174,7 +1174,7 @@ def disconnect_symbol_from_feed(
 
     logger.info(
         "[TRACE] neo4j_query/disconnect_symbol_from_feed end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1192,7 +1192,7 @@ def add_symbol_to_expression_or_feed(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/add_symbol_to_expression start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1225,7 +1225,7 @@ def add_symbol_to_expression_or_feed(
 
     logger.info(
         "[TRACE] neo4j_query/add_symbol_to_expression end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1239,7 +1239,7 @@ def get_list_of_sequence_values_for_derivation_id(tx, derivation_id: str) -> lis
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/list_sequence_values start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1268,7 +1268,7 @@ def get_list_of_sequence_values_for_derivation_id(tx, derivation_id: str) -> lis
 
     logger.info(
         "[TRACE] neo4j_query/list_sequence_values end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1294,7 +1294,7 @@ def add_step_to_derivation(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/add_step_to_derivation start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1331,7 +1331,7 @@ def add_step_to_derivation(
 
     logger.info(
         "[TRACE] neo4j_query/add_step_to_derivation end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1355,7 +1355,7 @@ def connect_expressions_to_step(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/connect_expressions_to_step start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1403,7 +1403,7 @@ def connect_expressions_to_step(
 
     logger.info(
         "[TRACE] neo4j_query/connect_expressions_to_step end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1430,7 +1430,7 @@ def add_expression(
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] neo4j_query/add_expression start " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/add_expression start " + str(trace_id) + " " + str(time.time())
     )
 
     result = tx.run(
@@ -1450,7 +1450,7 @@ def add_expression(
     )
 
     logger.info(
-        "[TRACE] neo4j_query/add_expression end " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/add_expression end " + str(trace_id) + " " + str(time.time())
     )
     return
 
@@ -1471,7 +1471,7 @@ def add_feed(
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] neo4j_query/add_feed start " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/add_feed start " + str(trace_id) + " " + str(time.time())
     )
 
     result = tx.run(
@@ -1484,7 +1484,7 @@ def add_feed(
         ' id:"' + str(feed_id) + '"})'
     )
 
-    logger.info("[TRACE] neo4j_query/add_feed end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] neo4j_query/add_feed end " + str(trace_id) + " " + str(time.time()))
     return
 
 
@@ -1507,7 +1507,7 @@ def add_quantum_operator_symbol(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/add_quantum_operator_symbol start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1526,7 +1526,7 @@ def add_quantum_operator_symbol(
 
     logger.info(
         "[TRACE] neo4j_query/add_quantum_operator_symbol end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1549,7 +1549,7 @@ def add_constant_value_with_units(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/add_constant_value_with_units start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1588,7 +1588,7 @@ def add_constant_value_with_units(
 
     logger.info(
         "[TRACE] neo4j_query/add_constant_value_with_units end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1621,7 +1621,7 @@ def add_scalar_symbol(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/add_scalar_symbol start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1653,7 +1653,7 @@ def add_scalar_symbol(
     )
 
     logger.info(
-        "[TRACE] neo4j_query/add_scalar_symbol end " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/add_scalar_symbol end " + str(trace_id) + " " + str(time.time())
     )
     return
 
@@ -1678,7 +1678,7 @@ def add_vector_symbol(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/add_vector_symbol start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1717,7 +1717,7 @@ def add_vector_symbol(
         )
 
     logger.info(
-        "[TRACE] neo4j_query/add_vector_symbol end " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/add_vector_symbol end " + str(trace_id) + " " + str(time.time())
     )
     return
 
@@ -1742,7 +1742,7 @@ def add_matrix_symbol(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/add_matrix_symbol start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1780,7 +1780,7 @@ def add_matrix_symbol(
         )
 
     logger.info(
-        "[TRACE] neo4j_query/add_matrix_symbol end " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/add_matrix_symbol end " + str(trace_id) + " " + str(time.time())
     )
     return
 
@@ -1804,7 +1804,7 @@ def add_operation_symbol(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/add_operation_symbol start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1828,7 +1828,7 @@ def add_operation_symbol(
 
     logger.info(
         "[TRACE] neo4j_query/add_operation_symbol end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1853,7 +1853,7 @@ def add_relation_symbol(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/add_relation_symbol start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1875,7 +1875,7 @@ def add_relation_symbol(
 
     logger.info(
         "[TRACE] neo4j_query/add_relation_symbol end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1905,7 +1905,7 @@ def delete_all_nodes_and_relationships(tx) -> None:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
         "[TRACE] neo4j_query/delete_all_nodes_and_relationships start "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1914,7 +1914,7 @@ def delete_all_nodes_and_relationships(tx) -> None:
 
     logger.info(
         "[TRACE] neo4j_query/delete_all_nodes_and_relationships end "
-        + trace_id
+        + str(trace_id)
         + " "
         + str(time.time())
     )
@@ -1931,7 +1931,7 @@ def user_query(tx, query: str) -> list:
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] neo4j_query/user_query start " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/user_query start " + str(trace_id) + " " + str(time.time())
     )
 
     list_of_results = []
@@ -1944,7 +1944,7 @@ def user_query(tx, query: str) -> list:
         list_of_results = ["WRITE OPERATIONS NOT ALLOWED (2)"]
 
     logger.info(
-        "[TRACE] neo4j_query/user_query end " + trace_id + " " + str(time.time())
+        "[TRACE] neo4j_query/user_query end " + str(trace_id) + " " + str(time.time())
     )
     return list_of_results
 
