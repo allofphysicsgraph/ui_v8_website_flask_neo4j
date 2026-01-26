@@ -43,32 +43,32 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
     Eq(sympy.Symbol('pdg99'), sympy.Symbol('pdg00'))
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] sympy_validate_expression/convert_sympy_expr_to_pdg_symbols start "
         + trace_id
     )
-    print(
-        "sympy_validate_expression/convert_sympy_expr_to_pdg_symbols: sympy_expr=",
-        sympy_expr,
+    logger.info(
+        "sympy_validate_expression/convert_sympy_expr_to_pdg_symbols: sympy_expr="
+        + str(sympy_expr)
     )
-    print(
-        "sympy_validate_expression/convert_sympy_expr_to_pdg_symbols: symbol_id_dict=",
-        symbol_id_dict,
+    logger.info(
+        "sympy_validate_expression/convert_sympy_expr_to_pdg_symbols: symbol_id_dict="
+        + str(symbol_id_dict)
     )
 
-    print("sympy_expr.atoms=", sympy_expr.atoms())
+    logger.info("sympy_expr.atoms=" + str(sympy_expr.atoms()))
     for this_atom in sympy_expr.atoms():
-        print("type:", type(this_atom))
+        logger.info("type:" + str(type(this_atom)))
 
     revised_expr = sympy_expr
     for this_symb in sympy_expr.atoms():
         this_symb_as_str = str(this_symb)
         if this_symb_as_str in symbol_id_dict.keys():
-            print("this_symb=", this_symb)
-            print("type(this_symb)=", type(this_symb))
+            logger.info("this_symb=" + str(this_symb))
+            logger.info("type(this_symb)=" + str(type(this_symb)))
             # register the atom as a SymPy symbol:
             my_str = str(this_symb) + " = sympy.Symbol('" + str(this_symb) + "')"
-            print("to exec:", my_str)
+            logger.info("to exec:" + my_str)
             exec(my_str)
 
             pdg_id = "pdg" + str(symbol_id_dict[str(this_symb)])
@@ -78,8 +78,8 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
 
             revised_expr = revised_expr.subs(this_symb, sympy.Symbol(pdg_id))
 
-    print("type(revised_expr)=", type(revised_expr))
-    print(
+    logger.info("type(revised_expr)=" + str(type(revised_expr)))
+    logger.info(
         "[TRACE] sympy_validate_expression/convert_sympy_expr_to_pdg_symbols end "
         + trace_id
     )
@@ -101,9 +101,13 @@ def dimensional_consistency(
     unknown
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print("[TRACE] sympy_validate_expression/dimensional_consistency start " + trace_id)
-    print("expression_dict=", expression_dict)
-    print("list_of_symbol_IDs_in_expression", list_of_symbol_IDs_in_expression)
+    logger.info(
+        "[TRACE] sympy_validate_expression/dimensional_consistency start " + trace_id
+    )
+    logger.info("expression_dict=" + str(expression_dict))
+    logger.info(
+        "list_of_symbol_IDs_in_expression" + str(list_of_symbol_IDs_in_expression)
+    )
 
     if "sympy" not in expression_dict.keys():
         return "sympy not provided for expression"
@@ -125,18 +129,21 @@ def dimensional_consistency(
             + str(err)
         )  # ths is what shows up in the HTML table
 
-    print("sympy_validate_expression/dimensional_consistency: sympy_expr=", sympy_expr)
+    logger.info(
+        "sympy_validate_expression/dimensional_consistency: sympy_expr="
+        + str(sympy_expr)
+    )
 
     # the split below could be replaced by expression_dict['sympy_lhs'] and expression_dict['sympy_rhs']
     try:
         LHS = sympy_expr.lhs
         RHS = sympy_expr.rhs
     except Exception as err:
-        print(str(err))
+        logger.info(str(err))
         return "unable to determine LHS,RHS for" + str(sympy_expr)
 
-    print("sympy_validate_expression/dimensional_consistency: LHS=", LHS)
-    print("sympy_validate_expression/dimensional_consistency: RHS=", RHS)
+    logger.info("sympy_validate_expression/dimensional_consistency: LHS=" + str(LHS))
+    logger.info("sympy_validate_expression/dimensional_consistency: RHS=" + str(RHS))
 
     # for each symbol used in the expression,
     # convert the numeric value for each dimension
@@ -179,7 +186,7 @@ def dimensional_consistency(
                 "temperature**(" + str(this_symbol_dict["dimension_temperature"]) + ")*"
             )
 
-        print("symbol_dim_powers=", symbol_dim_powers[:-1])
+        logger.info("symbol_dim_powers=" + str(symbol_dim_powers[:-1]))
 
         if (
             symbol_dim_powers[:-1] == ""
@@ -188,7 +195,7 @@ def dimensional_consistency(
         else:
             symbol_dim_powers_result = symbol_dim_powers[:-1]
 
-        print("symbol_dim_powers_result=", symbol_dim_powers_result)
+        logger.info("symbol_dim_powers_result=" + str(symbol_dim_powers_result))
 
         exec("pdg" + str(symbol_id) + " = " + symbol_dim_powers_result)
 
