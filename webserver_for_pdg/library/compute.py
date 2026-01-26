@@ -37,7 +37,7 @@ def generate_random_id(
     so they can't be used for the Physics Derivation Graph
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] compute/generate_random_id start " + trace_id + " " + str(time.time())
     )
     # print("node_type=", node_type)
@@ -45,7 +45,7 @@ def generate_random_id(
     try:
         assert node_type in list_of_valid.node_types
     except Exception as err:
-        print("error=" + str(err))
+        logger.info("error=" + str(err))
 
     list_of_existing_IDs = []
     with graphDB_Driver.session() as session:
@@ -61,7 +61,7 @@ def generate_random_id(
         if new_id not in list_of_existing_IDs:
             found_new_ID = True
 
-    print("new_id=", str(new_id))
+    logger.info("new_id=" + str(new_id))
     logger.info(
         "[TRACE] compute/generate_random_id end " + trace_id + " " + str(time.time())
     )
@@ -75,7 +75,7 @@ def get_dict_of_node_type_for_every_id(
     >>> get_node_type_from_id()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] compute/get_dict_of_node_type_for_every_id start "
         + trace_id
         + " "
@@ -114,7 +114,7 @@ def get_dict_of_node_type_for_every_id(
         else:  # there's just one node label
             dict_of_symbol_id_and_type[this_dict["n.id"]] = this_dict["labels(n)"][0]
 
-    print(
+    logger.info(
         "[TRACE] compute/get_dict_of_node_type_for_every_id end "
         + trace_id
         + " "
@@ -142,7 +142,7 @@ def remove_file_debris(
     >>> remove_file_debris(['/path/to/file/'],['filename_without_extension'], ['ext1', 'ext2'])
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] compute/remove_file_debris start " + trace_id + " " + str(time.time())
     )
 
@@ -167,7 +167,7 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
     >>> get_list_of_symbol_IDs_in_expression_or_feed()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] compute/get_list_of_symbol_IDs_in_expression_or_feed start " + trace_id
     )
 
@@ -231,7 +231,7 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
             "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed matrix"
         ] = round(time.time() - query_start_time, 3)
 
-    print(
+    logger.info(
         "[TRACE] compute/get_list_of_symbol_IDs_in_expression_or_feed end " + trace_id
     )
     return list_of_symbol_IDs_in_expression_or_feed, query_time_dict
@@ -252,7 +252,7 @@ def get_list_of_expression_dicts_that_use_symbol_id(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] compute/get_list_of_expression_dicts_that_use_symbol_id start "
         + trace_id
     )
@@ -299,7 +299,7 @@ def get_list_of_expression_dicts_that_use_symbol_id(
             "compute/get_dict_of_expression_dicts_that_use_symbol_id: get_dict_of_expression_dicts_that_use_symbol_id_by_category matrix"
         ] = round(time.time() - query_start_time, 3)
 
-    print(
+    logger.info(
         "[TRACE] compute/get_list_of_expression_dicts_that_use_symbol_id end "
         + trace_id
     )
@@ -313,7 +313,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] compute/get_list_of_derivation_dicts_that_use_symbol_id start "
         + trace_id
     )
@@ -360,7 +360,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
             "compute/get_dict_of_derivation_dicts_that_use_symbol: derivation_dicts_that_use_symbol matrix"
         ] = round(time.time() - query_start_time, 3)
 
-    print(
+    logger.info(
         "[TRACE] compute/get_list_of_derivation_dicts_that_use_symbol_id end "
         + trace_id
     )
@@ -761,7 +761,7 @@ def get_dict_of_derivations_used_per_inference_rule(
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] compute/get_dict_of_derivations_used_per_inference_rule start "
         + trace_id
     )
@@ -780,9 +780,9 @@ def get_dict_of_derivations_used_per_inference_rule(
             query_time_dict[
                 "compute/get_dict_of_derivations_used_per_inference_rule: derivations_that_use_inference_rule"
             ] = round(time.time() - query_start_time, 3)
-        print(
-            "list_of_derivations_that_use_this_inference_rule_id=",
-            list_of_derivations_that_use_this_inference_rule_id,
+        logger.info(
+            "list_of_derivations_that_use_this_inference_rule_id="
+            + str(list_of_derivations_that_use_this_inference_rule_id)
         )
         # can't use set on a list of dicts
         # list_of_derivations_that_use_this_inference_rule_id = list(
@@ -894,11 +894,13 @@ def get_dict_of_steps_in_derivation(
         query_time_dict[
             "compute/get_dict_of_steps_in_derivation: steps_in_this_derivation"
         ] = round(time.time() - query_start_time, 3)
-    print("list of steps for", str(derivation_id), ":", list_of_step_dicts)
+    logger.info(
+        "list of steps for" + str(derivation_id) + ":" + str(list_of_step_dicts)
+    )
 
     all_steps = {}
     for this_step_dict in list_of_step_dicts:
-        print('this_step_dict["id"]:', this_step_dict["id"])
+        logger.info('this_step_dict["id"]:' + this_step_dict["id"])
         (
             inference_rule_dict,
             list_of_input_dicts,
@@ -1012,7 +1014,7 @@ def remove_latex_presention_markings(latex_str: str) -> str:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] compute/remove_latex_presention_markings start " + trace_id)
 
-    print("latex to be cleaned: " + latex_str)
+    logger.info("latex to be cleaned: " + latex_str)
 
     if "\\left." in latex_str:
         latex_str = latex_str.replace("\\left.", "")
@@ -1051,7 +1053,7 @@ def remove_latex_presention_markings(latex_str: str) -> str:
         # logger.debug("found space \\qquad")
         latex_str = latex_str.replace("\\qquad", " ")
 
-    print("latex after cleaning: " + latex_str)
+    logger.info("latex after cleaning: " + latex_str)
 
     logger.info("[TRACE] compute/remove_latex_presention_markings end " + trace_id)
     return latex_str
