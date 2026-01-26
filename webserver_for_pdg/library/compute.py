@@ -825,6 +825,45 @@ def get_dict_of_operation_dicts_not_in_expression(
     return dict_of_operation_dicts_not_in_expression, query_time_dict
 
 
+def get_dict_of_relation_dicts_not_in_expression(
+    expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
+) -> Tuple[dict, query_timing_result_type]:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info(
+        "[TRACE] compute/get_dict_of_relation_dicts_not_in_expression start " + trace_id
+    )
+
+    dict_of_all_relation_dicts, query_time_dict = get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "relation"
+    )
+
+    logger.info("dict_of_all_relation_dicts=" + str(dict_of_all_relation_dicts))
+
+    # what is the relation currently used in this expression?
+    expression_dict = {}
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        expression_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "expression", expression_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_expression: get_node_properties expression"
+        ] = round(time.time() - query_start_time, 3)
+    logger.info("pdg_app/to_edit_expression: expression_dict:" + str(expression_dict))
+    logger.info("relation is " + str(expression_dict["latex_relation"]))
+
+    dict_of_relation_dicts_not_in_expression = {}
+
+    for relation_id in dict_of_all_relation_dicts.keys():
+        if relation_id != expression_dict["latex_relation"]:
+            dict_of_relation_dicts_not_in_expression[relation_id] = (
+                dict_of_all_relation_dicts[relation_id]
+            )
+
+    return dict_of_relation_dicts_not_in_expression, query_time_dict
+
+
 def get_dict_of_node_dicts(
     graphDB_Driver, query_time_dict: query_timing_result_type, node_type: str
 ) -> Tuple[dict, query_timing_result_type]:
