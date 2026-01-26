@@ -560,6 +560,45 @@ def get_dict_of_all_symbol_dicts(
     return dict_of_all_symbol_dicts, query_time_dict
 
 
+def get_dict_of_all_operation_dicts(
+    graphDB_Driver, query_time_dict: query_timing_result_type
+) -> Tuple[dict, query_timing_result_type]:
+    """
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] compute/get_dict_of_all_operation_dicts start " + trace_id)
+
+    dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "operation"
+    )
+
+    return dict_of_all_operation_dicts, query_time_dict
+
+
+def get_dict_of_symbol_dicts_in_expression(expression_id,graphDB_Driver, query_time_dict)
+    return dict_of_symbol_dicts_in_expression
+
+    dict_of_all_symbol_dicts, query_time_dict = get_dict_of_all_symbol_dicts(
+        graphDB_Driver, query_time_dict
+    )
+
+    list_of_symbol_IDs_in_expression, query_time_dict = (
+        get_list_of_symbol_IDs_in_expression_or_feed(
+            graphDB_Driver, query_time_dict, "expression", expression_id
+        )
+    )
+
+
+def get_dict_of_symbol_dicts_not_in_expression(expression_id,graphDB_Driver, query_time_dict)
+    return dict_of_symbol_dicts_not_in_expression
+def get_dict_of_operation_dicts_in_expression(expression_id,graphDB_Driver, query_time_dict)
+    return dict_of_operation_dicts_in_expression
+def get_dict_of_operation_dicts_not_in_expression(expression_id,graphDB_Driver, query_time_dict)
+    return dict_of_operation_dicts_not_in_expression
+
+
+
+
 def get_dict_of_node_dicts(
     graphDB_Driver, query_time_dict: query_timing_result_type, node_type: str
 ) -> Tuple[dict, query_timing_result_type]:
@@ -722,16 +761,16 @@ def get_dict_of_derivations_used_per_inference_rule(
 #     return symbols_per_expression_or_feed, query_time_dict
 
 
-def all_steps_in_derivation(
+def get_dict_of_steps_in_derivation(
     graphDB_Driver,
     derivation_id: unique_numeric_id_as_str,
     query_time_dict: query_timing_result_type,
 ):
     """
-    >>> all_steps_in_derivation()
+    >>> get_dict_of_steps_in_derivation()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] compute/all_steps_in_derivation start " + trace_id)
+    logger.info("[TRACE] compute/get_dict_of_steps_in_derivation start " + trace_id)
 
     # list all steps in this derivation
     list_of_step_dicts = []
@@ -740,7 +779,7 @@ def all_steps_in_derivation(
         list_of_step_dicts = session.read_transaction(
             neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
         )
-        query_time_dict["compute/all_steps_in_derivation: steps_in_this_derivation"] = (
+        query_time_dict["compute/get_dict_of_steps_in_derivation: steps_in_this_derivation"] = (
             round(time.time() - query_start_time, 3)
         )
     print("list of steps for", str(derivation_id), ":", list_of_step_dicts)
@@ -764,7 +803,7 @@ def all_steps_in_derivation(
                 neo4j_query.step_has_sequence_index, this_step_dict["id"]
             )
             query_time_dict[
-                "compute/all_steps_in_derivation: step_has_sequence_index"
+                "compute/get_dict_of_steps_in_derivation: step_has_sequence_index"
             ] = round(time.time() - query_start_time, 3)
         # print("sequence_index=", sequence_index)
 
@@ -775,7 +814,7 @@ def all_steps_in_derivation(
             "list of feed dicts": list_of_feed_dicts,
             "list of output dicts": list_of_output_dicts,
         }
-    logger.info("[TRACE] compute/all_steps_in_derivation end " + trace_id)
+    logger.info("[TRACE] compute/get_dict_of_steps_in_derivation end " + trace_id)
     return all_steps, query_time_dict
 
 
@@ -799,7 +838,7 @@ def input_feed_output_infrule_for_step(
         inference_rule_dict = session.read_transaction(
             neo4j_query.step_has_inference_rule, step_id
         )
-        query_time_dict["compute/all_steps_in_derivation: step_has_inference_rule"] = (
+        query_time_dict["compute/get_dict_of_steps_in_derivation: step_has_inference_rule"] = (
             round(time.time() - query_start_time, 3)
         )
     # print("inference_rule_dict=", inference_rule_dict)
@@ -811,7 +850,7 @@ def input_feed_output_infrule_for_step(
             "HAS_INPUT",
         )
         query_time_dict[
-            "compute/all_steps_in_derivation: step_id_has_expressions, HAS_INPUT"
+            "compute/get_dict_of_steps_in_derivation: step_id_has_expressions, HAS_INPUT"
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_input_dicts=", list_of_input_dicts)
     with graphDB_Driver.session() as session:
@@ -822,7 +861,7 @@ def input_feed_output_infrule_for_step(
             "HAS_FEED",
         )
         query_time_dict[
-            "compute/all_steps_in_derivation: step_id_has_expressions, HAS_FEED"
+            "compute/get_dict_of_steps_in_derivation: step_id_has_expressions, HAS_FEED"
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_feed_dicts=", list_of_feed_dicts)
     with graphDB_Driver.session() as session:
@@ -833,7 +872,7 @@ def input_feed_output_infrule_for_step(
             "HAS_OUTPUT",
         )
         query_time_dict[
-            "compute/all_steps_in_derivation: step_id_has_expressions, HAS_OUTPUT"
+            "compute/get_dict_of_steps_in_derivation: step_id_has_expressions, HAS_OUTPUT"
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_output_dicts=", list_of_output_dicts)
 
