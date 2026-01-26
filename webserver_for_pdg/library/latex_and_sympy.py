@@ -33,14 +33,14 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] latex_and_sympy/sympy_to_latex_str start "
         + trace_id
         + " "
         + str(time.time())
     )
 
-    print(
+    logger.info(
         "latex_and_sympy/sympy_to_latex_str: SymPy to be converted to Latex: "
         + str(sympy_expr)
     )
@@ -50,9 +50,9 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
     # TODO: sometimes the above files, like on a string with no SymPy formatting:
     #    NameError: name 'b' is not defined
 
-    print("latex_and_sympy/sympy_to_latex_str: latex_str=", latex_str)
+    logger.info("latex_and_sympy/sympy_to_latex_str: latex_str=" + latex_str)
 
-    print(
+    logger.info(
         "[TRACE] latex_and_sympy/sympy_to_latex_str end "
         + trace_id
         + " "
@@ -74,30 +74,36 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
     Eq(a, b)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] latex_and_sympy/cleaned_latex_str_to_sympy_expression start "
         + trace_id
         + " "
         + str(time.time())
     )
 
-    print("latex to be converted to SymPy: " + expr_latex)
+    logger.info("latex to be converted to SymPy: " + expr_latex)
 
     try:
         symp_expr = parse_latex(expr_latex)
     except sympy.SympifyError as err:
         # logger.error(err)
-        print("ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression", err)
+        logger.info(
+            "ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression" + str(err)
+        )
         raise Exception("Sympy unable to parse latex (1): " + expr_latex)
     except sympy.parsing.latex.errors.LaTeXParsingError as err:
         # logger.error(err)
-        print("ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression", err)
+        logger.info(
+            "ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression" + str(err)
+        )
         raise Exception("Sympy unable to parse latex (2): " + expr_latex)
     except sympy.core.sympify.SympifyError as err:
-        print("ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression", err)
+        logger.info(
+            "ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression" + str(err)
+        )
         raise Exception("Sympy unable to parse latex (3): " + expr_latex)
 
-    print(
+    logger.info(
         "[TRACE] latex_and_sympy/cleaned_latex_str_to_sympy_expression start "
         + trace_id
         + " "
@@ -115,7 +121,7 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     >>> list_of_sympy_symbols_in_sympy_expression(sympy_expr)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    print(
+    logger.info(
         "[TRACE] latex_and_sympy/list_of_sympy_symbols_in_sympy_expression start "
         + trace_id
         + " "
@@ -133,7 +139,7 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     # >>> type(list(list_of_sympy_symbols)[0])
     # <class 'sympy.core.symbol.Symbol'>
 
-    print(
+    logger.info(
         "[TRACE] latex_and_sympy/list_of_sympy_symbols_in_sympy_expression end "
         + trace_id
         + " "
