@@ -254,7 +254,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+        list_of_symbol_IDs_in_expression_or_feed = session.read_transaction(
             neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
             expression_or_feed,
             expression_id,
@@ -698,7 +698,7 @@ def get_dict_of_nonoperation_symbol_dicts_in_expression(
     dict_of_nonoperation_symbol_dicts_in_expression = {}
     for this_symbol_ID in list_of_nonoperation_symbol_IDs_in_expression:
         dict_of_nonoperation_symbol_dicts_in_expression[this_symbol_ID] = (
-            dict_of_all_symbol_dicts[this_symbol_ID]
+            dict_of_all_nonoperation_symbol_dicts[this_symbol_ID]
         )
 
     return dict_of_nonoperation_symbol_dicts_in_expression, query_time_dict
