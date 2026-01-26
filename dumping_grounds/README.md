@@ -1,1 +1,2 @@
-why are downloads saved to here?
+for exported files, like JSON or .cypher 
+
