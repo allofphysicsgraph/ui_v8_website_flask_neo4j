@@ -2331,6 +2331,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         dict_of_nonoperation_symbol_dicts_not_in_expression=dict_of_nonoperation_symbol_dicts_not_in_expression,
         dict_of_operation_dicts_in_expression=dict_of_operation_dicts_in_expression,
         dict_of_operation_dicts_not_in_expression=dict_of_operation_dicts_not_in_expression,
+        dict_of_relation_dicts_not_in_expression=dict_of_relation_dicts_not_in_expression,
     )
     # return redirect(url_for("to_list_expressions"))
 
