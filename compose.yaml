@@ -55,7 +55,7 @@ services:
 #      --worker-tmp-dir /dev/shm: points Gunicorn's temporary heartbeat files to a memory-based file system (Shared Memory).
 # 		A common fix for Gunicorn "freezing" or slowing down in Docker containers, 
 #               where the default disk-based /tmp can be slow or experience blocking.
-#      Levels for "--log-level" are 
+#      Levels for "--log-level" are info, warning, error, critical, debug
 #      --capture-output ensures Python stdout/stderr is redirected to logs
     # using "ports" makes flask/gunicorn accessible without going through nginx
     # ports:
