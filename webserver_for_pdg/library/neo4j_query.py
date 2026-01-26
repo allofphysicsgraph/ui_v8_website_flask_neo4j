@@ -189,7 +189,7 @@ def get_scalar_id_that_has_value_and_units_id(tx, value_and_units_id: str):
     )
 
     scalar_id = result.data()
-    print("neo4j_query/get_scalar_id_that_has_value_and_units_id: scalar_id"+ scalar_id)
+    logger.info("neo4j_query/get_scalar_id_that_has_value_and_units_id: scalar_id"+ scalar_id)
 
     logger.info(
         "[TRACE] neo4j_query/get_scalar_id_that_has_value_and_units_id end " + str(trace_id)
@@ -216,14 +216,14 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
         + str(time.time())
     )
 
-    print(
+    logger.info(
         "neo4j_query/get_list_of_symbol_IDs_in_expression_or_feed: symbol_category="+
         symbol_category
     )
 
-    print("neo4j_query/list_IDs: expression_or_feed=", expression_or_feed)
+    logger.info("neo4j_query/list_IDs: expression_or_feed="+expression_or_feed)
     assert expression_or_feed in ["expression", "feed"]
-    print("neo4j_query/list_IDs: symbol_category=", symbol_category)
+    logger.info("neo4j_query/list_IDs: symbol_category="+ symbol_category)
     assert symbol_category in list_of_valid.symbol_categories
 
     symbol_list = []  # type: List[str]
@@ -237,7 +237,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
         + "' RETURN s.id"
     ):
         symbol_list.append(result.data()["s.id"])
-    print("expression_or_feed_id=", expression_or_feed_id, "symbol_list=", symbol_list)
+    logger.info("expression_or_feed_id="+ expression_or_feed_id+ "symbol_list="+ symbol_list)
 
     logger.info(
         "[TRACE] neo4j_query/get_list_of_symbol_IDs_in_expression_or_feed end "
@@ -294,7 +294,7 @@ def get_list_node_dicts_of_type(tx, node_type: str) -> list:
     )
 
     # must be one of these node types. See also 'schema.log' file
-    print("neo4j_query/get_list_node_dicts_of_type:  node type:", node_type)
+    logger.info("neo4j_query/get_list_node_dicts_of_type:  node type:"+ node_type)
     assert node_type in list_of_valid.node_types
 
     node_list = []  # type: List[dict]
@@ -320,7 +320,7 @@ def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
         + " "
         + str(time.time())
     )
-    print("neo4j_query/get_derivation_dicts_that_use_feed: feed_id=", feed_id)
+    logger.info("neo4j_query/get_derivation_dicts_that_use_feed: feed_id="+feed_id)
 
     # TODO: this should be derivation->step->feed
     list_of_derivation_dicts = []  # type: List[dict]
@@ -354,9 +354,9 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
         + str(time.time())
     )
 
-    print(
-        "neo4j_query/derivations_that_use_inference_rule: inference_rule_id=",
-        inference_rule_id,
+    logger.info(
+        "neo4j_query/derivations_that_use_inference_rule: inference_rule_id="+
+        inference_rule_id
     )
 
     list_of_derivation_dicts = []  # type: List[dict]
@@ -400,9 +400,9 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(
         + str(time.time())
     )
 
-    print(
-        "neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_category=",
-        symbol_category,
+    logger.info(
+        "neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_category="+
+        str(symbol_category)
     )
 
     assert symbol_category in list_of_valid.symbol_categories
@@ -418,11 +418,11 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(
     ):
         list_of_expression_dicts.append(result.data()["e"])
 
-    print(
-        "neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_id=",
-        symbol_id,
-        "list_of_expressions=",
-        list_of_expression_dicts,
+    logger.info(
+        "neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_id="+
+        symbol_id+
+        "list_of_expressions="+
+        str(list_of_expression_dicts)
     )
 
     logger.info(
@@ -450,9 +450,9 @@ def get_list_of_derivation_dicts_that_use_symbol_id_by_category(
         + str(time.time())
     )
 
-    print(
-        "neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category: symbol_category=",
-        symbol_category,
+    logger.info(
+        "neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category: symbol_category="+
+        symbol_category
     )
     assert symbol_category in list_of_valid.symbol_categories
 
@@ -487,7 +487,7 @@ def get_list_of_value_dicts_for_constant_id(tx, scalar_id: str) -> list:
     logger.info(
         "[TRACE] neo4j_query/get_list_of_value_dicts_for_constant_id start " + str(trace_id)
     )
-    print("neo4j_query/get_list_of_value_dicts_for_constant_id: scalar_id=", scalar_id)
+    logger.info("neo4j_query/get_list_of_value_dicts_for_constant_id: scalar_id="+ scalar_id)
 
     list_of_value_dicts = []  # type: List[dict]
     for result in tx.run(
@@ -522,7 +522,7 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
     ):
         res = result.data()
 
-        print("neo4j_query/get_list_of_step_dicts_in_this_derivation: res=", res)
+        logger.info("neo4j_query/get_list_of_step_dicts_in_this_derivation: res="+str(res))
         # res= {'r.sequence_index': 0, 's': {'note_after_step_latex': '', 'author_name_latex': 'ben', 'id': '4022988', 'created_datetime': '2024-06-02_21-40-52-881678', 'note_before_step_latex': ''}}
 
         this_step_dict = res["s"]
@@ -532,9 +532,9 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
         # )
 
         this_step_index = res["r.sequence_index"]
-        print(
-            "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_index_dict=",
-            this_step_index,
+        logger.info(
+            "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_index_dict="+
+            str(this_step_index)
         )
 
         # add sequence_index property value to dict
@@ -565,7 +565,7 @@ def step_has_sequence_index(tx, step_id: str) -> int:
     )
     # print(type(result)) # don't access the `result` variable more than once, as mentioned on https://neo4j.com/docs/python-manual/current/transformers/
     sequence_index = result.data()[0]["r.sequence_index"]
-    print("neo4j_query/step_has_sequence_index: sequence_index=", sequence_index)
+    logger.info("neo4j_query/step_has_sequence_index: sequence_index="+str(sequence_index))
 
     logger.info(
         "[TRACE] neo4j_query/step_has_sequence_index end "
@@ -623,7 +623,7 @@ def get_derivation_id_from_step_id(tx, step_id: str) -> str:
         + str(time.time())
     )
 
-    print("neo4j_query/get_derivation_id_from_step_id: step_id=", step_id)
+    logger.info("neo4j_query/get_derivation_id_from_step_id: step_id="+ str(step_id))
 
     result = tx.run(
         'MATCH (d:derivation)-[r:"HAS_STEP"]->(:step {"id":"'
@@ -633,7 +633,7 @@ def get_derivation_id_from_step_id(tx, step_id: str) -> str:
 
     derivation_id = result.data()
 
-    print("neo4j_query/get_derivation_id_from_step_id: derivation_id=", derivation_id)
+    logger.info("neo4j_query/get_derivation_id_from_step_id: derivation_id="+ str(derivation_id))
 
     logger.info(
         "[TRACE] neo4j_query/get_derivation_id_from_step_id end "
@@ -660,11 +660,11 @@ def get_list_of_expression_dicts_from_step_id_and_expr_type(
         + str(time.time())
     )
 
-    print(
-        "neo4j_query/step_has_expressions: step_id=",
-        step_id,
-        "; expression_type=",
-        expression_type,
+    logger.info(
+        "neo4j_query/step_has_expressions: step_id="+
+        step_id+
+        "; expression_type="+
+        expression_type
     )
     assert (
         expression_type == "HAS_INPUT"
@@ -732,16 +732,16 @@ def get_node_properties(tx, node_type: str, node_id: str) -> dict:
         "[TRACE] neo4j_query/node_properties start " + str(trace_id) + " " + str(time.time())
     )
 
-    print("neo4j_query/node_properties: node_type=", node_type)
+    logger.info("neo4j_query/node_properties: node_type="+ node_type)
     assert node_type in list_of_valid.node_types
-    print("neo4j_query/node_properties: node_id:", node_id)
+    logger.info("neo4j_query/node_properties: node_id:"+ node_id)
 
     result = tx.run(
         "MATCH (n: " + str(node_type) + ') WHERE n.id = "' + str(node_id) + '" RETURN n'
     )
     # node_data = result.data()['n']
     node_data = result.data()[0]["n"]
-    print("neo4j_query/node_properties: node_data=", node_data)
+    logger.info("neo4j_query/node_properties: node_data="+ str(node_data))
 
     logger.info(
         "[TRACE] neo4j_query/node_properties end " + str(trace_id) + " " + str(time.time())
@@ -1057,7 +1057,7 @@ def disconnect_step_from_inference_rule(tx, step_id: str) -> None:
         + str(time.time())
     )
     # TODO
-    print("not doing anything yet")
+    logger.info("not doing anything yet")
     logger.info(
         "[TRACE] neo4j_query/disconnect_step_from_inference_rule end "
         + str(trace_id)
@@ -1084,13 +1084,13 @@ def delete_node(tx, node_id: str, node_type) -> None:
     )
 
     # must be one of these node types. See also 'schema.log' file
-    print("neo4j_query/delete_node: node_type=", node_type)
+    logger.info("neo4j_query/delete_node: node_type="+ node_type)
     assert node_type in list_of_valid.node_types
 
     result = tx.run(
         "MATCH (d:" + node_type + ' {id:"' + node_id + '"}) DETACH DELETE d'
     )
-    print("result.data=", result.data())
+    logger.info("result.data="+str(result.data()))
 
     logger.info(
         "[TRACE] neo4j_query/delete_node end " + str(trace_id) + " " + str(time.time())
@@ -1114,9 +1114,9 @@ def disconnect_symbol_from_expression(
         + str(time.time())
     )
 
-    print(
-        "neo4j_query/disconnect_symbol_from_expression: symbol_category=",
-        symbol_category,
+    logger.info(
+        "neo4j_query/disconnect_symbol_from_expression: symbol_category="+
+        symbol_category
     )
     assert symbol_category in list_of_valid.symbol_categories
 
@@ -1130,7 +1130,7 @@ def disconnect_symbol_from_expression(
         + str(symbol_id)
         + '"  DELETE r'
     )
-    print("result.data=", result.data())
+    logger.info("result.data="+str(result.data()))
 
     logger.info(
         "[TRACE] neo4j_query/disconnect_symbol_from_expression end "
@@ -1157,7 +1157,7 @@ def disconnect_symbol_from_feed(
         + str(time.time())
     )
 
-    print("neo4j_query/disconnect_symbol_from_feed: symbol_category=", symbol_category)
+    logger.info("neo4j_query/disconnect_symbol_from_feed: symbol_category="+ symbol_category)
     assert symbol_category in list_of_valid.symbol_categories
 
     result = tx.run(
@@ -1170,7 +1170,7 @@ def disconnect_symbol_from_feed(
         + str(symbol_id)
         + '"  DELETE r'
     )
-    print("result.data=", result.data())
+    logger.info("result.data="+str(result.data()))
 
     logger.info(
         "[TRACE] neo4j_query/disconnect_symbol_from_feed end "
@@ -1196,16 +1196,16 @@ def add_symbol_to_expression_or_feed(
         + " "
         + str(time.time())
     )
-    print("symbol_id=", symbol_id, "expression_or_feed_id=", expression_or_feed_id)
+    logger.info("symbol_id="+symbol_id+ "expression_or_feed_id="+ expression_or_feed_id)
 
-    print(
-        "neo4j_query/add_symbol_to_expression_or_feed: expression_or_feed=",
-        expression_or_feed,
+    logger.info(
+        "neo4j_query/add_symbol_to_expression_or_feed: expression_or_feed="+
+        expression_or_feed
     )
     assert expression_or_feed in ["expression", "feed"]
-    print(
-        "neo4j_query/add_symbol_to_expression_or_feed: symbol_category=",
-        symbol_category,
+    logger.info(
+        "neo4j_query/add_symbol_to_expression_or_feed: symbol_category="+
+        symbol_category
     )
     assert symbol_category in list_of_valid.symbol_categories
 
@@ -1246,8 +1246,8 @@ def get_list_of_sequence_values_for_derivation_id(tx, derivation_id: str) -> lis
 
     list_of_sequence_values = []  # type: List[int]
 
-    print("derivation_id=", derivation_id)
-    print(
+    logger.info("derivation_id="+derivation_id)
+    logger.info(
         'MATCH (d:derivation {id:"'
         + derivation_id
         + '"})-[r]->(s:step) RETURN r.sequence_index'
@@ -1259,12 +1259,12 @@ def get_list_of_sequence_values_for_derivation_id(tx, derivation_id: str) -> lis
     ):
         record = result.data()
         # record= {'r.sequence_index': '1'}
-        print("record=", record)
+        logger.info("record="+ str(record))
 
         list_of_sequence_values.append(int(record["r.sequence_index"]))
 
     list_of_sequence_values.sort()
-    print("list_of_sequence_values=", list_of_sequence_values)
+    logger.info("list_of_sequence_values="+str(list_of_sequence_values))
 
     logger.info(
         "[TRACE] neo4j_query/list_sequence_values end "
@@ -1302,7 +1302,7 @@ def add_step_to_derivation(
     # # https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Result
     # print("result=",result.single())
 
-    print("insert step with id; this works")
+    logger.info("insert step with id; this works")
     result = tx.run(
         'MERGE (:step {id:"' + step_id + '", '
         'author_name_latex:"' + author_name_latex + '", '
@@ -1312,7 +1312,7 @@ def add_step_to_derivation(
     )
     # print(result.data()) # this just shows "[]"
 
-    print("step with edge", derivation_id)
+    logger.info("step with edge"+ derivation_id)
     result = tx.run(
         "MATCH (a:derivation),(b:step) "
         'WHERE a.id="' + str(derivation_id) + '" AND b.id="' + str(step_id) + '" '
@@ -1321,7 +1321,7 @@ def add_step_to_derivation(
         + "}]->(b) RETURN r"
     )
 
-    print("inference_rule_id", inference_rule_id)
+    logger.info("inference_rule_id"+ inference_rule_id)
     result = tx.run(
         "MATCH (a:step),(b:inference_rule) "
         'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(inference_rule_id) + '"'
@@ -1366,14 +1366,14 @@ def connect_expressions_to_step(
         or (len(list_of_output_expression_IDs) > 0)
     )
 
-    print("list_of_input_expression_IDs", list_of_input_expression_IDs)
-    print("list_of_feed_expression_IDs", list_of_feed_expression_IDs)
-    print("list_of_output_expression_IDs", list_of_output_expression_IDs)
+    logger.info("list_of_input_expression_IDs"+str(list_of_input_expression_IDs))
+    logger.info("list_of_feed_expression_IDs"+str(list_of_feed_expression_IDs))
+    logger.info("list_of_output_expression_IDs"+str(list_of_output_expression_IDs))
 
     # input expressions
     for input_index, input_id in enumerate(list_of_input_expression_IDs):
-        print("input_id=", input_id, "; input_index=", input_index)
-        print("step_id=", step_id)
+        logger.info("input_id="+ input_id+ "; input_index="+ str(input_index))
+        logger.info("step_id="+ step_id)
         result = tx.run(
             "MATCH (a:step),(b:expression) "
             'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(input_id) + '" '
@@ -1383,7 +1383,7 @@ def connect_expressions_to_step(
 
     # feed expressions
     for feed_index, feed_id in enumerate(list_of_feed_expression_IDs):
-        print("feed_id=", feed_id, "; feed_index=", feed_index)
+        logger.info("feed_id="+ feed_id+ "; feed_index="+str(feed_index))
         result = tx.run(
             "MATCH (a:step),(b:feed) "
             'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(feed_id) + '" '
@@ -1393,7 +1393,7 @@ def connect_expressions_to_step(
 
     # output expressions
     for output_index, output_id in enumerate(list_of_output_expression_IDs):
-        print("output_id=", output_id, "; output_index=", output_index)
+        logger.info("output_id="+output_id+ "; output_index="+ str(output_index))
         result = tx.run(
             "MATCH (a:step),(b:expression) "
             'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(output_id) + '" '
@@ -1558,7 +1558,7 @@ def add_constant_value_with_units(
     for property_key, property_value in dict_of_units.items():
         str_to_add += property_key + ':"' + str(property_value) + '", '
 
-    print("neo4j_query/add_constant_value_with_units: str_to_add=", str_to_add)
+    logger.info("neo4j_query/add_constant_value_with_units: str_to_add="+ str_to_add)
 
     # create new node for value
     result = tx.run(
