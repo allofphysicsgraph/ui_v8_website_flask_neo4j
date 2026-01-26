@@ -1,6 +1,8 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
 <h1>User Documentation for the Physics Derivation Graph</h1>
 
 <P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
@@ -51,7 +53,7 @@ There are two primary ways a user can interact with the Physics Derivation Graph
   <LI><a href="#adding_content">generating new content or modifying existing content</a></LI>
   <LI><a href="#use cases">exploring and analyzing the content of the graph</a></LI>
 </UL>
-Before those are described in more detail at the bottom of this page, a background of
+<P>Before those are described in more detail at the bottom of this page, a background of
 the project is provided.
 
 <P>&nbsp;</P>
@@ -115,6 +117,7 @@ is designed to be read sequentially.
 </P>
 
 <P>ANTLER grammar:
+  <div align=center>
 <pre>
 grammar PhysicsDerivationGraph_grammar;
 
@@ -265,6 +268,7 @@ WS: [ \t] -&gt; skip;
 NEWLINE: '\n' -&gt; skip;
 
 </pre>
+</div>
 
 
 <P>&nbsp;</P>
@@ -435,14 +439,14 @@ The relation of these terms is shown graphically below in figure 1:<!--in Fig. \
 
 <!--\begin{figure}-->
 <img src="{{ url_for('static', filename='frequency_period_relation.png') }}" width=400>
-<CENTER>
-  Figure 2. A derivation step represented as a directed graph. The colored node shapes are
+<div align="center">
+  <P>Figure 2. A derivation step represented as a directed graph. The colored node shapes are
   not an integral feature of the Physics Derivation Graph are are present in this figure
   only to distinguish the distinct categories of object. The directed graph is
   comprised of an input expression (top blue circle), an output expression
   (bottom blue circle), an inference rule (red trapazoid), and a <a href="#feeds">feed</a> (purple
   rectangle).
-</CENTER>
+</div>
 <!--
 \label{fig:freq_period}
 \end{figure}
@@ -467,14 +471,14 @@ The relation of these terms is shown graphically below in figure 1:<!--in Fig. \
 <P>Visually, that can be represented as a graph:
 
   <img src="{{ url_for('static', filename='derivation_ab_add2.png') }}" width=400>
-  <CENTER>
+  <div align="center">
     Figure 3. A three step derivation involving two expressions.
     In this rendering, the start of the derivation is at the bottom of the image.
     In this example, inference rules are blue trapazoids,
     expressions are black ovals, and feeds are red rectangles. As with figure 2,
     node shapes and colors are used here to distinguish categories of object and
     are not integral to the Physics Derivation Graph.
-  </CENTER>
+  </div>
 </P>
 
 <P>&nbsp;</P>
@@ -552,7 +556,7 @@ expression, but feeds and inference rules may have duplicate node labels on the 
 <P>&nbsp;</P>
 
 <H2 id="topic scope">Physics Topics</H2>
-The ability to document Physics requires coverage across all the domains of Physics (e.g.,
+<P>The ability to document Physics requires coverage across all the domains of Physics (e.g.,
 classical mechanics, quantum mechanics, relativity, thermodynamics, statistical
 mechanics). As a consequence, much of mathematics covered up to undergraduate
 level is likely to be required.
@@ -660,7 +664,7 @@ for physics students the Physics Derivation Graph could address questions like
   <LI>"What portion of Physics does the course I'm taking represent?"</LI>
 </UL>
 
-Math classes essentially teach a set of inference rules.
+<P>Math classes essentially teach a set of inference rules.
 For math students, the Physics Derivation Graph could address questions like
 <UL>
   <LI>"What are example applications of the techniques I am learning?"</LI>

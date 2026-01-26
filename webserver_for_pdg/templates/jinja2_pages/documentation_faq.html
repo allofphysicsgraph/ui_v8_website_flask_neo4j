@@ -1,6 +1,8 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
 <H1>Frequently Asked Questions (FAQ) About the Physics Derivation Graph</H1>
 
 <P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
@@ -101,6 +103,7 @@ These descriptions of the project are equivalent:
   <a name="use cases">
     <em>What are the use cases for the Physics Derivation Graph?</em>
   </a><BR/>
+  <div align="center">
   <table border=1>
   <tr>
     <th>use case</th>
@@ -145,6 +148,7 @@ These descriptions of the project are equivalent:
     <td>progress in Physics?</td>
   </tr>
 </table>
+</div>
 <P>
 Each of these use cases involve significant amounts of tedious data entry and learning what inference rules exist and the interface to the Physics Derivation Graph.
 
@@ -290,7 +294,7 @@ There are also Science Ontologies like <a href="http://sciencewise.info/">scienc
       <LI>String/M theory, a candidate fundamental theory which
     unifies Yang-Mills and quantum gravity
     </UL>
-    <a href="https://www.icms.org.uk/downloads/bigproof/Douglas.pdf">source</a>: "Physics and Formal Methods" by Douglas (2019)
+    <P><a href="https://www.icms.org.uk/downloads/bigproof/Douglas.pdf">source</a>: "Physics and Formal Methods" by Douglas (2019)
 </P>
 <HR/> <!-- ************************************************** -->
 <P>
@@ -459,11 +463,11 @@ Separate from that, a unique identifier is also need for inference rules to dist
     <center>
       <img src="{{ url_for('static', filename='conceptual_physics_graph_expressions_linked_by_variables.svg')}}">
     </center>
-  More specifically, the Physics Graph would look like<BR/>
+  <P>More specifically, the Physics Graph would look like
     <center>
       <img src="{{ url_for('static', filename='conceptual_physics_graph_actual_expressions_linked_by_variables.svg')}}" width=800>
     </center>
-  This graph would be easy to construct -- merely include all expressions from Physics and appropriately link variable defintions for each expression.
+  <P>This graph would be easy to construct -- merely include all expressions from Physics and appropriately link variable definitions for each expression.
   This graph would be interesting but not provide as much insight as a derivation-based graph.
 
 <HR/> <!-- ************************************************** -->
@@ -545,7 +549,7 @@ For tips on how to learn Physics,<BR/>
       <LI> Counterintuitive: If you get completely stuck, move on! Learning often happens in non-linear ways. If you hit an insurmountable roadblock, just keep going. When you return in a few days/weeks, things will almost certainly be clearer.</LI>
     </UL>
   </blockquote>
-  <em>(end quote)</em><BR/>
+  <P><em>(end quote)</em><BR/>
 source: <a href="https://news.ycombinator.com/item?id=22691009">https://news.ycombinator.com/item?id=22691009</a>
 </P>
 
@@ -558,7 +562,7 @@ source: <a href="https://news.ycombinator.com/item?id=22691009">https://news.yco
   <img src="{{ url_for('static', filename='crackpot.jpg')}}">
   </center>
 <BR/>
-The goal (documenting all known Physics) sounds crackpot-ish. The approach doesn't disallow crackpot statements -- checking derivation steps using a <a href="https://en.wikipedia.org/wiki/Computer_algebra_system">computer algebra system</a> doens't prevent physically nonsensical conclusions.<BR/>
+<P>The goal (documenting all known Physics) sounds crackpot-ish. The approach doesn't disallow crackpot statements -- checking derivation steps using a <a href="https://en.wikipedia.org/wiki/Computer_algebra_system">computer algebra system</a> doens't prevent physically nonsensical conclusions.<BR/>
 The purpose of the Physics Derivation Graph is to document known knowledge. No new knowledge is expected.
 </P>
 
@@ -655,7 +659,7 @@ Anything from <a href="https://en.wikipedia.org/wiki/Classical_mechanics">Classi
 Mathematical proofs relate to exactly how a MODEL will behave. They don't have much to do with how the real world behaves. If the mathematics is carried out correctly, then one has "proven" how the model will behave.
 </blockquote>
 
-The reason for experimentation, is to find out if the completely fictional MODEL that somebody simply made up, behaves in any way the same, as observations suggest the real world behaves. If it doesn't, that is not an indication of a mathematical error, it simply means the fictional model is not a good description of the real world, and must be changed.
+<P>The reason for experimentation, is to find out if the completely fictional MODEL that somebody simply made up, behaves in any way the same, as observations suggest the real world behaves. If it doesn't, that is not an indication of a mathematical error, it simply means the fictional model is not a good description of the real world, and must be changed.
 </P>
 
 <HR/> <!-- ************************************************** -->

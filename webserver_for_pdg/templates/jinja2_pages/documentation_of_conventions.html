@@ -1,6 +1,8 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
 <h1>Conventions Documentation for the Physics Derivation Graph</h1>
 
 <P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
@@ -11,7 +13,7 @@
 <UL>
   <LI>On webpages the HTML tag "Fieldset" is used to denote actions available to the user.</LI>
   <LI>Expressions are decomposed into "LHS", "relation", "RHS"
-  <LI>"Symbols" refers to operations, scalars, vectors, matrices.
+  <LI>"Symbols" refers to relations, operations, scalars, vectors, matrices.
   <LI>"Non-operation symbols" refers to scalars, vectors, matrices.
 </UL>
 

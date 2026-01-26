@@ -1,6 +1,8 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
 <h1>Developer Documentation for the Physics Derivation Graph</h1>
 
 <P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
@@ -148,6 +150,7 @@ Figure 2.
 <H3><a name="run flask container">Run Flask container</a></H3>
 <P>
   Quick start on the command line:
+  <div align="center">
   <pre>
   git clone https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j.git
   cd ui_v8_website_flask_neo4j/flask/
@@ -156,8 +159,10 @@ Figure 2.
              -v`pwd`/logs/:/home/appuser/app/logs/ \
              --publish 5000:5000 flask_ub
   </pre>
+</div>
 
-  To enter the container, run the commands
+  <P>To enter the container, run the commands
+    <div align="center">
   <pre>
   docker run -it --rm -v`pwd`:/scratch \
              -v`pwd`/data.json:/home/appuser/app/data.json \
@@ -175,10 +180,12 @@ Figure 2.
              --publish 5000:5000 flask_ub /bin/bash
   make
   </pre>
+</div>
 </p>
 <H3><a name="run gunicorn container">Run gunicorn container</a></H3>
 <P>
   Quick start on the command line:
+  <div align="center">
   <pre>
   git clone https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j.git
   cd ui_v8_website_flask_neo4j/flask/
@@ -193,6 +200,7 @@ Figure 2.
            --access-logfile logs/gunicorn_access.log \
            --error-logfile logs/gunicorn_error.log
   </pre>
+</div>
 </P>
 
 <P>&nbsp;</P>
@@ -285,15 +293,18 @@ Figure 3. State diagram for the web interface.
 Docker containers make software dependencies explicit.
 <P>
 The <a href="{{ 'from_scratch_tutorial/docker_and_make/Dockerfile' }}">Dockerfile</a> contains
+<div align="center">
 <!-- include reads from templates -->
 <pre>
   {% include 'from_scratch_tutorial/docker_and_make/Dockerfile.html' %}
 </pre>
+</div>
 Similarly, to improve reproducibility of Docker commands, use a <a href="{{ 'from_scratch_tutorial/docker_and_make/Makefile' }}">Makefile</a> containing
+<div align="center">
 <pre>
   {% include 'from_scratch_tutorial/docker_and_make/Makefile.html' %}
 </pre>
-
+</div>
 <P>See <a href="https://github.com/allofphysicsgraph/pdg_essential_demo_docker">https://github.com/allofphysicsgraph/pdg_essential_demo_docker</a>
 
 <H3><a name="Python and Flask">Initial infrastructure: Python and Flask</a></H3>
@@ -302,20 +313,25 @@ Similarly, to improve reproducibility of Docker commands, use a <a href="{{ 'fro
 
 <P>
 <a href="{{ 'from_scratch_tutorial/python_and_flask/Dockerfile' }}">Dockerfile</a>
+<div align="center">
 <pre>
   {% include 'from_scratch_tutorial/python_and_flask/Dockerfile.html' %}
 </pre>
+</div>
 
-<a href="{{ 'from_scratch_tutorial/python_and_flask/controller.py' }}">controller.py</a>
+<P><a href="{{ 'from_scratch_tutorial/python_and_flask/controller.py' }}">controller.py</a>
+  <div align="center">
 <pre>
   {% include 'from_scratch_tutorial/python_and_flask/controller.py.html' %}
 </pre>
+</div>
 
-<a href="{{ 'from_scratch_tutorial/python_and_flask/requirements.txt' }}">requirements.txt</a>
+<P><a href="{{ 'from_scratch_tutorial/python_and_flask/requirements.txt' }}">requirements.txt</a>
+  <div align="center">
 <pre>
   {% include 'from_scratch_tutorial/python_and_flask/requirements.txt' %}
 </pre>
-
+</div>
 
 
 {% endblock %}

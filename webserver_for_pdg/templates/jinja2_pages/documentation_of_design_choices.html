@@ -1,6 +1,8 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
 <h1>Design Choices Documentation for the Physics Derivation Graph</h1>
 
 <P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
@@ -125,7 +127,7 @@ cat developer_documentation.html |\
 
 <H2><a name="supported math features">Supported Mathematical features</a></H2>
 
-Many but not all symbols are supported. Here are some categories of supported symbols. (Symbols exist on the left side or right side of an expression and can also appear in a feed.)
+<P>Many but not all symbols are supported. Here are some categories of supported symbols. (Symbols exist on the left side or right side of an expression and can also appear in a feed.)
 <UL>
 <LI>Scalars (Rank 0): Single values. Includes constants (e.g., pi, e, 42) and variables (e.g., x, y, c)
 <LI>Vectors (Rank 1): Ordered lists of scalars (1xn or nx1)
@@ -134,7 +136,7 @@ Many but not all symbols are supported. Here are some categories of supported sy
 <LI>Sets: real, integer, complex
 </UL>
 
-Operators. These act on symbols (listed above) and are part of either the left side or right side of an expression. Operators can also appear in feeds.
+<P>Operators. These act on symbols (listed above) and are part of either the left side or right side of an expression. Operators can also appear in feeds.
 <UL>
 <LI>arithmetic: +, -, multiply, divide, mod
 <LI>Unary Operators: factorial, negation, square root, bar (mean)
@@ -145,7 +147,7 @@ Operators. These act on symbols (listed above) and are part of either the left s
 <LI>Set operations, e.g., "is member of"
 </UL>
 
-Relations. These evaluate to True for an expression. Relations do not appear in a feed.
+<P>Relations. These evaluate to True for an expression. Relations do not appear in a feed.
 <UL>
 <LI>Equality/Equivalence: =
 <LI>Ordering (Inequalities): greater than, less than, greater than or equal to, less than or equal to
@@ -171,7 +173,7 @@ Relations. These evaluate to True for an expression. Relations do not appear in 
   <LI>Set operations, e.g., union, intersection
   <LI>Logic operations, e.g., "for all", "implies", AND, OR, XOR
 </UL>
-These aspects could be included if the data structure and workflow were adapted
+<P>These aspects could be included if the data structure and workflow were adapted
 to an expanded scope.
 
 <!--
