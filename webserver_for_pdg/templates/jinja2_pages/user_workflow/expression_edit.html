@@ -40,7 +40,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     <th>scope</th>
     <th>domain</th>
   </tr>
-  {% for symbol_id, symbol_dict in dict_of_symbol_dicts_in_expression.items() %}
+  {% for symbol_id, symbol_dict in dict_of_nonoperation_symbol_dicts_in_expression.items() %}
   <tr>
     <td>
       <a href="{{ url_for('to_edit_node', node_id=symbol_id ) }}">
@@ -73,8 +73,8 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     {{ form_no_options.csrf_token }}
     <P><!--symbol count: { { list_of_symbol_IDs|length } }-->
     <select name="symbol_select_id_to_add" class="selectpicker form-control" id="symbol_select">
-      {% for symbol_id in dict_of_symbol_dicts_not_in_expression.keys() %}
-      <option value="{{ symbol_id }}">{{ symbol_id }}, {{ dict_of_symbol_dicts_not_in_expression[symbol_id]['latex'] }} </option>
+      {% for symbol_id in dict_of_nonoperation_symbol_dicts_not_in_expression.keys() %}
+      <option value="{{ symbol_id }}">{{ symbol_id }}, {{ dict_of_nonoperation_symbol_dicts_not_in_expression[symbol_id]['latex'] }} </option>
       {% endfor %}
     </select>
     <input type="submit" value="add symbol to expression">
@@ -91,8 +91,8 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     {{ form_no_options.csrf_token }}
     <P><!--symbol count: { { list_of_symbol_IDs|length } }-->
     <select name="symbol_select_id_to_disconnect" class="selectpicker form-control" id="symbol_select">
-      {% for symbol_id in dict_of_symbol_dicts_in_expression.keys() %}
-      <option value="{{ symbol_id }}">{{ symbol_id }}, {{ dict_of_symbol_dicts_in_expression[symbol_id]['latex'] }} </option>
+      {% for symbol_id in dict_of_nonoperation_symbol_dicts_in_expression.keys() %}
+      <option value="{{ symbol_id }}">{{ symbol_id }}, {{ dict_of_nonoperation_symbol_dicts_in_expression[symbol_id]['latex'] }} </option>
       {% endfor %}
     </select>
     <input type="submit" value="remove symbol from expression">
