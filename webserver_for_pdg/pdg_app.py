@@ -2149,6 +2149,17 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         + str(dict_of_operation_dicts_not_in_expression)
     )
 
+    dict_of_relation_dicts_not_in_expression, query_time_dict = (
+        compute.get_dict_of_relation_dicts_not_in_expression(
+            expression_id, graphDB_Driver, query_time_dict
+        )
+    )
+
+    logger.info(
+        "pdg_app/to_edit_expression: dict_of_relation_dicts_not_in_expression"
+        + str(dict_of_relation_dicts_not_in_expression)
+    )
+
     # when the expression is edited, the altered content is equivalent to
     # deleting the old expression and creating a new expression
     # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
@@ -3060,6 +3071,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
         )
 
     web_form = SpecifyNewSymbolOperationForm(request.form)
+    web_form_no_options = NoOptionsForm(request.form)
     logger.info("pdg_app/to_edit_operation: request.method =" + str(request.method))
     logger.info("pdg_app/to_edit_operation: request.form = " + str(request.form))
     if request.method == "POST" and web_form.validate():
@@ -3108,6 +3120,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
         "jinja2_pages/user_workflow/symbol_operation_edit.html",
         query_time_dict=query_time_dict,
         form=web_form,
+        form_no_options=web_form_no_options,
         operation_dict=operation_dict,
     )
 
