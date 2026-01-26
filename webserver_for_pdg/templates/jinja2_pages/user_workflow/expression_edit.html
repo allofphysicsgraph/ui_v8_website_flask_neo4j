@@ -117,7 +117,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
      { % endfor % }
    -->
 
-<!--
+
 <table border="1" id="operation_table" class="sortable">
   <tr>
     <th>ID</th>
@@ -126,17 +126,16 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     <th>number of arguments</th>
     <th>description</th>
   </tr>
-  { % for symbol_id, symbol_dict in dict_of_operation_dicts_in_expression.items() % }
+  {% for symbol_id, symbol_dict in dict_of_operation_dicts_in_expression.items() %}
   <tr>
-    <td><a href="{ { url_for('to_edit_scalar_symbol', symbol_id=symbol_id) }}">{ { symbol_id }}</a></td> <!-- ID -- >
-    <td>{ { symbol_dict['latex'] }}</td> <!-- latex -- >
-    <td>{ { symbol_dict['name_latex'] }}</td> <!-- name -- >
-    <td>{ { symbol_dict['number_of_arguments'] }}</td>
-    <td>{ { symbol_dict['description_latex'] }}</td>
+    <td><a href="{{ url_for('to_edit_operation', operation_id=symbol_id) }}">{{ symbol_id }}</a></td> <!-- ID -->
+    <td>{{ symbol_dict['latex'] }}</td> <!-- latex -->
+    <td>{{ symbol_dict['name_latex'] }}</td> <!-- name -->
+    <td>{{ symbol_dict['number_of_arguments'] }}</td>
+    <td>{{ symbol_dict['description_latex'] }}</td>
   </tr>
-  { % endfor % }
+  {% endfor %}
 </table>
--->
 
 <fieldset>
   <legend>
@@ -173,6 +172,19 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 </fieldset>
 </fieldset>
 
+<fieldset>
+  <legend>
+    <H1>Relation in Expression \({{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}\)</h1>
+  </legend>
+<fieldset>
+  <legend>
+    <H3>Change Relation used in Expression</h3>
+  </legend>
+
+TODO: list of all other relations available
+
+</fieldset>
+</fieldset>
 
   <fieldset>
     <legend>
@@ -205,8 +217,6 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
                                'output_input_latex_lhs')">
               <br clear="all">
         <div id="output_input_latex_lhs"></div>
-
-=
 
     <P>{{ form_new_expression.expression_latex_rhs.label}} (<B>required</B>): 
        {{ form_new_expression.expression_latex_rhs(size=50, 
@@ -254,7 +264,8 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
       <H1>Delete Expression</h1>
     </legend>
 
-    <P>TODO: this should only be enabled if the expression is not used by any derivations
+    <P>TODO: this should only be enabled if the expression is not used by any derivations. 
+      Not clear what the consequence is of deleting an expression that is used by derivation(s)
 
     <P color="red">WARNING: THERE IS NO UNDO</P>
     <form method="post" action="" onsubmit="return checkForm(this);">
