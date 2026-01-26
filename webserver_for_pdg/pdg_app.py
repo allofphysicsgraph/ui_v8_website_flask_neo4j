@@ -20,8 +20,6 @@ more than one derivation in the same Latex document.
 For this version, the specific-to-Latex "local ID" (for expression labels)
 can be contructed using md5hash(<derivation_id>_<expression_id>).
 
-
-
 ****************************
 
 # convention: every call to flash must be either a string or the content must be wrapped in str()
@@ -1110,7 +1108,7 @@ def to_index():
 
     query_time_dict = {}  # type: query_timing_result_type
     T_and_f_derivation_ID = "884319"
-    all_steps, query_time_dict = compute.all_steps_in_derivation(
+    all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
         graphDB_Driver, T_and_f_derivation_ID, query_time_dict
     )
     try:
@@ -1552,7 +1550,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
         )
     logger.info("derivation_dict:" + str(derivation_dict))
 
-    all_steps, query_time_dict = compute.all_steps_in_derivation(
+    all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
         graphDB_Driver, derivation_id, query_time_dict
     )
 
@@ -1862,7 +1860,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
     #    with graphDB_Driver.session() as session:
     #        neo4j_query.step_has_expressions
 
-    all_steps, query_time_dict = compute.all_steps_in_derivation(
+    all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
         graphDB_Driver, derivation_id, query_time_dict
     )
 
@@ -2107,15 +2105,13 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
     # # editing the expression includes modifying the symbols present.
 
-    # dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
-    #     graphDB_Driver, query_time_dict
-    # )
+    dict_of_symbol_dicts_in_expression=compute.get_dict_of_symbol_dicts_in_expression(expression_id,graphDB_Driver, query_time_dict)
+    dict_of_symbol_dicts_not_in_expression=compute.get_dict_of_symbol_dicts_not_in_expression(expression_id,graphDB_Driver, query_time_dict)
+    dict_of_operation_dicts_in_expression=compute.get_dict_of_operation_dicts_in_expression(expression_id,graphDB_Driver, query_time_dict)
+    dict_of_operation_dicts_not_in_expression=compute.get_dict_of_operation_dicts_not_in_expression(expression_id,graphDB_Driver, query_time_dict)
+    
 
-    # list_of_symbol_IDs_in_expression, query_time_dict = (
-    #     compute.get_list_of_symbol_IDs_in_expression_or_feed(
-    #         graphDB_Driver, query_time_dict, "expression", expression_id
-    #     )
-    # )
+
 
     # logger.info("pdg_app/to_edit_expression: expression_id=" + str(expression_id))
     # logger.info(
@@ -2175,7 +2171,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
     # when the expression is edited, the altered content is equivalent to
     # deleting the old expression and creating a new expression
-    list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
+    #list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
     web_form_new_expression = SpecifyNewExpressionForm(request.form)
     if request.method == "POST" and web_form_new_expression.validate():
         logger.info(
@@ -2337,15 +2333,13 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     return render_template(
         "jinja2_pages/user_workflow/expression_edit.html",
         query_time_dict=query_time_dict,
+        expression_dict=expression_dict,
         form_no_options=web_form_no_options,
         form_new_expression=web_form_new_expression,
         dict_of_symbol_dicts_in_expression={},  # dict_of_symbol_dicts_in_expression,
         dict_of_symbol_dicts_not_in_expression={},  # dict_of_symbol_dicts_not_in_expression,
         dict_of_operation_dicts_in_expression={},
         dict_of_operation_dicts_not_in_expression={},  # dict_of_operation_dicts_not_in_expression,
-        expression_dict=expression_dict,
-        # sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
-        dict_of_all_symbol_dicts={},  # dict_of_all_symbol_dicts,
     )
     # return redirect(url_for("to_list_expressions"))
 
