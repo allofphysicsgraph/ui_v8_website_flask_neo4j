@@ -182,11 +182,11 @@ log_size = 10000000
 # )
 # handler_debug.setLevel(logging.DEBUG)
 handler_info = RotatingFileHandler(
-    "static/flask_critical_and_error_and_warning_and_info.log",
+    "logs/flask_critical_and_error_and_warning_and_info.log",
     maxBytes=log_size,
     backupCount=2,
 )
-handler_info.setLevel(logging.INFO)
+handler_info.setLevel(logging.DEBUG)
 # handler_warning = RotatingFileHandler(
 #     "flask_critical_and_error_and_warning.log",
 #     maxBytes=log_size,
@@ -204,7 +204,7 @@ logging.basicConfig(
     # if the severity level is INFO,
     # the logger will handle only INFO, WARNING, ERROR, and CRITICAL messages
     # and will ignore DEBUG messages
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="%(asctime)s|%(filename)-13s|%(levelname)-5s|%(lineno)-4d|%(funcName)-20s|%(message)s",  # ,
     # https://stackoverflow.com/questions/6290739/python-logging-use-milliseconds-in-time-format/7517430#7517430
     # datefmt="%m/%d/%Y %I:%M:%S %f %p", # https://strftime.org/
@@ -425,6 +425,8 @@ def callback():
     # Send user back to homepage
     logger.info("[TRACE] pdg_login/callback end " + str(trace_id) + "]")
     return redirect(url_for("to_navigation", referrer="login"))
+    # TODO: rather than return the user to navigation, put them back on the original page they came from
+    # This seems tricky; https://www.reddit.com/r/flask/comments/67lu0m/flasklogin_why_do_you_have_to_validate_a_next_url/
 
 
 @web_app.route("/logout", methods=["GET", "POST"])
@@ -2103,8 +2105,10 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     #  'latex_rhs': 'b', 'author_name_latex': 'ben', 'description_latex': '',
     #  'id': '9295979', 'latex_lhs': 'a', 'latex_relation': '='}
 
-    dict_of_symbol_dicts_in_expression = compute.get_dict_of_symbol_dicts_in_expression(
-        expression_id, graphDB_Driver, query_time_dict
+    dict_of_symbol_dicts_in_expression, query_time_dict = (
+        compute.get_dict_of_symbol_dicts_in_expression(
+            expression_id, graphDB_Driver, query_time_dict
+        )
     )
 
     logger.info(
@@ -2112,7 +2116,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         + str(dict_of_symbol_dicts_in_expression)
     )
 
-    dict_of_symbol_dicts_not_in_expression = (
+    dict_of_symbol_dicts_not_in_expression, query_time_dict = (
         compute.get_dict_of_symbol_dicts_not_in_expression(
             expression_id, graphDB_Driver, query_time_dict
         )
@@ -2123,7 +2127,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         + str(dict_of_symbol_dicts_not_in_expression)
     )
 
-    dict_of_operation_dicts_in_expression = (
+    dict_of_operation_dicts_in_expression, query_time_dict = (
         compute.get_dict_of_operation_dicts_in_expression(
             expression_id, graphDB_Driver, query_time_dict
         )
@@ -2134,7 +2138,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         + str(dict_of_operation_dicts_in_expression)
     )
 
-    dict_of_operation_dicts_not_in_expression = (
+    dict_of_operation_dicts_not_in_expression, query_time_dict = (
         compute.get_dict_of_operation_dicts_not_in_expression(
             expression_id, graphDB_Driver, query_time_dict
         )
