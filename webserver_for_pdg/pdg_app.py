@@ -1222,9 +1222,9 @@ def to_navigation():
                 str_to_print = session.write_transaction(
                     neo4j_query.delete_all_nodes_and_relationships
                 )
-                query_time_dict["main: delete_all_nodes_and_relationships"] = round(
-                    time.time() - query_start_time, 3
-                )
+                query_time_dict[
+                    "pdg_app/main: delete_all_nodes_and_relationships" + trace_id
+                ] = round(time.time() - query_start_time, 3)
             # upload Cypher content inside the neo4j docker image
             # automation TODO: how to automate this?
             logger.info(
@@ -1242,8 +1242,8 @@ def to_navigation():
                 neo4j_query.get_list_node_dicts_of_type, "derivation"
             )
         )
-        query_time_dict["main: list_nodes_of_type, derivation"] = round(
-            time.time() - query_start_time, 3
+        query_time_dict["pdg_app/main: list_nodes_of_type, derivation" + trace_id] = (
+            round(time.time() - query_start_time, 3)
         )
 
     number_of_inference_rules = (
@@ -1256,9 +1256,9 @@ def to_navigation():
                 neo4j_query.get_list_node_dicts_of_type, "inference_rule"
             )
         )
-        query_time_dict["main: list_nodes_of_type, inference_rule"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/main: list_nodes_of_type, inference_rule" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     number_of_expressions = -1  # initialize to an intentionally a non-sensical number
     with graphDB_Driver.session() as session:
@@ -1268,8 +1268,8 @@ def to_navigation():
                 neo4j_query.get_list_node_dicts_of_type, "expression"
             )
         )
-        query_time_dict["main: list_nodes_of_type, expression"] = round(
-            time.time() - query_start_time, 3
+        query_time_dict["pdg_app/main: list_nodes_of_type, expression" + trace_id] = (
+            round(time.time() - query_start_time, 3)
         )
 
     number_of_scalars = -1  # initialize to an intentionally a non-sensical number
@@ -1278,7 +1278,7 @@ def to_navigation():
         number_of_scalars = len(
             session.read_transaction(neo4j_query.get_list_node_dicts_of_type, "scalar")
         )
-        query_time_dict["main: list_nodes_of_type, scalar"] = round(
+        query_time_dict["pdg_app/main: list_nodes_of_type, scalar" + trace_id] = round(
             time.time() - query_start_time, 3
         )
 
@@ -1288,9 +1288,9 @@ def to_navigation():
         number_of_vectors = len(
             session.read_transaction(neo4j_query.get_list_node_dicts_of_type, "vector")
         )
-        query_time_dict["main: get_list_node_dicts_of_type, vector"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/main: get_list_node_dicts_of_type, vector" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     number_of_matrices = -1  # initialize to an intentionally a non-sensical number
     with graphDB_Driver.session() as session:
@@ -1298,9 +1298,9 @@ def to_navigation():
         number_of_matrices = len(
             session.read_transaction(neo4j_query.get_list_node_dicts_of_type, "matrix")
         )
-        query_time_dict["main: get_list_node_dicts_of_type, matrix"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/main: get_list_node_dicts_of_type, matrix" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     number_of_operations = -1  # initialize to an intentionally a non-sensical number
     with graphDB_Driver.session() as session:
@@ -1310,9 +1310,9 @@ def to_navigation():
                 neo4j_query.get_list_node_dicts_of_type, "operation"
             )
         )
-        query_time_dict["main: get_list_node_dicts_of_type, operation"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/main: get_list_node_dicts_of_type, operation" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     number_of_relations = -1  # initialize to an intentionally a non-sensical number
     with graphDB_Driver.session() as session:
@@ -1322,9 +1322,9 @@ def to_navigation():
                 neo4j_query.get_list_node_dicts_of_type, "relation"
             )
         )
-        query_time_dict["main: get_list_node_dicts_of_type, relation"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/main: get_list_node_dicts_of_type, relation" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     number_of_feeds = -1  # initialize to an intentionally a non-sensical number
     with graphDB_Driver.session() as session:
@@ -1332,9 +1332,9 @@ def to_navigation():
         number_of_feeds = len(
             session.read_transaction(neo4j_query.get_list_node_dicts_of_type, "feed")
         )
-        query_time_dict["main: get_list_node_dicts_of_type, feed"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/main: get_list_node_dicts_of_type, feed" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     logger.info(
         "[TRACE] pdg_app/to_navigation end " + str(trace_id) + " " + str(time.time())
@@ -1387,6 +1387,7 @@ def to_add_derivation() -> werkzeug.Response:
         )
         query_time_dict[
             "pdg_app/to_add_derivation: get_list_node_dicts_of_type derivation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     number_of_steps_per_derivation = {}
     for derivation_dict in list_of_derivation_dicts:
@@ -1400,6 +1401,7 @@ def to_add_derivation() -> werkzeug.Response:
             )
             query_time_dict[
                 "pdg_app/to_add_derivation: get_list_of_step_dicts_in_this_derivation"
+                + trace_id
             ] = round(time.time() - query_start_time, 3)
         number_of_steps_per_derivation[derivation_dict["id"]] = len(list_of_steps)
 
@@ -1488,8 +1490,8 @@ def to_add_derivation() -> werkzeug.Response:
                 derivation_reference_latex,
                 author_name_latex,
             )
-            query_time_dict["pdg_app/to_add_derivation: add_derivation"] = round(
-                time.time() - query_start_time, 3
+            query_time_dict["pdg_app/to_add_derivation: add_derivation" + trace_id] = (
+                round(time.time() - query_start_time, 3)
             )
         logger.info(
             "[TRACE] pdg_app/to_add_derivation end "
@@ -1547,9 +1549,9 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
-        query_time_dict["to_review_derivation: node_properties, derivation"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_review_derivation: node_properties, derivation" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info("derivation_dict:" + str(derivation_dict))
 
     all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
@@ -1566,6 +1568,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
         )
         query_time_dict[
             "pdg_app/to_review_derivation: get_list_of_step_dicts_in_this_derivation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     with graphDB_Driver.session() as session:
@@ -1575,6 +1578,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
         )
         query_time_dict[
             "pdg_app/to_review_derivation: get_list_of_sequence_values_for_derivation_id"
+            + trace_id
             + derivation_id
         ] = round(time.time() - query_start_time, 3)
     logger.info(
@@ -1589,6 +1593,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
         )
         query_time_dict[
             "pdg_app/to_review_derivation: get_list_node_dicts_of_type inference_rule"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     web_form_delete = NoOptionsForm(request.form)
@@ -1690,7 +1695,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                         neo4j_query.delete_node, this_step_dict["id"], "step"
                     )
                     query_time_dict[
-                        "pdg_app/to_review_derivation: delete_node step"
+                        "pdg_app/to_review_derivation: delete_node step" + trace_id
                     ] = round(time.time() - query_start_time, 3)
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
@@ -1698,7 +1703,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                     neo4j_query.delete_node, derivation_id, "derivation"
                 )
                 query_time_dict[
-                    "pdg_app/to_review_derivation: delete_node derivation"
+                    "pdg_app/to_review_derivation: delete_node derivation" + trace_id
                 ] = round(time.time() - query_start_time, 3)
             logger.info(
                 "[TRACE] pdg_app/to_review_derivation end "
@@ -1838,9 +1843,9 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
-        query_time_dict["to_select_step: node_properties, derivation"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_select_step: node_properties, derivation" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info("derivation_dict:" + str(derivation_dict))
 
     list_of_step_dicts = []
@@ -1849,9 +1854,10 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
         list_of_step_dicts = session.read_transaction(
             neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
         )
-        query_time_dict["to_select_step: get_list_of_step_dicts_in_this_derivation"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/to_select_step: get_list_of_step_dicts_in_this_derivation"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
     # logger.info("list_of_step_dicts=" + str(list_of_step_dicts))
 
     # inference_rule_per_step = {}
@@ -1929,9 +1935,10 @@ def to_edit_derivation_metadata(
                 abstract_latex,
                 author_name_latex,
             )
-            query_time_dict["to_edit_derivation_metadata: edit_derivation_metadata"] = (
-                round(time.time() - query_start_time, 3)
-            )
+            query_time_dict[
+                "pdg_app/to_edit_derivation_metadata: edit_derivation_metadata"
+                + trace_id
+            ] = round(time.time() - query_start_time, 3)
         logger.info(
             "[TRACE] pdg_app/to_edit_derivation_metadata end "
             + str(trace_id)
@@ -1947,9 +1954,9 @@ def to_edit_derivation_metadata(
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
-        query_time_dict["to_edit_derivation_metadata: node_properties"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_edit_derivation_metadata: node_properties" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info(
         "pdg_app/to_edit_derivation_metadata: derivation_dict:" + str(derivation_dict)
     )
@@ -2018,6 +2025,7 @@ def to_add_step_select_inference_rule(
         )
         query_time_dict[
             "pdg_app/to_add_step_select_inference_rule: get_list_node_dicts_of_type inference_rule"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info(
         "pdg_app/to_add_step_select_inference_rule: list_of_inference_rule_dicts="
@@ -2044,6 +2052,7 @@ def to_add_step_select_inference_rule(
         )
         query_time_dict[
             "pdg_app/to_add_step_select_inference_rule: get_node_properties derivation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info(
         "pdg_app/to_add_step_select_inference_rule: derivation_dict:"
@@ -2098,7 +2107,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             neo4j_query.get_node_properties, "expression", expression_id
         )
         query_time_dict[
-            "pdg_app/to_edit_expression: get_node_properties expression"
+            "pdg_app/to_edit_expression: get_node_properties expression" + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info("pdg_app/to_edit_expression: expression_dict:" + str(expression_dict))
     # {'name_latex': '', 'reference_latex': '', 'latex_condition': '',
@@ -2228,9 +2237,9 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
                 expression_reference_latex,
                 author_name_latex,
             )
-            query_time_dict["pdg_app/to_edit_expression: edit_expression"] = round(
-                time.time() - query_start_time, 3
-            )
+            query_time_dict[
+                "pdg_app/to_edit_expression: edit_expression" + trace_id
+            ] = round(time.time() - query_start_time, 3)
 
     web_form_no_options = NoOptionsForm(request.form)
     # web_form_no_options = DeleteButtonForm(request.form)
@@ -2356,8 +2365,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         feed_dict = session.read_transaction(
             neo4j_query.get_node_properties, "feed", feed_id
         )
-        query_time_dict["pdg_app/to_edit_feed: get_node_properties feed"] = round(
-            time.time() - query_start_time, 3
+        query_time_dict["pdg_app/to_edit_feed: get_node_properties feed" + trace_id] = (
+            round(time.time() - query_start_time, 3)
         )
     logger.info("pdg_app/to_edit_feed: feed_dict:" + str(feed_dict))
 
@@ -2382,7 +2391,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         list_of_feed_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "feed"
         )
-        query_time_dict["to_edit_feed: list_nodes_of_type"] = round(
+        query_time_dict["pdg_app/to_edit_feed: list_nodes_of_type" + trace_id] = round(
             time.time() - query_start_time, 3
         )
 
@@ -2460,7 +2469,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                     neo4j_query.edit_node_property, "feed", feed_id, "latex", feed_latex
                 )
                 query_time_dict[
-                    "pdg_app/to_edit_feed: edit_node_property feed latex"
+                    "pdg_app/to_edit_feed: edit_node_property feed latex" + trace_id
                 ] = round(time.time() - query_start_time, 3)
         if feed_dict["sympy"] != feed_sympy:
             # https://neo4j.com/docs/python-manual/current/session-api/
@@ -2470,7 +2479,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                     neo4j_query.edit_node_property, "feed", feed_id, "sympy", feed_sympy
                 )
                 query_time_dict[
-                    "pdg_app/to_edit_feed: edit_node_property feed sympy"
+                    "pdg_app/to_edit_feed: edit_node_property feed sympy" + trace_id
                 ] = round(time.time() - query_start_time, 3)
         if feed_dict["lean"] != feed_lean:
             # https://neo4j.com/docs/python-manual/current/session-api/
@@ -2480,7 +2489,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                     neo4j_query.edit_node_property, "feed", feed_id, "lean", feed_lean
                 )
                 query_time_dict[
-                    "pdg_app/to_edit_feed: edit_node_property feed lean"
+                    "pdg_app/to_edit_feed: edit_node_property feed lean" + trace_id
                 ] = round(time.time() - query_start_time, 3)
         logger.info(
             "[TRACE] pdg_app/to_edit_feed end " + str(trace_id) + " " + str(time.time())
@@ -2511,7 +2520,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                     feed_id,
                     "feed",
                 )
-                query_time_dict["to_edit_feed: delete_node"] = round(
+                query_time_dict["pdg_app/to_edit_feed: delete_node" + trace_id] = round(
                     time.time() - query_start_time, 3
                 )
 
@@ -2536,9 +2545,9 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                     feed_id,
                     "scalar",
                 )
-                query_time_dict["to_edit_feed: disconnect_symbol_from_feed"] = round(
-                    time.time() - query_start_time, 3
-                )
+                query_time_dict[
+                    "pdg_app/to_edit_feed: disconnect_symbol_from_feed" + trace_id
+                ] = round(time.time() - query_start_time, 3)
 
         if "symbol_select_id_to_add" in request.form.keys():
             symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
@@ -2557,9 +2566,9 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                     feed_id,
                     "scalar",
                 )
-                query_time_dict["to_edit_feed: add_symbol_to_feed"] = round(
-                    time.time() - query_start_time, 3
-                )
+                query_time_dict[
+                    "pdg_app/to_edit_feed: add_symbol_to_feed" + trace_id
+                ] = round(time.time() - query_start_time, 3)
         logger.info(
             "[TRACE] pdg_app/to_edit_feed end " + str(trace_id) + " " + str(time.time())
         )
@@ -2603,8 +2612,8 @@ def to_add_expression() -> werkzeug.Response:
         list_of_expression_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "expression"
         )
-        query_time_dict["to_add_expression: list_nodes_of_type"] = round(
-            time.time() - query_start_time, 3
+        query_time_dict["pdg_app/to_add_expression: list_nodes_of_type" + trace_id] = (
+            round(time.time() - query_start_time, 3)
         )
 
     symbol_IDs_per_expression_id = (
@@ -2634,7 +2643,7 @@ def to_add_expression() -> werkzeug.Response:
                 this_expression_dict["id"],
                 "scalar",
             )
-            query_time_dict["symbols_in_expression: "] = round(
+            query_time_dict["pdg_app/symbols_in_expression: " + trace_id] = round(
                 time.time() - query_start_time, 3
             )
 
@@ -2684,7 +2693,7 @@ def to_add_expression() -> werkzeug.Response:
             neo4j_query.get_list_node_dicts_of_type, "relation"
         )
         query_time_dict[
-            "pdg_app/to_add_expression get_list_node_dicts_of_type relation"
+            "pdg_app/to_add_expression get_list_node_dicts_of_type relation" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     # logger.info("list_of_relation_dicts=",list_of_relation_dicts)
@@ -2766,8 +2775,8 @@ def to_add_expression() -> werkzeug.Response:
                 now_str,
                 author_name_latex,
             )
-            query_time_dict["pdg_app/to_add_expression: add_expression"] = round(
-                time.time() - query_start_time, 3
+            query_time_dict["pdg_app/to_add_expression: add_expression" + trace_id] = (
+                round(time.time() - query_start_time, 3)
             )
 
         # after user provides latex for expression have them provide symbol count
@@ -2821,7 +2830,7 @@ def to_add_feed() -> werkzeug.Response:
         list_of_feed_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "feed"
         )
-        query_time_dict["to_add_feed: list_nodes_of_type"] = round(
+        query_time_dict["pdg_app/to_add_feed: list_nodes_of_type" + trace_id] = round(
             time.time() - query_start_time, 3
         )
 
@@ -2890,9 +2899,9 @@ def to_add_feed() -> werkzeug.Response:
                 now_str,
                 author_name_latex,
             )
-            query_time_dict["to_add_feed: add_feed new multi-symbol"] = round(
-                time.time() - query_start_time, 3
-            )
+            query_time_dict[
+                "pdg_app/to_add_feed: add_feed new multi-symbol" + trace_id
+            ] = round(time.time() - query_start_time, 3)
 
         # after user provides latex for feed have them provide symbol count
         logger.info("[TRACE] pdg_app/ end " + str(trace_id) + " " + str(time.time()))
@@ -2931,9 +2940,9 @@ def to_add_feed() -> werkzeug.Response:
                         now_str=now_str,
                         author_name_latex=author_name_latex,
                     )
-                    query_time_dict["to_add_feed: add_feed promoted symbol"] = round(
-                        time.time() - query_start_time, 3
-                    )
+                    query_time_dict[
+                        "pdg_app/to_add_feed: add_feed promoted symbol" + trace_id
+                    ] = round(time.time() - query_start_time, 3)
 
     logger.info(
         "[TRACE] pdg_app/to_add_feed end " + str(trace_id) + " " + str(time.time())
@@ -2986,9 +2995,9 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
             derivation_id = session.read_transaction(
                 neo4j_query.get_derivation_id_from_step_id, node_id
             )
-            query_time_dict["pdg_app/to_edit_node: get_derivation_id_from_step_id"] = (
-                round(time.time() - query_start_time, 3)
-            )
+            query_time_dict[
+                "pdg_app/to_edit_node: get_derivation_id_from_step_id" + trace_id
+            ] = round(time.time() - query_start_time, 3)
 
         logger.info(
             "[TRACE] pdg_app/to_edit_node end " + str(trace_id) + " " + str(time.time())
@@ -3224,8 +3233,8 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
         scalar_dict = session.read_transaction(
             neo4j_query.get_node_properties, "scalar", scalar_id
         )
-        query_time_dict["to_edit_scalar_symbol: node_properties"] = round(
-            time.time() - query_start_time, 3
+        query_time_dict["pdg_app/to_edit_scalar_symbol: node_properties" + trace_id] = (
+            round(time.time() - query_start_time, 3)
         )
     logger.info("pdg_app/to_edit_scalar scalar_dict:" + str(scalar_dict))
 
@@ -3277,7 +3286,8 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
                     5,  # new value
                 )
                 query_time_dict[
-                    "to_add_symbol_required_argument_count: edit_node_property, argument_count"
+                    "pdg_app/to_add_symbol_required_argument_count: edit_node_property, argument_count"
+                    + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
         # # https://neo4j.com/docs/python-manual/current/session-api/
@@ -3414,9 +3424,9 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
         list_of_scalar_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "scalar"
         )
-        query_time_dict["to_add_value_and_units: list_nodes_of_type scalar"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_add_value_and_units: list_nodes_of_type scalar" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     logger.info("pdg_app/to_add_value_and_units: request.form = " + str(request.form))
     web_form_constant_properties = SpecifyNewConstantNumberForm(request.form)
@@ -3492,9 +3502,9 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
         scalar_dict = session.read_transaction(
             neo4j_query.get_node_properties, "scalar", scalar_id
         )
-        query_time_dict["pdg_app/to_add_value_and_units get_node_properties"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_add_value_and_units get_node_properties" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     dict_of_expression_dicts_that_use_scalar = {}  # type: Dict[str,list]
     for this_scalar_dict in list_of_scalar_dicts:
@@ -3652,9 +3662,10 @@ def to_add_symbol_scalar() -> werkzeug.Response:
         list_of_scalar_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "scalar"
         )
-        query_time_dict["to_add_symbol_scalar: get_list_node_dicts_of_type scalar"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/to_add_symbol_scalar: get_list_node_dicts_of_type scalar"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     logger.info(
         "pdg_app/to_add_symbol_scalar: list_of_scalar_dicts ="
@@ -3730,9 +3741,10 @@ def to_add_symbol_vector() -> werkzeug.Response:
         list_of_vector_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "vector"
         )
-        query_time_dict["to_add_symbol_vector: get_list_node_dicts_of_type vector"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/to_add_symbol_vector: get_list_node_dicts_of_type vector"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     dict_of_expression_dicts_that_use_vector = {}  # type: Dict[str,list]
     for this_vector_dict in list_of_vector_dicts:
@@ -3850,9 +3862,9 @@ def to_add_symbol_matrix() -> werkzeug.Response:
         list_of_matrix_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "matrix"
         )
-        query_time_dict["to_add_symbol_matrix: list_nodes_of_type matrix"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_add_symbol_matrix: list_nodes_of_type matrix" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info(
         "pdg_app/to_add_symbol_matrix: list_of_matrix_dicts="
         + str(list_of_matrix_dicts)
@@ -5041,7 +5053,8 @@ def to_add_symbols_and_operations_for_expression(
             neo4j_query.get_node_properties, "expression", expression_id
         )
         query_time_dict[
-            "to_add_symbols_and_operations_for_expression, node_properties"
+            "pdg_app/to_add_symbols_and_operations_for_expression, node_properties"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info(
         "pdg_app/symbols_and_operations_for_expression: expression_dict="
@@ -5209,7 +5222,8 @@ def to_add_symbols_and_operations_for_expression(
                         symbol_category,
                     )
                     query_time_dict[
-                        "to_add_symbols_and_operations_for_expression: add_symbol_to_expression"
+                        "pdg_app/to_add_symbols_and_operations_for_expression: add_symbol_to_expression"
+                        + trace_id
                     ] = round(time.time() - query_start_time, 3)
 
                 symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
@@ -5274,9 +5288,9 @@ def to_add_sympy_and_lean_for_expression(
         expression_dict = session.read_transaction(
             neo4j_query.get_node_properties, "expression", expression_id
         )
-        query_time_dict["to_add_sympy_and_lean_for_expression, node_properties"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/to_add_sympy_and_lean_for_expression, node_properties" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info(
         "to_add_sympy_and_lean_for_expression: expression_dict=" + str(expression_dict)
     )
@@ -5383,7 +5397,8 @@ def to_add_sympy_and_lean_for_expression(
                     sympy_str_lhs,
                 )
                 query_time_dict[
-                    "to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
+                    "pdg_app/to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
+                    + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
             with graphDB_Driver.session() as session:
@@ -5396,7 +5411,8 @@ def to_add_sympy_and_lean_for_expression(
                     sympy_str_rhs,
                 )
                 query_time_dict[
-                    "to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
+                    "pdg_app/to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
+                    + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
             with graphDB_Driver.session() as session:
@@ -5409,7 +5425,8 @@ def to_add_sympy_and_lean_for_expression(
                     sympy_str_combined,
                 )
                 query_time_dict[
-                    "to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
+                    "pdg_app/to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
+                    + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
             with graphDB_Driver.session() as session:
@@ -5422,7 +5439,8 @@ def to_add_sympy_and_lean_for_expression(
                     lean_str,
                 )
                 query_time_dict[
-                    "to_add_sympy_and_lean_for_expression: edit_node_property, expression lean"
+                    "pdg_app/to_add_sympy_and_lean_for_expression: edit_node_property, expression lean"
+                    + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
         except neo4j.exceptions.CypherSyntaxError as err:
@@ -5489,9 +5507,9 @@ def to_add_symbols_and_operations_for_feed(
         feed_dict = session.read_transaction(
             neo4j_query.get_node_properties, "feed", feed_id
         )
-        query_time_dict["to_add_symbols_and_operations_for_feed, node_properties"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/to_add_symbols_and_operations_for_feed, node_properties" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info("pdg_app/symbols_and_operations_for_feed: feed_dict=" + str(feed_dict))
 
     list_of_symbol_dicts, query_time_dict = compute.get_list_of_all_symbol_dicts(
@@ -5615,7 +5633,8 @@ def to_add_symbols_and_operations_for_feed(
                         symbol_category,
                     )
                     query_time_dict[
-                        "to_add_symbols_and_operations_for_feed: add_symbol_to_expression"
+                        "pdg_app/to_add_symbols_and_operations_for_feed: add_symbol_to_expression"
+                        + trace_id
                     ] = round(time.time() - query_start_time, 3)
 
                 symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
@@ -5684,9 +5703,9 @@ def to_add_sympy_and_lean_for_feed(
         feed_dict = session.read_transaction(
             neo4j_query.get_node_properties, "feed", feed_id
         )
-        query_time_dict["to_add_sympy_and_lean_for_feed, node_properties"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_add_sympy_and_lean_for_feed, node_properties" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info("to_add_sympy_and_lean_for_feed: feed_dict=" + str(feed_dict))
 
     logger.info("to_add_sympy_and_lean_for_feed: symbol_id_dict=" + str(symbol_id_dict))
@@ -5752,7 +5771,8 @@ def to_add_sympy_and_lean_for_feed(
                     sympy_str,
                 )
                 query_time_dict[
-                    "to_add_sympy_and_lean_for_feed: edit_node_property, expression sympy"
+                    "pdg_app/to_add_sympy_and_lean_for_feed: edit_node_property, expression sympy"
+                    + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
             with graphDB_Driver.session() as session:
@@ -5765,7 +5785,8 @@ def to_add_sympy_and_lean_for_feed(
                     lean_str,
                 )
                 query_time_dict[
-                    "to_add_sympy_and_lean_for_feed: edit_node_property, expression lean"
+                    "pdg_app/to_add_sympy_and_lean_for_feed: edit_node_property, expression lean"
+                    + trace_id
                 ] = round(time.time() - query_start_time, 3)
         except neo4j.exceptions.CypherSyntaxError as err:
             logger.info("pdg_app/to_add_sympy_and_lean_for_feed ERROR:" + str(err))
@@ -6061,6 +6082,7 @@ def to_edit_inference_rule(
                 )
                 query_time_dict[
                     "pdg_app/to_edit_inference_rule: delete_node inference_rule"
+                    + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
             return redirect(url_for("to_list_inference_rules"))
@@ -6099,6 +6121,7 @@ def to_edit_inference_rule(
             )
             query_time_dict[
                 "pdg_app/to_edit_inference_rule: get_list_node_dicts_of_type inference_rule"
+                + trace_id
             ] = round(time.time() - query_start_time, 3)
 
         for inference_rule_dict in list_of_inference_rule_dicts:
@@ -6157,9 +6180,9 @@ def to_edit_inference_rule(
                 number_of_outputs=number_of_outputs,
                 author_name_latex=author_name_latex,
             )
-            query_time_dict["pdg_app/to_edit_inference_rule: add_inference_rule"] = (
-                round(time.time() - query_start_time, 3)
-            )
+            query_time_dict[
+                "pdg_app/to_edit_inference_rule: add_inference_rule" + trace_id
+            ] = round(time.time() - query_start_time, 3)
 
     list_of_derivation_dicts_that_use_this_inference_rule_id = []
     with graphDB_Driver.session() as session:
@@ -6181,9 +6204,9 @@ def to_edit_inference_rule(
         inference_rule_dict = session.read_transaction(
             neo4j_query.get_node_properties, "inference_rule", inference_rule_id
         )
-        query_time_dict["pdg_app/to_edit_inference_rule: get_node_properties"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_edit_inference_rule: get_node_properties" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     logger.info(
         "pdg_app/to_edit_inference_rule inference_rule_dict " + str(inference_rule_dict)
@@ -6256,7 +6279,7 @@ def to_query() -> werkzeug.Response:
                 list_of_records = session.read_transaction(
                     neo4j_query.user_query, query
                 )
-                query_time_dict["to_query: user_query"] = round(
+                query_time_dict["pdg_app/to_query: user_query" + trace_id] = round(
                     time.time() - query_start_time, 3
                 )
         except neo4j.exceptions.ClientError:
@@ -6394,9 +6417,9 @@ def to_query() -> werkzeug.Response:
         list_of_derivation_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "derivation"
         )
-        query_time_dict["to_query: list_nodes_of_type, derivation"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_query: list_nodes_of_type, derivation" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     # logger.info("list_of_derivation_dicts=", list_of_derivation_dicts)
     if len(list_of_derivation_dicts) > 0:
         derivation_id = list_of_derivation_dicts[0]["id"]
@@ -6410,9 +6433,9 @@ def to_query() -> werkzeug.Response:
         list_of_inference_rule_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "inference_rule"
         )
-        query_time_dict["to_query: list_nodes_of_type, inference_rule"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_query: list_nodes_of_type, inference_rule" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     # logger.info("list_of_inference_rule_dicts=", list_of_inference_rule_dicts)
     if len(list_of_inference_rule_dicts) > 0:
         inference_rule_id = list_of_inference_rule_dicts[0]["id"]
@@ -6426,8 +6449,8 @@ def to_query() -> werkzeug.Response:
         list_of_step_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "step"
         )
-        query_time_dict["to_query: list_nodes_of_type, step"] = round(
-            time.time() - query_start_time, 3
+        query_time_dict["pdg_app/to_query: list_nodes_of_type, step" + trace_id] = (
+            round(time.time() - query_start_time, 3)
         )
     # logger.info("list_of_step_dicts=", list_of_step_dicts)
     if len(list_of_step_dicts) > 0:
@@ -6467,9 +6490,9 @@ def to_list_feeds() -> werkzeug.Response:
         list_of_feed_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "feed"
         )
-        query_time_dict["to_list_feeds: list_nodes_of_type, feed"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_list_feeds: list_nodes_of_type, feed" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info("list_of_operation_dicts " + str(list_of_feed_dicts))
 
     dict_of_derivation_dicts_that_use_feed = {}  # type: Dict[str,list]
@@ -6480,7 +6503,8 @@ def to_list_feeds() -> werkzeug.Response:
                 neo4j_query.get_derivation_dicts_that_use_feed, this_feed_dict["id"]
             )
             query_time_dict[
-                "get_dict_of_derivation_dicts_that_use_feed: derivation_dicts_that_use_feed"
+                "pdg_app/get_dict_of_derivation_dicts_that_use_feed: derivation_dicts_that_use_feed"
+                + trace_id
             ] = round(time.time() - query_start_time, 3)
         dict_of_derivation_dicts_that_use_feed[this_feed_dict["id"]] = (
             list_of_derivation_dicts
@@ -6546,9 +6570,9 @@ def to_list_operations() -> werkzeug.Response:
         list_of_operation_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "operation"
         )
-        query_time_dict["to_list_operations: list_nodes_of_type, operation"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_list_operations: list_nodes_of_type, operation" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     dict_of_expression_dicts_that_use_operation = {}  # type: Dict[str,list]
     for this_operation_dict in list_of_operation_dicts:
@@ -6603,9 +6627,9 @@ def to_list_relations() -> werkzeug.Response:
         list_of_relation_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "relation"
         )
-        query_time_dict["to_list_relations: list_nodes_of_type, relation"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_list_relations: list_nodes_of_type, relation" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     dict_of_expression_dicts_that_use_relation = {}  # type: Dict[str,list]
     for this_relation_dict in list_of_relation_dicts:
@@ -6660,7 +6684,8 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
             neo4j_query.get_list_of_value_dicts_for_constant_id, scalar_id
         )
         query_time_dict[
-            "pdg_app/to_list_constant_values get_list_of_value_dicts_for_constant_id:"
+            "pdg_app/to_list_constant_values get_list_of_value_dicts_for_constant_id"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     with graphDB_Driver.session() as session:
@@ -6668,9 +6693,9 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
         scalar_dict = session.read_transaction(
             neo4j_query.get_node_properties, "scalar", scalar_id
         )
-        query_time_dict["pdg_app/to_add_value_and_units get_node_properties"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_add_value_and_units get_node_properties" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     logger.info(
         "[TRACE] pdg_app/to_list_constant_values end "
@@ -6724,9 +6749,9 @@ def to_edit_constant_value_and_units(
         scalar_dict = session.read_transaction(
             neo4j_query.get_node_properties, "scalar", scalar_id
         )
-        query_time_dict["pdg_app/to_add_value_and_units get_node_properties"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_add_value_and_units get_node_properties" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     # to compare with other existing values:
     with graphDB_Driver.session() as session:
@@ -6735,7 +6760,8 @@ def to_edit_constant_value_and_units(
             neo4j_query.get_list_of_value_dicts_for_constant_id, scalar_id
         )
         query_time_dict[
-            "pdg_app/to_list_constant_values get_list_of_value_dicts_for_constant_id:"
+            "pdg_app/to_list_constant_values get_list_of_value_dicts_for_constant_id"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     logger.info(
@@ -6774,9 +6800,9 @@ def to_list_scalars() -> str:
         list_of_scalar_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "scalar"
         )
-        query_time_dict["to_list_scalars: list_nodes_of_type scalar"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_list_scalars: list_nodes_of_type scalar" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     logger.info(
         "pdg_app/to_list_scalars: list_of_scalar_dicts=" + str(list_of_scalar_dicts)
@@ -6850,9 +6876,9 @@ def to_list_vectors() -> str:
         list_of_vector_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "vector"
         )
-        query_time_dict["to_list_scalars: list_nodes_of_type vector"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_list_vectors: list_nodes_of_type vector" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     dict_of_expression_dicts_that_use_vector = {}  # type: Dict[str,list]
     for this_vector_dict in list_of_vector_dicts:
@@ -6903,9 +6929,9 @@ def to_list_matrices() -> str:
         list_of_matrix_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "matrix"
         )
-        query_time_dict["to_list_scalars: list_nodes_of_type matrix"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "pdg_app/to_list_matrices: list_nodes_of_type matrix" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     dict_of_expression_dicts_that_use_matrix = {}  # type: Dict[str,list]
     for this_matrix_dict in list_of_matrix_dicts:
@@ -6963,6 +6989,7 @@ def to_list_expressions() -> str:
         )
         query_time_dict[
             "pdg_app/to_list_expressions: get_list_node_dicts_of_type expression"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info(
         "pdg_app/to_list_expressions: list_of_expression_dicts"
@@ -7007,6 +7034,7 @@ def to_list_expressions() -> str:
             )
             query_time_dict[
                 "pdg_app/to_list_expressions: get_list_of_symbol_IDs_per_category_in_expression_or_feed expression scalar"
+                + trace_id
             ] = round(time.time() - query_start_time, 3)
         dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
             sympy_validate_expression.dimensional_consistency(
@@ -7089,6 +7117,7 @@ def to_list_derivations() -> str:
         )
         query_time_dict[
             "pdg_app/to_list_derivations: get_list_node_dicts_of_type derivation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info("    list_of_derivation_dicts = " + str(list_of_derivation_dicts))
 
@@ -7104,6 +7133,7 @@ def to_list_derivations() -> str:
             )
             query_time_dict[
                 "pdg_app/to_list_derivations: get_list_of_step_dicts_in_this_derivation"
+                + trace_id
             ] = round(time.time() - query_start_time, 3)
         number_of_steps_per_derivation[derivation_dict["id"]] = len(list_of_steps)
 
@@ -7149,6 +7179,7 @@ def to_list_inference_rules() -> str:
         )
         query_time_dict[
             "pdg_app/to_list_inference_rules: get_list_node_dicts_of_type inference_rule"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     dict_of_derivations_used_per_inference_rule, query_time_dict = (
         compute.get_dict_of_derivations_used_per_inference_rule(

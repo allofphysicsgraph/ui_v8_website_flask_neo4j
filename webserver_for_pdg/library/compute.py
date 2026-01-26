@@ -51,9 +51,9 @@ def generate_random_id(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_existing_IDs = session.read_transaction(neo4j_query.list_IDs, node_type)
-        query_time_dict["compute/generate_random_id: list_IDs" + node_type] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "compute/generate_random_id: list_IDs" + node_type + " " + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     found_new_ID = False
     while not found_new_ID:
@@ -87,9 +87,9 @@ def get_dict_of_node_type_for_every_id(
         list_of_records = session.read_transaction(
             neo4j_query.list_of_all_node_IDs_and_labels
         )
-        query_time_dict["compute/to_edit_node: list_of_all_node_IDs_and_labels"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "compute/to_edit_node: list_of_all_node_IDs_and_labels" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     # [{'n.id': '8379131', 'labels(n)': ['relation']},
     #  {'n.id': '2201316', 'labels(n)': ['relation']},
@@ -181,6 +181,7 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
         )
         query_time_dict[
             "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed operation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     with graphDB_Driver.session() as session:
@@ -193,6 +194,7 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
         )
         query_time_dict[
             "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed relation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     with graphDB_Driver.session() as session:
@@ -205,6 +207,7 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
         )
         query_time_dict[
             "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed scalar"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     with graphDB_Driver.session() as session:
@@ -217,6 +220,7 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
         )
         query_time_dict[
             "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed vector"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     with graphDB_Driver.session() as session:
@@ -229,6 +233,7 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
         )
         query_time_dict[
             "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed matrix"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     logger.info(
@@ -262,6 +267,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
         )
         query_time_dict[
             "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed relation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     with graphDB_Driver.session() as session:
@@ -274,6 +280,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
         )
         query_time_dict[
             "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed scalar"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     with graphDB_Driver.session() as session:
@@ -286,6 +293,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
         )
         query_time_dict[
             "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed vector"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     with graphDB_Driver.session() as session:
@@ -298,6 +306,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
         )
         query_time_dict[
             "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed matrix"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     logger.info(
@@ -336,6 +345,7 @@ def get_list_of_expression_dicts_that_use_symbol_id(
         )
         query_time_dict[
             "compute/get_dict_of_expression_dicts_that_use_symbol_id: get_dict_of_expression_dicts_that_use_symbol_id_by_category operation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -346,6 +356,7 @@ def get_list_of_expression_dicts_that_use_symbol_id(
         )
         query_time_dict[
             "compute/get_dict_of_expression_dicts_that_use_symbol_id: get_dict_of_expression_dicts_that_use_symbol_id_by_category scalar"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -356,6 +367,7 @@ def get_list_of_expression_dicts_that_use_symbol_id(
         )
         query_time_dict[
             "compute/get_dict_of_expression_dicts_that_use_symbol_id: get_dict_of_expression_dicts_that_use_symbol_id_by_category vector"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -366,6 +378,7 @@ def get_list_of_expression_dicts_that_use_symbol_id(
         )
         query_time_dict[
             "compute/get_dict_of_expression_dicts_that_use_symbol_id: get_dict_of_expression_dicts_that_use_symbol_id_by_category matrix"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     logger.info(
@@ -397,6 +410,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
         )
         query_time_dict[
             "compute/get_dict_of_derivation_dicts_that_use_symbol: derivations_that_use_symbol operation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -407,6 +421,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
         )
         query_time_dict[
             "compute/get_dict_of_derivation_dicts_that_use_symbol: derivations_that_use_symbol scalar"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -417,6 +432,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
         )
         query_time_dict[
             "compute/get_dict_of_derivation_dicts_that_use_symbol: derivations_that_use_symbol vector"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -427,6 +443,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
         )
         query_time_dict[
             "compute/get_dict_of_derivation_dicts_that_use_symbol: derivation_dicts_that_use_symbol matrix"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     logger.info(
@@ -471,9 +488,9 @@ def get_list_of_all_symbol_dicts(
         list_of_operation_symbol_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "operation"
         )
-        query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     for this_symbol_dict in list_of_operation_symbol_dicts:
         this_symbol_dict["symbol_category"] = "operation"
         list_of_symbol_dicts.append(this_symbol_dict)
@@ -483,9 +500,9 @@ def get_list_of_all_symbol_dicts(
         list_of_scalar_symbol_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "scalar"
         )
-        query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     for this_symbol_dict in list_of_scalar_symbol_dicts:
         this_symbol_dict["symbol_category"] = "scalar"
         list_of_symbol_dicts.append(this_symbol_dict)
@@ -495,9 +512,9 @@ def get_list_of_all_symbol_dicts(
         list_of_vector_symbol_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "vector"
         )
-        query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     for this_symbol_dict in list_of_vector_symbol_dicts:
         this_symbol_dict["symbol_category"] = "vector"
         list_of_symbol_dicts.append(this_symbol_dict)
@@ -507,9 +524,9 @@ def get_list_of_all_symbol_dicts(
         list_of_matrix_symbol_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "matrix"
         )
-        query_time_dict["compute/get_list_of_all_symbol_dicts, list_nodes_of_type"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type" + trace_id
+        ] = round(time.time() - query_start_time, 3)
     for this_symbol_dict in list_of_matrix_symbol_dicts:
         this_symbol_dict["symbol_category"] = "matrix"
         list_of_symbol_dicts.append(this_symbol_dict)
@@ -548,6 +565,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
         )
         query_time_dict[
             "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     for this_symbol_dict in list_of_scalar_symbol_dicts:
         this_symbol_dict["symbol_category"] = "scalar"
@@ -560,6 +578,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
         )
         query_time_dict[
             "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     for this_symbol_dict in list_of_vector_symbol_dicts:
         this_symbol_dict["symbol_category"] = "vector"
@@ -572,6 +591,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
         )
         query_time_dict[
             "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     for this_symbol_dict in list_of_matrix_symbol_dicts:
         this_symbol_dict["symbol_category"] = "matrix"
@@ -763,6 +783,7 @@ def get_dict_of_operation_dicts_in_expression(
         )
         query_time_dict[
             "compute/get_dict_of_operation_dicts_in_expression get_list_of_symbol_IDs_per_category_in_expression_or_feed operation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     dict_of_operation_dicts_in_expression = {}
@@ -806,6 +827,7 @@ def get_dict_of_operation_dicts_not_in_expression(
         )
         query_time_dict[
             "compute/get_dict_of_operation_dicts_not_in_expression get_list_of_symbol_IDs_per_category_in_expression_or_feed operation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     dict_of_operation_dicts_in_expression, query_time_dict = (
@@ -848,7 +870,7 @@ def get_dict_of_relation_dicts_not_in_expression(
             neo4j_query.get_node_properties, "expression", expression_id
         )
         query_time_dict[
-            "pdg_app/to_edit_expression: get_node_properties expression"
+            "pdg_app/to_edit_expression: get_node_properties expression" + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info("pdg_app/to_edit_expression: expression_dict:" + str(expression_dict))
     logger.info("relation is " + str(expression_dict["latex_relation"]))
@@ -882,9 +904,9 @@ def get_dict_of_node_dicts(
         list_of_all_node_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, node_type
         )
-        query_time_dict["get_dict_of_node_dicts, list_nodes_of_type"] = round(
-            time.time() - query_start_time, 3
-        )
+        query_time_dict[
+            "compute/get_dict_of_node_dicts, list_nodes_of_type " + trace_id
+        ] = round(time.time() - query_start_time, 3)
     # print("list_of_all_node_dicts=", list_of_all_node_dicts)
 
     dict_of_all_node_dicts = {}
@@ -922,6 +944,7 @@ def get_dict_of_derivations_used_per_inference_rule(
             )
             query_time_dict[
                 "compute/get_dict_of_derivations_used_per_inference_rule: derivations_that_use_inference_rule"
+                + trace_id
             ] = round(time.time() - query_start_time, 3)
         logger.info(
             "list_of_derivations_that_use_this_inference_rule_id="
@@ -1036,6 +1059,7 @@ def get_dict_of_steps_in_derivation(
         )
         query_time_dict[
             "compute/get_dict_of_steps_in_derivation: steps_in_this_derivation"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info(
         "list of steps for" + str(derivation_id) + ":" + str(list_of_step_dicts)
@@ -1061,6 +1085,7 @@ def get_dict_of_steps_in_derivation(
             )
             query_time_dict[
                 "compute/get_dict_of_steps_in_derivation: step_has_sequence_index"
+                + trace_id
             ] = round(time.time() - query_start_time, 3)
         # print("sequence_index=", sequence_index)
 
@@ -1097,6 +1122,7 @@ def input_feed_output_infrule_for_step(
         )
         query_time_dict[
             "compute/get_dict_of_steps_in_derivation: step_has_inference_rule"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     # print("inference_rule_dict=", inference_rule_dict)
     with graphDB_Driver.session() as session:
@@ -1108,6 +1134,7 @@ def input_feed_output_infrule_for_step(
         )
         query_time_dict[
             "compute/get_dict_of_steps_in_derivation: step_id_has_expressions, HAS_INPUT"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_input_dicts=", list_of_input_dicts)
     with graphDB_Driver.session() as session:
@@ -1119,6 +1146,7 @@ def input_feed_output_infrule_for_step(
         )
         query_time_dict[
             "compute/get_dict_of_steps_in_derivation: step_id_has_expressions, HAS_FEED"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_feed_dicts=", list_of_feed_dicts)
     with graphDB_Driver.session() as session:
@@ -1130,6 +1158,7 @@ def input_feed_output_infrule_for_step(
         )
         query_time_dict[
             "compute/get_dict_of_steps_in_derivation: step_id_has_expressions, HAS_OUTPUT"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_output_dicts=", list_of_output_dicts)
 
