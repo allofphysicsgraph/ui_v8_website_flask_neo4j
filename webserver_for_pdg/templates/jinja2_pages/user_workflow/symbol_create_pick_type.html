@@ -1,0 +1,23 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
+{% block content %}
+
+<P>
+  Return to <a href="{{ url_for('to_navigation') }}?referrer=symbol_create_pick_type">navigation page</a>
+  or return to <a href="{{ url_for('to_list_matrices') }}?referrer=symbol_create_pick_type">list of matrices</a>
+</P>
+
+<fieldset>
+  <legend>
+    <H2>Pick type of symbol</H2>
+  </legend>
+  <UL>
+  	<LI><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=symbol_create_pick_type">scalar</a></LI>
+  	<LI><a href="{{ url_for('to_add_symbol_vector') }}?referrer=symbol_create_pick_type">vector</a></LI>
+  	<LI><a href="{{ url_for('to_add_symbol_matrix') }}?referrer=symbol_create_pick_type">matrix</a></LI>
+  	<LI><a href="{{ url_for('to_add_operation') }}?referrer=symbol_create_pick_type">operation</a>, e.g., +</LI>
+  	<LI><a href="{{ url_for('to_add_relation') }}?referrer=symbol_create_pick_type">relation</a>, e.g., =</LI>
+</UL>
+</fieldset>
+
+{% endblock %}
