@@ -2899,6 +2899,12 @@ def to_add_feed() -> werkzeug.Response:
             graphDB_Driver, query_time_dict, "feed"
         )
 
+        # as per https://strftime.org/
+        # %f = Microsecond as a decimal number, zero-padded on the left.
+        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
+        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+
         for symbol_dict in list_of_nonoperation_symbol_dicts:
             if symbol_dict["id"] == request.form["symbol_select_id_to_add"]:
                 # https://neo4j.com/docs/python-manual/current/session-api/
@@ -2910,7 +2916,8 @@ def to_add_feed() -> werkzeug.Response:
                         symbol_dict["latex"],
                         "sympy.Symbol('pdg" + symbol_dict["id"] + "')",
                         feed_lean="",
-                        author_name_latex="ben",
+                        now_str=now_str,
+                        author_name_latex=author_name_latex,
                     )
                     query_time_dict["to_add_feed: add_feed promoted symbol"] = round(
                         time.time() - query_start_time, 3
