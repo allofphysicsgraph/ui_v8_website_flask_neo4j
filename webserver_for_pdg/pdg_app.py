@@ -18,7 +18,7 @@ with cleaner separation between the MVC and the database.
 Previous versions had a "local ID" which is needed when including
 more than one derivation in the same Latex document.
 For this version, the specific-to-Latex "local ID" (for expression labels)
-can be contructed using md5hash(<derivation_id>_<expression_id>).
+can be constructed using md5hash(<derivation_id>_<expression_id>).
 
 ****************************
 
@@ -2105,26 +2105,26 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     #  'latex_rhs': 'b', 'author_name_latex': 'ben', 'description_latex': '',
     #  'id': '9295979', 'latex_lhs': 'a', 'latex_relation': '='}
 
-    dict_of_symbol_dicts_in_expression, query_time_dict = (
-        compute.get_dict_of_symbol_dicts_in_expression(
+    dict_of_nonoperation_symbol_dicts_in_expression, query_time_dict = (
+        compute.get_dict_of_nonoperation_symbol_dicts_in_expression(
             expression_id, graphDB_Driver, query_time_dict
         )
     )
 
     logger.info(
-        "pdg_app/to_edit_expression: dict_of_symbol_dicts_in_expression"
-        + str(dict_of_symbol_dicts_in_expression)
+        "pdg_app/to_edit_expression: dict_of_nonoperation_symbol_dicts_in_expression"
+        + str(dict_of_nonoperation_symbol_dicts_in_expression)
     )
 
-    dict_of_symbol_dicts_not_in_expression, query_time_dict = (
-        compute.get_dict_of_symbol_dicts_not_in_expression(
+    dict_of_nonoperation_symbol_dicts_not_in_expression, query_time_dict = (
+        compute.get_dict_of_nonoperation_symbol_dicts_not_in_expression(
             expression_id, graphDB_Driver, query_time_dict
         )
     )
 
     logger.info(
-        "pdg_app/to_edit_expression: dict_of_symbol_dicts_not_in_expression"
-        + str(dict_of_symbol_dicts_not_in_expression)
+        "pdg_app/to_edit_expression: dict_of_nonoperation_symbol_dicts_not_in_expression"
+        + str(dict_of_nonoperation_symbol_dicts_not_in_expression)
     )
 
     dict_of_operation_dicts_in_expression, query_time_dict = (
@@ -2316,8 +2316,8 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         expression_dict=expression_dict,
         form_no_options=web_form_no_options,
         form_new_expression=web_form_new_expression,
-        dict_of_symbol_dicts_in_expression=dict_of_symbol_dicts_in_expression,
-        dict_of_symbol_dicts_not_in_expression=dict_of_symbol_dicts_not_in_expression,
+        dict_of_nonoperation_symbol_dicts_in_expression=dict_of_nonoperation_symbol_dicts_in_expression,
+        dict_of_nonoperation_symbol_dicts_not_in_expression=dict_of_nonoperation_symbol_dicts_not_in_expression,
         dict_of_operation_dicts_in_expression=dict_of_operation_dicts_in_expression,
         dict_of_operation_dicts_not_in_expression=dict_of_operation_dicts_not_in_expression,
     )
