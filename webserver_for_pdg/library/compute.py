@@ -560,24 +560,14 @@ def get_dict_of_all_symbol_dicts(
     return dict_of_all_symbol_dicts, query_time_dict
 
 
-def get_dict_of_all_operation_dicts(
-    graphDB_Driver, query_time_dict: query_timing_result_type
+def get_dict_of_symbol_dicts_in_expression(
+    expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
 ) -> Tuple[dict, query_timing_result_type]:
-    """
-    """
+    """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] compute/get_dict_of_all_operation_dicts start " + trace_id)
-
-    dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "operation"
+    logger.info(
+        "[TRACE] compute/get_dict_of_symbol_dicts_in_expression start " + trace_id
     )
-
-    return dict_of_all_operation_dicts, query_time_dict
-
-
-def get_dict_of_symbol_dicts_in_expression(expression_id,graphDB_Driver, query_time_dict)
-    return dict_of_symbol_dicts_in_expression
-
     dict_of_all_symbol_dicts, query_time_dict = get_dict_of_all_symbol_dicts(
         graphDB_Driver, query_time_dict
     )
@@ -588,15 +578,137 @@ def get_dict_of_symbol_dicts_in_expression(expression_id,graphDB_Driver, query_t
         )
     )
 
+    logger.info(
+        "list_of_symbol_IDs_in_expression=" + str(list_of_symbol_IDs_in_expression)
+    )
 
-def get_dict_of_symbol_dicts_not_in_expression(expression_id,graphDB_Driver, query_time_dict)
-    return dict_of_symbol_dicts_not_in_expression
-def get_dict_of_operation_dicts_in_expression(expression_id,graphDB_Driver, query_time_dict)
-    return dict_of_operation_dicts_in_expression
-def get_dict_of_operation_dicts_not_in_expression(expression_id,graphDB_Driver, query_time_dict)
-    return dict_of_operation_dicts_not_in_expression
+    dict_of_symbol_dicts_in_expression = {}
+    for this_symbol_ID in list_of_symbol_IDs_in_expression:
+        dict_of_symbol_dicts_in_expression[this_symbol_ID] = dict_of_all_symbol_dicts[
+            this_symbol_ID
+        ]
+
+    return dict_of_symbol_dicts_in_expression, query_time_dict
 
 
+def get_dict_of_symbol_dicts_not_in_expression(
+    expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
+) -> Tuple[dict, query_timing_result_type]:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info(
+        "[TRACE] compute/get_dict_of_symbol_dicts_not_in_expression start " + trace_id
+    )
+    dict_of_all_symbol_dicts, query_time_dict = get_dict_of_all_symbol_dicts(
+        graphDB_Driver, query_time_dict
+    )
+
+    list_of_symbol_IDs_in_expression, query_time_dict = (
+        get_list_of_symbol_IDs_in_expression_or_feed(
+            graphDB_Driver, query_time_dict, "expression", expression_id
+        )
+    )
+
+    dict_of_symbol_dicts_in_expression, query_time_dict = (
+        get_dict_of_symbol_dicts_in_expression(
+            expression_id, graphDB_Driver, query_time_dict
+        )
+    )
+
+    dict_of_symbol_dicts_not_in_expression = {}  # TODO
+
+    for this_symbol_id in dict_of_all_symbol_dicts.keys():
+        if this_symbol_id not in dict_of_symbol_dicts_in_expression.keys():
+            dict_of_symbol_dicts_not_in_expression[this_symbol_id] = (
+                dict_of_all_symbol_dicts[this_symbol_id]
+            )
+
+    return dict_of_symbol_dicts_not_in_expression, query_time_dict
+
+
+def get_dict_of_operation_dicts_in_expression(
+    expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
+) -> Tuple[dict, query_timing_result_type]:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info(
+        "[TRACE] compute/get_dict_of_operation_dicts_in_expression start " + trace_id
+    )
+
+    dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "operation"
+    )
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_operation_IDs_in_expression = session.read_transaction(
+            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+            "expression",
+            expression_id,
+            "operation",
+        )
+        query_time_dict[
+            "compute/get_dict_of_operation_dicts_in_expression get_list_of_symbol_IDs_per_category_in_expression_or_feed operation"
+        ] = round(time.time() - query_start_time, 3)
+
+    dict_of_operation_dicts_in_expression = {}
+
+    for this_operation_ID in list_of_operation_IDs_in_expression:
+        logger.info(
+            "pdg_app/to_edit_expression: this_operation_ID=" + str(this_operation_ID)
+        )
+        dict_of_operation_dicts_in_expression[this_operation_ID] = (
+            dict_of_all_operation_dicts[this_operation_ID]
+        )
+    logger.info(
+        "pdg_app/to_edit_expression: dict_of_operation_dicts_in_expression="
+        + str(dict_of_operation_dicts_in_expression)
+    )
+
+    return dict_of_operation_dicts_in_expression, query_time_dict
+
+
+def get_dict_of_operation_dicts_not_in_expression(
+    expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
+) -> Tuple[dict, query_timing_result_type]:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info(
+        "[TRACE] compute/get_dict_of_operation_dicts_not_in_expression start "
+        + trace_id
+    )
+
+    dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
+        graphDB_Driver, query_time_dict, "operation"
+    )
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_operation_IDs_in_expression = session.read_transaction(
+            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+            "expression",
+            expression_id,
+            "operation",
+        )
+        query_time_dict[
+            "compute/get_dict_of_operation_dicts_not_in_expression get_list_of_symbol_IDs_per_category_in_expression_or_feed operation"
+        ] = round(time.time() - query_start_time, 3)
+
+    dict_of_operation_dicts_in_expression, query_time_dict = (
+        get_dict_of_operation_dicts_in_expression(
+            expression_id, graphDB_Driver, query_time_dict
+        )
+    )
+
+    dict_of_operation_dicts_not_in_expression = {}
+
+    for this_operation_id in dict_of_all_operation_dicts.keys():
+        if this_operation_id not in dict_of_operation_dicts_in_expression.keys():
+            dict_of_operation_dicts_not_in_expression[this_operation_id] = (
+                dict_of_all_operation_dicts[this_operation_id]
+            )
+
+    return dict_of_operation_dicts_not_in_expression, query_time_dict
 
 
 def get_dict_of_node_dicts(
@@ -779,9 +891,9 @@ def get_dict_of_steps_in_derivation(
         list_of_step_dicts = session.read_transaction(
             neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
         )
-        query_time_dict["compute/get_dict_of_steps_in_derivation: steps_in_this_derivation"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "compute/get_dict_of_steps_in_derivation: steps_in_this_derivation"
+        ] = round(time.time() - query_start_time, 3)
     print("list of steps for", str(derivation_id), ":", list_of_step_dicts)
 
     all_steps = {}
@@ -838,9 +950,9 @@ def input_feed_output_infrule_for_step(
         inference_rule_dict = session.read_transaction(
             neo4j_query.step_has_inference_rule, step_id
         )
-        query_time_dict["compute/get_dict_of_steps_in_derivation: step_has_inference_rule"] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "compute/get_dict_of_steps_in_derivation: step_has_inference_rule"
+        ] = round(time.time() - query_start_time, 3)
     # print("inference_rule_dict=", inference_rule_dict)
     with graphDB_Driver.session() as session:
         query_start_time = time.time()

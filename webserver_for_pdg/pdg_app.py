@@ -2103,75 +2103,51 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     #  'latex_rhs': 'b', 'author_name_latex': 'ben', 'description_latex': '',
     #  'id': '9295979', 'latex_lhs': 'a', 'latex_relation': '='}
 
-    # # editing the expression includes modifying the symbols present.
+    dict_of_symbol_dicts_in_expression = compute.get_dict_of_symbol_dicts_in_expression(
+        expression_id, graphDB_Driver, query_time_dict
+    )
 
-    dict_of_symbol_dicts_in_expression=compute.get_dict_of_symbol_dicts_in_expression(expression_id,graphDB_Driver, query_time_dict)
-    dict_of_symbol_dicts_not_in_expression=compute.get_dict_of_symbol_dicts_not_in_expression(expression_id,graphDB_Driver, query_time_dict)
-    dict_of_operation_dicts_in_expression=compute.get_dict_of_operation_dicts_in_expression(expression_id,graphDB_Driver, query_time_dict)
-    dict_of_operation_dicts_not_in_expression=compute.get_dict_of_operation_dicts_not_in_expression(expression_id,graphDB_Driver, query_time_dict)
-    
+    logger.info(
+        "pdg_app/to_edit_expression: dict_of_symbol_dicts_in_expression"
+        + str(dict_of_symbol_dicts_in_expression)
+    )
 
+    dict_of_symbol_dicts_not_in_expression = (
+        compute.get_dict_of_symbol_dicts_not_in_expression(
+            expression_id, graphDB_Driver, query_time_dict
+        )
+    )
 
+    logger.info(
+        "pdg_app/to_edit_expression: dict_of_symbol_dicts_not_in_expression"
+        + str(dict_of_symbol_dicts_not_in_expression)
+    )
 
-    # logger.info("pdg_app/to_edit_expression: expression_id=" + str(expression_id))
-    # logger.info(
-    #     "list_of_symbol_IDs_in_expression=" + str(list_of_symbol_IDs_in_expression)
-    # )
+    dict_of_operation_dicts_in_expression = (
+        compute.get_dict_of_operation_dicts_in_expression(
+            expression_id, graphDB_Driver, query_time_dict
+        )
+    )
 
-    # dict_of_symbol_dicts_in_expression = {}
-    # for this_symbol_ID in list_of_symbol_IDs_in_expression:
-    #     logger.info("pdg_app/to_edit_expression: this_symbol_ID=" + str(this_symbol_ID))
-    #     logger.info(
-    #         "dict_of_all_symbol_dicts.keys()=" + str(dict_of_all_symbol_dicts.keys())
-    #     )
-    #     dict_of_symbol_dicts_in_expression[this_symbol_ID] = dict_of_all_symbol_dicts[
-    #         this_symbol_ID
-    #     ]
-    # logger.info(
-    #     "pdg_app/to_edit_expression: dict_of_symbol_dicts_in_expression="
-    #     + str(dict_of_symbol_dicts_in_expression)
-    # )
+    logger.info(
+        "pdg_app/to_edit_expression: dict_of_operation_dicts_in_expression"
+        + str(dict_of_operation_dicts_in_expression)
+    )
 
-    # # create new dict of symbols NOT used in expression
-    # dict_of_symbol_dicts_not_in_expression = {}
-    # for this_symbol_id in dict_of_all_symbol_dicts.keys():
-    #     if this_symbol_id not in dict_of_symbol_dicts_in_expression.keys():
-    #         dict_of_symbol_dicts_not_in_expression[this_symbol_id] = (
-    #             dict_of_all_symbol_dicts[this_symbol_id]
-    #         )
-    # # logger.info(
-    # #     "pdg_app/to_edit_expression: dict_of_symbol_dicts_not_in_expression=" +
-    # #     str(dict_of_symbol_dicts_not_in_expression),
-    # # )
+    dict_of_operation_dicts_not_in_expression = (
+        compute.get_dict_of_operation_dicts_not_in_expression(
+            expression_id, graphDB_Driver, query_time_dict
+        )
+    )
 
-    # dict_of_operation_dicts_in_expression = {}
-    # for this_operation_ID in list_of_symbol_IDs_in_expression:
-    #     logger.info(
-    #         "pdg_app/to_edit_expression: this_operation_ID=" + str(this_operation_ID)
-    #     )
-    #     logger.info(
-    #         "dict_of_all_operation_dicts.keys()="
-    #         + str(dict_of_all_operation_dicts.keys())
-    #     )
-    #     dict_of_operation_dicts_in_expression[this_operation_ID] = (
-    #         dict_of_all_symbol_dicts[this_operation_ID]
-    #     )
-    # logger.info(
-    #     "pdg_app/to_edit_expression: dict_of_operation_dicts_in_expression="
-    #     + str(dict_of_operation_dicts_in_expression)
-    # )
-
-    # # create new dict of operations NOT used in expression
-    # dict_of_operation_dicts_not_in_expression = {}
-    # for this_operation_id in dict_of_all_operation_dicts.keys():
-    #     if this_operation_id not in dict_of_operation_dicts_in_expression.keys():
-    #         dict_of_operation_dicts_not_in_expression[this_operation_id] = (
-    #             dict_of_all_operation_dicts[this_operation_id]
-    #         )
+    logger.info(
+        "pdg_app/to_edit_expression: dict_of_operation_dicts_not_in_expression"
+        + str(dict_of_operation_dicts_not_in_expression)
+    )
 
     # when the expression is edited, the altered content is equivalent to
     # deleting the old expression and creating a new expression
-    #list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
+    # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
     web_form_new_expression = SpecifyNewExpressionForm(request.form)
     if request.method == "POST" and web_form_new_expression.validate():
         logger.info(
@@ -2336,10 +2312,10 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         expression_dict=expression_dict,
         form_no_options=web_form_no_options,
         form_new_expression=web_form_new_expression,
-        dict_of_symbol_dicts_in_expression={},  # dict_of_symbol_dicts_in_expression,
-        dict_of_symbol_dicts_not_in_expression={},  # dict_of_symbol_dicts_not_in_expression,
-        dict_of_operation_dicts_in_expression={},
-        dict_of_operation_dicts_not_in_expression={},  # dict_of_operation_dicts_not_in_expression,
+        dict_of_symbol_dicts_in_expression=dict_of_symbol_dicts_in_expression,
+        dict_of_symbol_dicts_not_in_expression=dict_of_symbol_dicts_not_in_expression,
+        dict_of_operation_dicts_in_expression=dict_of_operation_dicts_in_expression,
+        dict_of_operation_dicts_not_in_expression=dict_of_operation_dicts_not_in_expression,
     )
     # return redirect(url_for("to_list_expressions"))
 
