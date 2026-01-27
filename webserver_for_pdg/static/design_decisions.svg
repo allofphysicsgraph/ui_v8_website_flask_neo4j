@@ -1,0 +1,823 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920pt" height="1244pt" viewBox="0.00 0.00 1920.00 1244.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1240)">
+<title>G</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-1240 1916.49,-1240 1916.49,4 -4,4"/>
+<!-- how_to_store_data -->
+<g id="node1" class="node">
+<title>how_to_store_data</title>
+<polygon fill="none" stroke="black" points="127.69,-1047 12.35,-1029 127.69,-1011 243.04,-1029 127.69,-1047"/>
+<polyline fill="none" stroke="black" points="24.2,-1030.85 24.2,-1027.15"/>
+<polyline fill="none" stroke="black" points="115.84,-1012.85 139.55,-1012.85"/>
+<polyline fill="none" stroke="black" points="231.18,-1027.15 231.18,-1030.85"/>
+<polyline fill="none" stroke="black" points="139.55,-1045.15 115.84,-1045.15"/>
+<text xml:space="preserve" text-anchor="middle" x="127.69" y="-1024.8" font-family="Times,serif" font-size="14.00">how to store data?</text>
+</g>
+<!-- xml -->
+<g id="node2" class="node">
+<title>xml</title>
+<polygon fill="none" stroke="#8b8b83" points="480.12,-966 426.12,-966 426.12,-930 480.12,-930 480.12,-966"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-943.8" font-family="Times,serif" font-size="14.00">xml</text>
+</g>
+<!-- how_to_store_data&#45;&gt;xml -->
+<g id="edge1" class="edge">
+<title>how_to_store_data-&gt;xml</title>
+<path fill="none" stroke="#8b8b83" d="M162.52,-1016.07C195.12,-1004.02 246.04,-986.26 291.39,-975 332.96,-964.67 381.58,-957.12 414.37,-952.67"/>
+<polygon fill="#8b8b83" stroke="#8b8b83" points="414.74,-956.15 424.19,-951.37 413.82,-949.21 414.74,-956.15"/>
+</g>
+<!-- csv -->
+<g id="node3" class="node">
+<title>csv</title>
+<polygon fill="none" stroke="#8b8b83" points="480.12,-1074 426.12,-1074 426.12,-1038 480.12,-1038 480.12,-1074"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-1051.8" font-family="Times,serif" font-size="14.00">csv</text>
+</g>
+<!-- how_to_store_data&#45;&gt;csv -->
+<g id="edge2" class="edge">
+<title>how_to_store_data-&gt;csv</title>
+<path fill="none" stroke="#8b8b83" d="M204.93,-1035.36C270.8,-1040.86 363.23,-1048.58 414.36,-1052.85"/>
+<polygon fill="#8b8b83" stroke="#8b8b83" points="414.06,-1056.34 424.32,-1053.68 414.65,-1049.36 414.06,-1056.34"/>
+</g>
+<!-- json -->
+<g id="node4" class="node">
+<title>json</title>
+<polygon fill="none" stroke="blue" points="480.12,-1020 426.12,-1020 426.12,-984 480.12,-984 480.12,-1020"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-997.8" font-family="Times,serif" font-size="14.00">json</text>
+</g>
+<!-- how_to_store_data&#45;&gt;json -->
+<g id="edge3" class="edge">
+<title>how_to_store_data-&gt;json</title>
+<path fill="none" stroke="blue" d="M204.93,-1022.64C270.8,-1017.14 363.23,-1009.42 414.36,-1005.15"/>
+<polygon fill="blue" stroke="blue" points="414.65,-1008.64 424.32,-1004.32 414.06,-1001.66 414.65,-1008.64"/>
+</g>
+<!-- sql -->
+<g id="node5" class="node">
+<title>sql</title>
+<polygon fill="none" stroke="blue" points="481.34,-912 424.9,-912 424.9,-876 481.34,-876 481.34,-912"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-889.8" font-family="Times,serif" font-size="14.00">SQLite</text>
+</g>
+<!-- how_to_store_data&#45;&gt;sql -->
+<g id="edge4" class="edge">
+<title>how_to_store_data-&gt;sql</title>
+<path fill="none" stroke="blue" d="M160.45,-1015.69C187.24,-1003.62 225.83,-984.19 255.39,-961 274.2,-946.24 270.42,-932.51 291.39,-921 329.21,-900.23 379.02,-894.62 413.1,-893.49"/>
+<polygon fill="blue" stroke="blue" points="413.02,-896.99 422.95,-893.28 412.88,-889.99 413.02,-896.99"/>
+</g>
+<!-- neo4j -->
+<g id="node6" class="node">
+<title>neo4j</title>
+<polygon fill="none" stroke="blue" points="480.12,-1128 426.12,-1128 426.12,-1092 480.12,-1092 480.12,-1128"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-1105.8" font-family="Times,serif" font-size="14.00">Neo4j</text>
+</g>
+<!-- how_to_store_data&#45;&gt;neo4j -->
+<g id="edge5" class="edge">
+<title>how_to_store_data-&gt;neo4j</title>
+<path fill="none" stroke="blue" d="M162.52,-1041.93C195.12,-1053.98 246.04,-1071.74 291.39,-1083 332.96,-1093.33 381.58,-1100.88 414.37,-1105.33"/>
+<polygon fill="blue" stroke="blue" points="413.82,-1108.79 424.19,-1106.63 414.74,-1101.85 413.82,-1108.79"/>
+</g>
+<!-- rdf -->
+<g id="node7" class="node">
+<title>rdf</title>
+<polygon fill="none" stroke="red" points="480.12,-1236 426.12,-1236 426.12,-1200 480.12,-1200 480.12,-1236"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-1213.8" font-family="Times,serif" font-size="14.00">rdf</text>
+</g>
+<!-- how_to_store_data&#45;&gt;rdf -->
+<g id="edge6" class="edge">
+<title>how_to_store_data-&gt;rdf</title>
+<path fill="none" stroke="red" d="M139.68,-1045.38C163.15,-1078.91 221.73,-1155.19 291.39,-1191 330.22,-1210.96 380.63,-1216.67 414.56,-1218.05"/>
+<polygon fill="red" stroke="red" points="414.22,-1221.54 424.32,-1218.34 414.42,-1214.55 414.22,-1221.54"/>
+</g>
+<!-- custom_python_query -->
+<g id="node12" class="node">
+<title>custom_python_query</title>
+<polygon fill="none" stroke="blue" points="809.83,-993 674.84,-993 674.84,-957 809.83,-957 809.83,-993"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-970.8" font-family="Times,serif" font-size="14.00">custom Python query</text>
+</g>
+<!-- xml&#45;&gt;custom_python_query -->
+<g id="edge12" class="edge">
+<title>xml-&gt;custom_python_query</title>
+<path fill="none" stroke="#8b8b83" d="M480.37,-950.47C521.44,-954.33 602.47,-961.95 663.41,-967.67"/>
+<polygon fill="#8b8b83" stroke="#8b8b83" points="662.75,-971.13 673.03,-968.58 663.4,-964.16 662.75,-971.13"/>
+</g>
+<!-- csv&#45;&gt;custom_python_query -->
+<g id="edge13" class="edge">
+<title>csv-&gt;custom_python_query</title>
+<path fill="none" stroke="#8b8b83" d="M480.44,-1053.52C512.63,-1050.04 568.55,-1042.56 614.85,-1029 641.88,-1021.08 670.85,-1009 694.23,-998.27"/>
+<polygon fill="#8b8b83" stroke="#8b8b83" points="695.6,-1001.49 703.19,-994.09 692.64,-995.15 695.6,-1001.49"/>
+</g>
+<!-- json&#45;&gt;custom_python_query -->
+<g id="edge14" class="edge">
+<title>json-&gt;custom_python_query</title>
+<path fill="none" stroke="blue" d="M480.37,-999.53C521.44,-995.67 602.47,-988.05 663.41,-982.33"/>
+<polygon fill="blue" stroke="blue" points="663.4,-985.84 673.03,-981.42 662.75,-978.87 663.4,-985.84"/>
+</g>
+<!-- sql&#45;&gt;custom_python_query -->
+<g id="edge15" class="edge">
+<title>sql-&gt;custom_python_query</title>
+<path fill="none" stroke="black" d="M481.58,-896.61C513.94,-900.14 569.1,-907.6 614.85,-921 641.88,-928.92 670.85,-941 694.23,-951.73"/>
+<polygon fill="black" stroke="black" points="692.64,-954.85 703.19,-955.91 695.6,-948.51 692.64,-954.85"/>
+</g>
+<!-- cypher_query -->
+<g id="node13" class="node">
+<title>cypher_query</title>
+<polygon fill="none" stroke="blue" points="788.63,-1142 696.04,-1142 696.04,-1106 788.63,-1106 788.63,-1142"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-1119.8" font-family="Times,serif" font-size="14.00">Cypher query</text>
+</g>
+<!-- neo4j&#45;&gt;cypher_query -->
+<g id="edge16" class="edge">
+<title>neo4j-&gt;cypher_query</title>
+<path fill="none" stroke="blue" d="M480.37,-1111.28C526.39,-1113.52 622.61,-1118.21 684.48,-1121.23"/>
+<polygon fill="blue" stroke="blue" points="683.94,-1124.71 694.1,-1121.7 684.28,-1117.71 683.94,-1124.71"/>
+</g>
+<!-- sparql -->
+<g id="node14" class="node">
+<title>sparql</title>
+<polygon fill="none" stroke="red" points="777.18,-1223 707.5,-1223 707.5,-1187 777.18,-1187 777.18,-1223"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-1200.8" font-family="Times,serif" font-size="14.00">SPARQL</text>
+</g>
+<!-- rdf&#45;&gt;sparql -->
+<g id="edge17" class="edge">
+<title>rdf-&gt;sparql</title>
+<path fill="none" stroke="red" d="M480.37,-1216.81C529.42,-1214.59 635.48,-1209.79 696.21,-1207.04"/>
+<polygon fill="red" stroke="red" points="696.02,-1210.55 705.85,-1206.61 695.7,-1203.56 696.02,-1210.55"/>
+</g>
+<!-- which_language_for_backend -->
+<g id="node8" class="node">
+<title>which_language_for_backend</title>
+<polygon fill="none" stroke="black" points="127.69,-842.6 23.45,-801 127.69,-759.4 231.94,-801 127.69,-842.6"/>
+<polyline fill="none" stroke="black" points="34.59,-805.45 34.59,-796.55"/>
+<polyline fill="none" stroke="black" points="116.55,-763.85 138.84,-763.85"/>
+<polyline fill="none" stroke="black" points="220.79,-796.55 220.79,-805.45"/>
+<polyline fill="none" stroke="black" points="138.84,-838.15 116.55,-838.15"/>
+<text xml:space="preserve" text-anchor="middle" x="127.69" y="-805.2" font-family="Times,serif" font-size="14.00">which language</text>
+<text xml:space="preserve" text-anchor="middle" x="127.69" y="-788.4" font-family="Times,serif" font-size="14.00">for backend?</text>
+</g>
+<!-- python -->
+<g id="node9" class="node">
+<title>python</title>
+<polygon fill="none" stroke="blue" points="480.96,-858 425.28,-858 425.28,-822 480.96,-822 480.96,-858"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-835.8" font-family="Times,serif" font-size="14.00">Python</text>
+</g>
+<!-- which_language_for_backend&#45;&gt;python -->
+<g id="edge7" class="edge">
+<title>which_language_for_backend-&gt;python</title>
+<path fill="none" stroke="blue" d="M208.64,-810.64C273.93,-818.51 363.35,-829.3 413.66,-835.36"/>
+<polygon fill="blue" stroke="blue" points="413.12,-838.82 423.47,-836.55 413.96,-831.87 413.12,-838.82"/>
+</g>
+<!-- cpp -->
+<g id="node10" class="node">
+<title>cpp</title>
+<polygon fill="none" stroke="red" points="480.12,-804 426.12,-804 426.12,-768 480.12,-768 480.12,-804"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-781.8" font-family="Times,serif" font-size="14.00">C++</text>
+</g>
+<!-- which_language_for_backend&#45;&gt;cpp -->
+<g id="edge8" class="edge">
+<title>which_language_for_backend-&gt;cpp</title>
+<path fill="none" stroke="red" d="M222.24,-796.66C286.26,-793.69 367.72,-789.91 414.49,-787.75"/>
+<polygon fill="red" stroke="red" points="414.54,-791.25 424.36,-787.29 414.21,-784.25 414.54,-791.25"/>
+</g>
+<!-- python&#45;&gt;custom_python_query -->
+<g id="edge18" class="edge">
+<title>python-&gt;custom_python_query</title>
+<path fill="none" stroke="blue" d="M481.3,-840.2C514.35,-841.4 571.13,-846.6 614.85,-867 656.28,-886.33 694.85,-923.06 718.24,-948.28"/>
+<polygon fill="blue" stroke="blue" points="715.53,-950.5 724.85,-955.55 720.72,-945.79 715.53,-950.5"/>
+</g>
+<!-- sympy -->
+<g id="node17" class="node">
+<title>sympy</title>
+<polygon fill="none" stroke="blue" points="770.57,-804 714.11,-804 714.11,-768 770.57,-768 770.57,-804"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-781.8" font-family="Times,serif" font-size="14.00">SymPy</text>
+</g>
+<!-- python&#45;&gt;sympy -->
+<g id="edge34" class="edge">
+<title>python-&gt;sympy</title>
+<path fill="none" stroke="blue" d="M481.2,-835.82C513.2,-830.8 568.02,-821.93 614.85,-813 644.37,-807.37 677.58,-800.25 702.57,-794.74"/>
+<polygon fill="blue" stroke="blue" points="703.29,-798.16 712.29,-792.58 701.77,-791.33 703.29,-798.16"/>
+</g>
+<!-- flask -->
+<g id="node23" class="node">
+<title>flask</title>
+<polygon fill="none" stroke="blue" points="1419.09,-819 1365.09,-819 1365.09,-783 1419.09,-783 1419.09,-819"/>
+<text xml:space="preserve" text-anchor="middle" x="1392.09" y="-796.8" font-family="Times,serif" font-size="14.00">flask</text>
+</g>
+<!-- python&#45;&gt;flask -->
+<g id="edge32" class="edge">
+<title>python-&gt;flask</title>
+<path fill="none" stroke="blue" d="M481.43,-840.05C586.75,-840.06 976.5,-838.28 1296.2,-813 1315.34,-811.49 1336.56,-808.89 1354.07,-806.5"/>
+<polygon fill="blue" stroke="blue" points="1354.06,-810.03 1363.48,-805.18 1353.09,-803.1 1354.06,-810.03"/>
+</g>
+<!-- django -->
+<g id="node24" class="node">
+<title>django</title>
+<polygon fill="none" stroke="red" points="1419.14,-880 1365.04,-880 1365.04,-844 1419.14,-844 1419.14,-880"/>
+<text xml:space="preserve" text-anchor="middle" x="1392.09" y="-857.8" font-family="Times,serif" font-size="14.00">django</text>
+</g>
+<!-- python&#45;&gt;django -->
+<g id="edge33" class="edge">
+<title>python-&gt;django</title>
+<path fill="none" stroke="red" d="M481.17,-840.9C519.09,-842.15 590.22,-844.42 650.85,-846 920.24,-853.02 1244.83,-859.27 1353.56,-861.31"/>
+<polygon fill="red" stroke="red" points="1353.29,-864.8 1363.35,-861.49 1353.42,-857.8 1353.29,-864.8"/>
+</g>
+<!-- how_to_query_data -->
+<g id="node11" class="node">
+<title>how_to_query_data</title>
+<polygon fill="none" stroke="black" points="453.12,-1182 333.22,-1164 453.12,-1146 573.02,-1164 453.12,-1182"/>
+<polyline fill="none" stroke="black" points="345.09,-1165.78 345.09,-1162.22"/>
+<polyline fill="none" stroke="black" points="441.25,-1147.78 464.99,-1147.78"/>
+<polyline fill="none" stroke="black" points="561.15,-1162.22 561.15,-1165.78"/>
+<polyline fill="none" stroke="black" points="464.99,-1180.22 441.25,-1180.22"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-1159.8" font-family="Times,serif" font-size="14.00">how to query data?</text>
+</g>
+<!-- how_to_query_data&#45;&gt;custom_python_query -->
+<g id="edge9" class="edge">
+<title>how_to_query_data-&gt;custom_python_query</title>
+<path fill="none" stroke="blue" d="M548.73,-1159.92C571.55,-1155.82 595.04,-1148.8 614.85,-1137 629.14,-1128.49 689.68,-1046.48 721.54,-1002.52"/>
+<polygon fill="blue" stroke="blue" points="724.34,-1004.63 727.36,-994.48 718.66,-1000.53 724.34,-1004.63"/>
+</g>
+<!-- how_to_query_data&#45;&gt;cypher_query -->
+<g id="edge10" class="edge">
+<title>how_to_query_data-&gt;cypher_query</title>
+<path fill="none" stroke="blue" d="M517.51,-1155.17C567.52,-1148.21 636.64,-1138.58 684.79,-1131.88"/>
+<polygon fill="blue" stroke="blue" points="685.02,-1135.38 694.45,-1130.53 684.06,-1128.44 685.02,-1135.38"/>
+</g>
+<!-- how_to_query_data&#45;&gt;sparql -->
+<g id="edge11" class="edge">
+<title>how_to_query_data-&gt;sparql</title>
+<path fill="none" stroke="red" d="M516.44,-1172.9C570.55,-1180.62 647.61,-1191.62 696.03,-1198.53"/>
+<polygon fill="red" stroke="red" points="695.49,-1201.99 705.89,-1199.94 696.48,-1195.06 695.49,-1201.99"/>
+</g>
+<!-- which_cas_to_use -->
+<g id="node15" class="node">
+<title>which_cas_to_use</title>
+<polygon fill="none" stroke="black" points="453.12,-750 332.44,-732 453.12,-714 573.8,-732 453.12,-750"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-727.8" font-family="Times,serif" font-size="14.00">which CAS to use?</text>
+</g>
+<!-- sage -->
+<g id="node16" class="node">
+<title>sage</title>
+<polygon fill="none" stroke="red" points="769.34,-750 715.34,-750 715.34,-714 769.34,-714 769.34,-750"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-727.8" font-family="Times,serif" font-size="14.00">Sage</text>
+</g>
+<!-- which_cas_to_use&#45;&gt;sage -->
+<g id="edge19" class="edge">
+<title>which_cas_to_use-&gt;sage</title>
+<path fill="none" stroke="red" d="M577.18,-732C622.87,-732 671.41,-732 703.75,-732"/>
+<polygon fill="red" stroke="red" points="703.38,-735.5 713.38,-732 703.38,-728.5 703.38,-735.5"/>
+</g>
+<!-- which_cas_to_use&#45;&gt;sympy -->
+<g id="edge20" class="edge">
+<title>which_cas_to_use-&gt;sympy</title>
+<path fill="none" stroke="blue" d="M513.77,-741.38C544.1,-746.31 581.5,-752.64 614.85,-759 644.37,-764.63 677.58,-771.75 702.57,-777.26"/>
+<polygon fill="blue" stroke="blue" points="701.77,-780.67 712.29,-779.42 703.29,-773.84 701.77,-780.67"/>
+</g>
+<!-- expression_representation -->
+<g id="node18" class="node">
+<title>expression_representation</title>
+<polygon fill="none" stroke="black" points="453.12,-696 292.27,-678 453.12,-660 613.97,-678 453.12,-696"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-673.8" font-family="Times,serif" font-size="14.00">expression representation?</text>
+</g>
+<!-- expression_representation&#45;&gt;sage -->
+<g id="edge25" class="edge">
+<title>expression_representation-&gt;sage</title>
+<path fill="none" stroke="red" d="M521.89,-688.71C550.61,-693.42 584.42,-699.2 614.85,-705 644.94,-710.74 678.87,-718.02 704.01,-723.58"/>
+<polygon fill="red" stroke="red" points="703.24,-727 713.76,-725.75 704.76,-720.16 703.24,-727"/>
+</g>
+<!-- expression_representation&#45;&gt;sympy -->
+<g id="edge21" class="edge">
+<title>expression_representation-&gt;sympy</title>
+<path fill="none" stroke="blue" d="M563.67,-684.07C581.73,-688.45 599.53,-695.08 614.85,-705 639.06,-720.68 627.65,-741.86 650.85,-759 665.99,-770.19 685.76,-776.77 702.95,-780.63"/>
+<polygon fill="blue" stroke="blue" points="701.83,-783.98 712.32,-782.5 703.2,-777.11 701.83,-783.98"/>
+</g>
+<!-- latex -->
+<g id="node19" class="node">
+<title>latex</title>
+<polygon fill="none" stroke="blue" points="769.34,-480 715.34,-480 715.34,-444 769.34,-444 769.34,-480"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-457.8" font-family="Times,serif" font-size="14.00">latex</text>
+</g>
+<!-- expression_representation&#45;&gt;latex -->
+<g id="edge22" class="edge">
+<title>expression_representation-&gt;latex</title>
+<path fill="none" stroke="blue" d="M486.12,-663.34C521.69,-645.65 578.85,-612.86 614.85,-570 640.19,-539.84 621.27,-515.01 650.85,-489 665.5,-476.12 686.07,-469.38 703.89,-465.86"/>
+<polygon fill="blue" stroke="blue" points="704.35,-469.33 713.63,-464.22 703.19,-462.43 704.35,-469.33"/>
+</g>
+<!-- mathematica -->
+<g id="node20" class="node">
+<title>mathematica</title>
+<polygon fill="none" stroke="red" points="786.1,-642 698.58,-642 698.58,-606 786.1,-606 786.1,-642"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-619.8" font-family="Times,serif" font-size="14.00">mathematica</text>
+</g>
+<!-- expression_representation&#45;&gt;mathematica -->
+<g id="edge23" class="edge">
+<title>expression_representation-&gt;mathematica</title>
+<path fill="none" stroke="red" d="M515.38,-666.48C566.33,-656.9 638.15,-643.4 687.05,-634.21"/>
+<polygon fill="red" stroke="red" points="687.68,-637.65 696.86,-632.36 686.39,-630.77 687.68,-637.65"/>
+</g>
+<!-- mathml -->
+<g id="node21" class="node">
+<title>mathml</title>
+<polygon fill="none" stroke="red" points="775.61,-696 709.06,-696 709.06,-660 775.61,-660 775.61,-696"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-673.8" font-family="Times,serif" font-size="14.00">MathML</text>
+</g>
+<!-- expression_representation&#45;&gt;mathml -->
+<g id="edge24" class="edge">
+<title>expression_representation-&gt;mathml</title>
+<path fill="none" stroke="red" d="M618.28,-678C647.33,-678 675.24,-678 697.11,-678"/>
+<polygon fill="red" stroke="red" points="697.09,-681.5 707.09,-678 697.09,-674.5 697.09,-681.5"/>
+</g>
+<!-- rendering_latex_on_web -->
+<g id="node29" class="node">
+<title>rendering_latex_on_web</title>
+<polygon fill="none" stroke="black" points="1083.01,-450 907.75,-432 1083.01,-414 1258.27,-432 1083.01,-450"/>
+<text xml:space="preserve" text-anchor="middle" x="1083.01" y="-427.8" font-family="Times,serif" font-size="14.00">how to render Latex on web?</text>
+</g>
+<!-- latex&#45;&gt;rendering_latex_on_web -->
+<g id="edge41" class="edge">
+<title>latex-&gt;rendering_latex_on_web</title>
+<path fill="none" stroke="blue" d="M769.63,-459.67C813.15,-455.82 902.5,-447.9 974.54,-441.52"/>
+<polygon fill="blue" stroke="blue" points="974.78,-445.01 984.43,-440.64 974.16,-438.04 974.78,-445.01"/>
+</g>
+<!-- rendering_mathml_on_web -->
+<g id="node30" class="node">
+<title>rendering_mathml_on_web</title>
+<polygon fill="none" stroke="black" points="1083.01,-504 889.53,-486 1083.01,-468 1276.49,-486 1083.01,-504"/>
+<text xml:space="preserve" text-anchor="middle" x="1083.01" y="-481.8" font-family="Times,serif" font-size="14.00">how to render MathML on web?</text>
+</g>
+<!-- mathml&#45;&gt;rendering_mathml_on_web -->
+<g id="edge40" class="edge">
+<title>mathml-&gt;rendering_mathml_on_web</title>
+<path fill="none" stroke="black" d="M776.02,-670.75C793.61,-666.23 815.41,-659.63 833.82,-651 919.11,-611.02 1008.61,-544.46 1053.19,-509.34"/>
+<polygon fill="black" stroke="black" points="1055.17,-512.24 1060.82,-503.29 1050.82,-506.76 1055.17,-512.24"/>
+</g>
+<!-- webserver -->
+<g id="node22" class="node">
+<title>webserver</title>
+<polygon fill="none" stroke="black" points="1083.01,-804 968.43,-786 1083.01,-768 1197.58,-786 1083.01,-804"/>
+<text xml:space="preserve" text-anchor="middle" x="1083.01" y="-781.8" font-family="Times,serif" font-size="14.00">which webserver?</text>
+</g>
+<!-- webserver&#45;&gt;flask -->
+<g id="edge26" class="edge">
+<title>webserver-&gt;flask</title>
+<path fill="none" stroke="blue" d="M1172.83,-790.34C1232.7,-793.26 1308.65,-796.97 1353.35,-799.16"/>
+<polygon fill="blue" stroke="blue" points="1353.15,-802.65 1363.31,-799.64 1353.49,-795.66 1353.15,-802.65"/>
+</g>
+<!-- webserver&#45;&gt;django -->
+<g id="edge27" class="edge">
+<title>webserver-&gt;django</title>
+<path fill="none" stroke="red" d="M1129.32,-797.21C1190.19,-812.28 1297.24,-838.77 1353.74,-852.76"/>
+<polygon fill="red" stroke="red" points="1352.65,-856.09 1363.2,-855.1 1354.33,-849.3 1352.65,-856.09"/>
+</g>
+<!-- ui -->
+<g id="node25" class="node">
+<title>ui</title>
+<polygon fill="none" stroke="black" points="453.12,-318 417.04,-300 453.12,-282 489.2,-300 453.12,-318"/>
+<polyline fill="none" stroke="black" points="427.78,-305.36 427.78,-294.64"/>
+<polyline fill="none" stroke="black" points="442.38,-287.36 463.86,-287.36"/>
+<polyline fill="none" stroke="black" points="478.46,-294.64 478.46,-305.36"/>
+<polyline fill="none" stroke="black" points="463.86,-312.64 442.38,-312.64"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-295.8" font-family="Times,serif" font-size="14.00">UI?</text>
+</g>
+<!-- smartphone_app -->
+<g id="node26" class="node">
+<title>smartphone_app</title>
+<polygon fill="none" stroke="red" points="794.85,-372 689.82,-372 689.82,-336 794.85,-336 794.85,-372"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-349.8" font-family="Times,serif" font-size="14.00">smartphone app</text>
+</g>
+<!-- ui&#45;&gt;smartphone_app -->
+<g id="edge30" class="edge">
+<title>ui-&gt;smartphone_app</title>
+<path fill="none" stroke="red" d="M480.37,-304.94C524.89,-313.31 616.39,-330.51 678.32,-342.15"/>
+<polygon fill="red" stroke="red" points="677.56,-345.57 688.04,-343.98 678.86,-338.69 677.56,-345.57"/>
+</g>
+<!-- cmd_line -->
+<g id="node27" class="node">
+<title>cmd_line</title>
+<polygon fill="none" stroke="#8b8b83" points="790.19,-318 694.49,-318 694.49,-282 790.19,-282 790.19,-318"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-295.8" font-family="Times,serif" font-size="14.00">command line</text>
+</g>
+<!-- ui&#45;&gt;cmd_line -->
+<g id="edge28" class="edge">
+<title>ui-&gt;cmd_line</title>
+<path fill="none" stroke="#8b8b83" d="M490.2,-300C538.55,-300 624.94,-300 682.7,-300"/>
+<polygon fill="#8b8b83" stroke="#8b8b83" points="682.69,-303.5 692.69,-300 682.69,-296.5 682.69,-303.5"/>
+</g>
+<!-- webpage -->
+<g id="node28" class="node">
+<title>webpage</title>
+<polygon fill="none" stroke="blue" points="775.21,-264 709.46,-264 709.46,-228 775.21,-228 775.21,-264"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-241.8" font-family="Times,serif" font-size="14.00">webpage</text>
+</g>
+<!-- ui&#45;&gt;webpage -->
+<g id="edge29" class="edge">
+<title>ui-&gt;webpage</title>
+<path fill="none" stroke="blue" d="M480.37,-295.06C529.94,-285.75 637.74,-265.48 698.13,-254.12"/>
+<polygon fill="blue" stroke="blue" points="698.52,-257.61 707.7,-252.32 697.23,-250.73 698.52,-257.61"/>
+</g>
+<!-- webpage&#45;&gt;webserver -->
+<g id="edge31" class="edge">
+<title>webpage-&gt;webserver</title>
+<path fill="none" stroke="black" d="M775.59,-247.25C795.3,-249.79 819.42,-256.41 833.82,-273 904.52,-354.45 827.34,-413.86 869.82,-513 915.02,-618.49 1011.05,-718.67 1056.78,-762.64"/>
+<polygon fill="black" stroke="black" points="1054.21,-765.03 1063.87,-769.39 1059.04,-759.96 1054.21,-765.03"/>
+</g>
+<!-- webpage&#45;&gt;rendering_latex_on_web -->
+<g id="edge35" class="edge">
+<title>webpage-&gt;rendering_latex_on_web</title>
+<path fill="none" stroke="blue" d="M775.43,-248.37C794.58,-251.37 818.15,-258.08 833.82,-273 868.64,-306.15 834.55,-342.34 869.82,-375 896.34,-399.55 932.29,-413.74 967.07,-421.87"/>
+<polygon fill="blue" stroke="blue" points="966.31,-425.29 976.82,-423.98 967.79,-418.45 966.31,-425.29"/>
+</g>
+<!-- webpage&#45;&gt;rendering_mathml_on_web -->
+<g id="edge36" class="edge">
+<title>webpage-&gt;rendering_mathml_on_web</title>
+<path fill="none" stroke="red" d="M775.35,-247.46C794.97,-250.08 819.07,-256.72 833.82,-273 890.35,-335.41 808.39,-401.42 869.82,-459 901.46,-488.66 948.4,-496.88 990.09,-497.04"/>
+<polygon fill="red" stroke="red" points="989.94,-500.55 999.89,-496.92 989.85,-493.55 989.94,-500.55"/>
+</g>
+<!-- third_party_libraries_for_speed_or_self_written_slower -->
+<g id="node44" class="node">
+<title>third_party_libraries_for_speed_or_self_written_slower</title>
+<polygon fill="none" stroke="black" points="1083.01,-311.6 898.69,-270 1083.01,-228.4 1267.32,-270 1083.01,-311.6"/>
+<text xml:space="preserve" text-anchor="middle" x="1083.01" y="-274.2" font-family="Times,serif" font-size="14.00">third-party libraries (faster) or</text>
+<text xml:space="preserve" text-anchor="middle" x="1083.01" y="-257.4" font-family="Times,serif" font-size="14.00">self-written (slower)?</text>
+</g>
+<!-- webpage&#45;&gt;third_party_libraries_for_speed_or_self_written_slower -->
+<g id="edge53" class="edge">
+<title>webpage-&gt;third_party_libraries_for_speed_or_self_written_slower</title>
+<path fill="none" stroke="black" d="M775.5,-248.28C811.34,-250.82 871.86,-255.11 929.7,-259.21"/>
+<polygon fill="black" stroke="black" points="929.11,-262.67 939.33,-259.89 929.61,-255.69 929.11,-262.67"/>
+</g>
+<!-- mathjax -->
+<g id="node31" class="node">
+<title>mathjax</title>
+<polygon fill="none" stroke="blue" points="1422.64,-504 1361.54,-504 1361.54,-468 1422.64,-468 1422.64,-504"/>
+<text xml:space="preserve" text-anchor="middle" x="1392.09" y="-481.8" font-family="Times,serif" font-size="14.00">mathjax</text>
+</g>
+<!-- rendering_latex_on_web&#45;&gt;mathjax -->
+<g id="edge37" class="edge">
+<title>rendering_latex_on_web-&gt;mathjax</title>
+<path fill="none" stroke="blue" d="M1177.2,-440.79C1214.42,-445.09 1257.54,-451.09 1296.2,-459 1314.37,-462.72 1334.14,-468.12 1350.92,-473.12"/>
+<polygon fill="blue" stroke="blue" points="1349.42,-476.32 1360.01,-475.88 1351.46,-469.63 1349.42,-476.32"/>
+</g>
+<!-- katex -->
+<g id="node32" class="node">
+<title>katex</title>
+<polygon fill="none" stroke="red" points="1419.09,-450 1365.09,-450 1365.09,-414 1419.09,-414 1419.09,-450"/>
+<text xml:space="preserve" text-anchor="middle" x="1392.09" y="-427.8" font-family="Times,serif" font-size="14.00">katex</text>
+</g>
+<!-- rendering_latex_on_web&#45;&gt;katex -->
+<g id="edge38" class="edge">
+<title>rendering_latex_on_web-&gt;katex</title>
+<path fill="none" stroke="red" d="M1263.08,-432C1297.31,-432 1329.79,-432 1353.47,-432"/>
+<polygon fill="red" stroke="red" points="1353.17,-435.5 1363.17,-432 1353.17,-428.5 1353.17,-435.5"/>
+</g>
+<!-- rendering_mathml_on_web&#45;&gt;mathjax -->
+<g id="edge39" class="edge">
+<title>rendering_mathml_on_web-&gt;mathjax</title>
+<path fill="none" stroke="blue" d="M1281.53,-486C1307.25,-486 1331.17,-486 1350.05,-486"/>
+<polygon fill="blue" stroke="blue" points="1349.9,-489.5 1359.9,-486 1349.9,-482.5 1349.9,-489.5"/>
+</g>
+<!-- goal_accessible -->
+<g id="node33" class="node">
+<title>goal_accessible</title>
+<ellipse fill="none" stroke="black" cx="127.69" cy="-180" rx="71.9" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="127.69" y="-175.8" font-family="Times,serif" font-size="14.00">goal: accessible</text>
+</g>
+<!-- goal_low_cost -->
+<g id="node34" class="node">
+<title>goal_low_cost</title>
+<ellipse fill="none" stroke="black" cx="453.12" cy="-18" rx="65.22" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-13.8" font-family="Times,serif" font-size="14.00">goal: low cost</text>
+</g>
+<!-- goal_accessible&#45;&gt;goal_low_cost -->
+<g id="edge42" class="edge">
+<title>goal_accessible-&gt;goal_low_cost</title>
+<path fill="none" stroke="black" d="M144.18,-162.09C170.94,-132.44 228.99,-73.58 291.39,-45 317.95,-32.83 349.24,-26.09 377.12,-22.37"/>
+<polygon fill="black" stroke="black" points="377.42,-25.86 386.93,-21.18 376.58,-18.91 377.42,-25.86"/>
+</g>
+<!-- goal_accessible_to_physicist_users -->
+<g id="node35" class="node">
+<title>goal_accessible_to_physicist_users</title>
+<ellipse fill="none" stroke="black" cx="453.12" cy="-240" rx="141.38" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-235.8" font-family="Times,serif" font-size="14.00">goal: accessible to Physicist users</text>
+</g>
+<!-- goal_accessible&#45;&gt;goal_accessible_to_physicist_users -->
+<g id="edge43" class="edge">
+<title>goal_accessible-&gt;goal_accessible_to_physicist_users</title>
+<path fill="none" stroke="black" d="M186.52,-190.73C234.72,-199.67 304.29,-212.58 360.13,-222.94"/>
+<polygon fill="black" stroke="black" points="359.15,-226.31 369.62,-224.7 360.43,-219.43 359.15,-226.31"/>
+</g>
+<!-- goal_accessible_to_developers -->
+<g id="node36" class="node">
+<title>goal_accessible_to_developers</title>
+<ellipse fill="none" stroke="black" cx="453.12" cy="-180" rx="161.73" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-175.8" font-family="Times,serif" font-size="14.00">goal: accessible to software developers</text>
+</g>
+<!-- goal_accessible&#45;&gt;goal_accessible_to_developers -->
+<g id="edge44" class="edge">
+<title>goal_accessible-&gt;goal_accessible_to_developers</title>
+<path fill="none" stroke="black" d="M200.07,-180C223.97,-180 251.74,-180 279.93,-180"/>
+<polygon fill="black" stroke="black" points="279.66,-183.5 289.66,-180 279.66,-176.5 279.66,-183.5"/>
+</g>
+<!-- goal_accessible_to_physicist_users&#45;&gt;latex -->
+<g id="edge47" class="edge">
+<title>goal_accessible_to_physicist_users-&gt;latex</title>
+<path fill="none" stroke="blue" d="M575.93,-249.06C590.4,-254.51 603.89,-262.21 614.85,-273 667.43,-324.73 600.59,-381.02 650.85,-435 664.39,-449.54 685.38,-456.36 703.74,-459.52"/>
+<polygon fill="blue" stroke="blue" points="703.14,-462.97 713.53,-460.87 704.1,-456.03 703.14,-462.97"/>
+</g>
+<!-- goal_accessible_to_physicist_users&#45;&gt;webpage -->
+<g id="edge57" class="edge">
+<title>goal_accessible_to_physicist_users-&gt;webpage</title>
+<path fill="none" stroke="black" d="M593.1,-242.9C631.06,-243.7 669.46,-244.5 697.66,-245.09"/>
+<polygon fill="black" stroke="black" points="697.5,-248.59 707.58,-245.29 697.65,-241.59 697.5,-248.59"/>
+</g>
+<!-- goal_visualize_graph -->
+<g id="node57" class="node">
+<title>goal_visualize_graph</title>
+<ellipse fill="none" stroke="black" cx="742.34" cy="-192" rx="91.48" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-187.8" font-family="Times,serif" font-size="14.00">goal: visualize graph</text>
+</g>
+<!-- goal_accessible_to_physicist_users&#45;&gt;goal_visualize_graph -->
+<g id="edge68" class="edge">
+<title>goal_accessible_to_physicist_users-&gt;goal_visualize_graph</title>
+<path fill="none" stroke="black" d="M540.68,-225.53C578.55,-219.2 622.75,-211.82 660,-205.59"/>
+<polygon fill="black" stroke="black" points="660.55,-209.05 669.83,-203.95 659.39,-202.15 660.55,-209.05"/>
+</g>
+<!-- use_containers -->
+<g id="node49" class="node">
+<title>use_containers</title>
+<polygon fill="none" stroke="blue" points="790.18,-144 694.49,-144 694.49,-108 790.18,-108 790.18,-144"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-121.8" font-family="Times,serif" font-size="14.00">use containers</text>
+</g>
+<!-- goal_accessible_to_developers&#45;&gt;use_containers -->
+<g id="edge60" class="edge">
+<title>goal_accessible_to_developers-&gt;use_containers</title>
+<path fill="none" stroke="black" d="M547.74,-164.99C569.78,-161.25 593.17,-157.13 614.85,-153 637.19,-148.74 661.66,-143.63 683.07,-139"/>
+<polygon fill="black" stroke="black" points="683.78,-142.42 692.81,-136.88 682.29,-135.58 683.78,-142.42"/>
+</g>
+<!-- goal_concurrent_users -->
+<g id="node37" class="node">
+<title>goal_concurrent_users</title>
+<ellipse fill="none" stroke="black" cx="127.69" cy="-934" rx="127.69" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="127.69" y="-929.8" font-family="Times,serif" font-size="14.00">goal: support concurrent users</text>
+</g>
+<!-- goal_concurrent_users&#45;&gt;sql -->
+<g id="edge45" class="edge">
+<title>goal_concurrent_users-&gt;sql</title>
+<path fill="none" stroke="black" d="M225.29,-922.05C288.31,-914.26 367.16,-904.51 413.35,-898.79"/>
+<polygon fill="black" stroke="black" points="413.64,-902.29 423.14,-897.58 412.78,-895.34 413.64,-902.29"/>
+</g>
+<!-- goal_concurrent_users&#45;&gt;neo4j -->
+<g id="edge46" class="edge">
+<title>goal_concurrent_users-&gt;neo4j</title>
+<path fill="none" stroke="black" d="M176.97,-950.96C202.96,-962.11 233.99,-978.95 255.39,-1002 282.19,-1030.87 260.25,-1058.86 291.39,-1083 326.55,-1110.26 379.15,-1114.22 414.5,-1113.22"/>
+<polygon fill="black" stroke="black" points="414.44,-1116.72 424.27,-1112.78 414.12,-1109.73 414.44,-1116.72"/>
+</g>
+<!-- goal_verifiable_correctness -->
+<g id="node38" class="node">
+<title>goal_verifiable_correctness</title>
+<ellipse fill="none" stroke="black" cx="127.69" cy="-633" rx="115.6" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="127.69" y="-628.8" font-family="Times,serif" font-size="14.00">goal: verifiable correctness</text>
+</g>
+<!-- goal_verifiable_correctness&#45;&gt;which_cas_to_use -->
+<g id="edge48" class="edge">
+<title>goal_verifiable_correctness-&gt;which_cas_to_use</title>
+<path fill="none" stroke="black" d="M161.72,-650.56C193.95,-666.99 244.79,-691.02 291.39,-705 316.77,-712.62 345.08,-718.27 370.8,-722.38"/>
+<polygon fill="black" stroke="black" points="370.11,-725.82 380.53,-723.88 371.17,-718.9 370.11,-725.82"/>
+</g>
+<!-- which_theorem_prover_to_use -->
+<g id="node39" class="node">
+<title>which_theorem_prover_to_use</title>
+<polygon fill="none" stroke="black" points="453.12,-561 323.36,-543 453.12,-525 582.88,-543 453.12,-561"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-538.8" font-family="Times,serif" font-size="14.00">which prover to use?</text>
+</g>
+<!-- goal_verifiable_correctness&#45;&gt;which_theorem_prover_to_use -->
+<g id="edge52" class="edge">
+<title>goal_verifiable_correctness-&gt;which_theorem_prover_to_use</title>
+<path fill="none" stroke="black" d="M185.77,-617.12C245.57,-600.48 338.82,-574.53 397.63,-558.16"/>
+<polygon fill="black" stroke="black" points="398.4,-561.58 407.1,-555.53 396.52,-554.84 398.4,-561.58"/>
+</g>
+<!-- coq -->
+<g id="node40" class="node">
+<title>coq</title>
+<polygon fill="none" stroke="red" points="769.34,-534 715.34,-534 715.34,-498 769.34,-498 769.34,-534"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-511.8" font-family="Times,serif" font-size="14.00">COQ</text>
+</g>
+<!-- which_theorem_prover_to_use&#45;&gt;coq -->
+<g id="edge49" class="edge">
+<title>which_theorem_prover_to_use-&gt;coq</title>
+<path fill="none" stroke="red" d="M532.98,-535.59C588.54,-530.36 660.45,-523.6 703.62,-519.55"/>
+<polygon fill="red" stroke="red" points="703.86,-523.04 713.49,-518.62 703.21,-516.07 703.86,-523.04"/>
+</g>
+<!-- lean -->
+<g id="node41" class="node">
+<title>lean</title>
+<polygon fill="none" stroke="blue" points="769.34,-426 715.34,-426 715.34,-390 769.34,-390 769.34,-426"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-403.8" font-family="Times,serif" font-size="14.00">Lean</text>
+</g>
+<!-- which_theorem_prover_to_use&#45;&gt;lean -->
+<g id="edge50" class="edge">
+<title>which_theorem_prover_to_use-&gt;lean</title>
+<path fill="none" stroke="blue" d="M477.53,-528C513.59,-505.4 585.43,-462.35 650.85,-435 667.93,-427.86 687.55,-421.76 704.15,-417.18"/>
+<polygon fill="blue" stroke="blue" points="704.87,-420.61 713.62,-414.65 703.06,-413.85 704.87,-420.61"/>
+</g>
+<!-- isabelle_hol -->
+<g id="node42" class="node">
+<title>isabelle_hol</title>
+<polygon fill="none" stroke="red" points="788.43,-588 696.24,-588 696.24,-552 788.43,-552 788.43,-588"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-565.8" font-family="Times,serif" font-size="14.00">Isabelle/HOL</text>
+</g>
+<!-- which_theorem_prover_to_use&#45;&gt;isabelle_hol -->
+<g id="edge51" class="edge">
+<title>which_theorem_prover_to_use-&gt;isabelle_hol</title>
+<path fill="none" stroke="red" d="M532.98,-550.41C581,-554.93 641.24,-560.59 684.58,-564.66"/>
+<polygon fill="red" stroke="red" points="683.98,-568.12 694.26,-565.57 684.63,-561.15 683.98,-568.12"/>
+</g>
+<!-- goal_durable -->
+<g id="node43" class="node">
+<title>goal_durable</title>
+<ellipse fill="none" stroke="black" cx="1083.01" cy="-348" rx="61.72" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="1083.01" y="-343.8" font-family="Times,serif" font-size="14.00">goal: durable</text>
+</g>
+<!-- pure_javascript -->
+<g id="node45" class="node">
+<title>pure_javascript</title>
+<polygon fill="none" stroke="blue" points="1441.49,-354 1342.69,-354 1342.69,-318 1441.49,-318 1441.49,-354"/>
+<text xml:space="preserve" text-anchor="middle" x="1392.09" y="-331.8" font-family="Times,serif" font-size="14.00">pure javascript</text>
+</g>
+<!-- goal_durable&#45;&gt;pure_javascript -->
+<g id="edge56" class="edge">
+<title>goal_durable-&gt;pure_javascript</title>
+<path fill="none" stroke="black" d="M1144.68,-345.63C1198.74,-343.52 1277.41,-340.44 1331.23,-338.34"/>
+<polygon fill="black" stroke="black" points="1331.29,-341.84 1341.14,-337.95 1331.01,-334.85 1331.29,-341.84"/>
+</g>
+<!-- third_party_libraries_for_speed_or_self_written_slower&#45;&gt;pure_javascript -->
+<g id="edge54" class="edge">
+<title>third_party_libraries_for_speed_or_self_written_slower-&gt;pure_javascript</title>
+<path fill="none" stroke="blue" d="M1179.07,-290.43C1228.71,-301.1 1287.94,-313.83 1331.16,-323.12"/>
+<polygon fill="blue" stroke="blue" points="1330.36,-326.53 1340.87,-325.21 1331.83,-319.68 1330.36,-326.53"/>
+</g>
+<!-- javascript_libraries -->
+<g id="node46" class="node">
+<title>javascript_libraries</title>
+<polygon fill="none" stroke="blue" points="1451.99,-288 1332.2,-288 1332.2,-252 1451.99,-252 1451.99,-288"/>
+<text xml:space="preserve" text-anchor="middle" x="1392.09" y="-265.8" font-family="Times,serif" font-size="14.00">javascript libraries</text>
+</g>
+<!-- third_party_libraries_for_speed_or_self_written_slower&#45;&gt;javascript_libraries -->
+<g id="edge55" class="edge">
+<title>third_party_libraries_for_speed_or_self_written_slower-&gt;javascript_libraries</title>
+<path fill="none" stroke="blue" d="M1269.28,-270C1287.43,-270 1304.95,-270 1320.78,-270"/>
+<polygon fill="blue" stroke="blue" points="1320.48,-273.5 1330.48,-270 1320.48,-266.5 1320.48,-273.5"/>
+</g>
+<!-- d3js -->
+<g id="node60" class="node">
+<title>d3js</title>
+<polygon fill="none" stroke="blue" points="1648.17,-265 1594.17,-265 1594.17,-229 1648.17,-229 1648.17,-265"/>
+<text xml:space="preserve" text-anchor="middle" x="1621.17" y="-242.8" font-family="Times,serif" font-size="14.00">d3js</text>
+</g>
+<!-- javascript_libraries&#45;&gt;d3js -->
+<g id="edge72" class="edge">
+<title>javascript_libraries-&gt;d3js</title>
+<path fill="none" stroke="blue" d="M1452.46,-263.99C1493.66,-259.81 1547.29,-254.38 1582.68,-250.8"/>
+<polygon fill="blue" stroke="blue" points="1582.84,-254.3 1592.43,-249.81 1582.13,-247.33 1582.84,-254.3"/>
+</g>
+<!-- goal_reproducible -->
+<g id="node47" class="node">
+<title>goal_reproducible</title>
+<ellipse fill="none" stroke="black" cx="453.12" cy="-126" rx="139.49" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-121.8" font-family="Times,serif" font-size="14.00">goal: reproducible software build</text>
+</g>
+<!-- goal_reproducible&#45;&gt;use_containers -->
+<g id="edge67" class="edge">
+<title>goal_reproducible-&gt;use_containers</title>
+<path fill="none" stroke="blue" d="M593.1,-126C624.78,-126 656.76,-126 682.87,-126"/>
+<polygon fill="blue" stroke="blue" points="682.54,-129.5 692.54,-126 682.54,-122.5 682.54,-129.5"/>
+</g>
+<!-- bare_metal_or_containers -->
+<g id="node48" class="node">
+<title>bare_metal_or_containers</title>
+<polygon fill="none" stroke="black" points="453.12,-90 299.87,-72 453.12,-54 606.36,-72 453.12,-90"/>
+<polyline fill="none" stroke="black" points="311.79,-73.4 311.79,-70.6"/>
+<polyline fill="none" stroke="black" points="441.2,-55.4 465.04,-55.4"/>
+<polyline fill="none" stroke="black" points="594.45,-70.6 594.45,-73.4"/>
+<polyline fill="none" stroke="black" points="465.04,-88.6 441.2,-88.6"/>
+<text xml:space="preserve" text-anchor="middle" x="453.12" y="-67.8" font-family="Times,serif" font-size="14.00">bare metal or contaienrs?</text>
+</g>
+<!-- bare_metal_or_containers&#45;&gt;use_containers -->
+<g id="edge58" class="edge">
+<title>bare_metal_or_containers-&gt;use_containers</title>
+<path fill="none" stroke="blue" d="M520.71,-82.51C549.68,-87.26 584,-93.12 614.85,-99 637.19,-103.26 661.66,-108.37 683.07,-113"/>
+<polygon fill="blue" stroke="blue" points="682.29,-116.42 692.81,-115.12 683.78,-109.58 682.29,-116.42"/>
+</g>
+<!-- run_software_bare_metal -->
+<g id="node50" class="node">
+<title>run_software_bare_metal</title>
+<polygon fill="none" stroke="black" points="785.52,-89.8 699.16,-89.8 699.16,-48.2 785.52,-48.2 785.52,-89.8"/>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-73.2" font-family="Times,serif" font-size="14.00">run software</text>
+<text xml:space="preserve" text-anchor="middle" x="742.34" y="-56.4" font-family="Times,serif" font-size="14.00">bare metal</text>
+</g>
+<!-- bare_metal_or_containers&#45;&gt;run_software_bare_metal -->
+<g id="edge59" class="edge">
+<title>bare_metal_or_containers-&gt;run_software_bare_metal</title>
+<path fill="none" stroke="black" d="M597.73,-70.5C629.83,-70.16 661.94,-69.83 687.63,-69.56"/>
+<polygon fill="black" stroke="black" points="687.48,-73.06 697.44,-69.46 687.41,-66.06 687.48,-73.06"/>
+</g>
+<!-- which_container_tech -->
+<g id="node51" class="node">
+<title>which_container_tech</title>
+<polygon fill="none" stroke="black" points="1083.01,-155.6 977.21,-114 1083.01,-72.4 1188.81,-114 1083.01,-155.6"/>
+<text xml:space="preserve" text-anchor="middle" x="1083.01" y="-118.2" font-family="Times,serif" font-size="14.00">which container</text>
+<text xml:space="preserve" text-anchor="middle" x="1083.01" y="-101.4" font-family="Times,serif" font-size="14.00">technology?</text>
+</g>
+<!-- use_containers&#45;&gt;which_container_tech -->
+<g id="edge66" class="edge">
+<title>use_containers-&gt;which_container_tech</title>
+<path fill="none" stroke="black" d="M790.43,-124.33C837.57,-122.66 911.77,-120.03 973.52,-117.84"/>
+<polygon fill="black" stroke="black" points="973.51,-121.35 983.38,-117.49 973.26,-114.35 973.51,-121.35"/>
+</g>
+<!-- docker -->
+<g id="node52" class="node">
+<title>docker</title>
+<polygon fill="none" stroke="blue" points="1419.14,-137 1365.05,-137 1365.05,-101 1419.14,-101 1419.14,-137"/>
+<text xml:space="preserve" text-anchor="middle" x="1392.09" y="-114.8" font-family="Times,serif" font-size="14.00">docker</text>
+</g>
+<!-- which_container_tech&#45;&gt;docker -->
+<g id="edge61" class="edge">
+<title>which_container_tech-&gt;docker</title>
+<path fill="none" stroke="blue" d="M1185.84,-115.66C1243.36,-116.59 1311.85,-117.71 1353.36,-118.39"/>
+<polygon fill="blue" stroke="blue" points="1353.27,-121.88 1363.32,-118.55 1353.38,-114.89 1353.27,-121.88"/>
+</g>
+<!-- apptainer -->
+<g id="node53" class="node">
+<title>apptainer</title>
+<polygon fill="none" stroke="red" points="1426.13,-83 1358.05,-83 1358.05,-47 1426.13,-47 1426.13,-83"/>
+<text xml:space="preserve" text-anchor="middle" x="1392.09" y="-60.8" font-family="Times,serif" font-size="14.00">apptainer</text>
+</g>
+<!-- which_container_tech&#45;&gt;apptainer -->
+<g id="edge62" class="edge">
+<title>which_container_tech-&gt;apptainer</title>
+<path fill="none" stroke="red" d="M1159.52,-101.95C1218.22,-92.59 1297.63,-79.91 1346.55,-72.11"/>
+<polygon fill="red" stroke="red" points="1346.88,-75.6 1356.21,-70.57 1345.78,-68.69 1346.88,-75.6"/>
+</g>
+<!-- monolith_or_services -->
+<g id="node54" class="node">
+<title>monolith_or_services</title>
+<polygon fill="none" stroke="black" points="1621.17,-137 1487.99,-119 1621.17,-101 1754.34,-119 1621.17,-137"/>
+<text xml:space="preserve" text-anchor="middle" x="1621.17" y="-114.8" font-family="Times,serif" font-size="14.00">monolith or services?</text>
+</g>
+<!-- docker&#45;&gt;monolith_or_services -->
+<g id="edge65" class="edge">
+<title>docker-&gt;monolith_or_services</title>
+<path fill="none" stroke="blue" d="M1419.58,-119C1433.8,-119 1452.56,-119 1472.91,-119"/>
+<polygon fill="blue" stroke="blue" points="1472.85,-122.5 1482.85,-119 1472.85,-115.5 1472.85,-122.5"/>
+</g>
+<!-- monolith_container -->
+<g id="node55" class="node">
+<title>monolith_container</title>
+<polygon fill="none" stroke="red" points="1912.49,-166 1790.34,-166 1790.34,-130 1912.49,-130 1912.49,-166"/>
+<text xml:space="preserve" text-anchor="middle" x="1851.42" y="-143.8" font-family="Times,serif" font-size="14.00">monolith container</text>
+</g>
+<!-- monolith_or_services&#45;&gt;monolith_container -->
+<g id="edge63" class="edge">
+<title>monolith_or_services-&gt;monolith_container</title>
+<path fill="none" stroke="red" d="M1692.2,-127.9C1719.73,-131.4 1751.3,-135.41 1778.96,-138.92"/>
+<polygon fill="red" stroke="red" points="1778.29,-142.36 1788.65,-140.15 1779.17,-135.42 1778.29,-142.36"/>
+</g>
+<!-- multiple_container_services -->
+<g id="node56" class="node">
+<title>multiple_container_services</title>
+<polygon fill="none" stroke="blue" points="1910.54,-111.8 1792.29,-111.8 1792.29,-70.2 1910.54,-70.2 1910.54,-111.8"/>
+<text xml:space="preserve" text-anchor="middle" x="1851.42" y="-95.2" font-family="Times,serif" font-size="14.00">multiple container</text>
+<text xml:space="preserve" text-anchor="middle" x="1851.42" y="-78.4" font-family="Times,serif" font-size="14.00">services</text>
+</g>
+<!-- monolith_or_services&#45;&gt;multiple_container_services -->
+<g id="edge64" class="edge">
+<title>monolith_or_services-&gt;multiple_container_services</title>
+<path fill="none" stroke="blue" d="M1693.13,-110.29C1721.08,-106.87 1753.08,-102.94 1780.89,-99.53"/>
+<polygon fill="blue" stroke="blue" points="1781.12,-103.03 1790.62,-98.34 1780.27,-96.08 1781.12,-103.03"/>
+</g>
+<!-- which_graph_visualization -->
+<g id="node58" class="node">
+<title>which_graph_visualization</title>
+<polygon fill="none" stroke="black" points="1083.01,-210 869.82,-192 1083.01,-174 1296.2,-192 1083.01,-210"/>
+<text xml:space="preserve" text-anchor="middle" x="1083.01" y="-187.8" font-family="Times,serif" font-size="14.00">which graph visualizaiton software?</text>
+</g>
+<!-- goal_visualize_graph&#45;&gt;which_graph_visualization -->
+<g id="edge69" class="edge">
+<title>goal_visualize_graph-&gt;which_graph_visualization</title>
+<path fill="none" stroke="black" d="M834.09,-192C840.09,-192 846.26,-192 852.56,-192"/>
+<polygon fill="black" stroke="black" points="852.51,-195.5 862.51,-192 852.51,-188.5 852.51,-195.5"/>
+</g>
+<!-- graphviz -->
+<g id="node59" class="node">
+<title>graphviz</title>
+<polygon fill="none" stroke="blue" points="1424.58,-196 1359.6,-196 1359.6,-160 1424.58,-160 1424.58,-196"/>
+<text xml:space="preserve" text-anchor="middle" x="1392.09" y="-173.8" font-family="Times,serif" font-size="14.00">graphviz</text>
+</g>
+<!-- which_graph_visualization&#45;&gt;graphviz -->
+<g id="edge70" class="edge">
+<title>which_graph_visualization-&gt;graphviz</title>
+<path fill="none" stroke="blue" d="M1225.42,-185.55C1270,-183.52 1315.95,-181.43 1348.12,-179.96"/>
+<polygon fill="blue" stroke="blue" points="1347.98,-183.47 1357.81,-179.52 1347.66,-176.48 1347.98,-183.47"/>
+</g>
+<!-- which_graph_visualization&#45;&gt;d3js -->
+<g id="edge71" class="edge">
+<title>which_graph_visualization-&gt;d3js</title>
+<path fill="none" stroke="blue" d="M1182.35,-202.09C1302.65,-214.43 1500.41,-234.72 1582.57,-243.14"/>
+<polygon fill="blue" stroke="blue" points="1582.01,-246.6 1592.32,-244.14 1582.73,-239.64 1582.01,-246.6"/>
+</g>
+</g>
+</svg>

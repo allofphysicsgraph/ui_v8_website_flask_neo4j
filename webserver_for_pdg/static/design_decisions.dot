@@ -1,0 +1,233 @@
+digraph G {
+rankdir=LR;
+
+/* 
+legend for shapes:
+* decisions are diamonds
+* top-level design choices are Mdiamonds
+* goals are ovals
+* options are rectangles
+
+colors:
+* "Currently implemented" is blue
+* "never enacted" is red
+* "previously explored" is ivory4
+
+rule of connectivity for this graph:
+  DECISION -> OPTION, as in "has an"
+  GOAL -> OPTION, as in "is satisfied by"
+  GOAL -> GOAL, as in "has subgoal"
+  OPTION -> OPTION, as in "therefore"
+  
+*/
+
+/*
+Interestingly, some "decisions" never came up in my thinking
+* Goal of keeping cost low, so use open source
+* Goal of keeping cost low, so use linux
+* Goal of being reproducible, so release as open source
+
+(Windows and GUI might be more user-friendly)
+
+*/
+
+how_to_store_data [shape=Mdiamond, label="how to store data?"];
+
+xml [shape=rectangle, color=ivory4];
+csv [shape=rectangle, color=ivory4];
+json [shape=rectangle, color=blue];
+sql [shape=rectangle, label="SQLite", color=blue];
+neo4j [shape=rectangle, label="Neo4j", color=blue];
+rdf  [shape=rectangle, color=red];
+
+how_to_store_data -> xml [color=ivory4];
+how_to_store_data -> csv [color=ivory4];
+how_to_store_data -> json [color=blue];
+how_to_store_data -> sql [color=blue];
+how_to_store_data -> neo4j [color=blue];
+how_to_store_data -> rdf [color=red];
+
+which_language_for_backend [shape=Mdiamond, label="which language\nfor backend?"];
+
+python [shape=rectangle, label="Python", color=blue];
+cpp [shape=rectangle, label="C++", color=red];
+
+which_language_for_backend -> python [color=blue];
+which_language_for_backend -> cpp [color=red, color=red];
+
+how_to_query_data [shape=Mdiamond, label="how to query data?"];
+
+custom_python_query [shape=rectangle, label="custom Python query", color=blue];
+cypher_query [shape=rectangle, label="Cypher query", color=blue];
+sparql [shape=rectangle,label="SPARQL", color=red];
+
+how_to_query_data -> custom_python_query [color=blue];
+how_to_query_data -> cypher_query [color=blue];
+how_to_query_data -> sparql [color=red];
+
+xml -> custom_python_query [color=ivory4];
+csv -> custom_python_query [color=ivory4];
+json -> custom_python_query [color=blue];
+sql -> custom_python_query;
+
+neo4j -> cypher_query [color=blue];
+rdf -> sparql [color=red];
+
+python -> custom_python_query [color=blue];
+
+which_cas_to_use [shape=diamond, label="which CAS to use?"];
+
+which_cas_to_use -> sage [color=red];
+which_cas_to_use -> sympy [color=blue];
+
+expression_representation [shape=diamond, label="expression representation?"];
+sympy [shape=rectangle, label="SymPy", color=blue];
+latex [shape=rectangle, color=blue];
+mathematica [shape=rectangle, color=red];
+mathml [shape=rectangle, label="MathML", color=red];
+sage [shape=rectangle, label="Sage", color=red];
+
+expression_representation -> sympy [color=blue];
+expression_representation -> latex [color=blue];
+expression_representation -> mathematica [color=red];
+expression_representation -> mathml [color=red];
+expression_representation -> sage [color=red];
+
+webserver [shape=diamond, label="which webserver?"];
+flask [shape=rectangle, color=blue];
+django [shape=rectangle, color=red];
+webserver -> flask [color=blue];
+webserver -> django [color=red];
+
+ui [shape=Mdiamond, label="UI?"];
+smartphone_app [shape=rectangle, label="smartphone app", color=red];
+cmd_line [shape=rectangle, label="command line", color=ivory4];
+webpage [shape=rectangle, label="webpage", color=blue];
+ui -> cmd_line [color=ivory4];
+ui -> webpage [color=blue];
+ui -> smartphone_app [color=red];
+
+webpage -> webserver;
+
+python -> flask [color=blue];
+python -> django [color=red];
+
+python -> sympy [color=blue];
+
+//each_transformation_separate_query_or_pass_data_structure [shape=Mdiamond, label="each query\npass data structure or\nseparate query?"];
+
+//each_transformation_separate_query [shape=rectangle, label="separate query", color=blue];
+//each_transformation_pass_data_structure [shape=rectangle, label="pass data structure", color=blue];
+
+//each_transformation_separate_query_or_pass_data_structure -> each_transformation_separate_query [color=blue];
+//each_transformation_separate_query_or_pass_data_structure -> each_transformation_pass_data_structure [color=blue];
+
+rendering_latex_on_web [shape=diamond, label="how to render Latex on web?"];
+
+rendering_mathml_on_web [shape=diamond, label="how to render MathML on web?"];
+
+mathjax [shape=rectangle, color=blue];
+katex [shape=rectangle, color=red]
+
+webpage -> rendering_latex_on_web [color=blue];
+webpage -> rendering_mathml_on_web [color=red];
+
+rendering_latex_on_web -> mathjax [color=blue];
+rendering_latex_on_web -> katex [color=red];
+
+rendering_mathml_on_web -> mathjax [color=blue];
+
+mathml -> rendering_mathml_on_web;
+
+latex -> rendering_latex_on_web [color=blue];
+
+goal_accessible [label="goal: accessible"];
+goal_low_cost [label="goal: low cost"];
+goal_accessible_to_physicist_users [label="goal: accessible to Physicist users"];
+goal_accessible_to_developers [label="goal: accessible to software developers"];
+
+goal_accessible -> goal_low_cost;
+goal_accessible -> goal_accessible_to_physicist_users;
+goal_accessible -> goal_accessible_to_developers;
+
+goal_concurrent_users [label="goal: support concurrent users"];
+goal_concurrent_users -> sql;
+goal_concurrent_users -> neo4j;
+
+goal_accessible_to_physicist_users -> latex [color=blue];
+
+goal_verifiable_correctness [label="goal: verifiable correctness"];
+goal_verifiable_correctness -> which_cas_to_use;
+
+which_theorem_prover_to_use [shape=diamond, label="which prover to use?"];
+coq [shape=rectangle, label="COQ", color=red];
+lean [shape=rectangle, label="Lean", color=blue];
+isabelle_hol [shape=rectangle, label="Isabelle/HOL", color=red];
+
+which_theorem_prover_to_use -> coq [color=red];
+which_theorem_prover_to_use -> lean [color=blue];
+which_theorem_prover_to_use -> isabelle_hol [color=red];
+
+goal_verifiable_correctness -> which_theorem_prover_to_use;
+
+goal_durable [label="goal: durable"];
+
+third_party_libraries_for_speed_or_self_written_slower [shape=diamond, label="third-party libraries (faster) or\nself-written (slower)?"];
+
+webpage -> third_party_libraries_for_speed_or_self_written_slower;
+pure_javascript [shape=rectangle, label="pure javascript", color=blue];
+javascript_libraries [shape=rectangle, label="javascript libraries", color=blue];
+
+third_party_libraries_for_speed_or_self_written_slower -> pure_javascript [color=blue];
+third_party_libraries_for_speed_or_self_written_slower -> javascript_libraries [color=blue];
+
+goal_durable -> pure_javascript;
+
+goal_accessible_to_physicist_users -> webpage;
+
+goal_reproducible [label="goal: reproducible software build"];
+
+bare_metal_or_containers [shape=Mdiamond, label="bare metal or contaienrs?"];
+use_containers [shape=rectangle, label="use containers", color=blue];
+run_software_bare_metal [shape=rectangle, label="run software\nbare metal"]; 
+
+bare_metal_or_containers -> use_containers [color=blue];
+bare_metal_or_containers -> run_software_bare_metal;
+
+goal_accessible_to_developers -> use_containers;
+
+which_container_tech [shape=diamond, label="which container\ntechnology?"];
+docker [shape=rectangle, color=blue];
+apptainer [shape=rectangle, color=red];
+
+which_container_tech -> docker [color=blue];
+which_container_tech -> apptainer [color=red];
+
+monolith_or_services [shape=diamond, label="monolith or services?"];
+monolith_container  [shape=rectangle, label="monolith container", color=red];
+multiple_container_services [shape=rectangle, label="multiple container\nservices", color=blue];
+
+monolith_or_services -> monolith_container [color=red];
+monolith_or_services -> multiple_container_services [color=blue];
+
+docker -> monolith_or_services [color=blue];
+
+use_containers -> which_container_tech;
+
+goal_reproducible -> use_containers [color=blue];
+
+goal_visualize_graph [label="goal: visualize graph"];
+
+goal_accessible_to_physicist_users -> goal_visualize_graph;
+
+which_graph_visualization [shape=diamond, label="which graph visualizaiton software?"];
+graphviz [shape=rectangle, color=blue];
+d3js [shape=rectangle, color=blue];
+
+goal_visualize_graph -> which_graph_visualization;
+which_graph_visualization -> graphviz [color=blue];
+which_graph_visualization -> d3js [color=blue];
+
+javascript_libraries -> d3js [color=blue];
+
+}
