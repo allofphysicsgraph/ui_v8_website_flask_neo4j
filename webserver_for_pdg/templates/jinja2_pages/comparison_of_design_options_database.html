@@ -87,7 +87,7 @@
       </OL>
     </LI>
   </OL>
-Each of these have required a rewrite of the code from scratch, as well as transfer code (to move from n to n+1).
+<P>Each of these have required a rewrite of the code from scratch, as well as transfer code (to move from n to n+1).
 The author didn't know about property graphs when implementing v1, v2, and v3.
 </p>
 
@@ -104,7 +104,7 @@ The author didn't know about property graphs when implementing v1, v2, and v3.
 <H3><a name="other avenues">Other approaches</a></H3>
 <H4><a name="networkx">Networkx</a></H4>
 <!-- from https://allofphysicsgraph.github.io/proofofconcept/site/more_aspects/example_T_f_networkx.html -->
-<pre><code>
+<pre>
 import networkx as nx
 G=nx.digraph()
 G.add_edge([8332941,8482459])
@@ -117,7 +117,7 @@ G.add_edge([9483715,9380032])
 G.add_edge([9380032,8345721])
 nx.plot()
 plt.show()
-</code></pre>
+</pre>
 
 <H4><a name="graphml">GraphML</a></H4>
 
@@ -183,7 +183,7 @@ inference rule: multiply both sides by
 feed: 2
 output 2: 2*y = 2*m*x + 2*b
 </Pre>
-Putting this in RDF,
+<P>Putting this in RDF,
 <pre>
 step 1 | has input | y=mx+b
 step 1 | has inference rule | multiply both sides by
