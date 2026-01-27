@@ -82,7 +82,7 @@ Output:
 {f,=,1/T}
 </pre>
 
-Quadratic equation derivation<BR/>
+<P>Quadratic equation derivation<BR/>
 First, set up the inference rules:
 <pre>
 dividebothsidesby[expr_, x_] := Apart[First[expr]/x] == Apart[Last[expr]/x];
@@ -92,7 +92,7 @@ subXforY[expr_, x_, y_] := expr /. x -> y
 raiseBothSidesToPower[expr_, pwr_] = First[expr]^pwr == Last[expr]^pwr
 simplifyLHS [expr_, condition_] := FullSimplify [First[expr], condition] == Last[expr]
 </pre>
-Next, use the inference rules
+<P>Next, use the inference rules
 <pre>
 func = a*x^2+b*x+c == 0
 func = dividebothsidesby[func, a]
