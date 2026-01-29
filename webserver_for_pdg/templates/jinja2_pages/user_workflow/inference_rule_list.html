@@ -10,6 +10,8 @@
 { { list_of_derivations_used_per_inference_rule } }
 -->
 
+{% if list_of_inference_rule_dicts|length > 0 %}
+
 <fieldset>
 <legend>
   <H2>List of Inference Rules</h2>
@@ -51,6 +53,9 @@ function latex_filter() {
 <P>{% include 'jinja2_pages/reusable_components/_table_of_inference_rules.html' %}
 
 </fieldset>
+
+{% endif %}
+
 
 <fieldset>
 <legend>

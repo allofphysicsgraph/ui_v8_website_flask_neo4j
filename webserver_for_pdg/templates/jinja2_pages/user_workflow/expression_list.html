@@ -5,6 +5,8 @@
   Return to <a href="{{ url_for('to_navigation') }}?referrer=expression_list">navigation page</a>
 </P>
 
+{% if list_of_expression_dicts|length > 0 %}
+
 <fieldset>
 <legend>
   <H2>List of Expressions</h2>
@@ -12,8 +14,6 @@
 
 <!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
 Case-insensitive dynamic search of latex as plain text: <input type="text" id="latex_input" onkeyup="latex_filter()" placeholder="Search latex (plain text)" size="50">
-
-
 
 <script>
 function latex_filter() {
@@ -47,6 +47,8 @@ function latex_filter() {
 <P>{% include 'jinja2_pages/reusable_components/_table_of_expressions.html' %}
 
 </fieldset>
+
+{% endif %}
 
 <fieldset>
 <legend>
