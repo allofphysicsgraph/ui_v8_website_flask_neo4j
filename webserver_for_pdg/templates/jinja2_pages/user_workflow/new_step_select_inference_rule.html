@@ -13,6 +13,8 @@
 {{ derivation_dict['name_latex'] }} ?</P>
 
 
+{% if list_of_inference_rule_dicts|length > 0 %}
+
 <!-- https://stackoverflow.com/questions/32019733/getting-value-from-select-tag-using-flask -->
 
 <fieldset>
@@ -80,6 +82,8 @@ function latex_filter() {
   <P>The next step is to associate the inference rule with expressions. The expressions have to already exist in the database. 
 
 </fieldset>
+
+{% endif %}
 
 <fieldset>
   <legend>

@@ -23,14 +23,18 @@
 
     <P>{{form.inference_rule_number_of_outputs.label }} (<B>required</B>): {{ form.inference_rule_number_of_outputs() }}</P>
 
+    <P>The sum of input+feed+output must be greater than zero.
+
     <P><input type="submit" value="add inference rule"></P>
     
   </form>
 </fieldset>
 
+{% if list_of_inference_rule_dicts|length > 0 %}
 <P>TODO: as the user types the name and latex, filter the table below on that text.
 
 {% include 'jinja2_pages/reusable_components/_table_of_inference_rules.html' %}
 
+{% endif %}
 
 {% endblock %}

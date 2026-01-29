@@ -25,9 +25,13 @@
   </form>
 </fieldset>
 
+{% if list_of_derivation_dicts|length >0 %}
+
 <P>TODO: as user is entering derivation name, filter the list of existing derivations
 
 {% include 'jinja2_pages/reusable_components/_table_of_derivations.html' %}
+
+{% endif %}
 
 <script>
 function select_derivation() {

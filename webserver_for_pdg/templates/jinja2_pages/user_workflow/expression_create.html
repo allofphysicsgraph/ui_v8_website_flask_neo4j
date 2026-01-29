@@ -145,9 +145,13 @@ Latex:
   
 </fieldset>
 
+{% if list_of_expression_dicts|length > 0 %}
+
 TODO: as user is entering expression, filter the list of existing expressions
 
 {% include 'jinja2_pages/reusable_components/_table_of_expressions.html' %}
+
+{% endif %}
 
 <script>
 function select_expression() {
