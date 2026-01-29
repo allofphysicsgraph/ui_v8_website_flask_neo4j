@@ -73,6 +73,8 @@ def apoc_export_json(tx, output_filename: str):
     For the PDG, docker-compose has a shared folder on the host accessible both Neo4j and Flask.
     The file from neo4j can then be accessed by Flask for providing to the user via the web interface.
 
+    Default export data structure is 'JSON_LINES' (not JSON)
+
     >>> apoc_export_json(tx)
     """
     trace_id = str(random.randint(1000000, 9999999))

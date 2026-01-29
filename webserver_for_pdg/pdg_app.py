@@ -7290,6 +7290,11 @@ def to_delete_graph_content() -> werkzeug.Response:
 @web_app.route("/export_to_json")
 def to_export_json() -> werkzeug.Response:
     """
+    Produces JSON Lines (.jsonl) rather than JSON (JavaScript Object Notation)
+
+    Standard JSON is a single, often large, array or object,
+    while JSON Lines is a text format where each line is a valid, independent JSON object.
+
     https://github.com/neo4j/apoc
     https://neo4j.com/labs/apoc/4.1/installation/
 
@@ -7302,7 +7307,7 @@ def to_export_json() -> werkzeug.Response:
 
     with graphDB_Driver.session() as session:
         # query_start_time = time.time()
-        res = session.read_transaction(neo4j_query.apoc_export_json, "pdg.json")
+        res = session.read_transaction(neo4j_query.apoc_export_json, "pdg.jsonl")
         # query_time_dict["pdg_app/: "] = round(time.time() - query_start_time, 3)
 
     logger.info("pdg_app/to_export_json res=" + str(res))
@@ -7312,7 +7317,7 @@ def to_export_json() -> werkzeug.Response:
     logger.info(
         "[TRACE] pdg_app/to_export_json end " + str(trace_id) + " " + str(time.time())
     )
-    return redirect(url_for("static", filename="dumping_grounds/pdg.json"))
+    return redirect(url_for("static", filename="dumping_grounds/pdg.jsonl"))
 
 
 @web_app.route("/export_to_cypher")
