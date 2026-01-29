@@ -2696,6 +2696,11 @@ def to_add_expression() -> werkzeug.Response:
             "pdg_app/to_add_expression get_list_node_dicts_of_type relation" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
+    # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/66
+    if len(list_of_relation_dicts) == 0:
+        flash("Need to have at least on relation before entering an Expression")
+        return redirect(url_for("to_add_relation"))
+
     # logger.info("list_of_relation_dicts=",list_of_relation_dicts)
     # sort list_of_relation_dicts such that "=" is in position 0
     sorted_list_of_relation_dicts = []  # type: List[dict]
