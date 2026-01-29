@@ -92,6 +92,9 @@ RUN mv /code/node_modules/mathjax/es5 /code/static/mathjax
 # https://microsoft.github.io/pyright/#/installation
 RUN npm install -g pyright
 
+# Install Playwright browsers and their system dependencies
+#RUN npx playwright install --with-deps
+
 ################# end start npm; start pip #################################
 
 COPY requirements.txt requirements.txt
