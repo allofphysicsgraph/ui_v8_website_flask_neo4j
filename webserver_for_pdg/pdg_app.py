@@ -3165,20 +3165,23 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
             neo4j_query.get_node_properties, "relation", relation_id
         )
 
-    web_form = SpecifyNewSymbolRelationForm(request.form)
+    web_form_no_options = NoOptionsForm(request.form)
+    web_form_new_symbol = SpecifyNewSymbolRelationForm(request.form)
     logger.info("pdg_app/to_edit_relation: request.method =" + str(request.method))
     logger.info("pdg_app/to_edit_relation: request.form = " + str(request.form))
-    if request.method == "POST" and web_form.validate():
+    if request.method == "POST" and web_form_new_symbol.validate():
         logger.info(
             "pdg_app/to_edit_relation: in POST the request.form = " + str(request.form)
         )
 
-        relation_latex = str(web_form.relation_latex.data).strip()
-        relation_name_latex = str(web_form.relation_name_latex.data).strip()
+        relation_latex = str(web_form_new_symbol.relation_latex.data).strip()
+        relation_name_latex = str(web_form_new_symbol.relation_name_latex.data).strip()
         relation_description_latex = str(
-            web_form.relation_description_latex.data
+            web_form_new_symbol.relation_description_latex.data
         ).strip()
-        relation_reference_latex = str(web_form.relation_reference_latex.data).strip()
+        relation_reference_latex = str(
+            web_form_new_symbol.relation_reference_latex.data
+        ).strip()
 
         author_name_latex = latex.make_string_safe_for_latex(current_user.name)
 
@@ -3207,7 +3210,8 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
     return render_template(
         "jinja2_pages/user_workflow/symbol_relation_edit.html",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form=web_form_new_symbol,
+        form_no_options=web_form_no_options,
         relation_dict=relation_dict,
     )
 
@@ -5986,7 +5990,8 @@ def to_add_inference_rule() -> werkzeug.Response:
             assert int(number_of_feeds) >= 0
             assert int(number_of_outputs) >= 0
         except AssertionError as err:
-            flash(str(err))
+            # TODO: getting assertion error wipes whatever the user provided. That's bad.
+            flash("Assertion error; try again. " + str(err))
             logger.info(str(err))
             return redirect(url_for("to_add_inference_rule"))
 
