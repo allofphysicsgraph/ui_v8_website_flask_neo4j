@@ -34,6 +34,9 @@ flake8
 #pylint==4.0.4 as of 2026-01-24 on arm64
 pylint
 
+pytest
+pytest-flask
+
 # step validation
 #sympy==1.14.0 as of 2026-01-24 on arm64
 sympy
