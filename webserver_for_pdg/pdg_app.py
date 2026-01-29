@@ -5042,7 +5042,8 @@ def to_add_symbols_and_operations_for_expression(
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] pdg_app/symbols_and_operations_for_expression start " + str(trace_id)
+        "[TRACE] pdg_app/to_add_symbols_and_operations_for_expression start "
+        + str(trace_id)
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5057,7 +5058,7 @@ def to_add_symbols_and_operations_for_expression(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info(
-        "pdg_app/symbols_and_operations_for_expression: expression_dict="
+        "pdg_app/to_add_symbols_and_operations_for_expression: expression_dict="
         + str(expression_dict)
     )
 
@@ -5065,7 +5066,7 @@ def to_add_symbols_and_operations_for_expression(
         graphDB_Driver, query_time_dict
     )
     logger.info(
-        "pdg_app/symbols_and_operations_for_expression: list_of_symbols"
+        "pdg_app/to_add_symbols_and_operations_for_expression: list_of_symbols"
         + str(list_of_symbol_dicts)
     )
 
@@ -5096,7 +5097,7 @@ def to_add_symbols_and_operations_for_expression(
         expression_dict["latex_rhs"]
     )
     logger.info(
-        "pdg_app/symbols_and_operations_for_expression cleaned_latex_str_lhs="
+        "pdg_app/to_add_symbols_and_operations_for_expression cleaned_latex_str_lhs="
         + str(cleaned_latex_str_lhs)
     )
     logger.info("cleaned_latex_str_relation=" + str(cleaned_latex_str_relation))
@@ -5112,7 +5113,7 @@ def to_add_symbols_and_operations_for_expression(
         cleaned_latex_str_rhs
     )
     logger.info(
-        "pdg_app/symbols_and_operations_for_expression sympy_expr_lhs="
+        "pdg_app/to_add_symbols_and_operations_for_expression sympy_expr_lhs="
         + str(sympy_expr_lhs)
     )
     # logger.info("sympy_expr_relation=", str(sympy_expr_relation))
@@ -5133,7 +5134,7 @@ def to_add_symbols_and_operations_for_expression(
 
     # TODO: this is missing relation operators like "="
     logger.info(
-        "pdg_app/symbols_and_operations_for_expression list_of_sympy_symbols_from_expr="
+        "pdg_app/to_add_symbols_and_operations_for_expression list_of_sympy_symbols_from_expr="
         + str(list_of_sympy_symbols_from_expr)
     )
 
@@ -5197,9 +5198,45 @@ def to_add_symbols_and_operations_for_expression(
     web_form_no_options = NoOptionsForm(request.form)
     if request.method == "POST":
         logger.info(
-            "pdg_app/symbols_and_operations_for_expression request.form = "
+            "pdg_app/to_add_symbols_and_operations_for_expression request.form = "
             + str(request.form)
         )
+
+        # there are four possible choices for the user:
+        # - no symbols were matched (see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/67)
+        #   - and the user wants to continue to SymPy and Lean anyways
+        #   - and the user wants to skip entering SymPy and Lean
+        # - there were symbols matched
+        #   - and the user wants to enter SymPy and Lean
+        #   - and the user wants to skip entering SymPy and Lean (see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/68)
+        if request.form["submit_button"] == "continue to SymPy and Lean input anyways":
+            return redirect(
+                url_for(
+                    "to_add_sympy_and_lean_for_expression",
+                    expression_id=expression_id,
+                    symbol_id_dict=symbol_id_dict,
+                )
+            )
+        elif (
+            request.form["submit_button"]
+            == "continue anyways; also skip SymPy and Lean"
+        ):
+            return redirect(url_for("to_list_expressions"))
+        elif (
+            request.form["submit_button"]
+            == "update expression and enter SymPy and Lean"
+        ):
+            next_page_enter_SymPy_and_Lean = True
+        elif (
+            request.form["submit_button"]
+            == "update expression; skip entering SymPy and Lean"
+        ):
+            next_page_enter_SymPy_and_Lean = False
+
+        else:
+            raise Exception(
+                "Unrecognized value string from button on https://localhost/symbols_and_operations_for_expression/<expression_id>"
+            )
 
         list_of_symbol_IDs_in_expression = []  # type: List[str]
         symbol_id_dict = {}  # type: Dict[str, str]
@@ -5229,7 +5266,7 @@ def to_add_symbols_and_operations_for_expression(
                 symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
 
         logger.info(
-            "pdg_app/symbols_and_operations_for_expression symbol_id_dict="
+            "pdg_app/to_add_symbols_and_operations_for_expression symbol_id_dict="
             + str(symbol_id_dict)
         )
         # example output: {'a': '5638458', 'b': '7152159'}
@@ -5238,13 +5275,16 @@ def to_add_symbols_and_operations_for_expression(
             "[TRACE] pdg_app/to_add_symbols_and_operations_for_expression end "
             + str(trace_id)
         )
-        return redirect(
-            url_for(
-                "to_add_sympy_and_lean_for_expression",
-                expression_id=expression_id,
-                symbol_id_dict=symbol_id_dict,
+        if next_page_enter_SymPy_and_Lean:
+            return redirect(
+                url_for(
+                    "to_add_sympy_and_lean_for_expression",
+                    expression_id=expression_id,
+                    symbol_id_dict=symbol_id_dict,
+                )
             )
-        )
+        else:
+            return redirect(url_for("to_list_expressions"))
 
     return render_template(
         "jinja2_pages/user_workflow/expression_create_symbols_and_operations.html",

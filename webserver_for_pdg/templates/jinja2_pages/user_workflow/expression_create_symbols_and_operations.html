@@ -37,6 +37,11 @@ Associating expressions with symbols enables the validation of expressions and s
 <a href="{{ url_for('to_list_matrices') }}">list of matrices</a> to review what should have been detected.
 Or maybe symbol detection is having a bad day.
 
+<!-- the "value" string for these buttons is what drives the Python backend decision in pdg_app/to_add_symbols_and_operations_for_expression -->
+<P><input type="submit" name="submit_button" value="continue to SymPy and Lean input anyways">
+<P>xor
+<P><input type="submit" name="submit_button" value="continue anyways; also skip SymPy and Lean">
+
 {% else %}
 
 {% for symbol_dict in potential_symbols_found_in_Latex_expression %}
@@ -45,7 +50,10 @@ Or maybe symbol detection is having a bad day.
   TODO: used in which derivations?</LI>
 </UL>
 {% endfor %}
-  <P><input type="submit" name="submit_button" value="update expressions">
+  <!-- the "value" string for these buttons is what drives the Python backend decision in pdg_app/to_add_symbols_and_operations_for_expression -->
+  <P><input type="submit" name="submit_button" value="update expression and enter SymPy and Lean">
+  <P>xor
+  <P><input type="submit" name="submit_button" value="update expression; skip entering SymPy and Lean">
 
 {% endif %}
 
