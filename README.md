@@ -50,6 +50,13 @@ where the key-value pairs are properties.
 [x] Facilitate Collaboration and Sharing by using open source and publicly accessible information.
 [x] Enable programmatic interaction with the data using both a web interface and API.
 
+# Debugging
+
+To enter the container for debugging purposes,
+```bash
+docker exec -it `docker ps | grep ui_v8_website_flask_neo4j_webserver | cut -d' ' -f1` /bin/bash
+```
+
 # Licensing
 
 The content of this repo is covered by the 
