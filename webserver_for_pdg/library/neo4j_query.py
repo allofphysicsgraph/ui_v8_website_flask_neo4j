@@ -1301,18 +1301,32 @@ def add_symbol_to_expression_or_feed(
     assert expression_or_feed in ["expression", "feed"]
     assert symbol_category in list_of_valid.symbol_categories
 
+    # the following Cypher structure produces this warning:
+    #    If a part of a query contains multiple disconnected patterns, this will build a cartesian product between all those parts. This may produce a large amount of data and slow down query processing. While occasionally intended, it may often be possible to reformulate the query that avoids the use of this cross product, perhaps by adding a relationship between the different parts or by using OPTIONAL MATCH (identifier is: (s))'
+    # Gemini 3 Pro's explanation of the warning:
+    #    In Cypher, when you separate nodes with a comma in a single MATCH statement like this:
+    #    `MATCH (e:expression), (s:scalar)`
+    #    you are telling the database to find every possible combination of expressions and scalars. This is called a Cartesian Product
+    #
+    # result = tx.run(
+    #     "MATCH (e:"
+    #     + expression_or_feed
+    #     + "),(s:"
+    #     + symbol_category
+    #     + ") "
+    #     + 'WHERE e.id="'
+    #     + str(expression_or_feed_id)
+    #     + '" AND s.id="'
+    #     + str(symbol_id)
+    #     + '" '
+    #     + "MERGE (e)-[r:HAS_SYMBOL]->(s)"
+    # )
+
+    # To avoid triggering a Cartesian product, use
     result = tx.run(
-        "MATCH (e:"
-        + expression_or_feed
-        + "),(s:"
-        + symbol_category
-        + ") "
-        + 'WHERE e.id="'
-        + str(expression_or_feed_id)
-        + '" AND s.id="'
-        + str(symbol_id)
-        + '" '
-        + "MERGE (e)-[r:HAS_SYMBOL]->(s)"
+        "MATCH (e:" + expression_or_feed + " {id: '" + expression_or_feed_id + "'})"
+        "MATCH (s:" + symbol_category + " {id: '" + symbol_id + "'})"
+        "MERGE (e)-[r:HAS_SYMBOL]->(s)"
     )
 
     logger.info(
