@@ -28,21 +28,15 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
         TODO: this isn't working as desired.
         https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/19
 
-    latex_and_sympy/sympy_to_latex_str: SymPy to be converted to Latex: sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))
-    latex_and_sympy/sympy_to_latex_str: latex_str= \mathtt{\text{sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))}}
+    sympy_to_latex_str: SymPy to be converted to Latex: sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))
+    sympy_to_latex_str: latex_str= \mathtt{\text{sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))}}
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] latex_and_sympy/sympy_to_latex_str start "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] sympy_to_latex_str start " + trace_id + " " + str(time.time()))
 
     logger.info(
-        "latex_and_sympy/sympy_to_latex_str: SymPy to be converted to Latex: "
-        + str(sympy_expr)
+        "sympy_to_latex_str: SymPy to be converted to Latex: " + str(sympy_expr)
     )
 
     latex_str = sympy.latex(eval(sympy_expr))
@@ -50,14 +44,9 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
     # TODO: sometimes the above files, like on a string with no SymPy formatting:
     #    NameError: name 'b' is not defined
 
-    logger.info("latex_and_sympy/sympy_to_latex_str: latex_str=" + latex_str)
+    logger.info("sympy_to_latex_str: latex_str=" + latex_str)
 
-    logger.info(
-        "[TRACE] latex_and_sympy/sympy_to_latex_str end "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] sympy_to_latex_str end " + trace_id + " " + str(time.time()))
     return latex_str
 
 
@@ -75,7 +64,7 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] latex_and_sympy/cleaned_latex_str_to_sympy_expression start "
+        "[TRACE] cleaned_latex_str_to_sympy_expression start "
         + trace_id
         + " "
         + str(time.time())
@@ -87,24 +76,18 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
         symp_expr = parse_latex(expr_latex)
     except sympy.SympifyError as err:
         # logger.error(err)
-        logger.info(
-            "ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression" + str(err)
-        )
+        logger.info("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
         raise Exception("Sympy unable to parse latex (1): " + expr_latex)
     except sympy.parsing.latex.errors.LaTeXParsingError as err:
         # logger.error(err)
-        logger.info(
-            "ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression" + str(err)
-        )
+        logger.info("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
         raise Exception("Sympy unable to parse latex (2): " + expr_latex)
     except sympy.core.sympify.SympifyError as err:
-        logger.info(
-            "ERROR latex_and_sympy/cleaned_latex_str_to_sympy_expression" + str(err)
-        )
+        logger.info("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
         raise Exception("Sympy unable to parse latex (3): " + expr_latex)
 
     logger.info(
-        "[TRACE] latex_and_sympy/cleaned_latex_str_to_sympy_expression start "
+        "[TRACE] cleaned_latex_str_to_sympy_expression start "
         + trace_id
         + " "
         + str(time.time())
@@ -122,7 +105,7 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] latex_and_sympy/list_of_sympy_symbols_in_sympy_expression start "
+        "[TRACE] list_of_sympy_symbols_in_sympy_expression start "
         + trace_id
         + " "
         + str(time.time())
@@ -140,7 +123,7 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     # <class 'sympy.core.symbol.Symbol'>
 
     logger.info(
-        "[TRACE] latex_and_sympy/list_of_sympy_symbols_in_sympy_expression end "
+        "[TRACE] list_of_sympy_symbols_in_sympy_expression end "
         + trace_id
         + " "
         + str(time.time())
@@ -166,11 +149,11 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
 #     {x, nabla, y, vec}
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] latex_and_sympy/list_of_str_symbols_from_cleaned_latex_str start " + trace_id)
+#     logger.info("[TRACE] list_of_str_symbols_from_cleaned_latex_str start " + trace_id)
 #
 #     my_sym = list(sympy_expr.free_symbols)
 #
-#     logger.info("[TRACE] latex_and_sympy/list_of_str_symbols_from_cleaned_latex_str end " + trace_id)
+#     logger.info("[TRACE] list_of_str_symbols_from_cleaned_latex_str end " + trace_id)
 #     return my_sym
 
 # EOF
