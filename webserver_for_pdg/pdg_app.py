@@ -1225,11 +1225,20 @@ def to_navigation():
                 query_time_dict[
                     "pdg_app/main: delete_all_nodes_and_relationships" + trace_id
                 ] = round(time.time() - query_start_time, 3)
-            # upload Cypher content inside the neo4j docker image
-            # automation TODO: how to automate this?
-            logger.info(
-                "docker exec <CONTAINER_ID> bin/cypher-shell --file dumping_grounds/pdg.cypher"
-            )
+
+            with open(path_to_uploaded_file, "r") as file_handle:
+                queries = file_handle.read().split(";")
+
+            logger.info("queries read from file:")
+            logger.info(str(queries))
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                for query in queries:
+                    if query.strip():
+                        session.run(query)
+                query_time_dict[
+                    "pdg_app/main: list_nodes_of_type, derivation" + trace_id
+                ] = round(time.time() - query_start_time, 3)
 
     # performance TODO: replace the counts below with
     # MATCH (n) RETURN distinct labels(n), count(*)

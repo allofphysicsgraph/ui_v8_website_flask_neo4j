@@ -126,7 +126,8 @@ def apoc_export_cypher(tx, output_filename: str):
 
     for result in tx.run(
         "CALL apoc.export.cypher.all('" + output_filename + "', {"
-        "format: 'cypher-shell',"
+        # "format: 'cypher-shell'," # the output produced when using 'cypher-shell' is readable by `bin/cypher-shell --file dumping_grounds/pdg.cypher` but not the Python driver
+        "format: 'plain',"
         "useOptimizations: {type: 'UNWIND_BATCH', unwindBatchSize: 20}"
         "}) "
         "YIELD file, batches, source, format, nodes, relationships, properties, time, rows, batchSize "
