@@ -1217,14 +1217,17 @@ def to_navigation():
 
             # shutil.copy(path_to_uploaded_file, "/code/" + path_to_db)
 
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                str_to_print = session.write_transaction(
-                    neo4j_query.delete_all_nodes_and_relationships
-                )
-                query_time_dict[
-                    "pdg_app/main: delete_all_nodes_and_relationships" + trace_id
-                ] = round(time.time() - query_start_time, 3)
+            is_overwrite = request.form.get("overwrite_data")
+
+            if is_overwrite:
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    str_to_print = session.write_transaction(
+                        neo4j_query.delete_all_nodes_and_relationships
+                    )
+                    query_time_dict[
+                        "pdg_app/main: delete_all_nodes_and_relationships" + trace_id
+                    ] = round(time.time() - query_start_time, 3)
 
             # <<OPTION 1 FOR READING UPLOADED FILE>>
             with graphDB_Driver.session() as session:
@@ -2419,8 +2422,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                     latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
                 )
             except Exception as err:
-                flash("ERROR converting to Sympy: " + str(err))
-                logger.info("ERROR converting to Sympy: " + str(err))
+                flash("ERROR converting to Sympy in to_edit_feed: " + str(err))
+                logger.info("ERROR converting to Sympy in to_edit_feed: " + str(err))
                 sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
         else:
             sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
@@ -2693,8 +2696,8 @@ def to_add_expression() -> werkzeug.Response:
                     latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
                 )
             except Exception as err:
-                flash("ERROR converting to Sympy: " + str(err))
-                logger.info("ERROR converting to Sympy: " + str(err))
+                flash("ERROR converting to Sympy in to_add_expression: " + str(err))
+                logger.info("ERROR converting to Sympy in to_add_expression: " + str(err))
                 sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
         else:
             sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
@@ -2875,8 +2878,8 @@ def to_add_feed() -> werkzeug.Response:
                     latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
                 )
             except Exception as err:
-                flash("ERROR converting to Sympy: " + str(err))
-                logger.info("ERROR converting to Sympy: " + str(err))
+                flash("ERROR converting to Sympy in to_add_feed: " + str(err))
+                logger.info("ERROR converting to Sympy in to_add_feed: " + str(err))
                 sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
         else:
             sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
@@ -6592,8 +6595,8 @@ def to_list_feeds() -> werkzeug.Response:
                     latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
                 )
             except Exception as err:
-                flash("ERROR converting to Sympy: " + str(err))
-                logger.info("ERROR converting to Sympy: " + str(err))
+                flash("ERROR converting to Sympy in to_list_feeds: " + str(err))
+                logger.info("ERROR converting to Sympy in to_list_feeds: " + str(err))
                 sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
         else:
             sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
@@ -7122,8 +7125,8 @@ def to_list_expressions() -> str:
                     latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
                 )
             except Exception as err:
-                flash("ERROR converting to Sympy: " + str(err))
-                logger.info("ERROR converting to Sympy: " + str(err))
+                flash("ERROR converting to Sympy in to_list_expressions: " + str(err))
+                logger.info("ERROR converting to Sympy in to_list_expressions: " + str(err))
                 sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
         else:
             sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
