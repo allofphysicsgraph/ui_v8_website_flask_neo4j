@@ -1158,7 +1158,7 @@ def to_navigation():
     #     pass
     #     #logger.info(current_user) # <flask_login.mixins.AnonymousUserMixin object at 0x7fd47a0c5550>
     # else:
-    #     logger.info(current_user.name)
+    #     logger.info(current_user.email)
 
     if request.method == "POST":
         logger.info("pdg_app/to_navigation: request.form = " + str(request.form))
@@ -1470,7 +1470,7 @@ def to_add_derivation() -> werkzeug.Response:
         #     flash("   reference altered to " + str(derivation_reference_latex_SAFE))
         # derivation_reference_latex = derivation_reference_latex_SAFE
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         derivation_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "derivation"
@@ -1926,7 +1926,7 @@ def to_edit_derivation_metadata(
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -2223,7 +2223,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             + str(expression_latex_condition)
         )
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
@@ -2474,7 +2474,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # alter node properties based on user input
         if feed_dict["latex"] != feed_latex:
@@ -2771,7 +2771,7 @@ def to_add_expression() -> werkzeug.Response:
         )
         logger.info("expression_description_latex" + str(expression_description_latex))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -2899,7 +2899,7 @@ def to_add_feed() -> werkzeug.Response:
         feed_sympy = "TODO"  # TODO: if promoting existing symbol, this can be filled in immediately
         feed_lean = "TODO"
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -2945,7 +2945,7 @@ def to_add_feed() -> werkzeug.Response:
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         for symbol_dict in list_of_nonoperation_symbol_dicts:
             if symbol_dict["id"] == request.form["symbol_select_id_to_add"]:
@@ -3118,7 +3118,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
         operation_reference_latex = str(web_form.operation_reference_latex.data).strip()
         operation_number_of_arguments = int(web_form.operation_number_of_arguments.data)
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -3199,7 +3199,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
             web_form_new_symbol.relation_reference_latex.data
         ).strip()
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -3288,7 +3288,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
             web_form_symbol_properties.symbol_reference_latex.data
         ).strip()
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # instead of changing every property,
         # only change the properties that are different from symbol_dict
@@ -3495,7 +3495,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
             graphDB_Driver, query_time_dict, "value_with_units"
         )
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -3645,7 +3645,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
             web_form_scalar_properties.dimension_luminous_intensity.data
         )
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -3823,7 +3823,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
             web_form_vector_properties.vector_number_of_entries.data
         ).strip()
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -3948,7 +3948,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
             web_form_matrix_properties.matrix_number_of_columns.data
         ).strip()
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -4033,7 +4033,7 @@ def to_add_symbol() -> werkzeug.Response:
 #         logger.info("symbol_name:" + str(symbol_name))
 #         logger.info("symbol_description" + str(symbol_description))
 
-#         author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+#         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
 #         list_of_symbol_IDs = []
 #         with graphDB_Driver.session() as session:
@@ -4681,7 +4681,7 @@ def to_add_operation() -> werkzeug.Response:
         logger.info("operation_description_latex" + str(operation_description_latex))
         logger.info("operation_argument_count" + str(operation_argument_count))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         operation_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "operation"
@@ -4792,7 +4792,7 @@ def to_add_relation() -> werkzeug.Response:
         logger.info("relation_description_latex" + str(relation_description_latex))
         logger.info("relation_argument_count" + str(relation_argument_count))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -4951,7 +4951,7 @@ def to_add_step_select_expressions(
                 logger.info("out adding" + str(v))
                 list_of_output_expression_IDs.append(str(v))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         step_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict, "step"
@@ -5939,7 +5939,7 @@ def to_add_inference_rule() -> werkzeug.Response:
         number_of_outputs = int(
             str(web_form.inference_rule_number_of_outputs.data).strip()
         )
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # https://neo4j.com/docs/python-manual/current/session-api/
         list_of_inference_rule_dicts = []
@@ -6176,7 +6176,7 @@ def to_edit_inference_rule(
         number_of_outputs = int(
             str(web_form_edit.inference_rule_number_of_outputs.data).strip()
         )
-        author_name_latex = latex.make_string_safe_for_latex(current_user.name)
+        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         # https://neo4j.com/docs/python-manual/current/session-api/
         list_of_inference_rule_dicts = []
