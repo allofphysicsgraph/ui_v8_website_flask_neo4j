@@ -1226,19 +1226,41 @@ def to_navigation():
                     "pdg_app/main: delete_all_nodes_and_relationships" + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
-            with open(path_to_uploaded_file, "r") as file_handle:
-                queries = file_handle.read().split(";")
-
-            logger.info("queries read from file:")
-            logger.info(str(queries))
+            # <<OPTION 1 FOR READING UPLOADED FILE>>
             with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                for query in queries:
-                    if query.strip():
-                        session.run(query)
-                query_time_dict[
-                    "pdg_app/main: list_nodes_of_type, derivation" + trace_id
-                ] = round(time.time() - query_start_time, 3)
+                # session.run(
+                #     "CALL apoc.cypher.runFiles(['" + path_to_uploaded_file + "'])"
+                # )
+
+                filename = path_to_uploaded_file.split("/")[-1]
+
+                # Use parameters instead of string concatenation to prevent injection
+                result = session.run(
+                    "CALL apoc.cypher.runFiles([$path])", path=filename
+                )
+
+                # IMPORTANT: You must consume the result to trigger any potential errors
+                # .consume() waits for the database to finish and returns metadata
+                summary = result.consume()
+
+            # <<OPTION 2 FOR READING UPLOADED FILE>> The following reads the queries line-by-line using Python
+            # with open(path_to_uploaded_file, "r") as file_handle:
+            #     queries = file_handle.read().split(";")
+            #     # TODO: remove lines that start with "CREATE CONSTRAINT ON"
+            #     # TODO: remove lines that start with "DROP CONSTRAINT ON"
+            #     # TODO: splitting lines on ";" is dangerous since some content can include ";"
+            #     # queries = [line.strip() for line in file_handle if not line.startswith(':') and line.strip()]
+            #
+            # logger.info("queries read from file:")
+            # logger.info(str(queries))
+            # with graphDB_Driver.session() as session:
+            #     query_start_time = time.time()
+            #     for query in queries:
+            #         if query.strip():
+            #             session.run(query)
+            #     query_time_dict[
+            #         "pdg_app/main: list_nodes_of_type, derivation" + trace_id
+            #     ] = round(time.time() - query_start_time, 3)
 
     # performance TODO: replace the counts below with
     # MATCH (n) RETURN distinct labels(n), count(*)
