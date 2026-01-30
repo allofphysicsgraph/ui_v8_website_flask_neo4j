@@ -327,6 +327,39 @@ def get_list_node_dicts_of_type(tx, node_type: str) -> list:
     return node_list
 
 
+def count_nodes_of_type(tx, node_type: str) -> int:
+    """
+    for a specific node type (e.g., derivation XOR step XOR symbol, etc)
+    return a count of all nodes
+
+    >>> count_nodes_of_type(tx)
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info(
+        "[TRACE] neo4j_query/count_nodes_of_type start "
+        + str(trace_id)
+        + " "
+        + str(time.time())
+    )
+
+    # must be one of these node types. See also 'schema.log' file
+    logger.info("neo4j_query/count_nodes_of_type:  node type:" + node_type)
+    assert node_type in list_of_valid.node_types
+
+    node_count = -1
+    for result in tx.run("MATCH (n:" + node_type + ") RETURN count(n) as count"):
+        logger.info(result.data()["count"])
+        node_count = result.data()["count"]
+
+    logger.info(
+        "[TRACE] neo4j_query/count_nodes_of_type end "
+        + str(trace_id)
+        + " "
+        + str(time.time())
+    )
+    return node_count
+
+
 def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
     """ """
     trace_id = str(random.randint(1000000, 9999999))

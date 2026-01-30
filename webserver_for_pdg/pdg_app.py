@@ -1228,10 +1228,6 @@ def to_navigation():
 
             # <<OPTION 1 FOR READING UPLOADED FILE>>
             with graphDB_Driver.session() as session:
-                # session.run(
-                #     "CALL apoc.cypher.runFiles(['" + path_to_uploaded_file + "'])"
-                # )
-
                 filename = path_to_uploaded_file.split("/")[-1]
 
                 # Use parameters instead of string concatenation to prevent injection
@@ -1239,9 +1235,10 @@ def to_navigation():
                     "CALL apoc.cypher.runFiles([$path])", path=filename
                 )
 
-                # IMPORTANT: You must consume the result to trigger any potential errors
+                # must consume the result to trigger any potential errors
                 # .consume() waits for the database to finish and returns metadata
                 summary = result.consume()
+                logger.info(str(summary))
 
             # <<OPTION 2 FOR READING UPLOADED FILE>> The following reads the queries line-by-line using Python
             # with open(path_to_uploaded_file, "r") as file_handle:
@@ -1265,107 +1262,80 @@ def to_navigation():
     # performance TODO: replace the counts below with
     # MATCH (n) RETURN distinct labels(n), count(*)
 
-    number_of_derivations = -1  # initialize to an intentionally a non-sensical number
+    # number_of_derivations = -1  # initialize to an intentionally a non-sensical number
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        number_of_derivations = len(
-            session.read_transaction(
-                neo4j_query.get_list_node_dicts_of_type, "derivation"
-            )
+        number_of_derivations = session.read_transaction(
+            neo4j_query.count_nodes_of_type, "derivation"
         )
-        query_time_dict["pdg_app/main: list_nodes_of_type, derivation" + trace_id] = (
+        query_time_dict["pdg_app/main: count_nodes_of_type, derivation" + trace_id] = (
             round(time.time() - query_start_time, 3)
         )
 
-    number_of_inference_rules = (
-        -1
-    )  # initialize to an intentionally a non-sensical number
-    with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        number_of_inference_rules = len(
-            session.read_transaction(
-                neo4j_query.get_list_node_dicts_of_type, "inference_rule"
-            )
+        number_of_inference_rules = session.read_transaction(
+            neo4j_query.count_nodes_of_type, "inference_rule"
         )
         query_time_dict[
-            "pdg_app/main: list_nodes_of_type, inference_rule" + trace_id
+            "pdg_app/main: count_nodes_of_type, inference_rule" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    number_of_expressions = -1  # initialize to an intentionally a non-sensical number
-    with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        number_of_expressions = len(
-            session.read_transaction(
-                neo4j_query.get_list_node_dicts_of_type, "expression"
-            )
+        number_of_expressions = session.read_transaction(
+            neo4j_query.count_nodes_of_type, "expression"
         )
-        query_time_dict["pdg_app/main: list_nodes_of_type, expression" + trace_id] = (
+        query_time_dict["pdg_app/main: count_nodes_of_type, expression" + trace_id] = (
             round(time.time() - query_start_time, 3)
         )
 
-    number_of_scalars = -1  # initialize to an intentionally a non-sensical number
-    with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        number_of_scalars = len(
-            session.read_transaction(neo4j_query.get_list_node_dicts_of_type, "scalar")
+        number_of_scalars = session.read_transaction(
+            neo4j_query.count_nodes_of_type, "scalar"
         )
-        query_time_dict["pdg_app/main: list_nodes_of_type, scalar" + trace_id] = round(
+
+        query_time_dict["pdg_app/main: count_nodes_of_type, scalar" + trace_id] = round(
             time.time() - query_start_time, 3
         )
 
-    number_of_vectors = -1  # initialize to an intentionally a non-sensical number
-    with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        number_of_vectors = len(
-            session.read_transaction(neo4j_query.get_list_node_dicts_of_type, "vector")
+        number_of_vectors = session.read_transaction(
+            neo4j_query.count_nodes_of_type, "vector"
         )
-        query_time_dict[
-            "pdg_app/main: get_list_node_dicts_of_type, vector" + trace_id
-        ] = round(time.time() - query_start_time, 3)
+        query_time_dict["pdg_app/main: count_nodes_of_type, vector" + trace_id] = round(
+            time.time() - query_start_time, 3
+        )
 
-    number_of_matrices = -1  # initialize to an intentionally a non-sensical number
-    with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        number_of_matrices = len(
-            session.read_transaction(neo4j_query.get_list_node_dicts_of_type, "matrix")
+        number_of_matrices = session.read_transaction(
+            neo4j_query.count_nodes_of_type, "matrix"
         )
-        query_time_dict[
-            "pdg_app/main: get_list_node_dicts_of_type, matrix" + trace_id
-        ] = round(time.time() - query_start_time, 3)
+        query_time_dict["pdg_app/main: count_nodes_of_type, matrix" + trace_id] = round(
+            time.time() - query_start_time, 3
+        )
 
-    number_of_operations = -1  # initialize to an intentionally a non-sensical number
-    with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        number_of_operations = len(
-            session.read_transaction(
-                neo4j_query.get_list_node_dicts_of_type, "operation"
-            )
+        number_of_operations = session.read_transaction(
+            neo4j_query.count_nodes_of_type, "operation"
         )
-        query_time_dict[
-            "pdg_app/main: get_list_node_dicts_of_type, operation" + trace_id
-        ] = round(time.time() - query_start_time, 3)
+        query_time_dict["pdg_app/main: count_nodes_of_type, operation" + trace_id] = (
+            round(time.time() - query_start_time, 3)
+        )
 
-    number_of_relations = -1  # initialize to an intentionally a non-sensical number
-    with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        number_of_relations = len(
-            session.read_transaction(
-                neo4j_query.get_list_node_dicts_of_type, "relation"
-            )
+        number_of_relations = session.read_transaction(
+            neo4j_query.count_nodes_of_type, "relation"
         )
-        query_time_dict[
-            "pdg_app/main: get_list_node_dicts_of_type, relation" + trace_id
-        ] = round(time.time() - query_start_time, 3)
+        query_time_dict["pdg_app/main: count_nodes_of_type, relation" + trace_id] = (
+            round(time.time() - query_start_time, 3)
+        )
 
-    number_of_feeds = -1  # initialize to an intentionally a non-sensical number
-    with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        number_of_feeds = len(
-            session.read_transaction(neo4j_query.get_list_node_dicts_of_type, "feed")
+        number_of_feeds = session.read_transaction(
+            neo4j_query.count_nodes_of_type, "feed"
         )
-        query_time_dict[
-            "pdg_app/main: get_list_node_dicts_of_type, feed" + trace_id
-        ] = round(time.time() - query_start_time, 3)
+        query_time_dict["pdg_app/main: count_nodes_of_type, feed" + trace_id] = round(
+            time.time() - query_start_time, 3
+        )
 
     logger.info(
         "[TRACE] pdg_app/to_navigation end " + str(trace_id) + " " + str(time.time())
