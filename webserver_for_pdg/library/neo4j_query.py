@@ -660,6 +660,10 @@ def step_has_inference_rule(tx, step_id: str):
     # print(inf_rule_result)
     # [{'m': {'name_latex': 'add x to both sides', 'number_of_outputs': 1, 'number_of_inputs': 1, 'author_name_latex': 'ben', 'number_of_feeds': 1, 'id': '8818915', 'latex': 'add $1 to both sides of Eq $2 to get Eq $3'}}]
 
+    if len(inf_rule_list_of_dicts) == 0:
+        logger.critical("A step without an inference_rule is a misconfiguration")
+        return []
+
     logger.info(
         "[TRACE] neo4j_query/step_has_inference_rule end "
         + str(trace_id)
