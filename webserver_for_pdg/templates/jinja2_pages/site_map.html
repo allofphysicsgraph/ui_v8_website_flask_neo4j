@@ -60,10 +60,16 @@ or create a new derivation.
     <form method="post" enctype="multipart/form-data" id="upload_form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="file" name="file" accept=".cypher">
+      <br>
+
+      <input type="checkbox" id="overwrite_data" name="overwrite_data" value="true">
+      <label for="overwrite_data">Overwrite existing data</label>
+      <br>
+
       <input type="submit" name="upload_cypher" value="Upload Cypher">
     </form>
 
-    <P><B>Warning: the upload deletes the existing database</B>
+    <P>Overwrite the existing database</B>
 
 
   </fieldset>
