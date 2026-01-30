@@ -1228,7 +1228,7 @@ def to_navigation():
 
             # <<OPTION 1 FOR READING UPLOADED FILE>>
             with graphDB_Driver.session() as session:
-                filename = path_to_uploaded_file.split("/")[-1]
+                filename = os.path.basename(path_to_uploaded_file)
 
                 # Use parameters instead of string concatenation to prevent injection
                 result = session.run(
@@ -1261,6 +1261,8 @@ def to_navigation():
 
     # performance TODO: replace the counts below with
     # MATCH (n) RETURN distinct labels(n), count(*)
+    # 2026-01-29: Gemini 3 recommends using
+    # result = session.run("MATCH (n) RETURN labels(n) as l, count(*) as c")
 
     # number_of_derivations = -1  # initialize to an intentionally a non-sensical number
     with graphDB_Driver.session() as session:
@@ -2304,26 +2306,39 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         #             "to_edit_expression: disconnect_symbol_from_expression"
         #         ] = round(time.time() - query_start_time, 3)
 
-        # if "symbol_select_id_to_add" in request.form.keys():
-        #     symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
-        #     logger.info("to_edit_expression: symbol_id_to_add=" + str(symbol_id_to_add))
+        if "relation_select_id_to_update" in request.form.keys():
+            relation_id_to_add = str(request.form["symbol_select_id_to_add"])
+            logger.info(
+                "to_edit_expression: relation_id_to_add=" + str(relation_id_to_add)
+            )
 
-        #     # TODO: user provided a symbol, but adding is per-category
-        #     # FAULT EXPECTED for non-scalar add
+            # TODO: enact change
 
-        #     # https://neo4j.com/docs/python-manual/current/session-api/
-        #     with graphDB_Driver.session() as session:
-        #         query_start_time = time.time()
-        #         session.write_transaction(
-        #             neo4j_query.add_symbol_to_expression_or_feed,
-        #             "expression",
-        #             symbol_id_to_add,
-        #             expression_id,
-        #             dict_of_symbol_id_and_type[symbol_id_to_add],
-        #         )
-        #         query_time_dict["to_edit_expression: add_symbol_to_expression"] = round(
-        #             time.time() - query_start_time, 3
-        #         )
+        if "symbol_select_id_to_add" in request.form.keys():
+            symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
+            logger.info("to_edit_expression: symbol_id_to_add=" + str(symbol_id_to_add))
+
+            dict_of_symbol_id_and_type, query_time_dict = (
+                compute.get_dict_of_node_type_for_every_id(
+                    graphDB_Driver, query_time_dict
+                )
+            )
+            symbol_category = dict_of_symbol_id_and_type[symbol_id_to_add]
+            logger.info(symbol_category)
+
+            # https://neo4j.com/docs/python-manual/current/session-api/
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.add_symbol_to_expression_or_feed,
+                    "expression",
+                    symbol_id_to_add,
+                    expression_id,
+                    symbol_category,
+                )
+                query_time_dict["to_edit_expression: add_symbol_to_expression"] = round(
+                    time.time() - query_start_time, 3
+                )
 
     logger.info(
         "[TRACE] pdg_app/to_edit_expression end "
