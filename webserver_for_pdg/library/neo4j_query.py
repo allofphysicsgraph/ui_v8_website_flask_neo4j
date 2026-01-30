@@ -1290,18 +1290,15 @@ def add_symbol_to_expression_or_feed(
         + str(time.time())
     )
     logger.info(
-        "symbol_id=" + symbol_id + "expression_or_feed_id=" + expression_or_feed_id
-    )
-
-    logger.info(
-        "neo4j_query/add_symbol_to_expression_or_feed: expression_or_feed="
-        + expression_or_feed
-    )
-    assert expression_or_feed in ["expression", "feed"]
-    logger.info(
-        "neo4j_query/add_symbol_to_expression_or_feed: symbol_category="
+        "symbol_id="
+        + symbol_id
+        + "; expression_or_feed_id="
+        + expression_or_feed_id
+        + "; symbol_category="
         + symbol_category
     )
+
+    assert expression_or_feed in ["expression", "feed"]
     assert symbol_category in list_of_valid.symbol_categories
 
     result = tx.run(
