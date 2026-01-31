@@ -18,7 +18,6 @@ else
         @echo "Unknown architecture: $(ARCH). Cannot determine if Mac is new (arm64) or old (amd64)."
 endif
 
-
 WEBSERVER_IMAGE=ui_v8_flask_webserver
 
 CONTAINER_TAG=latest-$(this_arch)
@@ -63,7 +62,7 @@ launch_webserver:
 	$(DOCKER_OR_PODMAN) ps
 	$(DOCKER_OR_PODMAN) run --rm --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) -c 'black --workers 1 /scratch/webserver_for_pdg/*.py /scratch/webserver_for_pdg/library/*.py'
 	# https://docs.docker.com/compose/reference/up/
-	$(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans
+	$(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans $(COMPOSE_FLAGS)
 
 
 down:
