@@ -135,6 +135,7 @@ services:
       - "7687:7687"
     restart: unless-stopped
     # as per https://neo4j.com/docs/operations-manual/current/docker/clustering/
+    user: "${UID}:${GID}"
     volumes:
       - './neo4j_pdg/data:/var/lib/neo4j/data'
       - './neo4j_pdg/logs:/var/lib/neo4j/logs'
