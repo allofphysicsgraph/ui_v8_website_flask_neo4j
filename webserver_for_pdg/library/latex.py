@@ -660,7 +660,7 @@ def create_tex_file_for_derivation(
         # TODO: only create a bibliography if the .tex file contains "cite"
 
         latex_file_handle.write("\\bibliographystyle{plain}\n")
-        latex_file_handle.write("\\bibliography{pdg.bib}\n")
+        latex_file_handle.write("\\bibliography{pdg_derivation_citations.bib}\n")
         latex_file_handle.write("\\end{document}\n")
         latex_file_handle.write("% EOF\n")
 
@@ -718,10 +718,10 @@ def create_pdf_for_derivation(
 
     shutil.move(tex_filename_without_extension + ".tex", tmp_latex_folder_full_path)
 
-    # copy the current pdg.bib from static to local for use with bibtex when compiling tex to PDF
+    # copy the current pdg_derivation_citations.bib from static to local for use with bibtex when compiling tex to PDF
     # https://docs.python.org/3/library/shutil.html
-    shutil.copy("/code/static/pdg.bib", tmp_latex_folder_full_path)
-    # shutil.copy("/code/static/pdg.bib", "/code/")
+    shutil.copy("/code/static/pdg_derivation_citations.bib", tmp_latex_folder_full_path)
+    # shutil.copy("/code/static/pdg_derivation_citations.bib", "/code/")
 
     # images need to be in the temporary folder to compile the .tex to PDF
     # https://docs.python.org/3/library/shutil.html#shutil.copytree
