@@ -1131,7 +1131,7 @@ def to_old_nav():
     """
     TODO!
     """
-    return render_template("jinja2_pages/navigation.html")
+    return render_template("jinja2_pages/navigation_OLD.html")
 
 
 @web_app.route("/navigation", methods=["GET", "POST"])
@@ -1351,9 +1351,9 @@ def to_navigation():
 
     logger.info("[TRACE] to_navigation end " + str(trace_id) + " " + str(time.time()))
 
-    # TODO: site_map.html is a place-holder until I update navigation.html
+    # TODO: leverage content from navigation_OLD.html
     return render_template(
-        "jinja2_pages/site_map.html",
+        "jinja2_pages/navigation.html",
         title="site map",
         query_time_dict=query_time_dict,
         number_of_derivations=number_of_derivations,
@@ -6094,6 +6094,10 @@ def to_edit_inference_rule(
                 inference_rule_id,
             )
         )
+        query_time_dict[
+            "pdg_app/to_edit_inference_rule: derivations_that_use_inference_rule" + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
     # list_of_derivation_dicts_that_use_this_inference_rule_id = list(
     #     set(list_of_derivations_that_use_this_inference_rule_id)
     # )
@@ -7433,7 +7437,6 @@ def to_design_documentation():
     )
 
 
-
 @web_app.route("/faq", methods=["GET", "POST"])
 @web_app.route("/documentation/faq", methods=["GET", "POST"])
 def to_faq():
@@ -7474,7 +7477,6 @@ def to_literature_review():
     return render_template(
         "jinja2_pages/documentation_literature_review.html", title="Literature Review"
     )
-
 
 
 @web_app.route("/site_map", methods=["GET", "POST"])
