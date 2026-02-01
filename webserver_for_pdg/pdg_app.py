@@ -7433,17 +7433,6 @@ def to_design_documentation():
     )
 
 
-@web_app.route("/documentation/design_principles", methods=["GET", "POST"])
-def to_design_principles_and_goals():
-    """
-    a static page
-    """
-    logger.info("[TRACE] to_design_principles_and_goals")
-    return render_template(
-        "jinja2_pages/documentation_of_design_principles_and_goals.html",
-        title="Design Principles and Goals Documentation",
-    )
-
 
 @web_app.route("/faq", methods=["GET", "POST"])
 @web_app.route("/documentation/faq", methods=["GET", "POST"])
@@ -7486,18 +7475,6 @@ def to_literature_review():
         "jinja2_pages/documentation_literature_review.html", title="Literature Review"
     )
 
-
-@web_app.route("/historical_precedents", methods=["GET", "POST"])
-@web_app.route("/documentation/historical_precedents", methods=["GET", "POST"])
-def to_historical_precedents():
-    """
-    a static page
-    """
-    logger.info("[TRACE] ")
-    return render_template(
-        "jinja2_pages/documentation_historical_precedents.html",
-        title="historical precedents",
-    )
 
 
 @web_app.route("/site_map", methods=["GET", "POST"])
