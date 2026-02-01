@@ -1228,7 +1228,27 @@ def to_navigation():
                 # must consume the result to trigger any potential errors
                 # .consume() waits for the database to finish and returns metadata
                 summary = result.consume()
-                logger.info(str(summary))
+                # logger.info(str(summary)) # produces a `neo4j.work.summary.ResultSummary` object
+                if summary.notifications:
+                    for notification in summary.notifications:
+                        logger.info(
+                            f"[{notification['severity']}] {notification['title']}: {notification['description']}"
+                        )
+
+                logger.info(f"Query: {summary.query}")
+                logger.info(f"Parameters: {summary.parameters}")
+
+                counters = summary.counters
+                logger.info(f"Nodes Created: {counters.nodes_created}")
+                logger.info(f"Properties Set: {counters.properties_set}")
+                logger.info(f"Relationships Created: {counters.relationships_created}")
+                logger.info(f"Labels Added: {counters.labels_added}")
+
+                logger.info(f"Available after: {summary.result_available_after}ms")
+                logger.info(f"Consumed after: {summary.result_consumed_after}ms")
+
+                logger.info(f"Server Address: {summary.server.address}")
+                # logger.info(f"Server Version: {summary.server.version}")
 
             # <<OPTION 2 FOR READING UPLOADED FILE>> The following reads the queries line-by-line using Python
             # with open(path_to_uploaded_file, "r") as file_handle:
@@ -4910,7 +4930,7 @@ def to_add_symbols_and_operations_for_expression(
     This step comes immediately after the Latex expression is provided.
 
     Although Latex-to-SymPy could be performed after the Latex is provided,
-    sometimes the symbols used in the latex inhibit converstion to Latex.
+    sometimes the symbols used in the latex inhibit conversion to Latex.
     For example,
     r_{\rm Earth} = 6
     """
