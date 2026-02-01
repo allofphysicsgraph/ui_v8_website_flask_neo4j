@@ -10,7 +10,7 @@
    user documentation
 
 <P>
-  This page provides an overview of the Physics Derivation Graph project.
+  This page provides guidance on how to use the Physics Derivation Graph project.
   No prior background on this project is assumed.
   General knowledge of Physics and Mathematics at the first year college level is assumed.
 </P>
@@ -36,7 +36,6 @@ cat user_documentation.html |\
   <LI><a href="#graph content">Graph content</a></LI>
   <LI><a href="#topic scope">Physics Topics</a></LI>
   <LI><a href="#adding_content">Adding or modifying content</a></LI>
-  <LI><a href="#use cases">Use cases</a></LI>
   <OL>
       <LI><a href="#use case:students">Education in Math and Physics</a></LI>
       <LI><a href="#use case:scientific articles">Documenting Scientific Progress in Articles</a></LI>
@@ -472,7 +471,7 @@ The relation of these terms is shown graphically below in figure 1:<!--in Fig. \
 
   <img src="{{ url_for('static', filename='derivation_ab_add2.png') }}" width=400>
   <div align="center">
-    Figure 3. A three step derivation involving two expressions.
+    <P>Figure 3. A three step derivation involving two expressions.
     In this rendering, the start of the derivation is at the bottom of the image.
     In this example, inference rules are blue trapazoids,
     expressions are black ovals, and feeds are red rectangles. As with figure 2,
@@ -582,153 +581,6 @@ level is likely to be required.
 </P>
 
 <P>&nbsp;</P>
-
-<H2 id="use cases">Use cases</H2>
-
-<P>See also <a href="https://github.com/allofphysicsgraph/task-tracker/issues/28">https://github.com/allofphysicsgraph/task-tracker/issues/28</a>.
-
-<P>
-The Physics Derivation Graph is expected to be useful to multiple audiences
-and users. Viewers of the content could include students in math and physics,
-and analysis of the content could help shape curriculum. Contributors to the
-Physics Derivation Graph would be scientists who add new developments based
-on their work, or enthusiasts who convert published scientific literature
-into the Physics Derivation Graph database.
-</P>
-
-<P>
-  The entrypoint for the use cases below is
-  <a href="{{ url_for('to_navigation') }}?referrer=user_documentation">the navigation page</a>,
-  from which steps, expressions, symbols, operators, and inference rules can be viewed.
-<P>
-
-<H4 id="use case:students">Use case: Education in Math and Physics</H4>
-<P>
-  Currently students in Math and Physics are taught content using lectures,
-  textbooks, and homework.
-  The method of presentation varies, but the pedagogic story is often historically driven.
-  Algebra is old, calculus is newer, and topology is recent.
-  Classical mechanics is old, thermodynamics is newer, and quantum mechanics is recent.
-  When teaching, these subjects are taught by building on previous content --
-  calculus leverages algebra, thermodynamics leverages classical mechanics.
-</P>
-<P>
-  A role the Physics Derivation Graph can play in education is showing the
-  relevance of what is being taught.
-  The focus for students in mathematics classes is on the technique, e.g.,
-  "integrate both sides with respect to \(Y\)," and application is
-  necessarily of secondary importance.
-  Physics students are expected to know the mathematical techniques
-  and teaching is focused on application.
-  The Physics Derivation Graph can assist both scenarios.
-  The student in a math class can see where the inference rules they
-  learn are applied in Physics.
-  The student in the Physics class can see which inference rules are required in their field.
-</P>
-<P>
-  Stakeholders for this use case:
-  <UL>
-    <LI>Educators</LI>
-    <LI>Students</LI>
-  </UL>
-</P>
-
-<P>
-  <a name="audience:teachers">
-<em>How could the Physics Derivation Graph benefit teachers?</em>
-</a><BR/>
-For Physics teachers, the Physics Derivation Graph could address questions like
-<UL>
-  <LI>"What Physics knowledge is expected of students prior to taking this course?"</LI>
-  <LI>"What mathematical skills are expected of students prior to taking this course?"</LI>
-  <LI>"What specific mathematical skills will be used in this course?"</LI>
-  <LI>"What specific Physics knowledge will be gained in this course?"</LI>
-</UL>
-For Math teachers, the Physics Derivation Graph could address questions like
-<UL>
-  <LI>"What mathematical skills are expected of students prior to taking the course I am teaching?"</LI>
-  <LI>"What mathematical skills are gained in this course?"</LI>
-</UL>
-</P>
-
-<P>
-  <a name="audience:students">
-<em>How could the Physics Derivation Graph benefit students?</em>
-</a><BR/>
-The mechanics of mathematical physics is the application of inference rules taught in math classes.
-In addition the <a href="#audience:teachers">questions relevant for instructors</a>,
-for physics students the Physics Derivation Graph could address questions like
-<UL>
-  <LI>"How much of what is known in Physics have I learned?"</LI>
-  <LI>"What else in Physics is there to learn?"</LI>
-  <LI>"What portion of Physics does the course I'm taking represent?"</LI>
-</UL>
-
-<P>Math classes essentially teach a set of inference rules.
-For math students, the Physics Derivation Graph could address questions like
-<UL>
-  <LI>"What are example applications of the techniques I am learning?"</LI>
-  <LI>"How frequently is this technique used?"</LI>
-</UL>
-</P>
-
-<P>As an example, see
-  <a href="https://www.physicsforums.com/threads/fundamental-rules-for-physics-mathematical-derivations.86019/">
-    Fundamental rules for physics mathematical derivations?</a>
-</P>
-
-
-<H4 id="use case:scientific articles">Use case: Documenting Scientific Progress in Articles</H4>
-
-<P>
-The Physics Derivation Graph provides a very detailed explanation of how
-complex derivations are carried out.
-It also explicitly enumerates the assumptions necessary to perform derivations.
-Imposing these requirements on researchers would require clear and significant
-benefit to both the individual researchers and the community.
-</P>
-
-<P>
-  Peer-reviewed journal articles are one of the current methods of
-  demonstrating value in the scientific community.
-  Conciseness is a feature of this writing style, and the mathematics
-  presented is correspondingly sparse -- just sufficient to covey the
-  author's intention.
-  This results in a burden on the reader of the article, either to take
-  the author's claims on faith, or to rederive the mathematical expressions.
-  A reader's derivation is complicated by implicit assumptions made by
-  the author and unintentional mistakes in calculation.
-</P>
-
-<P>
-  With journals allowing supplemental materials for articles,
-  calculations could be included.
-  However, it is not clear what the appropriate level of detail is in
-  supplied calculations.
-  The intention is to be able to reproduce the work, but validation via computer.
-</P>
-
-<P>
-  <a name="audience:researchers">Stakeholders for this use case</a>:
-  <UL>
-    <LI>Authors. <em>Incentive</em>: validate content to identify mistakes.</LI>
-    <LI>Peer reviewers. <em>Incentive</em>: confidence that the material is mathematically correct.</LI>
-    <LI>Editors. <em>Incentive</em>: filter out incorrect papers early in the process.</LI>
-    <LI>Readers. <em>Incentive</em>: ability to reproduce and extend results.</LI>
-    <LI>Publishers. <em>Incentive</em>: construct a corpus of results that builds on prior work.</LI>
-  </UL>
-</P>
-
-<H4 id="use case:education curriculum design">Use case: Education Curriculum Design</H4>
-<P>
-  By measuring the frequency of a specific inference rule in the Physics Derivation Graph,
-  the question "What is the relative importance of this math skill?" can be addressed.
-</P>
-<P>
-  In the Physics Derivation Graph, it is simple to count utilization of inference rules.
-  Thus, we are able to measure the ratio of how often "multiply both
-  sides by X" is used relative to "integrate both sides with respect to \(Y\)."
-</P>
 
 
 

@@ -5,8 +5,8 @@
 
 <H1>Frequently Asked Questions (FAQ) About the Physics Derivation Graph</H1>
 
-<P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
-   <a href="{{ url_for('to_documentation_overview')}}">documentation overview</a> / 
+<P><a href="{{ url_for('to_navigation') }}?referrer=faq">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=faq">documentation overview</a> / 
    Frequently Asked Questions (FAQ)
 
 <HR/> <!-- ************************************************** -->
@@ -22,9 +22,8 @@ As of January 2026, a single developer is actively contributing to the project i
     <em>What is the durability of the project?</em>
   </a><BR/>
   Many projects in knowledge management of science last as long as a grant or are created in support of a publication.
-  The Physics Derivation Grpah is hosted on DigitalOcean using a single droplet at a cost of $75/year.
-  As of August 2026, the account has $63 available (so at least another year).
-  The lease on the domain name through Google is $12/year and renews annually. Paid through 2030.
+  The Physics Derivation Grpah is hosted on Hetzner using a single droplet at a cost of $48/year.
+  The lease on the domain name through SquareSpace is $12/year and renews annually. Paid through 2030.
 </P>
 
 <HR/> <!-- ************************************************** -->
@@ -37,7 +36,7 @@ Local account and authenticating with other services (e.g. Github, Gitlab, Faceb
 (If you want to advocate or request addition of a authentication site, submit <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/new">a feature request</a>.)
 
 <P>
-  Once you are signed in, go to the <a href="https://derivationmap.net/navigation?referrer=faq">navigation page</a>. There is a link to "<a href="https://derivationmap.net/start_new_derivation/?referrer=faq">starting a new derivation</a>".
+  Once you are signed in, go to the <a href="{{ url_for('to_navigation') }}?referrer=faq">navigation page</a>. There is a link to "<a href="{{ url_for('to_add_derivation') }}?referrer=faq">starting a new derivation</a>".
   For inference rules, expressions, and symbols first go to the review page and then scroll to the bottom.
 
 <HR/> <!-- ************************************************** -->
@@ -62,7 +61,7 @@ Local account and authenticating with other services (e.g. Github, Gitlab, Faceb
     <LI>Number of degrees of separation</LI>
     <LI>Minimum distance between two expressions</LI>
   </UL>
-
+<P>See also <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/55">https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/55</a>
 
 </P>
 <HR/> <!-- ************************************************** -->
@@ -103,6 +102,9 @@ These descriptions of the project are equivalent:
   <a name="use cases">
     <em>What are the use cases for the Physics Derivation Graph?</em>
   </a><BR/>
+
+<P>See also <a href="https://github.com/allofphysicsgraph/task-tracker/issues/28">https://github.com/allofphysicsgraph/task-tracker/issues/28</a>
+
   <div align="center">
   <table border=1>
   <tr>
@@ -149,13 +151,159 @@ These descriptions of the project are equivalent:
   </tr>
 </table>
 </div>
-<P>
-Each of these use cases involve significant amounts of tedious data entry and learning what inference rules exist and the interface to the Physics Derivation Graph.
+<P>Each of these use cases involve significant amounts of tedious data entry and learning what inference rules exist and the interface to the Physics Derivation Graph.
+
+
 
 <P>If research grants do not require validation of math, then researchers are not motivated to invest.
    If promotion in academia does not depend on validation of math, then professors are not motivated to invest.
    If publishing research does not require validation of math, then authors are not motivated to invest.
    If students doing homework can get by without being correct, then students are not motivated to invest.
+
+<P>
+The Physics Derivation Graph is expected to be useful to multiple audiences
+and users. Viewers of the content could include students in math and physics,
+and analysis of the content could help shape curriculum. Contributors to the
+Physics Derivation Graph would be scientists who add new developments based
+on their work, or enthusiasts who convert published scientific literature
+into the Physics Derivation Graph database.
+</P>
+
+<P>
+  The entrypoint for the use cases below is
+  <a href="{{ url_for('to_navigation') }}?referrer=user_documentation">the navigation page</a>,
+  from which steps, expressions, symbols, operators, and inference rules can be viewed.
+<P>
+
+<H4 id="use case:students">Use case: Education in Math and Physics</H4>
+<P>
+  Currently students in Math and Physics are taught content using lectures,
+  textbooks, and homework.
+  The method of presentation varies, but the pedagogic story is often historically driven.
+  Algebra is old, calculus is newer, and topology is recent.
+  Classical mechanics is old, thermodynamics is newer, and quantum mechanics is recent.
+  When teaching, these subjects are taught by building on previous content --
+  calculus leverages algebra, thermodynamics leverages classical mechanics.
+</P>
+<P>
+  A role the Physics Derivation Graph can play in education is showing the
+  relevance of what is being taught.
+  The focus for students in mathematics classes is on the technique, e.g.,
+  "integrate both sides with respect to \(Y\)," and application is
+  necessarily of secondary importance.
+  Physics students are expected to know the mathematical techniques
+  and teaching is focused on application.
+  The Physics Derivation Graph can assist both scenarios.
+  The student in a math class can see where the inference rules they
+  learn are applied in Physics.
+  The student in the Physics class can see which inference rules are required in their field.
+</P>
+<P>
+  Stakeholders for this use case:
+  <UL>
+    <LI>Educators</LI>
+    <LI>Students</LI>
+  </UL>
+</P>
+
+<P>
+  <a name="audience:teachers">
+<em>How could the Physics Derivation Graph benefit teachers?</em>
+</a><BR/>
+For Physics teachers, the Physics Derivation Graph could address questions like
+<UL>
+  <LI>"What Physics knowledge is expected of students prior to taking this course?"</LI>
+  <LI>"What mathematical skills are expected of students prior to taking this course?"</LI>
+  <LI>"What specific mathematical skills will be used in this course?"</LI>
+  <LI>"What specific Physics knowledge will be gained in this course?"</LI>
+</UL>
+For Math teachers, the Physics Derivation Graph could address questions like
+<UL>
+  <LI>"What mathematical skills are expected of students prior to taking the course I am teaching?"</LI>
+  <LI>"What mathematical skills are gained in this course?"</LI>
+</UL>
+</P>
+
+<P>
+  <a name="audience:students">
+<em>How could the Physics Derivation Graph benefit students?</em>
+</a><BR/>
+The mechanics of mathematical physics is the application of inference rules taught in math classes.
+In addition the <a href="#audience:teachers">questions relevant for instructors</a>,
+for physics students the Physics Derivation Graph could address questions like
+<UL>
+  <LI>"How much of what is known in Physics have I learned?"</LI>
+  <LI>"What else in Physics is there to learn?"</LI>
+  <LI>"What portion of Physics does the course I'm taking represent?"</LI>
+</UL>
+
+<P>Math classes essentially teach a set of inference rules.
+For math students, the Physics Derivation Graph could address questions like
+<UL>
+  <LI>"What are example applications of the techniques I am learning?"</LI>
+  <LI>"How frequently is this technique used?"</LI>
+</UL>
+</P>
+
+<P>As an example, see
+  <a href="https://www.physicsforums.com/threads/fundamental-rules-for-physics-mathematical-derivations.86019/">
+    Fundamental rules for physics mathematical derivations?</a>
+</P>
+
+
+<H4 id="use case:scientific articles">Use case: Documenting Scientific Progress in Articles</H4>
+
+<P>
+The Physics Derivation Graph provides a very detailed explanation of how
+complex derivations are carried out.
+It also explicitly enumerates the assumptions necessary to perform derivations.
+Imposing these requirements on researchers would require clear and significant
+benefit to both the individual researchers and the community.
+</P>
+
+<P>
+  Peer-reviewed journal articles are one of the current methods of
+  demonstrating value in the scientific community.
+  Conciseness is a feature of this writing style, and the mathematics
+  presented is correspondingly sparse -- just sufficient to covey the
+  author's intention.
+  This results in a burden on the reader of the article, either to take
+  the author's claims on faith, or to rederive the mathematical expressions.
+  A reader's derivation is complicated by implicit assumptions made by
+  the author and unintentional mistakes in calculation.
+</P>
+
+<P>
+  With journals allowing supplemental materials for articles,
+  calculations could be included.
+  However, it is not clear what the appropriate level of detail is in
+  supplied calculations.
+  The intention is to be able to reproduce the work, but validation via computer.
+</P>
+
+<P>
+  <a name="audience:researchers">Stakeholders for this use case</a>:
+  <UL>
+    <LI>Authors. <em>Incentive</em>: validate content to identify mistakes.</LI>
+    <LI>Peer reviewers. <em>Incentive</em>: confidence that the material is mathematically correct.</LI>
+    <LI>Editors. <em>Incentive</em>: filter out incorrect papers early in the process.</LI>
+    <LI>Readers. <em>Incentive</em>: ability to reproduce and extend results.</LI>
+    <LI>Publishers. <em>Incentive</em>: construct a corpus of results that builds on prior work.</LI>
+  </UL>
+</P>
+
+<H4 id="use case:education curriculum design">Use case: Education Curriculum Design</H4>
+<P>
+  By measuring the frequency of a specific inference rule in the Physics Derivation Graph,
+  the question "What is the relative importance of this math skill?" can be addressed.
+</P>
+<P>
+  In the Physics Derivation Graph, it is simple to count utilization of inference rules.
+  Thus, we are able to measure the ratio of how often "multiply both
+  sides by X" is used relative to "integrate both sides with respect to \(Y\)."
+</P>
+
+
 
 <HR/> <!-- ************************************************** -->
 <P>
