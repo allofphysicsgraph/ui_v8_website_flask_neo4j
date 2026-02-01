@@ -7,7 +7,7 @@
    <a href="{{ url_for('to_documentation_overview')}}">documentation overview</a> / 
    evaluation of LLM prompts
 
-<table border=1>
+<table border=1 id="LLM_prompts_table" class="sortable">
   <tr>
     <th>Prompt</th>
     <th>LLM</th>
@@ -55,6 +55,25 @@
     <td></td> <!-- output token count -->
     <td>0</td> <!-- price -->
   </tr>
+
+  <tr>
+    <td>What is the SymPy representation for the Latex expression $x^2 + y^2 = 1$ ?</td> <!-- prompt -->
+    <td>Gemini 3 Pro</td> <!-- LLM -->
+    <td>
+<pre>
+from sympy import symbols, Eq
+
+x, y = symbols('x y')
+equation = Eq(x**2 + y**2, 1)
+</pre>
+    </td> <!-- response -->
+    <TD>(correct)</TD> <!-- correct answer -->
+    <td>2026-02-01</td> <!-- date -->
+    <td>24</td> <!-- input token count -->
+    <td>1103</td> <!-- output token count -->
+    <td>0</td> <!-- price -->
+  </tr>
+
   <tr>
     <td>Answer the question based on the context below.
 
@@ -190,7 +209,7 @@
 <P>\[ \psi_n(x) = \sqrt{\frac{2}{L}} \sin\left(\frac{n\pi x}{L}\right) \]
 
 <P>where \( n \) is the quantum number, \( L \) is the length of the box.</td> <!-- response -->
-    <TD>ChatGPT 3.5</TD> <!-- correct answer -->
+    <TD></TD> <!-- correct answer -->
     <td>2023-12-16</td> <!-- date -->
     <td></td> <!-- input token count -->
     <td></td> <!-- output token count -->
@@ -268,6 +287,69 @@ end
     <td></td> <!-- output token count -->
     <td>0</td> <!-- price -->
   </tr>
+
+  <tr>
+    <td>
+<pre>
+Lean is a proof assistant and programming language. Lean is based on the calculus of constructions with inductive types.
+
+`a=b` is a proposition. The variable `a` is Real valued and `b` is Real valued. Prove in Lean that `(a=b) -> (a+2=b+2)`
+</pre>
+    </td> <!-- prompt -->
+    <td>Gemini 3 Pro</td> <!-- LLM -->
+    <td>
+<pre>
+Here is the proof in **Lean 4**.
+
+To work with Real numbers in Lean, you typically need **Mathlib**. The proof relies on the substitution property of equality (rewriting).
+
+```lean
+import Mathlib.Data.Real.Basic
+
+-- We define the example with variables a and b as Reals (ℝ)
+example (a b : ℝ) : (a = b) → (a + 2 = b + 2) := by
+  -- 1. Introduce the hypothesis `a = b` into the context
+  intro h
+  -- 2. Rewrite `a` to `b` in the goal using hypothesis `h`
+  rw [h]
+  -- Lean automatically closes the goal because `b + 2 = b + 2` is reflexive
+```
+
+### Explanation of the Steps
+
+1.  **`import Mathlib.Data.Real.Basic`**: This imports the definition of real numbers.
+2.  **`example (a b : ℝ)`**: We declare variables `a` and `b` of type `ℝ`.
+3.  **`intro h`**: Since the goal is an implication ($P \to Q$), we assume the premise $P$ (that $a=b$) and name it `h`.
+4.  **`rw [h]`**: The `rw` (rewrite) tactic looks at `h` (which proves $a=b$) and replaces occurrences of $a$ with $b$ in the goal.
+    *   The goal changes from `a + 2 = b + 2` to `b + 2 = b + 2`.
+    *   Since equality is reflexive ($x = x$), Lean closes the proof automatically.
+
+### Term-Mode Proof (Functional approach)
+
+Since you mentioned Lean is based on the **Calculus of Constructions**, you might appreciate the "Term Mode" proof. This treats proofs as functions. Here, we use `congrArg`, which applies a function to both sides of an equality.
+
+```lean
+import Mathlib.Data.Real.Basic
+
+example (a b : ℝ) : (a = b) → (a + 2 = b + 2) :=
+  fun h => congrArg (fun x => x + 2) h
+```
+
+**Logic:**
+*   `h` has type `a = b`.
+*   We define a function $f(x) = x + 2$.
+*   `congrArg` creates a proof that $f(a) = f(b)$ given $a = b$.
+</pre>
+    </td> <!-- response -->
+    <TD></TD> <!-- correct answer -->
+    <td>2026-02-01</td> <!-- date -->
+    <td>68</td> <!-- input token count -->
+    <td>1725</td> <!-- output token count -->
+    <td>0</td> <!-- price -->
+  </tr>
+
+
+
   <tr>
     <td>Answer the question based on the context below. Keep the answer short and concise. Respond "Unsure about answer" if not sure about the answer. Let's work this out in a step by step way to be sure we have the right answer.
 
@@ -648,26 +730,8 @@ properties and density. These strongly
     <td></td> <!-- output token count -->
     <td></td> <!-- price -->
   </tr>
-  <tr>
-    <td></td> <!-- prompt -->
-    <td></td> <!-- LLM -->
-    <td></td> <!-- response -->
-    <TD></TD> <!-- correct answer -->
-    <td>2023-12-16</td> <!-- date -->
-    <td></td> <!-- input token count -->
-    <td></td> <!-- output token count -->
-    <td></td> <!-- price -->
-  </tr>
-  <tr>
-    <td></td> <!-- prompt -->
-    <td></td> <!-- LLM -->
-    <td></td> <!-- response -->
-    <TD></TD> <!-- correct answer -->
-    <td>2023-12-16</td> <!-- date -->
-    <td></td> <!-- input token count -->
-    <td></td> <!-- output token count -->
-    <td></td> <!-- price -->
-  </tr>
+
+
 </table>
 
 {% endblock %}
