@@ -29,14 +29,17 @@ but I manually compared those to the automatically generated `symbols.cypher` fr
 
 # step 5
 
-used the ui_v8 web interface to upload the files in this sequence
-- operators
-- symbols
-- infrule
-- expr_and_feed
-- steps
-- deriv
-although order shouldn't matter for the merging in Neo4j
+Upload order mattered for reasons unknown to BHP. The problem was that `steps` and `symbols` both have `MATCH` statements, and that seems to overwrite each other. As a hack-fix, I used
+
+```
+cat deriv.cypher          > no_matches.cypher 
+cat expr_and_feed.cypher >> no_matches.cypher
+cat infrules.cypher      >> no_matches.cypher
+cat operators.cypher     >> no_matches.cypher
+cat steps.cypher       > match_used.cypher
+cat symbols.cypher    >> match_used.cypher
+```
+Not clear why I had to separate the `MATCH` and non-MATCH commands.
 
 # step 6
 
