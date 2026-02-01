@@ -71,8 +71,11 @@ def validate_step(
         + " "
         + str(time.time())
     )
-    # logger.info("[trace start " + trace_id + "]")
-    # logger.debug("step ID = " + step_id + " and deriv_id = " + deriv_id)
+
+    # logger.debug(str(inference_rule_dict))
+    # logger.debug(str(list_of_input_dicts))
+    # logger.debug(str(list_of_feed_dicts))
+    # logger.debug(str(list_of_output_dicts))
 
     if inference_rule_dict["name_latex"] in [
         "declare initial expression",
@@ -106,285 +109,792 @@ def validate_step(
         return "no validation is available for assumptions"
 
     elif inference_rule_dict["name_latex"] == "add X to both sides":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
-        return add_X_to_both_sides(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
+        return add_X_to_both_sides(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
 
     elif inference_rule_dict["name_latex"] == "divide both sides by":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
-        return divide_both_sides_by(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
+        return divide_both_sides_by(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
 
     elif inference_rule_dict["name_latex"] == "multiply both sides by":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
-        return multiply_both_sides_by(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
+        return multiply_both_sides_by(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
 
     elif inference_rule_dict["name_latex"] == "subtract X from both sides":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
-        return subtract_X_from_both_sides(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
+        return subtract_X_from_both_sides(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
 
-    elif inference_rule_dict["name_latex"] == "LHS of expr 1 equals LHS of expr 2
+    elif inference_rule_dict["name_latex"] == "LHS of expr 1 equals LHS of expr 2":
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
+        return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "RHS of expr 1 equals RHS of expr 2":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "X cross both sides by":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "X dot both sides":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "add X to both sides":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "add expr 1 to expr 2":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "add zero to LHS":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "add zero to RHS":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "apply divergence":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "apply function to both sides of expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+    elif (
+        inference_rule_dict["name_latex"]
+        == "apply function to both sides of expression"
+    ):
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "apply gradient to scalar function":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "apply operator to bra":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "apply operator to ket":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "assume N dimensions":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "both sides cross X":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "both sides dot X":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "boundary condition":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "boundary condition for expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "change five variables in expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "change four variables in expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "change six variables in expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "change three variables in expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "change two variables in expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "change variable X to Y":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "claim LHS equals RHS":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "claim expr 1 equals expr 2":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "combine like terms":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "conjugate both sides":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "conjugate function X":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "conjugate transpose both sides":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "declare assumption":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "declare guess solution":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "declare identity":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "differentiate with respect to":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "distribute conjugate to factors":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "distribute conjugate transpose to factors":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+    elif (
+        inference_rule_dict["name_latex"] == "distribute conjugate transpose to factors"
+    ):
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "divide expr 1 by expr 2":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "drop non-dominant term":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "evaluate definite integral":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "expand LHS":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "expand RHS":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "expand integrand":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "expand magnitude to conjugate":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "expr 1 is equivalent to expr 2 under the condition":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+    elif (
+        inference_rule_dict["name_latex"]
+        == "expr 1 is equivalent to expr 2 under the condition"
+    ):
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "expr 1 is true under condition expr 2":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "factor out X":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "factor out X from LHS":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "factor out X from RHS":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "function is even":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "function is odd":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "indefinite integral over":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "indefinite integrate LHS over":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "indefinite integrate RHS over":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "indefinite integration":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "integrate":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "integrate over from to":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "make expr power":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "maximum of expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "multiply LHS by unity":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "multiply RHS by unity":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "multiply expr 1 by expr 2":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "normalization condition":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "partially differentiate with respect to":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "raise both sides to power":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "replace constant with value":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "replace curl with LeviCevita summation contravariant":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+    elif (
+        inference_rule_dict["name_latex"]
+        == "replace curl with LeviCevita summation contravariant"
+    ):
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "replace scalar with vector":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "replace summation notation with vector notation":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+    elif (
+        inference_rule_dict["name_latex"]
+        == "replace summation notation with vector notation"
+    ):
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "select imaginary parts":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "select real parts":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "separate three vector components":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "separate two vector components":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "separate vector into two trigonometric ratios":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+    elif (
+        inference_rule_dict["name_latex"]
+        == "separate vector into two trigonometric ratios"
+    ):
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "simplify":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "solve for X":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "square root both sides":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "substitute LHS of expr 1 into expr 2":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "substitute LHS of five expressions into expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+    elif (
+        inference_rule_dict["name_latex"]
+        == "substitute LHS of five expressions into expression"
+    ):
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "substitute LHS of four expressions into expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+    elif (
+        inference_rule_dict["name_latex"]
+        == "substitute LHS of four expressions into expression"
+    ):
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "substitute LHS of six expressions into expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+    elif (
+        inference_rule_dict["name_latex"]
+        == "substitute LHS of six expressions into expression"
+    ):
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "substitute LHS of three expressions into expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+    elif (
+        inference_rule_dict["name_latex"]
+        == "substitute LHS of three expressions into expression"
+    ):
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "substitute LHS of two expressions into expression":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+    elif (
+        inference_rule_dict["name_latex"]
+        == "substitute LHS of two expressions into expression"
+    ):
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "substitute RHS of expr 1 into expr 2":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "subtract expr 1 from expr 2":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "sum exponents":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "sum exponents LHS":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "sum exponents RHS":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "swap LHS with RHS":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
     elif inference_rule_dict["name_latex"] == "take curl of both sides":
-        logger.info("[TRACE] sympy_validate_step/validate_step end "+ trace_id+ " "+ str(time.time()))
+        logger.info(
+            "[TRACE] sympy_validate_step/validate_step end "
+            + trace_id
+            + " "
+            + str(time.time())
+        )
         return "recognized infrule but not yet supported"
 
     else:
@@ -523,6 +1033,46 @@ def subtract_X_from_both_sides(
 
 def multiply_both_sides_by(input_expr_sympy, feed_expr_sympy, output_expr_sympy) -> str:
     """
+
+    inference_rule_dict is {'name_latex': 'multiply both sides by', 
+                            'assumptions_latex': '', 
+                            'number_of_outputs': 1, 'number_of_inputs': 1, 'number_of_feeds': 1, 
+                            'author_name_latex': 'ben.is.located@gmail.com', 
+                            'notes_latex': '', 'id': '111182', 
+                            'latex': 'Multiply both sides of Eq.~\ref{eq:#2} by $#1$; yields Eq.~\ref{eq:#3}.'}
+
+    list_of_input_dicts[{'name_latex': '', 
+                         'latex_lhs': 'T', 
+                         'latex_relation': '='
+                         'latex_rhs': '1 / f', 
+                         'sympy_lhs': "Equality(Symbol('pdg0009491'), Pow(Symbol('pdg0004201'), Integer(-1)))", 
+                         'sympy_rhs': '', 
+                         'reference_latex': '', 
+                         'latex_condition': '', 
+                         'lean': '', 
+                         'author_name_latex': 'ben.is.located@gmail.com', 
+                         'description_latex': '', 
+                         'id': '3131111133'}]
+
+    list_of_feed_dicts[{'lean': '', 
+                        'author_name_latex': 'ben.is.located@gmail.com', 
+                        'id': '9040079362', 
+                        'sympy': "Symbol('pdg0004201')", 
+                        latex': 'f'}]
+
+    list_of_output_dicts[{'sympy_lhs': "Equality(Mul(Symbol('pdg0009491'), Symbol('pdg0004201')), Integer(1))", 
+                          'name_latex': '', 
+                          'reference_latex': '', 
+                          'latex_condition': '', 
+                          'lean': '', 
+                          'latex_rhs': '1', 
+                          'sympy_rhs': '', 
+                          'author_name_latex': 'ben.is.located@gmail.com', 
+                          'description_latex': '', 
+                          'id': '2131616531', 
+                          'latex_lhs': 'T f', 
+                          'latex_relation': '='}]
+
     see also dividebothsidesby
     x*y = Mul(x,y)
 
