@@ -116,7 +116,6 @@ is designed to be read sequentially.
 </P>
 
 <P>ANTLER grammar:
-  <div align=center>
 <pre>
 grammar PhysicsDerivationGraph_grammar;
 
@@ -267,7 +266,6 @@ WS: [ \t] -&gt; skip;
 NEWLINE: '\n' -&gt; skip;
 
 </pre>
-</div>
 
 
 <P>&nbsp;</P>
@@ -564,21 +562,30 @@ level is likely to be required.
 
 <H2 id="adding_content">Adding or modifying content</H2>
 
-<P>
-  The web interface serves as a way to add content to the database and includes
+<P>The web interface serves as a way to add content to the database and includes
   supporting functions that make adding and editing content easier than
-  manually editing the JSON file.
+  manually editing the Neo4j database.
 </P>
-<P>
-  Adding content to the Physics Derivation Graph assumes experience with Latex and
+<P>Adding content to the Physics Derivation Graph assumes experience with Latex and
   familiarity with the derivation being added.
 <P>
 
-<P>
-  The entrypoint for the use cases below is
+<P>The entrypoint for is
   <a href="{{ url_for('to_navigation') }}?referrer=user_documentation">the navigation page</a>,
   from which new derivations can be added.
 </P>
+
+<P>
+  <a name="add content">
+    <em>How do I add a new derivation? a new inference rule? a new expression? a new symbol?</em>
+  </a><BR/>
+All of these actions require being signed in using your Google account.
+Local accounts and authenticating with other services (e.g. Github, Gitlab, Facebook) are not currently supported.
+(If you want to advocate or request addition of a authentication site, submit <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/new">a feature request</a>.)
+
+<P>
+  Once you are signed in, go to the <a href="{{ url_for('to_navigation') }}?referrer=faq">navigation page</a>. There is a link to "<a href="{{ url_for('to_add_derivation') }}?referrer=faq">starting a new derivation</a>".
+  For inference rules, expressions, and symbols first go to the review page and then scroll to the bottom.
 
 <P>&nbsp;</P>
 
