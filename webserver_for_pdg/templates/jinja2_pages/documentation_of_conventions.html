@@ -3,21 +3,120 @@
 
 {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
 
-<h1>Conventions Documentation for the Physics Derivation Graph</h1>
+<h1>Conventions and Definitions for the Physics Derivation Graph</h1>
 
-<P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
-   <a href="{{ url_for('to_documentation_overview')}}">documentation overview</a> / 
+<P><a href="{{ url_for('to_navigation') }}?referrer=convention_documentation">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview') }}?referrer=convention_documentation">documentation overview</a> / 
    conventions documentation
 
 
+<H2>Conventions</H2>
 <UL>
   <LI>On webpages the HTML tag "Fieldset" is used to denote actions available to the user.</LI>
-  <LI>Expressions are decomposed into "LHS", "relation", "RHS"
-  <LI>"Symbols" refers to relations, operations, scalars, vectors, matrices.
-  <LI>"Non-operation symbols" refers to scalars, vectors, matrices.
 </UL>
 
-
+<H2>Jargon, definitions, Dictionary</H2>
+<table border="1" id="definitions_table" class="sortable">
+  <thead>
+  <tr>
+    <th>word</th>
+    <th>definition</th>
+    <th>see more</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td id="Left-hand side">Left-hand side</td>
+    <td>LHS of an expression.<br>
+      LHS is comprised of non-relation symbols.<br>
+    In an expression, LHS is separated from RHS by a relation</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="LHS">LHS</td>
+    <td>See Left-hand side</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="Right-hand side">Right-hand side</td>
+    <td>RHS of an expression.<br>
+      RHS is comprised of non-relation symbols.<br>
+    In an expression, RHS is separated from LHS by a relation</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="RHS">RHS</td>
+    <td>See Right-hand side</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="Expression">Expression</td>
+    <td>An expression is comprised of a LHS, relation, RHS
+      <br>Each expression appears only once in the Physics Derivation Graph.</td>
+    <td><a href="{{ url_for('to_list_expressions') }}?referrer=convention_documentation">list of expressions</a></td>
+  </tr>
+  <tr>
+    <td id="Feed">Feed</td>
+    <td>A feed may appear more than once in the Physics Derivation Graph. <br>
+    A feed does not have a relation (e.g., equality or inequality).</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="Inference Rule">Inference Rule</td>
+    <td>Acts on one or more Expressions. <br>
+    Inference rule is the defining feature of a Step</td>
+    <td><a href="{{ url_for('to_user_documentation') }}?referrer=convention_documentation#inference%20rules">Inference rules</a></td>
+  </tr>
+  <tr>
+    <td id="Symbol">Symbol</td>
+    <td>"Symbols" refers to relations, operations, scalars, vectors, matrices.</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="Operation">Operation</td>
+    <td>Appears in LHS and RHS of an expression. Requires one or more arguments.</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="Relation">Relation</td>
+    <td>separates the LHS and RHS of an Expression</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="Derivation">Derivation</td>
+    <td>A derivation is comprised of steps</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="Step">Step</td>
+    <td>A step is comprised of an inference rule and one or more expressions</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="value">value</td>
+    <td>constants have numeric values with units</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="constant">constant</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="variable">variable</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="unit">unit</td>
+    <td>Constants are either unitless or have units.<br>Each dimensionality has a set of units</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="dimensionality">dimensionality</td>
+    <td>variables and constants are either dimensionless or have dimensionality</td>
+    <td></td>
+  </tr>
+</tbody></table>
 
 
 {% endblock %}
