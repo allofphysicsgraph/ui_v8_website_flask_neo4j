@@ -6095,7 +6095,8 @@ def to_edit_inference_rule(
             )
         )
         query_time_dict[
-            "pdg_app/to_edit_inference_rule: derivations_that_use_inference_rule" + trace_id
+            "pdg_app/to_edit_inference_rule: derivations_that_use_inference_rule"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     # list_of_derivation_dicts_that_use_this_inference_rule_id = list(
