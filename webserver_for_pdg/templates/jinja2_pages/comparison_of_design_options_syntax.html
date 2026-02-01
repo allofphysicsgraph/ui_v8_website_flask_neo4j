@@ -5,46 +5,35 @@
 
 <h1>Comparison of Syntax Design Options for the Physics Derivation Graph</h1>
 
-<P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
-   <a href="{{ url_for('to_documentation_overview')}}">documentation overview</a> / 
-   <a href="{{ url_for('to_developer_documentation') }}">developer documentation</a> /
+<P><a href="{{ url_for('to_navigation') }}?referrer=comparison_of_syntax">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=comparison_of_syntax">documentation overview</a> / 
+   <a href="{{ url_for('to_developer_documentation') }}?referrer=comparison_of_syntax">developer documentation</a> /
    syntax comparison
 
 <P>
   <em>Recommendation</em>: Read the
-  <a href="{{ url_for('to_user_documentation') }}?referrer=design_documentation">user documentation</a>
-  and <a href="{{ url_for('to_faq') }}?referrer=design_documentation">FAQ</a> first.
-  This page assumes familiarity with the jargon used in the Physics Derivation Graph.
+  <a href="{{ url_for('to_user_documentation') }}?referrer=comparison_of_syntax">user documentation</a>
+  and <a href="{{ url_for('to_faq') }}?referrer=comparison_of_syntax">FAQ</a> first.
+  This page assumes familiarity with the <a href="{{ url_for('to_conventions_documentation') }}?referrer=comparison_of_syntax">jargon</a> used in the Physics Derivation Graph.
 </P>
 
-<P>
-  This page compares syntax options for the Physics Derivation Graph (PDG).
-
-
-<H2><a name="comparison:syntax">Comparison of Syntax Options</a></H2>
-
-<P>
-  Here methods of capturing mathematical syntax required to describe derivations in physics are compared.
+<P>Here methods of capturing mathematical syntax required to describe derivations in physics are compared.
   This survey covers \(\rm\LaTeX\), Mathematical Markup Language (MathML), Mathematica, and SymPy.
   For MathML, both Presentation and Content forms are included.
 </P>
 
 
-<P>
-Although \(\rm\LaTeX\) is intuitive for scientists and is concise, it is a typesetting language and not well suited for the web or use in Computer Algebra Systems (CAS). Mathematica is also concise and has wide spread use by scientists, though its cost limits accessibility. Mathematica is also proprietary, which limits the ability to explore the correctness of this CAS
+<P>Although \(\rm\LaTeX\) is intuitive for scientists and is concise, it is a typesetting language and not well suited for the web or use in Computer Algebra Systems (CAS). Mathematica is also concise and has wide spread use by scientists, though its cost limits accessibility. Mathematica is also proprietary, which limits the ability to explore the correctness of this CAS
 </P>
 
-<P>
-\(\rm\LaTeX\) is concise and is widely used in the scientific community. It does not work well for portability to other representations and is ill-suited for use by CAS. For the initial phases of development for the Physics Derivation Graph, portability and compatibilty with a CAS are not the priority. Since getting content into the graph is the priority, the Latex representation will be used.
+<P>\(\rm\LaTeX\) is concise and is widely used in the scientific community. It does not work well for portability to other representations and is ill-suited for use by CAS. For the initial phases of development for the Physics Derivation Graph, portability and compatibilty with a CAS are not the priority. Since getting content into the graph is the priority, the Latex representation will be used.
 </P>
 
-<P>
-  For this survey it is assumed that users cares about the learning curve, leveraging previous experience, how wide spread use in their community, speed, ease of input, presentation (rendering), ability to access content across devices, OS independence, ease of setup.
+<P>For this survey it is assumed that users cares about the learning curve, leveraging previous experience, how wide spread use in their community, speed, ease of input, presentation (rendering), ability to access content across devices, OS independence, ease of setup.
   To evaluate criteria relevant to users, including the ability to <a href="#quantitative comparison of syntax">manually input syntax</a>, the ability to <a href="#conversion of syntax">transform between representations</a>, and the ability to <a href="#correctness of derivations">audit correctness</a>.
 </P>
 
-<P>
-  Use of a single syntax for the graph content is important. To illustrate why, consider the approach where each syntax is used for its intended purpose -- Latex for rendering equation, SymPy for the CAS, and MathML for portability. This introduces a significant source of error when a single equation requires three distinct representation. The manual entry could result in the three representations not being sychronized. Thus, a single representation satisfying multiple criteria is needed. If no single syntax meets all the needs of the Physics Derivation Graph, then the requirements must be prioritized.
+<P>Use of a single syntax for the graph content is important. To illustrate why, consider the approach where each syntax is used for its intended purpose -- Latex for rendering equation, SymPy for the CAS, and MathML for portability. This introduces a significant source of error when a single equation requires three distinct representation. The manual entry could result in the three representations not being sychronized. Thus, a single representation satisfying multiple criteria is needed. If no single syntax meets all the needs of the Physics Derivation Graph, then the requirements must be prioritized.
 </P>
 
 <P>
@@ -120,6 +109,7 @@ Case 4c: L&uuml;ders projection
 
 <H3><a name="quantitative comparison of syntax">Quantitative Comparison of Test Cases</a></H3>
 
+<div align="center">
 <table border="1" class="sortable">
   <tr>
     <th>Name</th>
@@ -158,6 +148,7 @@ Case 4c: L&uuml;ders projection
     <td>SymPy</td>
   </tr>
 </table>
+</div>
 
 <P>
   MathML is comprised of empty elements (symbols, e.g., <code>&lt;plus/&gt;</code>), token elements (both ASCII and entities), and annotation elements.

@@ -3,33 +3,29 @@
 
 {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
 
-<h1>Comparison of Proof Options for the Physics Derivation Graph</h1>
+<h1>Comparison of <a href="https://en.wikipedia.org/wiki/Proof_assistant">Proof Assistants</a> for the Physics Derivation Graph</h1>
 
-<P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
-   <a href="{{ url_for('to_documentation_overview')}}">documentation overview</a> / 
-   <a href="{{ url_for('to_developer_documentation') }}">developer documentation</a> /
+<P><a href="{{ url_for('to_navigation') }}?referrer=comparison_of_proof_assistants">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=comparison_of_proof_assistants">documentation overview</a> / 
+   <a href="{{ url_for('to_developer_documentation') }}?referrer=comparison_of_proof_assistants">developer documentation</a> /
    proof assistant comparison
 
 <P>
   <em>Recommendation</em>: Read the
-  <a href="{{ url_for('to_user_documentation') }}?referrer=design_documentation">user documentation</a>
-  and <a href="{{ url_for('to_faq') }}?referrer=design_documentation">FAQ</a> first.
-  This page assumes familiarity with the jargon used in the Physics Derivation Graph.
+  <a href="{{ url_for('to_user_documentation') }}?referrer=comparison_of_proof_assistants">user documentation</a>
+  and <a href="{{ url_for('to_faq') }}?referrer=comparison_of_proof_assistants">FAQ</a> first.
+  This page assumes familiarity with the 
+  <a href="{{ url_for('to_conventions_documentation') }}?referrer=comparison_of_proof_assistants">jargon</a> used in the Physics Derivation Graph.
 </P>
 
-<P>
-  This page compares Computer Algebra Systems (CAS) for use with the Physics Derivation Graph (PDG).
 
 
+<H2 id="Lean">Lean</H2>
 
-
-<H2><a name="comparison:computer algebra systems">Comparison of <a href="https://en.wikipedia.org/wiki/Proof_assistant">Proof Assistants</a></a></H2>
-
-<H3><a name="Lean">Lean</a></H3>
-
-<H3><a name="HOLLight">HOL Light theorem prover</a></H3>
+<H2 id="HOLLight">HOL Light theorem prover</H2>
 
 <P><a href="https://www.cl.cam.ac.uk/~jrh13/hol-light/tutorial.pdf">HOL Light tutorial</a>
 
+<H2>Isabelle</H2>
 
 {% endblock %}

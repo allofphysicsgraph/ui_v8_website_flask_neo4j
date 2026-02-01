@@ -5,16 +5,16 @@
 
 <h1>Comparison of Database Options for the Physics Derivation Graph</h1>
 
-<P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
-   <a href="{{ url_for('to_documentation_overview')}}">documentation overview</a> / 
-   <a href="{{ url_for('to_developer_documentation') }}">developer documentation</a> /
+<P><a href="{{ url_for('to_navigation') }}?referrer=comparison_of_databases">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=comparison_of_databases">documentation overview</a> / 
+   <a href="{{ url_for('to_developer_documentation') }}?referrer=comparison_of_databases">developer documentation</a> /
    database comparison
 
 <P>
   <em>Recommendation</em>: Read the
-  <a href="{{ url_for('to_user_documentation') }}?referrer=design_documentation">user documentation</a>
-  and <a href="{{ url_for('to_faq') }}?referrer=design_documentation">FAQ</a> first.
-  This page assumes familiarity with the jargon used in the Physics Derivation Graph.
+  <a href="{{ url_for('to_user_documentation') }}?referrer=comparison_of_databases">user documentation</a>
+  and <a href="{{ url_for('to_faq') }}?referrer=comparison_of_databases">FAQ</a> first.
+  This page assumes familiarity with the <a href="{{ url_for('to_conventions_documentation') }}?referrer=comparison_of_databases">jargon</a> used in the Physics Derivation Graph.
 </P>
 
 <P>
@@ -190,7 +190,7 @@ step 1 | has inference rule | multiply both sides by
 step 1 | has feed | 2
 step 1 | has output | 2*y = 2*m*x + 2*b
 </pre>
-  While it's easy to convert, I am unaware of the advantages of using RDF.
+<P>  While it's easy to convert, I am unaware of the advantages of using RDF.
   The Physics Derivation Graph is oriented towards visualization.
   SPARQL is the query language for RDF. I don't see much use for querying the graph.
   Using RDF doesn't help with using a computer algebra system for validation of the step.

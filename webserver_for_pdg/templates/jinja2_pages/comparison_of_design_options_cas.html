@@ -3,32 +3,24 @@
 
 {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
 
-<h1>Comparison of Computer Algebra System (CAS) Options for the Physics Derivation Graph</h1>
+<h1>Comparison of <a href="https://en.wikipedia.org/wiki/Computer_algebra_system">Computer Algebra System (CAS)</a> Options for the Physics Derivation Graph</h1>
 
-<P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
-   <a href="{{ url_for('to_documentation_overview')}}">documentation overview</a> / 
-   <a href="{{ url_for('to_developer_documentation') }}">developer documentation</a> /
+<P><a href="{{ url_for('to_navigation') }}?referrer=comparison_of_CAS">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=comparison_of_CAS">documentation overview</a> / 
+   <a href="{{ url_for('to_developer_documentation') }}?referrer=comparison_of_CAS">developer documentation</a> /
    Computer Algebra System (CAS) comparison
 
 <P>
   <em>Recommendation</em>: Read the
-  <a href="{{ url_for('to_user_documentation') }}?referrer=design_documentation">user documentation</a>
-  and <a href="{{ url_for('to_faq') }}?referrer=design_documentation">FAQ</a> first.
-  This page assumes familiarity with the jargon used in the Physics Derivation Graph.
+  <a href="{{ url_for('to_user_documentation') }}?referrer=comparison_of_CAS">user documentation</a>
+  and <a href="{{ url_for('to_faq') }}?referrer=comparison_of_CAS">FAQ</a> first.
+  This page assumes familiarity with the <a href="{{ url_for('to_conventions_documentation') }}?referrer=comparison_of_CAS">jargon</a> used in the Physics Derivation Graph.
 </P>
-
-<P>
-  This page compares Computer Algebra Systems (CAS) for use with the Physics Derivation Graph (PDG).
-
-
-
-
-<H2><a name="comparison:computer algebra systems">Comparison of <a href="https://en.wikipedia.org/wiki/Computer_algebra_system">Computer Algebra Systems</a></a></H2>
 
 <P>
   Sage, Mathematica, and SymPy are candidates capable of checking the correctness of derivations.
 
-<H3><a name="cas:sage">Sage</a></H3>
+<H2 id="cas:sage">Sage</H2>
 
 <P>
   The following Sage code checks that the claimed step as stated by the inference rule is carried out correctly:
@@ -43,11 +35,11 @@ expected_output_expr = T * f == 1
 feed = f
 input_expr * feed == expected_output_expr
 </pre>
-The output is
+<P>The output is
 <pre>
 True
 </pre>
-which means that the claimed step in the derivation was implemented consistent with the inference rule applied.
+<P>which means that the claimed step in the derivation was implemented consistent with the inference rule applied.
 
 <P>
   Sage code can be run in <a href="https://sagecell.sagemath.org/">https://sagecell.sagemath.org/</a>.
@@ -55,7 +47,7 @@ which means that the claimed step in the derivation was implemented consistent w
 <P>
   In this <a href="https://physicsderivationgraph.blogspot.com/2015/12/sage-isnt-robust-computer-algebra.html">analysis of Sage</a> the support for standard operations wasn't sufficient.
 
-<H3><a name="cas:mathematica">Mathematica</a></H3>
+<H2 id="cas:mathematica">Mathematica</H2>
 <!-- from https://allofphysicsgraph.github.io/proofofconcept/site/more_aspects/example_T_f_mathematica.html -->
 <P>
   A computer algebra system like Mathematica can validate the steps of a derivation.
@@ -106,13 +98,14 @@ func = subXforY[func, Last[func], ±Last[func]]
 func = subtractXfromBothSides [func, b/(2 a)]
 </pre>
 
-<H3><a name="cas:sympy">Sympy</a></H3>
+<H2 id="cas:sympy">Sympy</H2>
 <P>
   The motives for using Sympy are the cost (free), the code (open source), the integration (Python), support for Physics, and the support for parsing Latex.
 
 <P>
   The snippets of SymPy can be run in <a href="http://live.sympy.org/">http://live.sympy.org/</a>
 
+<P>TODO: add more examples here.
 
 
 {% endblock %}
