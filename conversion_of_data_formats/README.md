@@ -32,10 +32,11 @@ but I manually compared those to the automatically generated `symbols.cypher` fr
 Upload order mattered for reasons unknown to BHP. The problem was that `steps` and `symbols` both have `MATCH` statements, and that seems to overwrite each other. As a hack-fix, I used
 
 ```
-cat deriv.cypher          > no_matches.cypher 
-cat expr_and_feed.cypher >> no_matches.cypher
-cat infrules.cypher      >> no_matches.cypher
-cat operators.cypher     >> no_matches.cypher
+cat deriv.cypher                  > no_matches.cypher 
+cat expr_and_feed.cypher         >> no_matches.cypher
+cat infrules.cypher              >> no_matches.cypher
+cat operators.cypher             >> no_matches.cypher
+cat symbols_vector_manual.cypher >> no_matches.cypher
 cat steps.cypher       > match_used.cypher
 cat symbols.cypher    >> match_used.cypher
 ```
