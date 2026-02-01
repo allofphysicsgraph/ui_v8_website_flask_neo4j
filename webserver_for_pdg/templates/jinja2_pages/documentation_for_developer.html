@@ -210,16 +210,7 @@ Figure 2.
 <H2><a name="how to navigate the codebase">How to navigate the codebase</a></H2>
 
 <P>
-  Much of the current codebase is focused on managing the numeric IDs
-  associated with every facet of the database.
-  This workload is due to not using a property graph representation (e.g., Neo4j).
-  If I used Neo4j, I wouldn't need to track all the IDs and I could instead just work with the data.
-  I've decided to stick with JSON and managing numeric IDs since I won't
-  want to use proprietary software. (Neo4j community edition is open
-  source, but I'm wary of the ties to a commercial product.)
-
-<P>
-  After checking out the github repo, I navigate to
+  After checking out the github repo, navigate to
   <code>ui_v8_website_flask_neo4j/flask</code> and then run
   <code>make dockerlive</code> and then open Firefox to <code>https://localhost:5000</code>.<BR/>
   The purpose of this section is to address the question,  <em>What happened when that docker container ran and the webpage was opened?</em><BR/>
@@ -332,6 +323,164 @@ Similarly, to improve reproducibility of Docker commands, use a <a href="{{ 'fro
   {% include 'from_scratch_tutorial/python_and_flask/requirements.txt' %}
 </pre>
 </div>
+
+
+<H2 id="ANTLR grammar">ANTLER grammar</H2>
+
+<P>ANTLR grammar:
+<pre>
+grammar PhysicsDerivationGraph_grammar;
+
+// claim: this grammar should be equivalent to the schema of the Neo4j property graph
+
+derivation
+   : step+
+   ;
+
+// "|" signifies is and/or condition. 
+// ":" comes after the LHS rule name
+// The Antlr4 formatter is found at https://github.com/antlr/Antlr4Formatter
+// prefer ':' to immediately proceed the first RHS rule
+step
+   : inference_rule expression+ feed*
+   ;
+inference_rule
+   : 'add X to both sides'
+   | 'multiply both sides by'
+   | 'integrate both sides with respect to'
+   | 'declareInitialExpression'  
+ ;
+ 
+// example expression 'a = b'  -&gt; symbolAST.variable = symbolAST.variable
+// example expression 'a + 2 = b + 2' -&gt; symbolAST.variable + symbolAST.constant.value.INT = symbolAST.variable + symbolAST.constant.value.INT 
+
+expression
+   :
+   //written as latex
+   symbolAST
+   ;
+
+//example feeds  are 'c' 'x/2'
+feed
+   :
+   //written as latex
+   symbolAST
+   ;
+ 
+
+//The current version allows for the empty string, such as implicit multiplication of "a b = 4"
+// As per the Diagram a symbol may be operator, constant, variable.
+// There is no constraint to say that one of the 3 must exist so symbol AST could be empty
+// Also it should be clear as to what combination can be valid for better parsing later on.
+symbolAST
+   : operator
+   | constant
+   | variable
+   | variable EQUALS variable
+   ;
+
+EQUALS:
+  '='
+;
+
+// INT, FLOAT, REAL, COMPLEX 
+value
+   : FLOAT
+   | INT
+   ;
+
+FLOAT
+   : INT? ('.' INT)+
+   ;
+
+INT
+   : '0'
+   | [1-9] [0-9]+
+   ;
+// Letters of the alphabet are often used as variables with different kinds of context.
+// Need to capture that context in some way. 
+// In Set Theory there are a common set of single characters that have a common meaning. 
+// In Calculus a different set of common variable, single letter symbols but different from set theory.
+// in sympy.Symbol('a',integer=True,even=True) for example 
+variable
+   : 'a'
+   | 'b'
+   | 'c'
+   | 'x'
+   | dimensionality
+   ;
+   //becuase integrals are complex I would write it as it's own non-terminal
+   
+operator
+   : '+'
+   | '-'
+   | '\\int'
+   ;
+
+constant
+   : value unit
+   ;
+
+// see https://en.wikipedia.org/wiki/Dimensional_analysis
+// write these entries as a non-terminal as there are likely several complex cases with several or conditions to consider.
+dimensionality
+   : time
+   | length
+   | luminous_intensity
+   | mass
+   | amount_of_substance
+   | electric_current
+   | absolute_temperature
+   ;
+
+// to be defined
+time
+   : 'time'
+   ;
+
+// to be defined
+length
+   : 'length'
+   ;
+   // to be defined
+luminous_intensity
+   : 'luminous_intensite'
+   ;
+   // to be defined
+mass
+   : 'mass'
+   ;
+   // to be defined
+amount_of_substance
+   : 'amount_of_substance'
+   ;
+   // to be defined
+electric_current
+   : 'electric_current'
+   ;
+   // to be defined
+absolute_temperature
+   : 'absolute_temperature'
+   ;
+   // Likely non-terminals depending on the complexity of the OR conditions.
+   
+unit
+   : 'meter'
+   | 'foot'
+   | 'second'
+   | 'hour'
+   | 'Watt'
+   | 'Joule'
+   | 'inch'
+   ;
+
+WS: [ \t] -&gt; skip;
+NEWLINE: '\n' -&gt; skip;
+
+</pre>
+
+
+<P>&nbsp;</P>
 
 
 {% endblock %}
