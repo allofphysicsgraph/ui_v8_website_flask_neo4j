@@ -9,6 +9,8 @@ python3 v7_json_to_cypher_expressions.py
 import json
 import re
 import sympy
+from sympy.parsing.sympy_parser import parse_expr
+import tokenize
 
 SYMBOL_PREFIX="000"
 INFRULE_PREFIX="111"
@@ -40,22 +42,33 @@ for expr_ID, expr_dict in data['expressions'].items():
 
 #    print(result_AST)
 
+    sympy_error=False
     try:
-        expr = sympy.sympify(result_AST)
+        #expr = sympy.sympify(result_AST, evaluate=False)
+        expr = parse_expr(result_AST, evaluate=False)
     except ValueError as e:
         print("\nValue Error for "+expr_ID+" :")
         print(result_AST)
         print(e)
+        sympy_error=True
     except TypeError as e:
         print("\nTypeError for "+expr_ID+" :")
         print(result_AST)
         print(e)
+        sympy_error=True
     except AttributeError as e:
         print("\nAttributeError for "+expr_ID+" :")
         print(result_AST)
         print(e)
+        sympy_error=True
+    except tokenize.TokenError as e:
+        print("\tokenize.TokenError for "+expr_ID+" :")
+        print(result_AST)
+        print(e)
+        sympy_error=True
 
-    
+    print(expr_ID)
+    print(expr_dict['latex'])
     if "=" not in expr_dict['latex']:
 #        print("feed")
         #str_to_prnt += ":begin"+"\n"
@@ -75,13 +88,19 @@ for expr_ID, expr_dict in data['expressions'].items():
             #print(expr_dict['latex'])
             list_of_latex = expr_dict['latex'].split(" = ")
 
-        if expr in locals() or expr in globals():
-            sympy_LHS = sympy.srepr(expr.lhs)
-            sympy_RHS = sympy.srepr(expr.rhs)
-        else:
-            sympy_LHS = result_AST
+        print(sympy_error)
+        print(result_AST)
+        if sympy_error:
+            sympy_LHS = str(result_AST)
             sympy_RHS = ""
-        
+        else:
+            try:
+                sympy_LHS = str(sympy.srepr(expr.lhs))
+                sympy_RHS = str(sympy.srepr(expr.rhs))
+            except AttributeError as e:
+                sympy_LHS = str(result_AST)
+                sympy_RHS = ""
+
         #str_to_prnt += ":begin"+"\n"
         str_to_prnt += 'UNWIND [{id:"'+expr_ID+'",\n'
         str_to_prnt += '         properties:{sympy_lhs:"'+sympy_LHS+'",'+'\n'
