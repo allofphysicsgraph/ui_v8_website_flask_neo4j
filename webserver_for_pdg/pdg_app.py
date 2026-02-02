@@ -1811,7 +1811,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
     )
 
 
-@web_app.route("/select_step/<derivation_id>/", methods=["GET", "POST"])
+@web_app.route("/select_step/<derivation_id>", methods=["GET", "POST"])
 def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response:
     """
     User wants to delete step or edit step
@@ -1868,7 +1868,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
     )
 
 
-@web_app.route("/edit_derivation_metadata/<derivation_id>/", methods=["GET", "POST"])
+@web_app.route("/edit_derivation_metadata/<derivation_id>", methods=["GET", "POST"])
 @login_required
 def to_edit_derivation_metadata(
     derivation_id: unique_numeric_id_as_str,
@@ -2570,7 +2570,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     # return redirect(url_for("to_list_feeds"))
 
 
-@web_app.route("/new_expression/", methods=["GET", "POST"])
+@web_app.route("/new_expression", methods=["GET", "POST"])
 @login_required
 def to_add_expression() -> werkzeug.Response:
     """
@@ -2787,7 +2787,7 @@ def to_add_expression() -> werkzeug.Response:
     )
 
 
-@web_app.route("/new_feed/", methods=["GET", "POST"])
+@web_app.route("/new_feed", methods=["GET", "POST"])
 @login_required
 def to_add_feed() -> werkzeug.Response:
     """
@@ -3508,7 +3508,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
     )
 
 
-@web_app.route("/new_symbol_scalar/", methods=["GET", "POST"])
+@web_app.route("/new_symbol_scalar", methods=["GET", "POST"])
 @login_required
 def to_add_symbol_scalar() -> werkzeug.Response:
     """
@@ -3655,7 +3655,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
     )
 
 
-@web_app.route("/new_symbol_vector/", methods=["GET", "POST"])
+@web_app.route("/new_symbol_vector", methods=["GET", "POST"])
 @login_required
 def to_add_symbol_vector() -> werkzeug.Response:
     """
@@ -3768,7 +3768,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
     )
 
 
-@web_app.route("/new_symbol_matrix/", methods=["GET", "POST"])
+@web_app.route("/new_symbol_matrix", methods=["GET", "POST"])
 @login_required
 def to_add_symbol_matrix() -> werkzeug.Response:
     """
@@ -3889,7 +3889,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
     )
 
 
-@web_app.route("/new_symbol/", methods=["GET", "POST"])
+@web_app.route("/new_symbol", methods=["GET", "POST"])
 def to_add_symbol() -> werkzeug.Response:
     """
     novel symbol
@@ -3897,7 +3897,7 @@ def to_add_symbol() -> werkzeug.Response:
     return render_template("jinja2_pages/user_workflow/symbol_create_pick_type.html")
 
 
-# @web_app.route("/new_symbol/", methods=["GET", "POST"])
+# @web_app.route("/new_symbol", methods=["GET", "POST"])
 # def to_add_symbol() -> werkzeug.Response:
 #     """
 #     novel symbol
@@ -4511,7 +4511,7 @@ def to_add_symbol() -> werkzeug.Response:
 #     )
 
 
-@web_app.route("/new_operation/", methods=["GET", "POST"])
+@web_app.route("/new_operation", methods=["GET", "POST"])
 @login_required
 def to_add_operation() -> werkzeug.Response:
     """
@@ -4610,7 +4610,7 @@ def to_add_operation() -> werkzeug.Response:
     )
 
 
-@web_app.route("/new_relation/", methods=["GET", "POST"])
+@web_app.route("/new_relation", methods=["GET", "POST"])
 @login_required
 def to_add_relation() -> werkzeug.Response:
     """
@@ -5745,7 +5745,7 @@ def to_add_sympy_and_lean_for_feed(
     )
 
 
-@web_app.route("/new_inference_rule/", methods=["GET", "POST"])
+@web_app.route("/new_inference_rule", methods=["GET", "POST"])
 @login_required
 def to_add_inference_rule() -> werkzeug.Response:
     """
@@ -7202,7 +7202,7 @@ def to_rss(path):
 ###########################################################################
 
 
-@web_app.route("/profile/", methods=["GET", "POST"])
+@web_app.route("/profile", methods=["GET", "POST"])
 def my_profile():
     """
     # TODO -- this is just a stub
@@ -7329,7 +7329,7 @@ def static_file_from_root():
 ###########################################################################
 
 
-@web_app.route("/static_dir", methods=["GET", "POST"])
+@web_app.route("/static_dir/", methods=["GET", "POST"])
 def static_dir():
     """
     "static_dir" is a directory listing
@@ -7363,6 +7363,7 @@ def to_evaluation_of_LLM_prompts():
 ###########################################################################
 
 
+@web_app.route("/documentation", methods=["GET", "POST"])
 @web_app.route("/documentation/", methods=["GET", "POST"])
 @web_app.route("/documentation/overview", methods=["GET", "POST"])
 def to_documentation_overview():
@@ -7597,6 +7598,7 @@ def to_survey_of_named_expressions():
 ###########################################################################
 
 
+@web_app.route("/blog", methods=["GET"])
 @web_app.route("/blog/", methods=["GET"])
 def to_blog_list():
     """ """
@@ -7671,154 +7673,77 @@ def to_spectrum_of_precision():
     """
     exploration of layering formalization
     """
-    page_title = "Spectrum of Precision: Overview"
+    return render_template(
+        "jinja2_pages/layers_overview.html", title="Spectrum of Precision: Overview"
+    )
+
+
+@web_app.route("/spectrum_of_precision/<which_layer>", methods=["GET", "POST"])
+def to_spectrum_of_precision_layer(which_layer):
+    """
+    exploration of layering formalization
+    """
+    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
+    if which_layer == "overview":
+        return render_template("jinja2_pages/layers_overview.html", title=page_title)
+    elif which_layer == "lecture":
+        return render_template(
+            "jinja2_pages/layers_lecture_video.html", title=page_title
+        )
+    elif which_layer == "handwritten":
+        return render_template(
+            "jinja2_pages/layers_handwritten_notes.html", title=page_title
+        )
+    elif which_layer == "latex":
+        return render_template(
+            "jinja2_pages/layers_document_without_decorations.html", title=page_title
+        )
+    elif which_layer == "tag_sections":
+        return render_template(
+            "jinja2_pages/layers_section_document_structure.html", title=page_title
+        )
+    elif which_layer == "tag_words":
+        return render_template(
+            "jinja2_pages/layers_words_named_entity_recognition.html", title=page_title
+        )
+    elif which_layer == "tag_expressions":
+        return render_template("jinja2_pages/layers_contentML.html", title=page_title)
+    elif which_layer == "tag_all":
+        return render_template(
+            "jinja2_pages/layers_sections_words_contentML.html", title=page_title
+        )
+    elif which_layer == "variables":
+        return render_template(
+            "jinja2_pages/layers_concepts_to_variables.html", title=page_title
+        )
+    elif which_layer == "all_steps":
+        return render_template("jinja2_pages/layers_all_steps.html", title=page_title)
+    elif which_layer == "pdg":
+        return render_template(
+            "jinja2_pages/layers_derivation_graph.html", title=page_title
+        )
+    elif which_layer == "CAS_validation":
+        return render_template(
+            "jinja2_pages/layers_validate_steps.html", title=page_title
+        )
+    elif which_layer == "numeric_id":
+        return render_template(
+            "jinja2_pages/layers_replace_variables_with_numeric_id.html",
+            title=page_title,
+        )
+    elif which_layer == "dimensional_validation":
+        return render_template(
+            "jinja2_pages/layers_dimensional_validation.html", title=page_title
+        )
+    elif which_layer == "proof":
+        return render_template(
+            "jinja2_pages/layers_proof_of_inference_rule.html", title=page_title
+        )
+    else:
+        flash("unrecognized argument: " + which_layer)
+        logger.debug("unrecognized argument: " + which_layer)
+        return render_template("jinja2_pages/layers_overview.html", title=page_title)
     return render_template("jinja2_pages/layers_overview.html", title=page_title)
-
-
-@web_app.route("/spectrum_of_precision/lecture", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_lecture():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("jinja2_pages/layers_lecture_video.html", title=page_title)
-
-
-@web_app.route("/spectrum_of_precision/handwritten", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_handwritten():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template(
-        "jinja2_pages/layers_handwritten_notes.html", title=page_title
-    )
-
-
-@web_app.route("/spectrum_of_precision/latex", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_latex():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template(
-        "jinja2_pages/layers_document_without_decorations.html", title=page_title
-    )
-
-
-@web_app.route("/spectrum_of_precision/tag_sections", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_tag_sections():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template(
-        "jinja2_pages/layers_section_document_structure.html", title=page_title
-    )
-
-
-@web_app.route("/spectrum_of_precision/tag_words", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_tag_words():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template(
-        "jinja2_pages/layers_words_named_entity_recognition.html", title=page_title
-    )
-
-
-@web_app.route("/spectrum_of_precision/tag_expressions", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_tag_expressions():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("jinja2_pages/layers_contentML.html", title=page_title)
-
-
-@web_app.route("/spectrum_of_precision/tag_all", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_tag_all():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template(
-        "jinja2_pages/layers_sections_words_contentML.html", title=page_title
-    )
-
-
-@web_app.route("/spectrum_of_precision/variables", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_variables():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template(
-        "jinja2_pages/layers_concepts_to_variables.html", title=page_title
-    )
-
-
-@web_app.route("/spectrum_of_precision/all_steps", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_all_steps():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("jinja2_pages/layers_all_steps.html", title=page_title)
-
-
-@web_app.route("/spectrum_of_precision/pdg", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_pdg():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template(
-        "jinja2_pages/layers_derivation_graph.html", title=page_title
-    )
-
-
-@web_app.route("/spectrum_of_precision/CAS_validation", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_CAS_validation():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template("jinja2_pages/layers_validate_steps.html", title=page_title)
-
-
-@web_app.route("/spectrum_of_precision/numeric_id", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_numeric_id():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template(
-        "jinja2_pages/layers_replace_variables_with_numeric_id.html", title=page_title
-    )
-
-
-@web_app.route("/spectrum_of_precision/dimensional_validation", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_dimensional_validation():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template(
-        "jinja2_pages/layers_dimensional_validation.html", title=page_title
-    )
-
-
-@web_app.route("/spectrum_of_precision/proof", methods=["GET", "POST"])
-def to_spectrum_of_precision_layer_proof():
-    """
-    exploration of layering formalization
-    """
-    page_title = "Spectrum of Precision for Formal Mathematical Physics Content"
-    return render_template(
-        "jinja2_pages/layers_proof_of_inference_rule.html", title=page_title
-    )
 
 
 ###########################################################################
