@@ -11,6 +11,8 @@ For a given derivation step, use SymPy to validate the consistency of the input 
 Historically, the validation functions are from
 https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/v2_XML/databases/inference_rules_database.xml
 
+Convention: every inference rule validation function has the same arguments
+
 https://pymotw.com/3/doctest/
 how to use doctest for the entire file:
 python -m doctest -v validate_inference_rules_sympy.py
@@ -75,7 +77,9 @@ def validate_step(
     # logger.debug(str(list_of_feed_dicts))
     # logger.debug(str(list_of_output_dicts))
 
-    if inference_rule_dict["name_latex"] in [
+    name_latex = name_latex
+
+    if name_latex in [
         "declare initial expression",
         "declare final expression",
         "declare identity",
@@ -86,7 +90,7 @@ def validate_step(
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "no validation is available for declarations"
 
-    elif inference_rule_dict["name_latex"] in [
+    elif name_latex in [
         "assume N dimensions",
         "normalization condition",
         "boundary condition",
@@ -96,339 +100,388 @@ def validate_step(
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "no validation is available for assumptions"
 
-    elif inference_rule_dict["name_latex"] == "add X to both sides":
+    elif name_latex == "add X to both sides":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return add_X_to_both_sides(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
 
-    elif inference_rule_dict["name_latex"] == "divide both sides by":
+    elif name_latex == "divide both sides by":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return divide_both_sides_by(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
 
-    elif inference_rule_dict["name_latex"] == "multiply both sides by":
+    elif name_latex == "multiply both sides by":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return multiply_both_sides_by(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
 
-    elif inference_rule_dict["name_latex"] == "subtract X from both sides":
+    elif name_latex == "subtract X from both sides":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return subtract_X_from_both_sides(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
 
-    elif inference_rule_dict["name_latex"] == "LHS of expr 1 equals LHS of expr 2":
+    elif name_latex == "LHS of expr 1 equals LHS of expr 2":
+        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
+        return LHS_of_expr_1_eq_LHS_of_expr_2(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "RHS of expr 1 equals RHS of expr 2":
+        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
+        return RHS_of_expr_1_eq_RHS_of_expr_2(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "X cross both sides by":
+        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
+        return X_cross_both_sides_by(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "X dot both sides":
+        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
+        return X_dot_both_sides(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "add expr 1 to expr 2":
+        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
+        return add_expr_1_to_expr_2(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "add zero to LHS":
+        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
+        return add_zero_to_LHS(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "add zero to RHS":
+        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
+        return add_zero_to_RHS(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "apply divergence":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
+        return apply_divergence(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "apply function to both sides of expression":
+        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "RHS of expr 1 equals RHS of expr 2":
+    elif name_latex == "apply gradient to scalar function":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "X cross both sides by":
+    elif name_latex == "apply operator to bra":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "X dot both sides":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "add X to both sides":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "add expr 1 to expr 2":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "add zero to LHS":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "add zero to RHS":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "apply divergence":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif (
-        inference_rule_dict["name_latex"]
-        == "apply function to both sides of expression"
-    ):
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "apply gradient to scalar function":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "apply operator to bra":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "apply operator to ket":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "assume N dimensions":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "both sides cross X":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "both sides dot X":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "boundary condition":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "boundary condition for expression":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "change five variables in expression":
-        logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "change four variables in expression":
+        return apply_operator_to_bra(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "apply operator to ket":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "change six variables in expression":
+        return apply_operator_to_ket(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "both sides cross X":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "change three variables in expression":
+        return both_sides_cross_X(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "both sides dot X":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "change two variables in expression":
+        return both_sides_dot_X(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "change variable X to Y":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "change variable X to Y":
+        return change_variable_X_to_Y(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "change two variables in expression":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "claim LHS equals RHS":
+        return change_two_variables_in_expr(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "change three variables in expression":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "claim expr 1 equals expr 2":
+        return change_three_variables_in_expr(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "change four variables in expression":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "combine like terms":
+        return change_four_variables_in_expr(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "change five variables in expression":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "conjugate both sides":
+        return change_five_variables_in_expr(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "change six variables in expression":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "conjugate function X":
+        return change_six_variables_in_expr(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "claim LHS equals RHS":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "conjugate transpose both sides":
+        return claim_LHS_equals_RHS(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "claim expr 1 equals expr 2":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "declare assumption":
+        return claim_expr_1_equals_expr_2(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "combine like terms":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "declare guess solution":
+    elif name_latex == "conjugate both sides":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "declare identity":
+        return conjugate_both_sides(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "conjugate function X":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "differentiate with respect to":
+        return conjugate_function_X(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "conjugate transpose both sides":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "distribute conjugate to factors":
+        return conjugate_transpose_both_sides(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "differentiate with respect to":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif (
-        inference_rule_dict["name_latex"] == "distribute conjugate transpose to factors"
-    ):
+        return differentiate_with_respect_to(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "distribute conjugate to factors":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "divide expr 1 by expr 2":
+    elif name_latex == "distribute conjugate transpose to factors":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "drop non-dominant term":
+    elif name_latex == "divide expr 1 by expr 2":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "evaluate definite integral":
+        return divide_expr_by_expr(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "drop non-dominant term":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "expand LHS":
+    elif name_latex == "evaluate definite integral":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "expand RHS":
+        return evaluate_definite_integral(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "expand LHS":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "expand integrand":
+        return expand_LHS(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
+    elif name_latex == "expand RHS":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "expand magnitude to conjugate":
+        return expand_RHS(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
+    elif name_latex == "expand integrand":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif (
-        inference_rule_dict["name_latex"]
-        == "expr 1 is equivalent to expr 2 under the condition"
-    ):
+    elif name_latex == "expand magnitude to conjugate":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "expr 1 is true under condition expr 2":
+    elif name_latex == "expr 1 is equivalent to expr 2 under the condition":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "factor out X":
+    elif name_latex == "expr 1 is true under condition expr 2":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "factor out X from LHS":
+    elif name_latex == "factor out X":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "factor out X from RHS":
+        return factor_out_x(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "factor out X from LHS":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "function is even":
+        return factor_out_x_from_lhs(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "factor out X from RHS":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "function is odd":
+        return factor_out_x_from_rhs(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "function is even":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "indefinite integral over":
+        return function_is_even(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "function is odd":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "indefinite integrate LHS over":
+        return function_is_even(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "indefinite integral over":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "indefinite integrate RHS over":
+        return indefinite_integral_over(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "indefinite integrate LHS over":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "indefinite integration":
+        return indefinite_integrate_LHS_over(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "indefinite integrate RHS over":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "integrate":
+        return indefinite_integrate_RHS_over(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "indefinite integration":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "integrate over from to":
+        return indefinite_integration(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "integrate":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "make expr power":
+    elif name_latex == "integrate over from to":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "maximum of expression":
+        return integrate_over_from_to(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "make expr power":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "multiply LHS by unity":
+        return make_expr_power(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "maximum of expression":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "multiply RHS by unity":
+    elif name_latex == "multiply LHS by unity":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "multiply expr 1 by expr 2":
+        return multiply_LHS_by_unity(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "multiply RHS by unity":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "normalization condition":
+        return multiply_RHS_by_unity(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "multiply expr 1 by expr 2":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "partially differentiate with respect to":
+        return mult_expr_1_by_expr_2(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "partially differentiate with respect to":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "raise both sides to power":
+        return partially_differentiate_with_respect_to(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "raise both sides to power":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "replace constant with value":
+        return raise_both_sides_to_power(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "replace constant with value":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif (
-        inference_rule_dict["name_latex"]
-        == "replace curl with LeviCevita summation contravariant"
-    ):
+    elif name_latex == "replace curl with LeviCevita summation contravariant":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "replace scalar with vector":
+    elif name_latex == "replace scalar with vector":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif (
-        inference_rule_dict["name_latex"]
-        == "replace summation notation with vector notation"
-    ):
+        return replace_scalar_with_vector(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "replace summation notation with vector notation":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "select imaginary parts":
+    elif name_latex == "select imaginary parts":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "select real parts":
+        return select_imag_parts(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "select real parts":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "separate three vector components":
+        return select_real_parts(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "separate three vector components":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "separate two vector components":
+        return separate_three_vector_components(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "separate two vector components":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif (
-        inference_rule_dict["name_latex"]
-        == "separate vector into two trigonometric ratios"
-    ):
+        return separate_two_vector_components(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "separate vector into two trigonometric ratios":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "simplify":
+    elif name_latex == "simplify":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "solve for X":
+        return simplify(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
+    elif name_latex == "solve for X":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "square root both sides":
+    elif name_latex == "square root both sides":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "substitute LHS of expr 1 into expr 2":
+        return square_root_both_sides(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "substitute LHS of five expressions into expression":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif (
-        inference_rule_dict["name_latex"]
-        == "substitute LHS of five expressions into expression"
-    ):
+    elif name_latex == "substitute LHS of four expressions into expression":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif (
-        inference_rule_dict["name_latex"]
-        == "substitute LHS of four expressions into expression"
-    ):
+    elif name_latex == "substitute LHS of six expressions into expression":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif (
-        inference_rule_dict["name_latex"]
-        == "substitute LHS of six expressions into expression"
-    ):
+    elif name_latex == "substitute LHS of three expressions into expression":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif (
-        inference_rule_dict["name_latex"]
-        == "substitute LHS of three expressions into expression"
-    ):
+    elif name_latex == "substitute LHS of two expressions into expression":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif (
-        inference_rule_dict["name_latex"]
-        == "substitute LHS of two expressions into expression"
-    ):
+        return substitute_LHS_of_two_expressions_into_expr(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "substitute LHS of expr 1 into expr 2":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "substitute RHS of expr 1 into expr 2":
+        return substitute_LHS_of_expr_1_into_expr_2(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "substitute RHS of expr 1 into expr 2":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "subtract expr 1 from expr 2":
+        return substitute_RHS_of_expr_1_into_expr_2(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "subtract expr 1 from expr 2":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "sum exponents":
+        return subtract_expr_1_from_expr_2(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "sum exponents":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "sum exponents LHS":
+    elif name_latex == "sum exponents LHS":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "sum exponents RHS":
+    elif name_latex == "sum exponents RHS":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "swap LHS with RHS":
+    elif name_latex == "swap LHS with RHS":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
-    elif inference_rule_dict["name_latex"] == "take curl of both sides":
+        return swap_LHS_with_RHS(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
+    elif name_latex == "take curl of both sides":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
 
     else:
         # logger.error("unexpected inf rule:" + step_dict["inf rule"])
         logger.warning(
-            "sympy_validate_step/validate_step unexpected inf rule:"
-            + inference_rule_dict["name_latex"]
+            "sympy_validate_step/validate_step unexpected inf rule:" + name_latex
         )
         # raise Exception(
         #     "sympy_validate_step/validate_step Unexpected inf rule: "
-        #     + inference_rule_dict["name_latex"]
+        #     + name_latex
         # )
         return "unrecognized inference rule"
 
@@ -488,7 +541,7 @@ def add_X_to_both_sides(
         logger.info(
             "[TRACE] add_X_to_both_sides end " + trace_id + " " + str(time.time())
         )
-        return "valid (as per SymPy)"
+        return "valid"
     else:
         logger.info(
             "[TRACE] add_X_to_both_sides end " + trace_id + " " + str(time.time())
@@ -689,6 +742,1596 @@ def divide_both_sides_by(
     else:
         logger.info("[TRACE] divide_both_sides_by end " + trace_id)
         return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
+
+
+def change_variable_X_to_Y(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    given 'a + b = c',
+    substitute b --> d
+    to get 'a + d = c'
+
+    # to run the doctest below, use
+    import doctest
+    from validate_steps_sympy import *
+    doctest.run_docstring_examples(change_variable_X_to_Y, globals(), verbose=True)
+
+    >>> latex_dict = {}
+    >>> latex_dict['input'] = [{'LHS': parse_latex('a + b'), 'RHS': parse_latex('c')}]
+    >>> latex_dict['feed'] = [parse_latex('b'), parse_latex('d')]
+    >>> latex_dict['output'] = [{'LHS': parse_latex('a + d'), 'RHS': parse_latex('c')}]
+    >>> change_variable_X_to_Y(latex_dict)
+    'valid'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace change_variable_X_to_Y start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1) - output_expr_sympy_lhs
+    )  # subs(old, new)
+    d2 = sympy.simplify(
+        input_expr_sympy_rhs.subs(feed_sympy_0, feed_sympy_1) - output_expr_sympy_rhs
+    )  # subs(old, new)
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace change_variable_X_to_Y end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace change_variable_X_to_Y end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
+
+
+def multiply_LHS_by_unity(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    see also multRHSbyUnity
+
+    Given a = b
+    mult LHS by (c/c)
+    get (a*c)/c = b
+
+    # to run the doctest below, use
+    import doctest
+    from validate_steps_sympy import *
+    doctest.run_docstring_examples(multiply_LHS_by_unity, globals(), verbose=True)
+
+
+    >>> latex_dict = {}
+    >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')}]
+    >>> latex_dict['feed'] = [parse_latex('c/c')]
+    >>> latex_dict['output'] = [{'LHS': parse_latex('(a c)/c'), 'RHS': parse_latex('b')}]
+    >>> multiply_LHS_by_unity(latex_dict)
+    'valid'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace multiply_LHS_by_unity start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(feed_sympy - 1)
+    d2 = sympy.simplify(
+        sympy.Mul(input_expr_sympy_lhs, feed_sympy) - output_expr_sympy_lhs
+    )
+    d3 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+    if (d1 == 0) and (d2 == 0) and (d3 == 0):
+        logger.info("[trace multiply_LHS_by_unity end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace multiply_LHS_by_unity end " + trace_id + "]")
+        return (
+            "feed diff is "
+            + str(d1)
+            + "\n"
+            + "LHS diff is "
+            + str(d2)
+            + "\n"
+            + "RHS diff is "
+            + str(d3)
+        )
+
+
+def multiply_RHS_by_unity(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    see also multLHSbyUnity
+
+    Given a = b
+    mult by (c/c)
+    get a = (b*c)/c
+
+    >>> latex_dict = {}
+    >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')}]
+    >>> latex_dict['feed'] = [parse_latex('c/c')]
+    >>> latex_dict['output'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('(b c)/c')}]
+    >>> multiply_RHS_by_unity(latex_dict)
+    'valid'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace multiply_RHS_by_unity start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(feed_sympy - 1)
+    d2 = sympy.simplify(
+        sympy.Mul(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
+    )
+    d3 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    if (d1 == 0) and (d2 == 0) and (d3 == 0):
+        logger.info("[trace multiply_RHS_by_unity end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace multiply_RHS_by_unity end " + trace_id + "]")
+        return (
+            "feed diff is "
+            + str(d1)
+            + "\n"
+            + "LHS diff is "
+            + str(d3)
+            + "\n"
+            + "RHS diff is "
+            + str(d2)
+        )
+
+
+def add_zero_to_LHS(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    see also add_zero_to_RHS
+    ((feed==0) and (out_lhs0 == (in_lhs0+zero)) and (out_rhs0 == in_rhs0))
+
+    >>> latex_dict = {}
+    >>> latex_dict['input'] = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
+    >>> latex_dict['feed'] = [parse_latex('')]
+    >>> latex_dict['output'] = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
+    >>> add_zero_to_LHS(latex_dict)
+    'valid'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace add_zero_to_LHS start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(feed_sympy)
+    d2 = sympy.simplify(
+        sympy.Add(input_expr_sympy_lhs, feed_sympy) - output_expr_sympy_lhs
+    )
+    d3 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+    if (d1 == 0) and (d2 == 0) and (d3 == 0):
+        logger.info("[trace add_zero_to_LHS end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace add_zero_to_LHS end " + trace_id + "]")
+        return (
+            "feed diff is "
+            + str(d1)
+            + "\n"
+            + "LHS diff is "
+            + str(d2)
+            + "\n"
+            + "RHS diff is "
+            + str(d3)
+        )
+
+
+def add_zero_to_RHS(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((feed==0) and (out_rhs0 == (in_rhs0+zero)) and (out_lhs0 == in_lhs0))
+
+
+    >>> latex_dict = {}
+    >>> latex_dict['input'] = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
+    >>> latex_dict['feed'] = [parse_latex('')]
+    >>> latex_dict['output'] = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
+    >>> add_zero_to_RHS(latex_dict)
+    'valid'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace add_zero_to_RHS start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(feed_sympy)
+    d2 = sympy.simplify(
+        sympy.Add(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
+    )
+    d3 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    if (d1 == 0) and (d2 == 0) and (d3 == 0):
+        logger.info("[trace add_zero_to_RHS end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace add_zero_to_RHS end " + trace_id + "]")
+        return (
+            "feed diff is "
+            + str(d1)
+            + "\n"
+            + "LHS diff is "
+            + str(d3)
+            + "\n"
+            + "RHS diff is "
+            + str(d2)
+        )
+
+
+def take_curl_of_both_sides(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((out_lhs0 == (\nabla \times in_lhs0)) and (out_rhs0 == \nabla \times in_rhs0))
+    """
+    return "recognized infrule but not yet supported"
+
+
+def apply_divergence(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Curl: $\vec{\nabla} \cdot$
+    """
+    return "recognized infrule but not yet supported"
+
+
+def indefinite_integral_over(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((out_lhs0 == (\int in_lhs0 feed0)) and (out_rhs0 == \int in_rhs0 feed0))
+
+    Given a = b
+    over dt
+    get \inf a dt = \inf b dt
+    """
+    return "recognized infrule but not yet supported"
+
+
+def indefinite_integration(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((out_lhs0 == (\int in_lhs0 )) and (out_rhs0 == \int in_rhs0 ))
+    """
+    return "recognized infrule but not yet supported"
+
+
+def indefinite_integrate_LHS_over(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((out_lhs0 == (\int in_lhs0 feed0)) and (out_rhs0 == in_rhs0))
+    """
+    return "recognized infrule but not yet supported"
+
+
+def indefinite_integrate_RHS_over(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((out_lhs0 == in_lhs0) and (out_rhs0 == \int in_rhs0 feed0))
+    """
+    return "recognized infrule but not yet supported"
+
+
+def integrate_over_from_to(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((out_lhs0 == (\int_{feed1}^{feed2} in_lhs0 feed0)) and (out_rhs0 == \int_{feed1}^{feed2} in_rhs0 feed0))
+    """
+
+
+def partially_differentiate_with_respect_to(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    \frac{\partial}{\partial #1}
+    """
+    return "recognized infrule but not yet supported"
+
+
+def X_cross_both_sides_by(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    arg x LHS = arg x RHS
+    """
+    return "recognized infrule but not yet supported"
+
+
+def both_sides_cross_X(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    LHS x arg = RHS x arg
+    """
+
+
+def X_dot_both_sides(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    arg \cdot LHS = arg \cdot RHS
+    """
+    return "recognized infrule but not yet supported"
+
+
+def both_sides_dot_X(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    LHS \cdot arg = RHS \cdot arg
+    """
+    return "recognized infrule but not yet supported"
+
+
+def make_expr_power(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((out_lhs0 == (feed0)**(in_lhs0)) and (out_rhs0 == (feed0)**(in_rhs0)))
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace make_expr_power start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        output_expr_sympy_lhs - sympy.Pow(feed_sympy, input_expr_sympy_lhs)
+    )
+    d2 = sympy.simplify(
+        output_expr_sympy_rhs - sympy.Pow(feed_sympy, input_expr_sympy_rhs)
+    )
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace make_expr_power end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace make_expr_power end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
+
+
+def select_real_parts(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    sympy.re(2+3*sympy.I)==2
+
+    Given a+i*b = c+i*d
+    get a = c
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace select_real_parts start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(sympy.re(input_expr_sympy_lhs) - output_expr_sympy_lhs)
+    d2 = sympy.simplify(sympy.re(input_expr_sympy_rhs) - output_expr_sympy_rhs)
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace select_real_parts end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace select_real_parts end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
+
+
+def select_imag_parts(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    sympy.im(2+3*sympy.I)==3
+
+    Given a+i*b = c+i*d
+    get b = d
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace select_imag_parts start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(sympy.im(input_expr_sympy_lhs) - output_expr_sympy_lhs)
+    d2 = sympy.simplify(sympy.im(input_expr_sympy_rhs) - output_expr_sympy_rhs)
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace select_imag_parts end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace select_imag_parts end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
+
+
+def swap_LHS_with_RHS(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((in_lhs0 == out_rhs0) and (in_rhs0 == out_lhs0))
+
+    given 'a + b = c'
+    get   'c = a + b'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace swap_LHS_with_RHS start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_rhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_lhs)
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace swap_LHS_with_RHS end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace swap_LHS_with_RHS end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d1)
+
+
+def sum_exponents_LHS(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    see also sum_exponents_RHS
+    (in_rhs0 == out_rhs0)
+    """
+    return "recognized infrule but not yet supported"
+
+
+def sum_exponents_RHS(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    see also sum_exponents_LHS
+    (in_lhs0 == out_lhs0)
+    """
+    return "recognized infrule but not yet supported"
+
+
+def add_expr_1_to_expr_2(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    assumes result form LHS(X)+LHS(Y)=RHS(X)+RHS(Y)
+
+    (((in_lhs0+in_lhs1)==out_lhs0) and ((in_rhs0+in_rhs1)==out_rhs0))
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace add_expr_1_to_expr_2 start " + trace_id + "]")
+
+    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        sympy.Add(input_expr_sympy_lhs_0, input_expr_sympy_lhs_1)
+        - output_expr_sympy_lhs_0
+    )
+    d2 = sympy.simplify(
+        sympy.Add(input_expr_sympy_rhs_0, input_expr_sympy_rhs_1)
+        - output_expr_sympy_rhs_0
+    )
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace add_expr_1_to_expr_2 end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace add_expr_1_to_expr_2 end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d1)
+
+
+def substitute_RHS_of_expr_1_into_expr_2(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a = b
+    and c = b*d
+    get c = a*d
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace substitute_RHS_of_expr_1_into_expr_2 start " + trace_id + "]")
+
+    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        input_expr_sympy_lhs_1.subs(input_expr_sympy_rhs_0, input_expr_sympy_lhs_0)
+        - output_expr_sympy_lhs
+    )  # subs(old,new)
+    d2 = sympy.simplify(
+        input_expr_sympy_rhs_1.subs(input_expr_sympy_rhs_0, input_expr_sympy_lhs_0)
+        - output_expr_sympy_rhs
+    )  # subs(old,new)
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace substitute_RHS_of_expr_1_into_expr_2 end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace substitute_RHS_of_expr_1_into_expr_2 end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
+
+
+def substitute_LHS_of_expr_1_into_expr_2(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a = b
+    and   c = a*d
+    get   c = b*d
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace substitute_LHS_of_expr_1_into_expr_2 start " + trace_id + "]")
+
+    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        input_expr_sympy_lhs_1.subs(input_expr_sympy_lhs_0, input_expr_sympy_rhs_0)
+        - output_expr_sympy_lhs
+    )  # subs(old,new)
+    d2 = sympy.simplify(
+        input_expr_sympy_rhs_1.subs(input_expr_sympy_lhs_0, input_expr_sympy_rhs_0)
+        - output_expr_sympy_rhs
+    )  # subs(old,new)
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace substitute_LHS_of_expr_1_into_expr_2 end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace substitute_LHS_of_expr_1_into_expr_2 end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
+
+
+def mult_expr_1_by_expr_2(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a = b
+    and   c = d
+    get a*c = b*d
+
+    ((in_lhs0*in_lhs1 == out_lhs0) and (in_rhs0*in_rhs1 == out_rhs0))
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace mult_expr_1_by_expr_2 start " + trace_id + "]")
+
+    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        sympy.Mul(input_expr_sympy_lhs_0, input_expr_sympy_lhs_1)
+        - output_expr_sympy_lhs_0
+    )
+    d2 = sympy.simplify(
+        sympy.Mul(input_expr_sympy_rhs_0, input_expr_sympy_rhs_1)
+        - output_expr_sympy_rhs_0
+    )
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace mult_expr_1_by_expr_2 end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace mult_expr_1_by_expr_2 end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d1)
+
+
+def LHS_of_expr_1_eq_LHS_of_expr_2(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a = b
+    and   a = d
+    get   b = d
+
+    ((in_lhs0 == in_lhs1) and (out_lhs0 == in_rhs0) and (out_rhs0 == in_rhs1))
+
+    >>> latex_dict = {}
+    >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')},
+                               {'LHS': parse_latex('a'), 'RHS': parse_latex('d')}]
+    >>> latex_dict['output'] = [{'LHS': parse_latex('b'), 'RHS': parse_latex('d')}]
+    >>> LHS_of_expr_equals_LHS_of_expr(latex_dict)
+    'valid'
+
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace LHS_of_expr_1_eq_LHS_of_expr_2 start " + trace_id + "]")
+
+    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_lhs_0 - input_expr_sympy_lhs_1)  #  0 = a - a
+    d2 = sympy.simplify(input_expr_sympy_rhs_0 - output_expr_sympy_lhs_0)  #  0 = b - b
+    d3 = sympy.simplify(input_expr_sympy_rhs_1 - output_expr_sympy_rhs_0)  #  0 = d - d
+
+    if (d1 == 0) and (d2 == 0) and (d3 == 0):
+        logger.info("[trace LHS_of_expr_1_eq_LHS_of_expr_2 end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace LHS_of_expr_1_eq_LHS_of_expr_2 end " + trace_id + "]")
+        return (
+            "input diff is "
+            + str(d1)
+            + "\n"
+            + " diff is "
+            + str(d2)
+            + "\n"
+            + " diff is "
+            + str(d3)
+        )
+
+
+def RHS_of_expr_1_eq_RHS_of_expr_2(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((in_rhs0 == in_rhs1) and (out_lhs0 == in_lhs0) and (out_rhs0 == in_lhs1))
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace RHS_of_expr_1_eq_RHS_of_expr_2 start " + trace_id + "]")
+
+    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_rhs_0 - input_expr_sympy_rhs_1)
+    d2 = sympy.simplify(output_expr_sympy_lhs_0 - input_expr_sympy_lhs_0)
+    d3 = sympy.simplify(output_expr_sympy_rhs_0 - input_expr_sympy_lhs_1)
+    if (d1 == 0) and (d2 == 0) and (d3 == 0):
+        logger.info("[trace RHS_of_expr_1_eq_RHS_of_expr_2 end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace RHS_of_expr_1_eq_RHS_of_expr_2 end " + trace_id + "]")
+        return (
+            "input diff is "
+            + str(d1)
+            + "\n"
+            + " diff is "
+            + str(d2)
+            + "\n"
+            + " diff is "
+            + str(d3)
+        )
+
+
+def raise_both_sides_to_power(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((out_lhs0 == (in_lhs0)**(feed0)) and (out_rhs0 == (in_rhs0)**(feed0)))
+    """
+    return "recognized infrule but not yet supported"
+
+
+def claim_expr_1_equals_expr_2(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    ((in_lhs0 == in_lhs1) and (in_rhs0 == in_rhs1))
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace claim_expr_1_equals_expr_2 start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace claim_expr_1_equals_expr_2 end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace claim_expr_1_equals_expr_2 end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d1)
+
+
+def claim_LHS_equals_RHS(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    (in_lhs0 == in_rhs0)
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace claim_LHS_equals_RHS start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_rhs - input_expr_sympy_lhs)
+
+    if d1 == 0:
+        logger.info("[trace claim_LHS_equals_RHS end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace claim_LHS_equals_RHS end " + trace_id + "]")
+        return "diff is " + str(d1)
+
+
+def function_is_even(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    colloquially,
+    sympy.cos(x)==sympy.cos(-x)
+
+    sympy.cos(x) - sympy.cos(-x) == 0
+    """
+    return "recognized infrule but not yet supported"
+
+
+def function_is_odd(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    colloquially,
+    sympy.sin(-x) == -sympy.sin(x)
+
+    sympy.sin(-x) - -sympy.sin(x) == 0
+    """
+    return "recognized infrule but not yet supported"
+
+
+def conjugate_function_X(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    colloquially,
+    sympy.conjugate(sympy.I)==-sympy.I
+
+    replace f with f^*; replace $i$ with $-i$
+    """
+    return "recognized infrule but not yet supported"
+
+
+def conjugate_both_sides(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    colloquially,
+    sympy.conjugate(sympy.I)==-sympy.I
+
+    Apply ^*; replace $i$ with $-i$
+    """
+    return "recognized infrule but not yet supported"
+
+
+def conjugate_transpose_both_sides(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Apply ^+; replace $i$ with $-i$ and transpose matrices
+    """
+    return "recognized infrule but not yet supported"
+
+
+def distribute_conjugate_transpose_to_factors(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Apply ^+; replace $i$ with $-i$ and transpose matrices, rotate bra-ket.
+    this is a combination of "distribute conjugate" and then "distribute transpose"
+    """
+    return "recognized infrule but not yet supported"
+
+
+def distribute_conjugate_to_factors(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Apply ^*; replace $i$ with $-i$
+    """
+    return "recognized infrule but not yet supported"
+
+
+def expand_magnitude_to_conjugate(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    replace |f|^2 with ff^*
+    """
+    return "recognized infrule but not yet supported"
+
+
+def replace_scalar_with_vector(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given F = m*a
+    Get \vec{F} = m*\vec{a}
+    """
+    return "recognized infrule but not yet supported"
+
+
+def simplify(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace simplify start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace simplify end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace simplify end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
+
+
+def subtract_expr_1_from_expr_2(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Instead of creating the inf rule for subtraction,
+    write this inf rule in terms of add_expr_1_to_expr_2
+
+    Given  a = b
+    and    c = d
+    get    a - c = b - d
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace subtract_expr_1_from_expr_2 start " + trace_id + "]")
+
+    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        (input_expr_sympy_lhs_1 - input_expr_sympy_lhs_0) - output_expr_sympy_lhs_0
+    )
+    d2 = sympy.simplify(
+        (input_expr_sympy_rhs_1 - input_expr_sympy_rhs_0) - output_expr_sympy_rhs_0
+    )
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace subtract_expr_1_from_expr_2 end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace subtract_expr_1_from_expr_2 end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
+
+
+def factor_out_x(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a*x + b*x = c*x + d*x
+    factor out x
+    Get x*(a + b) = (c + d)*x
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace factor_out_x start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace factor_out_x end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace factor_out_x end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
+
+
+def factor_out_x_from_lhs(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a*x + b*x = c
+    factor out x
+    get x*(a + b) = c
+
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace factor_out_x_from_lhs start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace factor_out_x_from_lhs end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace factor_out_x_from_lhs end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
+    return "no check performed"
+
+
+def factor_out_x_from_rhs(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a = b*x + c*x
+    factor out x
+    get a = (b + c)*x
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace factor_out_x_from_rhs start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace factor_out_x_from_rhs end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace factor_out_x_from_rhs end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
+
+
+def differentiate_with_respect_to(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a = b,
+    wrt t
+    get \frac{d}{dt}a = \frac{d}{dt}b
+    """
+    return "recognized infrule but not yet supported"
+
+
+def substitute_LHS_of_two_expressions_into_expr(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a = b
+    and   c = d
+    and   a + c = g
+    Get   b + d = g
+    """
+    return "recognized infrule but not yet supported"
+
+
+def change_two_variables_in_expr(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    given 'a + b = c',
+    substitute b --> d
+    substitute a --> f
+    to get 'f + d = c'
+
+    # to run the doctest below, use
+    import doctest
+    from validate_steps_sympy import *
+    doctest.run_docstring_examples(change_two_variables_in_expr, globals(), verbose=True)
+
+    >>> latex_dict = {}
+    >>> latex_dict['input'] = [{'LHS': parse_latex('a + b'), 'RHS': parse_latex('c')}]
+    >>> latex_dict['feed'] = [parse_latex('b'), parse_latex('d'), parse_latex('a'), parse_latex('f')]
+    >>> latex_dict['output'] = [{'LHS': parse_latex('f + d'), 'RHS': parse_latex('c')}]
+    >>> change_two_variables_in_expr(latex_dict)
+    'valid'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace change_two_variables_in_expr start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
+    feed_sympy_2 = eval(list_of_feed_dicts[2]["sympy"])
+    feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
+    feed_sympy_4 = eval(list_of_feed_dicts[4]["sympy"])
+    feed_sympy_5 = eval(list_of_feed_dicts[5]["sympy"])
+    feed_sympy_6 = eval(list_of_feed_dicts[6]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1).subs(
+            feed_sympy_2, feed_sympy_3
+        )
+        - output_expr_sympy_lhs
+    )
+    d2 = sympy.simplify(
+        input_expr_sympy_rhs.subs(feed_sympy_0, feed_sympy_1).subs(
+            feed_sympy_2, feed_sympy_3
+        )
+        - output_expr_sympy_rhs
+    )
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace change_two_variables_in_expr end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace change_two_variables_in_expr end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
+    return "no check performed"
+
+
+def change_three_variables_in_expr(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    given 'a + b = c',
+    substitute b --> d
+    substitute a --> f
+    substitute c --> g
+    to get 'f + d = g'
+
+    # to run the doctest below, use
+    import doctest
+    from validate_steps_sympy import *
+    doctest.run_docstring_examples(change_two_variables_in_expr, globals(), verbose=True)
+
+    >>> latex_dict = {}
+    >>> latex_dict['input'] = [{'LHS': parse_latex('a + b'), 'RHS': parse_latex('c')}]
+    >>> latex_dict['feed'] = [parse_latex('b'), parse_latex('d'), parse_latex('a'), parse_latex('f'), parse_latex('c'), parse_latex('g')]
+    >>> latex_dict['output'] = [{'LHS': parse_latex('f + d'), 'RHS': parse_latex('g')}]
+    >>> change_three_variables_in_expr(latex_dict)
+    'valid'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace change_three_variables_in_expr start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
+    feed_sympy_2 = eval(list_of_feed_dicts[2]["sympy"])
+    feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
+    feed_sympy_4 = eval(list_of_feed_dicts[4]["sympy"])
+    feed_sympy_5 = eval(list_of_feed_dicts[5]["sympy"])
+    feed_sympy_6 = eval(list_of_feed_dicts[6]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1)
+        .subs(feed_sympy_2, feed_sympy_3)
+        .subs(feed_sympy_4, feed_sympy_5)
+        - output_expr_sympy_lhs
+    )
+    d2 = sympy.simplify(
+        input_expr_sympy_rhs.subs(feed_sympy_0, feed_sympy_1)
+        .subs(feed_sympy_2, feed_sympy_3)
+        .subs(feed_sympy_4, feed_sympy_5)
+        - output_expr_sympy_rhs
+    )
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace change_three_variables_in_expr end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace change_three_variables_in_expr end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
+    return "no check performed"
+
+
+def change_four_variables_in_expr(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace change_four_variables_in_expr start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
+    feed_sympy_2 = eval(list_of_feed_dicts[2]["sympy"])
+    feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
+    feed_sympy_4 = eval(list_of_feed_dicts[4]["sympy"])
+    feed_sympy_5 = eval(list_of_feed_dicts[5]["sympy"])
+    feed_sympy_6 = eval(list_of_feed_dicts[6]["sympy"])
+    feed_sympy_7 = eval(list_of_feed_dicts[7]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1)
+        .subs(feed_sympy_2, feed_sympy_3)
+        .subs(feed_sympy_4, feed_sympy_5)
+        .subs(feed_sympy_6, feed_sympy_7)
+        - output_expr_sympy_lhs
+    )
+    d2 = sympy.simplify(
+        input_expr_sympy_rhs.subs(feed_sympy_0, feed_sympy_1)
+        .subs(feed_sympy_2, feed_sympy_3)
+        .subs(feed_sympy_4, feed_sympy_5)
+        .subs(feed_sympy_6, feed_sympy_7)
+        - output_expr_sympy_rhs
+    )
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace change_four_variables_in_expr end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace change_four_variables_in_expr end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
+    return "no check performed"
+
+
+def change_five_variables_in_expr(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
+    feed_sympy_2 = eval(list_of_feed_dicts[2]["sympy"])
+    feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
+    feed_sympy_4 = eval(list_of_feed_dicts[4]["sympy"])
+    feed_sympy_5 = eval(list_of_feed_dicts[5]["sympy"])
+    feed_sympy_6 = eval(list_of_feed_dicts[6]["sympy"])
+    feed_sympy_7 = eval(list_of_feed_dicts[7]["sympy"])
+    feed_sympy_8 = eval(list_of_feed_dicts[8]["sympy"])
+    feed_sympy_9 = eval(list_of_feed_dicts[9]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1)
+        .subs(feed_sympy_2, feed_sympy_3)
+        .subs(feed_sympy_4, feed_sympy_5)
+        .subs(feed_sympy_6, feed_sympy_7)
+        .subs(feed_sympy_8, feed_sympy_9)
+        - output_expr_sympy_lhs
+    )
+    d2 = sympy.simplify(
+        input_expr_sympy_rhs.subs(feed_sympy_0, feed_sympy_1)
+        .subs(feed_sympy_2, feed_sympy_3)
+        .subs(feed_sympy_4, feed_sympy_5)
+        .subs(feed_sympy_6, feed_sympy_7)
+        .subs(feed_sympy_8, feed_sympy_9)
+        - output_expr_sympy_rhs
+    )
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace change_five_variables_in_expr end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace change_five_variables_in_expr end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
+    return "no check performed"
+
+
+def change_six_variables_in_expr(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace change_six_variables_in_expr start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
+    feed_sympy_2 = eval(list_of_feed_dicts[2]["sympy"])
+    feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
+    feed_sympy_4 = eval(list_of_feed_dicts[4]["sympy"])
+    feed_sympy_5 = eval(list_of_feed_dicts[5]["sympy"])
+    feed_sympy_6 = eval(list_of_feed_dicts[6]["sympy"])
+    feed_sympy_7 = eval(list_of_feed_dicts[7]["sympy"])
+    feed_sympy_8 = eval(list_of_feed_dicts[8]["sympy"])
+    feed_sympy_9 = eval(list_of_feed_dicts[9]["sympy"])
+    feed_sympy_10 = eval(list_of_feed_dicts[10]["sympy"])
+    feed_sympy_11 = eval(list_of_feed_dicts[11]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(
+        input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1)
+        .subs(feed_sympy_2, feed_sympy_3)
+        .subs(feed_sympy_4, feed_sympy_5)
+        .subs(feed_sympy_6, feed_sympy_7)
+        .subs(feed_sympy_8, feed_sympy_9)
+        .subs(feed_sympy_10, feed_sympy_11)
+        - output_expr_sympy_lhs
+    )
+    d2 = sympy.simplify(
+        input_expr_sympy_rhs.subs(feed_sympy_0, feed_sympy_1)
+        .subs(feed_sympy_2, feed_sympy_3)
+        .subs(feed_sympy_4, feed_sympy_5)
+        .subs(feed_sympy_6, feed_sympy_7)
+        .subs(feed_sympy_8, feed_sympy_9)
+        .subs(feed_sympy_10, feed_sympy_11)
+        - output_expr_sympy_rhs
+    )
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace change_six_variables_in_expr end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace change_six_variables_in_expr end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
+    return "no check performed"
+
+
+def square_root_both_sides(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a = b
+    sqrt both side
+    get sqrt(a) = sqrt(b)
+    and sqrt(a) = - sqrt(b)
+
+    >>> latex_dict = {}
+    >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')}]
+    >>> latex_dict['output'] = [{'LHS': parse_latex('\sqrt{a}'), 'RHS': parse_latex('\sqrt{b}')},
+                                {'LHS': parse_latex('\sqrt{a}'), 'RHS': parse_latex('-\sqrt{b}')}]
+    >>> square_root_both_sides(latex_dict)
+    'valid'
+    """
+    return "recognized infrule but not yet supported"
+
+
+def divide_expr_by_expr(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a = b
+    and c = d
+    get a/c = b/d
+
+    >>> latex_dict = {}
+    >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')},
+                               {'LHS': parse_latex('c'), 'RHS': parse_latex('d')}]
+    >>> latex_dict['output'] = [{'LHS': parse_latex('a/c'), 'RHS': parse_latex('b/d')}]
+    >>> divide_expr_by_expr(latex_dict)
+    'valid'
+    """
+    return "recognized infrule but not yet supported"
+
+
+def separate_two_vector_components(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a_x \hat{x} + a_y \hat{y} = v_x \hat{x} + v_y \hat{y}
+    get a_x = v_x
+    and a_y = v_y
+    """
+    return "recognized infrule but not yet supported"
+
+
+def separate_three_vector_components(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given a_x \hat{x} + a_y \hat{y} + a_z \hat{z} = v_x \hat{x} + v_y \hat{y} + v_z \hat{z}
+    get a_x = v_x
+    and a_y = v_y
+    and a_z = v_z
+    """
+    return "recognized infrule but not yet supported"
+
+
+def evaluate_definite_integral(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    Given   a = \int_0^x dx
+    Get     a = x
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace evaluate_definite_integral start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    # feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace evaluate_definite_integral end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace evaluate_definite_integral end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
+
+
+def expand_LHS(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace expand_LHS start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace expand_LHS end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace expand_LHS end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
+    return "no check performed"
+
+
+def expand_RHS(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[trace expand_RHS start " + trace_id + "]")
+
+    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+
+    if (d1 == 0) and (d2 == 0):
+        logger.info("[trace expand_RHS end " + trace_id + "]")
+        return "valid"
+    else:
+        logger.info("[trace expand_RHS end " + trace_id + "]")
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
+    return "no check performed"
+
+
+def apply_operator_to_bra(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    given
+    x = \\langle\\psi_{\\alpha}| \\hat{A} |\\psi_{\\beta}\\rangle
+    return
+    x = \\langle\\psi_{\\alpha}| a_{\\alpha} |\psi_{\\beta} \\rangle
+    """
+    return "recognized infrule but not yet supported"
+
+
+def apply_operator_to_ket(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    given
+    x = \\langle\\psi_{\\alpha}| \\hat{A} |\\psi_{\\beta}\\rangle
+    return
+    x = \\langle\\psi_{\\alpha}| a_{\\beta} |\psi_{\\beta} \\rangle
+    """
+    return "recognized infrule but not yet supported"
+
+
+def drop_nondominant_term(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    given
+    x = \\langle\\psi_{\\alpha}| \\hat{A} |\\psi_{\\beta}\\rangle
+    return
+    x = \\langle\\psi_{\\alpha}| a_{\\beta} |\psi_{\\beta} \\rangle
+    """
+    return "recognized infrule but not yet supported"
+
+
+def apply_gradient_to_scalar_function(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    """
+    given
+    x = \\langle\\psi_{\\alpha}| \\hat{A} |\\psi_{\\beta}\\rangle
+    return
+    x = \\langle\\psi_{\\alpha}| a_{\\beta} |\psi_{\\beta} \\rangle
+    """
+    return "recognized infrule but not yet supported"
 
 
 # EOF
