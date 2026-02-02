@@ -88,7 +88,7 @@ black_out:
 	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) make black_in
 
 black_in:
-	black webserver_for_pdg/*.py webserver_for_pdg/library/*.py
+	black -v --workers 1 webserver_for_pdg/*.py webserver_for_pdg/library/*.py
 
 mypy_out:
 	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(WEBSERVER_IMAGE) mypy --check-untyped-defs webserver/pdg_app.py webserver/library
