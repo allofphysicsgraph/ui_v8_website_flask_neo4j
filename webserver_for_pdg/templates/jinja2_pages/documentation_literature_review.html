@@ -11,25 +11,14 @@
 <P>
   This page contains references to papers that lack associated software.
   For software, see also <a href="{{ url_for('to_other_projects') }}">this listing</a>.
-    <!--
-  <div id="toc_container">
-  <p class="toc_title">Contents</p>
-  <OL class="toc_list">
-
-    <LI><a href="#"></a></LI>
-
-    In bash,
-    cat literature_review.html | grep "<H4" | sed 's/H4>/LI>/g' | sed 's/name="/name="#/'
-
-
-  </OL>
-  </div>
--->
   The purpose of these references is to contextualize the Physics Derivation Graph.
 
-<!--
-Recommendations for reading (not everything listed here is worth reading).
--->
+<P>To generate a bibtex file, run
+<pre>
+$ cat literature_review.html | grep "{\|}"
+  </pre>
+<P>against the source code of this page.
+
 
 <!--
 To create a new citation, use
@@ -133,8 +122,8 @@ https://flamingtempura.github.io/bibtex-tidy/
     </td> <!-- citation -->
     <td>
       <blockquote cite="https://www.azquotes.com/quote/1117453">
-        Science offers the boldest metaphysics of the age. It is a thoroughly human construct, driven by the faith that if we dream, press to discover, explain, and dream again, thereby plunging repeatedly into new terrain, the world will somehow come clearer and we will grasp the true strangeness of the universe.
-        <strong>And the strangeness will all prove to be connected, and make sense</strong>.
+        "Science offers the boldest metaphysics of the age. It is a thoroughly human construct, driven by the faith that if we dream, press to discover, explain, and dream again, thereby plunging repeatedly into new terrain, the world will somehow come clearer and we will grasp the true strangeness of the universe.
+        <strong>And the strangeness will all prove to be connected, and make sense</strong>."
         <footer><cite><a href="https://www.azquotes.com/quote/1117453">source</a></cite></footer>
       </blockquote>
     </td> <!-- comment -->
@@ -974,11 +963,11 @@ Clear writing. Broad survey of efforts in formalizing math.
       Goal:
       </P>
       <blockquote cite="https://www.cs.ru.nl/~freek/qed/qed.html">
-      To build a computer system that effectively represents all important
+      "To build a computer system that effectively represents all important
       mathematical knowledge and techniques. The QED system will conform to
       the highest standards of mathematical rigor, including the use of strict
       formality in the internal representation of knowledge and the use of
-      mechanical methods to check proofs of the correctness of all entries in the system.
+      mechanical methods to check proofs of the correctness of all entries in the system."
         <footer>
           <cite>
             <a href="https://www.cs.ru.nl/~freek/qed/qed.html">source</a>
