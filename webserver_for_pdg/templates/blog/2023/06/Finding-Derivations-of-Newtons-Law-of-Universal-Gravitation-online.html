@@ -1,0 +1,57 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Finding Derivations of Newton's Law of Universal Gravitation online</H1>
+
+<P><small>Published 2023-06-10T22:14:00.001Z by Physics Derivation Graph</small></P>
+
+<p><i>Question</i>: was Newton's law of universal gravitation found empirically (from measurements) or can it be derived mathematically? The short answer is yes -- both. The historical process is separate from what can be done now.</p>
+
+<h2>Empirical (historical) route</h2>
+<p>The second paragraph of <a href="https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation">the Wikipedia article on Newton's Law of Universal Gravitation</a> says, "This is a general physical law derived from empirical observations by what Isaac Newton called inductive reasoning." There's a <a href="https://www.youtube.com/watch?v=Ki5g0CpRj1I">video on YouTube</a> describing that Newton started with 
+  </p>
+
+<ul style="text-align: left;">
+  <li>acceleration of gravity on earth, g = 9.8 m/s^2</li>
+  <li>distance between Earth and Moon = 60*(radius of earth)</li>
+  <li>radius of Earth =&nbsp;</li>
+  <li>orbital period of moon = 27.32 days</li></ul>
+
+<p>Newton figured out how fast the Moon is circling the Earth using</p>
+<pre> velocity = distance/time</pre>
+where, in the case of the moon circling the Earth, 
+<pre> distance the moon travels around the Earth = circumference = 2*pi*r_{orbit of Moon}</pre>
+<p>Plugging in numbers, <code>velocity of Moon around Earth = 1022 m/s</code>. 
+  That can then be plugged into the centripetal acceleration,
+</p><pre>a_{centripetal} = v^2/r</pre>
+How does <code>a_{centripetal}</code> compare to the gravitational acceleration <code>g</code>?
+<pre>g/a_{centripetal} = 60^2</pre>
+<p>Noticing the 60 is common to the ratio and the distance between the Earth and the Moon, Newton figures that gravitation follows an inverse square law. Newton then checked this against data from observational studies of planets.
+  
+</p><p>That's a big leap to <code>F = G*(M*m)/(r^2)</code>, so are there more mathematical routes?
+  
+</p><h2>Mathematical Derivations</h2>
+
+<h3>From nasa.gov</h3>
+<p>I first found <a href="https://imagine.gsfc.nasa.gov/observatories/learning/swift/classroom/law_grav_derivation.html">NASA's classroom materials</a>. There are some leaps that I wasn't able to follow. The same content of that page is duplicated on <a href="https://imagine.gsfc.nasa.gov/educators/programs/swift/classroom/law_grav_derivation.html">a related NASA page</a>. The derivation starts with <code>F=ma</code> and <code>a_{centripetal} = v^2/r</code>. The author mentions Kepler's Third Law but says <code>T^2 \approx R^3</code> (which is dimenionally inconsistent) when they mean <code>T^2 \propto R^3</code>. The misuse of <code>\approx</code> and <code>\propto</code> continues throughout the rest of the derivation. 
+  
+</p><pre>velocity = distance/time</pre>and the <code>distance</code> here is the circumfrence, <code>2*pi*r</code>, so 
+<pre>period T = (2*pi*R)/v</pre>
+<p>Drop the <code>2*pi</code> to get
+</p><pre>period v \approx R/T</pre>
+Square both sides and apply Kepler's Third law
+<pre>T^2 \propto R^3</pre>
+to get 
+<pre>v^2 \propto 1/R</pre>
+<p>The second source of my confusion is subscripting versus superscripting -- <code>v_2</code> versus <code>v^2</code>. 
+</p><pre>F = (m*(v^2))/R</pre>
+
+<p>I tried submitting a correction to <a href="https://imagine.gsfc.nasa.gov/cgi-bin/ideas.pl">NASA's feedback page</a> but couldn't since the Captcha is missing. :(
+
+</p><p><br /></p><h3>From a tutorial</h3>
+<p>Next I found <a href="https://protonstalk.com/gravitation/newtons-law-of-gravitation/">another student-oriented page</a> that has a derivation which is even less helpful than NASA's. The derivation presented starts from angular speed and <code>F=mr\omega^2</code>.
+  
+</p><p><br /></p><h3>YouTube tutorial</h3>
+<p>Happily I found this helpful <a href="https://www.youtube.com/watch?v=fJYdFIZlD8k">video from Daniel M, "Deriving Newton's Law of Universal Gravitation"</a>.</p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p>
+
+{% endblock %}

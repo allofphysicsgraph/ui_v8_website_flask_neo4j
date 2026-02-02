@@ -1,0 +1,51 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>notes on status and near-term plans</H1>
+
+<P><small>Published 2024-05-20T00:42:00Z by Physics Derivation Graph</small></P>
+
+<p>status updates after ~30 hours of work over the course of 1 weekend.</p>
+<ul>
+  <li>made good progress with text input to web UI for Neo4j property graph back-end.</li><li>new user workflow: instead of user providing expressions during specification of step, now expressions are separate. (<i>Not clear how well this will work for actually use</i>.)</li><li>new schema: see&nbsp;<a href="https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html">https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html</a></li>
+</ul>
+
+<p>I'm happy with the rewrite of the back-end since it makes the design more robust and flexible.&nbsp;</p>
+
+<p>I've learned enough Cypher to feel comfortable continuing with this path. I'm also somewhat confident (with no basis in experience) that switching to a different property graph is feasible without having to rewrite the front-end and controller).</p><p><br /></p>
+
+<h2>Developer workflow</h2><div>My "how do I develop the code" steps have evolved to include Black and mypy.&nbsp;</div><div><br /></div>
+After making changes to the code I format using Black and then use type hinting:
+<pre>make black_out
+docker run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ property_graph_webserver mypy --check-untyped-defs webserver/app.py
+</pre>
+
+To launch the web UI,
+<pre>make black_out; docker ps | grep property | cut -d' ' -f1 | xargs docker kill; date; make up
+</pre>
+
+<p>I added Selenium tests to speed up the UI validation.
+
+</p><p><br /></p><h2>Near-term plans</h2><div>There's a lot to do, so in roughly priority order (from most important near-term to will-get-to-later)</div>
+
+<ol>
+<li>Convert Latex expressions to Sympy
+</li><li>Check the dimensionality and consistency of expressions using sympy
+</li><li>Provide feedback to user on invalid inputs using dimensionality checks and symbol consistency
+</li><li>Check steps using SymPy. Currently in the v7 code base the file "validate_steps_sympy.py" takes Latex as input, converts to SymPy, then validates step. I think the step validation should be done using pure SymPy? (rather than taking Latex as input).</li></ol>
+
+<p>Lean: Explorer how to include lean derivations per step. Can I get lean to run on my computer?
+
+</p><p>Add API support to enable curl interactions. <br />
+This would improve command line testability of workflows 
+
+</p><p>Write more selenium tests. <br />
+This assumes the web UI is stable.</p><p>Make the HTML tables sortable (as already exists on <a href="https://derivationmap.net/">https://derivationmap.net/</a>)
+
+</p><p>Support rendering latex in HTML  (as already exists on <a href="https://derivationmap.net/">https://derivationmap.net/</a>)
+
+</p><p>Migrating existing content into the new back end
+
+</p><p>Convert latex strings into PNG files for visualization (as already exists on&nbsp;<a href="https://derivationmap.net/">https://derivationmap.net/</a>)</p><p>Render derivations as PDF (as already exists on&nbsp;<a href="https://derivationmap.net/">https://derivationmap.net/</a>)</p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p>
+
+{% endblock %}

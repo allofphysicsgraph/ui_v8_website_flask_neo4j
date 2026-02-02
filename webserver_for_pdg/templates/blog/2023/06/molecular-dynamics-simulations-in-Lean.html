@@ -1,0 +1,16 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>molecular dynamics simulations in Lean</H1>
+
+<P><small>Published 2023-06-19T13:10:00.001Z by Physics Derivation Graph</small></P>
+
+Working from textbooks like those from Berend Smit's Understanding Molecular Simulation and Allan and Tildesley’s textbook.
+
+The textbook you linked to also seems to cover the basics all right. For the dynamics, we will need to 
+<UL>
+  <LI>implement velocity verlet and/or verlet and 
+  <LI>prove that these algorithms converge to the true dynamics in the limit of infinitesimal time step. 
+</UL>
+
+{% endblock %}

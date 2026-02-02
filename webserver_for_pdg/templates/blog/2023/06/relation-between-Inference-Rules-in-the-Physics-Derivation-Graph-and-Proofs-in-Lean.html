@@ -1,0 +1,99 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>relation between Inference Rules in the Physics Derivation Graph and Proofs in Lean</H1>
+
+<P><small>Published 2023-06-18T13:56:00.001Z by Physics Derivation Graph</small></P>
+
+<P>In this post I explore the concept that each derivation can be phrased as a proof of the initial declaration and the final result. Also, each step in a derivation can be phrased as a proof.</P>
+
+
+<h2 style="text-align: left;">Lean Proofs of Derivation Steps</h2>
+
+<p>As per <a href="https://stackoverflow.com/questions/41946310/how-to-prove-a-b-%E2%86%92-a-1-b-1-in-lean">https://stackoverflow.com/questions/41946310/how-to-prove-a-b-%E2%86%92-a-1-b-1-in-lean</a>&nbsp;Lean can prove that 
+</p><pre>(a=b) -&gt; (a+1=b+1)
+</pre>
+<p>In comparison, a PDG Inference Rule is more generic:
+</p><pre>add __ to both sides of (LHS=RHS) to get (LHS+__=RHS+__)
+</pre>
+<p>The PDG Inference Rule is generic because the types of LHS and RHS are undefined. Are they Real? Complex? Matrices?</p><p>The relevance of types for inference rules is because mixing types may not work. "Add 1 to both sides of (LHS=RHS)" won't work if LHS and RHS are 2x2 matrices.&nbsp;&nbsp;</p><p><span></span></p><!--more--><p></p>
+
+<h3 style="text-align: left;">Example Step</h3>
+
+<p>To leverage Lean, a PDG derivation step involves</p><ol style="text-align: left;"><li>
+Select the relevant PDG Inference Rule.</li><li>Prove the application of the inference rule specific to the expressions associated with the step</li></ol>
+
+<p>As an example, the derivation step 
+  </p><pre>  (T = 1/f) -&gt; (T f = 1)<br /></pre>
+is a provable instance of the PDG Inference Rule
+<pre>multiply both sides of (LHS=RHS) by __ to get (LHS*__=RHS*__)
+</pre>
+
+<span></span><span><!--more--></span><h3 style="text-align: left;">Generalizability for an Inference Rule&nbsp;</h3><p>The proofs of each application of each inference rule follow a similar structure. Once I've shown</p>
+<pre>(a=b) -&gt; (a*c=b*c) for all (a, b, c) in Complex
+</pre>
+then I can later substitute 
+<pre>a=LHS
+b=RHS
+c=__
+</pre>
+<p>and re-run the same proof tactics. The proof tactics should be agnostic to the specific contents of <code>LHS</code> and <code>RHS</code> as long as <code>LHS</code>, <code>RHS</code>, and __ are Real or Complex.</p><p>If I've proven</p>
+<pre>(a=b) -&gt; (a*c=b*c) for all (a, b, c) in Complex
+</pre>
+then the proof tactics will the same for
+<pre>(a+d=b*f) -&gt; ((a+d)*c=(b*f)*c) for all (a, b, c, d, f) in Complex
+</pre>
+
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p><h2 style="text-align: left;">Lean Proofs of Derivations</h2><div><br /></div><p>What about more complicated derivations that have multiple predicates, like
+</p><pre>A    B
+\   /
+ \ /  
+  F   C
+  \   /
+   \ /
+    D
+</pre>
+where A and B and C are initial assumptions and D is the final expression in the derivation?<p></p>
+
+<p>In Lean the top-level summary would be
+  </p><pre>  (A ^ B ^ C) -&gt; D
+  </pre>
+and the derivation steps expressed in Lean would be
+<pre>(A ^ B) -&gt; F
+and 
+(F ^ C) -&gt; D
+</pre><div><br /></div>
+
+This decomposition also applies to derivations with branches and joins. A derivation like
+<pre>A    B
+\   /
+ \ / 
+  F
+ / \
+/   \
+D   C 
+|   |
+E   |
+\   /
+ \ /
+  G
+</pre>
+expressed in Lean would be
+<pre>(A ^ B) -&gt; F
+and 
+F -&gt; (D ^ C)
+and
+D -&gt; E
+and
+(E ^ C) -&gt; G
+</pre>
+<p>with a top-level description in Lean being</p>
+<pre>(A ^ B) -&gt; G
+</pre>
+
+{% endblock %}

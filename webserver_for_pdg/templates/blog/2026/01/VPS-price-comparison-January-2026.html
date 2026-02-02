@@ -1,0 +1,52 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>VPS price comparison January 2026</H1>
+
+<P><small>Published 2026-01-24T19:52:00Z by Physics Derivation Graph</small></P>
+
+<div>Other posts in this series:</div><ul>
+  <li><a href="https://physicsderivationgraph.blogspot.com/2026/01/vps-price-comparison-september-2024.html">https://physicsderivationgraph.blogspot.com/2026/01/vps-price-comparison-september-2024.html
+</a></li></ul>
+
+<p style="text-align: left;">See&nbsp;<a href="https://github.com/allofphysicsgraph/task-tracker/issues/56">hhttps://github.com/allofphysicsgraph/task-tracker/issues/56</a></p>
+
+<h2>DigitalOcean</h2>
+
+<p>Currently (as of 2026-01-24) paying $6/month for 2 CPUs, 1GB of RAM,&nbsp;</p>
+
+<p>Was paying $12/month for 2 CPUs, 2GB of RAM (to support Neo4j)</p>
+
+<h2>Hetzner</h2>
+<div><a href="https://www.hetzner.com/cloud/">https://www.hetzner.com/cloud/</a></div>
+<div><br /></div>
+<div>"CPX11" in US host is 2 vCPUs, 2GB of RAM, 40GB SSD for 5 euros. Doesn't include VAT</div>
+<div><br /></div>
+<div><i>Update 2026-01-31</i>: See&nbsp;<a href="https://physicsderivationgraph.blogspot.com/2026/01/hetzner-vps-initial-configuration-notes.html">https://physicsderivationgraph.blogspot.com/2026/01/hetzner-vps-initial-configuration-notes.html</a></div>
+
+<h2 style="text-align: left;">Oracle</h2>
+<p><a href="https://www.oracle.com/cloud/compute/arm/pricing/">https://www.oracle.com/cloud/compute/arm/pricing/</a></p><p><a href="https://www.oracle.com/cloud/free/">https://www.oracle.com/cloud/free/</a></p><p>"AMD Compute Instance" has 1/8 OCPU and 1 GB memory</p><p>"Arm Compute Instance" has 4 Arm-based Ampere A1 cores and 24 GB of memory usable as 1 VM or up to 4 VMs Always Free 3,000 OCPU hours and 18,000 GB hours per month</p><p>I attempted to use Oracle (see <a href="https://physicsderivationgraph.blogspot.com/2026/01/oracle-cloud-configuration-for-free-tier.html">https://physicsderivationgraph.blogspot.com/2026/01/oracle-cloud-configuration-for-free-tier.html</a>) but their free tier didn't have any available instances.</p><p></p>
+
+<h2>Google Compute Engine</h2>
+<div><a href="https://cloud.google.com/pricing">https://cloud.google.com/pricing</a></div>
+<div><a href="https://cloud.google.com/products/calculator">https://cloud.google.com/products/calculator</a></div>
+<div><br /></div>
+<div>"E2" with 2vCPUs and 2GB of RAM is $37.11/month</div>
+<div><br /></div>
+<div><a href="https://docs.cloud.google.com/free/docs/free-cloud-features">https://docs.cloud.google.com/free/docs/free-cloud-features</a>&nbsp;says "1 non-preemptible e2-micro VM instance per month in one of the following US regions: Oregon: us-west1. Iowa: us-central1. South Carolina: us-east1. 30 GB-months standard persistent disk. 1 GB of outbound data transfer from North America to all region destinations (excluding China and Australia) per month."</div>
+<div><br /></div>
+<div>The e2-micro is 0.25 CPUs and 1GB of RAM.</div>
+<div><br /></div>
+
+<h2>Microsoft Azure</h2>
+<div>B2pts v2 = 1GB of RAM, 2 vCPUs for $6.13/month</div><div>next step up is&nbsp;</div><div>B2pls v2 = 4GB of RAM, 2 vCPUs for&nbsp;$24.5280/month</div><div><br /></div><div><a href="https://azure.microsoft.com/en-us/pricing/details/container-instances/">https://azure.microsoft.com/en-us/pricing/details/container-instances/</a></div><div>$3.8909 per GB/month</div>
+
+<h2>AWS Lightsail</h2><div>"Bundles resources like memory, vCPU, and solid-state drive (SSD) storage into one plan, so budgeting is easy."&nbsp;</div><div>aka AWS simplified using pre-set configurations.</div><div><br /></div><div>$12/month for 2 GB Memory 2 vCPUs 60 GB SSD Disk 3 TB Transfer</div>
+
+<h2 style="text-align: left;">AWS</h2>
+<p><a href="https://aws.amazon.com/free/">https://aws.amazon.com/free/</a><br /><a href="https://aws.amazon.com/free/free-tier-faqs/">https://aws.amazon.com/free/free-tier-faqs/</a></p><p>2026-01-28: "Free plan eligible instances include: T3.micro, T3.small, T4g.micro, T4g.small, C7i-flex.large, M7i-flex.large" (<i>source</i>:&nbsp;<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-free-tier-usage.html">https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-free-tier-usage.html</a>)</p><p>"The free plan allows you to experiment with AWS services and build proof-of-concepts at no cost for up to 6 months until you upgrade to a paid plan."</p><span><!--more--></span><p>EC2 has "t4g.small" for $0.0168/hour with 2 CPUs 2 GiB RAM.&nbsp;</p><p>Based on a rate of $0.0168 per hour, the cost for one month (assuming a 30-day month with 720 hours) is approximately $12.10 ($0.0168 × 24 hours × 30 days).</p><p><br /></p><h2 style="text-align: left;">Linode</h2><div><a href="https://www.linode.com/pricing/">https://www.linode.com/pricing/</a></div><div><br /></div><div>"Nanode 1 GB" is $5/month, 1 GB of RAM, 25 GB storage,&nbsp;</div><div><br /></div><div>"Linode 2 GB" is $12/month</div>
+
+<h2 style="text-align: left;">Hostinger</h2>
+<p><a href="https://www.hostinger.com/vps-hosting">https://www.hostinger.com/vps-hosting</a></p><p>"KVM 1" =&nbsp;1 vCPU, 4 GB RAM, 50 GB NVMe disk space, 4 TB bandwidth</p><p>"KVM 1" is $5/month, and then "Renews at $ 9.99/mo for 2 years. Cancel anytime."<br /><i>Explanation (from their chat AI)</i>: After the initial billing period you select (such as 1 month, 12 months), the renewal price will be $10 per month. You can lock in the $5/month rate for a longer period by choosing a longer billing cycle when you purchase<br />Maximum buy-in of 24 months.</p>
+
+{% endblock %}

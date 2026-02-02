@@ -1,0 +1,286 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>glossary for TLA+ and PlusCal jargon</H1>
+
+<P><small>Published 2022-10-08T17:35:00.014Z by Physics Derivation Graph</small></P>
+
+<h1>TLA+</h1>
+<p>See also <a href="https://lamport.azurewebsites.net/tla/summary-standalone.pdf">TLA+ language summary</a> and <a href="https://lamport.azurewebsites.net/tla/summary.pdf">this summary</a>. Here's <a href="https://apalache.informal.systems/docs/lang/standard-operators.html">another summary of operators</a>.</p>
+<table border="1">
+  <tbody>
+    <tr>
+      <th>jargon</th>
+      <th>definition</th>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Apalache</td>
+      <td>"symbolic model checker for TLA+." "Translates TLA+ into the logic supported by SMT solvers such as <a href="https://github.com/Z3Prover/z3">Microsoft Z3</a>."<br />
+        <small><i>Source</i>: <a href="https://github.com/informalsystems/apalache">apalache github</a></small></td>
+    </tr>
+    <tr>
+      <td>behavior</td>
+      <td><p>aka execution<br />
+         sequence of states<br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=p54W-XOIEF8">Lecture 1 video</a></small></p>
+      </td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;"><a name="CONSTANT">CONSTANT</a></span></td>
+      <td><p><br />
+        <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/book-21-07-04.pdf">Specifying Systems</a> page i25</small></p>
+      </td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;">CONSTANTS</span></td>
+      <td>See <a href="#CONSTANT">CONSTANT</a></td>
+    </tr>
+    <tr>
+      <td><a name="execution">execution</a></td>
+      <td>see <a href="#execution">behavior</a>.<br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=p54W-XOIEF8">Lecture 1 video</a></small>
+      </td>
+    </tr>
+    <tr>
+      <td><a name="deadlock">deadlock</a></td>
+      <td><P>execution stopped when it wasn't supposed to<BR>
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=4NtHUfXlf4g">Lecture 3 video</a></small></P>
+    See also <a href="#termination">termination</a></td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;">EXTENDS</span></td>
+      <td><br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=4snwZl726c4">Lecture 2 video</a></small></td>
+    </tr>
+    <tr>
+      <td><a name="FALSE"><span style="font-family: courier;">FALSE</span></a></td>
+      <td>See also <a href="#TRUE">TRUE</a><br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=4snwZl726c4">Lecture 2 video</a></small></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;">IF THEN</span></td>
+      <td><br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=4snwZl726c4">Lecture 2 video</a></small></td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;">IF THEN ELSE</span></td>
+      <td><br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=4snwZl726c4">Lecture 2 video</a></small></td>
+    </tr>
+
+    <tr>
+      <td><a name="liveness property">liveness property</a></td>
+      <td><p>"you have to look at the entire execution, which may be infinite, to determine that it is not satisfied."<br />
+        <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/tutorial/session9.html">session 9</a></small></p>
+      <p>See also <a href="#safety property">safety property</a></p></td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;">MODULE</span></td>
+      <td><br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=4snwZl726c4">Lecture 2 video</a></small></td>
+    </tr>
+    <tr>
+      <td>PlusCal</td>
+      <td><a href="https://lamport.azurewebsites.net/tla/p-manual.pdf">User's manual</a></td>
+    </tr>
+    <tr>
+      <td><a name="safety property">safety property</a></td>
+      <td><p>"if is not satisfied by an execution, then you can tell that it's not satisfied by looking at a finite portion of the execution—even if the execution is infinite."<br />
+        <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/tutorial/session9.html">session 9</a></small></p>
+  <p>See also <a href="#liveness property">liveness property</a></p></td>
+    </tr>
+    <tr>
+      <td>state</td>
+      <td>assignment of values to variables<br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=p54W-XOIEF8">Lecture 1 video</a></small> and<br />
+        <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/pubs/spec-book-chap.pdf">TLA+ chapter in "Software Specification Methods"</a></small></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>state machine, specification of</td>
+      <td>
+        <ul>
+          <li>all possible initial states
+            <ul>
+              <li>variables</li>
+              <li>initial value of each variable</li>
+            </ul>
+          </li>
+          <li>what state follows a given state</li><ul><li>relations values of variables in current state and possible values in the next state.</li></ul>
+        </ul>
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=p54W-XOIEF8">Lecture 1 video</a></small>
+      </td>
+    </tr>
+    <tr>
+      <td>state predicate</td>
+      <td><p>"A formula that is true or false of a state.  A state predicate is just an ordinary Boolean-valued formula that can contain variables but no primed variables and no temporal operators like &lt;&gt;."<br />
+        <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/tutorial/session9.html">session 9</a></small></p>
+    </td></tr>
+    <tr>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>step</td>
+      <td>change from one state to the next state. <br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=p54W-XOIEF8">Lecture 1 video</a></small></td>
+    </tr>
+    <tr>
+      <td><a name="strong fairness">strong fairness</a></td>
+      <td>"A step of a process is strongly fair in a behavior iff there is no point in the behavior after which the step is enabled in infinitely many states but no such step occurs in the behavior."<br />
+        <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/tutorial/session9.html">session 9</a><br /><span style="font-size: small;"><br />See also <a href="#weak fairness">weak fairness</a></span></small></td>
+    </tr>  
+    <tr>
+      <td>strongly fair</td>
+      <td>see <a href="#strong fairness">strong fairness</a></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a name="termination">termination</a></td>
+      <td><P>execution stopped when it was supposed to<BR>
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=4NtHUfXlf4g">Lecture 3 video</a></small></P>
+    See also <a href="#deadlock">deadlock</a></td>
+    </tr>
+    <tr>
+      <td>TLA</td>
+      <td><p>Temporal Logic of Actions<br />
+        a temporal logic developed for describing
+and reasoning about concurrent and distributed systems<br />
+      <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/pubs/spec-and-verifying.pdf">Specifying and Verifying Systems With TLA+</a></small> </p></td>
+    </tr>
+    <tr>
+      <td>TLAPS</td>
+      <td><a href="#TLA+">TLA+</a> proof system. <br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=p54W-XOIEF8">Lecture 1 video</a></small> and<br />
+        <small><i>Source</i>: <a href="https://tla.msr-inria.inria.fr/tlaps/content/Home.html">TLA+ Proof System (TLAPS)</a></small></td>
+    </tr>
+
+    <tr>
+      <td><a name="TLA+">TLA+</a></td>
+      <td><p>language for high-level modeling digital systems. Here "high-level" refers to the design aspects, above the code. Examples of digital systems: algorithms, programs, and computer systems. <br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=p54W-XOIEF8">Lecture 1 video</a></small></p>
+      <p>"a formal specification language based on (untyped) ZF
+set theory, first-order logic, and TLA (the Temporal Logic of Actions)"<br />
+      <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/pubs/spec-and-verifying.pdf">Specifying and Verifying Systems With TLA+</a></small></p><p><a href="https://lamport.azurewebsites.net/tla/tla2-guide.pdf">TLA+ version 2 user guide</a>&nbsp;(2018)</p><p><a href="https://lamport.azurewebsites.net/tla/hyperbook.html">TLA+ hyperbook</a></p></td>
+    </tr>
+    <tr>
+      <td><a name="toolbox">TLA+ toolbox</a></td>
+      <td><a href="https://en.wikipedia.org/wiki/Integrated_development_environment">IDE</a> for <a href="#TLA+">TLA+</a>.
+          <br /><small><i>Source</i>: <a href="https://www.youtube.com/watch?v=p54W-XOIEF8">Lecture 1 video</a></small>.<br /><br />
+          <a href="https://lamport.azurewebsites.net/tla/toolbox.html">Toolbox website</a>
+      </td>
+    </tr>
+    <tr>
+      <td>TLC</td>
+      <td>on-the-fly <u>model checker</u> for debugging <a href="#TLA+">TLA+</a> specifications<br />
+      <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/pubs/spec-and-verifying.pdf">Specifying and Verifying Systems With TLA+</a></small></td>
+    </tr>
+    <tr>
+      <td><a name="TRUE"><span style="font-family: courier;">TRUE</span></a></td>
+      <td>See also <a href="#FALSE"><span style="font-family: courier;">FALSE</span></a><br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=4snwZl726c4">Lecture 2 video</a></small></td>
+    </tr>
+    <tr>
+      <td>VARIABLE</td>
+      <td><br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=4snwZl726c4">Lecture 2 video</a></small></td>
+    </tr>
+    <tr>
+      <td>VARIABLES</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a name="weak fairness">weak fairness</a></td>
+      <td><p>the process must keep taking steps if it can<br />
+        <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/tutorial/session9.html">session 9</a></small></p><p>See also <a href="#strong fairness">strong fairness</a></p></td>
+    </tr>
+    <tr>
+      <td>weakly fair</td>
+      <td>see <a href="#weak fairness">weak fairness</a></td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;"><b>/\</b></span></td>
+      <td>and</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;"><b>\/</b></span></td>
+      <td>or<br />
+        <small><i>Source</i>: <a href="https://www.youtube.com/watch?v=4snwZl726c4">Lecture 2 video</a></small></td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;"><b>&lt;&gt;</b></span></td>
+      <td><p>aka eventually<br />
+        For any state predicate P, the formula &lt;&gt;P is true of a behavior iff P is true of at least one state of the behavior.<br />
+        <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/tutorial/session9.html">session 9</a></small></p></td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;"><b>[]</b></span></td>
+      <td><p>aka always<br />
+        For any state predicate P, the formula &lt;&gt;P is true of a behavior iff P is true of at least one state of the behavior.<br />
+        <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/tutorial/session9.html">session 9</a></small></p></td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;"><b>~&gt;</b></span></td>
+      <td><p>aka leads to<br />
+        <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/tutorial/session9.html">session 9</a></small></p></td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;"><b>'</b></span></td>
+      <td>aka prime<br />
+        next value</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+<h1><br /></h1><h1>In module <span style="font-family: courier;">Sequences</span></h1>
+See <a href="https://lamport.azurewebsites.net/tla/summary-standalone.pdf">TLA+ summary</a> page 8 of 9, and <a href="https://lamport.azurewebsites.net/tla/summary.pdf">this summary</a>.
+<table border="1">
+  <tbody>
+    <tr>
+      <th>jargon</th>
+      <th>definition</th>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;">Append(seq,e)</span></td>
+      <td>the sequence obtained by appending the value <span style="font-family: courier;">e</span> as the new last element of the sequence <span style="font-family: courier;">seq</span>. For example,<br /><span style="font-family: courier;">Append(&lt;&lt;1, 2&gt;&gt;, 42)</span> equals <span style="font-family: courier;">&lt;&lt;1, 2, 42&gt;&gt;</span>.<br />
+      <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/tutorial/intermezzo1.html">intermezzo 1</a></small></td>
+    </tr>
+    <tr>
+      <td><span style="font-family: courier;">Head(seq)</span></td>
+      <td>the first element of a non-empty sequence <span style="font-family: courier;">seq</span>.  For example, <span style="font-family: courier;">Head(&lt;&lt;"a", "c", "b"&gt;&gt;)</span> equals <span style="font-family: courier;">"a"</span>.<br />
+      <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/tutorial/intermezzo1.html">intermezzo 1</a></small></td>
+    </tr>
+    <tr>
+      <td>\o</td>
+      <td>aka concatenation<br />
+        "<span style="font-family: courier;">seq1 \o seq2</span> is the sequence obtained by concatinating the sequences <span style="font-family: courier;">seq1</span> and <span style="font-family: courier;">seq2</span> in the obvious way.  For example, <span style="font-family: courier;">seq \o &lt;&lt;e&gt;&gt;</span> equals <span style="font-family: courier;">Append(seq,e)</span> for any sequence <span style="font-family: courier;">seq</span> and value <span style="font-family: courier;">e</span>."<br />
+      <small><i>Source</i>: <a href="https://lamport.azurewebsites.net/tla/tutorial/intermezzo1.html">intermezzo 1</a></small></td>
+    </tr>
+
+  </tbody>
+</table>
+
+{% endblock %}

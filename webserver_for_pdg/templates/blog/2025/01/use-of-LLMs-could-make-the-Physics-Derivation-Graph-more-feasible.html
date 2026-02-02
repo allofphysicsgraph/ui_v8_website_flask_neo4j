@@ -1,0 +1,376 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>use of LLMs could make the Physics Derivation Graph more feasible</H1>
+
+<P><small>Published 2025-01-08T00:03:00Z by Physics Derivation Graph</small></P>
+
+<p>Previously I've considered the Physics Derivation Graph to be an unlikely dream, in that a complete representation of Physics is infeasible, and even a breadth-first approach is infeasible. My expectation of infeasibility was based on the constraints that data entry would not just require a significant number of person-hours, but the data entry would need to be enacted by highly-qualified people with training tailored to the Physics Derivation Graph. </p>
+
+<p>If the workflow can be segmented into small tasks, LLMs might provide relevant automation of complex tasks that require semantic context. 
+  
+</p><h2 style="text-align: left;">Overview of workflow</h2><p>For example, 
+  </p><ol>
+    <li>Given a corpus of papers on arxiv,</li><li>identify whether a paper has a derivation.</li><li>Given a paper with a derivation, can the steps be identified? (Associate specific inference rule)
+    </li><li>Can the steps be verified (e.g., SymPy, Lean)?
+    </li><li>For derivations with steps, what variables and constants are used in the paper?
+    </li><li>Do these variables and constants appear in other derivations?
+</li></ol><div>That's a combination of text search and semantic awareness of the text content. Not every step has to be "just a human" or "just an LLM" -- an augmented capability is a reasonable workflow.</div><p>Another enabling aspect is the Latex representation for arxiv papers. That makes parsing (by regex or LLM) easier. 
+  
+</p><p>The above process could also be applied to pages on Wikipedia. See&nbsp;<a href="https://github.com/allofphysicsgraph/proofofconcept/wiki/All-Branches-of-Physics">https://github.com/allofphysicsgraph/proofofconcept/wiki/All-Branches-of-Physics</a></p>
+
+<p><br /></p>
+
+<h2 style="text-align: left;">Analysis of a specific paper</h2>
+
+<p>I had previously explored extraction of content from a specific paper in&nbsp;<a href="https://physicsderivationgraph.blogspot.com/2021/08/steps-to-convert-published-scientific.html">https://physicsderivationgraph.blogspot.com/2021/08/steps-to-convert-published-scientific.html</a>. The following is an exploration of how to extract a derivation using Gemini 2.0 LLM on 2025-01-07.</p><p>&nbsp;For "Speed of sound from fundamental physical constants" the .tex files are available from <a href="https://arxiv.org/abs/2004.04818">https://arxiv.org/abs/2004.04818</a></p>
+
+<pre>$ tar xzvf arXiv-2004.04818v2.tar.gz 
+x elemental.pdf
+x fig3.pdf
+x sound1.tex
+x sound-speeds.pdf
+</pre>The file sound1.tex is 37110 bytes (36kB), 302 lines, 37108 characters, and 5134 words.
+
+<p>Loading the .tex into Gemini 2.0's prompt uses 10,518 tokens (with the max for Gemini 2.0 being 1,048,574 tokens).</p>
+
+<fieldset>
+<pre>The following is a scientific article. Answer the 
+question about the article below.
+
+```latex
+\documentclass[aps,prl,groupedaddress,fleqn,twocolumn,10pt]{revtex4}
+\pdfoutput=1
+\usepackage{graphicx}
+
+...snipped...
+
+may be requested from the authors.
+\end{document} 
+```
+
+Question: Does this article contain a derivation?
+
+Answer:</pre>
+</fieldset>
+
+<p>Gemini 2.0 (on 2025-01-07) says</p>
+
+<blockquote>
+  Yes, the article contains a derivation. It presents two approaches to derive the speed of sound, starting from system elasticity and vibrational properties, respectively. Both approaches lead to the same result, which is then used to find the upper bound for the speed of sound.
+</blockquote>
+
+I ask a follow-up question,
+
+<fieldset>
+<pre>What is the latex equation that is the result for the 
+derivation for the speed of sound in this paper?
+</pre>
+</fieldset>
+
+<p>Gemini's response:
+</p><fieldset>
+<pre>The main result of the derivation for the upper 
+bound of the speed of sound, as given in the paper, is:
+
+```latex
+\frac{v_u}{c}=\alpha\left(\frac{m_e}{2m_p}\right)^{\frac{1}{2}}
+```
+
+This is equation (1) in the paper (though it is labeled (v0)).
+
+There is also an intermediate result for the speed 
+of sound *v* before it is specialized to the upper bound *vu*:
+
+```latex
+v=\alpha\left(\frac{m_e}{2m}\right)^{\frac{1}{2}}c
+```
+
+This is equation (6), labeled (v00).
+</pre>
+</fieldset>
+
+I follow with another prompt,
+<fieldset>
+<pre>What latex equation is the start of the derivation in this article?
+
+Provide the latex for the equation and 
+the equation label from the article.
+</pre>
+</fieldset>
+
+<p>Gemini's response:
+  
+</p><fieldset>
+<pre>The starting equation for the first derivation approach, 
+based on system elasticity, is:
+
+```latex
+v=\left({\frac{M}{\rho}}\right)^{\frac{1}{2}}
+```
+
+This equation does not have a label.
+
+The second approach, based on vibrational properties starts with:
+
+```latex
+v=\frac{1}{\pi}\omega_{\rm D}a.
+```
+This is equation (7), labeled (v001).
+</pre>
+</fieldset>
+
+Let's see if Gemini can extract symbol definitions:
+
+
+<fieldset>
+<pre>Using only the article and the latex equation
+```latex
+v=\frac{1}{\pi}\omega_{\rm D}a.
+```
+what is the name or meaning of each variable used in the equation?
+</pre>
+</fieldset>
+
+<p>Gemini's response:
+  
+</p><fieldset>
+<pre>Okay, using only the provided equation and the article, here's the breakdown of each variable:
+
+*   **v**: This represents the **longitudinal speed 
+of sound**. The article states, "The longitudinal 
+speed of sound, $v$, can be evaluated as the phase velocity..."
+
+*   **ω<sub>D</sub>**: This is the **Debye frequency**. The article 
+defines it as "$\omega_{\rm D}$ are Debye frequency..." 
+in the context of the Debye approximation.
+
+*   **a**: This is the **interatomic (inter-molecule) 
+separation**. The article states, 
+"Using $k_{\rm D}=\frac{\pi}{a}$, where $a$ is the 
+interatomic (inter-molecule) separation, gives..."
+</pre>
+  </fieldset><div><br /></div>
+
+The use of unicode isn't desirable. Let's see if we can force the use of Latex using the prompt<fieldset>
+<pre>please restate the previous answer and use 
+latex to express the symbols and equations.
+</pre>
+</fieldset>
+
+<p>Gemini's response:
+  
+</p><fieldset>
+<pre>Okay, here's the restatement of the previous answer, 
+using LaTeX to express the symbols and equations:
+
+Using only the provided equation and the article, 
+here's the breakdown of each variable:
+
+*   $v$: This represents the **longitudinal speed of 
+sound**. The article states, "The longitudinal speed 
+of sound, $v$, can be evaluated as the phase velocity..."
+
+*   $\omega_{\rm D}$: This is the **Debye frequency**. 
+The article defines it as "$\omega_{\rm D}$ are Debye 
+frequency..." in the context of the Debye approximation.
+
+*   $a$: This is the **interatomic (inter-molecule) 
+separation**. The article states, 
+"Using $k_{\rm D}=\frac{\pi}{a}$, where $a$ is the 
+interatomic (inter-molecule) separation, gives..."
+
+The equation itself is:
+
+```latex
+v=\frac{1}{\pi}\omega_{\rm D}a.
+```
+</pre>
+</fieldset>
+
+<p>Now lets see if Gemini can identify the steps of the derivation.</p>
+<fieldset>
+<pre>The starting equation for the first derivation approach, 
+based on system elasticity is
+```latex
+v=\left({\frac{M}{\rho}}\right)^{\frac{1}{2}}
+```
+
+The upper bound of the speed of sound, as given in the paper, is:
+\frac{v_u}{c}=\alpha\left(\frac{m_e}{2m_p}\right)^{\frac{1}{2}}
+
+What are the steps of the derivation to get from the starting
+equation to the final result? 
+
+Use Latex for equations and symbols in your answer. 
+Explain how to get from one step to the next in the derivation.
+</pre>
+</fieldset>
+
+<p>Gemini's response</p>
+
+<fieldset>
+<pre>Okay, let's trace the steps of the derivation from 
+the initial equation based on system elasticity to 
+the final upper bound for the speed of sound.
+
+**Starting Point:**
+
+The derivation begins with the equation for the 
+longitudinal speed of sound based on system elasticity:
+
+```latex
+v=\left({\frac{M}{\rho}}\right)^{\frac{1}{2}}
+```
+where:
+*  $v$ is the speed of sound.
+*  $M$ is the longitudinal modulus (related to bulk and shear modulus).
+*  $\rho$ is the density.
+
+**Step 1: Relating Modulus to Bonding Energy**
+
+The article states that elastic constants are 
+related to the density of electromagnetic energy. 
+Specifically, the modulus *M* is related to the bonding 
+energy *E* and the interatomic separation *a* with a 
+proportionality coefficient $f$.
+```latex
+M = f\frac{E}{a^3}
+```
+where *f* is a proportionality coefficient in the range of about 1-6
+
+**Step 2: Expressing Density in Terms of Atomic Mass**
+
+The density, $\rho$, can be expressed in terms 
+of the mass *m* of the atom or molecule and the 
+interatomic separation $a$. Using the relationship 
+between mass, density, and volume, we have the volume 
+on the order of $a^3$, and hence:
+```latex
+m = \rho a^3
+```
+or
+```latex
+\rho = \frac{m}{a^3}
+```
+
+**Step 3: Substituting into the Speed of Sound Equation**
+
+Substituting the expressions for *M* and $\rho$ 
+in terms of E, m and a into the original equation for $v$ :
+
+```latex
+v=\left({\frac{M}{\rho}}\right)^{\frac{1}{2}}
+```
+
+gives
+
+```latex
+v = \left( \frac{f\frac{E}{a^3}}{\frac{m}{a^3}}\right)^{\frac{1}{2}} = \left(f \frac{E}{m}\right)^{\frac{1}{2}}
+```
+Since the factor  $f^{\frac{1}{2}}$ is about 1-2 
+and can be dropped in an approximate evaluation of $v$
+
+```latex
+v = \left(\frac{E}{m}\right)^{\frac{1}{2}}
+```
+
+**Step 4: Introducing the Rydberg Energy**
+The bonding energy in condensed phases is approximately 
+equal to the Rydberg energy, $E_{\rm R}$
+```latex
+E_{\rm R}=\frac{m_ee^4}{32\pi^2\epsilon_0^2\hbar^2}
+```
+Thus we can replace *E* with $E_{\rm R}$ in the equation for *v*.
+```latex
+v = \left(\frac{E_{\rm R}}{m}\right)^{\frac{1}{2}}
+```
+
+**Step 5: Rewriting the Rydberg Energy**
+
+The Rydberg energy can be rewritten in terms of the 
+fine-structure constant $\alpha$ and the speed of light *c* as:
+```latex
+E_{\rm R} = \frac{1}{2}m_e \left(\alpha c\right)^2
+```
+where $\alpha=\frac{1}{4\pi\epsilon_0}\frac{e^2}{\hbar c}$ 
+is the fine structure constant.
+
+**Step 6: Substituting the Rewritten Rydberg Energy**
+
+Substitute the rewritten Rydberg energy into the equation for *v*:
+```latex
+v = \left(\frac{\frac{1}{2}m_e \left(\alpha c\right)^2}{m}\right)^{\frac{1}{2}}
+```
+which simplifies to:
+```latex
+v=\alpha\left(\frac{m_e}{2m}\right)^{\frac{1}{2}}c
+```
+
+**Step 7: Defining the Upper Bound**
+
+The upper bound of the speed of sound, $v_u$, is found 
+by setting the mass $m$ to be the proton mass $m_p$, 
+which is the lightest relevant atomic mass scale. This 
+corresponds to the case of atomic hydrogen.
+```latex
+v_u = \alpha \left(\frac{m_e}{2m_p}\right)^{\frac{1}{2}}c
+```
+Dividing by c gives the final result:
+
+```latex
+\frac{v_u}{c}=\alpha\left(\frac{m_e}{2m_p}\right)^{\frac{1}{2}}
+```
+Thus, by relating the speed of sound to the density, 
+modulus, and then to the bonding energy and finally, 
+the Rydberg energy, the derivation arrives at the upper 
+bound of the speed of sound expressed in terms of fundamental constants.
+
+</pre>
+</fieldset>
+
+Next step: extract the variables used in the above derivation to see if they are present in the Physics Derivation Graph by using the PDG API.
+
+
+<fieldset>
+<pre>What are all the symbols and their definitions used in
+the derivation steps?
+
+Do not include the associated equations -- just provide 
+a list of latex symbols and the definitions as a list.
+
+Use Latex for equations and symbols in your answer. 
+</pre>
+</fieldset>
+
+<p>Gemini's response (2025-01-07):
+
+</p><fieldset>
+<pre>Okay, here's a list of all the symbols and their 
+definitions used in the derivation steps, without 
+including the associated equations:
+
+*   $v$: longitudinal speed of sound
+*   $M$: longitudinal modulus (related to bulk and shear modulus)
+*   $\rho$: density
+*   $f$: proportionality coefficient
+*   $E$: bonding energy
+*   $a$: interatomic separation
+*  $m$: mass of an atom or molecule
+*  $E_{\rm R}$: Rydberg energy
+*   $m_e$: electron mass
+*   $e$: electron charge
+*   $\epsilon_0$: permittivity of free space
+*   $\hbar$: reduced Planck constant
+*  $\alpha$: fine-structure constant
+*   $c$: speed of light in vacuum
+*   $m_p$: proton mass
+* $v_u$: upper bound for speed of sound
+</pre>
+</fieldset>
+
+<p>TODO: the PDG API needs to be able to handle tasks associated with a workflow that uses an LLM.
+
+</p><p>There are a few additional steps outlined in <a href="https://physicsderivationgraph.blogspot.com/2021/08/steps-to-convert-published-scientific.html">https://physicsderivationgraph.blogspot.com/2021/08/steps-to-convert-published-scientific.html</a>, like identifying inference rules between equations. I explored that in this post: <a href="https://physicsderivationgraph.blogspot.com/2025/01/using-gemini-llm-to-create-derivation.html">https://physicsderivationgraph.blogspot.com/2025/01/using-gemini-llm-to-create-derivation.html</a>.</p><p></p><p></p>
+
+{% endblock %}

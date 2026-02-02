@@ -1,0 +1,161 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Omniscient project management</H1>
+
+<P><small>Published 2023-05-02T02:56:00.001Z by Physics Derivation Graph</small></P>
+
+<p>The Physics Derivation Graph relies on a diverse set of skills. To speed up the development process we could identify separable tasks and then spread the tasks among a team of contributors. Collaboration requires coordination, and that coordination can be top-down or organic or a mixture.</p>
+
+<p>This post focuses on the top-down approach and assumes an omniscient view.&nbsp;</p>
+
+<p>A standard data structure in project management is the Gantt chart. A Gantt chart uses information about tasks, task dependencies, task durations, and dates to create a visualization associated with a project.</p>
+
+<table border="1">
+  <tbody><tr>
+    <th>task ID</th>
+    <th>task description</th>
+    <th>task duration [days]</th>
+    <th>depends on tasks</th>
+    <th>earliest start date</th>
+  </tr>
+  <tr>
+    <td>14235</td>
+    <td>something useful</td>
+    <td>3</td>
+    <td>N/A</td>
+    <td>2022-03-01</td>
+  </tr>
+  <tr>
+    <td>25532</td>
+    <td>hard work</td>
+    <td>2</td>
+    <td>[14235]</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <td>3456252</td>
+    <td>keeping busy</td>
+    <td>3</td>
+    <td>[25532]</td>
+    <td>N/A</td>
+  </tr>
+</tbody></table>
+
+<p>That table can be visualized with tasks versus time:</p><p></p><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgCzSXPGe-LjtBkjyfPX-8VWh8pepZbsKXuz1bge4PNCyJo5DVFDynBQsV7RXDO3BBiHbxSTL39p6ZhdvhI7MfRTI-2WbsJKUyDFuCUmOzwFN89zbl1vGn_TJDkSAEQK_Qgj_wT6qq1sUj2KOJdke-JaJes_mjoQgnuWJsY4sz5FvmQtoj49MhW6TXXng/s499/Screen%20Shot%202023-05-01%20at%209.47.26%20PM.png" style="margin-left: auto; margin-right: auto;"><img border="0" data-original-height="345" data-original-width="499" height="442" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgCzSXPGe-LjtBkjyfPX-8VWh8pepZbsKXuz1bge4PNCyJo5DVFDynBQsV7RXDO3BBiHbxSTL39p6ZhdvhI7MfRTI-2WbsJKUyDFuCUmOzwFN89zbl1vGn_TJDkSAEQK_Qgj_wT6qq1sUj2KOJdke-JaJes_mjoQgnuWJsY4sz5FvmQtoj49MhW6TXXng/w640-h442/Screen%20Shot%202023-05-01%20at%209.47.26%20PM.png" width="640" /></a></td></tr><tr><td class="tr-caption" style="text-align: center;">Visualization of a Gantt chart. Four tasks. Task 2 and 3 depend on task 1 being completed. Task 4 depends on task 2 being completed.</td></tr></tbody></table><br />&nbsp;<p></p>
+
+<p>That data structure doesn't account for staffing, skills, equipment, or budget. The&nbsp; Gantt chart doesn't account for uncertainty of task duration, nor alternative paths.</p>
+
+<h2 style="text-align: left;">Gantt charts present a single path</h2><p>Project management involves contingency planning.&nbsp;&nbsp;</p>
+
+<pre>IF this THEN
+   that 
+ELSE
+   other</pre>
+
+<p>Every conditional statement is a branching of possible paths, each a separate Gantt chart.</p>
+
+<p>A single Gantt chart is a snapshot of a single path.</p><p><br /></p><h2 style="text-align: left;">Staffing, budget, equipment, skills, uncertainty</h2><div>Augmenting the basic Gantt chart means extending the table data structure to something like</div>
+
+<table border="1">
+  <tbody><tr>
+    <th>task ID</th>
+    <th>task description</th>
+    <th>task duration [days]</th>
+    <th>depends on tasks</th>
+    <th>earliest start date</th>
+    <th>depends on equipment</th>
+    <th>minimum skill set and level</th>
+    <th>uncertainty in duration [days]</th>
+  </tr>
+  <tr>
+    <td>14235</td>
+    <td>something useful</td>
+    <td>3</td>
+    <td>N/A</td>
+    <td>2022-03-01</td>
+    <td>[Photoshop]</td>
+    <td>photo editing, intermediate</td>
+    <td>+/-1</td>
+  </tr>
+  <tr>
+    <td>25532</td>
+    <td>hard work</td>
+    <td>2</td>
+    <td>[14235]</td>
+    <td>N/A</td>
+    <td>[Excel]</td>
+    <td>math, beginner; text editing, beginner</td>
+    <td>+2</td>
+  </tr>
+  <tr>
+    <td>3456252</td>
+    <td>keeping busy</td>
+    <td>3</td>
+    <td>[25532]</td>
+    <td>N/A</td>
+    <td>Chrome browser</td>
+    <td>clicking on links, beginner</td>
+    <td>0</td>
+  </tr>
+</tbody></table>
+
+<p>That information needs to be augmented with a cost table for equipment:</p>
+
+<table border="1">
+  <tbody><tr>
+    <th>equipment</th>
+    <th>cost per day [USD]</th>
+    <th>acquisition cost [USD]</th>
+  </tr>
+  <tr>
+    <td>Photoshop</td>
+    <td>0</td>
+    <td>100</td>
+  </tr>
+  <tr>
+    <td>Excel</td>
+    <td>0</td>
+    <td>20</td>
+  </tr>
+  <tr>
+    <td>Chrome browser</td>
+    <td>0</td>
+    <td>0</td>
+  </tr>
+</tbody></table>
+<p>Lastly, we need people who can do the tasks.</p>
+<table border="1">
+  <tbody><tr>
+    <th>person name</th>
+    <th>hourly cost [USD]</th>
+    <th>skill and level</th>
+    <th>dates available</th>
+  </tr>
+  <tr>
+    <td>Alice</td>
+    <td>20</td>
+    <td>Excel, beginner; text editing, intermediate</td>
+    <td>[2022-01-02, 2022-01-03, 2022-01-04]</td>
+  </tr>
+  <tr>
+    <td>Bob</td>
+    <td>15</td>
+    <td>Excel, intermediate; Math, beginner</td>
+    <td>[2022-02-01, 2022-02-15, 2022-02-24]</td>
+  </tr>
+  <tr>
+    <td>Charlie</td>
+    <td>24</td>
+    <td>photo editing, beginner</td>
+    <td>[2022-01-12, 2022-01-23, 2022-01-24]</td>
+  </tr>
+</tbody></table>
+
+<div style="text-align: left;"><br /></div><div style="text-align: left;"><i>Caveat</i>: the above model is focused exclusively on experts doing tasks using equipment. The model does not account for managers, nor does the model account for support staff. The model could include any scope of tasks, but a boundary needs to be drawn somewhere to avoid becoming <a href="https://en.wikipedia.org/wiki/Psychohistory_(fictional)">Seldon's psychohistory</a>. The problem of tasks existing outside the model is the risk that out-of-model tasks block project progress or alter the project cost. Anything outside the model could be an invisible dependency.</div><div style="text-align: left;"><br /></div><h2 style="text-align: left;">Derived project views</h2><div>The following views can be derived from the three tables above:</div><div><ul style="text-align: left;"><li>standard task Gantt chart</li><li>project duration histogram. (Each "task duration" has an uncertainty that can be aggregated and results in variance.)</li><li>per-person activity schedule -- who works on what when. A prioritization based on task dependencies and when people with skills are available</li><li>cost per day -- the spend rate</li></ul></div><h2 style="text-align: left;">Blockers inhibiting the omniscient project management view<br /></h2><p style="text-align: left;">Even though the issue can be formulated into a set of data structures</p><p style="text-align: left;">Blockers are the amount of time needed to&nbsp;</p><p></p><ul style="text-align: left;"><li>gather the relevant information and keep the information up-to-date as the situation evolves</li><li>document the information and tune the model</li><li>survey the skills of the workforce</li><li>have the workforce track their time spent on a&nbsp;task</li><li>define each task, along with a "definition of done"</li><li>track costs of the workforce and equipment</li><li>identifying conditional paths and tracking which alternative was selected</li></ul><p></p><p>Blockers that aren't time-based:</p><p></p><ul style="text-align: left;"><li>inability to break project into atomic tasks (where "atomic" is based on skill set and skill level)</li><li>can break project into tasks, but unable to identify relevant skills for task</li></ul><div><br /></div><div>The centralization of this model is merely to construct a narrative. Software like Atlassian's Jira is a way of distributing the task tracking rather than try to administer the project in a centralized top-down approach.</div><p></p>
+
+<h2>Conclusion</h2>
+
+<p>The top-down omniscient view of project management is an unrealistic fantasy. However, it might be a helpful artifact for negotiation among decision makers. The alternative (where decision makers don't have a quantitative model to argue about) devolves into reliance on personal relationships, turf battles, and political factions. Bureaucratic processes evolve as a substitute for the lack of top-down omniscient view of project management.&nbsp;</p>
+
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>LLM that includes the concept of inference rules</H1>
+
+<P><small>Published 2023-12-20T01:05:00Z by Physics Derivation Graph</small></P>
+
+<p><i>Question</i>: What's the difference between a plain old search engine and an LLM+RAG?<br /><i>Answer</i>: LLM+RAG provides an experience like semantic search capability plus synthesis but without the need for semantic tagging on the front-end or the back-end.&nbsp;<br />[<a href="https://www.sbert.net/examples/applications/semantic-search/README.html#semantic-search">https://www.sbert.net/examples/applications/semantic-search/README.html#semantic-search</a>]</p><p><i>Relevance to the Physics Derivation Graph</i>: add the following to an existing large language model (LLM)
+  </p><ul style="text-align: left;">
+    <li>the list of inference rules for the Physics Derivation Graph</li>
+    <li>examples of Latex-to-Sage conversion</li>
+    <li>example Lean4 proofs</li></ul>
+
+"fine tuning" versus "context provision"<div><br /></div><div>How is "context provision" different from RAG?</div><div><br /><div>What's the difference between a transformer and a model?</div>
+  <div><a href="https://huggingface.co/docs/transformers/main/model_doc/llama2">https://huggingface.co/docs/transformers/main/model_doc/llama2</a></div>
+
+<div><br /></div>
+  <div><a href="https://huggingface.co/meta-llama">https://huggingface.co/meta-llama</a></div><div>specifically</div><div><a href="https://huggingface.co/meta-llama/Llama-2-7b-chat">https://huggingface.co/meta-llama/Llama-2-7b-chat</a></div><div><br /></div>
+
+
+
+  
+    <div><br /></div>
+    
+    <div><br /></div>
+  
+  <h2>output of help for llama.cpp</h2>
+<pre>docker run -it --rm  -v `pwd`:/scratch llama-cpp-with-mistral-7b-v0.1.q6_k:2023-12-22 /bin/bash 
+root@dc98ac4a23d5:/opt/llama.cpp# ./main -h
+
+usage: ./main [options]
+
+options:
+  -h, --help            show this help message and exit
+      --version         show version and build info
+  -i, --interactive     run in interactive mode
+  --interactive-first   run in interactive mode and wait for input right away
+  -ins, --instruct      run in instruction mode (use with Alpaca models)
+  -cml, --chatml        run in chatml mode (use with ChatML-compatible models)
+  --multiline-input     allows you to write or paste multiple lines without ending each in '\'
+  -r PROMPT, --reverse-prompt PROMPT
+                        halt generation at PROMPT, return control in interactive mode
+                        (can be specified more than once for multiple prompts).
+  --color               colorise output to distinguish prompt and user input from generations
+  -s SEED, --seed SEED  RNG seed (default: -1, use random seed for &lt; 0)
+  -t N, --threads N     number of threads to use during generation (default: 20)
+  -tb N, --threads-batch N
+                        number of threads to use during batch and prompt processing (default: same as --threads)
+  -p PROMPT, --prompt PROMPT
+                        prompt to start generation with (default: empty)
+  -e, --escape          process prompt escapes sequences (\n, \r, \t, \', \", \\)
+  --prompt-cache FNAME  file to cache prompt state for faster startup (default: none)
+  --prompt-cache-all    if specified, saves user input and generations to cache as well.
+                        not supported with --interactive or other interactive options
+  --prompt-cache-ro     if specified, uses the prompt cache but does not update it.
+  --random-prompt       start with a randomized prompt.
+  --in-prefix-bos       prefix BOS to user inputs, preceding the `--in-prefix` string
+  --in-prefix STRING    string to prefix user inputs with (default: empty)
+  --in-suffix STRING    string to suffix after user inputs with (default: empty)
+  -f FNAME, --file FNAME
+                        prompt file to start generation.
+  -n N, --n-predict N   number of tokens to predict (default: -1, -1 = infinity, -2 = until context filled)
+  -c N, --ctx-size N    size of the prompt context (default: 512, 0 = loaded from model)
+  -b N, --batch-size N  batch size for prompt processing (default: 512)
+  --samplers            samplers that will be used for generation in the order, separated by ';', for example: "top_k;tfs;typical;top_p;min_p;temp"
+  --sampling-seq        simplified sequence for samplers that will be used (default: kfypmt)
+  --top-k N             top-k sampling (default: 40, 0 = disabled)
+  --top-p N             top-p sampling (default: 0.9, 1.0 = disabled)
+  --min-p N             min-p sampling (default: 0.1, 0.0 = disabled)
+  --tfs N               tail free sampling, parameter z (default: 1.0, 1.0 = disabled)
+  --typical N           locally typical sampling, parameter p (default: 1.0, 1.0 = disabled)
+  --repeat-last-n N     last n tokens to consider for penalize (default: 64, 0 = disabled, -1 = ctx_size)
+  --repeat-penalty N    penalize repeat sequence of tokens (default: 1.1, 1.0 = disabled)
+  --presence-penalty N  repeat alpha presence penalty (default: 0.0, 0.0 = disabled)
+  --frequency-penalty N repeat alpha frequency penalty (default: 0.0, 0.0 = disabled)
+  --mirostat N          use Mirostat sampling.
+                        Top K, Nucleus, Tail Free and Locally Typical samplers are ignored if used.
+                        (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0)
+  --mirostat-lr N       Mirostat learning rate, parameter eta (default: 0.1)
+  --mirostat-ent N      Mirostat target entropy, parameter tau (default: 5.0)
+  -l TOKEN_ID(+/-)BIAS, --logit-bias TOKEN_ID(+/-)BIAS
+                        modifies the likelihood of token appearing in the completion,
+                        i.e. `--logit-bias 15043+1` to increase likelihood of token ' Hello',
+                        or `--logit-bias 15043-1` to decrease likelihood of token ' Hello'
+  --grammar GRAMMAR     BNF-like grammar to constrain generations (see samples in grammars/ dir)
+  --grammar-file FNAME  file to read grammar from
+  --cfg-negative-prompt PROMPT
+                        negative prompt to use for guidance. (default: empty)
+  --cfg-negative-prompt-file FNAME
+                        negative prompt file to use for guidance. (default: empty)
+  --cfg-scale N         strength of guidance (default: 1.000000, 1.0 = disable)
+  --rope-scaling {none,linear,yarn}
+                        RoPE frequency scaling method, defaults to linear unless specified by the model
+  --rope-scale N        RoPE context scaling factor, expands context by a factor of N
+  --rope-freq-base N    RoPE base frequency, used by NTK-aware scaling (default: loaded from model)
+  --rope-freq-scale N   RoPE frequency scaling factor, expands context by a factor of 1/N
+  --yarn-orig-ctx N     YaRN: original context size of model (default: 0 = model training context size)
+  --yarn-ext-factor N   YaRN: extrapolation mix factor (default: 1.0, 0.0 = full interpolation)
+  --yarn-attn-factor N  YaRN: scale sqrt(t) or attention magnitude (default: 1.0)
+  --yarn-beta-slow N    YaRN: high correction dim or alpha (default: 1.0)
+  --yarn-beta-fast N    YaRN: low correction dim or beta (default: 32.0)
+  --ignore-eos          ignore end of stream token and continue generating (implies --logit-bias 2-inf)
+  --no-penalize-nl      do not penalize newline token
+  --temp N              temperature (default: 0.8)
+  --logits-all          return logits for all tokens in the batch (default: disabled)
+  --hellaswag           compute HellaSwag score over random tasks from datafile supplied with -f
+  --hellaswag-tasks N   number of tasks to use when computing the HellaSwag score (default: 400)
+  --keep N              number of tokens to keep from the initial prompt (default: 0, -1 = all)
+  --draft N             number of tokens to draft for speculative decoding (default: 8)
+  --chunks N            max number of chunks to process (default: -1, -1 = all)
+  -np N, --parallel N   number of parallel sequences to decode (default: 1)
+  -ns N, --sequences N  number of sequences to decode (default: 1)
+  -pa N, --p-accept N   speculative decoding accept probability (default: 0.5)
+  -ps N, --p-split N    speculative decoding split probability (default: 0.1)
+  -cb, --cont-batching  enable continuous batching (a.k.a dynamic batching) (default: disabled)
+  --mmproj MMPROJ_FILE  path to a multimodal projector file for LLaVA. see examples/llava/README.md
+  --image IMAGE_FILE    path to an image file. use with multimodal models
+  --mlock               force system to keep model in RAM rather than swapping or compressing
+  --no-mmap             do not memory-map model (slower load but may reduce pageouts if not using mlock)
+  --numa                attempt optimizations that help on some NUMA systems
+                        if run without this previously, it is recommended to drop the system page cache before using this
+                        see https://github.com/ggerganov/llama.cpp/issues/1437
+  --verbose-prompt      print prompt before generation
+  -dkvc, --dump-kv-cache
+                        verbose print of the KV cache
+  -nkvo, --no-kv-offload
+                        disable KV offload
+  -ctk TYPE, --cache-type-k TYPE
+                        KV cache data type for K (default: f16)
+  -ctv TYPE, --cache-type-v TYPE
+                        KV cache data type for V (default: f16)
+  --simple-io           use basic IO for better compatibility in subprocesses and limited consoles
+  --lora FNAME          apply LoRA adapter (implies --no-mmap)
+  --lora-scaled FNAME S apply LoRA adapter with user defined scaling S (implies --no-mmap)
+  --lora-base FNAME     optional model to use as a base for the layers modified by the LoRA adapter
+  -m FNAME, --model FNAME
+                        model path (default: models/7B/ggml-model-f16.gguf)
+  -md FNAME, --model-draft FNAME
+                        draft model for speculative decoding
+  -ld LOGDIR, --logdir LOGDIR
+                        path under which to save YAML logs (no logging if unset)
+  --override-kv KEY=TYPE:VALUE
+                        advanced option to override model metadata by key. may be specified multiple times.
+                        types: int, float, bool. example: --override-kv tokenizer.ggml.add_bos_token=bool:false
+
+log options:
+  --log-test            Run simple logging test
+  --log-disable         Disable trace logs
+  --log-enable          Enable trace logs
+  --log-file            Specify a log filename (without extension)
+  --log-new             Create a separate new log file on start. Each log file will have unique name: "&lt;name&gt;.&lt;ID&gt;.log"
+  --log-append          Don't truncate the old log file.
+</pre><p></p><p></p></div>
+
+{% endblock %}

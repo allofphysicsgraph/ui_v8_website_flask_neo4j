@@ -1,0 +1,71 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>analyzing the PDG repo using Gemini</H1>
+
+<P><small>Published 2025-01-10T01:15:00Z by Physics Derivation Graph</small></P>
+
+<p>This post documents the first time I used an LLM to assess the Physics Derivation Graph
+
+</p><h2>All of the files in the git repo (tl;dr: Gemini crashed)</h2>
+<p>I uploaded all of the Physics Derivation Graph software and asked Gemini 2.0 
+
+</p><p>The git repo has 96 files; 14 .py and 58 .html
+</p><pre>$ find . -type f | wc -l
+      96
+</pre>
+<p>10503 lines of Python, 4337 lines of HTML, and 968kB
+
+</p><p>Uploading the files uses 230,346 tokens of an available window size of 1,048,576 tokens on 2025-01-09.
+
+</p><p>Here's the prompt I provided along with the files:</p><fieldset>
+  <pre>The following files are from a project that works but is incomplete. 
+Review the code and provide suggestions of what the most important 
+tasks are to work on next.
+</pre>
+</fieldset>
+<p>Result: Gemini crashed ("An internal error has occurred.") after 40 seconds of processing. Two more tries also didn't work.
+
+</p><h2>Just the .py and .html files</h2>
+
+<p>Removed everything except for 13 py and 58 html files, down to 816kB.
+
+</p><p>Now the token count is 209,717
+</p><fieldset>
+  <pre>The following files are from a project that works but is incomplete. 
+Review the code and provide suggestions of what the most important 
+tasks are to work on next.
+</pre>
+</fieldset>
+
+<p>That prompt resulted in Gemini making 7 very reasonable suggestions. I opened two new issues on github as a result of Gemini's assessment.
+
+</p><p>In the same context I asked
+</p><fieldset>
+  <pre>Briefly describe the purpose and goals of the software project. 
+Highlight its key features and benefits.
+</pre>
+</fieldset>
+
+<p>The result from Gemini offered relevant text that I have included in the README.md file. The text is literally better than what I could have written!</p>
+
+<p>Next I asked for a visualization,
+
+</p><fieldset><pre>Create a visual diagram of the program's flow, showing the sequence 
+of operations, decision points, and loops. Create a markdown file 
+with ASCII art for use in a README.md file.</pre>
+</fieldset>
+<p>That produced some almost-correctly-formatted ASCII art. The caveats provided by Gemini were very reasonable</p>
+<blockquote>
+  "This is a simplified representation. The actual program flow involves many more specific states and transitions, not shown for simplicity."
+</blockquote>
+
+<p>Lastly I asked Gemini</p><fieldset>
+<pre>Document the public APIs and web interfaces exposed by the software, 
+including input/output formats and usage examples. Provide the answer 
+as a single HTML file.</pre>
+</fieldset>
+
+<p>Gemini's output was mostly HTML (some Markdown) and very useful. </p><p></p><p></p>
+
+{% endblock %}

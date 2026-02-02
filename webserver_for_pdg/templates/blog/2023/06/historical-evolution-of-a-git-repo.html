@@ -1,0 +1,77 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>historical evolution of a git repo</H1>
+
+<P><small>Published 2023-06-07T03:05:00Z by Physics Derivation Graph</small></P>
+
+JSON-like output
+<pre>git log --date=format-local:'%Y-%m-%d %H:%M:%S' \
+--pretty=format:'{%n  "commit": "%H",%n  "author": "%aN &lt;%aE&gt;",%n  "date": "%ad",%n  "message": "%f"%n},' &gt; all_logs.dat</pre>
+
+<p>as per <a href="https://stackoverflow.com/a/34778736/1164295">https://stackoverflow.com/a/34778736/1164295</a> and&nbsp;<a href="https://gist.github.com/textarcana/1306223">https://gist.github.com/textarcana/1306223</a> which points to&nbsp;<a href="https://gist.github.com/textarcana/1306223">https://gist.github.com/textarcana/1306223</a></p>
+
+<pre>python3 -c "import json; 
+with open('all_entries','r') as fh:
+    content = json.load(fh)
+print(content)"
+</pre><b>Single line is better</b>:
+
+<pre>git log --date=format-local:'%Y-%m-%d %H:%M:%S' --pretty=format:"%H%x09%ae%x09%ad%x09%s" &gt; all_hash
+</pre>
+
+<p>TODO:
+  </p><ul>
+    <li>how many commits per year?
+     </li><li>sample the git repo at a given frequency and count number of files in the sample
+</li></ul>
+<p>general approach:</p>
+<pre>git clone [remote_address_here] my_repo
+cd my_repo
+git reset --hard [ENTER HERE THE COMMIT HASH YOU WANT]
+</pre>
+<p>as per <a href="https://stackoverflow.com/a/3555202/1164295">https://stackoverflow.com/a/3555202/1164295</a></p>
+loop over relevant hashes:
+<pre>git clone https://github.com/allofphysicsgraph/proofofconcept.git
+cd proofofconcept
+find . -type f | grep -v ".git" | wc -l
+    3381
+git reset --hard f12795798d2537d3fec80ba2b4d33396e52011bd
+find . -type f | grep -v ".git" | wc -l
+       2
+</pre>
+
+number of commits in a year:
+<pre>cat all_hash | grep 2014- | wc -l
+      17
+</pre>
+<pre>for year in {2014..2023}; do commits_per_year=`cat all_hash | grep ${year}- | wc -l`; echo $year $commits_per_year; done
+2014 17
+2015 234
+2016 62
+2017 41
+2018 81
+2019 30
+2020 790
+2021 67
+2022 90
+2023 5
+</pre>
+
+<pre>for year in {2014..2023}; do this_hash=`cat all_hash | grep $year | head -n 1 | cut -c-40`; git reset --hard $this_hash; file_count=`find . -type f | grep -v ".git" | wc -l`; echo $this_hash $year $file_count; done &gt; counts_per_year.dat
+</pre>
+
+<pre>cat counts_per_year.dat | grep -v HEAD
+4289c2a3311d4e051bdab3b0d99f49b25dab6bc3 2014 1027
+b81d6ddba5a2015d328975607318d7e7755b27aa 2015 3339
+26b0d9fc8c49ede12c897b4bf4cd050765747a81 2016 2098
+eec25f59649a4cc9e9e8b166355793b58b742672 2017 2194
+201822fd2025349f8749b9433533d0d54c7363b3 2018 3007
+918245c17bece668f868ce7201976e2d49dc1743 2019 3022
+bd4fb0528c1a46ed2fac13aa16f77508aaa43e67 2020 3150
+7dd27b734673e20e405cd26acbdf7d237cf73e33 2021 3343
+ad8dfc5931922788f32a21f10906d97c50f7ca36 2022 3384
+9df026b16827dfe97fc8a44c4063e493c21a49d4 2023 3384
+</pre>
+
+{% endblock %}

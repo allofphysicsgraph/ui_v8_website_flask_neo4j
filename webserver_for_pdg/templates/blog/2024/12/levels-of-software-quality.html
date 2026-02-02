@@ -1,0 +1,39 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>levels of software quality</H1>
+
+<P><small>Published 2024-12-24T12:14:00Z by Physics Derivation Graph</small></P>
+
+<p>This post defines discrete levels of <a href="https://en.wikipedia.org/wiki/Software_quality">software quality</a>. There are many dimensions of what "software quality" means, so the discrete levels described here are an oversimplification. The attribute clusters below are typically observed together.
+</p><p><br /></p>
+<h2>software quality level 1</h2><div><i>"Worked for me at one point."</i></div><ul>
+<li>Code does not compile 
+</li><li>No documentation 
+</li><li>Required dependencies not included 
+</li><li>Purpose of code is unclear 
+</li><li>Hard coded numerical values
+</li><li>Code is wrong - severe design and implementation flaws
+</li><li>No tests
+</li></ul>
+
+<h2>software quality level 2</h2><div><i>"Good enough."</i></div><ul>
+  <li>Code compiles successfully, but with warnings
+</li><li>Has bugs
+</li><li>Inefficient 
+</li><li>Purpose of code isn't documented</li><li>Documentation limited to inline comments
+</li></ul>
+
+<h2>software quality level 3</h2>
+<div><i>Best practices are enacted.</i></div><ul style="text-align: left;">
+<li>Code compiles and runs without errors</li><li>Documentation:</li><ul><li>Inline documentation follows a style guide, e.g. <a href="https://google.github.io/styleguide/">https://google.github.io/styleguide/</a></li><li>README file contains</li><ul><li>purpose of project</li><li>how to install</li><ul><li>requirements</li></ul><li>quick start guide</li><li>description of features</li><li>roadmap</li></ul><li>Additional documentation like Doxygen, Sphinx
+</li></ul><li>Containerized (e.g., Docker, Podman, Apptainer/Singularity)
+  </li><li>Code is formatted consistently
+</li><li>1 or more tests
+</li><li>Type hints for Python 
+</li></ul>
+  
+<h2>software quality level 4</h2>
+<p><i>Other developers point to this project as an example of what to aspire to.</i></p><p></p><ul style="text-align: left;"><li>code is designed to be intuitive</li><li>no dead code present</li><li>complete test coverage</li><li>documentation is written in an easy-to-read style and has no grammatical errors</li></ul><p></p>
+
+{% endblock %}

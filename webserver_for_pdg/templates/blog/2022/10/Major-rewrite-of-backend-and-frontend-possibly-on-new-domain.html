@@ -1,0 +1,10 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Major rewrite of backend and frontend, possibly on new domain</H1>
+
+<P><small>Published 2022-10-09T14:37:00Z by Physics Derivation Graph</small></P>
+
+<p>I currently own&nbsp;<a href="https://derivationmap.net/">https://derivationmap.net/</a>, and I was recently gifted <a href="https://allofphysics.com/">https://allofphysics.com/</a></p><p>At the same time, I'm working on rewriting the backend (to Neo4j from JSON) and the front-end (Cypher-based search instead of static HTML+Javascript).&nbsp;<br /></p><p>Concurrently hosting both the old version (JSON backend, HTML, <a href="https://derivationmap.net/">https://derivationmap.net/</a>) and the new version (Neo4j, Cypher, <a href="https://allofphysics.com/">https://allofphysics.com/</a>) on the same virtual private server (VPS) is probably feasible but I haven't done that before.</p><p>My evidence that hosting two domains on one server is feasible:</p><p></p><ul style="text-align: left;"><li><a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-server-blocks-virtual-hosts-on-ubuntu-16-04">https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-server-blocks-virtual-hosts-on-ubuntu-16-04</a></li></ul><p></p><p><br /></p>
+
+{% endblock %}

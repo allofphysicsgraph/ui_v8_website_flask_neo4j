@@ -1,0 +1,30 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Derivations, CAS, Lean, and Assumptions in Physics</H1>
+
+<P><small>Published 2024-03-09T19:53:00Z by Physics Derivation Graph</small></P>
+
+<p>Initially the Physics Derivation Graph documented expressions as Latex. Then SymPy was added to support validation of steps (is the step self-consistent) and dimensionality (is the expression self-consistent?).&nbsp;</p>
+
+<p>Recently I learned that Lean could be used to prove each step in a derivation. The difference between a Computer Algebra System (e.g., SymPy) and Lean is whether "<span style="font-family: courier;">a = b&nbsp; --&gt; a/b = 1</span>" is a valid step -- it isn't when <span style="font-family: courier;">b</span> is zero. Lean catches that; SymPy does not.&nbsp;</p>
+
+<p>While Lean proofs sound like the last possible refinement, there are two additional complications to account for not addressed by Lean.&nbsp;</p><h2 style="text-align: left;"><i>Challenge</i>: Bounded ranges of applicability</h2>
+
+<p>In classical mechanics the relation between momentum, mass, and velocity is "<span style="font-family: courier;">p = m v</span>". That hold when "<span style="font-family: courier;">v &lt;&lt; c</span>". Near the speed of light we need to switch to relativistic mass,&nbsp;</p>
+
+<p><span style="font-family: courier;">m = m_{rest} / sqrt{1-((v^2)/(c^2))}</span>.</p>
+
+<p>The boundary between "<span style="font-family: courier;">v &lt;&lt; c</span>" and "<span style="font-family: courier;">v ~ c</span>" is usually set by the context being considered.&nbsp;</p><p>One response for users of Lean would be to always use the "correct" relativistic equation, even when "<span style="font-family: courier;">v &lt;&lt; c</span>."&nbsp; A more conventional approach used by Physicists is to use</p>
+
+<p><span style="font-family: courier;">p = m v, where v &lt;&lt; c</span></p>
+
+<p>then drop the "<span style="font-family: courier;">v &lt;&lt; c</span>" clause and rely on context.</p><p><br /></p>
+
+<h2 style="text-align: left;"><i>Challenge</i>:&nbsp;Real versus Float versus experimental characterization</h2>
+
+<p>Lean forces you to characterize numbers as Real or Integer or Complex. This presents a problem for numerical simulations that have something like a 64 bit float representation.</p><p>In thermodynamics we assume the number of particles involved is sufficiently large that we focus on the behavior of the ensemble rather than individual particles. The imprecision of floats is not correct, but neither is the infinite precision assumed by Real numbers.&nbsp;</p><p><br /></p><h2 style="text-align: left;">Example applications of Lean proofs needing bounds on values</h2><p>Math doesn't have convenient ways of indicating "finite precision, as set by the Plank scale."&nbsp; The differential element used in calculus cannot actually go to zero, but we use that concept because it works at the scales we are used to.&nbsp;</p><p>Physicists make simplifying assumptions that sometimes ignore reality (e.g., assuming continuous media when particles are discrete). Then again the assumption that particles are discrete is also a convenient fiction that ignores the wavefunction of quantum mechanics.&nbsp;</p><p>Lean can be used to prove derivations in classical mechanics, but to be explicit about the bounds of those proofs we'd also need to indicate "v &lt;&lt; c" and "assume <a href="https://en.wikipedia.org/wiki/Euclidean_space">space is Euclidean</a>."&nbsp;</p><p>For molecular dynamics, another constraint to account for is "temperature &lt;&lt; 1E10 Kelvin" or whatever temperature the atoms breaks down into plasma.&nbsp;</p><p>Distinguishing the context of (classical mechanics from quantum) and (classical from relativistic) and (conventional gas versus plasma) seems important so that we know when a claim proven in Lean is applicable.&nbsp;</p>
+
+<p></p>
+
+{% endblock %}

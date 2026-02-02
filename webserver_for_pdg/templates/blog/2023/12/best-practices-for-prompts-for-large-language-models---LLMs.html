@@ -1,0 +1,159 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>best practices for prompts for large language models - LLMs</H1>
+
+<P><small>Published 2023-12-16T19:13:00Z by Physics Derivation Graph</small></P>
+
+<p>ChatGPT was made available by OpenAI on 2022-11-30. As of 2023-12-16 I hadn't used ChatGPT (Generative Pre-trained Transformer) or other large language models (LLMs). In this post I document best practices other folks have come up with. My intent is to identify whether ChatGPT could be useful for tasks relevant to the Physics Derivation Graph.&nbsp;</p>
+
+<p>Sites I reviewed for best practices for prompts:</p>
+<ul>
+  <li><a href="https://help.openai.com/en/articles/6654000-best-practices-for-prompt-engineering-with-openai-api">https://help.openai.com/en/articles/6654000-best-practices-for-prompt-engineering-with-openai-api
+  </a></li><li><a href="https://platform.openai.com/docs/guides/prompt-engineering/strategy-write-clear-instructions">https://platform.openai.com/docs/guides/prompt-engineering/strategy-write-clear-instructions
+  </a></li><li><a href="https://www.promptingguide.ai">https://www.promptingguide.ai
+</a></li><li><a href="https://ollama.ai/blog/how-to-prompt-code-llama">https://ollama.ai/blog/how-to-prompt-code-llama</a></li></ul>
+
+<h2>General text response</h2>
+
+<h3>Prompt</h3>
+<fieldset>Answer the question based on the context below. Keep the answer short and concise. Respond "Unsure about answer" if not sure about the answer.
+
+<p>Context: &lt;context&gt;
+
+</p><p>Question: &lt;question&gt;
+
+</p><p>Answer:
+</p></fieldset>
+
+<h3>Prompt</h3>
+<fieldset>
+Before providing the answer, state what you know and what you assume. Then state the steps that led you to your answer. Finally, provide the answer.
+</fieldset>
+<h3>Prompt</h3>
+
+<fieldset>Let's think step by step.</fieldset>
+
+<h3>Prompt</h3>
+
+<fieldset>Let's work this out in a step by step way to be sure we have the right answer.
+</fieldset>
+
+<h3>Prompt</h3>
+
+<fieldset>Imagine three different experts are answering this question.<br />
+All experts will write down 1 step of their thinking, then share it with the group.<br />
+Then all experts will go on to the next step, etc.<br />
+If any expert realizes they are wrong at any point then they leave.<br />
+The question is...
+</fieldset>
+
+<h2 style="text-align: left;"><br /></h2><h2 style="text-align: left;">What to use an LLM for</h2>
+
+
+The following table is from <a href="https://www.philschmid.de/instruction-tune-llama-2">https://www.philschmid.de/instruction-tune-llama-2</a>
+<table border="1">
+  <tbody><tr>
+	<th>Capability</th>
+    <th>Example Instruction</th>
+  </tr>
+  <tr>
+    <td>Brainstorming</td>
+    <td>Provide a diverse set of creative ideas for new flavors of ice cream.
+  </td></tr>
+  <tr>
+    <td>Classification</td>
+    <td>Categorize these movies as either comedy, drama, or horror based on the plot summary.
+  </td></tr>
+  <tr>
+    <td>Closed QA</td>
+    <td>Answer the question 'What is the capital of France?' with a single word.
+  </td></tr>
+  <tr>
+    <td>Generation</td>
+    <td>Write a poem in the style of Robert Frost about nature and the changing seasons.
+  </td></tr>
+  <tr>
+    <td>Information Extraction</td>
+    <td>Extract the names of the main characters from this short story.
+  </td></tr>
+  <tr>
+    <td>Open QA</td>
+    <td>Why do leaves change color in autumn? Explain the scientific reasons.
+  </td></tr>
+  <tr>
+    <td>Summarization</td>
+    <td>Summarize this article on recent advancements in renewable energy in 2-3 sentences.
+  </td></tr>
+</tbody></table>
+<br /><div><br /></div>
+<h2 style="text-align: left;">Software generation</h2>
+
+<fieldset>You are an expert programmer that writes simple, concise code and explanations. Write a python function to generate the nth fibonacci number.</fieldset>
+&nbsp;
+<fieldset>
+A simple python function to remove whitespace from a string
+</fieldset>
+&nbsp;
+Code Llama supports a special prompt called infill
+<fieldset>
+  &lt;PRE&gt; def compute_gcd(x, y): &lt;SUF&gt;return result &lt;MID&gt;
+</fieldset>
+    
+<div><br /></div><h3 style="text-align: left;">Code review</h3>
+<fieldset style="text-align: left;">
+<pre>Where is the bug in this code?
+```
+def fib(n):
+    if n &lt;= 0:
+        return n
+    else:
+        return fib(n-1) + fib(n-2)
+```
+</pre>
+</fieldset><h3 style="text-align: left;">
+
+Tests of Software
+</h3><fieldset>
+  write a unit test for this function: 
+</fieldset>
+
+
+    <h2 style="text-align: left;">Prompts for Retrieval Augmented Generation (RAG)</h2>
+RAG = https://www.promptingguide.ai/techniques/rag&nbsp;<div><br /></div><div>From <a href="https://github.com/run-llama/llama_index/blob/main/llama_index/prompts/chat_prompts.py">https://github.com/run-llama/llama_index/blob/main/llama_index/prompts/chat_prompts.py</a></div><div><fieldset>
+      <pre>    You are an expert Q&amp;A system that is trusted around the world.\n"
+        "Always answer the query only using the provided context information, "
+        "and not prior knowledge."
+        </pre>
+    </fieldset>
+&nbsp;
+    <fieldset>
+      <pre>      "Context information is below.\n"
+            "---------------------\n"
+            "{context_str}\n"
+            "---------------------\n"
+            "Given the context information and not prior knowledge, "
+            "answer the query.\n"
+            "Query: {query_str}\n"
+            "Answer: "
+      </pre>
+    </fieldset>
+<p>&nbsp;
+  </p><p>From <a href="https://docs.llamaindex.ai/en/stable/examples/prompts/prompts_rag.html">https://docs.llamaindex.ai/en/stable/examples/prompts/prompts_rag.html</a>
+</p><fieldset>
+  <pre>Context information is below.
+---------------------
+{context_str}
+---------------------
+Given the context information and not prior knowledge, 
+answer the query asking about citations over different topics.
+Some examples are given below.
+
+{few_shot_examples}
+
+Query: {query_str}
+Answer: 
+  </pre>
+</fieldset><p></p><p></p></div>
+
+{% endblock %}

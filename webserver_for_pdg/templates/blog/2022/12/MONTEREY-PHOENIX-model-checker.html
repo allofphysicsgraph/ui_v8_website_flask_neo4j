@@ -1,0 +1,193 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>MONTEREY PHOENIX model checker</H1>
+
+<P><small>Published 2022-12-18T20:44:00.002Z by Physics Derivation Graph</small></P>
+
+<p>In this blog post I discuss a model involving two actors: a car and a driver. Each actor has an associated set of actions they can take.</p><p>For a video walkthrough of this code, see&nbsp;<a href="https://youtu.be/r6aPKem6WLs">https://youtu.be/r6aPKem6WLs</a></p><p>Using the web interface <a href="https://firebird.nps.edu/">https://firebird.nps.edu/</a>, run this model
+</p><pre style="text-align: left;">SCHEMA using_a_car /* model title */
+
+/* Actor Behaviors */
+
+/* purple text is an MP keyword,
+   actors are green text,
+   atomic events are blue */
+
+/* with space as the separator, 
+   the events (blue) are an ordered sequence */
+
+ROOT Driver: enters_car 
+             starts_car
+             move_forward turn_left turn_right 
+             stops_car
+             exits_car;
+
+ROOT Car: off
+          starting 
+          running_idle
+          move_forward
+          turn_left
+          turn_right
+          shutting_down;
+</pre><h2 style="text-align: left;">
+
+Introduce branching logic</h2><pre style="text-align: left;">SCHEMA using_a_car /* model title */
+
+/* Actor Behaviors */
+
+/* purple text is an MP keyword,
+   actors are green text,
+   atomic events are blue,
+   composit events are orange */
+
+/* 
+      ( A | B ) are alternative events 
+*/
+
+ROOT Driver: enters_car <span style="color: red;"><b>(starts_car | exits_car);
+starts_car:</b></span>  move_forward turn_left turn_right 
+             stops_car
+             exits_car;
+
+ROOT Car: off
+          starting 
+          running_idle
+          move_forward
+          turn_left
+          turn_right
+          shutting_down;
+</pre><h2 style="text-align: left;">
+
+Events among actors are coordinated
+
+</h2><pre style="text-align: left;">SCHEMA using_a_car /* model title */
+
+/* Actor Behaviors */
+
+/* purple text is an MP keyword,
+   actors are green text,
+   atomic events are blue,
+   composit events are orange */
+
+ROOT Driver: enters_car (starts_car | exits_car);
+starts_car:  move_forward turn_left turn_right 
+             stops_car
+             exits_car;
+
+ROOT Car: off
+          starting 
+          running_idle
+          move_forward
+          turn_left
+          turn_right
+          shutting_down;
+
+/* the two processes are related by specific events */
+
+<b><span style="color: red;">COORDINATE
+$a: starts_car FROM Driver,
+$b: starting FROM Car
+DO
+ADD $a PROCEEDS $b;
+OD;
+
+COORDINATE
+$a: stops_car FROM Driver,
+$b: shutting_down FROM Car
+DO
+ADD $a PROCEEDS $b;
+OD;
+</span></b></pre><h2 style="text-align: left;">
+
+Actors may take zero or more actions
+
+</h2><pre style="text-align: left;">SCHEMA using_a_car /* model title */
+
+/* Actor Behaviors */
+
+/* purple text is an MP keyword,
+   actors are green text,
+   atomic events are blue,
+   composit events are orange */
+
+/* 
+    {* *} is an unordered set of zero or more events 
+*/
+
+ROOT Driver: enters_car (starts_car | exits_car);
+starts_car:  <b><span style="color: red;">{* ( move_forward | 
+                  turn_left | 
+                  turn_right ) *}</span></b>
+             stops_car
+             exits_car;
+
+ROOT Car: off
+          starting 
+          running_idle
+<b><span style="color: red;">          {* ( move_forward | 
+               turn_left | 
+               turn_right ) *}</span></b>
+          shutting_down;
+
+COORDINATE
+$a: starts_car FROM Driver,
+$b: starting FROM Car
+DO
+ADD $a PROCEEDS $b;
+OD;
+
+COORDINATE
+$a: stops_car FROM Driver,
+$b: shutting_down FROM Car
+DO
+ADD $a PROCEEDS $b;
+OD;
+</pre><h2 style="text-align: left;">
+
+Events are shared among actors
+
+</h2><pre>SCHEMA using_a_car /* model title */
+
+/* Actor Behaviors */
+
+/* purple text is an MP keyword,
+   actors are green text,
+   atomic events are blue,
+   composit events are orange */
+
+ROOT Driver: enters_car (starts_car | exits_car);
+starts_car:  {* ( move_forward | 
+                  turn_left | 
+                  turn_right ) *}
+             stops_car
+             exits_car;
+
+ROOT Car: off
+          starting 
+          running_idle
+          {* ( move_forward | 
+               turn_left | 
+               turn_right ) *}
+          shutting_down;
+
+<b><span style="color: red;">Driver, Car SHARE ALL move_forward, 
+                      turn_left, 
+                      turn_right;</span></b>
+
+COORDINATE
+$a: starts_car FROM Driver,
+$b: starting FROM Car
+DO
+ADD $a PROCEEDS $b;
+OD;
+
+COORDINATE
+$a: stops_car FROM Driver,
+$b: shutting_down FROM Car
+DO
+ADD $a PROCEEDS $b;
+OD;
+</pre><p></p>
+
+{% endblock %}

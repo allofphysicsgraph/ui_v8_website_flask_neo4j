@@ -1,0 +1,104 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Characterizing complexity of software and social systems</H1>
+
+<P><small>Published 2024-12-15T18:56:00Z by Physics Derivation Graph</small></P>
+
+<p><a href="https://en.wikipedia.org/wiki/BLUF_(communication)">BLUF</a>: Definitions of distance and modularity enable characterization of complexity in technical and social systems. However, I am unable to find a simple quantification of complexity or rank complexity.</p><p>This post is a mixture of notes from a YouTube video (linked at the bottom of this post) plus some analysis.&nbsp;</p><p><br /></p><h2>Characterizing Complexity</h2><div>The scope of this post covers the both software complexity and social complexity.&nbsp;</div>
+<p><b>Software complexity</b> is characterized by</p><ul>
+  <li>how many layers of abstraction: namespace/package, classes, functions?</li><li>the number of <i>modules</i> at each level of abstraction: how many of each for namespaces, classes per namespace, functions per class?</li><li>number of interfaces per <i>module</i> at each level of abstraction</li><li>the <i>distance</i> between interdependent modules
+  </li><li>the amount of information transmitted between <i>modules
+</i></li></ul>
+<p><b>Social complexity</b> is characterized by</p><ul>
+  <li>how many layers in the hierarchy?&nbsp;</li><li>the number of <i>modules</i>&nbsp;at each level of hierarchy: how many of each for organizations, teams-per-organization, and people-per-team</li><li>the number of interfaces at each level of hierarchy. <i><span style="font-size: x-small;">A person talks to how many other people? A team coordinates with how many other teams?</span></i></li><li>the <i>distance</i> between interdependent modules. <i><span style="font-size: x-small;">When two teams have to coordinate, are they in the same parent organization? Or separate organizations?</span></i></li><li>the amount of information transmitted between <i>modules</i>. <i><span style="font-size: x-small;">A short email, a long telephone call, or multiple in-person meetings?</span></i></li></ul>
+
+<p>[Claim] When refactoring a system (whether software redesign or re-oganization of people roles and titles) that lacks redundancies, the complexity of the software+social is conserved if the functionality remains the same. Here conservation means productivity and efficiency are unchanged.</p><p>Even with the characterizations above and the definitions below I don't see how to quantify complexity in software-social systems as a scalar number or as a vector. I don't see how to rank complexity to enable comparison of different systems, or how the complexity of a system changes over time.</p><p><br /></p>
+
+<h2>Definitions</h2><div>In the characterizations above I used words that need explanation.</div><div><br /></div>
+
+<h3>Definition of System</h3>
+<p><b>System</b>: "an interconnected set of elements that is clearly organized in a way that achieves something" <br /><span style="font-size: x-small;"><i>
+  source</i>: "Thinking in Systems" by D. Meadows</span></p>
+<p>In other words, a set of components + interactions that accomplish a goal. This applies to software, hardware, and social settings.
+  
+
+</p><p><br /></p><h3>Definition of Distance within a System</h3>
+Distance within a system of software is characterized by
+  <ul>
+  <li>services, which are decomposed into
+  </li><li>namespace or package, which are decomposed into
+  </li><li>class, which are decomposed into
+  </li><li>methods or functions, which are decomposed into
+  </li><li>lines
+</li></ul>
+  
+Distance in hierarchical social systems is characterized by
+  <ul>
+  <li>organization
+  </li><li>team
+  </li><li>person
+</li></ul><div><br /></div>
+  
+<h3>Definition of Modularity</h3>
+Modularity is defined as having these characteristics
+<ul>
+  <li>enacts self-contained capability
+  </li><li>capability can be called by other modules
+  </li><li>capability can operate independently
+</li></ul><span style="font-size: x-small;"><i>
+source</i>: "Composite/structured design" by G. Myers
+  
+</span><p>modules + interactions accomplish future goals (aka flexibility)
+</p>
+
+<p>There's a 2018 review that surveys the various types of coupling in software and the tooling capable of measuring the coupling.&nbsp;</p><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhL8Gk8sm4SgJOZN_M2UA32efdvSB-zNAXbqH4NZR6nugtpX0g0-Z5i4X0KfQ78KN8ugYgJT6NJUdcamqayCCiJ8dQ8Qd7Ytmt20LJdL5UfTmsDVQGdAcgZaoJf-tomEGLOpcvnPmhyFlsC7EPkpUkI09CQpD2zwnf34bxcR2DLvNwBAmEjEoEluvQPRQWr/s1664/Screenshot%202024-12-15%20at%208.53.52%E2%80%AFAM.png" style="margin-left: auto; margin-right: auto;"><img border="0" data-original-height="1664" data-original-width="1360" height="640" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhL8Gk8sm4SgJOZN_M2UA32efdvSB-zNAXbqH4NZR6nugtpX0g0-Z5i4X0KfQ78KN8ugYgJT6NJUdcamqayCCiJ8dQ8Qd7Ytmt20LJdL5UfTmsDVQGdAcgZaoJf-tomEGLOpcvnPmhyFlsC7EPkpUkI09CQpD2zwnf34bxcR2DLvNwBAmEjEoEluvQPRQWr/w525-h640/Screenshot%202024-12-15%20at%208.53.52%E2%80%AFAM.png" width="525" /></a></td></tr><tr><td class="tr-caption" style="text-align: center;">From "A Survey on Software Coupling Relations and Tools" by&nbsp;Fregnan et al, 2018&nbsp;<a href="https://fpalomba.github.io/pdf/Journals/J16.pdf">https://fpalomba.github.io/pdf/Journals/J16.pdf</a></td></tr></tbody></table><div class="separator" style="clear: both; text-align: center;"><br />
+</div><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgxIhc-HKC61g3kbzE6dzzZPm9DIKjEbzTsaxGtN9m7HIz_bNV_5YhqAfFN60vkLXLb8UXu4Sh8iGzhZBLRP9yMIHKYtCTbnpE_qwG0F-pLLQT9VWVtis2trttiKwyyxjcFwX8Uno7saEVkUBDdD0Fd57ktRG2LEy6fcNrvRKgB-9clXow9Ez-038uLlk2j/s1678/Screenshot%202024-12-15%20at%208.54.04%E2%80%AFAM.png" style="margin-left: auto; margin-right: auto;"><img border="0" data-original-height="1600" data-original-width="1678" height="610" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgxIhc-HKC61g3kbzE6dzzZPm9DIKjEbzTsaxGtN9m7HIz_bNV_5YhqAfFN60vkLXLb8UXu4Sh8iGzhZBLRP9yMIHKYtCTbnpE_qwG0F-pLLQT9VWVtis2trttiKwyyxjcFwX8Uno7saEVkUBDdD0Fd57ktRG2LEy6fcNrvRKgB-9clXow9Ez-038uLlk2j/w640-h610/Screenshot%202024-12-15%20at%208.54.04%E2%80%AFAM.png" width="640" /></a></td></tr><tr><td class="tr-caption" style="text-align: center;">From "A Survey on Software Coupling Relations and Tools" by&nbsp;Fregnan et al, 2018&nbsp;<a href="https://fpalomba.github.io/pdf/Journals/J16.pdf">https://fpalomba.github.io/pdf/Journals/J16.pdf</a></td></tr></tbody>
+</table><div class="separator" style="clear: both; text-align: center;"><br /></div>
+<div><br /></div>The tables above illustrate that there are nuances to what "modularity" means in software. Modularity can improve flexibility for re-use but incurs cognitive load of the relationships and dependencies.<br />
+<p><br /></p>
+<p><br /></p><h2 style="text-align: left;">Definition of Complexity
+</h2><p>Once you write a line of software it becomes legacy code and technical debt is incurred. Similarly in social settings, as soon as one person engages with another (cooperatively or competitively) there are decisions to be made about the interaction. The best you can aim for is to be aware of both the available trade-offs and the consequences of your actions when altering the system.</p>
+<p><br /></p>
+<p>Complexity is characterized by cause and effect in the&nbsp;<a href="https://en.wikipedia.org/wiki/Cynefin_framework">https://en.wikipedia.org/wiki/Cynefin_framework</a>&nbsp;in contrast with other categories:</p>
+<p></p>
+<ul style="text-align: left;">
+  <li>Obvious = relationship between cause and effect is obvious to system participants</li>
+  <li>Complicated = relationship between cause and effect requires analysis</li>
+  <li>Complex = relationship between cause and effect is clear only in hindsight</li>
+  <li>Chaotic = no relationship between cause and effect</li></ul>
+<p>When a software developer is exploring a software that is novel to them, the code can seem complex or complicated. After they have internalized the design and the reasoning for the design the same code base can seem obvious. Complexity is not a static characterization.
+    
+    </p><p>Similarly for interactions of people, a person new to an organization may initially feel overwhelmed, but after forming relationships and understanding the history views the organization as obvious.</p><p><br /></p><p>Symptoms of complexity from Chapter 2 of "A Philosophy of Software Design" by&nbsp;Ousterhout</p><p></p><ul style="text-align: left;"><li>Change amplification: a simple change requires changes in many different places.&nbsp;</li><li>Cognitive load: the developer needs to learn a lot to complete a task.&nbsp;</li><li>Unknown unknowns: it is not obvious which pieces of code need to change to complete a task.</li></ul><p></p>
+
+<h4>Ways to measure complexity of software</h4>
+<p>Cyclomatic Complexity - measure the control flow of software<br />
+  <a href="http://www.literateprogramming.com/mccabe.pdf">
+  http://www.literateprogramming.com/mccabe.pdf</a><br />
+  <a href="https://en.wikipedia.org/wiki/Cyclomatic_complexity">
+  https://en.wikipedia.org/wiki/Cyclomatic_complexity</a></p>
+
+<p>Halstead complexity -- countable aspects of software<br /><a href="https://en.wikipedia.org/wiki/Halstead_complexity_measures">https://en.wikipedia.org/wiki/Halstead_complexity_measures</a></p>
+<p><br /></p>
+
+<h4 style="text-align: left;">Why measure complexity</h4>
+<ul style="text-align: left;">
+  <li>To find heterogenous distribution of complexity within a system (and then re-distribute)</li>
+  <li>To compare one system to another</li>
+  <li>To compare changes across time</li>
+  <ul>
+    <li><i>historical</i>: has the system become more complex? If yes, how?</li>
+    <li><i>forecasting</i>: would this design change make a future system more or less complex?</li>
+  </ul>
+</ul>
+<p><br /><br /></p>
+<h2 style="text-align: left;">Sources for the ideas in this post</h2>
+<p>This post is primarily informed by two recent sources. The first is a superb talk by Sonya Natanzon,&nbsp;<a href="https://www.youtube.com/watch?v=Ukv0JVDh_BI">https://www.youtube.com/watch?v=Ukv0JVDh_BI</a>&nbsp;titled "Complexity &amp; Modularity: the Yin and Yang of Socio-Technical Design". This post is a summary of that talk plus an extension of the ideas.&nbsp; The second is a blog post that qualitatively ranks social distance,&nbsp;<a href="https://tej.as/blog/how-to-grow-professional-relationships-tjs-model">https://tej.as/blog/how-to-grow-professional-relationships-tjs-model</a></p>
+
+<h3 style="text-align: left;">References</h3>
+<p>A Philosophy of Software Design | John Ousterhout | Talks at Google<br />
+  <a href="https://www.youtube.com/watch?v=bmSAYlu0NcY">https://www.youtube.com/watch?v=bmSAYlu0NcY</a></p><p><br />
+</p><p><span style="text-align: center;">"A Survey on Software Coupling Relations and Tools" by&nbsp;Fregnan et al, 2018&nbsp;<br />
+  </span><a href="https://fpalomba.github.io/pdf/Journals/J16.pdf" style="text-align: center;">https://fpalomba.github.io/pdf/Journals/J16.pdf</a></p><p></p>
+
+{% endblock %}

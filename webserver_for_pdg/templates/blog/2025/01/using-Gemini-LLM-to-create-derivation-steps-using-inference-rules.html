@@ -1,0 +1,351 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>using Gemini LLM to create derivation steps using inference rules</H1>
+
+<P><small>Published 2025-01-07T22:22:00Z by Physics Derivation Graph</small></P>
+
+<p>Previous related post: <a href="https://physicsderivationgraph.blogspot.com/2023/12/llm-prompts-for-physics-derivation-graph.html">LLM prompts for PDG</a>.</p>
+
+<p><i>tl;dr</i>: I'm unsuccessful at getting Gemini 2.0 (on 2025-01-07) to relate Brewster's angle to the Law of Refraction. However, Gemini is able to provide the steps for simple (non-trivial) derivations.</p>
+
+<h2 style="text-align: left;">Reformatting HTML table</h2>
+
+<p>The site <a href="https://aistudio.google.com/">https://aistudio.google.com/</a> provides Gemini 2.0 LLM for free. 
+To experiment with using it I wanted to provide the inference rules. There are 94 inference rules listed on <a href="https://allofphysics.com/list_all_inference_rules">https://allofphysics.com/list_all_inference_rules</a> in an 8 column table.
+  
+After removing javascript, headers, and footers the HTML file has 3869 lines. That takes 32,164 tokens for the prompt
+</p><fieldset>
+<pre>The following is an HTML table. The table has 8 columns currently. 
+Please remove the last 3 columns from the table and provide the HTML 
+result. No explanation is necessary -- just show the HTML table with 
+the 3 columns ("Used in derivations", "number of uses", "assumptions") 
+removed. The new HTML table should have 5 columns.
+
+```html
+&lt;!DOCTYPE html&gt;
+&lt;HTML lang='en'&gt;
+  &lt;body&gt;
+
+&lt;table border="1"  class="sortable" id="infrule_table"&gt;
+  &lt;tr&gt;
+    &lt;th&gt;inf rule name&lt;/th&gt;
+    &lt;th&gt;inputs&lt;/th&gt;
+...
+</pre>
+</fieldset>
+<p>Gemini provided the correct 5 column HTML file. Huzzah!</p><h2 style="text-align: left;">Brewster's angle and Law of Refraction</h2>
+
+<p>Next step is to see if Gemini can use the inference rules for a derivation.
+</p><fieldset>
+  <pre>Answer the question based on the context below. Keep 
+the answer short and concise. Respond "Unsure about 
+answer" if not sure about the answer.
+
+Context: Latex is software for document preparation 
+to generate PDF files. Mathematical equations can be 
+expressed in Latex using markup syntax. 
+
+Brewster's angle is the angle of incidence at which 
+light is perfectly transmitted through a transparent 
+dielectric surface with no reflection. It's also known 
+as the polarizing angle.
+
+Expressed in Latex, Brewster's angle is
+```latex
+\theta_{\rm Brewster} = \arctan{ \left( \frac{ n_1 }{ n_2 } \right) }
+```
+
+The law of refraction, also called Snell's Law, expressed in Latex, is
+```latex
+n_1 \sin( \theta_1 ) = n_2 \sin( \theta_2 )
+```
+
+Context: a derivation in mathematical Physics consists 
+of a sequence of steps. Each step relates mathematical 
+expressions to an inference rule. An expression is 
+comprised of symbols and operators. An inference rule 
+typically transforms input expressions into output expressions.
+
+Inference rules:
+```html
+&lt;!DOCTYPE html&gt;
+&lt;HTML lang='en'&gt;
+  &lt;body&gt;
+
+&lt;table border="1"  class="sortable" id="infrule_table"&gt;
+  &lt;tr&gt;
+    &lt;th&gt;inf rule name&lt;/th&gt;
+    &lt;th&gt;inputs&lt;/th&gt;
+    &lt;th&gt;outputs&lt;/th&gt;
+    &lt;th&gt;feeds&lt;/th&gt;
+    &lt;th&gt;Latex&lt;/th&gt;
+  &lt;/tr&gt;
+
+  &lt;tr&gt;
+    &lt;td&gt;&lt;a name="LHS of expr 1 equals LHS of expr 2"&gt;LHS of expr 1 equals LHS of expr 2&lt;/a&gt;&lt;/td&gt;
+    &lt;td&gt;2&lt;/td&gt;
+    &lt;td&gt;1&lt;/td&gt;
+    &lt;td&gt;0&lt;/td&gt;
+    &lt;td&gt;LHS of Eq.~ref{eq:#1} is equal to LHS of Eq.~ref{eq:#2}; yields Eq.~ref{eq:#3}.&lt;/td&gt;
+  &lt;/tr&gt;
+
+  &lt;tr&gt;
+    &lt;td&gt;&lt;a name="RHS of expr 1 equals RHS of expr 2"&gt;RHS of expr 1 equals RHS of expr 2&lt;/a&gt;&lt;/td&gt;
+    &lt;td&gt;2&lt;/td&gt;
+    &lt;td&gt;1&lt;/td&gt;
+    &lt;td&gt;0&lt;/td&gt;
+    &lt;td&gt;RHS of Eq.~ref{eq:#1} is equal to RHS of Eq.~ref{eq:#2}; yields Eq.~ref{eq:#3}.&lt;/td&gt;
+  &lt;/tr&gt;
+
+...snipped...
+
+  &lt;tr&gt;
+    &lt;td&gt;&lt;a name="take curl of both sides"&gt;take curl of both sides&lt;/a&gt;&lt;/td&gt;
+    &lt;td&gt;1&lt;/td&gt;
+    &lt;td&gt;1&lt;/td&gt;
+    &lt;td&gt;0&lt;/td&gt;
+    &lt;td&gt;Apply curl to both sides of Eq.~ref{eq:#1}; yields Eq.~ref{eq:#2}.&lt;/td&gt;
+  &lt;/tr&gt;
+
+  &lt;caption&gt;
+    &lt;a name="table of inference rules"&gt;
+      Physics Derivation Graph: 94 Inference Rules
+    &lt;/a&gt;
+  &lt;/caption&gt;
+&lt;/table&gt;
+
+    &lt;/body&gt;
+&lt;/html&gt;
+```
+
+Question: Using the inference rules above, 
+what are the derivation steps that relate 
+Brewster's angle to the Law of refraction?
+
+Answer:
+  </pre>
+</fieldset>
+
+To which Gemini replied&nbsp;(on 2025-01-07),
+<blockquote>
+"Unsure about answer"
+</blockquote>
+
+<p>That's reasonable, so I removed the inference rules and tried again
+</p><fieldset>
+  <pre>Answer the question based on the context below. Keep 
+the answer short and concise. Respond "Unsure about 
+answer" if not sure about the answer.
+
+Context: Latex is software for document preparation 
+to generate PDF files. Mathematical equations can be 
+expressed in Latex using markup syntax. 
+
+Brewster's angle is the angle of incidence at which 
+light is perfectly transmitted through a transparent 
+dielectric surface with no reflection. It's also known 
+as the polarizing angle.
+
+Expressed in Latex, Brewster's angle is
+```latex
+\theta_{\rm Brewster} = \arctan{ \left( \frac{ n_1 }{ n_2 } \right) }
+```
+
+The law of refraction, also called Snell's Law, expressed in Latex, is
+```latex
+n_1 \sin( \theta_1 ) = n_2 \sin( \theta_2 )
+```
+
+Context: a derivation in mathematical Physics consists 
+of a sequence of steps. Each step relates mathematical 
+expressions to an inference rule. An expression is 
+comprised of symbols and operators. An inference rule 
+typically transforms input expressions into output expressions.
+
+Question: what are the derivation steps that relate 
+Brewster's angle to the Law of refraction?
+
+Answer:
+  </pre>
+</fieldset>
+
+Again Gemini replied&nbsp;&nbsp;(on 2025-01-07),
+<blockquote>
+"Unsure about answer"
+</blockquote>
+
+I then relaxed the constraint about right answers only and encouraged step-by-step reasoning
+<fieldset>
+  <pre>Answer the question based on the context below. 
+Keep the answer short and concise. Step through 
+the reasoning step by step, explaining why each 
+step is correct before proceeding to the next step 
+in the derivation.
+
+Context: Latex is software for document preparation 
+to generate PDF files. Mathematical equations can be 
+expressed in Latex using markup syntax.
+
+Brewster's angle is the angle of incidence at which 
+light is perfectly transmitted through a transparent 
+dielectric surface with no reflection. It's also known 
+as the polarizing angle.
+
+Expressed in Latex, Brewster's angle is
+```latex
+\theta_{\rm Brewster} = \arctan{ \left( \frac{ n_1 }{ n_2 } \right) }
+```
+
+The law of refraction, also called Snell's Law, expressed in Latex, is
+```latex
+n_1 \sin( \theta_1 ) = n_2 \sin( \theta_2 )
+```
+
+Context: a derivation in mathematical Physics consists 
+of a sequence of steps. Each step relates mathematical 
+expressions to an inference rule. An expression is 
+comprised of symbols and operators. An inference rule 
+typically transforms input expressions into output expressions.
+
+Question: What are the derivation steps that relate 
+Brewster's angle to the Law of refraction?
+
+Answer:
+</pre>
+</fieldset>
+Gemini's response (on 2025-01-07):
+<blockquote>
+  It's not possible to directly derive Brewster's angle from Snell's Law, or vice versa, using standard mathematical manipulations. Brewster's angle is a specific condition related to polarization, while Snell's Law describes refraction in general. Therefore, no sequence of inference rules can relate them directly. They are independent physical principles governing light behavior under different conditions.
+</blockquote><p></p>
+
+<h2>Simple derivation</h2>
+
+<fieldset>
+<pre>Answer the question based on the context below. 
+Keep the answer short and concise. Step through 
+the reasoning step by step, explaining why each 
+step is correct before proceeding to the next step 
+in the derivation.
+
+Context: Latex is software for document preparation 
+to generate PDF files. Mathematical equations can be 
+expressed in Latex using markup syntax.
+
+Context: a derivation in mathematical Physics consists 
+of a sequence of steps. Each step relates mathematical 
+expressions to an inference rule. An expression is 
+comprised of symbols and operators. An inference rule 
+typically transforms input expressions into output expressions.
+
+Here are four inference rules that are used in derivations:
+```latex
+"declare initial expression"
+number of inputs: 0; feeds: 0; outputs: 1
+Eq.~\ref{eq:#1} is an initial expression.
+
+"add X to both sides"
+number of inputs: 1; feeds: 1; outputs: 1
+Add $#1$ to both sides of Eq.~\ref{eq:#2}; yields Eq.~\ref{eq:#3}.
+
+"declare final expression"
+number of inputs: 1; feeds: 0; outputs: 0
+Eq.~\ref{eq:#1} is one of the final expressions.
+```
+
+Question: What are the derivation steps that relate 
+```latex
+a = b
+``` 
+to the expression
+```latex
+a + c = b + c
+```
+
+Answer:
+</pre>
+</fieldset><div><br /></div>
+
+Gemini 2.0 on 2025-01-07 responds with
+
+<fieldset>
+<pre>1. **"declare initial expression"**: The initial expression is `a = b`.
+2. **"add X to both sides"**: Adding `c` to both sides of `a = b` yields `a + c = b + c`.
+</pre>
+</fieldset>
+That's "good enough" in my view to be useful -- associating the relevant inference rule with specific steps in a multi-step derivation!
+
+<h2>Non-trivial derivation</h2>
+  
+ <fieldset>
+<pre>Answer the question based on the context below. 
+Keep the answer short and concise. Step through 
+the reasoning step by step, explaining why each 
+step is correct before proceeding to the next step 
+in the derivation.
+
+Context: Latex is software for document preparation 
+to generate PDF files. Mathematical equations can be 
+expressed in Latex using markup syntax.
+
+Context: a derivation in mathematical Physics consists 
+of a sequence of steps. Each step relates mathematical 
+expressions to an inference rule. An expression is 
+comprised of symbols and operators. An inference rule 
+typically transforms input expressions into output expressions.
+
+Here are four inference rules that are used in derivations:
+```latex
+"declare initial expression"
+number of inputs: 0; feeds: 0; outputs: 1
+Eq.~\ref{eq:#1} is an initial expression.
+
+"add X to both sides"
+number of inputs: 1; feeds: 1; outputs: 1
+Add $#1$ to both sides of Eq.~\ref{eq:#2}; yields Eq.~\ref{eq:#3}.
+
+"substitute LHS of expr 1 into expr 2	"
+number of inputs: 2; feeds: 0; outputs: 1
+Substitute LHS of Eq.~\ref{eq:#1} into Eq.~\ref{eq:#2}; yields Eq.~\ref{eq:#3}.	
+
+"swap LHS with RHS"	
+number of inputs: 1; feeds: 0; outputs: 0
+Swap LHS of Eq.~\ref{eq:#1} with RHS; yields Eq.~\ref{eq:#2}.	
+
+"subtract X from both sides"
+number of inputs: 1; feeds: 1; outputs: 1
+Subtract $#1$ from both sides of Eq.~\ref{eq:#2}; yields Eq.~\ref{eq:#3}.	
+
+"declare final expression"
+number of inputs: 1; feeds: 0; outputs: 0
+Eq.~\ref{eq:#1} is one of the final expressions.
+```
+
+Question: Using the inference rules listed above, what are the derivation steps that relate 
+```latex
+n_1 \sin( \theta_{\rm Brewster} ) = n_2 \sin( \theta_{\rm refracted} )
+``` 
+and
+```latex
+\theta_{\rm Brewster} + \theta_{\rm refracted} = 90^{\circ}
+```
+to the expression
+```latex
+n_1 \sin( \theta_{\rm Brewster} ) = n_2 \sin( 90^{\circ} - \theta_{\rm Brewster} )
+```
+
+Answer:
+  </pre>
+</fieldset>
+
+Gemini 2.0 on 2025-01-07 responds with
+
+<fieldset>
+<pre>1. **"declare initial expression"**: The first initial expression is `n_1 \sin( \theta_{\rm Brewster} ) = n_2 \sin( \theta_{\rm refracted} )`.
+2. **"declare initial expression"**: The second initial expression is `\theta_{\rm Brewster} + \theta_{\rm refracted} = 90^{\circ}`.
+3. **"subtract X from both sides"**: Subtract `\theta_{\rm Brewster}` from both sides of `\theta_{\rm Brewster} + \theta_{\rm refracted} = 90^{\circ}` to get `\theta_{\rm refracted} = 90^{\circ} - \theta_{\rm Brewster}`.
+4. **"substitute LHS of expr 1 into expr 2	"**: Substitute `\theta_{\rm refracted}` from `\theta_{\rm refracted} = 90^{\circ} - \theta_{\rm Brewster}` into `n_1 \sin( \theta_{\rm Brewster} ) = n_2 \sin( \theta_{\rm refracted} )` to get `n_1 \sin( \theta_{\rm Brewster} ) = n_2 \sin( 90^{\circ} - \theta_{\rm Brewster} )`.
+  </pre>
+</fieldset>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>requirements generation</H1>
+
+<P><small>Published 2025-05-04T17:17:00Z by Physics Derivation Graph</small></P>
+
+<p><a href="https://en.wikipedia.org/wiki/BLUF_(communication)">BLUF</a>/tl;dr: methods of requirements generation are described in this post: "one-shot think hard and brainstorm", learn from others, iterative adversarial feedback, and <a href="https://en.wikipedia.org/wiki/Program_derivation">formal models</a>.</p>
+
+<p>As a solo hobby developer I get to do what feels right with regard to my project. That autonomy and freedom applies to both prioritization and scope. Part of the joy of working is based on being able to follow my curiosity, and to do so at a time and rate of my choosing.</p>
+
+<p>When I work with another person on a shared goal, then there is value in identifying how to divide tasks. For example, by skill, by interests, by availability.</p>
+
+<p>A vision distills into use cases, and these use cases determine requirements which determine tasks. Then sequencing and parallelization of tasks can happen. Let's refer to this as the "think hard and brainstorm" waterfall method. The success of waterfall relies on the ability of planners to identify all contingencies before taking action. Use of an LLM for generating requirements fits in this category as an alternative to thinking hard.</p>
+
+<p>If someone else has a similar situation, learning from their requirements is a valid way of making progress. Plagiarism is acceptable; no need for being original.</p><p><br /></p>
+
+<p>The optimistic waterfall method described above assumes the alignment of incentives for participants doing the tasks. If the participants doing tasks are looking for the easiest solution to the requirement they may provided results that don't satisfy the vision.&nbsp;</p>
+
+<p>If the folks satisfying a requirement may be adversarial, that can be accounted for in an iterative manner.</p>
+<ol>
+  <li>think hard and brainstorm to come up with an initial draft of requirements
+  </li><li>provide the draft requirements to adversarial works with the instructions, "provide a solution in a day." Leverage their creativity to provide an insufficient result. 
+  </li><li>Determine why the adversarial solutions (which do meet the requirements) don't satisfy the vision. Use that insight to develop better requirements.
+</li></ol>
+<p>Repeat the iterations until requirements are "fool proof" for the sample pool of fools.</p><p><br /></p>
+
+<p>A third method of coming up with requirements is to use formal methods. For example,</p>
+
+<blockquote>"Program Derivation is the practice of beginning with a specification of a function, and by a series of mechanical steps, deriving an efficient implementation." (source: <a href="https://www.youtube.com/watch?v=JDqD6RZpnZA">https://www.youtube.com/watch?v=JDqD6RZpnZA</a>)</blockquote><a href="https://p-org.github.io/P/">
+
+https://p-org.github.io/P/</a> and <a href="https://github.com/p-org/P">https://github.com/p-org/P</a><br /><a href="https://www.youtube.com/watch?v=FdXZXnkMDxs">
+https://www.youtube.com/watch?v=FdXZXnkMDxs</a><br /><a href="https://www.youtube.com/watch?v=tZnX585r4ms">
+https://www.youtube.com/watch?v=tZnX585r4ms</a><div><br /></div><div><a href="https://www.cs.toronto.edu/~hehner/aPToP/aPToP.pdf">https://www.cs.toronto.edu/~hehner/aPToP/aPToP.pdf</a></div><p></p>
+
+{% endblock %}

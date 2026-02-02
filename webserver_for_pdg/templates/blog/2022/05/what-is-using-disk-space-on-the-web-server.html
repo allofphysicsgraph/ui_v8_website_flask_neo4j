@@ -1,0 +1,78 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>what is using disk space on the web server?</H1>
+
+<P><small>Published 2022-05-20T11:49:00.006Z by Physics Derivation Graph</small></P>
+
+<p>
+https://stackoverflow.com/a/15142053/1164295
+</p>
+
+
+<pre>$ du -cBM --max-depth=1 2&gt; &gt;(grep -v 'Permission denied') | sort -n 
+0M	./dev
+0M	./proc
+0M	./sys
+1M	./lost+found
+1M	./media
+1M	./mnt
+1M	./root
+1M	./srv
+2M	./run
+7M	./etc
+11M	./opt
+74M	./tmp
+151M	./boot
+1329M	./home
+1497M	./snap
+2535M	./usr
+3820M	./var
+9421M	.
+9421M	total
+</pre>
+Confusingly, that doesn't seem consistent with 
+<pre>$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            474M     0  474M   0% /dev
+tmpfs            99M  1.2M   97M   2% /run
+/dev/vda1        25G   20G  4.4G  82% /
+tmpfs           491M     0  491M   0% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+tmpfs           491M     0  491M   0% /sys/fs/cgroup
+/dev/vda15      105M  9.2M   96M   9% /boot/efi
+tmpfs            99M     0   99M   0% /run/user/0
+tmpfs            99M     0   99M   0% /run/user/1000
+/dev/loop4       68M   68M     0 100% /snap/lxd/22526
+/dev/loop2       44M   44M     0 100% /snap/snapd/15177
+/dev/loop3       56M   56M     0 100% /snap/core18/2344
+/dev/loop5       68M   68M     0 100% /snap/lxd/22753
+/dev/loop0       62M   62M     0 100% /snap/core20/1405
+/dev/loop6       45M   45M     0 100% /snap/snapd/15534
+/dev/loop7       62M   62M     0 100% /snap/core20/1434
+overlay          25G   20G  4.4G  82% /var/lib/docker/overlay2/b1e93808993411941a56eeab3447a9620dabf64956633befd4f4997c00d3bfea/merged
+shm              64M     0   64M   0% /var/lib/docker/containers/dd7ef352d6ba8fa022bde66cc083c81c868ecc492b41eb31725cbd3d44e41297/mounts/shm
+overlay          25G   20G  4.4G  82% /var/lib/docker/overlay2/37c02acbf47a52998e26eb679988396a263c4b2bc723435a7e185d999adb3554/merged
+shm              64M     0   64M   0% /var/lib/docker/containers/4ca979c1faea9fee6b29a1bcebbea5b1897aabcb8f5e6b4e3844b52a90f481e7/mounts/shm
+/dev/loop8       56M   56M     0 100% /snap/core18/2409
+</pre>
+
+<h2>Disk usage savings #1: decrease Journal</h2>
+
+https://askubuntu.com/a/1238221
+and
+https://unix.stackexchange.com/a/130802/431711
+and https://wiki.archlinux.org/title/Systemd/Journal
+
+<pre>cd /var/log/journal
+</pre>
+
+<pre>sudo journalctl --vacuum-time=10d
+</pre>
+
+<h2>Disk usage savings #2: remove unused Docker images</h2>
+
+<pre>docker images | grep "&lt;none&gt; &lt;none&gt;" | tr -s " " | cut -d' ' -f3 | xargs docker rmi
+</pre>
+
+{% endblock %}

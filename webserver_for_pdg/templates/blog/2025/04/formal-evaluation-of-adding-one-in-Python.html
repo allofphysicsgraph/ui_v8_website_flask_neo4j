@@ -1,0 +1,406 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>formal evaluation of adding one in Python</H1>
+
+<P><small>Published 2025-04-22T20:55:00Z by Physics Derivation Graph</small></P>
+
+<i>Here's what I want to accomplish</i>:<br />&nbsp;&nbsp;<div><fieldset>
+  <legend>program requirements, v1</legend>
+<p><i>objective</i>:&nbsp;add one to a user-provided value
+  </p></fieldset>
+
+<p><br /></p>
+
+<p><i>And here's an implementation in Python that I think provides that capability</i>:
+</p><fieldset>
+  <legend>program implementation, v1</legend>
+<pre>#!/usr/bin/env python3
+import sys
+"""
+how hard can it be to add one to a user-provided value?
+"""
+
+def add_one_to_arg(number_str: str):
+    """
+    do the addition
+    """
+    try:
+        number = int(number_str)
+    except ValueError:
+        try:
+            number = float(number_str)
+        except ValueError:
+            print(f"Error: '{number_str}' is not a valid float.")
+            print(f"Usage: python {sys.argv[0]} &lt;number&gt;")
+            sys.exit(1) # Exit with an error status code
+
+    return number + 1
+    
+if __name__ == "__main__":
+
+    if len(sys.argv) &lt; 2:
+        print("Error: Please provide a number as a command-line argument.")
+        print(f"Usage: python {sys.argv[0]} &lt;number&gt;")
+        sys.exit(1) # Exit with a non-zero status code to indicate an error
+
+    # Get the first argument (index 1)
+    number_str = sys.argv[1]
+
+    result = add_one_to_arg(number_str)
+
+    print(f"{number_str} plus one is {result}")
+
+#EOF</pre>
+</fieldset>
+
+<p>When I run the above script I get
+</p><pre>$ python3 add_one.py 4
+4 plus one is 5
+$ python3 add_one.py 4.2
+4.2 plus one is 5.2
+$ python3 add_one.py cat
+Error: 'cat' is not a valid float.
+Usage: python add_one.py &lt;number&gt;</pre>
+
+<p><br /></p><p>Next I'm going to intentionally add a few bugs and then ask how to prove the implementation has no bugs:
+  
+  </p>
+
+<fieldset>
+  <legend>program implementation, v2 (with bugs)</legend>
+<pre>#!/usr/bin/env python3
+
+import sys
+import random
+import os
+"""
+how hard can it be to add one to a user-provided value?
+"""
+
+def add_one_to_arg(number_str: str):
+    """
+    do the addition
+    """
+    try:
+        number = int(number_str)
+    except ValueError:
+        try:
+            number = float(number_str)
+        except ValueError:
+            print(f"Error: '{number_str}' is not a valid float.")
+            print(f"Usage: python {sys.argv[0]} &lt;number&gt;")
+            sys.exit(1) # Exit with an error status code
+
+    # deterministic bug
+    if number == 3.14159265359:
+        return 6
+
+    # random bug
+    if random.random()&lt;0.001:
+        return number+2
+
+    # bug that is specific to user environment
+    my_var = os.environ.get("ASDF")
+    if my_var:
+        return number+3
+
+    return number + 1
+
+if __name__ == "__main__":
+
+    if len(sys.argv) &lt; 2:
+        print("Error: Please provide a number as a command-line argument.")
+        print(f"Usage: python {sys.argv[0]} &lt;number&gt;")
+        sys.exit(1) # Exit with a non-zero status code to indicate an error
+
+    # Get the first argument (index 1)
+    number_str = sys.argv[1]
+
+    result = add_one_to_arg(number_str)
+
+    print(f"{number_str} plus one is {result}")
+
+#EOF</pre>
+</fieldset>
+<p>I've added three bugs in v2: a deterministic bug, a random bug, and bug that depends on the user's environment. A brute force test would be expensive but could identify the first two bugs. </p>
+
+<p>There are a couple problems with v1 of the program requirements to "add one to a user-provided value." 
+  </p><ul>
+    <li>The input range (unstated) is negative infinity to positive infinity. 
+      <ul>
+        <li>Python does not have a built-in limit for the size of integers. The maximum integer value is restricted only by the available memory of the system.
+        </li>
+        <li>For floats there is an upper bound:<pre>&gt;&gt;&gt; import sys
+&gt;&gt;&gt; sys.float_info.max
+1.7976931348623157e+308</pre>
+      </li></ul>
+    </li><li>Time-out conditions are unspecified. So if the program doesn't respond for 5 minutes, the requirements have nothing to say about that.
+</li></ul>
+
+<p>Rewrite the program requirements to be more specific:
+</p><fieldset>
+  <legend>program requirements, v2</legend>
+<p><i>objective</i>:&nbsp;add one to a user-provided value. <br /><i>constraint</i>: User-provided value must be between -1E100 and +1E100.<br /><i>constraint</i>:&nbsp;Response to user must be provided less than 1 minute after user input.
+  </p></fieldset>
+
+<p>If the "computer" doing this calculation has a 1Hz CPU clock frequency with 1byte of RAM, that might result in the Python program being "right" but the hardware being inadequate. 
+
+</p><p>Also, let's make explicit the assumption that we are operating in base 10 numbers.</p><p>To be safe with the input string, let's bound that to be less than 1000 characters.</p><fieldset>
+  <legend>program assumptions and requirements, v3</legend>
+<p><i>objective</i>: add one to a user-provided value. <br /><i>constraint</i>:&nbsp;User-provided value must be between -1E100 and +1E100.<br /><i>constraint</i>:&nbsp;Response to user must be provided less than 1 minute after user input.<br /><i>constraint</i>: user-provided input and the result are both base 10 numbers.<br /><i>constraint</i>: user-provided input is less than 1000 characters.<br />
+  <i>assumption</i>: the program is run on a MacBook Air M2 with 8GB of RAM with factory settings.<br /></p></fieldset>
+
+<p>The revised implementation is</p>
+
+<fieldset>
+  <legend>program implementation, v3 -- with bugs and constraints</legend>
+<pre>#!/usr/bin/env python3
+
+import sys
+import random
+import os
+"""
+how hard can it be to add one to a user-provided value?
+"""
+
+def add_one_to_arg(number_str: str):
+    """
+    do the addition
+    """
+    try:
+        number = int(number_str)
+    except ValueError:
+        try:
+            number = float(number_str)
+        except ValueError:
+            print(f"Error: '{number_str}' is not a valid float.")
+            print(f"Usage: python {sys.argv[0]} &lt;number&gt;")
+            sys.exit(1) # Exit with an error status code
+
+    assert(number&lt;1E100)
+    assert(number&gt;-1E100)
+
+    # deterministic bug
+    if number == 3.14159265359:
+        return 6
+
+    # random bug
+    if random.random()&lt;0.001:
+        return number+2
+
+    # bug that is specific to user environment
+    my_var = os.environ.get("ASDF")
+    if my_var:
+        return number+3
+
+    return number + 1
+
+if __name__ == "__main__":
+
+    if len(sys.argv) &lt; 2:
+        print("Error: Please provide a number as a command-line argument.")
+        print(f"Usage: python {sys.argv[0]} &lt;number&gt;")
+        sys.exit(1) # Exit with a non-zero status code to indicate an error
+
+    # Get the first argument (index 1)
+    number_str = sys.argv[1]
+
+    assert(len(number_str)&lt;1000)
+
+    result = add_one_to_arg(number_str)
+
+    print(f"{number_str} plus one is {result}")
+
+#EOF</pre>
+</fieldset>
+
+<p>Normal testing involves evaluating pre-determined cases, like "input 5, get 6" and "input 5.4, get 6.4" and "input 'cat', get error" and "input (nothing), get error."</p>
+  
+<fieldset>
+  <legend>program implementation, v4 -- with pytest</legend>
+<pre>#!/usr/bin/env python3
+
+import sys
+import random
+import os
+"""
+how hard can it be to add one to a user-provided value?
+"""
+
+def add_one(number_str: str):
+    """
+    do the addition
+    """
+    try:
+        number = int(number_str)
+    except ValueError:
+        try:
+            number = float(number_str)
+        except ValueError:
+            print(f"Error: '{number_str}' is not a valid float.")
+            print(f"Usage: python {sys.argv[0]} &lt;number&gt;")
+            sys.exit(1) # Exit with an error status code
+
+    assert(number&lt;1E100)
+    assert(number&gt;-1E100)
+
+    # deterministic bug
+    if number == 3.14159265359:
+        return 6
+
+    # random bug
+    if random.random()&lt;0.001:
+        return number+2
+
+    # bug that is specific to user environment
+    my_var = os.environ.get("ASDF")
+    if my_var:
+        return number+3
+
+    return number + 1
+
+def test_add_one_to_int():
+    result = add_one(number_str="5")
+    assert result == 6
+
+def test_add_one_to_float():
+    result = add_one(number_str="5.3")
+    assert result == 6.3
+    
+def test_add_one_to_nuthin():
+    with pytest.raises(SystemExit):
+        result = add_one(number_str="")    
+
+#EOF</pre>
+</fieldset>
+  
+  
+  <p><br /></p><p>Property-based testing (e.g., <a href="https://hypothesis.readthedocs.io/en/latest/">https://hypothesis.readthedocs.io/en/latest/</a>) is where you "write tests which should pass for all inputs in whatever range you describe, and let Hypothesis randomly choose which of those inputs to check - including edge cases you might not have thought about."&nbsp;</p>
+  
+<fieldset>
+  <legend>program implementation, v4 -- with hypothesis</legend>
+<pre>#!/usr/bin/env python3
+
+import sys
+import random
+import os
+import pytest
+import hypothesis
+"""
+how hard can it be to add one to a user-provided value?
+"""
+
+def add_one(number_str: str):
+    """
+    do the addition
+    """
+    try:
+        number = int(number_str)
+    except ValueError:
+        try:
+            number = float(number_str)
+        except ValueError:
+            print(f"Error: '{number_str}' is not a valid float.")
+            print(f"Usage: python {sys.argv[0]} &lt;number&gt;")
+            sys.exit(1) # Exit with an error status code
+
+    assert(number&lt;1E100)
+    assert(number&gt;-1E100)
+
+    # deterministic bug
+    if number == 3.14159265359:
+        return 6
+
+    # random bug
+    if random.random()&lt;0.001:
+        return number+2
+        
+    # bug that is specific to user environment
+    my_var = os.environ.get("ASDF")
+    if my_var:
+        return number+3
+
+    return number + 1
+
+@hypothesis.given(number=(hypothesis.strategies.integers(-1E10, 1E10) | hypothesis.strategies.floats(-1E10, 1E10, allow_nan=False)))
+@hypothesis.settings(max_examples=1000) # default is 200
+def test_add_one_properties(number):
+    result = add_one(number_str=str(number))
+    assert result == number+1
+
+#EOF</pre>
+</fieldset>
+To run the above script, use
+  <pre>  pytest name_of_file.py
+  </pre>
+  
+  <p>Similarly, <a href="https://github.com/zlorb/PyModel">https://github.com/zlorb/PyModel</a> is a model checker that generates test cases based on constraints.
+  
+
+  
+  </p><p>This blog post is about formal methods. There are a few options:
+
+</p><ul style="text-align: left;">
+  <li>formal design specification</li><ul><li><a href="https://github.com/fizzbee-io/FizzBee">https://github.com/fizzbee-io/FizzBee</a> is a design specification language. FizzBee is supposed to be before you start coding
+  </li></ul><li>formal implementation verification</li><ul><li><a href="https://github.com/marcoeilers/nagini">https://github.com/marcoeilers/nagini</a>, a static verification tool for Python using Viper, is an implementation verification language. <a href="https://www.youtube.com/watch?v=PIwP3SuWLb0">https://www.youtube.com/watch?v=PIwP3SuWLb0
+  </a></li><li><a href="https://deal.readthedocs.io/basic/verification.html">https://deal.readthedocs.io/basic/verification.html</a> is an implementation verification language.
+  </li><li><a href="https://github.com/pschanely/CrossHair">https://github.com/pschanely/CrossHair</a>: a static verification tool for Python using symbolic execution. "Repeatedly calls your functions with symbolic inputs. It uses an SMT solver (a kind of theorem prover) to explore viable execution paths and find counterexamples for you."</li></ul><li><a href="https://github.com/formal-land/coq-of-python">https://github.com/formal-land/coq-of-python</a>&nbsp;-&nbsp;Translate Python code to Coq code for formal verification. "formal-land" is a commercial company selling verification-as-a-service:&nbsp;</li><li><a href="https://github.com/arsalan0c/dafny-of-python">https://github.com/arsalan0c/dafny-of-python</a>: translates a program written in <a href="https://github.com/arsalan0c/dafny-of-python/wiki/Language">a subset of typed Python</a> along with its specification, to the Dafny verification language. Uses&nbsp;Dune, a build system for OCaml projects. Last update was 4 years ago. See&nbsp;<a href="https://dune.build/">https://dune.build/</a> and&nbsp;<a href="https://dune.readthedocs.io/en/latest/index.html">https://dune.readthedocs.io/en/latest/index.html</a></li></ul>
+  
+  <div><br /></div>
+  <div><br /></div><div>Design by Contract (<a href="https://en.wikipedia.org/wiki/Design_by_contract">https://en.wikipedia.org/wiki/Design_by_contract</a>) approaches for Python include Dafny, Deal, and icontract. <br />For Dafny you write the program in Dafny and compile to Python. <br />For Deal you write Python and provide decorators.</div><div><br /></div>
+  
+  <h1 style="text-align: left;">Dafny</h1><div><a href="https://en.wikipedia.org/wiki/Dafny">https://en.wikipedia.org/wiki/Dafny</a></div><div><br /></div><div>"Dafny lifts the burden of writing bug-free code into that of writing bug-free annotations."&nbsp;<br />Dafny was&nbsp;created by Rustan Leino at Microsoft Research.<br />Dafny uses the Z3 automated theorem prover and Boogie.
+
+  <blockquote>
+Boogie is a simple programming language that is meant to be
+<ul>
+  <li>an easy compile target (think "like JVM bytecode, but for proving code correct")
+  </li><li>easy to analyze soundly
+  </li><li>not actually intended to be executable
+  </li></ul>
+<p>Instead of running Boogie programs, the Boogie compiler looks through the Boogie code to find assertions. For each assertion, the compiler generates a "verification condition", which is a formula based on a (symbolic) analysis of the program; the verification condition formula is constructed so that if the verification condition is true, the assertion holds.
+
+</p><p>It then hands those verification conditions, along with annotations in the program like assumptions, preconditions, postconditions, and loop invariants, to an SMT solver (Boogie uses Z3 by default). The SMT solver determines whether or not the assumptions definitely ensure the verification condition holds; Boogie complains about the assertions whose verification-conditions haven't been shown to hold.
+  </p></blockquote><i>
+  source</i>: <a href="https://www.reddit.com/r/ProgrammingLanguages/comments/tc55ld/how_does_the_dafny_programming_language/">https://www.reddit.com/r/ProgrammingLanguages/comments/tc55ld/how_does_the_dafny_programming_language/</a>
+    
+  </div><p></p></div><div><br /></div>
+  
+  <div><a href="https://dafny.org/dafny/OnlineTutorial/guide.html">https://dafny.org/dafny/OnlineTutorial/guide.html</a></div><div><br /></div><div>Since "add 1" doesn't have a loop, the main aspects we'll need in Dafny are</div><div><ul style="text-align: left;"><li>@requires(...): Preconditions -- what must be true before the function is called.&nbsp;</li><li>@ensures(...): Postconditions -- what must be true after the function returns normally.</li></ul><div>Requires input is a number (int or float)</div></div><div>Ensures input &lt; output</div><div><br /></div>
+
+
+<h1 style="text-align: left;">Deal</h1>
+<div>Integrates with Z3 prover</div>
+<div><a href="https://github.com/life4/deal">https://github.com/life4/deal</a></div>
+<div><a href="https://github.com/life4/deal-solver">https://github.com/life4/deal-solver</a></div>
+<div><a href="https://deal.readthedocs.io/">https://deal.readthedocs.io/</a></div>
+<a href="https://deal.readthedocs.io/basic/verification.html#background">https://deal.readthedocs.io/basic/verification.html#background</a><p></p>
+
+<div>As of April 2025, Deal doesn't have an issue tracker and doesn't seem to be active.&nbsp;</div>
+
+<fieldset>
+  <legend>deal example</legend>
+<pre>
+#!/usr/bin/env python3
+import deal
+from typing import Union
+
+@deal.pre(lambda number: number&lt;1E100) # Precondition must be true before the function is executed.
+@deal.pre(lambda number: number&gt;-1E100)
+@deal.ensure(lambda number, result: result==number+1)
+def add_one_to_arg(number: Union[int, float]) -> Union[int, float]:
+    """
+    do the addition
+    """
+    return number + 1
+#EOF</pre>
+</fieldset>
+which can be run using
+<pre> python3 -m deal prove name_of_file.py</pre>
+
+<div><br /></div>
+
+<h1 style="text-align: left;">iContract</h1><div>No prover, just consistency of conditions within Python using decorators.</div><div><br /></div><div><a href="https://github.com/Parquery/icontract">https://github.com/Parquery/icontract</a></div><div><a href="https://icontract.readthedocs.io/en/latest/">https://icontract.readthedocs.io/en/latest/</a></div><div><br /></div><div>This report found lack of coverage</div><div><a href="https://github.com/mristin/python-by-contract-corpus/blob/main/python_by_contract_corpus/incorrect_from_recorded/aoc2020/day_10_adapter_array/missed_edge_case_empty.py">https://github.com/mristin/python-by-contract-corpus/blob/main/python_by_contract_corpus/incorrect_from_recorded/aoc2020/day_10_adapter_array/missed_edge_case_empty.py</a></div><div>from&nbsp;<a href="https://github.com/mristin/python-by-contract-corpus">https://github.com/mristin/python-by-contract-corpus</a></div>
+
+{% endblock %}

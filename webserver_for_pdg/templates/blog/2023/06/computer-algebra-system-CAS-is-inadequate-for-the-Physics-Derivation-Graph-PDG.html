@@ -1,0 +1,24 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>computer algebra system (CAS) is inadequate for the Physics Derivation Graph (PDG)</H1>
+
+<P><small>Published 2023-06-15T10:27:00.004Z by Physics Derivation Graph</small></P>
+
+<p>I'm beginning to appreciate that a computer algebra system (CAS) is not sufficient for the Physics Derivation Graph (PDG). The evidence of this is that the variables I'm defining can be real or complex; that is not distinguished by the computer algebra system. 
+
+</p><p>The simple story of starting with 
+</p><pre>a = b</pre>
+and then adding 2 to both sides to get
+<pre>a+2 = b+2</pre>
+is appropriate for a computer algebra system. But if "a" is a matrix then the operation is invalid. The only way to distinguish "scalar a" from "vector a" from "matrix a" is to specify the difference. [SymPy does have support for predicates --&nbsp;<a href="https://docs.sympy.org/latest/guides/assumptions.html#predicates">https://docs.sympy.org/latest/guides/assumptions.html#predicates</a> .]<p>In the Physics Derivation Graph I want to be more specific about the possible values of a and b. 
+Even for non-physics derivations like the Euler equations, there are assumptions about the possible values of each variable.
+
+</p><p>I don't know Lean, but I also don't know the foundational concepts of theorems and proofs.<br />
+Is a step a theorem?<br />
+Is a derivation a theorem?<br />
+The role of inference rules in steps in derivations does not map to anything in a theorem.
+  
+  </p><p></p><p></p><p></p>
+
+{% endblock %}

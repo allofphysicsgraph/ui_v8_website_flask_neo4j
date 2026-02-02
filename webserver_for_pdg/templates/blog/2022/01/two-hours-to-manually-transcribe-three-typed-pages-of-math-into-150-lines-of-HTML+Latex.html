@@ -1,0 +1,21 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>two hours to manually transcribe three typed pages of math into 150 lines of HTML+Latex</H1>
+
+<P><small>Published 2022-01-05T18:57:00.004Z by Physics Derivation Graph</small></P>
+
+<p>I have about 20 boxes of notes from roughly 10 years of undergrad and graduate classes in Math and Physics. I've kept the notes for the past 10 years with the intent of converting the notes into a structured and computer-readable format. The current site <a href="https://derivationmap.net/">https://derivationmap.net/</a>&nbsp;shows the proof-of-concept that the technical capability is feasible.&nbsp;</p><p>I spent two hours manually transcribing&nbsp;three typed pages of math into&nbsp;<a href="https://derivationmap.net/class_notes/math402_mathematical_physics_hale">https://derivationmap.net/class_notes/math402_mathematical_physics_hale</a>. The resulting HTML with MathJax was about 150 lines. By the end my attention/focus was waning, so a break was necessary.&nbsp;</p><p>The typed notes are merely transcription into computer-readable format; the notes are not in the "equation graph" form necessary for the Physics Derivation Graph. That is a separate tedious process.&nbsp;</p><p><i>Observations</i>:</p><p></p><ul style="text-align: left;"><li>An estimate of how long transcribing all the notes would take:</li><ul><li>If I type HTML+MathJax for 4 hours a day, that seems reasonable</li><li>If a box of notes is 1 ream (500 pages), (500 pages/box)*(2 hours/3 pages)*(20 boxes)=6666 hours</li><li>6666 hours/(4 hours/day) = 1666.5 days, or 4.5 years</li></ul><li>There are many diagrams that go with the text and equations. The three pages in this sample didn't have diagrams. Converting the diagrams into tikz would be time consuming.</li><li>The structure of the notes is not compatible with the constraints of the "equation graph" structure.&nbsp;</li><li>I expect that scanning + OCR would be of limited value for producing Latex. Also, much of the notation in the notes is sloppy and requires translation to more rigorous notation.&nbsp;</li><li>Even the more "rigorous notation" is merely an improvement; the notation is a long ways from the specificity needed for use in a computer algebra system. As an example,&nbsp;</li><ul>
+  <li>the original format for an inner product is (<b>x</b>, <b>y</b>) -- here "x" and "y" are merely bolded</li>
+  <li>my more rigorous notation is $(\vec{x}, \vec{y})$</li>
+  <li>Multiplying the inner product by a complex value $\alpha(\vec{x}, \vec{y})$ is visually ambiguous -- it could be interpreted that $\vec{x}$ and $\vec{y}$ are arguments to the function $\alpha$. See also <a href="https://math.stackexchange.com/questions/402005/what-is-rigorous-notation-for-functions">this question</a>.</li></ul><li>Notes for a course are either a single page (with thousands of equations, which render in MathJax slowly) or split among many pages (increasing the number of context switches)</li>
+</ul><div><br /></div><div>If typing every page of notes into HTML+MathJax is not reasonable (or useful), then identifying what part of the notes are useful should be the objective.&nbsp;</div><div><ul>
+  <li><i>not useful</i>: Homework problems and exams are reliant on identifying and applying one or more Physics expressions and then numerically compute the result for a given scenario. Homework problems rarely demonstrate connectivity among Physics expressions.&nbsp;</li>
+  <li><i>not useful</i>: identities that arise from definitions. Example: Cauchy Schwartz</li>
+  <li><i>marginally useful</i>: Derivation from definitions&nbsp;</li>
+  <li><i>marginally useful</i>:&nbsp;Derivation from experiments&nbsp;</li>
+  <li><i>potentially useful</i>: Derivation from another expression&nbsp;</li>
+</ul><div><br /></div>
+  Simple harmonic oscillator - identify every domain it is used in</div>
+
+{% endblock %}

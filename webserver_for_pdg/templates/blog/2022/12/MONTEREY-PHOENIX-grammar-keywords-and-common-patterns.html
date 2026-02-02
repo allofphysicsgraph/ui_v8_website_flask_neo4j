@@ -1,0 +1,154 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>MONTEREY PHOENIX grammar, keywords, and common patterns</H1>
+
+<P><small>Published 2022-12-19T01:18:00.002Z by Physics Derivation Graph</small></P>
+
+<h2>MONTEREY PHOENIX grammar</h2><div>In this table <i>A</i> is an event and <i>B</i> and <i>C</i> are events in <i>A</i></div>
+<table border="1">
+  <tbody><tr>
+    <th>description of pattern</th>
+    <th>grammar rule</th>
+  </tr>
+  <tr>
+    <td>Ordered sequence of events (B followed by C)</td> 
+    <td>A: B C;</td> 
+  </tr>
+  <tr>
+    <td>Alternative events (B or C)</td> 
+    <td>A: ( B | C );</td> 
+  </tr>
+  <tr>
+    <td>Optional event (B or no event at all)</td> 
+    <td>A: [ B ];</td> 
+  </tr>
+  <tr>
+    <td>Ordered sequence of zero or more events B</td> 
+    <td>A: (* B *);</td> 
+  </tr>
+  <tr>
+    <td>Ordered sequence of one or more events B</td> 
+    <td>A: (+ B +);</td> 
+  </tr>
+  <tr>
+    <td>Unordered set of events B and C (B and C may happen concurrently)</td> 
+    <td>A: { B, C };</td> 
+  </tr>
+  <tr>
+    <td>Unordered set of zero or more events B</td> 
+    <td>A: {* B *};</td> 
+  </tr>
+  <tr>
+    <td>Unordered set of one or more events B</td> 
+    <td>A: {+ B +};</td> 
+  </tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<table border="1">
+  <tbody><tr>
+    <th>description of pattern</th>
+    <th>grammar rule</th>
+  </tr>
+  <tr>
+    <td>name of model</td> 
+    <td>SCHEMA</td> 
+  </tr>
+  <tr>
+    <td>Identifies an actor</td> 
+    <td>ROOT</td> 
+  </tr>
+  <tr>
+    <td>event precedence across swimlanes</td> 
+    <td>COORDINATE</td> 
+  </tr>
+  <tr>
+    <td>if and only if</td> 
+    <td>&lt;-&gt;</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>&lt;!&gt;</td> 
+  </tr>
+  <tr>
+    <td>a condition that each valid trace should satisfy</td> 
+    <td>ENSURE</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>FOREACH</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>BUILD</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>DISJ</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>MARK</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>ONFAIL</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>CHECK</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>AFTER</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>EXISTS</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>MAP</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>CLEAR</td> 
+  </tr>
+  <tr>
+    <td></td> 
+    <td>SHOW</td> 
+  </tr>
+  <tr>
+    <td>message box that prints text</td> 
+    <td>SAY("hello world")</td> 
+  </tr>
+</tbody>
+</table>
+
+
+<h2>Common pattern: branching logic in swimlane</h2>
+<pre>ROOT Driver: enters_car (starts_car | exits_car);
+starts_car:  move_forward
+             stops_car
+             exits_car;
+</pre>
+  
+<h2>Common pattern: dependency across swimlanes</h2>
+<pre>COORDINATE
+$a: turn_steering_wheel_right FROM driver,
+$b: right FROM front_tires
+DO 
+ADD $a PRECEDES $b; 
+OD;
+</pre>
+
+  <h2>Common pattern: shared events</h2>
+<pre>Driver, Car SHARE ALL move_forward, 
+                      turn_left, 
+                      turn_right;
+</pre>
+
+{% endblock %}

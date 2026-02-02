@@ -1,0 +1,30 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Next steps once math expressions are tokenized</H1>
+
+<P><small>Published 2022-05-28T21:14:00.004Z by Physics Derivation Graph</small></P>
+
+<p>In my <a href="https://physicsderivationgraph.blogspot.com/2022/05/searchable-latex-semantic-enrichment.html">previous post</a> I outlined a sequence of steps with a negative framing about how difficult each step would be. A positive framing of the sequence is
+
+</p><ol>
+<li>Analyze .tex from arxiv and account for issues like encoding and misspelling and mal-formed latex and expansion of macros.
+</li><li>Once the math (e.g. $x$) and expressions are separated from the text, tokenize variables within expressions. 
+</li><li>Once variables are tokenized within expressions, identifying the concept (e.g., name of constants) based on the text in the paper. 
+</li><li>Reconcile variables across different .tex files in arxiv
+</li><li>Create an interface providing semantically-enriched arxiv content that is indexed for search queries to users. 
+</li></ol>
+
+<p>Suppose we are at step 2 and everything in a document is correctly tokenized (or even if just a fraction&nbsp; of the content is tokenized). The follow-on step (3) would be to detect the definition of the tokens from the text. For example, if the variable "a" shows up in an expression, and $a$ shows up in the text, and the text is something like 
+</p><pre>"where $a$ is the number of cats in the house"
+</pre>
+Then we can deduce that "a" is defined as "number of cats in the house".
+
+<p>Step 4 would be to figure out if "a" is used similarly in other papers. That would indicate a relation of the papers based on the topic of the content.
+See for example&nbsp;<a href="https://arxiv.org/pdf/1902.00027.pdf">https://arxiv.org/pdf/1902.00027.pdf</a>
+  
+</p><p><br /></p><p>Another use case for tokenized text (in step 2) with some semantic meaning (step 3) would be to validate the expressions.
+If the expression is "a = b" and the two variables have different units, that means the expression is wrong.
+</p><p></p><p></p><p></p>
+
+{% endblock %}

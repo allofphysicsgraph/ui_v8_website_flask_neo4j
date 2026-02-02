@@ -1,0 +1,125 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>troubleshooting docker and podman on MacAirbook M2</H1>
+
+<P><small>Published 2025-01-01T15:44:00Z by Physics Derivation Graph</small></P>
+
+<p>I have an old MacBook Air running&nbsp;</p>
+<ul style="text-align: left;">
+  <li>macOS Catalina v10.15.7 with a 1.8GHz Intel Core i5 and 4GB of RAM</li>
+  <li>`docker compose version` = 2.2.1</li>
+  <li>`docker --version` = 20.10.11</li>
+</ul>
+<p>I have a new MacBook Air running&nbsp;</p>
+<ul style="text-align: left;">
+  <li>macOS Sonoma v14.6.1 with an Apple M2 and 8GB of RAM</li>
+</ul><div><br /></div><p></p>
+
+<h2>Podman on the new MacBook M2</h2><div>Downloaded&nbsp;</div><div><a href="https://github.com/podman-desktop/podman-desktop/releases/download/v1.15.0/podman-desktop-1.15.0-universal.dmg">https://github.com/podman-desktop/podman-desktop/releases/download/v1.15.0/podman-desktop-1.15.0-universal.dmg</a></div><div>from&nbsp;<a href="https://podman-desktop.io/downloads">https://podman-desktop.io/downloads</a></div><div>Confusingly, 1.15.0 provides Podman 4.9.0 (?)</div><div><br /></div><div><br /></div>
+As per <a href="https://stackoverflow.com/a/76488304">https://stackoverflow.com/a/76488304</a> I tried
+<fieldset>
+<pre>% podman machine stop; podman machine start
+
+Waiting for VM to exit...
+Machine "podman-machine-default" stopped successfully
+Starting machine "podman-machine-default"
+Waiting for VM ...
+Mounting volume... /Users:/Users
+chattr: Operation not supported while reading flags on /
+mkdir: cannot create directory ‘/Users’: Read-only file system
+chattr: Operation not supported while reading flags on /
+Error: exit status 1
+</pre>
+</fieldset><div><br /></div>
+I then tried
+<fieldset>
+<pre>% podman machine stop
+Waiting for VM to exit...
+Machine "podman-machine-default" stopped successfully
+
+% podman machine rm
+The following files will be deleted:
+...
+Are you sure you want to continue? [y/N] y
+
+% podman machine init                                         
+Extracting compressed file: podman-machine-default_fedora-coreos-41.20241215.2.0-qemu.aarch64.qcow2: done  
+Image resized.
+Machine init complete
+To start your machine run:
+	podman machine start
+    
+% podman machine start
+Starting machine "podman-machine-default"
+Waiting for VM ...
+Mounting volume... /Users:/Users
+chattr: Operation not supported while reading flags on /
+mkdir: cannot create directory ‘/Users’: Read-only file system
+chattr: Operation not supported while reading flags on /
+Error: exit status 1
+</pre>
+</fieldset><div><br /></div>
+Running as root doesn't help
+
+<fieldset>
+<pre>% sudo podman machine start
+Error: cannot run command "podman machine start" as root
+</pre>
+</fieldset>
+<br />As per <a href="https://stackoverflow.com/a/71576242">https://stackoverflow.com/a/71576242</a> I tried
+<fieldset>
+<pre>% podman machine init --cpus=4 --disk-size=60 --memory=6096 -v $HOME:$HOME
+Extracting compressed file: podman-machine-default_fedora-coreos-41.20241215.2.0-qemu.aarch64.qcow2: done  
+Image resized.
+Machine init complete
+To start your machine run:
+	podman machine start
+
+% podman machine start
+Starting machine "podman-machine-default"
+Waiting for VM ...
+Mounting volume... /Users/myinitials:/Users/myinitials
+chattr: Operation not supported while reading flags on /
+mkdir: cannot create directory ‘/Users’: Read-only file system
+chattr: Operation not supported while reading flags on /
+Error: exit status 1
+</pre>
+</fieldset>
+
+As a consequence, while I can run the container,
+<fieldset>
+<pre>% podman run -it --rm localhost/ui_v8_website_flask_neo4j_webserver /bin/bash 
+WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
+root@4d006ef73e19:/code# 
+</pre>
+</fieldset>
+<br />
+I am unable to mount the local directory
+<fieldset>
+<pre>% podman run -it --rm -v `pwd`:/scratch localhost/ui_v8_website_flask_neo4j_webserver /bin/bash
+WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
+Error: statfs /Users/bhp/version_control/allofphysicsgraph/ui_v8_website_flask_neo4j: no such file or directory
+</pre>
+</fieldset>
+
+<h2>Uninstall Podman</h2>
+<fieldset>
+<pre>podman machine stop podman-machine-default
+podman machine rm podman-machine-default
+podman machine rm
+sudo /opt/podman/bin/podman-mac-helper uninstall
+sudo rm /etc/paths.d/podman-pkg
+sudo rm -rfv /opt/podman
+sudo rm -rf /Applications/Podman\ Desktop.app/
+sudo rm /var/run/docker.sock
+rm -fr ~/.local/share/containers/
+</pre>
+</fieldset>
+
+
+<h2>Docker  on the new MacBook M2</h2>
+<p>Downloaded <a href="https://desktop.docker.com/mac/main/arm64/Docker.dmg">https://desktop.docker.com/mac/main/arm64/Docker.dmg</a> from 
+<a href="https://docs.docker.com/desktop/setup/install/mac-install/">https://docs.docker.com/desktop/setup/install/mac-install/</a></p>
+
+{% endblock %}

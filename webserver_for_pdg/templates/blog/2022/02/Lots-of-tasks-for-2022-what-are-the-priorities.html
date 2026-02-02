@@ -1,0 +1,10 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Lots of tasks for 2022; what are the priorities</H1>
+
+<P><small>Published 2022-02-21T22:23:00.005Z by Physics Derivation Graph</small></P>
+
+<p>With the JSON/SQL implementation, I showed myself that what I was imagining (Latex entry, CAS integration, symbol tracking, Latex/PDF output) was in fact feasible. However, the JSON/SQL backend and the forms-based web front-end were sufficiently embarrassing that I wasn't interested in showing off the idea.&nbsp;</p><p>Now my goal with the Neo4j/SQL backend my goal is 1) provide query capability and 2) to not be embarrassed.&nbsp;</p><p><br /></p><p>High priority:</p><p></p><ul style="text-align: left;"><li>Property graph implementation from scratch; probably Neo4j --&nbsp;<a href="https://github.com/allofphysicsgraph/proofofconcept/issues/171">https://github.com/allofphysicsgraph/proofofconcept/issues/171</a></li><ul><li>web search --&nbsp;<a href="https://github.com/allofphysicsgraph/proofofconcept/issues/238">https://github.com/allofphysicsgraph/proofofconcept/issues/238</a>&nbsp;</li><li>integrating SQL for variables, inference rules, units</li></ul><li>automation of inference rules</li><li>add derivation, add step, add expressions -- form-based or dynamic canvas?</li></ul><p></p><p>Low priority:&nbsp;</p><p></p><ul style="text-align: left;"><li>analysis of server logs --&nbsp;https://github.com/allofphysicsgraph/proofofconcept/issues/246</li></ul><p></p>
+
+{% endblock %}

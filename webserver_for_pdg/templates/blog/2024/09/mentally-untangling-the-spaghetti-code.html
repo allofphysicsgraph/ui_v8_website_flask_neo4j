@@ -1,0 +1,238 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>mentally untangling the spaghetti code</H1>
+
+<P><small>Published 2024-09-28T15:03:00Z by Physics Derivation Graph</small></P>
+
+<p>I recently started exploring how to migrate the Physics Derivation Graph website from the JSON-based backend (v7) to Neo4j (v8). For v7 I have a working JSON-based backend+frontend, and for v8 I have a working Neo4j-backend with minimal frontend (e.g., no nginx, no authentication, no documentation pages).</p>
+
+<p>I'm aware of two ways to carry out the migration:</p>
+
+<ul style="text-align: left;">
+  <li><i>hard cut-over</i>: port all existing front-end capabilities (nginx, authentication, documentation) and backend capabilities {render d3js, render tex, render pdf, render graphviz} to v8, then switch public site from v7 to v8</li>
+  <li><i>slow transition</i>: add Neo4j to existing v7 JSON-based site and then incrementally transition site features like {render d3js, render tex, render pdf, render graphviz}</li>
+</ul>
+
+<p>The "slow transition" has the advantage of not having to port the front-end capabilities. The downside is that the two codebases (v7, v8) exist concurrently and I have to refactor each backend feature on the live site.</p>
+
+<p>I don't have a good sense for how much work porting front-end capabilities (the hard cut-over option) involves.&nbsp;</p><p><br /></p>
+
+<p>In the process of trying the "slow transition" I am getting lost in the code dependencies and which complexity is essential versus accidental. Refactoring requires the ability to distinguish essential versus accidental complexity.&nbsp;</p>
+
+<p>The usual way to guide refactoring is to rely on tests of features. If I change some code and a feature breaks, then the essential complexity wasn't met. If I change something and all tests pass, then the assumption is that my change reduced accidental complexity. (This also relies on full test coverage and the assumption that tests are correlated with necessary capabilities.)</p>
+
+<p>A different way to distinguish essential versus accidental complexity is to enumerate roles, use cases per role, and the requirements of each use case. The requirements are the essential complexity. Then the code I write is in response to a specific requirement.&nbsp;</p><p>In practice, as a developer my natural instinct is to enact the minimum amount of change based on my local perspective. To break out of this local minimum I need the context of tracing the roles to use cases to requirements. For each change to the software! That's asking a lot.</p>
+
+<p>Writing out all the roles, uses cases, and requirements turns out to be pretty messy. This corresponds with the amount of code needed to support the Physics Derivation Graph.</p>
+
+<p><a href="https://dreampuf.github.io/GraphvizOnline/#digraph%20G%20%7B%0A%0A%20%20rankdir%3D%22LR%22%3B%0A%20%20%0A%20%20%2F%2F%20see%20https%3A%2F%2Fgraphviz.org%2Fdocs%2Fattrs%2Fsplines%2F%0A%20%20%2F%2Fsplines%3Dfalse%3B%0A%20%20%2F%2Fsplines%3Dcurved%3B%0A%20%20%2F%2Fsplines%3Dpolyline%3B%0A%20%20splines%3Dortho%3B%0A%0A%20%20unauthenticated_user%20%5Blabel%3D%22unauthenticated%20user%22%2C%20shape%3D%22rectangle%22%5D%3B%0A%20%20authenticated_user%20%5Blabel%3D%22authenticated%20user%22%2C%20shape%3D%22rectangle%22%5D%3B%0A%20%20%0A%20%20log_in%20%5Blabel%3D%22authenticate%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20unauthenticated_user%20-%3E%20log_in%20-%3E%20authenticated_user%3B%0A%20%20auth_google%20%5Blabel%3D%22authenticate%20using%20Google%22%5D%3B%0A%20%20log_in%20-%3E%20auth_google%3B%0A%20%20%0A%20%20log_out%20%5Blabel%3D%22log%20out%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20authenticated_user%20-%3E%20log_out%20-%3E%20unauthenticated_user%3B%0A%20%20%0A%20%20export_database%20%5Blabel%3D%22export%20database%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20unauthenticated_user%20-%3E%20export_database%3B%0A%20%20authenticated_user%20-%3E%20export_database%3B%0A%20%20%0A%20%20export_database_json_webUI%20%5Blabel%3D%22web%20UI%3A%20link%20to%20database%20JSON%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20export_database%20-%3E%20export_database_json_webUI%3B%0A%20%20export_database_cypher_webUI%20%5Blabel%3D%22web%20UI%3A%20link%20to%20database%20Cypher%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20export_database%20-%3E%20export_database_cypher_webUI%3B%0A%20%20%0A%20%20export_database_json_rest%20%5Blabel%3D%22REST%20API%3A%20export%20database%20as%20JSON%22%20style%3Dfilled%20color%3Dlightpink%5D%3B%0A%20%20export_database%20-%3E%20export_database_json_rest%3B%0A%20%20export_database_cypher_rest%20%5Blabel%3D%22REST%20API%3A%20export%20database%20as%20Cypher%22%20style%3Dfilled%20color%3Dlightpink%5D%3B%0A%20%20export_database%20-%3E%20export_database_cypher_rest%3B%0A%20%20%0A%20%20export_database_json_backend%20%5Blabel%3D%22backend%3A%20export%20database%20as%20JSON%22%5D%3B%0A%20%20export_database_json_rest%20-%3E%20export_database_json_backend%3B%0A%20%20export_database_json_webUI%20-%3E%20export_database_json_backend%3B%0A%20%20%0A%20%20export_database_cypher_backend%20%5Blabel%3D%22backend%3A%20export%20database%20as%20Cypher%22%5D%3B%0A%20%20export_database_cypher_webUI%20-%3E%20export_database_cypher_backend%3B%0A%20%20export_database_cypher_rest%20-%3E%20export_database_cypher_backend%3B%0A%20%20%0A%20%20import_database_as_cypher%20%5Blabel%3D%22import%20database%20as%20Cypher%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20authenticated_user%20-%3E%20import_database_as_cypher%3B%0A%0A%20%20upload_database_as_cypher_webUI%20%5Blabel%3D%22web%20UI%3A%20upload%20database%20as%20Cypher%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20import_database_as_cypher%20-%3E%20upload_database_as_cypher_webUI%3B%0A%20%20%0A%20%20upload_database_as_cypher_backend%20%5Blabel%3D%22backend%3A%20upload%20database%20as%20Cypher%22%5D%3B%0A%20%20upload_database_as_cypher_webUI%20-%3E%20upload_database_as_cypher_backend%3B%0A%20%20%0A%20%20read_FAQ%20%5Blabel%3D%22read%20FAQ%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20unauthenticated_user%20-%3E%20read_FAQ%3B%0A%20%20authenticated_user%20-%3E%20read_FAQ%3B%0A%20%20render_FAQ%20%5Blabel%3D%22web%20UI%3A%20render%20FAQ%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20read_FAQ%20-%3E%20render_FAQ%3B%0A%20%20%0A%20%20query_graph%20%5Blabel%3D%22query%20graph%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20unauthenticated_user%20-%3E%20query_graph%3B%0A%20%20authenticated_user%20-%3E%20query_graph%3B%0A%20%20%0A%20%20query_graph_webUI%20%5Blabel%3D%22web%20UI%3A%20query%20graph%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20query_graph%20-%3E%20query_graph_webUI%3B%0A%0A%20%20query_graph_rest%20%5Blabel%3D%22REST%20API%3A%20query%20graph%22%20style%3Dfilled%20color%3Dlightpink%5D%3B%0A%20%20query_graph%20-%3E%20query_graph_rest%3B%0A%20%20%0A%20%20query_graph_backend%20%5Blabel%3D%22backend%3A%20query%20graph%22%5D%3B%0A%20%20query_graph_webUI%20-%3E%20query_graph_backend%3B%0A%20%20query_graph_rest%20-%3E%20query_graph_backend%3B%0A%20%20%0A%20%20enter_new_operator%20%5Blabel%3D%22enter%20new%20operator%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20authenticated_user%20-%3E%20enter_new_operator%3B%0A%20%20%0A%20%20create_new_operator_webUI%20%5Blabel%3D%22web%20UI%3A%20create%20new%20operator%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20enter_new_operator%20-%3E%20create_new_operator_webUI%3B%0A%20%20%0A%20%20enter_new_expression%20%5Blabel%3D%22enter%20new%20expression%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20authenticated_user%20-%3E%20enter_new_expression%3B%0A%0A%20%20create_new_expression_webUI%20%5Blabel%3D%22web%20UI%3A%20create%20new%20expression%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20enter_new_expression%20-%3E%20create_new_expression_webUI%3B%0A%0A%20%20add_new_expression%20%5Blabel%3D%22backend%3A%20add%20new%20expression%22%5D%3B%0A%20%20create_new_expression_webUI%20-%3E%20add_new_expression%3B%0A%20%20%0A%20%20verify_expr_dimensional_consistency%20%5Blabel%3D%22backend%3A%20verify%20expression%20dimensional%20consistency%22%5D%3B%0A%20%20create_new_expression_webUI%20-%3E%20verify_expr_dimensional_consistency%3B%0A%0A%20%20enter_new_derivation%20%5Blabel%3D%22enter%20new%20derivation%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20authenticated_user%20-%3E%20enter_new_derivation%3B%0A%20%20%0A%20%20create_new_derivation_webUI%20%5Blabel%3D%22web%20UI%3A%20create%20new%20derivation%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20enter_new_derivation%20-%3E%20create_new_derivation_webUI%3B%0A%0A%20%20add_new_derivation%20%5Blabel%3D%22backend%3A%20add%20new%20derivation%22%5D%3B%0A%20%20create_new_derivation_webUI%20-%3E%20add_new_derivation%3B%0A%0A%20%20enter_new_symbol%20%5Blabel%3D%22enter%20new%20symbol%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20authenticated_user%20-%3E%20enter_new_symbol%3B%0A%20%20%0A%20%20create_new_symbol_webUI%20%5Blabel%3D%22web%20UI%3A%20create%20new%20symbol%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20enter_new_symbol%20-%3E%20create_new_symbol_webUI%3B%0A%0A%20%20add_new_symbol%20%5Blabel%3D%22backend%3A%20add%20new%20symbol%22%5D%3B%0A%20%20create_new_symbol_webUI%20-%3E%20add_new_symbol%3B%0A%0A%20%20read_list_of_derivations%20%5Blabel%3D%22read%20list%20of%20derivations%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20unauthenticated_user%20-%3E%20read_list_of_derivations%3B%0A%20%20authenticated_user%20-%3E%20read_list_of_derivations%3B%0A%0A%20%20list_of_derivations_html%20%5Blabel%3D%22web%20UI%3A%20render%20list%20of%20derivations%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20read_list_of_derivations%20-%3E%20list_of_derivations_html%3B%0A%0A%20%20list_of_derivations_json%20%5Blabel%3D%22REST%20API%3A%20JSON%20list%20of%20derivations%22%20style%3Dfilled%20color%3Dlightpink%5D%3B%0A%20%20read_list_of_derivations%20-%3E%20list_of_derivations_json%3B%0A%0A%20%20list_of_derivations%20%5Blabel%3D%22backend%3A%20get%20list%20of%20derivations%22%5D%3B%0A%20%20list_of_derivations_json%20-%3E%20list_of_derivations%3B%0A%20%20list_of_derivations_html%20-%3E%20list_of_derivations%3B%0A%0A%20%20read_list_of_symbols%20%5Blabel%3D%22read%20list%20of%20symbols%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20unauthenticated_user%20-%3E%20read_list_of_symbols%3B%0A%20%20authenticated_user%20-%3E%20read_list_of_symbols%3B%0A%0A%20%20list_of_symbols_html%20%5Blabel%3D%22web%20UI%3A%20show%20list%20of%20symbols%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20read_list_of_symbols%20-%3E%20list_of_symbols_html%3B%0A%0A%20%20list_of_symbols_json%20%5Blabel%3D%22REST%20API%3A%20JSON%20list%20of%20symbols%22%20style%3Dfilled%20color%3Dlightpink%5D%3B%0A%20%20read_list_of_symbols%20-%3E%20list_of_symbols_json%3B%0A%0A%20%20list_of_symbols%20%5Blabel%3D%22backend%3A%20get%20list%20of%20symbols%22%5D%0A%20%20list_of_symbols_html%20-%3E%20list_of_symbols%3B%0A%20%20list_of_symbols_json%20-%3E%20list_of_symbols%3B%0A%0A%20%20read_list_of_expressions%20%5Blabel%3D%22read%20list%20of%20expressions%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20unauthenticated_user%20-%3E%20read_list_of_expressions%3B%0A%20%20authenticated_user%20-%3E%20read_list_of_expressions%3B%0A%0A%20%20list_of_expressions_html%20%5Blabel%3D%22web%20UI%3A%20show%20list%20of%20expressions%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20read_list_of_expressions%20-%3E%20list_of_expressions_html%3B%0A%20%20list_of_expressions_html%20-%3E%20verify_expr_dimensional_consistency%3B%0A%0A%20%20list_of_expressions_json%20%5Blabel%3D%22REST%20API%3A%20JSON%20list%20of%20expressions%22%20style%3Dfilled%20color%3Dlightpink%5D%3B%0A%20%20read_list_of_expressions%20-%3E%20list_of_expressions_json%3B%0A%0A%20%20list_of_expressions%20%5Blabel%3D%22backend%3A%20get%20list%20of%20expressions%22%5D%3B%0A%20%20list_of_expressions_json%20-%3E%20list_of_expressions%3B%0A%20%20list_of_expressions_html%20-%3E%20list_of_expressions%3B%0A%0A%20%20read_derivation%20%5Blabel%3D%22read%20derivation%22%20style%3Dfilled%20color%3Dlightgrey%5D%3B%0A%20%20unauthenticated_user%20-%3E%20read_derivation%3B%0A%20%20authenticated_user%20-%3E%20read_derivation%3B%0A%20%20%0A%20%20derivation_steps_json%20%5Blabel%3D%22REST%20API%3A%20JSON%20list%20of%20steps%22%20style%3Dfilled%20color%3Dlightpink%5D%3B%0A%20%20read_derivation%20-%3E%20derivation_steps_json%3B%0A%20%20derivation_table%20%5Blabel%3D%22web%20UI%3A%20show%20table%20of%20steps%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20read_derivation%20-%3E%20derivation_table%3B%0A%20%20derivation_table%20-%3E%20verify_expr_dimensional_consistency%3B%0A%20%20%0A%20%20verify_step_consistency%20%5Blabel%3D%22backend%3A%20verify%20step%20consistency%22%5D%3B%0A%20%20derivation_table%20-%3E%20verify_step_consistency%3B%0A%20%20%0A%20%20list_of_steps%20%5Blabel%3D%22backend%3A%20get%20list%20of%20steps%22%5D%3B%0A%20%20derivation_steps_json%20-%3E%20list_of_steps%3B%0A%20%20derivation_table%20-%3E%20list_of_steps%3B%0A%20%20%0A%20%20derivation_tex%20%5Blabel%3D%22web%20UI%3A%20link%20to%20derivation%20.tex%20file%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20read_derivation%20-%3E%20derivation_tex%3B%0A%20%20derivation_pdf%20%5Blabel%3D%22web%20UI%3A%20link%20to%20derivation%20.pdf%20file%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20read_derivation%20-%3E%20derivation_pdf%3B%0A%20%20derivation_d3js%20%5Blabel%3D%22web%20UI%3A%20show%20derivation%20d3js%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20read_derivation%20-%3E%20derivation_d3js%3B%0A%20%20derivation_graphviz_png%20%5Blabel%3D%22web%20UI%3A%20show%20derivation%20graphviz%20PNG%22%20style%3Dfilled%20color%3Dlightblue%5D%3B%0A%20%20read_derivation%20-%3E%20derivation_graphviz_png%3B%0A%0A%20%20derivation_d3js%20-%3E%20list_of_steps%3B%0A%20%20derivation_graphviz_png%20%20-%3E%20list_of_steps%3B%0A%20%20%0A%20%20get_expression_for_step%20%5Blabel%3D%22backend%3A%20get%20expressions%20per%20step%22%5D%3B%0A%20%20derivation_d3js%20-%3E%20get_expression_for_step%3B%0A%20%20derivation_table%20-%3E%20get_expression_for_step%3B%0A%20%20get_infrule_for_step%20%5Blabel%3D%22backend%3A%20get%20infrule%20per%20step%22%5D%3B%0A%20%20derivation_graphviz_png%20-%3E%20get_infrule_for_step%3B%0A%20%20%0A%20%20generate_png_for_expression%20%5Blabel%3D%22backend%3A%20generate%20png%20for%20expression%22%5D%3B%0A%20%20derivation_d3js%20-%3E%20generate_png_for_expression%3B%0A%20%20derivation_graphviz_png%20-%3E%20generate_png_for_expression%3B%0A%20%20generate_png_for_infrule%20%5Blabel%3D%22backend%3A%20generate%20png%20for%20infrule%22%5D%3B%0A%20%20derivation_d3js%20-%3E%20generate_png_for_infrule%3B%0A%20%20derivation_graphviz_png%20-%3E%20generate_png_for_infrule%3B%0A%20%20%0A%20%20generate_derivation_tex%20%5Blabel%3D%22backend%3A%20generate%20tex%20for%20derivation%22%5D%3B%0A%20%20derivation_tex%20-%3E%20generate_derivation_tex%3B%0A%20%20generate_derivation_tex%20-%3E%20list_of_steps%3B%0A%20%20generate_derivation_tex%20-%3E%20get_infrule_for_step%3B%0A%20%20generate_derivation_tex%20-%3E%20get_expression_for_step%3B%0A%20%20%0A%20%20generate_derivation_pdf_from_tex%20%5Blabel%3D%22backend%3A%20generate%20derivation%20PDF%20from%20.tex%22%5D%3B%0A%20%20derivation_pdf%20-%3E%20generate_derivation_pdf_from_tex%20-%3E%20generate_derivation_tex%3B%0A%20%20%0A%20%20generate_pdf_from_tex%20%5Blabel%3D%22backend%3A%20generate%20PDF%20from%20.tex%22%5D%3B%0A%20%20generate_derivation_pdf_from_tex%20-%3E%20generate_pdf_from_tex%3B%0A%7D">DreamPuf</a>
+
+</p><pre>digraph G {
+
+  rankdir="LR";
+  
+  // see https://graphviz.org/docs/attrs/splines/
+  //splines=false;
+  //splines=curved;
+  //splines=polyline;
+  splines=ortho;
+
+  unauthenticated_user [label="unauthenticated user", shape="rectangle"];
+  authenticated_user [label="authenticated user", shape="rectangle"];
+  
+  log_in [label="authenticate" style=filled color=lightgrey];
+  unauthenticated_user -&gt; log_in -&gt; authenticated_user;
+  auth_google [label="authenticate using Google"];
+  log_in -&gt; auth_google;
+  
+  log_out [label="log out" style=filled color=lightgrey];
+  authenticated_user -&gt; log_out -&gt; unauthenticated_user;
+  
+  export_database [label="export database" style=filled color=lightgrey];
+  unauthenticated_user -&gt; export_database;
+  authenticated_user -&gt; export_database;
+  
+  export_database_json_webUI [label="web UI: link to database JSON" style=filled color=lightblue];
+  export_database -&gt; export_database_json_webUI;
+  export_database_cypher_webUI [label="web UI: link to database Cypher" style=filled color=lightblue];
+  export_database -&gt; export_database_cypher_webUI;
+  
+  export_database_json_rest [label="REST API: export database as JSON" style=filled color=lightpink];
+  export_database -&gt; export_database_json_rest;
+  export_database_cypher_rest [label="REST API: export database as Cypher" style=filled color=lightpink];
+  export_database -&gt; export_database_cypher_rest;
+  
+  export_database_json_backend [label="backend: export database as JSON"];
+  export_database_json_rest -&gt; export_database_json_backend;
+  export_database_json_webUI -&gt; export_database_json_backend;
+  
+  export_database_cypher_backend [label="backend: export database as Cypher"];
+  export_database_cypher_webUI -&gt; export_database_cypher_backend;
+  export_database_cypher_rest -&gt; export_database_cypher_backend;
+  
+  import_database_as_cypher [label="import database as Cypher" style=filled color=lightgrey];
+  authenticated_user -&gt; import_database_as_cypher;
+
+  upload_database_as_cypher_webUI [label="web UI: upload database as Cypher" style=filled color=lightblue];
+  import_database_as_cypher -&gt; upload_database_as_cypher_webUI;
+  
+  upload_database_as_cypher_backend [label="backend: upload database as Cypher"];
+  upload_database_as_cypher_webUI -&gt; upload_database_as_cypher_backend;
+  
+  read_FAQ [label="read FAQ" style=filled color=lightgrey];
+  unauthenticated_user -&gt; read_FAQ;
+  authenticated_user -&gt; read_FAQ;
+  render_FAQ [label="web UI: render FAQ" style=filled color=lightblue];
+  read_FAQ -&gt; render_FAQ;
+  
+  query_graph [label="query graph" style=filled color=lightgrey];
+  unauthenticated_user -&gt; query_graph;
+  authenticated_user -&gt; query_graph;
+  
+  query_graph_webUI [label="web UI: query graph" style=filled color=lightblue];
+  query_graph -&gt; query_graph_webUI;
+
+  query_graph_rest [label="REST API: query graph" style=filled color=lightpink];
+  query_graph -&gt; query_graph_rest;
+  
+  query_graph_backend [label="backend: query graph"];
+  query_graph_webUI -&gt; query_graph_backend;
+  query_graph_rest -&gt; query_graph_backend;
+  
+  enter_new_operator [label="enter new operator" style=filled color=lightgrey];
+  authenticated_user -&gt; enter_new_operator;
+  
+  create_new_operator_webUI [label="web UI: create new operator" style=filled color=lightblue];
+  enter_new_operator -&gt; create_new_operator_webUI;
+  
+  enter_new_expression [label="enter new expression" style=filled color=lightgrey];
+  authenticated_user -&gt; enter_new_expression;
+
+  create_new_expression_webUI [label="web UI: create new expression" style=filled color=lightblue];
+  enter_new_expression -&gt; create_new_expression_webUI;
+
+  add_new_expression [label="backend: add new expression"];
+  create_new_expression_webUI -&gt; add_new_expression;
+  
+  verify_expr_dimensional_consistency [label="backend: verify expression dimensional consistency"];
+  create_new_expression_webUI -&gt; verify_expr_dimensional_consistency;
+
+  enter_new_derivation [label="enter new derivation" style=filled color=lightgrey];
+  authenticated_user -&gt; enter_new_derivation;
+  
+  create_new_derivation_webUI [label="web UI: create new derivation" style=filled color=lightblue];
+  enter_new_derivation -&gt; create_new_derivation_webUI;
+
+  add_new_derivation [label="backend: add new derivation"];
+  create_new_derivation_webUI -&gt; add_new_derivation;
+
+  enter_new_symbol [label="enter new symbol" style=filled color=lightgrey];
+  authenticated_user -&gt; enter_new_symbol;
+  
+  create_new_symbol_webUI [label="web UI: create new symbol" style=filled color=lightblue];
+  enter_new_symbol -&gt; create_new_symbol_webUI;
+
+  add_new_symbol [label="backend: add new symbol"];
+  create_new_symbol_webUI -&gt; add_new_symbol;
+
+  read_list_of_derivations [label="read list of derivations" style=filled color=lightgrey];
+  unauthenticated_user -&gt; read_list_of_derivations;
+  authenticated_user -&gt; read_list_of_derivations;
+
+  list_of_derivations_html [label="web UI: render list of derivations" style=filled color=lightblue];
+  read_list_of_derivations -&gt; list_of_derivations_html;
+
+  list_of_derivations_json [label="REST API: JSON list of derivations" style=filled color=lightpink];
+  read_list_of_derivations -&gt; list_of_derivations_json;
+
+  list_of_derivations [label="backend: get list of derivations"];
+  list_of_derivations_json -&gt; list_of_derivations;
+  list_of_derivations_html -&gt; list_of_derivations;
+
+  read_list_of_symbols [label="read list of symbols" style=filled color=lightgrey];
+  unauthenticated_user -&gt; read_list_of_symbols;
+  authenticated_user -&gt; read_list_of_symbols;
+
+  list_of_symbols_html [label="web UI: show list of symbols" style=filled color=lightblue];
+  read_list_of_symbols -&gt; list_of_symbols_html;
+
+  list_of_symbols_json [label="REST API: JSON list of symbols" style=filled color=lightpink];
+  read_list_of_symbols -&gt; list_of_symbols_json;
+
+  list_of_symbols [label="backend: get list of symbols"]
+  list_of_symbols_html -&gt; list_of_symbols;
+  list_of_symbols_json -&gt; list_of_symbols;
+
+  read_list_of_expressions [label="read list of expressions" style=filled color=lightgrey];
+  unauthenticated_user -&gt; read_list_of_expressions;
+  authenticated_user -&gt; read_list_of_expressions;
+
+  list_of_expressions_html [label="web UI: show list of expressions" style=filled color=lightblue];
+  read_list_of_expressions -&gt; list_of_expressions_html;
+  list_of_expressions_html -&gt; verify_expr_dimensional_consistency;
+
+  list_of_expressions_json [label="REST API: JSON list of expressions" style=filled color=lightpink];
+  read_list_of_expressions -&gt; list_of_expressions_json;
+
+  list_of_expressions [label="backend: get list of expressions"];
+  list_of_expressions_json -&gt; list_of_expressions;
+  list_of_expressions_html -&gt; list_of_expressions;
+
+  read_derivation [label="read derivation" style=filled color=lightgrey];
+  unauthenticated_user -&gt; read_derivation;
+  authenticated_user -&gt; read_derivation;
+  
+  derivation_steps_json [label="REST API: JSON list of steps" style=filled color=lightpink];
+  read_derivation -&gt; derivation_steps_json;
+  derivation_table [label="web UI: show table of steps" style=filled color=lightblue];
+  read_derivation -&gt; derivation_table;
+  derivation_table -&gt; verify_expr_dimensional_consistency;
+  
+  verify_step_consistency [label="backend: verify step consistency"];
+  derivation_table -&gt; verify_step_consistency;
+  
+  list_of_steps [label="backend: get list of steps"];
+  derivation_steps_json -&gt; list_of_steps;
+  derivation_table -&gt; list_of_steps;
+  
+  derivation_tex [label="web UI: link to derivation .tex file" style=filled color=lightblue];
+  read_derivation -&gt; derivation_tex;
+  derivation_pdf [label="web UI: link to derivation .pdf file" style=filled color=lightblue];
+  read_derivation -&gt; derivation_pdf;
+  derivation_d3js [label="web UI: show derivation d3js" style=filled color=lightblue];
+  read_derivation -&gt; derivation_d3js;
+  derivation_graphviz_png [label="web UI: show derivation graphviz PNG" style=filled color=lightblue];
+  read_derivation -&gt; derivation_graphviz_png;
+
+  derivation_d3js -&gt; list_of_steps;
+  derivation_graphviz_png  -&gt; list_of_steps;
+  
+  get_expression_for_step [label="backend: get expressions per step"];
+  derivation_d3js -&gt; get_expression_for_step;
+  derivation_table -&gt; get_expression_for_step;
+  get_infrule_for_step [label="backend: get infrule per step"];
+  derivation_graphviz_png -&gt; get_infrule_for_step;
+  
+  generate_png_for_expression [label="backend: generate png for expression"];
+  derivation_d3js -&gt; generate_png_for_expression;
+  derivation_graphviz_png -&gt; generate_png_for_expression;
+  generate_png_for_infrule [label="backend: generate png for infrule"];
+  derivation_d3js -&gt; generate_png_for_infrule;
+  derivation_graphviz_png -&gt; generate_png_for_infrule;
+  
+  generate_derivation_tex [label="backend: generate tex for derivation"];
+  derivation_tex -&gt; generate_derivation_tex;
+  generate_derivation_tex -&gt; list_of_steps;
+  generate_derivation_tex -&gt; get_infrule_for_step;
+  generate_derivation_tex -&gt; get_expression_for_step;
+  
+  generate_derivation_pdf_from_tex [label="backend: generate derivation PDF from .tex"];
+  derivation_pdf -&gt; generate_derivation_pdf_from_tex -&gt; generate_derivation_tex;
+  
+  generate_pdf_from_tex [label="backend: generate PDF from .tex"];
+  generate_derivation_pdf_from_tex -&gt; generate_pdf_from_tex;
+}
+</pre><p></p>
+
+{% endblock %}

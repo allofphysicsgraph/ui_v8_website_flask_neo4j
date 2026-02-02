@@ -1,0 +1,30 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>HTML arxiv papers, semantic tagging, and formal verification</H1>
+
+<P><small>Published 2023-08-26T12:10:00.001Z by Physics Derivation Graph</small></P>
+
+<p>arxiv recently started experimenting with converting .tex files to HTML: <a href="https://info.arxiv.org/about/accessible_HTML.html">https://info.arxiv.org/about/accessible_HTML.html</a></p>
+<p>The first official announcement was in February 2022:
+<br /><a href="https://blog.arxiv.org/2022/02/21/arxiv-articles-as-responsive-web-pages/">https://blog.arxiv.org/2022/02/21/arxiv-articles-as-responsive-web-pages/</a></p>
+
+<p>The HTML from .tex effort is a collaboration between Deyan Ginev (a student of Dr. Kohlhase) and Bruce Miller (at NIST - <a href="https://www.nist.gov/people/bruce-r-miller">https://www.nist.gov/people/bruce-r-miller</a>). 
+Kohlhase's group (<a href="https://kwarc.info/research/">https://kwarc.info/research/</a>) focuses on semantic enrichment of Latex. Bruce provided the software to convert Latex.
+
+</p><p>The reason for this Latex to HTML conversion is because it's the first step for enabling semantic enrichment of content on the arxiv. There's immediate benefit for arxiv being able to support HTML, which I suspect is why arxiv cooperated with Kohlhase's group. 
+
+</p><p>In the long term I see a need to connect semantic tagging (the focus of Kohlhase's group) with formal verification (e.g., derivations-as-proofs using Lean). The formally verified math expressions need to be tied to use in narrative text (e.g., arxiv papers).  For example, if I'm referring to "x" in a publication, is that the same "x" specified in a Lean-based proof? One way of answering is to use tags like
+</p><pre>&lt;unique_variable_id=42&gt;x&lt;/unique_variable_id&gt;
+ </pre>
+in the narrative text document, and then have Lean reference the ID 42 in derivations.
+There are more conventional uses of tags like
+  <pre>&lt;properties name_of_variable="distance" dimension_of_variable="length"&gt;x&lt;/properties&gt;
+</pre>
+but those tags don't address the question of whether two variables refer to the same concept. 
+
+<h2>Summary</h2>
+<p>I predict that the conversion of arxiv .tex files to HTML will enable semantic tagging. 
+This will intersect with the challenge of "how do I relate the use of variables and expressions across multiple proofs in Lean?"</p><p></p><p></p><p></p>
+
+{% endblock %}

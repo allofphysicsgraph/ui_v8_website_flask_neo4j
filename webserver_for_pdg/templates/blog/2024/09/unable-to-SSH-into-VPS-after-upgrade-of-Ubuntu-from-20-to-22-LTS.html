@@ -1,0 +1,99 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>unable to SSH into VPS after upgrade of Ubuntu from 20 to 22 LTS</H1>
+
+<P><small>Published 2024-09-02T17:33:00Z by Physics Derivation Graph</small></P>
+
+<p>Prior to upgrading from Ubuntu 20 to 22 LTS I was able to SSH from my local laptop to a remote VPS using the command</p>
+<pre>ssh -v username@IPaddress
+</pre>
+
+<p>After the upgrade I got
+</p><pre>ssh -v username@IPaddress
+OpenSSH_9.7p1, LibreSSL 3.3.6
+debug1: Reading configuration data /etc/ssh/ssh_config
+debug1: /etc/ssh/ssh_config line 21: include /etc/ssh/ssh_config.d/* matched no files
+debug1: /etc/ssh/ssh_config line 54: Applying options for *
+debug1: Authenticator provider $SSH_SK_PROVIDER did not resolve; disabling
+debug1: Connecting to IPaddress [IPaddress] port 22.
+debug1: connect to address IPaddress port 22: Operation timed out
+ssh: connect to host IPaddress port 22: Operation timed out</pre><p><span></span></p><!--more-->
+<p></p><p>Via the recovery console on the remote VPS I ran
+</p><pre>sudo systemctl status ssh
+</pre>
+and got 
+<pre>Active: active (running)
+</pre>
+
+<p>&nbsp;
+</p><p>Via the recovery console on the remote VPS I ran
+</p><pre>sudo service ssh stop
+sudo service ssh start
+sudo service ssh restart
+</pre>
+
+<p><a href="https://askubuntu.com/questions/462968/take-changes-in-file-sshd-config-file-without-server-reboot">https://askubuntu.com/questions/462968/take-changes-in-file-sshd-config-file-without-server-reboot</a>&nbsp;
+</p><span></span><span><!--more--></span><p>On the remote VPS I reviewed the contents of <code>/etc/ssh/sshd_config</code></p>
+
+<p>I verified that SSH is exposed on port 22 using</p>
+<pre>sudo lsof -Pi | grep ssh</pre>
+
+<p>On the VPS I monitored
+</p><pre>sudo tail -f /var/log/auth.log</pre>
+and concurrent attempted to log in from my local laptop
+<pre>ssh -v username@IPaddress
+</pre>
+Since no entries were showing up in auth.log, maybe there's a firewall configured?
+
+<p>Yes, firewall exists; see <a href="https://physicsderivationgraph.blogspot.com/2020/09/ufw-allow-status-numbered-delete.html">https://physicsderivationgraph.blogspot.com/2020/09/ufw-allow-status-numbered-delete.html  
+</a></p><pre>$ sudo ufw status verbose
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), deny (routed)
+New profiles: skip
+</pre>
+
+I temporarily disabled the firewall on the VPS using
+<pre>sudo ufw disable</pre>
+as per https://ubuntu.com/server/docs/firewalls and then monitored 
+<pre>sudo tail -f /var/log/auth.log</pre>
+while trying to SSH from my laptop, but that didn't make a difference. Therefore I can rule out the firewall as blocking SSH. I then ran
+<pre>sudo ufw enable</pre>
+
+<hr />
+<p>Next I enabled password-based auth in <code>/etc/ssh/sshd_config</code> with
+  </p><pre>PasswordAuthentication yes</pre>
+and then
+<pre>sudo service ssh restart</pre>
+Then tried to SSH from my laptop but still no difference -- just a time-out and no new lines in <code>/var/log/auth.log</code>.
+
+<hr />
+<pre>ping google.com
+ping: google.com: Temporary failure in name resolution</pre>
+
+I inspected the content of 
+<pre>/etc/resolv.conf</pre>
+which has the line
+<pre>nameserver 127.0.0.53
+options edns0 trust-ad
+search .</pre>
+
+<pre>resolvectl status</pre>
+
+<pre>journalctl -u systemd-resolved -f</pre>
+
+<hr />
+
+<p>Actually, my DNS might not be the issue:</p>
+<pre>ping 8.8.8.8
+ping: connect: network is unreachable
+</pre>
+
+<p>The DNS problem is described on https://askubuntu.com/questions/1452215/dns-resolution-broken-after-upgrading-ubuntu-20-04-to-22-04 but 
+</p><pre>sudo dpkg-reconfigure resolveconf</pre>but that doesn't work:
+<pre>dpkg-query: package 'resolveconf' is not installed and no information is available.</pre>
+
+<p>The thread https://askubuntu.com/questions/1436144/no-network-after-upgrading-from-ubuntu-20-04-to-ubuntu-22-04 also didn't provide any insights for my situation.</p><p></p>
+
+{% endblock %}

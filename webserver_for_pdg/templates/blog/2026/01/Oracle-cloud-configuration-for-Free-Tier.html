@@ -1,0 +1,51 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Oracle cloud configuration for Free Tier</H1>
+
+<P><small>Published 2026-01-28T16:11:00Z by Physics Derivation Graph</small></P>
+
+<h2>Configuring a VCN (Virtual Cloud Network)</h2>
+
+<p>To have the full range of options when setting up the VPS, first create a <a href="https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/create_vcn.htm">VCN (virtual cloud network)</a> and <a href="https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/create_subnet.htm">Create a Subnet</a>. That way, when you are setting up the VPS (virtual private server) you can select an existing VCN and subnet.
+
+</p><p>From the user dashboard, on the right-side "Build" menu select "Set up a network with a wizard"</p><p>"Create VCN" and then use the wizard for "Create VCN with internet connectivity"</p><p>VCN name:&nbsp;pdg_test_vcn</p><p>Then "Reserved public IPv4 address" &gt; Create</p><p><br /></p>
+
+<h2>Configuring my First VPS</h2>
+
+<p>From the user dashboard, on the right-side "Build" menu select "Create compute instance" wizard, </p>
+
+<p>For "placement" I selected AD2 (no reason not to go with AD1 or AD3 as far as I can tell)
+
+
+</p><p>Under "Advanced Options" I selected "On-demand capacity" out of the options; see 
+https://docs.oracle.com/en-us/iaas/Content/Compute/Concepts/computeoverview.htm#capacity_types
+for descriptions
+  
+</p><p>Under "Image and shape" the default image is "Oracle Linux 9". My Digital Ocean droplet is currently "Ubuntu 24.04.3 LTS".
+  Oracle offers 8 version of Ubuntu, so I selected 24.04
+  
+  </p><p>For "Shape" I selected "virtual machine" (rather than "bare metal")
+    
+    </p><p>For "Shape series" I selected "Ampere" (rather than AMD or Intel) and "VM.Standard.A1.Flex" which is eligble for Free Tier.
+      
+      
+</p><p>In the Networking section I set up a Primary VNIC (virtual network interface card) which connects to a VCN (virtual cloud network). This is required for a public IP for the Internet.
+  
+</p><p>Primary VNIC name: pdg_test_VNIC
+  
+</p><p>Primary network: "create new virtual cloud network"
+  
+</p><p>new virtual cloud network name: vcn-20260127-0933_pdg
+  
+</p><p>Subnet: create new public subset; name: subnet-20260127-0933_pdg. CIDR block 10.0.0.0/24
+  
+</p><p>Private</p>
+
+<p>&nbsp;</p>
+
+<h2>Result: Oracle doesn't have capacity in the AD</h2>
+
+<blockquote>"Out of capacity for shape VM.Standard.A1.Flex in availability domain AD-1. Create the instance in a different availability domain or try again later.If you specified a fault domain, try creating the instance without specifying a fault domain. If that doesn’t work, please try again later.Learn more about host capacity."</blockquote>
+
+{% endblock %}

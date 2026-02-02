@@ -1,0 +1,44 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>arm64 and amd64 docker builds</H1>
+
+<P><small>Published 2025-05-07T11:34:00Z by Physics Derivation Graph</small></P>
+
+<h2>Makefile</h2>
+<pre># Get the machine architecture.
+# On arm64 (Apple Silicon M1/M2/etc.), `uname -m` outputs "arm64".
+# On amd64 (Intel), `uname -m` outputs "x86_64".
+ARCH := $(shell uname -m)
+
+ifeq ($(ARCH), arm64)
+        this_arch=arm64
+else ifeq ($(ARCH), x86_64)
+        this_arch=amd64
+else
+        @echo "Unknown architecture: $(ARCH). Cannot determine if Mac is new or old."
+endif
+</pre>
+
+<p><br /></p>
+
+<h2 style="text-align: left;"><code>docker push</code> multiple platforms using <code>buildx</code></h2><p>I wasn't able to get <code>docker manifest</code> to amend both amd64 and arm64, so I used the <code>buildx</code> approach:
+
+
+</p>
+<pre>docker buildx build --push --platform linux/arm64,linux/amd64 --tag benislocated/allofphysicscom-flask:latest .</pre><i>
+
+Result</i>:
+
+<pre>ERROR: Multi-platform build is not supported for the docker driver.
+Switch to a different driver, or turn on the containerd image store, and try again.
+Learn more at https://docs.docker.com/go/build-multi-platform/
+</pre>
+
+<p>&nbsp;</p>
+
+<h2 style="text-align: left;">References</h2>
+
+<p><a href="https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/">https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/</a></p><p></p>
+
+{% endblock %}

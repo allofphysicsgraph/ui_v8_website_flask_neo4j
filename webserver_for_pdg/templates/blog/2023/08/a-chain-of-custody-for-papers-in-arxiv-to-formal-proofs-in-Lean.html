@@ -1,0 +1,24 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>a chain of custody for papers in arxiv to formal proofs in Lean</H1>
+
+<P><small>Published 2023-08-13T00:59:00.003Z by Physics Derivation Graph</small></P>
+
+<p>Papers published in arxiv using Latex contain narrative text and mathematical expressions. How could we have confidence that the content of a published paper is related to a formal proof?</p>
+
+<p>The narrative text would refer to symbols, expressions, units, and quantities. The expressions and symbols could be embedded in the Latex source using a package that provides macros.</p>
+
+<p>The author's .tex would include loading a package like<br /></p>
+<pre>\usepackage{pdg}[server_address=http://serveraddressforpdg.net]</pre>
+<p>Then when the author references an expression they would use</p>
+<pre>\begin{equation}
+\pdgexp{192839}
+\end{equation}</pre>
+<p>When compiled to PDF, the macro <code>\pdgexp</code> calls to the server address http://serveraddressforpdg.net to return the Latex expression. The same could be done for an inline reference to a symbol, like <code>\pdgsymbol{93831911}</code>.&nbsp;</p>
+
+<p>In this approach there wouldn't need to be an appendix for the derivation because the derivation steps are hosted on the PDG server.</p>
+
+<p>The chain of custody would be</p><p>arxiv PDF -- arxiv .tex -- .tex contains references to PDG expression and symbol IDs -- PDG server contains derivation steps -- steps are validated using Lean</p><p><br /></p><p>The macro might need to cache the PDG database locally so the server doesn't get called every time the .tex is compiled PDF.&nbsp;<br />Also, allow the author to force a refresh of the cache.</p>
+
+{% endblock %}

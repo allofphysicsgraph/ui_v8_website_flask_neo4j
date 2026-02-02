@@ -1,0 +1,35 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>software for numerical calculations of derived expressions versus implementation of an algorithm</H1>
+
+<P><small>Published 2023-06-18T14:38:00.001Z by Physics Derivation Graph</small></P>
+
+<p>Suppose I have a Python program that takes "angle" and "initial speed" as arguments and calculates where a ball shot from a cannon lands. The program could be described using the function</p>
+<pre>f(\theta, s) = d</pre>
+<p>where <code>\theta</code> is the angle, <code>s</code> is the speed, and <code>d</code> is the distance from the cannon where the ball lands. The function could be expressed using a variety of languages like Python, C, Lean, etc.</p>
+<p>If <code>f(\theta, s) = d</code> is derived from the <a href="https://en.wikipedia.org/wiki/Equations_of_motion">equations of motion</a> (like <a href="https://derivationmap.net/review_derivation/201726/">https://derivationmap.net/review_derivation/201726/</a>) and each step is verified using Lean (as described in <a href="https://physicsderivationgraph.blogspot.com/2023/06/relation-between-inference-rules-in.html">this post</a>), then we can use Lean to calculate <code>d</code> from <code>\theta</code> and <code>s</code>. The difference would be that there's more explanation of where the result came from. Rather than just "here the equation to use," including the derivation step and proof of each step makes the assumptions explicit and the implementation correct.&nbsp;</p>
+
+<p><br /></p><p>All software programs can be described as functions that take arguments and return results. That doesn't mean that all functions are derived. As an example of software that is a function but isn't derived, consider the <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">A* routing algorithm</a>. An algorithm outlines a sequence of steps for accomplishing a function. 
+  
+</p><p>While all programs could be written in Lean (because each program is a function), not all functions are derived mathematically. As a trivial example, printing "hello world" is not a derived function. In contrast, the first example in this post, the distance a projectile flies, is derived from the <a href="https://en.wikipedia.org/wiki/Equations_of_motion">equations of motion</a>. <i>What distinguishes "hello world" and A* routing from the cannon ball trajectory?</i></p>
+
+<p>The distinction is that the cannon ball example is a numerical simulation of a tangible scenario, whereas "hello world" is not describing physically-constrained reality.&nbsp;</p><p>For numerical simulations, Lean can formally verify the derivation and the formula used for analytical calculation. Keeping both aspects in Lean results in a clear chain of custody.&nbsp;</p><p>For algorithms (e.g., A* routing, "hello world"), the verification is to show that the implementation is consistent with the requirements. Here languages like Dafny and F* are relevant.</p>
+
+<p><i>More on F*</i>:
+  </p><ul>
+    <li><a href="https://en.wikipedia.org/wiki/F*_(programming_language)">https://en.wikipedia.org/wiki/F*_(programming_language)</a></li>
+    <li><a href="https://www.microsoft.com/en-us/research/project/the-f-project/">https://www.microsoft.com/en-us/research/project/the-f-project/</a></li>
+    <li><a href="https://github.com/FStarLang/FStar">https://github.com/FStarLang/FStar</a></li>
+    <li><a href="https://www.fstar-lang.org/">https://www.fstar-lang.org/</a></li>
+    <li><a href="https://fstarlang.github.io/">https://fstarlang.github.io/</a></li>
+</ul>
+<p><i>More on Dafny</i>:
+  </p><ul>
+    <li><a href="https://en.wikipedia.org/wiki/Dafny">https://en.wikipedia.org/wiki/Dafny</a></li><li><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2008/12/dafny_krml203.pdf">https://www.microsoft.com/en-us/research/wp-content/uploads/2008/12/dafny_krml203.pdf</a></li>
+    <li><a href="https://homepage.cs.uiowa.edu/~tinelli/classes/181/Fall15/Papers/Lein13.pdf">https://homepage.cs.uiowa.edu/~tinelli/classes/181/Fall15/Papers/Lein13.pdf</a></li>
+    <li><a href="https://dafny.org/">https://dafny.org/</a></li>
+</ul><div><br /></div><h3 style="text-align: left;">Floats in Lean</h3><div><a href="https://leanprover.zulipchat.com/#narrow/stream/116395-maths/topic/floats.20vs.2E.20reals">https://leanprover.zulipchat.com/#narrow/stream/116395-maths/topic/floats.20vs.2E.20reals</a></div><div>float is not a ring.</div><div>Nor is there an injection; inf is not a real</div><div><a href="https://github.com/verified-optimization/CvxLean/blob/main/CvxLean/Tactic/Solver/Float/RealToFloat.lean">https://github.com/verified-optimization/CvxLean/blob/main/CvxLean/Tactic/Solver/Float/RealToFloat.lean</a></div><div><a href="https://leanprover.zulipchat.com/#narrow/stream/113488-general/topic/Real.20to.20float.20translation">https://leanprover.zulipchat.com/#narrow/stream/113488-general/topic/Real.20to.20float.20translation</a></div>
+<p></p><p></p><p></p>
+
+{% endblock %}

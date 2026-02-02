@@ -1,0 +1,10 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>automating entry of derivations into the Physics Derivation Graph website</H1>
+
+<P><small>Published 2023-06-10T21:03:00.002Z by Physics Derivation Graph</small></P>
+
+<p></p><div>What would it take to integrate support for symbol detection and conversion to SymPy for a single step in a derivation?</div><ol style="text-align: left;"><li>user provides initial expression in Latex to web UI.</li><li>computer parses symbols and operators from Latex</li><li>computer searches&nbsp;Physics Derivation Graph database of symbols and operators to find candidate symbols</li><li>computer provides candidate symbols to user and prompts, "which of the following symbols were you referring to?"</li><li>computer parses expression to SymPy, returns AST to user, and prompts, "is this the AST you meant?"</li><li>if yes, continue; if no, go back to step 1 or provide corrections to AST.</li><li>user provides next expression in Latex</li><li>computer parses symbols and operators from Latex</li><li>if symbols match symbols used in this derivation, then associate with those; otherwise&nbsp;</li><li>computer searches&nbsp;Physics Derivation Graph database of symbols and operators to find candidate symbols</li><li>if computer had to search PDG database, then computer provides candidate symbols to user and prompts, "which of the following symbols were you referring to?"</li><li>computer parses expression from step 7 to SymPy, returns AST to user, and prompts, "is this the AST you meant?"</li><li>computer uses brute force to check every inference rule using a CAS against the provided expressions to "guess" the inference rule.&nbsp;</li><li>if valid inference rule is found, continue to next expression; if no valid inference rule is found, prompt user to provide inference rule.</li><li>Given the inference rule and associated expressions, use the CAS to verify the step.</li></ol><p></p>
+
+{% endblock %}

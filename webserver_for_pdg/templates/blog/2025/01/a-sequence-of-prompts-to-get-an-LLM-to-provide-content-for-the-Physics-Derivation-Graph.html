@@ -1,0 +1,129 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>a sequence of prompts to get an LLM to provide content for the Physics Derivation Graph</H1>
+
+<P><small>Published 2025-01-28T15:22:00Z by Physics Derivation Graph</small></P>
+
+<p>In&nbsp;<a href="https://github.com/allofphysicsgraph/allofphysics.com/issues/16">https://github.com/allofphysicsgraph/allofphysics.com/issues/16</a> I created a set of prompts that got Gemini 2.0 (<a href="https://aistudio.google.com/prompts/">https://aistudio.google.com/prompts/</a>) to generate content relevant&nbsp;for the Physics Derivation Graph. Probably saved a day or 2 of manual labor per derivation.</p>
+
+<p>The steps below have been vetted in <a href="https://github.com/allofphysicsgraph/allofphysics.com/issues/20">https://github.com/allofphysicsgraph/allofphysics.com/issues/20</a>
+
+</p><p><br /></p>
+
+<h2>Find a relevant derivation</h2>
+<fieldset>
+  <legend>
+    bridge two concepts
+  </legend>
+<p>In mathematical Physics a derivation is comprised of steps and equations.&nbsp;</p><p>Is there a derivation that bridges Newton's Second Law for the Center of Mass to the concepts of torque and moment of inertia which describe rotational motion?
+
+If yes, provide the steps of the derivation. Format the answer using Latex as a single file.
+</p><p>Latex is a software system for typesetting documents.&nbsp;LaTeX is widely used for the communication and publication of scientific documents and technical note-taking in many fields, owing partially to its support for complex mathematical notation.</p><p>Do not have equations inline with the text. Equations should be separate and inside a math environment for Latex:<br />
+  </p><pre>\begin{equation}
+\end{equation}</pre><p></p>
+  
+  <p>Each equation should have a left-hand side and right-hand side.&nbsp; Do specify equations, but avoid using equations that contain multiple equal signs.&nbsp;</p>
+
+</fieldset><div><br /></div><i>
+
+Alternative starting point</i><fieldset>
+  <legend>
+    reformat wikipedia to Latex
+  </legend>
+<p>Wikipedia uses MediaWiki syntax. Convert the following MediaWiki content to a single Latex document.
+</p><p>Latex is a software system for typesetting documents.&nbsp;LaTeX is widely used for the communication and publication of scientific documents and technical note-taking in many fields, owing partially to its support for complex mathematical notation.</p></fieldset>
+
+
+<p>Manually clean up the latex using <a href="https://www.overleaf.com/project">Overleaf</a>
+
+</p><fieldset>
+  <legend>
+    Insert labels for equations.
+  </legend>
+<p>For the following Latex file, write out the file and insert a label for each equation. The label that is added should be descriptive of the equation and contain no spaces, only underscores.
+
+</p><p>Labels for equations should be unique within the document.</p><p>Don't provide any commentary. Just write the revised Latex file content as your answer.
+  </p><p></p></fieldset>
+
+
+<fieldset>
+  <legend>
+    Make expression references explicit
+  </legend>
+<p>The following Latex file contains a derivation with many steps. Sometimes a previous expression is referenced implicitly.
+
+Edit the following text to manually insert references where appropriate. For example replace text like "substitute the forces" with "substitute Eq.~\ref{} to get".
+
+Be sure to reference the relevant equation labels so that Latex can compile the document.
+  </p></fieldset>
+
+
+
+
+  <fieldset>
+  <legend>
+Add more steps    
+  </legend>
+<p>A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
+
+</p><p>Modify the Latex file below by adding explanatory text about each step of the derivation. Document the mathematical transformations that relate each equation in the file to other equations in the file.
+
+</p><p>Use the Latex equation labels to reference equations.
+  </p></fieldset>
+
+<p><i>Only if needed</i>:</p>
+<fieldset>
+  <legend>
+Separate equations
+  </legend>
+<p>A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
+
+</p><p>In the Latex file below, for equations that have multiple instances of the equals sign, separate those into multiple equations such that each equation only has one use of the equals sign.
+
+</p><p>Do not have equations in the text. Equations should be inside<br /></p><pre>\begin{equation}
+\end{equation}</pre><p>Write out the modified content as a single Latex file.
+  </p><p></p><p></p></fieldset>
+
+<fieldset>
+  <legend>
+Add explanatory text between equations 
+  </legend>
+<p>A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
+
+</p><p>In the Latex file below, where there are two equations with no explanatory text between them, modify the Latex file by adding explanatory text to document the mathematical transformations that relate each equation in the file to other equations in the file.
+
+</p><p>Use the Latex equation labels to reference equations.
+  </p><p></p><p></p></fieldset>
+
+<fieldset>
+  <legend>
+    
+  </legend>
+<p>
+  </p></fieldset>
+
+
+<h2>List of variables is last step</h2>
+
+<fieldset>
+  <legend>
+    list variables used in the derivation with reference
+  </legend>
+<p>The following latex file contains equations and variables. Provide a list, formatted as Latex, of every unique variable and a description of that variable.
+
+<P>For each entry in the list include a reference to the labeled equations where each variable is used. Write out just the Latex list as your answer.
+</p></fieldset>
+
+<P>If you already have a list of variables,
+
+<fieldset>
+  <legend>
+    list variables used in the derivation with reference
+  </legend>
+<p>The following Latex file contains equations and variables. The first section contains a list of all the variables used in the equations. Modify the Latex list to include a reference to the labeled equations where each variable is used. Write out just the modified Latex list as your answer.
+</p></fieldset>
+
+<p></p>
+
+{% endblock %}

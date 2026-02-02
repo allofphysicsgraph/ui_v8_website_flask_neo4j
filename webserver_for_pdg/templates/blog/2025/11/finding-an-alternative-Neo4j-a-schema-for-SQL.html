@@ -1,0 +1,582 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>finding an alternative Neo4j; a schema for SQL</H1>
+
+<P><small>Published 2025-11-02T22:08:00Z by Physics Derivation Graph</small></P>
+
+<p>I had been using Neo4j's property graph for the Physics Derivation Graph for a few years and recently stopped due to the 1GB of memory used by the server that is constantly running. (That 1GB of RAM is unrelated to the size of the underlying database, which in my case was a few hundred nodes.)&nbsp;</p><p>I realized that what I want is a SQLite-like "offline" database that only is noticeable to CPU and RAM use when there's a query. I'm ok with the database's initialization cost resulting slower queries.</p>
+
+<h2>Search for Alternatives</h2>
+
+<p><a href="https://jgrapht.org/">https://jgrapht.org/</a> and NetworkX are irrelevant to the needs of the Physics Derivation Graph</p><p><a href="https://en.wikipedia.org/wiki/Blazegraph">https://en.wikipedia.org/wiki/Blazegraph</a> is unsupported since 2018</p><p>KuzuDB was exactly what I was interested in -- an embedded offline property database comptible with Cypher. Coincidentally,&nbsp;<a href="https://kuzudb.github.io/">https://kuzudb.github.io/</a> announced Oct 10 (3 weeks ago) that the project was being terminated immediately.<br /><a href="https://news.ycombinator.com/item?id=45560036">https://news.ycombinator.com/item?id=45560036</a><br /><a href="https://www.reddit.com/r/Database/comments/1o3w73z/status_of_kuzudb_from_kuzu_inc/">https://www.reddit.com/r/Database/comments/1o3w73z/status_of_kuzudb_from_kuzu_inc/</a><br /><a href="https://www.theregister.com/2025/10/14/kuzudb_abandoned/">https://www.theregister.com/2025/10/14/kuzudb_abandoned/</a><br />A fork:&nbsp;<a href="https://github.com/Kineviz/bighorn">https://github.com/Kineviz/bighorn</a></p><p>Possible contenders:</p><p></p><ul style="text-align: left;"><li><a href="https://en.wikipedia.org/wiki/OrientDB">https://en.wikipedia.org/wiki/OrientDB</a></li><li><a href="https://memgraph.com/">https://memgraph.com/</a></li></ul><p></p>
+
+<p>However, the most reliable approach may be to switch to SQLite and use LLMs to craft Cypher-like queries. This is inelegant (I had been exposing read-only Cypher capabilities on the web) and requires coming up with a schema (something I have no experience with).&nbsp;</p>
+
+<h2>Convert Property Graph to Relational Database for SQL</h2>
+
+Here's the prompt I provided Gemini 2.5 Pro:
+
+<fieldset>
+<pre>I have a complicated property graph in Neo4j and want to convert to SQLite. Design a schema for the relational database.
+
+The nodes present in the property graph representation are below.
+
+
+node type: 'derivation'
+properties={'author_name_latex': str,  
+  'name_latex': str,     
+  'id': str,  
+  'abstract_latex': str,  
+  'reference_latex': str, 
+  'created_datetime': str} 
+
+node type: 'step'
+properties={'author_name_latex': str,   
+'note_before_step_latex': str, 
+'note_after_step_latex': str, 
+'id': str,   
+ 'created_datetime': str} 
+
+node type: 'feed'
+properties={'author_name_latex': str,  
+'id': str,  
+'sympy': str, 
+'lean': str,   
+ 'latex': str} 
+
+node type: 'expression'
+properties={'author_name_latex': str,   
+ 'name_latex': str, 
+ 'description_latex': str,  
+ 'reference_latex': str,   
+ 'id': str,         
+ 'latex': str,  
+ 'lean': str,   
+ 'sympy': str}  
+
+node type: 'operation'
+properties={'author_name_latex': str, 
+'name_latex': str,  'argument_count': int,  
+'description_latex': str,     
+ 'reference_latex': str, 
+   'id': str,  
+   'latex': str} 
+
+node type: 'scalar'
+properties={'author_name_latex': str,
+ 'name_latex': str, 
+ 'description_latex': str,  
+ 'id': str,         
+ 'reference_latex': str,   
+ 'latex': str,     
+ 'scope': str, 
+ 'variable_or_constant': str,  
+ 'domain': str,   
+ 'dimension_length': int,      
+ 'dimension_time': int,        
+ 'dimension_mass': int,        
+ 'dimension_temperature': int, 
+ 'dimension_electric_charge': int,     
+ 'dimension_amount_of_substance': int, 
+ 'dimension_luminous_intensity': int}  
+
+node type: 'value_and_units'
+properties={'author_name_latex': str
+ 'id': str,         
+ 'dimension_length_unit': int, 
+ 'dimension_time_unit': int,   
+ 'dimension_mass_unit': int,   
+ 'dimension_temperature_unit': int, 
+ 'dimension_electric_charge_unit': int,  
+ 'dimension_amount_of_substance_unit': int,
+ 'dimension_luminous_intensity_unit': int, 
+
+node type: 'vector'
+properties={'author_name_latex': str,
+ 'name_latex': str, 
+ 'description_latex': str,  
+ 'reference_latex': str,   
+ 'id': str,         
+ 'latex': str}     
+
+node type: 'matrix'
+properties={'author_name_latex': str,
+ 'name_latex': str, 
+ 'description_latex': str,  
+ 'id': str,         
+ 'reference_latex': str,   
+ 'latex': str}     
+
+node type: 'quantum_operator'
+properties={'author_name_latex': str,
+ 'name_latex': str, 
+ 'description_latex': str,  
+ 'requires_arguments': bool,
+ 'reference_latex': str,   
+ 'id': str,         
+ 'latex': str}
+
+node type: 'inference_rule'
+properties={'author_name_latex': str,  
+ 'number_of_inputs': int,     
+ 'number_of_outputs': int,    
+ 'number_of_feeds': int,      
+ 'name_latex': str, 
+ 'id': str,         
+ 'latex': str}      
+
+
+
+
+
+The nodes and edges occur only in certain combinations described below.
+
+
+edge 'HAS_STEP' properties={'sequence_index': int}
+connects node type "derivation"
+to node type "step"
+
+edge 'HAS_INPUT' properties={'sequence_index': int}
+connects node type "step"
+to node type "expression"
+
+edge 'HAS_FEED' properties={'sequence_index': int}
+connects node type "step"
+to node type "feed"
+
+edge 'HAS_OUTPUT' properties={'sequence_index': int}
+connects node type "step"
+to node type "expression"
+
+edge 'HAS_INFERENCE_RULE'
+connects node type "step"
+to node type "inference_rule"
+
+
+edge 'HAS_SYMBOL'
+connects node type "expression"
+to node type "scalar"
+
+edge 'HAS_SYMBOL'
+connects node type "expression"
+to node type "vector"
+
+edge 'HAS_SYMBOL'
+connects node type "expression"
+to node type "matrix"
+
+edge 'HAS_SYMBOL'
+connects node type "expression"
+to node type "operation"
+
+edge 'HAS_SYMBOL'
+connects node type "expression"
+to node type "quantum_operator"
+
+edge 'HAS_SYMBOL'
+connects node type "feed"
+to node type "scalar"
+
+edge 'HAS_SYMBOL'
+connects node type "feed"
+to node type "vector"
+
+edge 'HAS_SYMBOL'
+connects node type "feed"
+to node type "matrix"
+
+edge 'HAS_SYMBOL'
+connects node type "feed"
+to node type "operation"
+
+edge 'HAS_SYMBOL'
+connects node type "feed"
+to node type "quantum_operator"
+
+
+edge 'HAS_VALUE'
+connects node type "scalar"
+to node type "value_and_units"
+
+</pre>
+</fieldset><div><br /></div><i>
+
+Response from Gemini</i>:
+
+<p>Converting a property graph to a relational model involves translating nodes into tables and edges into relationships (either through foreign keys or dedicated join tables). Here is a comprehensive SQLite schema designed to represent your Neo4j graph structure, balancing relational purity with the flexibility of the original graph.
+
+</p><h2>Design Principles</h2>
+
+<ul>
+<li>Nodes as Tables: Each distinct node type (`derivation`, `step`, `expression`, etc.) will become its own table.
+</li><li>Properties as Columns: The properties of each node will become columns in the corresponding table. The node's `id` will serve as the `PRIMARY KEY`.
+</li><li>Edges as Relationships:
+    <ul>
+    <li>   One-to-Many / One-to-One Edges: These are modeled using a foreign key column in the "many" or "child" table. For example, since a `step` belongs to one `derivation`, the `steps` table will have a `derivation_id` column.
+    </li><li>  Many-to-Many Edges: These are modeled using a separate "join table" (or "link table") that contains foreign keys to the two connected tables. For example, a `step` can have many `expression` inputs, and an `expression` can be an input to many `steps`. This requires a `step_inputs` join table.
+    </li></ul>
+</li><li> Polymorphic Edges: The `HAS_SYMBOL` edge is polymorphic because it can connect to multiple different types of symbol nodes (`scalar`, `vector`, etc.). To handle this cleanly without losing foreign key integrity, we will create a dedicated join table for each specific relationship (e.g., `expression_scalars`, `expression_vectors`). A more "graph-like" but less relationally pure alternative is discussed in the rationale section.
+</li></ul>
+
+<h2>SQLite Schema Definition</h2>
+
+Here are the `CREATE TABLE` statements for the SQLite database.
+
+Node Tables. These tables store the data for each type of node.
+
+<pre>-- The top-level container for a mathematical derivation.
+CREATE TABLE derivations (
+    id TEXT PRIMARY KEY,
+    author_name_latex TEXT,
+    name_latex TEXT,
+    abstract_latex TEXT,
+    reference_latex TEXT,
+    created_datetime TEXT NOT NULL
+);
+
+-- Represents a single logical step in a derivation.
+-- It connects to a derivation (one-to-many) and an inference_rule (many-to-one).
+CREATE TABLE steps (
+    id TEXT PRIMARY KEY,
+    derivation_id TEXT NOT NULL,
+    inference_rule_id TEXT NOT NULL,
+    sequence_index INTEGER NOT NULL, -- From the 'HAS_STEP' edge property
+    author_name_latex TEXT,
+    note_before_step_latex TEXT,
+    note_after_step_latex TEXT,
+    created_datetime TEXT NOT NULL,
+    FOREIGN KEY (derivation_id) REFERENCES derivations(id) ON DELETE CASCADE,
+    FOREIGN KEY (inference_rule_id) REFERENCES inference_rules(id) ON DELETE RESTRICT,
+    UNIQUE (derivation_id, sequence_index) -- A derivation cannot have two steps at the same index
+);
+
+-- Represents the mathematical content of an expression.
+CREATE TABLE expressions (
+    id TEXT PRIMARY KEY,
+    author_name_latex TEXT,
+    name_latex TEXT,
+    description_latex TEXT,
+    reference_latex TEXT,
+    latex TEXT,
+    lean TEXT,
+    sympy TEXT
+);
+
+-- Represents feed-in values or assumptions for a step.
+CREATE TABLE feeds (
+    id TEXT PRIMARY KEY,
+    author_name_latex TEXT,
+    sympy TEXT,
+    lean TEXT,
+    latex TEXT
+);
+
+-- Represents a rule of logic or mathematics used in a step.
+CREATE TABLE inference_rules (
+    id TEXT PRIMARY KEY,
+    author_name_latex TEXT,
+    name_latex TEXT,
+    latex TEXT,
+    number_of_inputs INTEGER,
+    number_of_outputs INTEGER,
+    number_of_feeds INTEGER
+);
+
+-- Represents a mathematical operation like addition or differentiation.
+CREATE TABLE operations (
+    id TEXT PRIMARY KEY,
+    author_name_latex TEXT,
+    name_latex TEXT,
+    description_latex TEXT,
+    reference_latex TEXT,
+    latex TEXT,
+    argument_count INTEGER
+);
+
+-- Represents a scalar value (a single number).
+CREATE TABLE scalars (
+    id TEXT PRIMARY KEY,
+    author_name_latex TEXT,
+    name_latex TEXT,
+    description_latex TEXT,
+    reference_latex TEXT,
+    latex TEXT,
+    scope TEXT,
+    variable_or_constant TEXT,
+    domain TEXT,
+    dimension_length INTEGER,
+    dimension_time INTEGER,
+    dimension_mass INTEGER,
+    dimension_temperature INTEGER,
+    dimension_electric_charge INTEGER,
+    dimension_amount_of_substance INTEGER,
+    dimension_luminous_intensity INTEGER
+);
+
+-- Represents a vector.
+CREATE TABLE vectors (
+    id TEXT PRIMARY KEY,
+    author_name_latex TEXT,
+    name_latex TEXT,
+    description_latex TEXT,
+    reference_latex TEXT,
+    latex TEXT
+);
+
+-- Represents a matrix.
+CREATE TABLE matrices (
+    id TEXT PRIMARY KEY,
+    author_name_latex TEXT,
+    name_latex TEXT,
+    description_latex TEXT,
+    reference_latex TEXT,
+    latex TEXT
+);
+
+-- Represents a quantum mechanical operator.
+CREATE TABLE quantum_operators (
+    id TEXT PRIMARY KEY,
+    author_name_latex TEXT,
+    name_latex TEXT,
+    description_latex TEXT,
+    reference_latex TEXT,
+    latex TEXT,
+    requires_arguments INTEGER -- Using INTEGER for BOOLEAN (0=false, 1=true)
+);
+
+-- Represents the numerical value and units for a scalar.
+-- This has a one-to-one relationship with a scalar.
+CREATE TABLE values_and_units (
+    id TEXT PRIMARY KEY,
+    scalar_id TEXT NOT NULL UNIQUE, -- The UNIQUE constraint enforces the 1-to-1 relationship
+    author_name_latex TEXT,
+    dimension_length_unit INTEGER,
+    dimension_time_unit INTEGER,
+    dimension_mass_unit INTEGER,
+    dimension_temperature_unit INTEGER,
+    dimension_electric_charge_unit INTEGER,
+    dimension_amount_of_substance_unit INTEGER,
+    dimension_luminous_intensity_unit INTEGER,
+    FOREIGN KEY (scalar_id) REFERENCES scalars(id) ON DELETE CASCADE
+);
+
+</pre>
+
+Relationship (Join) Tables. These tables model the many-to-many relationships defined by the edges.
+
+<pre>-- Links steps to their input expressions.
+CREATE TABLE step_inputs (
+    step_id TEXT NOT NULL,
+    expression_id TEXT NOT NULL,
+    sequence_index INTEGER NOT NULL,
+    PRIMARY KEY (step_id, sequence_index),
+    FOREIGN KEY (step_id) REFERENCES steps(id) ON DELETE CASCADE,
+    FOREIGN KEY (expression_id) REFERENCES expressions(id) ON DELETE CASCADE
+);
+
+-- Links steps to their output expressions.
+CREATE TABLE step_outputs (
+    step_id TEXT NOT NULL,
+    expression_id TEXT NOT NULL,
+    sequence_index INTEGER NOT NULL,
+    PRIMARY KEY (step_id, sequence_index),
+    FOREIGN KEY (step_id) REFERENCES steps(id) ON DELETE CASCADE,
+    FOREIGN KEY (expression_id) REFERENCES expressions(id) ON DELETE CASCADE
+);
+
+-- Links steps to their feed-in values.
+CREATE TABLE step_feeds (
+    step_id TEXT NOT NULL,
+    feed_id TEXT NOT NULL,
+    sequence_index INTEGER NOT NULL,
+    PRIMARY KEY (step_id, sequence_index),
+    FOREIGN KEY (step_id) REFERENCES steps(id) ON DELETE CASCADE,
+    FOREIGN KEY (feed_id) REFERENCES feeds(id) ON DELETE CASCADE
+);
+
+-- Join tables for the polymorphic 'HAS_SYMBOL' relationships
+-- These tables link expressions and feeds to the various symbol types they contain.
+
+-- Expression-to-Symbol Links
+CREATE TABLE expression_symbols (
+    expression_id TEXT NOT NULL,
+    symbol_id TEXT NOT NULL,
+    symbol_type TEXT NOT NULL, -- e.g., 'scalar', 'vector', 'matrix', 'operation', 'quantum_operator'
+    PRIMARY KEY (expression_id, symbol_id),
+    FOREIGN KEY (expression_id) REFERENCES expressions(id) ON DELETE CASCADE
+);
+
+-- Feed-to-Symbol Links
+CREATE TABLE feed_symbols (
+    feed_id TEXT NOT NULL,
+    symbol_id TEXT NOT NULL,
+    symbol_type TEXT NOT NULL, -- e.g., 'scalar', 'vector', 'matrix', 'operation', 'quantum_operator'
+    PRIMARY KEY (feed_id, symbol_id),
+    FOREIGN KEY (feed_id) REFERENCES feeds(id) ON DELETE CASCADE
+);
+</pre>
+
+<h2>Rationale and Explanation</h2>
+
+<p>Direct Relationships (`derivation` -&gt; `step`, `step` -&gt; `inference_rule`): The `HAS_STEP` edge connects one derivation to many steps. This is a classic one-to-many relationship, best modeled by adding a `derivation_id` foreign key to the `steps` table. The `sequence_index` from the edge property is also placed here. The same logic applies to the `HAS_INFERENCE_RULE` edge.
+
+</p><p>Step Inputs/Outputs/Feeds: A `step` can have multiple ordered inputs, outputs, and feeds. These are many-to-many relationships modeled with the join tables `step_inputs`, `step_outputs`, and `step_feeds`. The `sequence_index` property from the edge is a crucial part of the primary key to maintain order and uniqueness.
+
+</p><p>One-to-One Relationship (`scalar` -&gt; `value_and_units`): The `HAS_VALUE` edge is modeled by adding a `scalar_id` foreign key to the `values_and_units` table. Adding a `UNIQUE` constraint on `scalar_id` ensures that each scalar can have at most one `value_and_units` entry, perfectly modeling the one-to-one relationship.
+
+</p><p>Handling Polymorphism (`HAS_SYMBOL`): This is the most complex relationship to model. An `expression` or a `feed` can contain many symbols of different types.
+    </p><ul>
+    <li><i>   Chosen Approach</i>: The schema uses two tables, `expression_symbols` and `feed_symbols`. Each table stores the ID of the source (`expression_id` or `feed_id`), the ID of the target symbol (`symbol_id`), and a `symbol_type` column to tell you which table to join with to get the symbol's details (e.g., `scalars`, `vectors`).
+    </li><li><i>Advantage</i>: This approach is pragmatic. It keeps the number of tables manageable.
+    </li><li><i>Trade-off</i>: It sacrifices full relational integrity because you cannot create a native `FOREIGN KEY` on `symbol_id` that points to five different tables. You would enforce this relationship at the application layer (e.g., when you retrieve an `expression`'s symbols, you read the `symbol_type` and then query the appropriate table).
+
+</li></ul>
+
+<hr />
+
+<p>In my assessment, the SQL schema is inelegant compared to the property graph representation.</p><p>The use of `ON DELETE CASCADE` is a guess by the LLM and is not always the desired behavior. (The `ON DELETE CASCADE` means that if the parent gets deleted then automatically delete the linked child.)&nbsp;<br />The alternative is `ON DELETE RESTRICT` (or `NO ACTION`). It prevents deletion of the parent row as long as any child rows&nbsp; exist. The database would return an error. This is used when you want to protect the child data.</p><p><br /></p>
+
+<p>The above tailored-to-PDG schema is complicated. A simpler schema like the one below incurs a higher query cost.</p>
+
+<p>From Gemini I learned that the EAV (Entity-Attribute-Value) model is a normalized and traditional approach that is portable across almost any relational database.</p><span><!--more--></span><p><i>Gemini output</i>:</p><p>What to model:
+  </p><ul>
+    <li>Nodes (or Vertices): The entities in the graph (e.g., a Person, a Company).
+      <ul>
+<li>Have a unique ID.
+</li><li>Have one or more labels (e.g., a node can be a Person and an Employee).
+</li><li>Have a set of key-value properties (e.g., name: "Alice", age: 30).
+  </li></ul>
+</li><li>Edges (or Relationships): The connections between nodes.
+  <ul>
+<li>Have a unique ID.
+</li><li>Have a single type or label (e.g., WORKS_FOR, KNOWS).
+</li><li>Are directed, having a source node and a target node.
+</li><li>Have their own set of key-value properties (e.g., since: "2020-05-18").
+        </li></ul>
+    </li></ul>
+
+EAV (Entity-Attribute-Value) Schema creates separate tables for nodes, edges, labels, and the properties themselves. This is a robust and portable design.
+
+<pre>+----------------+      +-------------------+
+|      Nodes     |      |   Node_Labels     |
++----------------+      +-------------------+
+| PK node_id     |-----&gt;| FK node_id        |
++----------------+      |    label          |
+                        +-------------------+
+
++----------------+      +-------------------+
+|      Edges     |      |  Edge_Properties  |
++----------------+      +-------------------+
+| PK edge_id     |-----&gt;| FK edge_id        |
+|    label       |      |    property_key   |
+| FK source_node |      |    value_string   |
+| FK target_node |      |    value_numeric  |
++----------------+      |    value_boolean  |
+                        |    value_datetime |
++----------------+      +-------------------+
+| Node_Properties|
++----------------+
+| FK node_id     |
+|    property_key|
+|    value_string|
+|    value_numeric|
+|    value_boolean|
+|    value_datetime|
++----------------+
+</pre>
+
+SQL `CREATE TABLE` Statements
+
+<pre>-- The core table for all nodes in the graph
+CREATE TABLE nodes (
+    node_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY
+);
+
+-- A table to handle multiple labels per node
+-- This allows a node to be both a 'Person' and an 'Employee', for example.
+CREATE TABLE node_labels (
+    node_id BIGINT NOT NULL,
+    label VARCHAR(255) NOT NULL,
+    PRIMARY KEY (node_id, label),
+    FOREIGN KEY (node_id) REFERENCES nodes(node_id) ON DELETE CASCADE
+);
+
+-- A single table for all directed edges/relationships
+CREATE TABLE edges (
+    edge_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    source_node_id BIGINT NOT NULL,
+    target_node_id BIGINT NOT NULL,
+    label VARCHAR(255) NOT NULL,
+    FOREIGN KEY (source_node_id) REFERENCES nodes(node_id) ON DELETE CASCADE,
+    FOREIGN KEY (target_node_id) REFERENCES nodes(node_id) ON DELETE CASCADE
+);
+
+-- EAV table for NODE properties.
+-- Only one 'value' column should be non-NULL for any given row.
+CREATE TABLE node_properties (
+    node_id BIGINT NOT NULL,
+    property_key VARCHAR(255) NOT NULL,
+    value_string TEXT,
+    value_numeric NUMERIC,
+    value_boolean BOOLEAN,
+    value_datetime TIMESTAMPTZ,
+    PRIMARY KEY (node_id, property_key),
+    FOREIGN KEY (node_id) REFERENCES nodes(node_id) ON DELETE CASCADE,
+    -- Ensure that only one value type is set per property
+    CONSTRAINT chk_one_value_type_node CHECK (
+        (value_string IS NOT NULL)::int +
+        (value_numeric IS NOT NULL)::int +
+        (value_boolean IS NOT NULL)::int +
+        (value_datetime IS NOT NULL)::int
+        = 1
+    )
+);
+
+-- EAV table for EDGE properties.
+CREATE TABLE edge_properties (
+    edge_id BIGINT NOT NULL,
+    property_key VARCHAR(255) NOT NULL,
+    value_string TEXT,
+    value_numeric NUMERIC,
+    value_boolean BOOLEAN,
+    value_datetime TIMESTAMPTZ,
+    PRIMARY KEY (edge_id, property_key),
+    FOREIGN KEY (edge_id) REFERENCES edges(edge_id) ON DELETE CASCADE,
+    CONSTRAINT chk_one_value_type_edge CHECK (
+        (value_string IS NOT NULL)::int +
+        (value_numeric IS NOT NULL)::int +
+        (value_boolean IS NOT NULL)::int +
+        (value_datetime IS NOT NULL)::int
+        = 1
+    )
+);
+
+-- RECOMMENDED INDEXES for performance
+CREATE INDEX idx_node_labels_label ON node_labels(label);
+CREATE INDEX idx_edges_label ON edges(label);
+CREATE INDEX idx_edges_source_target ON edges(source_node_id, target_node_id);
+CREATE INDEX idx_node_properties_key_value ON node_properties(property_key, value_string);
+CREATE INDEX idx_edge_properties_key_value ON edge_properties(property_key, value_string);
+</pre>
+
+<p>The verbosity is high. To see that, here's an example of finding all people named "Alice" who WORK_FOR a company named "Graph Inc."
+</p><pre>SELECT p_node.node_id
+FROM nodes AS p_node
+JOIN node_labels AS p_label ON p_node.node_id = p_label.node_id
+JOIN node_properties AS p_name ON p_node.node_id = p_name.node_id
+JOIN edges ON p_node.node_id = edges.source_node_id
+JOIN nodes AS c_node ON edges.target_node_id = c_node.node_id
+JOIN node_labels AS c_label ON c_node.node_id = c_label.node_id
+JOIN node_properties AS c_name ON c_node.node_id = c_name.node_id
+WHERE
+    p_label.label = 'Person'
+    AND p_name.property_key = 'name'
+    AND p_name.value_string = 'Alice'
+    AND edges.label = 'WORKS_FOR'
+    AND c_label.label = 'Company'
+    AND c_name.property_key = 'name'
+    AND c_name.value_string = 'Graph Inc.';
+    </pre><p></p><p></p><p></p>
+
+{% endblock %}

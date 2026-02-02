@@ -1,0 +1,36 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Levels of reproducibility and repeatability and replication</H1>
+
+<P><small>Published 2022-10-26T10:07:00.005Z by Physics Derivation Graph</small></P>
+
+<p>Knowledge progresses when one person can leverage the insights of another person. There are levels of&nbsp;reproducibility that require different levels investment on the part of the person looking to build on the initial knowledge.&nbsp;</p>
+
+<p>The levels described below are ranked from "requires lots of work to build upon" to "very easy to leverage."</p>
+
+<h3 style="text-align: left;">Level 0: discoverable claim</h3><div>Undocumented claims that no one else is aware of are irrelevant to the advancement of science.&nbsp;</div>
+
+<p></p>
+
+<h3 style="text-align: left;">Level 1: claim without evidence</h3>
+<p><i>example</i>: "My design for this car tire supports operational speeds of 50 miles per hour and will be usable for 50,000 miles."<br />
+  No software or analytical calculations are provided. No explanation of how claim was arrived at.
+</p><p><br /></p>
+<p></p>
+
+<h3 style="text-align: left;">Level 2: verbal hints of process used</h3><i>software-based example</i>:&nbsp;My design for the car tire is based on calculations from code written in Python.<br /><i>analytical example</i>: In my calculation of operational speed I used the Fourier transform.<p></p><p>What distinguishes 2 from 1: Advertising that code was written, or math was done.&nbsp;<br />Most peer-reviewed scientific papers are written at this level or, if you're lucky, level 2.&nbsp;<br />Most presentations of experiments (e.g., at conferences and lectures) also are made at this level or level 2.</p><p><br /></p><p></p>
+
+<h3 style="text-align: left;">Level 3: software without documentation or dependencies; or, for analytical, a few of the key equations</h3>
+<p><i>software-based&nbsp;</i><i>example</i>: Python script provided by the author to back up claim. No configuration file or random seed value. Library dependencies and versions need to be determined through trial and error (aka digital archeology).<br />
+<i>analytical example</i>: a few key equations (from a much more complex derivation) are mentioned, as are a few (not all) of the assumptions.</p><p></p><p><i>consequence</i>: If you're smart and diligent, you may be able to recover statistically similar (though not exact) behavior for stochastic models, assuming neither you nor the original author had any bugs in the implementation.</p><p><br /></p><p></p>
+
+<h3 style="text-align: left;">Level 4:</h3><i>software-based&nbsp;</i><i>example</i>:&nbsp;Python script with random seed value specified and configuration parameters documented. Documentation not included, nor are dependencies made explicit.&nbsp;<br /><i>analytical example</i>: complete derivation provided, with explanation of assumptions<br /><br /><p></p><p></p>
+
+<h3 style="text-align: left;">Level 5: repeatable</h3><i>software-based&nbsp;</i><i>example</i>:&nbsp;Python script containerized, software versions pinned. Build process is executable. <span style="background-color: #fcff01;">No digital archeology needed</span>.<br /><i>analytical example</i>:&nbsp;portions of the complete derivation are checked by a computer algebra system (CAS) for correctness.<p></p><p><br /></p><p></p>
+
+<h3 style="text-align: left;">Level 6:</h3><i>software-based&nbsp;</i><i>example</i>:&nbsp;Python script containerized with documentation of assumptions and examples of how to use. Configuration file with parameters and random seed values provided.<br /><i>analytical example</i>: complete derivation checked by a computer algebra system (CAS) for correctness. Proofs provided.&nbsp; Citations where appropriate.<p></p><p><br /></p><p><i>Caveat</i>: the levels described above are not actually linear. There are a few meandering paths that get from 0 to 6.&nbsp;</p><p><br /></p>
+
+<h2 style="text-align: left;">References</h2><div>"Reproducibility vs. Replicability: A Brief History of a Confused Terminology"<br /><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5778115/">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5778115/</a></div><p></p><p></p><p></p><p></p><p></p><p></p><p></p>
+
+{% endblock %}

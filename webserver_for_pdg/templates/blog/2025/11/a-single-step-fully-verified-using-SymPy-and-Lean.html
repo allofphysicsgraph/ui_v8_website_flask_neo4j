@@ -1,0 +1,106 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>a single step fully verified using SymPy and Lean</H1>
+
+<P><small>Published 2025-11-24T01:03:00Z by Physics Derivation Graph</small></P>
+
+<p>As very simple example, start with the equation
+</p><pre>T = 1/f 
+</pre>
+where <code>T</code> is period of oscillation and <code>f</code> is frequency of oscillation.
+A transformation would be to multiply both sides by <code>f</code> to get
+<pre style="text-align: left;">f T = 1
+</pre>
+<h3 style="text-align: left;">Verification of a step using a Computer Algebra System like&nbsp;<a href="https://en.wikipedia.org/wiki/SymPy">SymPy</a></h3><p>The single step above could be verified using a Computer Algebra System like <a href="https://en.wikipedia.org/wiki/SymPy">SymPy</a>. The generic form of the inference rule is "<i>multiply both sides of (LHS=RHS) by feed to get (LHS*feed=RHS*feed)</i>". To show the inference rule was correctly applied, we want to show that</p>
+<pre>LHS_in*feed == LHS_out
+and
+RHS_in*feed == RHS_out
+</pre>
+<div>Another way to describe the equivalence is that the difference should be zero:</div>
+<pre>LHS_in*feed - LHS_out = 0
+and
+RHS_in*feed - RHS_out = 0
+</pre>That's the generic formulation of the inference rule check. In this step, 
+<pre>LHS_in = T
+RHS_in = 1/f
+feed = f
+LHS_out = f T
+RHS_out = 1
+</pre><p>This check is implemented in <a href="https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/v7_pickle_web_interface/flask/validate_steps_sympy.py#L496">line 496 of validate_steps_sympy.py</a> as
+</p><pre>import sympy
+def multiply_both_sides_by(LHS_in, RHS_in, feed, LHS_out, RHS_out):
+    diff1 = sympy.simplify(sympy.Mul(LHS_in, feed) - LHS_out)
+    diff2 = sympy.simplify(sympy.Mul(RHS_in, feed) - RHS_out)
+    if (diff1 == 0) and (diff2 == 0):
+        return "valid"
+    else:
+        return "LHS diff is " + str(diff1) + "\n" + "RHS diff is " + str(diff2)
+</pre>We can run that using
+<pre>&gt;&gt;&gt; import sympy
+&gt;&gt;&gt; print(sympy.__version__)
+1.11.1
+&gt;&gt;&gt; f, T = sympy.symbols('f T')
+&gt;&gt;&gt; multiply_both_sides_by(T, 1/f, f, f*T, 1)
+'valid'
+</pre>
+<p>Wahoo! The step has been validated using SymPy to show the inference rule is applied correctly.</p><p>The cool part is that the "multiply_both_sides()" Python function is generic to any input expression. The same check can be used for many different steps that use the inference rule. Using SymPy we can gain confidence that the expressions associated with a step were correctly transformed.&nbsp;</p><p><br /></p>
+
+<h3 style="text-align: left;">Consistency of dimensionality using SymPy</h3>
+
+<p>In addition to evaluating the transformation of symbols in a step, we can verify the consistency of dimensions for each expression. That requires more than just the symbols -- the user will have to specify the dimensions of each symbol.</p>
+
+<p>For example, in JSON for period T we have</p>
+<pre>        "9491": {
+            "category": "variable",
+            "dimensions": {
+                "amount of substance": 0,
+                "electric charge": 0,
+                "length": 0,
+                "luminous intensity": 0,
+                "mass": 0,
+                "temperature": 0,
+                "time": 1
+            },
+            "latex": "T",
+            "name": "period",
+            "scope": [
+                "real"
+            ]
+        },
+</pre>
+<p>The script <a href="https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/v7_pickle_web_interface/flask/validate_dimensions_sympy.py">validate_dimensions_sympy.py</a>
+</p><pre>&gt;&gt;&gt; import sympy
+&gt;&gt;&gt; from sympy.physics.units import mass, length, time, temperature, luminous_intensity, amount_of_substance, charge  # type: ignore
+&gt;&gt;&gt; from sympy.physics.units.systems.si import dimsys_SI
+
+&gt;&gt;&gt; from sympy.parsing.latex import parse_latex
+&gt;&gt;&gt; sympy.srepr(parse_latex('T = 1/f'))
+
+TODO
+&gt;&gt;&gt; determine_consistency = dimsys_SI.equivalent_dims( eval(str(LHS)), eval(str(RHS)) )
+</pre>
+
+<p>See <a href="https://physicsderivationgraph.blogspot.com/2020/07/function-latex-for-sympy.html">https://physicsderivationgraph.blogspot.com/2020/07/function-latex-for-sympy.html</a></p><p></p>
+
+<h3 style="text-align: left;">Verification of the step using Lean</h3>
+To prove<pre>(T=1/f) -&gt; (f*T=1)</pre>
+<p>
+additional constraints are needed for reasoning around division by 0.
+
+If you expect to avoid negative or zero frequency or period, you could define f and T to have be "positive real numbers" (which exclude zero; non-negative reals include zero). This does define the context more precisely, but there is a price - we won’t have nearly as many proofs for positive reals as we have for reals. The alternative is to add additional hypotheses as constraints. The latter case (additional hypotheses) is favored.</p>
+
+
+<pre>import Mathlib.Data.Real.Basic
+import Mathlib.Tactic -- Import standard tactics, specifically import Mathlib.Tactic.FieldSimp
+
+theorem inversion_amultbeq1
+  (a b : Real)
+  (hb_ne_zero : b ≠ 0) :
+  a = 1 / b <-> a * b = 1 := by
+  -- field_simp clears the denominator 'b' on the LHS,
+  -- turning (a = 1 / b) into (a * b = 1) automatically.
+  field_simp [hb_ne_zero]
+</-></pre>
+
+{% endblock %}

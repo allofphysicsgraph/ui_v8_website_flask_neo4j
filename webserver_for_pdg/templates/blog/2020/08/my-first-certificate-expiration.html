@@ -3,12 +3,15 @@
 
 <H1>my first certificate expiration</H1>
 
-<P><small>Published 2020-08-09T20:41:00.007Z by Physics Derivation Graph</small></P>
+<P><small>Published 2020-08-09T20:41:00.009Z by Physics Derivation Graph</small></P>
+
+<div class="separator" style="clear: both; text-align: left;"><i>Update</i>: <a href="https://physicsderivationgraph.blogspot.com/2021/10/periodic-renewal-of-https-letsencrypt.html">concise instructions</a></div>
+
+<p>
+This morning I was greeted with this warning from Chrome when visiting <a href="https://derivationmap.net/">https://derivationmap.net</a></p>
 
 <div class="separator" style="clear: both; text-align: center;">
-This morning I was greeted with this warning from Chrome when visiting <a href="https://derivationmap.net/">https://derivationmap.net</a></div>
-<div class="separator" style="clear: both; text-align: center;">
-<a href="https://1.bp.blogspot.com/-DhpVxAlwkbw/XzBW4-Vya3I/AAAAAAABCiw/RG6bcnAj0Y8dXm0UoTREbvtHtGADEqGtgCLcBGAsYHQ/s1600/Screen%2BShot%2B2020-08-09%2Bat%2B4.03.52%2BPM.png" style="margin-left: 1em; margin-right: 1em;"><img border="0" data-original-height="468" data-original-width="824" height="363" src="https://1.bp.blogspot.com/-DhpVxAlwkbw/XzBW4-Vya3I/AAAAAAABCiw/RG6bcnAj0Y8dXm0UoTREbvtHtGADEqGtgCLcBGAsYHQ/s640/Screen%2BShot%2B2020-08-09%2Bat%2B4.03.52%2BPM.png" width="640" /></a></div>
+<a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi6dDx0wSPiWODsdDKsrHG4I7LYzZH2NxO1lfQ3jxztWYxQfSZT9X6SVXotDRxqMmUGfGABL67y6W4ziOgQMUj5kWITt3AgjNB4gLj9byChyILTKOAPyyku5-SI118zM_J23hWZ0jy0eLpJ/s1600/Screen+Shot+2020-08-09+at+4.03.52+PM.png" style="margin-left: 1em; margin-right: 1em;"><img border="0" data-original-height="468" data-original-width="824" height="363" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi6dDx0wSPiWODsdDKsrHG4I7LYzZH2NxO1lfQ3jxztWYxQfSZT9X6SVXotDRxqMmUGfGABL67y6W4ziOgQMUj5kWITt3AgjNB4gLj9byChyILTKOAPyyku5-SI118zM_J23hWZ0jy0eLpJ/s640/Screen+Shot+2020-08-09+at+4.03.52+PM.png" width="640" /></a></div>
 The error message indicated my certificates had expired.<br />
 <br />
 I SSH'd into my DigitalOcean node and ran a scan of the certs that certbot can find<br />
@@ -40,10 +43,10 @@ The corresponds with the command history entry from&nbsp;2020-05-11,</div>
 </pre>
 <h2>Solution</h2>
 <div>
-delete existing certs</div>
+Delete existing certs</div>
 <pre>sudo rm -rf /etc/letsencrypt/{live,renewal,archive}/{derivationmap.net,derivationmap.net.conf}/
 </pre>
-<p>request new certs</p>
+<p>Request new certs</p>
 <pre>sudo certbot certonly --webroot \
 -w /home/pdg/proofofconcept/v7_pickle_web_interface/certs \
 --server https://acme-v02.api.letsencrypt.org/directory \
@@ -58,6 +61,6 @@ openssl dhparam -out dhparam.pem 2048
 <p>Restart Docker-compose</p>
 <pre>docker-compose up --build --force-recreate --remove-orphans --detach</pre>
 
-<p>If the docker containers are not restarted, the changes made to the file on the host won't take effect.</p><p>Verify in a browser that&nbsp;https://derivationmap.net/ has the updated certificate.</p><p>Set a calendar reminder to renew the certificate</p>
+<p>If the docker containers are not restarted, the changes made to the file on the host won't take effect.</p><p>Verify in a browser that&nbsp;<a href="https://derivationmap.net/">https://derivationmap.net/</a> has the updated certificate.</p><p>Set a calendar reminder to renew the certificate</p>
 
 {% endblock %}

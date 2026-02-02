@@ -1,0 +1,66 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>new droplet for Ubuntu 24 LTS</H1>
+
+<P><small>Published 2024-09-02T18:14:00Z by Physics Derivation Graph</small></P>
+
+My upgrade from Ubuntu 20 to 22 resulted in an inability to SSH to the server; see <a href="https://physicsderivationgraph.blogspot.com/2024/09/unable-to-ssh-into-vps-after-upgrade-of.html">https://physicsderivationgraph.blogspot.com/2024/09/unable-to-ssh-into-vps-after-upgrade-of.html
+</a><br />I decided to get a new droplet and start from scratch with Ubuntu 24 LTS. 
+
+Logged in as root via the web console,
+<pre>adduser pdg
+usermod -aG sudo pdg</pre>
+
+<pre>ufw allow OpenSSH
+ufw enable</pre>
+
+Then I was able to SSH from my laptop to the VPS as "pdg"
+
+<pre>sudo ufw allow 443
+sudo ufw allow 80
+</pre>
+
+<p>edit <code>~/.bashrc</code> to include
+</p><pre>alias ..='cd ..'</pre>
+
+
+<p>Install Docker
+</p><pre>sudo apt update
+sudo apt upgrade
+sudo apt install apt-transport-https curl
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release &amp;&amp; echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl is-active docker
+</pre>
+as per <a href="https://linuxiac.com/how-to-install-docker-on-ubuntu-24-04-lts/">https://linuxiac.com/how-to-install-docker-on-ubuntu-24-04-lts/
+
+</a><p>To clone the github repos over SSH requires keys.
+</p><pre>ssh-keygen</pre>
+and upload the newly generated public key to <a href="https://github.com/settings/keys">https://github.com/settings/keys
+
+</a><p>Ubuntu 24 LTS doesn't come with make by default, so
+</p><pre>sudo apt install make</pre>
+
+<p>By default the user <code>pdg</code> can't launch Docker, so
+</p><pre>sudo usermod -a -G docker $USER
+  newgrp docker</pre>
+as per <a href="https://stackoverflow.com/a/48450294">https://stackoverflow.com/a/48450294</a>
+
+<p>Certs need to be loaded; see <a href="https://physicsderivationgraph.blogspot.com/2021/10/periodic-renewal-of-https-letsencrypt.html">https://physicsderivationgraph.blogspot.com/2021/10/periodic-renewal-of-https-letsencrypt.html</a></p>
+
+<pre>sudo apt -y install certbot</pre>
+
+<P>Certbot requires a running webservice on port 80 to create new certificates.
+
+<p><br /></p>
+
+<p><br /></p>
+
+
+<p>Reference: <br /><a href="https://physicsderivationgraph.blogspot.com/2020/10/upgrading-ubuntu-1804-to-2004-on.html">https://physicsderivationgraph.blogspot.com/2020/10/upgrading-ubuntu-1804-to-2004-on.html</a></p><p></p><p></p><p></p><p></p><p></p>
+
+{% endblock %}

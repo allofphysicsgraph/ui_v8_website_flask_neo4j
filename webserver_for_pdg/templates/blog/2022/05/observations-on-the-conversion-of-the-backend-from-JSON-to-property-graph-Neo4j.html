@@ -1,0 +1,10 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>observations on the conversion of the backend from JSON to property graph (Neo4j)</H1>
+
+<P><small>Published 2022-05-04T00:52:00.005Z by Physics Derivation Graph</small></P>
+
+<p>The JSON backend for the Physics Derivation Graph&nbsp;</p><p></p><ul style="text-align: left;"><li>is concise -- only the fields necessary are present&nbsp;</li><li>is easily readable -- plain text and not much nesting</li><li>requires significant investment to construct queries</li><li>is static in terms of dependencies; unlikely to degrade or require maintenance</li></ul><div>The property graph (in Neo4j) backend</div><div><ul style="text-align: left;"><li>supports user-provided queries</li><li>adds maintenance risk of keeping up with changes to Cypher and Neo4j</li></ul></div><p></p>
+
+{% endblock %}

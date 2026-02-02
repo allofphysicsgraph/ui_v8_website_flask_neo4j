@@ -1,0 +1,126 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Python dependencies visualization using pydeps</H1>
+
+<P><small>Published 2024-01-21T20:16:00Z by Physics Derivation Graph</small></P>
+
+<p>To see what Python modules are available on my system I can run</p><pre>pydoc3 modules</pre>
+<p>One of the modules is pandas. Here's a script that just loads pandas module:</p><pre>cat load_pandas.py 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+import pandas as pd 
+</pre>
+<p>When the script is run nothing happens
+</p><pre>python3 load_pandas.py</pre>
+I have <code>pydeps</code> installed:
+<pre>pydeps --version
+pydeps v1.12.17</pre>
+<p>Output of analysis by pydeps:</p><pre>pydeps -o myfile.png --show-dot -T png --noshow load_pandas.py 
+
+digraph G {
+    concentrate = true;
+
+    rankdir = TB;
+    node [style=filled,fillcolor="#ffffff",fontcolor="#000000",fontname=Helvetica,fontsize=10];
+
+    load_pandas_py [fillcolor="#a65959",fontcolor="#ffffff",label="load_pandas.py"];
+    pandas [fillcolor="#039595",fontcolor="#ffffff"];
+    pandas__config [fillcolor="#24d0d0",label="pandas._config"];
+    pandas__version [fillcolor="#47c2c2",label="pandas\.\n_version"];
+    pandas__version_meson [fillcolor="#47c2c2",label="pandas\.\n_version_meson"];
+    pandas_api [fillcolor="#3db8b8",label="pandas.api"];
+    pandas_arrays [fillcolor="#46a4a4",label="pandas.arrays"];
+    pandas_compat [fillcolor="#17d3d3",label="pandas.compat"];
+    pandas_compat__optional [fillcolor="#31c4c4",label="pandas\.\ncompat\.\n_optional"];
+    pandas_compat_pyarrow [fillcolor="#3db8b8",label="pandas\.\ncompat\.\npyarrow"];
+    pandas_core [fillcolor="#10f9f9",label="pandas.core"];
+    pandas_core_api [fillcolor="#3a8888",fontcolor="#ffffff",label="pandas\.\ncore\.\napi"];
+    pandas_core_computation [fillcolor="#3bcece",label="pandas\.\ncore\.\ncomputation"];
+    pandas_core_computation_api [fillcolor="#46a4a4",label="pandas\.\ncore\.\ncomputation\.\napi"];
+    pandas_core_config_init [fillcolor="#3a8888",fontcolor="#ffffff",label="pandas\.\ncore\.\nconfig_init"];
+    pandas_core_dtypes [fillcolor="#2fdbdb",label="pandas\.\ncore\.\ndtypes"];
+    pandas_core_dtypes_dtypes [fillcolor="#339999",fontcolor="#ffffff",label="pandas\.\ncore\.\ndtypes\.\ndtypes"];
+    pandas_core_reshape [fillcolor="#47c2c2",label="pandas\.\ncore\.\nreshape"];
+    pandas_core_reshape_api [fillcolor="#46a4a4",label="pandas\.\ncore\.\nreshape\.\napi"];
+    pandas_errors [fillcolor="#3ab0b0",label="pandas.errors"];
+    pandas_io [fillcolor="#0bdfdf",label="pandas.io"];
+    pandas_io_api [fillcolor="#46a4a4",label="pandas.io.api"];
+    pandas_io_json [fillcolor="#23c8c8",label="pandas.io.json"];
+    pandas_io_json__normalize [fillcolor="#4cb3b3",label="pandas\.\nio\.\njson\.\n_normalize"];
+    pandas_plotting [fillcolor="#31c4c4",label="pandas\.\nplotting"];
+    pandas_testing [fillcolor="#4cb3b3",label="pandas.testing"];
+    pandas_tseries [fillcolor="#23c8c8",label="pandas.tseries"];
+    pandas_tseries_api [fillcolor="#46a4a4",label="pandas\.\ntseries\.\napi"];
+    pandas_tseries_offsets [fillcolor="#26d9d9",label="pandas\.\ntseries\.\noffsets"];
+    pandas_util [fillcolor="#05e5e5",label="pandas.util"];
+    pandas_util__print_versions [fillcolor="#409696",fontcolor="#ffffff",label="pandas\.\nutil\.\n_print_versions"];
+    pandas_util__tester [fillcolor="#46a4a4",label="pandas\.\nutil\.\n_tester"];
+    pandas -&gt; load_pandas_py [fillcolor="#039595",minlen="2"];
+    pandas__config -&gt; pandas [fillcolor="#24d0d0"];
+    pandas__config -&gt; pandas_core_config_init [fillcolor="#24d0d0",minlen="2"];
+    pandas__config -&gt; pandas_errors [fillcolor="#24d0d0"];
+    pandas__version -&gt; pandas [fillcolor="#47c2c2"];
+    pandas__version -&gt; pandas_util__print_versions [fillcolor="#47c2c2",minlen="2"];
+    pandas__version_meson -&gt; pandas [fillcolor="#47c2c2"];
+    pandas__version_meson -&gt; pandas_util__print_versions [fillcolor="#47c2c2",minlen="2"];
+    pandas_api -&gt; pandas [fillcolor="#3db8b8"];
+    pandas_arrays -&gt; pandas [fillcolor="#46a4a4"];
+    pandas_compat -&gt; pandas [fillcolor="#17d3d3"];
+    pandas_compat -&gt; pandas_core_dtypes_dtypes [fillcolor="#17d3d3",minlen="3"];
+    pandas_compat -&gt; pandas_util__print_versions [fillcolor="#17d3d3",minlen="2"];
+    pandas_compat -&gt; pandas_util__tester [fillcolor="#17d3d3",minlen="2"];
+    pandas_compat__optional -&gt; pandas [fillcolor="#31c4c4",minlen="2"];
+    pandas_compat__optional -&gt; pandas_util__print_versions [fillcolor="#31c4c4",minlen="2"];
+    pandas_compat__optional -&gt; pandas_util__tester [fillcolor="#31c4c4",minlen="2"];
+    pandas_compat_pyarrow -&gt; pandas [fillcolor="#3db8b8",minlen="2"];
+    pandas_compat_pyarrow -&gt; pandas_compat [fillcolor="#3db8b8",weight="2"];
+    pandas_core -&gt; pandas [fillcolor="#10f9f9"];
+    pandas_core -&gt; pandas_arrays [fillcolor="#10f9f9"];
+    pandas_core -&gt; pandas_util [fillcolor="#10f9f9"];
+    pandas_core_api -&gt; pandas [fillcolor="#3a8888",minlen="2"];
+    pandas_core_computation -&gt; pandas [fillcolor="#3bcece",minlen="2"];
+    pandas_core_computation -&gt; pandas_core_config_init [fillcolor="#3bcece",weight="2"];
+    pandas_core_computation_api -&gt; pandas [fillcolor="#46a4a4",minlen="3"];
+    pandas_core_config_init -&gt; pandas [fillcolor="#3a8888",minlen="2"];
+    pandas_core_dtypes -&gt; pandas [fillcolor="#2fdbdb",minlen="2"];
+    pandas_core_dtypes -&gt; pandas_core_api [fillcolor="#2fdbdb",weight="2"];
+    pandas_core_dtypes -&gt; pandas_core_config_init [fillcolor="#2fdbdb",weight="2"];
+    pandas_core_dtypes_dtypes -&gt; pandas [fillcolor="#339999",minlen="3"];
+    pandas_core_dtypes_dtypes -&gt; pandas_core_api [fillcolor="#339999",minlen="2",weight="2"];
+    pandas_core_reshape -&gt; pandas [fillcolor="#47c2c2",minlen="2"];
+    pandas_core_reshape_api -&gt; pandas [fillcolor="#46a4a4",minlen="3"];
+    pandas_errors -&gt; pandas [fillcolor="#3ab0b0"];
+    pandas_errors -&gt; pandas_core_dtypes_dtypes [fillcolor="#3ab0b0",minlen="3"];
+    pandas_io -&gt; pandas [fillcolor="#0bdfdf"];
+    pandas_io -&gt; pandas_core_api [fillcolor="#0bdfdf",minlen="2"];
+    pandas_io -&gt; pandas_core_config_init [fillcolor="#0bdfdf",minlen="2"];
+    pandas_io_api -&gt; pandas [fillcolor="#46a4a4",minlen="2"];
+    pandas_io_json -&gt; pandas [fillcolor="#23c8c8",minlen="2"];
+    pandas_io_json -&gt; pandas_io [fillcolor="#23c8c8",weight="2"];
+    pandas_io_json -&gt; pandas_io_api [fillcolor="#23c8c8",weight="2"];
+    pandas_io_json__normalize -&gt; pandas [fillcolor="#4cb3b3",minlen="3"];
+    pandas_plotting -&gt; pandas [fillcolor="#31c4c4"];
+    pandas_plotting -&gt; pandas_core_config_init [fillcolor="#31c4c4",minlen="2"];
+    pandas_testing -&gt; pandas [fillcolor="#4cb3b3"];
+    pandas_tseries -&gt; pandas [fillcolor="#23c8c8"];
+    pandas_tseries -&gt; pandas_core_api [fillcolor="#23c8c8",minlen="2"];
+    pandas_tseries_api -&gt; pandas [fillcolor="#46a4a4",minlen="2"];
+    pandas_tseries_offsets -&gt; pandas [fillcolor="#26d9d9",minlen="2"];
+    pandas_tseries_offsets -&gt; pandas_core_api [fillcolor="#26d9d9",minlen="2"];
+    pandas_tseries_offsets -&gt; pandas_tseries [fillcolor="#26d9d9",weight="2"];
+    pandas_tseries_offsets -&gt; pandas_tseries_api [fillcolor="#26d9d9",weight="2"];
+    pandas_util -&gt; pandas [fillcolor="#05e5e5"];
+    pandas_util -&gt; pandas_arrays [fillcolor="#05e5e5"];
+    pandas_util -&gt; pandas_compat__optional [fillcolor="#05e5e5",minlen="2"];
+    pandas_util -&gt; pandas_compat_pyarrow [fillcolor="#05e5e5",minlen="2"];
+    pandas_util -&gt; pandas_core_dtypes_dtypes [fillcolor="#05e5e5",minlen="3"];
+    pandas_util -&gt; pandas_errors [fillcolor="#05e5e5"];
+    pandas_util__print_versions -&gt; pandas [fillcolor="#409696",minlen="2"];
+    pandas_util__tester -&gt; pandas [fillcolor="#46a4a4",minlen="2"];
+}
+</pre>
+
+<p></p><p></p><p></p><p></p>
+
+{% endblock %}

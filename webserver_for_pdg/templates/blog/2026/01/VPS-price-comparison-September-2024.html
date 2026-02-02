@@ -1,0 +1,105 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>VPS price comparison September 2024</H1>
+
+<P><small>Published 2026-01-24T21:12:00Z by Physics Derivation Graph</small></P>
+
+Other posts in this series:
+<ul>
+  <li><a href="https://physicsderivationgraph.blogspot.com/2026/01/vps-price-comparison-january-2026.html">https://physicsderivationgraph.blogspot.com/2026/01/vps-price-comparison-january-2026.html
+</a></li></ul>
+
+<h3>Netcup</h3>
+
+<p><a href="https://www.netcup.com/en">https://www.netcup.com/en
+
+</a></p><p>German company. Has US hosting capability.
+
+</p><p>as of 2024-09-02, lowest cost relevant configuration: "VPS 250 G11s"
+</p><pre>3.35 eur is currently $3.71 usd
+2 vCore (x86)
+2 GB ECC RAM
+64 GB SSD
+Traffic included
+  </pre>
+<p>Unfortunately, the US-based servers are only available for beefy configurations. The "VPS 250 G11s" is hosted in Germany; see <a href="https://www.netcup.com/en/server/vps">https://www.netcup.com/en/server/vps</a></p>
+
+<h3>Namecheap</h3>
+<p><a href="https://www.namecheap.com/hosting/shared/">https://www.namecheap.com/hosting/shared/
+
+</a></p><p>Is not a VPS. Provides disk space and pre-configured web services. Not suitable for running Docker.
+
+</p><h3>hetzner</h3>
+
+<p><a href="https://www.hetzner.com/cloud/">https://www.hetzner.com/cloud/
+
+</a></p><p>Servers hosted in Germany or Finland
+
+</p><p>CX22 is
+</p><pre>2 vCPU
+4GB RAM
+40 GB SSD
+</pre>
+<p>for 4.51 eur ($5 USD) per month</p>
+
+<h3>AWS S3</h3>
+
+<p>AWS S3 is suitable for static sites only. Dynamic content would need to live in lambdas for on-demand execution.
+
+</p><p>As per <a href="https://www.reddit.com/r/aws/comments/mfbgot/is_aws_a_good_alternative_to_a_20mo_vps_for/">https://www.reddit.com/r/aws/comments/mfbgot/is_aws_a_good_alternative_to_a_20mo_vps_for/</a></p>
+
+
+
+<h3>AWS LightSail</h3>
+
+<p>AWS VPS is "LightSail"
+
+</p><p><a href="https://calculator.aws/#/createCalculator/Lightsail">https://calculator.aws/#/createCalculator/Lightsail
+
+</a></p><p>The configuration "Bundle:2GB" features
+</p><pre>Storage: 60GB
+vCPU: 2
+Memory: 2GB
+Data Transfer Quota: 3TB
+</pre>
+and costs $11.77/month
+
+<p></p>
+
+<h3>Google Cloud (GCP)</h3>
+
+<p><a href="https://cloud.google.com/compute/vm-instance-pricing#general-purpose_machine_type_family">https://cloud.google.com/compute/vm-instance-pricing#general-purpose_machine_type_family
+
+</a></p><p>"e2-standard-2"
+</p><pre>2 vCPUs
+8GB RAM
+</pre>
+for $55.08726/month in Virgina, or $48/month in Iowa. Cheaper if you sign up for 1 or 3 years.
+
+<p></p>
+
+<h3>linode</h3>
+
+<p><a href="https://www.linode.com/pricing/">https://www.linode.com/pricing/</a> as of 2024-11-29 offers
+</p><pre>1GB RAM, 25GB storage for $5/month
+2GB RAM, 50GB storage for $12/month
+</pre>
+
+<h3>ioflood</h3>
+
+
+<p><a href="https://ioflood.com/bare-metal-cloud-server.php">https://ioflood.com/bare-metal-cloud-server.php
+</a></p><pre>Dual Intel Xeon E5-2695v4 CPUs
+36 CPU cores
+64GB RAM
+960GB NVMe SSD
+100TB @ 10Gbps (Inbound unmetered)
+</pre>
+for $99/mo monthly<p></p>
+
+<p><a href="https://manage.ioflood.com/orderform/index.php?form=Max-95v4-September-2024">https://manage.ioflood.com/orderform/index.php?form=Max-95v4-September-2024
+
+</a></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p>
+
+{% endblock %}

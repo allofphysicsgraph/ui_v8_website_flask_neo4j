@@ -1,0 +1,36 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>resizing to smaller VPS</H1>
+
+<P><small>Published 2025-10-04T22:04:00Z by Physics Derivation Graph</small></P>
+
+<p>I'm currently paying $12/month for my VPS (virtual private server) that has 2GB of RAM and 25GB of storage. I had been paying $6/month previously, but including Neo4j bumped the memory usage to nearly 100%. (CPU usage is averaging around 10% and spikes to 30%.)</p>
+
+<p>I have a few iterations of the source code for the webserver so I'll need to figure out which is actually in use. After logging into the VPS, I see I have two folders:</p>
+<pre>allofphysics.com
+ui_v7_website_flask_json</pre>
+<p>Using <code>docker images</code> I see the latest image (from 7 months ago) is <code>allofphysicscom-flask</code>. That doesn't help me figure out which repo is in use.
+  
+  
+</p><p><code>allofphysics.com/docker-compose.yaml</code> has neo4j, whereas <code>ui_v7_website_flask_json/docker-compose.yaml</code> does not. Therefore I'm currently operating out of <code>allofphysics.com/docker-compose.yaml</code>
+  
+</p><p>I have two options: either revert to the "v7" or disable neo4j in "allofphysics.com". 
+
+</p><p>Going with option 1,
+  </p><pre>~/allofphysics.com$ docker compose down
+~/allofphysics.com$ cd ~/ui_v7_website_flask_json
+~/ui_v7_website_flask_json$ git pull
+~/ui_v7_website_flask_json$ make
+</pre>
+
+Turns out the packages are pretty old. The opencv package wasn't compatible. After I reverted all pip packages to known good version numbers I found the crypto libraries weren't happy. Eventually I was able to get a docker image built.
+
+<P>Next the certs weren't present so I copied those from <code>~/allofphysics.com/certs/</code> and that worked.
+
+<P>To free up disk space I ran
+<pre>docker images | grep none | tr -s ' ' | cut -d' ' -f3 | xargs docker rmi
+</pre>
+<p>I powered down the VPS, changed to a smaller size, powered on, and then ran <code>make</code> to get a running webserver.</p>
+
+{% endblock %}

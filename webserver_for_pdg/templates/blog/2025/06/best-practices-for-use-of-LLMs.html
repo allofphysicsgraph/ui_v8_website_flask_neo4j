@@ -1,0 +1,32 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>best practices for use of LLMs</H1>
+
+<P><small>Published 2025-06-17T12:31:00Z by Physics Derivation Graph</small></P>
+
+I've previously written about <a href="https://physicsderivationgraph.blogspot.com/2023/12/best-practices-for-prompts-for-large.html">best practices for prompts</a>. This post is more abstract.<div><br />&nbsp;
+
+
+<h2>Avoid asking factual questions</h2><div>The LLM is not a database of facts. Historical events, dates, places are not stored as exact references. LLMs generate their response based on statistical probabilities derived from patterns.</div>
+
+<h2>The more widely documented something is, the better the LLM knows it</h2><div>The LLM's training is roughly proportional to the representation of the information on the Internet. An LLM is more reliable and detailed when discussing common knowledge.</div><div><h2>Precise questions using relevant jargon with context yields useful output</h2><div>Poorly worded questions that do not use domain-specific terminology are less likely to produce clear answers.</div><h2>Do not trust citations</h2></div><div>The LLM does not have citations hard-coded into the network. Citations are most likely to be hallucinations&nbsp;</div><div><br /></div>
+  
+<h2>Decompose complex tasks and questions into a sequence of iterative prompts</h2><div>There is a limited amount of "thinking" by the LLM per prompt, so simpler tasks are more likely to produce relevant answers.</div><div><br /></div><h2>Structure your question to produce a page or less of output</h2>
+
+<p>Producing a 200 page book from a single prompt devolves into hallucinations after a few pages. Shorter answers are more likely to remain lucid, so phrase your question in a way that can be answered with a small amount of text.</p>
+
+
+<h2>LLMs default to the average</h2>
+
+<p>While LLM output can be creative (in unexpected ways), seeking exceptional insight yields the mundane</p>
+
+<h2>Simplify your question to a one-shot prompt</h2>
+
+<p>Iterative questions are more likely to yield hallucinations</p><p><br /></p>
+
+<h2>Delegation to an intern who doesn't learn</h2><div>This can be confusing, as the LLM occasionally knows more than you do.</div>
+
+<p></p></div>
+
+{% endblock %}

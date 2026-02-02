@@ -1,0 +1,24 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>tracing Python in JSON-based workflow is untenable</H1>
+
+<P><small>Published 2023-05-27T18:41:00.001Z by Physics Derivation Graph</small></P>
+
+<p>I added</p>
+<pre>
+def mytrace(frame, event, arg):
+    if event == "call":
+        print("call", frame.f_code.co_name, frame.f_locals)
+    elif event == "return":
+        print("return", frame.f_code.co_name, arg)
+    return mytrace
+
+sys.settrace(mytrace)
+</pre>
+<P>to <a href="https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/v7_pickle_web_interface/flask/controller.py">https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/v7_pickle_web_interface/flask/controller.py</a> but the output wasn't that useful since I'm passing the entire database as JSON. The full JSON shows up in almost every argument and return value, making the output of the trace unreadable.
+  
+
+<P>When I switch to the Neo4j/Cypher-based approach, the trace might be more usable.
+
+{% endblock %}

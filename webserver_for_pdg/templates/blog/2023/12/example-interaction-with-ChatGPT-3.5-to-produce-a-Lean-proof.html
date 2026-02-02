@@ -1,0 +1,126 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>example interaction with ChatGPT 3.5 to produce a Lean proof</H1>
+
+<P><small>Published 2023-12-17T03:59:00Z by Physics Derivation Graph</small></P>
+
+In a new conversation I provided the following prompt:
+<fieldset><legend>prompt</legend>
+<p>Answer the question based on the context below. Let's work this out in a step by step way to be sure we have the right answer.
+
+</p><p>Context: Lean is a proof assistant and programming language. Lean is based on the calculus of constructions with inductive types.  
+
+</p><p>Context: There are multiple versions of Lean. This question is about Lean 4
+
+</p><p>`a=b` is a proposition. The variable `a` is Real valued and `b` is Real valued. Prove in version 4 of Lean that `(a=b) -&gt; (a+2=b+2)`
+</p></fieldset>
+
+ChatGTP 3.5 wrote in response
+<fieldset><legend>ChatGPT 3.5 response</legend>
+<p>Certainly! To prove the statement `(a = b) -&gt; (a + 2 = b + 2)` in version 4 of Lean, you can follow these steps:
+
+</p><p>1. **Introduction of Variables**: Begin by introducing the variables and assumptions using the `variables` keyword. In this case, you have the variables `a` and `b` both being Real valued.
+  
+</p><pre>```lean
+variables {a b : ℝ}
+</pre>```
+
+<p>2. **Assumption**: State the assumption that `(a = b)`.
+
+</p><pre>```lean
+example (h : a = b) : a + 2 = b + 2 :=
+</pre>```
+
+<p>3. **Transformation**: Use the assumption to transform the left-hand side of the conclusion `(a + 2)` to `(b + 2)` using the property of equality.
+
+</p><pre>```lean
+calc
+   a + 2 = b + 2 : by rw h
+</pre>```
+
+<p>Here, `calc` is used to chain together a sequence of expressions, and `rw h` applies the assumption `h`.
+
+</p><p>4. **QED (Quod Erat Demonstrandum)**: Conclude the proof.
+
+</p><pre>```lean
+   example (h : a = b) : a + 2 = b + 2 :=
+   begin
+     calc
+       a + 2 = b + 2 : by rw h
+   end
+</pre>```
+
+<p>This step-by-step approach uses the Lean proof style to demonstrate the validity of the given proposition. The `calc` tactic is particularly useful for chaining together equalities.
+</p></fieldset>
+
+On my computer I created a file "second_chatGPT_attempt.lean" and wrote
+<pre>variables {a b : ℝ}
+
+example (h : a = b) : a + 2 = b + 2 :=
+begin
+  calc
+    a + 2 = b + 2 : by rw h
+end
+</pre>
+and then ran
+<pre><b>docker run -it --rm -v `pwd`:/scratch --workdir /scratch lean3onubuntu lean --run second_chatGPT_attempt.lean</b>
+second_chatGPT_attempt.lean:2:0: error: unexpected identifier; expected command
+second_chatGPT_attempt.lean:5:0: error: unknown identifier 'begin'
+second_chatGPT_attempt.lean:6:2: error: unexpected token 'calc'; expected command
+second_chatGPT_attempt.lean:8:0: error: invalid 'end', insufficient scopes
+</pre>
+
+I then told ChatGPT
+
+<fieldset><legend>prompt</legend>
+<p>When I run the script
+</p><pre>```lean
+variables {a b : ℝ}
+
+example (h : a = b) : a + 2 = b + 2 :=
+begin
+  calc
+    a + 2 = b + 2 : by rw h
+end
+</pre>```
+
+<p>Lean 4 returns an error message: `error: unexpected identifier; expected command`
+
+</p><p>What should I do to fix the error?
+</p><p></p><p></p></fieldset>
+
+<fieldset><legend>ChatGPT 3.5 response</legend>
+<p>Apologies for the oversight. It seems I made an error in my previous responses. In Lean, you should use `theorem` or `example` as part of the proof declaration. Here's the corrected version:
+
+</p><pre>```lean
+variables {a b : ℝ}
+
+theorem add_two_eq_add_two (h : a = b) : a + 2 = b + 2 :=
+begin
+  calc
+    a + 2 = b + 2 : by rw h
+end
+</pre>```
+
+<p>In this corrected version, I replaced `example` with `theorem`. You can use `example` as well, but `theorem` is more appropriate when proving statements. This should resolve the error you encountered.
+</p><p></p></fieldset>
+
+I then created a second Lean script, third_chatGPT_attempt.lean, and wrote
+<pre>variables {a b : ℝ}
+
+theorem add_two_eq_add_two (h : a = b) : a + 2 = b + 2 :=
+begin
+  calc
+    a + 2 = b + 2 : by rw h
+end
+</pre>
+which got the same error as before when I attempted to run the script using Lean 4:
+<pre><b>docker run -it --rm -v `pwd`:/scratch --workdir /scratch lean3onubuntu lean --run third_chatGPT_attempt.lean </b>
+third_chatGPT_attempt.lean:1:0: error: unexpected identifier; expected command
+third_chatGPT_attempt.lean:4:0: error: unknown identifier 'begin'
+third_chatGPT_attempt.lean:5:2: error: unexpected token 'calc'; expected command
+third_chatGPT_attempt.lean:7:0: error: invalid 'end', insufficient scopes
+  </pre>
+
+{% endblock %}

@@ -1,0 +1,321 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Hetzner VPS initial configuration notes</H1>
+
+<P><small>Published 2026-01-31T14:53:00Z by Physics Derivation Graph</small></P>
+
+<p>Having just configured the Oracle cloud server, and having used DigitalOcean for years, Hetzner's interface for initial configuration is closer to DigitalOcean than Oracle cloud. And the price of $3.50/month for 2 CPUs and 4GB of RAM with 40GB of storage is mindblowing compared to DigitalOcean's 2 CPUs with 1 GB of RAM and 25GB of storage for $6/month.</p>
+
+<p>Configuration and management interface is at&nbsp;<a href="https://console.hetzner.com/">https://console.hetzner.com/</a></p>
+
+<h2>Create user</h2>
+<p>I logged into the server using 
+  </p><pre>  $ ssh -i ~/.ssh/KEYNAMEHERE root@SERVERIPHERE
+  </pre>
+and then create a new user and group
+<pre># sudo adduser pdg
+# sudo adduser pdg sudo
+# sudo addgroup pdg_grp
+# sudo usermod -aG pdg_grp pdg
+</pre>
+<p>The -a (append) and -G (groups) options ensure the user is added to the new group without being removed from their other groups.
+
+</p><p>Validating,
+</p><pre># groups pdg
+pdg : pdg sudo users pdg_grp
+# id pdg
+uid=1000(pdg) gid=1000(pdg) groups=1000(pdg),27(sudo),100(users),1001(pdg_grp)
+</pre>
+
+<h2>SSH</h2>
+Next, disable root from logging in via SSH. 
+
+First, copy my public cert from my laptop to the server
+<pre>$ ssh-copy-id pdg@SERVERIPHERE
+</pre>
+
+On the server I exited the root SSH session and logged back in as pdg:
+<pre>$ ssh -i ~/.ssh/KEYNAMEHERE pdg@SERVERIPHERE
+$ sudo vi /etc/ssh/sshd_config
+     PermitRootLogin no
+     PubkeyAuthentication yes
+     PasswordAuthentication no
+     PermitEmptyPasswords no
+     AuthorizedKeysFile      .ssh/authorized_keys .ssh/authorized_keys2
+
+$ mkdir ~/.ssh
+$ chmod 700 ~/.ssh
+$ cat ~/.ssh/authorized_keys
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart ssh.socket
+</pre>
+
+
+<h2>Updating bash configuration</h2>
+Added to ~/.bash_aliases
+<pre>lias vi='vim'
+
+alias s='git status'
+alias p='git push'
+
+# do not overwrite existing files
+set -o noclobber
+
+alias nothing='docker ps; git pull; git push; git status'
+alias ll="ls -hal"
+alias ..="cd .."
+alias grin="grep -R -i -n --color"
+</pre>
+and to ~/.bashrc
+<pre># HISTSIZE determines the number of commands remembered in memory during the current session.
+# HISTFILESIZE determines the maximum number of lines allowed in the history file
+export HISTSIZE=100000
+export HISTFILESIZE=200000
+
+export HISTTIMEFORMAT="%h %d %H:%M:%S "
+
+shopt -s histappend
+shopt -s cmdhist
+</pre>
+
+<h2>UFW = Uncomplicated Firewall</h2>
+<ul>
+  <li>104.210.140.141 = OpenAI, observed 2025-12-04
+  </li><li>114.119.147.137 = PetalBot (for Huawei), observed 2025-12-04
+  </li><li>156.59.198.136 = bytedance, observed 2025-12-04
+  </li></ul>
+
+Best practice for order of firewall rules is:
+<ol>
+  <li>Specific DENY rules (blocking known bad actors).
+  </li><li>Specific ALLOW rules (allowing trusted hosts/networks).
+  </li><li>General ALLOW rules (allowing public services).
+  </li><li>General DENY rules (the default policy, often implied).
+</li></ol>
+
+<pre>$ sudo ufw status verbose
+Status: inactive
+$ sudo nft list ruleset
+</pre>
+add rules
+<pre>$ sudo ufw deny from 156.59.198.136/24
+$ sudo ufw deny from 114.119.147.0/24
+$ sudo ufw deny from 104.210.140.0/24
+$ sudo ufw allow ssh
+$ sudo ufw allow 443
+$ sudo ufw allow 80
+</pre>
+
+Now I have
+<pre>$ sudo ufw status numbered
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] Anywhere                   DENY IN     156.59.198.0/24           
+[ 2] Anywhere                   DENY IN     114.119.147.0/24          
+[ 3] Anywhere                   DENY IN     104.210.140.0/24          
+[ 4] 22/tcp                     ALLOW IN    Anywhere                  
+[ 5] 443                        ALLOW IN    Anywhere                  
+[ 6] 80                         ALLOW IN    Anywhere                  
+[ 7] 22/tcp (v6)                ALLOW IN    Anywhere (v6)             
+[ 8] 443 (v6)                   ALLOW IN    Anywhere (v6)             
+[ 9] 80 (v6)                    ALLOW IN    Anywhere (v6)     
+</pre>
+
+<h2>Update OS</h2>
+
+Running Ubuntu 24.04.3 LTS, default load is
+<pre> System information as of Sat Jan 31 02:24:09 AM UTC 2026
+  System load:  0.04              Processes:             123
+  Usage of /:   3.0% of 37.23GB   Users logged in:       1
+  Memory usage: 5%                IPv4 address for eth0: 65.21.252.29
+  Swap usage:   0%                IPv6 address for eth0: 2a01:4f9:c013:5897::1
+  </pre>
+
+
+<pre>$ sudo apt update
+$ sudo apt upgrade
+</pre>
+
+
+<h2>Install Docker</h2>
+
+Docker
+<pre>$ sudo apt update
+$ sudo apt install apt-transport-https curl
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+$ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release &amp;&amp; echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+$ sudo apt update
+$ sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+$ sudo systemctl is-active docker
+active
+</pre>
+as per https://linuxiac.com/how-to-install-docker-on-ubuntu-24-04-lts/
+
+Then add pdg to docker group 
+<pre>$ sudo usermod -a -G docker pdg
+</pre>
+as per https://stackoverflow.com/questions/47854463/docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socke/48450294#48450294
+<pre>$ sudo apt -y install make
+</pre>
+
+<h2>Enable Upload to GitHub</h2>
+<pre>$ ssh-keygen
+$ cat id_ed25519.pub
+</pre>
+Upload public key to my profile, https://github.com/settings/keys
+
+<h2>Clone git repo</h2>
+
+On the server
+<pre>$ cd /home/pdg/ui_v8_website_flask_neo4j
+$ git clone git@github.com:allofphysicsgraph/ui_v8_website_flask_neo4j.git</pre>
+
+On my laptop
+<pre>$ scp -i ~/.ssh/KEYNAMEHERE neo4j_pdg/plugins/apoc.jar pdg@SERVERIPHERE:/home/pdg
+</pre>
+
+On the server
+<pre>
+cd /home/pdg/ui_v8_website_flask_neo4j
+echo "UID=$(id -u)" > .env
+echo "GID=$(id -g)" >> .env
+</pre>
+
+<h2>Build containers</h2>
+
+<pre>$ cd /home/pdg/ui_v8_website_flask_neo4j
+$ make container_build</pre>
+Which results in
+<pre>$ docker images
+IMAGE                                ID             DISK USAGE   CONTENT SIZE   EXTRA
+ui_v8_flask_webserver:latest-amd64   68046aa182c6       3.61GB          872MB       
+</pre>
+From my laptop I copy the secrets file
+<pre>$ scp -i ~/.ssh/KEYNAMEHERE .env.google pdg@SERVERIPHERE:/home/pdg/ui_v8_website_flask_neo4j
+</pre>
+On the server I have a few changes to enact,
+<pre>cd /home/pdg/ui_v8_website_flask_neo4j
+mkdir logs
+cd certs
+openssl genrsa &gt; privkey.pem
+openssl req -new -x509 -key privkey.pem &gt; fullchain.pem
+openssl dhparam -out dhparam.pem 2048
+</pre>
+I then tried running the server using
+<pre>cd /home/pdg/ui_v8_website_flask_neo4j
+make launch_webserver
+</pre>
+but encountered some permissions issues that were fixed using
+<pre>cd /home/pdg/ui_v8_website_flask_neo4j
+sudo chown -R pdg:pdg neo4j_pdg/
+sudo chown -R pdg:pdg dumping_grounds/
+</pre>
+I was then able to successfully run
+<pre>$ make launch_webserver COMPOSE_FLAGS=--detach
+</pre>
+The webserver is then running at SERVERIPHERE on the internet! 
+
+<h2>DNS</h2>
+
+Log into <a href="https://account.squarespace.com/domains">https://account.squarespace.com/domains</a>&nbsp;<div>On the page <a href="https://account.squarespace.com/domains/managed/allofphysics.com/dns/domain-nameservers">https://account.squarespace.com/domains/managed/allofphysics.com/dns/domain-nameservers</a> change the Name Servers to Hetzner's:
+<ul>
+  <li>helium.ns.hetzner.com
+  </li><li>hydrogen.ns.hetzner.com
+  </li><li>oxygen.ns.hetzner.com
+</li></ul>
+
+<p>On the Hetzner console webpage, select "DNS" and then "Add DNS zone"</p>
+
+<p>Set the domain (allofphysics.com) and "Create an Empty zone." (The other options are "Import Zone file" and "Secondary".)</p>
+
+<p>On DigitalOcean's DNS console, change TTL to 300 for each of the domains. 
+  
+</p><p>Since the nameservers are ns1.digitalocean.com, then I will need to change the records in the DigitalOcean Control Panel.
+
+</p><p>In DigitalOcean's Control Panel, set the "A" records to point to Hetzner's SERVERIPHERE and "NS" to point to Hetzner's 
+  
+</p><p>In Hetzner's panel, set "@" and "www" and "*" to Hetzner's SERVERIPHERE.
+
+
+</p><h2>Certbot</h2>
+
+<p>In Hetzner's DNS panel, added TXT record "_acme-challenge" with TTL 300. The "value" will later be provided by certbot
+
+</p><p>Followed instructions from <a href="https://certbot.eff.org/instructions?ws=nginx&amp;os=pip">https://certbot.eff.org/instructions?ws=nginx&amp;os=pip
+</a></p><pre>cd /home/pdg/
+sudo apt update
+sudo apt upgrade
+sudo apt install python3 python3-dev python3-venv libaugeas-dev gcc
+sudo python3 -m venv /opt/certbot/
+sudo /opt/certbot/bin/pip install --upgrade pip
+sudo /opt/certbot/bin/pip install certbot certbot-nginx
+sudo ln -s /opt/certbot/bin/certbot /usr/local/bin/certbot
+</pre>
+Since my nginx isn't running baremetal, I can't use the recommended <code>sudo certbot certonly --nginx</code>.&nbsp;<div>Instead, I used<pre>sudo certbot certonly --manual --preferred-challenges dns \
+--server https://acme-v02.api.letsencrypt.org/directory \
+-d derivationmap.net -d www.derivationmap.net \
+-d allofphysics.com -d www.allofphysics.com
+
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Requesting a certificate for derivationmap.net and 3 more
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please deploy a DNS TXT record under the name:
+
+_acme-challenge.allofphysics.com.
+
+with the following value:
+
+ARANDOMLOOKINGSTRINGHERE
+
+Before continuing, verify the TXT record has been deployed. Depending on the DNS
+provider, this may take some time, from a few seconds to multiple minutes. You can
+check if it has finished deploying with aid of online tools, such as the Google
+Admin Toolbox: https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.allofphysics.com.
+Look for one or more bolded line(s) below the line ';ANSWER'. It should show the
+value(s) you've just added.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Press Enter to Continue
+
+Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/derivationmap.net/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/derivationmap.net/privkey.pem
+This certificate expires on 2026-05-01.
+These files will be updated when the certificate renews.
+
+NEXT STEPS:
+- This certificate will not be renewed automatically. 
+Autorenewal of --manual certificates requires the use of 
+an authentication hook script (--manual-auth-hook) but one was not provided. 
+To renew this certificate, repeat this same certbot command 
+before the certificate's expiry date.
+</pre>
+
+<p>The Google Admin Toolbox page (<a href="https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.allofphysics.com">https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.allofphysics.com</a>) didn't pick up the TXT record, but nslookup did:
+</p><pre>$ nslookup -q=TXT _acme-challenge.allofphysics.com hydrogen.ns.hetzner.com
+Server:		hydrogen.ns.hetzner.com
+Address:	213.133.100.98#53
+
+_acme-challenge.allofphysics.com	text = "ARANDOMLOOKINGSTRINGHERE"
+</pre>
+
+<p>Now <a href="https://allofphysics.com/">https://allofphysics.com/</a> looks correct and has no errors! (Same for <a href="http://derivationmap.net">derivationmap.net</a>)
+
+
+</p><p>The renewal instructions on https://physicsderivationgraph.blogspot.com/2021/10/periodic-renewal-of-https-letsencrypt.html
+should be valid when these certs expire?
+
+</p><pre>sudo certbot certonly --webroot \
+-w /home/pdg/ui_v8_website_flask_neo4j/certs \
+--server https://acme-v02.api.letsencrypt.org/directory \
+-d derivationmap.net -d www.derivationmap.net \
+-d allofphysics.com -d www.allofphysics.com
+</pre>
+
+
+<p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p></div></div>
+
+{% endblock %}

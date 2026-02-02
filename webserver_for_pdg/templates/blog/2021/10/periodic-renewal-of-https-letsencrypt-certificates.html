@@ -1,0 +1,69 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>periodic renewal of https letsencrypt certificates</H1>
+
+<P><small>Published 2021-10-09T19:34:00.005Z by Physics Derivation Graph</small></P>
+
+Confirm expiration date of current certificates
+<pre>openssl x509 -dates -noout &lt; \
+/home/pdg/allofphysics.com/certs/fullchain.pem</pre><div><br /></div>
+
+Delete existing certs
+<pre>sudo rm -rf /etc/letsencrypt/live/derivationmap.net
+sudo rm -rf /etc/letsencrypt/renewal/derivationmap.net
+sudo rm -rf /etc/letsencrypt/archive/derivationmap.net
+</pre><div>Confirm folders are empty</div><pre>sudo ls -hal /etc/letsencrypt/live/
+sudo ls -hal /etc/letsencrypt/renewal/
+sudo ls -hal /etc/letsencrypt/archive/
+</pre>
+<div><br /></div>
+Request new certs
+<pre><strike>sudo certbot certonly --webroot \
+-w /home/pdg/allofphysics.com/certs \
+--server https://acme-v02.api.letsencrypt.org/directory \
+-d derivationmap.net -d www.derivationmap.net</strike>
+</pre>
+
+To use multiple domains and a single cert, use
+<pre>sudo certbot certonly --webroot \
+-w /home/pdg/allofphysics.com/certs \
+--server https://acme-v02.api.letsencrypt.org/directory \
+-d derivationmap.net -d www.derivationmap.net \
+-d allofphysics.com -d www.allofphysics.com
+</pre>
+Output should be something like
+<pre>Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator webroot, Installer None
+Obtaining a new certificate
+
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at:
+   /etc/letsencrypt/live/derivationmap.net/fullchain.pem
+   Your key file has been saved at:
+   /etc/letsencrypt/live/derivationmap.net/privkey.pem
+   Your cert will expire on YYYY-MM-DD. To obtain a new or tweaked
+   version of this certificate in the future, simply run certbot
+   again. To non-interactively renew *all* of your certificates, run
+   "certbot renew"
+</pre><div><br /></div>
+Copy new certs to directory that nginx mounts in Docker-compose
+<pre>cd /home/pdg/allofphysics.com/certs
+
+mv dhparam.pem dhparam.pem_OLD
+mv fullchain.pem fullchain.pem_OLD
+mv privkey.pem privkey.pem_OLD
+
+sudo cp /etc/letsencrypt/live/derivationmap.net/fullchain.pem .
+sudo cp /etc/letsencrypt/live/derivationmap.net/privkey.pem .
+sudo chown pdg:pdg privkey.pem
+sudo openssl dhparam -out dhparam.pem 2048
+</pre><div><br /></div>
+
+Restart Docker-compose
+<pre>cd /home/pdg/allofphysics.com/
+docker compose up --build --force-recreate --remove-orphans --detach
+</pre>
+If the docker containers are not restarted, the changes made to the file on the host won't take effect.<div><br /></div><div>Verify in a browser that <a href="https://derivationmap.net/">https://derivationmap.net/</a> has the updated certificate.&nbsp;</div><div><br /></div><div>Set a calendar reminder to renew the certificate.</div>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>OpenAI's process supervision for math problems and relevance to the Physics Derivation Graph</H1>
+
+<P><small>Published 2023-06-01T02:43:00.005Z by Physics Derivation Graph</small></P>
+
+<p>OpenAI just announced (see&nbsp;<a href="https://openai.com/research/improving-mathematical-reasoning-with-process-supervision">https://openai.com/research/improving-mathematical-reasoning-with-process-supervision</a>) progress on solving math problems using&nbsp;process supervision during training.</p><p>The data on&nbsp;https://github.com/openai/prm800k/tree/main comes from&nbsp;https://github.com/hendrycks/math (which is for&nbsp;https://arxiv.org/pdf/2103.03874.pdf) and there are examples in that data which come from&nbsp;<a href="https://artofproblemsolving.com/wiki/index.php/2015_AIME_II_Problems/Problem_6">https://artofproblemsolving.com/wiki/index.php/2015_AIME_II_Problems/Problem_6</a></p><p>AoPS describes itself as "Math texts, online classes, and more for students in grades 5-12."</p><p>The problems are constrained and feel very artificial. See for example&nbsp;<a href="https://artofproblemsolving.com/wiki/index.php/Mock_AIME_1_Pre_2005_Problems/Problem_4">https://artofproblemsolving.com/wiki/index.php/Mock_AIME_1_Pre_2005_Problems/Problem_4</a></p><p>The training data doesn't have inference rules, so the output from the LLM doesn't have inference rules. As a consequence, the output of the LLM cannot be confirmed by a Computer Algebra System. The output text needs to be validated by a human. LLMs are hallucinating answers that sound reasonable, so checking each step is still vital.&nbsp;</p><p>The ability to resolve distinct variables across all of Mathematical Physics is beyond the scope of the training data.&nbsp;</p><p>On a positive note, if the Physics Derivation Graph content existed, I now think an LLM-based approach could be used to make progress in Mathematical Physics.</p>
+
+{% endblock %}

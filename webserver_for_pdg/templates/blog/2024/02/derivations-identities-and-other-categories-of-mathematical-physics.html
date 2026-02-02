@@ -1,0 +1,41 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>derivations, identities, and other categories of mathematical physics</H1>
+
+<P><small>Published 2024-02-25T19:10:00Z by Physics Derivation Graph</small></P>
+
+<p>Transforming from one expression to another is carried out with respect to a goal. There are different categories of goals (listed below). I don't yet know what distinguishes one category from another.</p><p>My motivation for the Physics Derivation Graph is exclusively the first category -- derivations, specifically across domains. This motivation is more specific than a broader question, "what is the relation between every expression in mathematical physics and every other expression?" because the answer might be "symbols and inference rules are common."</p>
+
+<p>The other categories are neat but not as rewarding for me. These other categories are included in the PDG because the infrastructure for software and UI and data format are the same.</p><p>
+  <br /></p>
+
+<h3 style="text-align: left;">Examples of Derivations</h3>
+<div><i>Relation between two disparate descriptions of nature:</i></div><p></p>
+<ul style="text-align: left;">
+  <li><a href="https://derivationmap.net/review_derivation/000004/?referrer=https://physicsderivationgraph.blogspot.com/">Maxwell equations to electric field wave equation</a></li>
+  <li><a href="https://derivationmap.net/review_derivation/522862/?referrer=physicsderivationgraph.blogspot.com_2024_02_derivations-identities-and-other">optics: Law of refraction to Brewster's angle</a></li>
+</ul><div><i>Derivation of expression from simpler observations plus assumptions:</i></div><div>
+  <ul style="text-align: left;">
+    <li><a href="https://derivationmap.net/review_derivation/207210/?referrer=physicsderivationgraph.blogspot.com_2024_02_derivations-identities-and-other">Newton's Law of Gravitation</a></li>
+    <li><a href="https://derivationmap.net/review_derivation/513999/?referrer=physicsderivationgraph.blogspot.com_2024_02_derivations-identities-and-other">first law of thermodynamics</a></li></ul><div><i>An expression in one domain simplifies to another expression in a different domain under modified assumptions</i></div><div>
+  <ul style="text-align: left;">
+    <li><a href="https://en.wikipedia.org/wiki/Correspondence_principle">https://en.wikipedia.org/wiki/Correspondence_principle</a></li><li><a href="https://www.physicsforums.com/threads/schroedinger-equation-in-the-classical-limit.775531/">https://www.physicsforums.com/threads/schroedinger-equation-in-the-classical-limit.775531/</a></li><li><a href="https://mathoverflow.net/questions/102313/classical-limit-of-quantum-mechanics">https://mathoverflow.net/questions/102313/classical-limit-of-quantum-mechanics</a></li><li><a href="https://iopscience.iop.org/article/10.1088/0031-8949/90/10/108009/pdf">"A wave equation interpolating between classical and quantum mechanics"</a></li><li><a href="https://mathoverflow.net/questions/225814/does-quantum-mechanics-ever-really-quantize-classical-mechanics">https://mathoverflow.net/questions/225814/does-quantum-mechanics-ever-really-quantize-classical-mechanics</a></li><li><a href="https://farside.ph.utexas.edu/teaching/sm1/lectures/node82.html">https://farside.ph.utexas.edu/teaching/sm1/lectures/node82.html</a></li>
+  </ul><div><i>The same concept appears in multiple domains</i></div></div><div>
+  <ul style="text-align: left;"><li>Anderson localization (for electron transport, photonics; anywhere with waves)</li><li>simple harmonic oscillator, particle in a box</li>
+    <li><a href="https://en.wikipedia.org/wiki/Continuity_equation">https://en.wikipedia.org/wiki/Continuity_equation</a>, aka transport equation</li>
+  </ul>
+  </div><div><br /></div></div>
+<h3 style="text-align: left;">Examples of Identities</h3><div><i>An equation can be expressed differently but be equivalent:</i></div><div><ul style="text-align: left;">
+  <li><a href="https://derivationmap.net/review_derivation/000002/?referrer=physicsderivationgraph.blogspot.com_2024_02_derivations-identities-and-other">Euler equation: trig square root</a></li>
+  </ul><div><br /></div><h3 style="text-align: left;">Examples of Proofs</h3></div><div><i>Show that two sides of an equation are, in fact, the same:</i></div><div><ul style="text-align: left;">
+  <li><a href="https://derivationmap.net/review_derivation/000001/?referrer=physicsderivationgraph.blogspot.com_2024_02_derivations-identities-and-other">Euler equation proof</a></li></ul><div><br /></div>
+    
+    <h3 style="text-align: left;">Examples of Use Case</h3></div><div><i>Start from one or more expressions to derive a conclusion with practical utility</i></div><div>
+  <ul style="text-align: left;">
+    <li><a href="https://derivationmap.net/review_derivation/129143/?referrer=_table_of_derivations">escape velocity</a></li><li><a href="https://derivationmap.net/review_derivation/142831/?referrer=physicsderivationgraph.blogspot.com_2024_02_derivations-identities-and-other">Schwarzschild radius for non-rotating black hole</a></li>
+    <li><a href="https://derivationmap.net/review_derivation/201726/?referrer=physicsderivationgraph.blogspot.com_2024_02_derivations-identities-and-other">angle of maximum distance for projectile motion</a></li>
+    <li><a href="https://derivationmap.net/review_derivation/387954/?referrer=physicsderivationgraph.blogspot.com_2024_02_derivations-identities-and-other">speed of Earth around Sun</a></li>
+    <li><a href="https://derivationmap.net/review_derivation/527822/?referrer=physicsderivationgraph.blogspot.com_2024_02_derivations-identities-and-other">mass of the Earth</a></li></ul></div><div>This is the focus of the <a href="https://atomslab.github.io/">ATOMS lab at UMBC</a>, specifically enacted using <a href="https://en.wikipedia.org/wiki/Lean_(proof_assistant)">Lean</a>.</div><p></p>
+
+{% endblock %}

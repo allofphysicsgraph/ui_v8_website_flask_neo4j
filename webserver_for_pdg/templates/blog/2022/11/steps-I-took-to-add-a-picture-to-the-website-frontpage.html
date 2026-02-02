@@ -1,0 +1,26 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>steps I took to add a picture to the website frontpage</H1>
+
+<P><small>Published 2022-11-20T18:58:00.004Z by Physics Derivation Graph</small></P>
+
+<p>The current iteration of&nbsp;<a href="https://derivationmap.net/">https://derivationmap.net/</a>&nbsp;uses data from a JSON file to dynamically generate page content.&nbsp;</p><p>On the front page of&nbsp;<a href="https://derivationmap.net/">https://derivationmap.net/</a> there's currently an SVG. I wanted to place a PNG next to the SVG. Before placing the PNG, I wanted to make the SVG narrower. Looking at the source code for the page index.html, I see</p>
+
+<pre>&lt;svg id='viz'&gt;&lt;/svg&gt;
+</pre>
+
+<p>Inspecting the source code of the rendered page, I see</p>
+
+<pre>var width = 600;</pre>
+
+<p>which comes from&nbsp;<a href="https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/v7_pickle_web_interface/flask/templates/_d3_js.html#L29">https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/v7_pickle_web_interface/flask/templates/_d3_js.html#L29</a></p>
+
+<p>To test out a change to a narrower width, I start "Docker desktop" on my Mac and, in the directory <code>allofphysicsgraph/proofofconcept/v7_pickle_web_interface</code>, run the command</p>
+
+<pre>docker-compose up --build --remove-orphans
+</pre>
+
+<p>In a web browser I was then able to access <a href="http://localhost:80">http://localhost:80</a>&nbsp;and got a warning from Chrome that the certs were invalid. Incognito mode seemed to be working better.</p>
+
+{% endblock %}

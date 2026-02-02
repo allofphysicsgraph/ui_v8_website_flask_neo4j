@@ -1,0 +1,19 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>Changing from JSON to property graph + SQL backend</H1>
+
+<P><small>Published 2022-03-06T23:55:00.001Z by Physics Derivation Graph</small></P>
+
+<p>
+A few recent conversations with scientists about the Physics Derivation Graph have led me think about different queries (<a href="https://github.com/allofphysicsgraph/proofofconcept/issues/247">247</a>, <a href="https://github.com/allofphysicsgraph/proofofconcept/issues/243">243</a>, <a href="https://github.com/allofphysicsgraph/proofofconcept/issues/241">241</a>, <a href="https://github.com/allofphysicsgraph/proofofconcept/issues/240">240</a>, <a href="https://github.com/allofphysicsgraph/proofofconcept/issues/239">239</a>, <a href="https://github.com/allofphysicsgraph/proofofconcept/issues/238">238</a>) that could be of value and can be extracted from the&nbsp; current content.
+</p>
+
+<p>
+In coming up with ways to query the graph, I realized a property graph is useful for supporting the queries. That is in contrast to writing a custom query capability against my existing JSON format. I'm already embarrassed by the JSON/SQL implementation, so having specific queries of interest provided me sufficient motivation to investigate implementing a Neo4j backend.</p>
+
+<p>
+Transitioning to a property graph (specifically <a href="https://en.wikipedia.org/wiki/Neo4j">Neo4j</a>) loses the fine grain control over the mechanics of the graph. However, the trade-off is well worth the increased development speed. Having a <a href="https://en.wikipedia.org/wiki/Cypher_(query_language)">Cypher query</a> interface via the web GUI very powerful.
+</p><p><br /></p><p>With the property graph representation, augmenting information is needed in tabular format:</p><p></p><ul style="text-align: left;"><li>all possible inference rules, along with the CAS implementation per rule</li><li>all variable definitions, along with dimensions, constant or variable, scope, and reference URLs</li><li>units, along with dimensions, and reference URLs</li></ul><p></p><p>Those three tables could be stored in an SQL database.&nbsp;</p><p>I'm replacing a single plaintext JSON file with two non-plaintext data formats -- SQL and Neo4j.&nbsp;</p>
+
+{% endblock %}

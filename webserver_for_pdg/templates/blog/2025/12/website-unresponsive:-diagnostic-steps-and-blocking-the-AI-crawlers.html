@@ -1,0 +1,229 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>website unresponsive: diagnostic steps and blocking the AI crawlers</H1>
+
+<P><small>Published 2025-12-04T11:37:00Z by Physics Derivation Graph</small></P>
+
+<p>I received an email alert this morning with subject "<a href="https://www.wachete.com/">Wachete</a> error notification" which indicated my website wasn't responsive.&nbsp;</p>
+
+<p>In a browser I verified that&nbsp;<a href="https://allofphysics.com/">https://allofphysics.com/</a> is hanging. (No immediate error response.) After a few minutes I got "504 Gateway Time-out nginx/1.17.9"</p>
+
+<p>I ssh'd into the VPS (virtual private server) and ran&nbsp;<br /><code>docker ps</code><br />to verify the containers were running.</p>
+
+<p>I used<br /><code>top</code><br />to verify the CPU load and memory load. Two instances of gunicorn are using 2% of the CPU each and 10% of the RAM each. That's expected.</p>
+
+<p>Next I logged into the VPS web portal to review system usage for the past 7 days. There is certainly a noticeable change of metrics that started suddenly yesterday:</p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhtcyO0J_F0AEr5y4kD929GVhYDWWdcRaSmTjK1Ir7wKu7PAO2ZBBfl_GuZLpw1iXDQND_OlqoRJMVBaC8gR5Myj41cF4WJDg60r1QZzfOISxi9VCId8PtIss31vFtITa6cX-OV9aRzGdSsM43dq-lAILtgV1Bv-rZhM-q7Uprb2YXon81zIAEsC9C1Dqmq/s2006/Screenshot%202025-12-04%20at%205.56.31%E2%80%AFAM.png" style="margin-left: 1em; margin-right: 1em;"><img border="0" data-original-height="1792" data-original-width="2006" height="573" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhtcyO0J_F0AEr5y4kD929GVhYDWWdcRaSmTjK1Ir7wKu7PAO2ZBBfl_GuZLpw1iXDQND_OlqoRJMVBaC8gR5Myj41cF4WJDg60r1QZzfOISxi9VCId8PtIss31vFtITa6cX-OV9aRzGdSsM43dq-lAILtgV1Bv-rZhM-q7Uprb2YXon81zIAEsC9C1Dqmq/w640-h573/Screenshot%202025-12-04%20at%205.56.31%E2%80%AFAM.png" width="640" /></a></div><br /><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjXjD64LoVFDnYT0b2fcKVT1zDnTjsW1mXldo0ymm3hWohXSvcjb1uaHt-wKmZlosyJem87-AAKzX9oqqX8oLbMgT80BJFn3tvT1_SfGKvUUPiwVoRHFby7C_dUtOweKKU4PKug3HP_t1PHIKYaQl9Zy3PATecrsRt507g5r3t8lAE-GnAr7kVo6LpZP1p5/s2018/Screenshot%202025-12-04%20at%205.56.51%E2%80%AFAM.png" style="margin-left: 1em; margin-right: 1em;"><img border="0" data-original-height="1686" data-original-width="2018" height="534" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjXjD64LoVFDnYT0b2fcKVT1zDnTjsW1mXldo0ymm3hWohXSvcjb1uaHt-wKmZlosyJem87-AAKzX9oqqX8oLbMgT80BJFn3tvT1_SfGKvUUPiwVoRHFby7C_dUtOweKKU4PKug3HP_t1PHIKYaQl9Zy3PATecrsRt507g5r3t8lAE-GnAr7kVo6LpZP1p5/w640-h534/Screenshot%202025-12-04%20at%205.56.51%E2%80%AFAM.png" width="640" /></a></div><br />
+
+<p>The last interaction I had with the server (more than a week ago) was to update the HTTPS certificates using <a href="https://letsencrypt.org/">Let's Encrypt</a>. Although the website had returned a 504 error I could check the certificate expiration in the browser. The certs were valid.</p>
+
+<p>In the logs directory on the server&nbsp;</p>
+
+<pre>-rwxrwxrwx 1 usr  usr          0 Sep  3  2024 auth.log*
+-rw-r--r-- 1 usr  usr    6194913 Dec  3 14:38 flask_critical_and_error_and_warning.log
+-rw-r--r-- 1 usr  usr     383596 Nov 26 06:27 flask_critical_and_error_and_warning.log.1
+-rw-r--r-- 1 usr  usr    9999931 Nov 23 18:02 flask_critical_and_error_and_warning.log.2
+-rw-r--r-- 1 usr  usr    9945758 Dec  3 14:42 flask_critical_and_error_and_warning_and_info.log
+-rw-r--r-- 1 usr  usr    9999983 Dec  2 16:14 flask_critical_and_error_and_warning_and_info.log.1
+-rw-r--r-- 1 usr  usr    9999938 Dec  1 16:40 flask_critical_and_error_and_warning_and_info.log.2
+-rw-r--r-- 1 usr  usr    1206714 Dec  3 14:42 flask_critical_and_error_and_warning_and_info_and_debug.log
+-rw-r--r-- 1 usr  usr    9999916 Dec  3 12:46 flask_critical_and_error_and_warning_and_info_and_debug.log.1
+-rw-r--r-- 1 usr  usr    9999926 Dec  3 00:53 flask_critical_and_error_and_warning_and_info_and_debug.log.2
+-rw-r--r-- 1 usr  usr  125459598 Dec  3 14:42 gunicorn_access.log
+-rw-r--r-- 1 usr  usr  166722892 Dec  3 14:42 gunicorn_error.log
+-rw-r--r-- 1 root root 126147128 Dec  4 11:01 nginx_access.log
+-rw-r--r-- 1 root root  28785863 Dec  4 11:01 nginx_error.log
+</pre>
+Only nginx logs have today's date. That's consistent with the blocker being nginx.
+
+Using <br /><code>tail -f nginx_access.log</code> <br />I see the latest entries are associated with <a href="https://webmaster.petalsearch.com/site/petalbot">https://webmaster.petalsearch.com/site/petalbot</a> which says the crawler
+
+<blockquote>"establish an index database which enables users to search the content of your site in Petal search engine and present content recommendations for the user in Huawei Assistant and AI Search services"</blockquote>
+
+
+<p>Using Gemini 2.5 Flash from <a href="https://aistudio.google.com/">https://aistudio.google.com/</a> I ask
+  </p><blockquote>I'm running a webserver that uses nginx and runs on linux. I am interested in blocking certain IP address ranges. Should I configure nginx to filter IP ranges or should I filter using the linux firewall? I want to use the software I already have rather than add yet another tool for this blocking.</blockquote>
+and learn that linux firewall is recommended over nginx.
+
+<p>Next question for Gemini 2.5 Flash LLM is
+  </p><blockquote>I'm using Ubuntu for a webserver. How do I determine what firewall is being used from the command line?</blockquote>
+
+<p>I then run the following on my VPS:
+</p><pre>$ sudo ufw status verbose
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), deny (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+22/tcp (OpenSSH)           ALLOW IN    Anywhere                  
+443                        ALLOW IN    Anywhere                  
+80                         ALLOW IN    Anywhere                  
+22/tcp (OpenSSH (v6))      ALLOW IN    Anywhere (v6)             
+443 (v6)                   ALLOW IN    Anywhere (v6)             
+80 (v6)                    ALLOW IN    Anywhere (v6)             
+</pre>
+
+I then also verify that nft exists using
+<pre>$ sudo nft list ruleset
+# Warning: table ip filter is managed by iptables-nft, do not touch!
+table ip filter {
+	chain ufw-before-logging-input {
+	}
+...long output, snipped...
+</pre>
+
+From a few minutes of reviewing <code>tail -f nginx_access.log</code> the major offenders for this denial-of-service (DOS) attack appear to be
+<pre>104.210.140.141 = OpenAI, observed 2025-12-04
+114.119.147.137 = PetalBot (for Huawei), observed 2025-12-04
+156.59.198.136 = bytedance, observed 2025-12-04
+</pre>
+
+<p>LLM query:
+</p><blockquote>ufw block IP address range for web server</blockquote>
+followed by
+<blockquote>how to pick the correct CIDR value for IP blocking?</blockquote>
+from which I learn <code>/24</code> is the last octet (0 to 255)
+
+<p>I then run
+</p><pre>$ sudo ufw deny from 156.59.198.136/24
+WARN: Rule changed after normalization
+Rule added
+$ sudo ufw deny from 114.119.147.0/24
+Rule added
+$ sudo ufw deny from 104.210.140.0/24
+Rule added
+</pre>
+
+Check the results
+<pre>$ sudo ufw status
+Status: active
+
+To                         Action      From
+--                         ------      ----
+OpenSSH                    ALLOW       Anywhere                  
+443                        ALLOW       Anywhere                  
+80                         ALLOW       Anywhere                  
+Anywhere                   DENY        156.59.198.0/24           
+Anywhere                   DENY        114.119.147.0/24          
+Anywhere                   DENY        104.210.140.0/24          
+OpenSSH (v6)               ALLOW       Anywhere (v6)             
+443 (v6)                   ALLOW       Anywhere (v6)             
+80 (v6)                    ALLOW       Anywhere (v6)             
+</pre>
+
+The LLM had warned me that "If you find that the new deny rules are at the bottom of the list, you may need to use the insert function to put them at the top (e.g., position 1 and 2)."&nbsp;<div>Gemini 2.5 says the general best practice for firewall rules is:
+<ol>
+  <li>Specific DENY rules (blocking known bad actors).
+  </li><li>Specific ALLOW rules (allowing trusted hosts/networks).
+  </li><li>General ALLOW rules (allowing public services).
+  </li><li>General DENY rules (the default policy, often implied).
+</li></ol>
+
+Gemini 2.5's advice was almost correct. The LLM got the rule indices wrong. Here are the commands I ran:<pre>$ sudo ufw status
+Status: active
+
+To                         Action      From
+--                         ------      ----
+OpenSSH                    ALLOW       Anywhere                  
+443                        ALLOW       Anywhere                  
+80                         ALLOW       Anywhere                  
+Anywhere                   DENY        156.59.198.0/24           
+Anywhere                   DENY        114.119.147.0/24          
+Anywhere                   DENY        104.210.140.0/24          
+OpenSSH (v6)               ALLOW       Anywhere (v6)             
+443 (v6)                   ALLOW       Anywhere (v6)             
+80 (v6)                    ALLOW       Anywhere (v6)             
+
+$ sudo ufw status numbered
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] OpenSSH                    ALLOW IN    Anywhere                  
+[ 2] 443                        ALLOW IN    Anywhere                  
+[ 3] 80                         ALLOW IN    Anywhere                  
+[ 4] Anywhere                   DENY IN     156.59.198.0/24           
+[ 5] Anywhere                   DENY IN     114.119.147.0/24          
+[ 6] Anywhere                   DENY IN     104.210.140.0/24          
+[ 7] OpenSSH (v6)               ALLOW IN    Anywhere (v6)             
+[ 8] 443 (v6)                   ALLOW IN    Anywhere (v6)             
+[ 9] 80 (v6)                    ALLOW IN    Anywhere (v6)             
+
+$ sudo ufw delete 4
+Deleting:
+ deny from 156.59.198.0/24
+Proceed with operation (y|n)? y
+Rule deleted
+$ sudo ufw insert 1 deny from 156.59.198.0/24 to any
+Rule inserted
+$ sudo ufw delete 4
+Deleting:
+ allow 80
+Proceed with operation (y|n)? n
+Aborted
+$ sudo ufw status numbered
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] Anywhere                   DENY IN     156.59.198.0/24           
+[ 2] OpenSSH                    ALLOW IN    Anywhere                  
+[ 3] 443                        ALLOW IN    Anywhere                  
+[ 4] 80                         ALLOW IN    Anywhere                  
+[ 5] Anywhere                   DENY IN     114.119.147.0/24          
+[ 6] Anywhere                   DENY IN     104.210.140.0/24          
+[ 7] OpenSSH (v6)               ALLOW IN    Anywhere (v6)             
+[ 8] 443 (v6)                   ALLOW IN    Anywhere (v6)             
+[ 9] 80 (v6)                    ALLOW IN    Anywhere (v6)             
+
+$ sudo ufw delete 5
+Deleting:
+ deny from 114.119.147.0/24
+Proceed with operation (y|n)? y
+Rule deleted
+$ sudo ufw insert 2 deny from 114.119.147.0/24 to any
+Rule inserted
+$ sudo ufw status numbered
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] Anywhere                   DENY IN     156.59.198.0/24           
+[ 2] Anywhere                   DENY IN     114.119.147.0/24          
+[ 3] OpenSSH                    ALLOW IN    Anywhere                  
+[ 4] 443                        ALLOW IN    Anywhere                  
+[ 5] 80                         ALLOW IN    Anywhere                  
+[ 6] Anywhere                   DENY IN     104.210.140.0/24          
+[ 7] OpenSSH (v6)               ALLOW IN    Anywhere (v6)             
+[ 8] 443 (v6)                   ALLOW IN    Anywhere (v6)             
+[ 9] 80 (v6)                    ALLOW IN    Anywhere (v6)             
+
+$ sudo ufw delete 6
+Deleting:
+ deny from 104.210.140.0/24
+Proceed with operation (y|n)? y
+Rule deleted
+$ sudo ufw insert 3 deny from 104.210.140.0/24 to any
+Rule inserted
+$ sudo ufw status numbered
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] Anywhere                   DENY IN     156.59.198.0/24           
+[ 2] Anywhere                   DENY IN     114.119.147.0/24          
+[ 3] Anywhere                   DENY IN     104.210.140.0/24          
+[ 4] OpenSSH                    ALLOW IN    Anywhere                  
+[ 5] 443                        ALLOW IN    Anywhere                  
+[ 6] 80                         ALLOW IN    Anywhere                  
+[ 7] OpenSSH (v6)               ALLOW IN    Anywhere (v6)             
+[ 8] 443 (v6)                   ALLOW IN    Anywhere (v6)             
+[ 9] 80 (v6)                    ALLOW IN    Anywhere (v6)            
+</pre><p>&nbsp;</p>
+
+<p>In a web browser I visited <a href="https://allofphysics.com/">https://allofphysics.com/</a> and the page loaded immediately. Yay!</p><p></p><p></p><p></p>
+</div>
+
+{% endblock %}

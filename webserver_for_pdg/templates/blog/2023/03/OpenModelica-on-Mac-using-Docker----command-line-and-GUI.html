@@ -1,0 +1,61 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>OpenModelica on Mac using Docker -- command line and GUI</H1>
+
+<P><small>Published 2023-03-26T22:15:00.008Z by Physics Derivation Graph</small></P>
+
+<blockquote>"Modelica is a non-proprietary, object-oriented, equation based language to conveniently model complex physical systems."</blockquote>
+<p>(<a href="https://marcobonvini.com/modelica/2017/01/02/modelica-in-action.html">source</a>)</p>
+
+<blockquote>"Modelica is the language for solving systems of ordinary differential, algebraic, continuous, and discrete equations."</blockquote>
+<p>(<a href="https://www.reddit.com/r/Python/comments/dcj6fy/jmodelica_combining_the_power_of_python_and/">source</a>)</p>
+
+<p>
+  <a href="https://modelica.org/tools.html">https://modelica.org/tools.html</a><br />
+  <a href="https://openmodelica.org/">https://openmodelica.org/</a>
+</p>
+
+<p>Source code: <a href="https://github.com/OpenModelica/OpenModelica">https://github.com/OpenModelica/OpenModelica</a>
+
+</p><h2 style="text-align: left;">Running <a href="https://en.wikipedia.org/wiki/Modelica">Modelica</a> using Docker</h2><p>In a terminal on your Mac, run:
+</p><pre>ip=$(ifconfig en0 | grep inet | awk '$1=="inet" {print $2}') 
+Xhost +$ip 
+docker run -it -v ~/.Xauthority:/root/.Xauthority -e DISPLAY=$ip:0  openmodelica/openmodelica:v1.20.0-gui /bin/bash
+</pre>
+Source: <a href="https://openmodelica.org/forum/default-topic/3490-docker-instructions-for-mac">Docker instructions</a>, which also had the commands for linux:
+<pre>docker run -it --rm -e "HOME=$HOME" -e "DISPLAY=$DISPLAY" --network=host --user "$UID" -v "$HOME:$HOME" -v "$PWD:$PWD" -w "$PWD" openmodelica/openmodelica:v1.20.0-gui
+</pre>
+
+From <a href="https://openmodelica.org/useresresources/userdocumentation/">https://openmodelica.org/useresresources/userdocumentation/</a> see
+<a href="https://openmodelica.org/doc/OpenModelicaUsersGuide/OpenModelicaUsersGuide-latest.pdf">https://openmodelica.org/doc/OpenModelicaUsersGuide/OpenModelicaUsersGuide-latest.pdf</a>
+
+
+After launching the Docker container, in the command prompt I ran
+<pre>root@54d835361dc8:/# OMShell-terminal
+OMShell Copyright 1997-2022, Open Source Modelica Consortium (OSMC)
+Distributed under OMSC-PL and GPL, see www.openmodelica.org
+
+To get help on using OMShell and OpenModelica, type "help()" and press enter
+Set shortOutput flag: true
+
+&gt;&gt;&gt; x := 1:12
+{1,2,3,4,5,6,7,8,9,10,11,12}
+
+&gt;&gt;&gt; quit()
+</pre>
+
+I launched the GUI using
+<pre># OMEdit 
+QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-root'
+libGL error: No matching fbConfigs or visuals found
+libGL error: failed to load driver: swrast
+</pre>
+
+<p>
+  On Mac using XQuartz I see</p><div class="separator" style="clear: both; text-align: center;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiiA29nhg6SoKNKurpD9FJry1EgaIQ6ZYWLivx0n_BvZ1z2ZKKkkZIv1gMpyRXwDpZwwbhoMvDoTkZ_nYMHllf8hcSAIsJ9VgOwTqYjG1QnpZfRZWDLIbgZMjrUFJn0onx4JEU3_7s4sGo37GZYyrIzmR_ioNl3i6090uN2Qy1Sv7F701h_TKNLQDtduA/s1351/Screen%20Shot%202023-03-26%20at%206.14.13%20PM.png" style="margin-left: 1em; margin-right: 1em;"><img border="0" data-original-height="766" data-original-width="1351" height="362" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiiA29nhg6SoKNKurpD9FJry1EgaIQ6ZYWLivx0n_BvZ1z2ZKKkkZIv1gMpyRXwDpZwwbhoMvDoTkZ_nYMHllf8hcSAIsJ9VgOwTqYjG1QnpZfRZWDLIbgZMjrUFJn0onx4JEU3_7s4sGo37GZYyrIzmR_ioNl3i6090uN2Qy1Sv7F701h_TKNLQDtduA/w640-h362/Screen%20Shot%202023-03-26%20at%206.14.13%20PM.png" width="640" /></a></div><br />
+
+<p>Questions:
+<a href="https://stackoverflow.com/questions/tagged/openmodelica">https://stackoverflow.com/questions/tagged/openmodelica</a></p><p><br /></p><p>Comment threads:</p><p></p><ul style="text-align: left;"><li><a href="https://news.ycombinator.com/item?id=16013179">https://news.ycombinator.com/item?id=16013179</a></li><li><a href="https://news.ycombinator.com/item?id=23690788">https://news.ycombinator.com/item?id=23690788</a></li></ul><p></p><p></p><p></p>
+
+{% endblock %}

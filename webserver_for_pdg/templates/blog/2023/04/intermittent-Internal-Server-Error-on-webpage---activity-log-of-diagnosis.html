@@ -1,0 +1,49 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>intermittent Internal Server Error on webpage - activity log of diagnosis</H1>
+
+<P><small>Published 2023-04-22T23:51:00.001Z by Physics Derivation Graph</small></P>
+
+<P>My login to the server provides an overview,
+<pre>
+Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-45-generic x86_64)
+
+  System information as of Sat Apr 22 23:49:00 UTC 2023
+
+  System load:                      0.09
+  Usage of /:                       70.8% of 24.06GB
+  Memory usage:                     72%
+  Swap usage:                       0%
+  Processes:                        131
+  Users logged in:                  1
+</pre>
+
+<p>I first confirmed disk utilization.
+</p><pre>$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            474M     0  474M   0% /dev
+tmpfs            99M  1.2M   97M   2% /run
+/dev/vda1        25G   18G  7.1G  71% /
+</pre>
+
+<p>I next looked at the error logs. When the error occurred, the fault trace ended with
+</p><pre>  File "/home/appuser/app/controller.py", line 3424, in review_derivation
+    dat = clib.read_db(path_to_db)
+  File "/home/appuser/app/common_lib.py", line 142, in read_db
+    for row in cur.execute("SELECT * FROM data"):
+sqlite3.OperationalError: no such table: data
+  </pre>
+Probably a race condition in the Python? If so, this problem is due to my hack of writing the database to SQL. My motivation to resolve this issue is low because I had intended to switch to Neo4j. I haven't complete the migration from JSON/SQL to Neo4j yet.
+
+  
+<p>I used <code>top</code> and saw 2 and 3 instances of <code>gunicorn</code>
+
+</p><p>I checked for redundant Docker containers running but saw only what's expected:
+</p><pre>$ docker ps
+CONTAINER ID   IMAGE                           COMMAND                  CREATED       STATUS       PORTS                                                                      NAMES
+632ee101f714   v7_pickle_web_interface_nginx   "nginx -g 'daemon of…"   4 weeks ago   Up 4 weeks   0.0.0.0:80-&gt;80/tcp, :::80-&gt;80/tcp, 0.0.0.0:443-&gt;443/tcp, :::443-&gt;443/tcp   v7_pickle_web_interface_nginx_1
+80bb13ec66ca   v7_pickle_web_interface_flask   "gunicorn --reload -…"   4 weeks ago   Up 4 weeks   5000/tcp                                                                   v7_pickle_web_interface_flask_1
+</pre><p></p><p></p><p></p><p></p>
+
+{% endblock %}

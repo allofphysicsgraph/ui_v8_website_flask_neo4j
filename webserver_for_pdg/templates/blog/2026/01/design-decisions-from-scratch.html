@@ -1,0 +1,71 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>design decisions from scratch</H1>
+
+<P><small>Published 2026-01-24T19:47:00Z by Physics Derivation Graph</small></P>
+
+<p>See also&nbsp;<a href="https://github.com/allofphysicsgraph/task-tracker/issues/30">https://github.com/allofphysicsgraph/task-tracker/issues/30</a></p><p>Currently <a href="https://allofphysics.com/design_documentation">https://allofphysics.com/design_documentation</a> is sparse. This post is draft content to expand that page. This page will be deleted after content is moved to allofphyics.com repo.</p><p>Restating the goal from&nbsp;<a href="https://allofphysics.com/">https://allofphysics.com/</a>,</p>
+<blockquote><i>Goal</i>: Write down all known mathematical physics in a way that can be both read by humans and checked by a computer algebra system.</blockquote>
+
+<p><br /></p><h3 style="text-align: left;"><i>Decision</i>: what constitutes "all known mathematical physics"?</h3>
+<p>Dirac notation, calculus, differential equations, algebra, trigonometry.<br />Not geometry.</p><p><br /></p>
+
+<h3 style="text-align: left;"><i>Decision</i>: what does "human-readable" mean?</h3>
+<p>Reasonable for a human to understand without use of specialized knowledge.&nbsp;<br />\int_0^{\infty} is out of scope, so is contentML</p><p><br /></p>
+
+<h3 style="text-align: left;"><i>Decision</i>: what does "checkable by CAS" mean?</h3>
+<p>Just writing down symbols and expressions is not meaningful.&nbsp;</p><h3 style="text-align: left;"><i>Decision</i>: which Computer Algebra System(s) to use?</h3><p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/117">https://github.com/allofphysicsgraph/task-tracker/issues/117</a></p>
+<p>Mathematica, MathCad, Sage</p><h3 style="text-align: left;"><i>Decision</i>: which proof assistant(s) to use?</h3><p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/106">https://github.com/allofphysicsgraph/task-tracker/issues/106</a></p><p>COQ, Isabelle, Lean</p><p><br /></p>
+
+<h3 style="text-align: left;"><i>Decision</i>: how to represent expressions?</h3><p>Latex, Content MathML, Presentation ML, Mathematica,&nbsp;</p><p><br /></p><h3 style="text-align: left;"><i>Decision</i>: How to render graphs visually?</h3><p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/97">https://github.com/allofphysicsgraph/task-tracker/issues/97</a></p><p>d3js, graphviz, networkx</p><h3 style="text-align: left;">Decision: Which Property Graph database?</h3><p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/43">https://github.com/allofphysicsgraph/task-tracker/issues/43</a></p>
+
+<h3 style="text-align: left;">Decision: upgrade path from JSON/SQL to Neo4j</h3>
+
+<p>I had ui_v7 for JSON/SQL and ui_v8 for Neo4j. The ui_v7 had a working implementation of Google authentication. I had trouble getting Google authentication working in ui_v8, and I didn't want to have to refactor all the static content from ui_v7, so I decided to create a new repo, "allofphysics.com".&nbsp;</p><p>Although getting Neo4j into ui_v7 was do-able, the "mash together to repos" ended up being a bad decision from a troubleshooting and cleanliness-of-design experience.</p>
+
+<h3 style="text-align: left;"><i>Decision</i>: naming of repo</h3>
+  
+<p>I decided to name the repo "allofphysics.com" to make it clear which repo hosted the website on the Internet. Also, the alternative repo name "a mashup of v7 and v8" wasn't a good name, though it would have been more descriptive.
+  
+  </p><p>In retrospect, that was a bad naming convention because I later reverted to using ui_v7 for the website.
+
+</p><h3 style="text-align: left;"><i>Decision</i>: page scope</h3>
+
+<p>Rendered HTML pages should have a single scope. (As opposed to a single-page website.)</p>
+
+<h3 style="text-align: left;"><i>Decision</i>: Which VPS provider service company to use?</h3>
+<p>DigitalOcean, AWS, Oracle, Azure</p>
+<p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/56">https://github.com/allofphysicsgraph/task-tracker/issues/56</a></p>
+<p><a href="https://physicsderivationgraph.blogspot.com/2026/01/vps-price-comparison-september-2024.html">https://physicsderivationgraph.blogspot.com/2026/01/vps-price-comparison-september-2024.html</a><br /><a href="https://physicsderivationgraph.blogspot.com/2026/01/vps-price-comparison-january-2026.html">https://physicsderivationgraph.blogspot.com/2026/01/vps-price-comparison-january-2026.html</a></p>
+
+<h3 style="text-align: left;"><i>Decision</i>: separate non-interactive workflow pages (e.g., user_documentation) into a separate Python file</h3>
+
+<p>Having all the routes in a single file (e.g., pdg_app.py) results in a huge file with thousands of lines.</p>
+
+<p>Happily, Flask provides a way to separate routes into separate files (e.g., pdg_other_routes.py) using blueprints.&nbsp;</p>
+
+The file pdg_app.py contains
+<pre>from pdg_other_routes import other_routes_bp
+web_app.register_blueprint(other_routes_bp)
+</pre>
+and then pdg_other_routes.py contains
+<pre>other_routes_bp = Blueprint("other_routes", __name__)
+
+@other_routes_bp.route("/api_via_js")
+def to_api_via_js() -&gt; str:
+    return render_template("js_with_api/api_js.html")
+</pre>
+
+<p>So far, so good. The cost of this separation is that Flask namespaces the endpoints to ensure there are no name collisions between different files. The <code>url_for</code> function in Jinja2 templates (and in the Python code) now expects the format:
+</p><pre>other_routes.function_name
+</pre>
+
+<p>That would require figuring out which <code>url_for</code> functions point to routes in pdg_other_routes.py and which routes are in pdg_app.py
+  
+</p><p>Therefore, having all routes in pdg_app.py is easiest.</p><h3 style="text-align: left;"><i>Decision</i>: Which languages to use?</h3>
+<p>Languages I'm comfortable with and are widely used - Python; HTML; Docker</p><h3 style="text-align: left;"><i>Decision</i>: Interface</h3><p>Why web ui? Why not a GUI? Or command line?
+
+</p><p>Accessibility</p><p></p><p></p><p></p><p></p><p></p><p></p><p></p>
+
+{% endblock %}

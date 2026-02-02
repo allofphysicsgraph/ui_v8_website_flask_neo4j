@@ -1,0 +1,116 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>old log entries from 2014</H1>
+
+<P><small>Published 2022-02-09T02:22:00.002Z by Physics Derivation Graph</small></P>
+
+<p>20140927     syntax := ABNF
+
+</p><p>An issue I've previously encountered is how to store the information associated with the graph. I started with plain text, and then moved to XML (the current state). The content stored in the XML is Latex. Latex renders well, but lacks context (meaning). I am now investigating Content MathML as a stricter (but less widely adopted) syntax. Although Content MathML is better, it doesn't entirely capture the use I intend for this project. 
+
+</p><p>The core of the project centers on the following two conventions:
+</p><pre>&lt;statement&gt; = &lt;left hand side&gt; &lt;relation&gt; &lt;right hand side&gt;
+&lt;statement&gt; --&gt; &lt;inference rule&gt; --&gt; &lt;statement&gt;
+</pre>
+The relation is typically equality or inequality, though it could include union and other operators. 
+
+<p>The inference rule acts on one or more statements.
+
+</p><p>The statement is the relation between two mathematical expressions
+
+</p><p>This is outside the scope of Content MathML, XML, and Latex. I think the appropriate capture is to use something like <a href="https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form">Augmented Backus-Naur Form</a> (ABNF). Here are a few possible rules:
+</p>
+
+<p>derivation = 1*2statement inferenceRule statement; some derivations involve multiple input statements, here we allow 1 or 2
+
+</p><pre>statement = mathExpression relation mathExpression
+
+mathExpression = *ALPHA *DIGIT *SP *operator *"\" *"." *"," *"'" 
+
+relation = ( "=" / "&lt;=" / "&lt;" / "&gt;" / "&gt;=" / "U" )
+
+operator = ( "+" / "-" / "/" / "*" / "^" / "!" / ( "[" "]" ) / ( "(" ")" ) / ( "{" "}" ) / "|" )
+</pre>
+Looking at <a href="https://code.google.com/archive/p/physics-equations-graph/source/default/source">the code</a>, I've already adopted the following rules
+<pre><a href="https://code.google.com/p/physics-equations-graph/source/browse/trunk/databases/inference_rules_database.xml">infrule_name</a> = 1*ALPHA
+
+<a href="https://code.google.com/p/physics-equations-graph/source/browse/trunk/databases/connections_database.xml">statement_punid</a> = 10DIGIT
+
+<a href="https://code.google.com/p/physics-equations-graph/source/browse/trunk/databases/connections_database.xml">statement_tunid</a> = 7DIGIT
+
+<a href="https://code.google.com/p/physics-equations-graph/source/browse/trunk/databases/symbols_database.xml">symbol_punid</a> = 15DIGIT
+</pre>
+
+<p>From my notes, it appears I first figured out the requirement for the statement label restrictions on 20110406.
+
+</p><p>20140527     commercial projects
+
+</p><p>In the past week I've been made aware of 3 commercial efforts similar to this project
+
+</p>
+  
+  <ul>
+<li>EquationMap</li>
+    <li><a href="http://formula-database.com/release/">Formula-Database
+</a></li>
+    <li><a href="https://www.symbolab.com/">SymboLab</a></li>
+  </ul>
+<p>SymboLab and Formula-Database are similar, in that both are about search of equations. In addition to search, SymboLab provides derivations and plot. It's not clear whether these are dynamic or hand-coded. SymboLab appears to be more mathematics oriented, whereas Formula-Database has descriptions of the physics and symbol definitions. EquationMap is about user-generated graphs of derivations. My project has a poorer user interface, and the objective is grander (capture all of physics derivations).
+
+</p><p>None of these three are direct competition with this open source project, though there is overlap with subtasks from each project. I don't see a clear use case for any of the three -- if it were that useful as a product, I would have expected someone else to already be working in this area. 
+
+</p><p>I'm not clear on why there aren't other open source projects in this area. <a href="https://proofwiki.org/wiki/Euler%27s_Identity">Proofwiki.org</a> is not graph-based, and PlanetPhysics disappeared.
+
+</p><p>20140527     task prioritization
+
+</p><p>Task prioritization:
+
+</p><ul>
+<li>navigable interface. The current graph is large enough that intuitive navigation is an issue which needs to be addressed. The graph is currently rendered as a static PNG file. Rendering the graph in a web browser might be more accessible (allowing interactive navigation), and would generate a new set of issues to be addressed (i.e., reading XML databases into a new data structure). By "navigable interface" I am distinguishing from an interface for entering new data to be stored in the database
+<ul>
+<li><a href="http://mkolkowski.lqnstudio.mydevil.net/">http://mkolkowski.lqnstudio.mydevil.net/
+</a></li><li><a href="http://cytoscapeweb.cytoscape.org/demos">http://cytoscapeweb.cytoscape.org/demos</a>. This is flash-based, but the pan-zoom feature is present in <a href="https://github.com/cytoscape/cytoscape.js-panzoom">https://github.com/cytoscape/cytoscape.js-panzoom
+</a></li></ul>
+</li><li>ability to high-light subsections of the total graph related to a specific derivation
+</li><li>ability to high-light the symbol use graph within the statement graph
+</li><li>add content (E=mc^2, Maxwell's equations)
+</li><li>fully check graph using CAS (currently SymPy)
+</li><li>user input through CLI
+</li><li>user input through web browser GUI
+<ul>
+<li><a href="http://mathquill.com/">MathQuill</a></li></ul>
+</li></ul>
+To create a navigable interface, my first guess is to start by finding an example of an HTML5/Javascript directed graph with png/svg files as nodes. This is because I think it's probably unrealistic to render the Latex statements in a browser with a dynamic graph
+
+<p>As far as intuitive interface, I like Google Maps and its ability to zoom in/out when visualizing large spatial data. EquationMap is a good start but isn't open source.
+
+</p><p>20140526     computer algebra system (CAS) inputs
+
+</p><p>In reviewing candidate Computer Algebra systems, I still think SymPy is the best option compared to the other free and open source CASs
+
+https://en.wikipedia.org/wiki/List_of_computer_algebra_systems
+
+</p><p>Currently I expect the user to provide two inputs for each statement: Latex for visual rendering, and the SymPy equivalent for checking with the CAS. This is redundant, since SymPy can render Latex.
+
+</p><p>The reason I let the user supply Latex is because as a physicist I think in terms of Latex (not SymPy). I treat the addition of the SymPy equivalent as a second step
+
+</p><p>I have a fundamental conflict with (1) wanting the input format to be easy (i.e., Latex) and (2) wanting the content to be checkable by a CAS (i.e., MathML). I don't think there is a an easy-to-input format which is also easily checkable by a CAS. 
+
+</p><p>Does the database need to be checked by a CAS?
+
+</p><p>There are two reasons one builds this database:
+</p><ul>
+<li>as a notepad for current research, possibly to be used in a publication. Assumptions: dynamic; written to by only a few people; it may contain mistakes. Thus, it would be helpful to be checked by a CAS
+</li><li> to store relations between all accumulated knowledge. Assumptions: static database; written to by many people; read by many people. Thus, mistakes are likely to be found whether or not there is a CAS
+</li></ul>
+
+<p>20140510       graph vs relational database
+
+</p><p>I need to better understand the difference between Graph vs relational database vs object
+</p><ul>
+<li>https://en.wikipedia.org/wiki/Graph_database
+</li><li>https://en.wikipedia.org/wiki/Relational_databases
+</li></ul><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p>
+
+{% endblock %}

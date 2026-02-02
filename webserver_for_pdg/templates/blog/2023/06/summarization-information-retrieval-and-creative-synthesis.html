@@ -1,0 +1,10 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+<H1>summarization, information retrieval, and creative synthesis</H1>
+
+<P><small>Published 2023-06-05T01:09:00.002Z by Physics Derivation Graph</small></P>
+
+Large Language Models like ChatGPT are a hot topic due to the novelty of results in multiple application domains. Stepping back from the hype, the central capabilities seem to include summarization of content, information retrieval, and creative synthesis. Unfortunately those are not separate categories -- the summarization or information retrieval can contain hallucinations that get stated confidently.<div><br /></div><div>Focusing on the topic of information retrieval and setting aside hallucinations, let's consider alternative mechanisms for search:&nbsp;&nbsp;</div><div><ul style="text-align: left;"><li>plain text search, like what Google supports</li><li>boolean logic, i.e., AND/OR/NOT</li><li>use of special indicators like&nbsp;wild cards, quotes for exact search</li><li>regular expressions</li><li>graph queries for inference engines that support inductive, deductive, and abduction</li></ul><div>Except for the last, those search mechanisms all return specific results from a previously collected set of sources.&nbsp;</div></div><div><br /></div><div>--&gt; I expect conventional search to remain important. There are cases where I really am looking for a specific document and not a summarization.</div><div><br /></div><div>--&gt; Specialized search capabilities like regular expressions and wild cards will remain relevant for matching specific text strings. An LLM might provide suggestions on designing the regex?</div><div><br /></div><div>--&gt; Graph queries rely on bespoke databases that LLMs are not trained on currently. I'm not aware of any reason these can't be combined.&nbsp;</div><div><br /></div><div>The Physics Derivation Graph effectively provides a knowledge graph for mathematical Physics. Combining this with machine learning is feasible.</div>
+
+{% endblock %}
