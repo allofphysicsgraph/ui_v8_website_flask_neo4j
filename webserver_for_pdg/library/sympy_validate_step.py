@@ -13,6 +13,15 @@ https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/v2_XML/databas
 
 Convention: every inference rule validation function has the same arguments
 
+TODO: although some functions have doctests, these doctests rely on the previous argument structures
+rather than the current "list of dicts"x3.
+        # Implementation expects:
+        input_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+
+        # Doctest provides:
+        input_expr = parse_latex("a = b") # Returns an Equality object
+
+
 https://pymotw.com/3/doctest/
 how to use doctest for the entire file:
 python -m doctest -v validate_inference_rules_sympy.py
@@ -77,7 +86,7 @@ def validate_step(
     # logger.debug(str(list_of_feed_dicts))
     # logger.debug(str(list_of_output_dicts))
 
-    name_latex = name_latex
+    name_latex = inference_rule_dict["name_latex"]
 
     if name_latex in [
         "declare initial expression",
@@ -169,7 +178,9 @@ def validate_step(
         return "recognized infrule but not yet supported"
     elif name_latex == "apply gradient to scalar function":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
+        return apply_gradient_to_scalar_function(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
     elif name_latex == "apply operator to bra":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return apply_operator_to_bra(
@@ -255,10 +266,14 @@ def validate_step(
         )
     elif name_latex == "distribute conjugate to factors":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
+        return distribute_conjugate_to_factors(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
     elif name_latex == "distribute conjugate transpose to factors":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
+        return distribute_conjugate_transpose_to_factors(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
     elif name_latex == "divide expr 1 by expr 2":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return divide_expr_by_expr(
@@ -266,7 +281,9 @@ def validate_step(
         )
     elif name_latex == "drop non-dominant term":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
+        return drop_nondominant_term(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
     elif name_latex == "evaluate definite integral":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return evaluate_definite_integral(
@@ -283,7 +300,9 @@ def validate_step(
         return "recognized infrule but not yet supported"
     elif name_latex == "expand magnitude to conjugate":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
+        return expand_magnitude_to_conjugate(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
     elif name_latex == "expr 1 is equivalent to expr 2 under the condition":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
@@ -312,7 +331,7 @@ def validate_step(
         )
     elif name_latex == "function is odd":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return function_is_even(
+        return function_is_odd(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "indefinite integral over":
@@ -335,6 +354,9 @@ def validate_step(
         return indefinite_integration(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
+
+    # "integrate" might be DEPRECATED in favor of other integration infrules
+    # TODO: investigate whether any steps reference this infrule. If not, delete
     elif name_latex == "integrate":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
@@ -461,10 +483,14 @@ def validate_step(
         return "recognized infrule but not yet supported"
     elif name_latex == "sum exponents LHS":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
+        return sum_exponents_LHS(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
     elif name_latex == "sum exponents RHS":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
+        return sum_exponents_RHS(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
     elif name_latex == "swap LHS with RHS":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return swap_LHS_with_RHS(
@@ -472,7 +498,9 @@ def validate_step(
         )
     elif name_latex == "take curl of both sides":
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
+        return take_curl_of_both_sides(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
 
     else:
         # logger.error("unexpected inf rule:" + step_dict["inf rule"])
@@ -566,6 +594,14 @@ def subtract_X_from_both_sides(
     subtract c
     get a - c = b - c
 
+    TODO: issue detected by Gemini 3 Pro on 2026-02-02:
+    Issue: The logic assumes a specific ordering of inputs and
+           outputs that maps strictly to "If A=B and A=D then B=D".
+    Inconsistency: If the user provides the inputs in the reverse order
+                   (Input 0: A=D, Input 1: A=B), the validation logic
+                   rhs0 - out_lhs (D - B) might fail if the output is B=D (B-D != 0),
+                   even though the derivation is logically valid.
+                   The validation is brittle regarding the order of the input list.
 
     >>> input_expr = parse_latex("a = b")
     >>> feed = parse_latex("c")
@@ -641,6 +677,15 @@ def multiply_both_sides_by(
                           'reference_latex': '', 'latex_condition': '', 'lean': '',
                           'author_name_latex': 'ben.is.located@gmail.com', 'description_latex': '', 'id': '2131616531'}]
 
+    Gemini 3 Pro on 2026-02-02 complains that
+    The validation logic assumes that applying an operation to both sides preserves the relation operator (e.g., =). This is mathematically false for inequalities involving multiplication or division by negative numbers.
+    Inconsistency: If the input is x < y and the feed is -1, the correct output is -x > -y.
+        If the user provides the correct math (-x > -y), the assert fails (relations > and < differ), marking a valid derivation as an error.
+        If the user provides incorrect math (-x < -y), the assert passes, and the algebraic check ((-x) - (-x) == 0) passes, marking an invalid derivation as "valid".
+
+    Gemini 3 Pro on 2026-02-02 complains that
+    Rules that introduce division do not check if the divisor is zero, which would make the derivation  invalid.
+    Checks feed - 1 == 0. If feed is 0/0, SymPy yields nan. Validating strictly feed - 1 == 0 might catch this, but explicit handling is safer.
 
     see also dividebothsidesby
     x*y = Mul(x,y)
@@ -698,6 +743,17 @@ def divide_both_sides_by(
     https://docs.sympy.org/latest/tutorial/manipulation.html
 
     x/y = Mul(x, Pow(y, -1))
+
+    Gemini 3 Pro on 2026-02-02 complains that
+    The validation logic assumes that applying an operation to both sides preserves the relation operator (e.g., =). This is mathematically false for inequalities involving multiplication or division by negative numbers.
+    Inconsistency: If the input is x < y and the feed is -1, the correct output is -x > -y.
+        If the user provides the correct math (-x > -y), the assert fails (relations > and < differ), marking a valid derivation as an error.
+        If the user provides incorrect math (-x < -y), the assert passes, and the algebraic check ((-x) - (-x) == 0) passes, marking an invalid derivation as "valid".
+
+    Gemini 3 Pro on 2026-02-02 complains that
+    Rules that introduce division do not check if the divisor is zero, which would make the derivation  invalid.
+    Checks LHS * (1/feed) - Output == 0. If feed is 0, SymPy represents this as zoo (complex infinity) or raises an error depending on context. The validation should explicitly check feed != 0.
+
 
     given 'a + b = c'
     divide both sides by d
@@ -1068,6 +1124,7 @@ def integrate_over_from_to(
     """
     ((out_lhs0 == (\int_{feed1}^{feed2} in_lhs0 feed0)) and (out_rhs0 == \int_{feed1}^{feed2} in_rhs0 feed0))
     """
+    return "recognized infrule but not yet supported"
 
 
 def partially_differentiate_with_respect_to(
@@ -1100,6 +1157,7 @@ def both_sides_cross_X(
     """
     LHS x arg = RHS x arg
     """
+    return "recognized infrule but not yet supported"
 
 
 def X_dot_both_sides(
@@ -1241,7 +1299,7 @@ def swap_LHS_with_RHS(
         return "valid"
     else:
         logger.info("[trace swap_LHS_with_RHS end " + trace_id + "]")
-        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d1)
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
 def sum_exponents_LHS(
@@ -1301,7 +1359,7 @@ def add_expr_1_to_expr_2(
         return "valid"
     else:
         logger.info("[trace add_expr_1_to_expr_2 end " + trace_id + "]")
-        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d1)
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
 def substitute_RHS_of_expr_1_into_expr_2(
@@ -1326,11 +1384,11 @@ def substitute_RHS_of_expr_1_into_expr_2(
 
     d1 = sympy.simplify(
         input_expr_sympy_lhs_1.subs(input_expr_sympy_rhs_0, input_expr_sympy_lhs_0)
-        - output_expr_sympy_lhs
+        - output_expr_sympy_lhs_0
     )  # subs(old,new)
     d2 = sympy.simplify(
         input_expr_sympy_rhs_1.subs(input_expr_sympy_rhs_0, input_expr_sympy_lhs_0)
-        - output_expr_sympy_rhs
+        - output_expr_sympy_rhs_0
     )  # subs(old,new)
 
     if (d1 == 0) and (d2 == 0):
@@ -1363,11 +1421,11 @@ def substitute_LHS_of_expr_1_into_expr_2(
 
     d1 = sympy.simplify(
         input_expr_sympy_lhs_1.subs(input_expr_sympy_lhs_0, input_expr_sympy_rhs_0)
-        - output_expr_sympy_lhs
+        - output_expr_sympy_lhs_0
     )  # subs(old,new)
     d2 = sympy.simplify(
         input_expr_sympy_rhs_1.subs(input_expr_sympy_lhs_0, input_expr_sympy_rhs_0)
-        - output_expr_sympy_rhs
+        - output_expr_sympy_rhs_0
     )  # subs(old,new)
 
     if (d1 == 0) and (d2 == 0):
@@ -1413,7 +1471,7 @@ def mult_expr_1_by_expr_2(
         return "valid"
     else:
         logger.info("[trace mult_expr_1_by_expr_2 end " + trace_id + "]")
-        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d1)
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
 def LHS_of_expr_1_eq_LHS_of_expr_2(
@@ -1432,7 +1490,7 @@ def LHS_of_expr_1_eq_LHS_of_expr_2(
     >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')},
                                {'LHS': parse_latex('a'), 'RHS': parse_latex('d')}]
     >>> latex_dict['output'] = [{'LHS': parse_latex('b'), 'RHS': parse_latex('d')}]
-    >>> LHS_of_expr_equals_LHS_of_expr(latex_dict)
+    >>> LHS_of_expr_1_eq_LHS_of_expr_2(latex_dict)
     'valid'
 
     """
@@ -1523,6 +1581,18 @@ def claim_expr_1_equals_expr_2(
 ) -> str:
     """
     ((in_lhs0 == in_lhs1) and (in_rhs0 == in_rhs1))
+
+    TODO: issue detected by Gemini 3 Pro on 2026-02-02:
+    The function name suggests comparing two inputs, but the code ignores the second input entirely.
+
+        The inference rule name implies comparing two distinct input expressions
+        (Expression 1 and Expression 2). However, the implementation only reads the
+        first input and compares it to the output. It treats the rule as an identity
+        check (Input 0 == Output 0) rather than an equivalence check between two inputs.
+        Inconsistency: It accesses list_of_input_dicts[0] but never accesses
+        list_of_input_dicts[1], ignoring the second expression entirely.
+
+
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[trace claim_expr_1_equals_expr_2 start " + trace_id + "]")
@@ -1539,7 +1609,7 @@ def claim_expr_1_equals_expr_2(
         return "valid"
     else:
         logger.info("[trace claim_expr_1_equals_expr_2 end " + trace_id + "]")
-        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d1)
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
 def claim_LHS_equals_RHS(
@@ -1549,6 +1619,11 @@ def claim_LHS_equals_RHS(
 ) -> str:
     """
     (in_lhs0 == in_rhs0)
+
+    TODO: issue detected by Gemini 3 Pro on 2026-02-02:
+    This function checks if the Input's LHS equals the Input's RHS (checking for a tautology). However, it ignores the list_of_output_dicts entirely in the logic check.
+    If a user inputs a valid tautology (e.g., x = x) but asserts a completely unrelated output (e.g., y = z), the function will return 'valid', creating a break in the derivation chain.
+
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[trace claim_LHS_equals_RHS start " + trace_id + "]")
@@ -1784,6 +1859,10 @@ def factor_out_x_from_lhs(
     factor out x
     get x*(a + b) = c
 
+    Gemini 3 Pro on 2026-02-02 complains that
+    The validation logic for factoring rules checks for algebraic equivalence between input and output but fails to validate that the specific operation (factoring out a specific term) actually occurred.
+    Inconsistency: If the input is ax + bx = y and the user provides an output ax + bx = y (no change) or (a+b)x = y (factored), both will return "valid". The function ignores the inference rule's intent (to factor out feed_sympy). It effectively degrades to a generic simplify check.
+
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[trace factor_out_x_from_lhs start " + trace_id + "]")
@@ -1815,6 +1894,11 @@ def factor_out_x_from_rhs(
     Given a = b*x + c*x
     factor out x
     get a = (b + c)*x
+
+    Gemini 3 Pro on 2026-02-02 complains that
+    The validation logic for factoring rules checks for algebraic equivalence between input and output but fails to validate that the specific operation (factoring out a specific term) actually occurred.
+    Inconsistency: If the input is ax + bx = y and the user provides an output ax + bx = y (no change) or (a+b)x = y (factored), both will return "valid". The function ignores the inference rule's intent (to factor out feed_sympy). It effectively degrades to a generic simplify check.
+
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[trace factor_out_x_from_rhs start " + trace_id + "]")
@@ -1873,6 +1957,13 @@ def change_two_variables_in_expr(
     substitute b --> d
     substitute a --> f
     to get 'f + d = c'
+
+    TODO: issue detected by Gemini 3 Pro on 2026-02-02:
+    The implementation uses chained substitution (.subs().subs()). This causes logical errors if the variables being swapped are coupled (e.g., swapping x→y and y→x).
+    Scenario: Input x + y, swap x->y and y->x.
+    Mathematical Expectation: y + x.
+    Code Behavior: (x+y).subs(x,y) becomes y+y. Then (y+y).subs(y,x) becomes x+x.
+    Result: The logic fails to handle simultaneous swaps or circular dependencies correctly. This logic applies to change_three_variables... and higher as well.
 
     # to run the doctest below, use
     import doctest
@@ -1937,7 +2028,7 @@ def change_three_variables_in_expr(
     # to run the doctest below, use
     import doctest
     from validate_steps_sympy import *
-    doctest.run_docstring_examples(change_two_variables_in_expr, globals(), verbose=True)
+    doctest.run_docstring_examples(change_three_variables_in_expr, globals(), verbose=True)
 
     >>> latex_dict = {}
     >>> latex_dict['input'] = [{'LHS': parse_latex('a + b'), 'RHS': parse_latex('c')}]
@@ -2205,6 +2296,13 @@ def evaluate_definite_integral(
     """
     Given   a = \int_0^x dx
     Get     a = x
+
+    TODO: issue detected by Gemini 3 Pro on 2026-02-02:
+
+    The function attempts to validate an integral by subtracting the output from the input. However, parsed LaTeX integrals in SymPy often result in unevaluated Integral objects. The sympy.simplify function does not strictly guarantee that it will call .doit() to perform the integration. Consequently, Integral(x, (x, 0, 1)) - 0.5 may result in a non-zero expression object, causing false validation failures.
+    Fix: The code should likely call .doit() on the input expression to force evaluation before simplification.
+
+
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[trace evaluate_definite_integral start " + trace_id + "]")
