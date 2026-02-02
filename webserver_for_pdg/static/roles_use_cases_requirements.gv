@@ -1,0 +1,206 @@
+digraph G {
+
+  rankdir="LR";
+  
+  // see https://graphviz.org/docs/attrs/splines/
+  //splines=false;
+  //splines=curved;
+  //splines=polyline;
+  splines=ortho;
+
+  unauthenticated_user [label="unauthenticated user", shape="rectangle"];
+  authenticated_user [label="authenticated user", shape="rectangle"];
+  
+  log_in [label="authenticate" style=filled color=lightgrey];
+  unauthenticated_user -> log_in -> authenticated_user;
+  auth_google [label="authenticate using Google"];
+  log_in -> auth_google;
+  
+  log_out [label="log out" style=filled color=lightgrey];
+  authenticated_user -> log_out -> unauthenticated_user;
+  
+  export_database [label="export database" style=filled color=lightgrey];
+  unauthenticated_user -> export_database;
+  authenticated_user -> export_database;
+  
+  export_database_json_webUI [label="web UI: link to database JSON" style=filled color=lightblue];
+  export_database -> export_database_json_webUI;
+  export_database_cypher_webUI [label="web UI: link to database Cypher" style=filled color=lightblue];
+  export_database -> export_database_cypher_webUI;
+  
+  export_database_json_rest [label="REST API: export database as JSON" style=filled color=lightpink];
+  export_database -> export_database_json_rest;
+  export_database_cypher_rest [label="REST API: export database as Cypher" style=filled color=lightpink];
+  export_database -> export_database_cypher_rest;
+  
+  export_database_json_backend [label="backend: export database as JSON"];
+  export_database_json_rest -> export_database_json_backend;
+  export_database_json_webUI -> export_database_json_backend;
+  
+  export_database_cypher_backend [label="backend: export database as Cypher"];
+  export_database_cypher_webUI -> export_database_cypher_backend;
+  export_database_cypher_rest -> export_database_cypher_backend;
+  
+  import_database_as_cypher [label="import database as Cypher" style=filled color=lightgrey];
+  authenticated_user -> import_database_as_cypher;
+
+  upload_database_as_cypher_webUI [label="web UI: upload database as Cypher" style=filled color=lightblue];
+  import_database_as_cypher -> upload_database_as_cypher_webUI;
+  
+  upload_database_as_cypher_backend [label="backend: upload database as Cypher"];
+  upload_database_as_cypher_webUI -> upload_database_as_cypher_backend;
+  
+  read_FAQ [label="read FAQ" style=filled color=lightgrey];
+  unauthenticated_user -> read_FAQ;
+  authenticated_user -> read_FAQ;
+  render_FAQ [label="web UI: render FAQ" style=filled color=lightblue];
+  read_FAQ -> render_FAQ;
+  
+  query_graph [label="query graph" style=filled color=lightgrey];
+  unauthenticated_user -> query_graph;
+  authenticated_user -> query_graph;
+  
+  query_graph_webUI [label="web UI: query graph" style=filled color=lightblue];
+  query_graph -> query_graph_webUI;
+
+  query_graph_rest [label="REST API: query graph" style=filled color=lightpink];
+  query_graph -> query_graph_rest;
+  
+  query_graph_backend [label="backend: query graph"];
+  query_graph_webUI -> query_graph_backend;
+  query_graph_rest -> query_graph_backend;
+  
+  enter_new_operator [label="enter new operator" style=filled color=lightgrey];
+  authenticated_user -> enter_new_operator;
+  
+  create_new_operator_webUI [label="web UI: create new operator" style=filled color=lightblue];
+  enter_new_operator -> create_new_operator_webUI;
+  
+  enter_new_expression [label="enter new expression" style=filled color=lightgrey];
+  authenticated_user -> enter_new_expression;
+
+  create_new_expression_webUI [label="web UI: create new expression" style=filled color=lightblue];
+  enter_new_expression -> create_new_expression_webUI;
+
+  add_new_expression [label="backend: add new expression"];
+  create_new_expression_webUI -> add_new_expression;
+  
+  verify_expr_dimensional_consistency [label="backend: verify expression dimensional consistency"];
+  create_new_expression_webUI -> verify_expr_dimensional_consistency;
+
+  enter_new_derivation [label="enter new derivation" style=filled color=lightgrey];
+  authenticated_user -> enter_new_derivation;
+  
+  create_new_derivation_webUI [label="web UI: create new derivation" style=filled color=lightblue];
+  enter_new_derivation -> create_new_derivation_webUI;
+
+  add_new_derivation [label="backend: add new derivation"];
+  create_new_derivation_webUI -> add_new_derivation;
+
+  enter_new_symbol [label="enter new symbol" style=filled color=lightgrey];
+  authenticated_user -> enter_new_symbol;
+  
+  create_new_symbol_webUI [label="web UI: create new symbol" style=filled color=lightblue];
+  enter_new_symbol -> create_new_symbol_webUI;
+
+  add_new_symbol [label="backend: add new symbol"];
+  create_new_symbol_webUI -> add_new_symbol;
+
+  read_list_of_derivations [label="read list of derivations" style=filled color=lightgrey];
+  unauthenticated_user -> read_list_of_derivations;
+  authenticated_user -> read_list_of_derivations;
+
+  list_of_derivations_html [label="web UI: render list of derivations" style=filled color=lightblue];
+  read_list_of_derivations -> list_of_derivations_html;
+
+  list_of_derivations_json [label="REST API: JSON list of derivations" style=filled color=lightpink];
+  read_list_of_derivations -> list_of_derivations_json;
+
+  list_of_derivations [label="backend: get list of derivations"];
+  list_of_derivations_json -> list_of_derivations;
+  list_of_derivations_html -> list_of_derivations;
+
+  read_list_of_symbols [label="read list of symbols" style=filled color=lightgrey];
+  unauthenticated_user -> read_list_of_symbols;
+  authenticated_user -> read_list_of_symbols;
+
+  list_of_symbols_html [label="web UI: show list of symbols" style=filled color=lightblue];
+  read_list_of_symbols -> list_of_symbols_html;
+
+  list_of_symbols_json [label="REST API: JSON list of symbols" style=filled color=lightpink];
+  read_list_of_symbols -> list_of_symbols_json;
+
+  list_of_symbols [label="backend: get list of symbols"]
+  list_of_symbols_html -> list_of_symbols;
+  list_of_symbols_json -> list_of_symbols;
+
+  read_list_of_expressions [label="read list of expressions" style=filled color=lightgrey];
+  unauthenticated_user -> read_list_of_expressions;
+  authenticated_user -> read_list_of_expressions;
+
+  list_of_expressions_html [label="web UI: show list of expressions" style=filled color=lightblue];
+  read_list_of_expressions -> list_of_expressions_html;
+  list_of_expressions_html -> verify_expr_dimensional_consistency;
+
+  list_of_expressions_json [label="REST API: JSON list of expressions" style=filled color=lightpink];
+  read_list_of_expressions -> list_of_expressions_json;
+
+  list_of_expressions [label="backend: get list of expressions"];
+  list_of_expressions_json -> list_of_expressions;
+  list_of_expressions_html -> list_of_expressions;
+
+  read_derivation [label="read derivation" style=filled color=lightgrey];
+  unauthenticated_user -> read_derivation;
+  authenticated_user -> read_derivation;
+  
+  derivation_steps_json [label="REST API: JSON list of steps" style=filled color=lightpink];
+  read_derivation -> derivation_steps_json;
+  derivation_table [label="web UI: show table of steps" style=filled color=lightblue];
+  read_derivation -> derivation_table;
+  derivation_table -> verify_expr_dimensional_consistency;
+  
+  verify_step_consistency [label="backend: verify step consistency"];
+  derivation_table -> verify_step_consistency;
+  
+  list_of_steps [label="backend: get list of steps"];
+  derivation_steps_json -> list_of_steps;
+  derivation_table -> list_of_steps;
+  
+  derivation_tex [label="web UI: link to derivation .tex file" style=filled color=lightblue];
+  read_derivation -> derivation_tex;
+  derivation_pdf [label="web UI: link to derivation .pdf file" style=filled color=lightblue];
+  read_derivation -> derivation_pdf;
+  derivation_d3js [label="web UI: show derivation d3js" style=filled color=lightblue];
+  read_derivation -> derivation_d3js;
+  derivation_graphviz_png [label="web UI: show derivation graphviz PNG" style=filled color=lightblue];
+  read_derivation -> derivation_graphviz_png;
+
+  derivation_d3js -> list_of_steps;
+  derivation_graphviz_png  -> list_of_steps;
+  
+  get_expression_for_step [label="backend: get expressions per step"];
+  derivation_d3js -> get_expression_for_step;
+  derivation_table -> get_expression_for_step;
+  get_infrule_for_step [label="backend: get infrule per step"];
+  derivation_graphviz_png -> get_infrule_for_step;
+  
+  generate_png_for_expression [label="backend: generate png for expression"];
+  derivation_d3js -> generate_png_for_expression;
+  derivation_graphviz_png -> generate_png_for_expression;
+  generate_png_for_infrule [label="backend: generate png for infrule"];
+  derivation_d3js -> generate_png_for_infrule;
+  derivation_graphviz_png -> generate_png_for_infrule;
+  
+  generate_derivation_tex [label="backend: generate tex for derivation"];
+  derivation_tex -> generate_derivation_tex;
+  generate_derivation_tex -> list_of_steps;
+  generate_derivation_tex -> get_infrule_for_step;
+  generate_derivation_tex -> get_expression_for_step;
+  
+  generate_derivation_pdf_from_tex [label="backend: generate derivation PDF from .tex"];
+  derivation_pdf -> generate_derivation_pdf_from_tex -> generate_derivation_tex;
+  
+  generate_pdf_from_tex [label="backend: generate PDF from .tex"];
+  generate_derivation_pdf_from_tex -> generate_pdf_from_tex;
+}
+
