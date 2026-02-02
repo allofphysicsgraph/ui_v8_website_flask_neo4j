@@ -17,19 +17,23 @@ including input/output formats and usage examples. Provide the answer as a singl
    <a href="{{ url_for('to_documentation_overview')}}">documentation overview</a> / 
    workflow documentation
 
+<P>Some routes have required arguments; these are not hyperlinked.
+
 <h3>Main Page</h3>
-    <p><a href="{{ url_for('to_index') }}">Index</a></p>
-    <p><I>Description:</I> A central hub page to navigate all the different functions of the software</p>
-    <P>From the main page a user goes to <a href="#navigation">Navigation</a>
+    <p><a href="{{ url_for('to_index') }}">/index</a><BR>
+       <a href="{{ url_for('to_index') }}">/</a></p>
+    <p><em>Description:</em> A central hub page to navigate all the different functions of the software</p>
+    <P>From the main page a user goes to <a href="#navigation">Navigation</a>.
 
 <H3 id="navigation">Navigation</H3>
-    <P><a href="{{ url_for('to_navigation') }}">navigation</a>
-    <P><I>Description:</I> Provides a quantitative overview of next actions
-    <P>From Navigation a user goes to <a href="#create a new derivation">create a new derivation</a>
+    <P><a href="{{ url_for('to_navigation') }}">/navigation</a>
+    <P><em>Description:</em> Provides a quantitative overview of next actions
+    <P>From Navigation a user goes to <a href="#create a new derivation">create a new derivation</a>.
 
 <h3 id="create a new derivation">Create a new derivation</h3>
     <P><a href="{{ url_for('to_add_derivation') }}">/new_derivation</a></P>
-    <p><I>Description:</I> Creates a new derivation by requesting:
+    <P>Requires being logged in.
+    <p><em>Description:</em> User can create a new derivation by specifying
     <UL><LI> derivation name (latex)
     <LI> derivation abstract (latex)
     <LI> derivation reference (latex)
@@ -38,7 +42,7 @@ including input/output formats and usage examples. Provide the answer as a singl
 
 <h3>Review an existing derivation</h3>
     <P>/review_derivation/&lt;derivation_id&gt;</P>
-    <p><I>Description:</I> View the details of an existing derivation (list of steps), and options to:
+    <p><em>Description:</em> View the details of an existing derivation (list of steps), and options to:
        <UL><LI> add steps
        <LI> delete steps
        <LI> edit steps
@@ -49,183 +53,473 @@ including input/output formats and usage examples. Provide the answer as a singl
 
 <h3>Select a Step (for editing or deleting)</h3>
     <P>/select_step/&lt;derivation_id&gt;</a></P>
-    <p><I>Description:</I> Provides a list of the steps within a specific derivation. Used for editing a specific step.</p>
+    <p><em>Description:</em> Provides a list of the steps within a specific derivation. Used for editing a specific step.</p>
 
 <h3>Edit Derivation Metadata</h3>
     <P>/edit_derivation_metadata/&lt;derivation_id&gt;</a></P>
-     <p><I>Description:</I> Modifies derivation metadata, such as the name and abstract.</p>
+    <P>Requires being logged in.
+     <p><em>Description:</em> Modifies derivation metadata, such as the name and abstract.</p>
 
 <h3>New step: select the inference rule</h3>
     <P>/new_step_select_inference_rule/&lt;derivation_id&gt;</a></P>
-    <p><I>Description:</I>  Specifies which inference rule is used when inserting a new step in a derivation.</p>
+    <P>Requires being logged in.
+    <p><em>Description:</em>  Specifies which inference rule is used when inserting a new step in a derivation.</p>
 
 <h3>Edit Expression</h3>
     <P>/edit_expression/&lt;expression_id&gt;</a></P>
-    <p><I>Description:</I>  Modifies an expression, including assigning symbols to it or deleting it.</p>
+    <P>Requires being logged in.
+    <p><em>Description:</em>  Modifies an expression, including assigning symbols to it or deleting it.</p>
 
 <h3>Edit Feed</h3>
     <P>/edit_feed/&lt;feed_id&gt;</a></P>
-    <p><I>Description:</I>  Modifies a feed, including assigning symbols to it or deleting it.</p>
+    <P>Requires being logged in.
+    <p><em>Description:</em>  Modifies a feed, including assigning symbols to it or deleting it.</p>
 
 <h3>New Expression</h3>
-    <P><a href="{{ url_for('to_add_expression')">/new_expression/</a></P>
-    <p><I>Description:</I>  Creates a new expression, allowing to specify the LHS, RHS, relation, and name.
+    <P><a href="{{ url_for('to_add_expression') }}">/new_expression/</a></P>
+    <P>Requires being logged in.
+    <p><em>Description:</em>  Creates a new expression, allowing to specify the LHS, RHS, relation, and name.
     </p>
 
     <h3>New Feed</h3>
     <P><a href="{{ url_for('to_add_feed') }}">/new_feed/</a></P>
-    <p><I>Description:</I>  Creates a new feed.
+    <P>Requires being logged in.
+    <p><em>Description:</em>  Creates a new feed.
     </p>
 
 <h3>Edit Node</h3>
     <P>/edit_node/&lt;node_id&gt;</a></P>
-    <p><I>Description:</I> A gateway for editing a node, which redirects to the appropriate sub-page depending on the node type (e.g., a scalar, matrix, vector).
+    <P>Requires being logged in.
+    <p><em>Description:</em> A gateway for editing a node, which redirects to the appropriate sub-page depending on the node type (e.g., a scalar, matrix, vector).
    </p>
 
 <h3>Edit Operation</h3>
      <P>/edit_operation/&lt;operation_id&gt;</a></P>
-      <p><I>Description:</I> Edit an operation symbol.
+    <P>Requires being logged in.
+      <p><em>Description:</em> Edit an operation symbol.
      </p>
 
 <h3>Edit Relation</h3>
      <P>/edit_relation/&lt;relation_id&gt;</a></P>
-      <p><I>Description:</I> Edit a relation symbol.
+    <P>Requires being logged in.
+      <p><em>Description:</em> Edit a relation symbol.
      </p>
 
 <h3>Edit Scalar</h3>
      <P>/edit_scalar/&lt;scalar_id&gt;</a></P>
-     <p><I>Description:</I> Edit a scalar symbol.
+    <P>Requires being logged in.
+     <p><em>Description:</em> Edit a scalar symbol.
      </p>
 
 <h3>Edit Vector</h3>
      <P>/edit_vector/&lt;vector_id&gt;</a></P>
-    <p><I>Description:</I> Edit a vector symbol.
+    <P>Requires being logged in.
+    <p><em>Description:</em> Edit a vector symbol.
     </p>
 
 <h3>Edit Matrix</h3>
      <P>/edit_matrix/&lt;matrix_id&gt;</a></P>
-      <p><I>Description:</I> Edit a matrix symbol.
+    <P>Requires being logged in.
+      <p><em>Description:</em> Edit a matrix symbol.
      </p>
 
 <h3>New scalar value and unit</h3>
     <P>/new_symbol_scalar_constant_value_and_units/&lt;scalar_id&gt;/</a></P>
-     <p><I>Description:</I>  Specifies the units and value for constant scalar symbols.
+    <P>Requires being logged in.
+     <p><em>Description:</em>  Specifies the units and value for constant scalar symbols.
    </p>
 
 <h3>New scalar symbol</h3>
     <P><a href="{{ url_for('to_add_symbol_scalar') }}">/new_symbol_scalar/</a></P>
-     <p><I>Description:</I>  Creates a scalar symbol, optionally adding a value to it.
+    <P>Requires being logged in.
+     <p><em>Description:</em>  Creates a scalar symbol, optionally adding a value to it.
    </p>
 
    <h3>New Vector symbol</h3>
    <P><a href="{{ url_for('to_add_symbol_vector') }}">/new_symbol_vector/</a></P>
-   <p><I>Description:</I>  Creates a vector symbol.
+    <P>Requires being logged in.
+   <p><em>Description:</em>  Creates a vector symbol.
   </p>
 
     <h3>New Matrix symbol</h3>
    <P><a href="{{ url_for('to_add_symbol_matrix') }}">/new_symbol_matrix/</a></P>
-   <p><I>Description:</I>  Creates a matrix symbol.
+    <P>Requires being logged in.
+   <p><em>Description:</em>  Creates a matrix symbol.
   </p>
+
+<H3 id="new symbol">New Symbol</H3>
+<P><a href="{{ url_for('to_add_symbol') }}">/new_symbol/</a></P>
+<P>Requires being logged in.
+   <p><em>Description:</em>
 
     <h3>New operation symbol</h3>
       <P><a href="{{ url_for('to_add_operation') }}">/new_operation/</a></P>
-      <p><I>Description:</I> Creates a new operation symbol, for use in expressions.
+    <P>Requires being logged in.
+      <p><em>Description:</em> Creates a new operation symbol, for use in expressions.
       </p>
 
       <h3>New relation symbol</h3>
         <P><a href="{{ url_for('to_add_relation') }}">/new_relation/</a></P>
-        <p><I>Description:</I> Creates a new relation symbol, for use in expressions.
+    <P>Requires being logged in.
+        <p><em>Description:</em> Creates a new relation symbol, for use in expressions.
         </p>
 
 
 <h3>New step: select expressions</h3>
      <P>/new_step_expressions/&lt;derivation_id&gt;/&lt;inference_rule_id&gt;</a></P>
-      <p><I>Description:</I>  Specifies which expressions and feeds are used when inserting a new step into a derivation.
+    <P>Requires being logged in.
+      <p><em>Description:</em>  Specifies which expressions and feeds are used when inserting a new step into a derivation.
      </p>
 
 <h3>Symbols and Operations in an Expression</h3>
      <P>/symbols_and_operations_for_expression/&lt;expression_id&gt;</a></P>
-      <p><I>Description:</I> Specifies which symbols are used by an expression.
+    <P>Requires being logged in.
+      <p><em>Description:</em> Specifies which symbols are used by an expression.
      </p>
 
  <h3>Sympy and Lean strings for an Expression</h3>
      <P>/sympy_and_latex_for_expression/&lt;expression_id&gt;/&lt;symbol_id_dict&gt;</a></P>
-     <p><I>Description:</I> Provides a form to edit the SymPy and Lean representations of an expression.
+    <P>Requires being logged in.
+     <p><em>Description:</em> Provides a form to edit the SymPy and Lean representations of an expression.
       </p>
 
 <h3>Symbols and Operations in a feed</h3>
     <P>/symbols_and_operations_for_feed/&lt;feed_id&gt;</a></P>
-    <p><I>Description:</I> Specifies which symbols are used by a feed.
+    <P>Requires being logged in.
+    <p><em>Description:</em> Specifies which symbols are used by a feed.
     </p>
 
 <h3>Sympy and Lean strings for a feed</h3>
     <P>/sympy_and_latex_for_feed/&lt;feed_id&gt;/&lt;symbol_id_dict&gt;</a></P>
-    <p><I>Description:</I> Provides a form to edit the SymPy and Lean representations of a feed.
+    <P>Requires being logged in.
+    <p><em>Description:</em> Provides a form to edit the SymPy and Lean representations of a feed.
      </p>
+
+<H3 id="new infrule">New Inference Rule</H3>
+<P><a href="{{ url_for('to_add_inference_rule') }}">/new_inference_rule/</a></P>
+    <P>Requires being logged in.
+    <p><em>Description:</em> 
+
+<H3 id="edit step">Edit Step</H3>
+<P>/edit_step/&lt;derivation_id&gt;/&lt;step_id&gt;/</a></P>
+    <P>Requires being logged in.
+    <p><em>Description:</em> 
+
+<H3 id="edit infrule">Edit Inference Rule</H3>
+<P><a href="{{ url_for('') }}">/edit_inference_rule/&lt;inference_rule_id&gt;/</a></P>
+    <P>Requires being logged in.
+    <p><em>Description:</em> 
 
 <h3>List of Derivations</h3>
     <P><a href="{{ url_for('to_list_derivations') }}">/list_derivations</a></P>
-     <p><I>Description:</I> Shows a list of all derivations.</p>
+     <p><em>Description:</em> Shows a list of all derivations.</p>
 <h3>List of Inference Rules</h3>
     <P><a href="{{ url_for('to_list_inference_rules') }}">/list_inference_rules</a></P>
-    <p><I>Description:</I> Shows a list of all inference rules.
+    <p><em>Description:</em> Shows a list of all inference rules.
    </p>
 <h3>List of Expressions</h3>
     <P><a href="{{ url_for('to_list_expressions') }}">/list_expressions</a></P>
-    <p><I>Description:</I> Shows a list of all expressions.
+    <p><em>Description:</em> Shows a list of all expressions.
     </p>
  <h3>List of Feeds</h3>
    <P><a href="{{ url_for('to_list_feeds') }}">/list_feeds</a></P>
-   <p><I>Description:</I> Shows a list of all feeds.
+   <p><em>Description:</em> Shows a list of all feeds.
    </p>
+
+<H3 id="list constants">List Constants</H3>
+<P>/list_constant_values/&lt;scalar_id&gt;/</P>
+    <p><em>Description:</em> 
+
+
+<H3 id="edit constant">Edit Constant</H3>
+<P>/edit_constant_value_and_units/&lt;value_and_units_id&gt;/</a></P>
+<P>Requires being logged in.
+    <p><em>Description:</em> 
+
 
 <h3>List of Operations</h3>
     <P><a href="{{ url_for('to_list_operations') }}">/list_operations</a></P>
-     <p><I>Description:</I> Shows a list of all operations.</p>
+     <p><em>Description:</em> Shows a list of all operations.</p>
 
 <h3>List of Relations</h3>
     <P><a href="{{ url_for('to_list_relations') }}">/list_relations</a></P>
-     <p><I>Description:</I> Shows a list of all relation symbols.</p>
+     <p><em>Description:</em> Shows a list of all relation symbols.</p>
 
 <h3>List of Scalars</h3>
   <P><a href="{{ url_for('to_list_scalars') }}">/list_scalars</a></P>
-   <p><I>Description:</I> Shows a list of all scalar symbols.
+   <p><em>Description:</em> Shows a list of all scalar symbols.
    </p>
 
 <h3>List of Vectors</h3>
  <P><a href="{{ url_for('to_list_vectors') }}">/list_vectors</a></P>
-  <p><I>Description:</I> Shows a list of all vector symbols.
+  <p><em>Description:</em> Shows a list of all vector symbols.
    </p>
 
 <h3>List of Matrices</h3>
  <P><a href="{{ url_for('to_list_matrices') }}">/list_matrices</a></P>
-  <p><I>Description:</I> Shows a list of all matrix symbols.
+  <p><em>Description:</em> Shows a list of all matrix symbols.
    </p>
 
 <h3>List of all constant values for a scalar</h3>
   <P>/new_symbol_scalar_constant_value_and_units/&lt;scalar_id&gt;/</a></P>
-  <p><I>Description:</I> View and edit value associated with a particular scalar</p>
-
-<h3>View a Cypher file</h3>
-  <P><a href="/view_cypher/">/view_cypher/</a></P>
-  <p><I>Description:</I> View the most recent database export in Cypher format.</p>
+  <p><em>Description:</em> View and edit value associated with a particular scalar</p>
 
 <h3>Query Neo4j via Cypher</h3>
-<P><a href="/query">/query</a></P>
-<p><I>Description:</I> An interface for running Cypher queries, either from the user or pre-defined. Provides some help and links for creating a Cypher query.</p>
+<P><a href="{{ url_for('to_query') }}">/query</a></P>
+<p><em>Description:</em> An interface for running Cypher queries, either from the user or pre-defined. Provides some help and links for creating a Cypher query.</p>
 
 <h3>API documenation</h3>
 <P><a href="{{ url_for('to_api_documentation') }}">/api_documentation</a></P>
-<p><I>Description:</I> A list of all available API routes and the corresponding data formats.</p>
+<p><em>Description:</em> A list of all available API routes and the corresponding data formats.</p>
 
 <h3>Delete All Content</h3>
 <P><a href="/delete_all">/delete_all</a></P>
- <p><I>Description:</I> A button for deletion of all database content, not just the derivations.
-</p>
+ <P>Requires being logged in.
+ <p><em>Description:</em> A button for deletion of all database content, not just the derivations.</p>
 
 <h3>API via Javascript</h3>
   <P><a href="{{ url_for('to_api_via_js') }}">/api_via_js</a></P>
-  <p><I>Description:</I> Demonstrates how to use the APIs from Javascript</p>
+  <p><em>Description:</em> Demonstrates how to use the APIs from Javascript</p>
+
+<H3 id="login">Login</H3>
+<P><a href="{{ url_for('to_login') }}">/login</a></P>
+<P><em>Description:</em> Google authentication.
+
+<H3 id="logout">Logout</H3>
+<P><a href="{{ url_for('to_logout') }}">/logout</a></P>
+ <P>Requires being logged in.
+<P><em>Description:</em>
+
+<H3 id="export to JSON">Export to JSON</H3>
+<P><a href="{{ url_for('to_export_json') }}">/export_to_json</a></P>
+<P><em>Description:</em>
+
+<H3 id="export to Cypher">Export to Cypher</H3>
+<P><a href="{{ url_for('to_export_cypher') }}">/export_to_cypher</a></P>
+
+<H3 id="workflow documentation">Workflow Documentation</H3>
+<P><a href="{{ url_for('to_workflow_documenation') }}">/workflow_documentation</a></P>
+<P><em>Description:</em> this page.
+
+<H3 id="rss">RSS</H3>
+<P>/rss/&lt;path:path&gt;</P>
+<P><em>Description:</em>
+
+<H3 id="profile">Profile</H3>
+<P><a href="{{ url_for('my_profile') }}">/profile/</a></P>
+<P>Requires being logged in.
+<P><em>Description:</em>
+
+<H3 id="search">Search of this Site</H3>
+<P><a href="{{ url_for('search_redirect_to_google') }}">/search</a></P>
+<P><em>Description:</em> Search site using Google.
+
+<H3 id="favicon.ico">favicon.ico</H3>
+/favicon.ico
+<P><em>Description:</em>
+
+<H3 id="robots.txt">robots.txt</H3>
+<P>/robots.txt
+<P><em>Description:</em> 
+
+<H3 id="sitemap.txt">sitemap.txt</H3>
+<P>/sitemap.txt
+<P><em>Description:</em> 
+
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('static_dir') }}">/static_dir</a></P>
+<P><em>Description:</em> 
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_evaluation_of_LLM_prompts') }}">/documentation/evaluation_of_LLM_prompts</a></P>
+<P><em>Description:</em> 
+
+<H3 id="documentation overview">Documentation overview</H3>
+<P><a href="{{ url_for('to_documentation_overview')}}">/documentation/</a><BR>
+    <a href="{{ url_for('to_documentation_overview')}}">/documentation/overview/</a></P>
+<P><em>Description:</em> 
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_user_documentation') }}">/documentation/user</a><BR>
+   <a href="{{ url_for('to_user_documentation') }}">/user_documentation</a></P>
+<P><em>Description:</em> 
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_developer_documentation') }}">/developer_documentation</a><BR>
+   <a href="{{ url_for('to_developer_documentation') }}">/documentation/developer</a></P>
+<P><em>Description:</em> 
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_conventions_documentation') }}">/conventions_documentation</a></P>
+<P><a href="{{ url_for('to_conventions_documentation') }}">/documentation/conventions</a></P>
+<P><em>Description:</em> 
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_design_documentation') }}">/design_documentation</a></P>
+<P><a href="{{ url_for('to_design_documentation') }}">/documentation/design_choices</a></P>
+<P><em>Description:</em> 
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_faq') }}">/faq</a></P>
+<P><a href="{{ url_for('to_faq') }}">/documentation/faq</a></P>
+<P><em>Description:</em> 
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_other_projects') }}">/other_projects</a></P>
+<P><a href="{{ url_for('to_other_projects') }}">/documentation/other_projects</a></P>
+<P><em>Description:</em> 
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_literature_review') }}">/literature_review</a></P>
+<P><a href="{{ url_for('to_literature_review') }}">/documentation/literature_review</a></P>
+<P><em>Description:</em> 
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_site_map') }}">/site_map</a></P>
+<P><a href="{{ url_for('to_site_map') }}">/documentation/site_map</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_comparison_of_design_options_cas') }}">/documentation/developer/comparison_of_design_options/cas</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_comparison_of_design_options_proofs') }}">/documentation/developer/comparison_of_design_options/proofs",
+<P><em>Description:</em> 
+
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_comparison_of_design_options_syntax') }}">/documentation/developer/comparison_of_design_options/syntax",
+<P><em>Description:</em> 
+
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_comparison_of_design_options_database') }}">/documentation/developer/comparison_of_design_options/database",
+<P><em>Description:</em> 
+
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_list_named_expressions') }}">/list_named_expressions</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_survey_of_named_expressions') }}">/survey_of_named_expressions</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="blog">Blog</H3>
+<P><a href="{{ url_for('to_blog_list') }}">/blog/</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="blog pages">Blog Pages</H3>
+<P>/blog/&lt;YYYY&gt;/&lt;MM&gt;/&lt;blog_title&gt;/</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_clickable_layers') }}">/clickable_layers</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id=""></H3>
+<P><a href="{{ url_for('to_class_notes_overview') }}">/class_notes</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id=""></H3>
+<P>/class_notes/<which_class&gt;/</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision overview">Spectrum of Precision: Overview</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision') }}">/spectrum_of_precision</a></P>
+<P><a href="{{ url_for('to_spectrum_of_precision') }}">/spectrum_of_precision/overview</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision lecture">Spectrum of Precision: lecture</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_lecture') }}">/spectrum_of_precision/lecture</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision handwritten">Spectrum of Precision: handwritten</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_handwritten') }}">/spectrum_of_precision/handwritten</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision latex">Spectrum of Precision: latex</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_latex') }}">/spectrum_of_precision/latex</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision tag_sections">Spectrum of Precision: tag_sections</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_tag_sections') }}">/spectrum_of_precision/tag_sections</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision tag_words">Spectrum of Precision: tag_words</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_tag_words') }}">/spectrum_of_precision/tag_words</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision tag_expressions">Spectrum of Precision: tag_expressions</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_tag_expressions') }}">/spectrum_of_precision/tag_expressions</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision tag_all">Spectrum of Precision: tag_all</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_tag_all') }}">/spectrum_of_precision/tag_all</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision variables">Spectrum of Precision: variables</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_variables') }}">/spectrum_of_precision/variables</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision all_steps">Spectrum of Precision: all_steps</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_all_steps') }}">/spectrum_of_precision/all_steps</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision PDG">Spectrum of Precision: Physics Derivation Graph</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_pdg') }}">/spectrum_of_precision/pdg</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision CAS_validation">Spectrum of Precision: CAS_validation</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_CAS_validation') }}">/spectrum_of_precision/CAS_validation</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision numeric_id">Spectrum of Precision: numeric_id</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_numeric_id') }}">/spectrum_of_precision/numeric_id</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision dimensional_validation">Spectrum of Precision: dimensional_validation</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_dimensional_validation') }}">/spectrum_of_precision/dimensional_validation</a></P>
+<P><em>Description:</em> 
+
+
+<H3 id="spectrum_of_precision proof">Spectrum of Precision: Proof</H3>
+<P><a href="{{ url_for('to_spectrum_of_precision_layer_proof') }}">/spectrum_of_precision/proof</a></P>
+<P><em>Description:</em> 
+
+
+
+
+<!--
+<H3 id=""></H3>
+<P><a href="{{ url_for('') }}"></a></P>
+<P><em>Description:</em>
+-->
+
 
 
 {% endblock %}
