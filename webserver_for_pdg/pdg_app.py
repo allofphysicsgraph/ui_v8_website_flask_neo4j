@@ -7073,11 +7073,14 @@ def to_delete_graph_content() -> werkzeug.Response:
 
     # https://neo4j.com/docs/python-manual/current/session-api/
     with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
+        query_start_time = time.time()
         str_to_print = session.write_transaction(
             neo4j_query.delete_all_nodes_and_relationships
         )
-        # query_time_dict["pdg_app/: "] = round(time.time() - query_start_time, 3)
+        query_time_dict[
+            "pdg_app/to_delete_graph_content: delete_all_nodes_and_relationships"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info(
         "[TRACE] to_delete_graph_content end " + str(trace_id) + " " + str(time.time())
     )
@@ -7103,9 +7106,11 @@ def to_export_json() -> werkzeug.Response:
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
+        query_start_time = time.time()
         res = session.read_transaction(neo4j_query.apoc_export_json, "pdg.jsonl")
-        # query_time_dict["pdg_app/: "] = round(time.time() - query_start_time, 3)
+        query_time_dict["pdg_app/to_export_json: apoc_export_json" + trace_id] = round(
+            time.time() - query_start_time, 3
+        )
 
     logger.info("to_export_json res=" + str(res))
     # <Record file='all.json' source='database: nodes(4), rels(0)' format='json' nodes=4 relationships=0 properties=16 time=123 rows=4 batchSize=-1 batches=0 done=True data=None>
@@ -7113,6 +7118,50 @@ def to_export_json() -> werkzeug.Response:
     # "dumping_grounds" is a variable set in the docker-compose file using variable NEO4J_dbms_directories_import
     logger.info("[TRACE] to_export_json end " + str(trace_id) + " " + str(time.time()))
     return redirect(url_for("static", filename="dumping_grounds/pdg.jsonl"))
+
+
+@web_app.route("/export_to_csv")
+def to_export_csv() -> werkzeug.Response:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] to_export_csv start " + str(trace_id) + " " + str(time.time()))
+    query_time_dict = {}  # type: query_timing_result_type
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        res = session.read_transaction(neo4j_query.apoc_export_csv, "pdg.csv")
+        query_time_dict["pdg_app/to_export_csv: apoc_export_csv" + trace_id] = round(
+            time.time() - query_start_time, 3
+        )
+
+    logger.info("res=" + str(res))
+
+    logger.info("[TRACE] to_export_csv end " + str(trace_id) + " " + str(time.time()))
+    return redirect(url_for("static", filename="dumping_grounds/pdg.csv"))
+
+
+@web_app.route("/export_to_graphml")
+def to_export_graphml() -> werkzeug.Response:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info(
+        "[TRACE] to_export_graphml start " + str(trace_id) + " " + str(time.time())
+    )
+    query_time_dict = {}  # type: query_timing_result_type
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        res = session.read_transaction(neo4j_query.apoc_export_graphml, "pdg.graphml")
+        query_time_dict["pdg_app/to_export_graphml: apoc_export_graphml" + trace_id] = (
+            round(time.time() - query_start_time, 3)
+        )
+
+    logger.info("res=" + str(res))
+
+    logger.info(
+        "[TRACE] to_export_graphml end " + str(trace_id) + " " + str(time.time())
+    )
+    return redirect(url_for("static", filename="dumping_grounds/pdg.graphml"))
 
 
 @web_app.route("/export_to_cypher")
@@ -7132,12 +7181,14 @@ def to_export_cypher() -> werkzeug.Response:
     logger.info(
         "[TRACE] to_export_cypher start " + str(trace_id) + " " + str(time.time())
     )
-    # query_time_dict = {}  # type: query_timing_result_type
+    query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
+        query_start_time = time.time()
         res = session.read_transaction(neo4j_query.apoc_export_cypher, "pdg.cypher")
-        # query_time_dict["pdg_app/: "] = round(time.time() - query_start_time, 3)
+        query_time_dict["pdg_app/to_export_cypher: apoc_export_cypher" + trace_id] = (
+            round(time.time() - query_start_time, 3)
+        )
 
     logger.info("res=" + str(res))
     # <Record file='all.cypher' batches=1 source='database: nodes(4), rels(0)' format='cypher' nodes=4 relationships=0 properties=16 time=13 rows=4 batchSize=20000>
