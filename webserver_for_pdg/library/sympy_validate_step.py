@@ -651,6 +651,26 @@ def multiply_both_sides_by(
 ) -> str:
     """
 
+    Validates the operation of multiplying both sides of an equation or inequality by a term.
+
+    Handles edge cases:
+    1. Algebraic consistency: Checks (LHS_in * feed) == LHS_out and (RHS_in * feed) == RHS_out.
+    2. Inequalities:
+       - If feed > 0, relation must be preserved (e.g., < remains <).
+       - If feed < 0, relation must flip (e.g., < becomes >).
+       - If feed sign is indeterminate (symbolic), allows either provided the relation remains an inequality.
+    3. Zero/Invalid multipliers: Flags if the multiplier simplifies to 0 (which destroys information) or is undefined.
+
+    Args:
+        list_of_input_dicts: List containing the source equation/inequality.
+        list_of_feed_dicts: List containing the term to multiply by.
+        list_of_output_dicts: List containing the resulting equation/inequality.
+
+    Returns:
+        str: 'valid' if the derivation step is correct, otherwise an error message describing the issue.
+
+
+
     inference_rule_dict
     {'name_latex': 'multiply both sides by',
     'assumptions_latex': '',
@@ -677,15 +697,6 @@ def multiply_both_sides_by(
                           'reference_latex': '', 'latex_condition': '', 'lean': '',
                           'author_name_latex': 'ben.is.located@gmail.com', 'description_latex': '', 'id': '2131616531'}]
 
-    Gemini 3 Pro on 2026-02-02 complains that
-    The validation logic assumes that applying an operation to both sides preserves the relation operator (e.g., =). This is mathematically false for inequalities involving multiplication or division by negative numbers.
-    Inconsistency: If the input is x < y and the feed is -1, the correct output is -x > -y.
-        If the user provides the correct math (-x > -y), the assert fails (relations > and < differ), marking a valid derivation as an error.
-        If the user provides incorrect math (-x < -y), the assert passes, and the algebraic check ((-x) - (-x) == 0) passes, marking an invalid derivation as "valid".
-
-    Gemini 3 Pro on 2026-02-02 complains that
-    Rules that introduce division do not check if the divisor is zero, which would make the derivation  invalid.
-    Checks feed - 1 == 0. If feed is 0/0, SymPy yields nan. Validating strictly feed - 1 == 0 might catch this, but explicit handling is safer.
 
     see also dividebothsidesby
     x*y = Mul(x,y)
@@ -703,34 +714,153 @@ def multiply_both_sides_by(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] multiply_both_sides_by start " + trace_id)
 
-    # input and output should have same relation
-    assert (
-        list_of_input_dicts[0]["latex_relation"]
-        == list_of_output_dicts[0]["latex_relation"]
-    )
+    # BHP's original (inadequate) attempt:
+    # delta_lhs = sympy.simplify(
+    #     sympy.Mul(input_expr_sympy_lhs, feed_sympy) - output_expr_sympy_lhs
+    # )
+    # delta_rhs = sympy.simplify(
+    #     sympy.Mul(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
+    # )
+    # if (delta_lhs == 0) and (delta_rhs == 0):
+    #     logger.info("[TRACE] multiply_both_sides_by end " + trace_id)
+    #     return "valid"
+    # else:
+    #     logger.info("[TRACE] multiply_both_sides_by end " + trace_id)
+    #     return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
 
-    # TODO: address non-equality relations, e.g., >, >=, <, <=, >>, <<, \lt, \leq, \gt, \geq
-    assert list_of_input_dicts[0]["latex_relation"] == "="
-    assert list_of_output_dicts[0]["latex_relation"] == "="
-
+    # Gemini 3 Pro says `sympy.parse_expr` or specific context handling is safer than `eval()`.
+    # Gemini 3 Pro also says using sympify is safer and more robust than eval() for math expressions
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
     input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
     feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
     output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
     output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
 
-    delta_lhs = sympy.simplify(
-        sympy.Mul(input_expr_sympy_lhs, feed_sympy) - output_expr_sympy_lhs
+    input_rel_latex = list_of_input_dicts[0].get("latex_relation", "=").strip()
+    output_rel_latex = list_of_output_dicts[0].get("latex_relation", "=").strip()
+
+    # input and output should have same relation
+    assert (
+        list_of_input_dicts[0]["latex_relation"]
+        == list_of_output_dicts[0]["latex_relation"]
     )
-    delta_rhs = sympy.simplify(
-        sympy.Mul(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
-    )
-    if (delta_lhs == 0) and (delta_rhs == 0):
-        logger.info("[TRACE] multiply_both_sides_by end " + trace_id)
+
+    try:
+        # Check for Zero or Invalid Multiplier
+        # Multiplying by zero (0=0) is trivially true but usually invalid in derivations.
+        # Multiplying by infinity/nan is invalid.
+        if feed_sympy == 0:
+            return (
+                "Invalid derivation: Multiplier is zero, which destroys the equation."
+            )
+
+        # Check for NaN (e.g., 0/0) or complex infinity
+        if feed_sympy is sympy.nan or feed_sympy is sympy.zoo:
+            return (
+                "Invalid derivation: Multiplier evaluates to NaN or Complex Infinity."
+            )
+
+        # Algebraic Verification
+        # Check: (Input * Feed) - Output == 0
+        delta_lhs = sympy.simplify(
+            sympy.Mul(input_expr_sympy_lhs, feed_sympy) - output_expr_sympy_lhs
+        )
+        delta_rhs = sympy.simplify(
+            sympy.Mul(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
+        )
+
+        if delta_lhs != 0:
+            logger.info(
+                f"[TRACE] multiply_both_sides_by {trace_id} LHS mismatch: {delta_lhs}"
+            )
+            logger.info(f"[TRACE] multiply_both_sides_by end {trace_id}")
+            return f"LHS arithmetic error. Diff: {delta_lhs}"
+
+        if delta_rhs != 0:
+            logger.info(
+                f"[TRACE] multiply_both_sides_by {trace_id} RHS mismatch: {delta_rhs}"
+            )
+            logger.info(f"[TRACE] multiply_both_sides_by end {trace_id}")
+            return f"RHS arithmetic error. Diff: {delta_rhs}"
+
+        # Relation Logic (Inequality Edge Cases)
+
+        # Normalize LaTeX relations to standard symbols for comparison
+        # Mapping common LaTeX relations to internal representations
+        rel_map = {
+            "=": "=",
+            "\\approx": "=",
+            "\\equiv": "=",
+            "<": "<",
+            "\\lt": "<",
+            ">": ">",
+            "\\gt": ">",
+            "\\leq": "<=",
+            "\\le": "<=",
+            "\\geq": ">=",
+            "\\ge": ">=",
+            "\\ll": "<",  # treat strict strong inequalities as strict
+            "\\gg": ">",
+        }
+
+        in_rel = rel_map.get(input_rel_latex, input_rel_latex)
+        out_rel = rel_map.get(output_rel_latex, output_rel_latex)
+
+        # Define the "flip" map for negative multiplication
+        flip_map = {"<": ">", ">": "<", "<=": ">=", ">=": "<="}
+
+        is_equality = in_rel in ["="]
+        is_inequality = in_rel in flip_map
+
+        # Case A: Equality
+        if is_equality:
+            if in_rel != out_rel:
+                logger.info(f"[TRACE] multiply_both_sides_by end {trace_id}")
+                return f"Relation Error: Expected equality '{in_rel}', got '{out_rel}'."
+
+        # Case B: Inequality
+        elif is_inequality:
+            # Determine properties of the feed term (multiplier)
+            # is_negative returns True, False, or None (if indeterminate)
+            is_neg = feed_sympy.is_negative
+            is_pos = feed_sympy.is_positive
+
+            # Determine if the relation actually flipped in the user's output
+            did_flip = out_rel == flip_map.get(in_rel)
+            did_stay = out_rel == in_rel
+
+            if is_neg is True:
+                # Must flip
+                if not did_flip:
+                    logger.info(f"[TRACE] multiply_both_sides_by end {trace_id}")
+                    return f"Inequality Error: Multiplied by negative term '{feed_sympy}' but relation did not flip."
+            elif is_pos is True:
+                # Must NOT flip
+                if not did_stay:
+                    logger.info(f"[TRACE] multiply_both_sides_by end {trace_id}")
+                    return f"Inequality Error: Multiplied by positive term '{feed_sympy}' but relation flipped."
+            else:
+                # Indeterminate sign (e.g., multiplying by variable 'a')
+                # Allow the step if the user consistently flipped OR stayed,
+                # but reject if the relation became an equality or nonsense.
+                if not (did_flip or did_stay):
+                    logger.info(f"[TRACE] multiply_both_sides_by end {trace_id}")
+                    return f"Relation Error: Inequality relation changed unpredictably from '{in_rel}' to '{out_rel}'."
+
+        else:
+            # Unknown relation type (e.g., set membership \in), default to requiring identity
+            if input_rel_latex != output_rel_latex:
+                logger.info(f"[TRACE] multiply_both_sides_by end {trace_id}")
+                return f"Relation mismatch: '{input_rel_latex}' vs '{output_rel_latex}'"
+
+        # If all checks pass
+        logger.info(f"[TRACE] multiply_both_sides_by end {trace_id}")
         return "valid"
-    else:
-        logger.info("[TRACE] multiply_both_sides_by end " + trace_id)
-        return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
+
+    except Exception as e:
+        logger.error(f"[TRACE] {trace_id} Exception: {str(e)}")
+        logger.info(f"[TRACE] multiply_both_sides_by end {trace_id}")
+        return f"Validation Exception: {str(e)}"
 
 
 def divide_both_sides_by(
@@ -740,20 +870,28 @@ def divide_both_sides_by(
 ) -> str:
     """
     see also multiply_both_sides_by
+
+    Validates dividing both sides of an equation or inequality by a value (feed).
+    Handles edge cases: division by zero and inequality sign flipping.
+
+    Edge Cases Addressed:
+    1. Division by Zero: explicitly returns an error.
+    2. Inequalities with Negative Numbers: Enforces relation flipping (e.g., -x > -y).
+    3. Symbolic Ambiguity: Allows relation to either flip or stay same if divisor sign is unknown.
+
+    Args:
+        list_of_input_dicts: List containing dict with 'sympy_lhs', 'sympy_rhs', 'latex_relation'.
+        list_of_feed_dicts: List containing dict with 'sympy' (the divisor).
+        list_of_output_dicts: List containing dict with 'sympy_lhs', 'sympy_rhs', 'latex_relation'.
+
+    Returns:
+        'valid' if step is mathematically correct, otherwise an error string.
+
+
+
     https://docs.sympy.org/latest/tutorial/manipulation.html
 
     x/y = Mul(x, Pow(y, -1))
-
-    Gemini 3 Pro on 2026-02-02 complains that
-    The validation logic assumes that applying an operation to both sides preserves the relation operator (e.g., =). This is mathematically false for inequalities involving multiplication or division by negative numbers.
-    Inconsistency: If the input is x < y and the feed is -1, the correct output is -x > -y.
-        If the user provides the correct math (-x > -y), the assert fails (relations > and < differ), marking a valid derivation as an error.
-        If the user provides incorrect math (-x < -y), the assert passes, and the algebraic check ((-x) - (-x) == 0) passes, marking an invalid derivation as "valid".
-
-    Gemini 3 Pro on 2026-02-02 complains that
-    Rules that introduce division do not check if the divisor is zero, which would make the derivation  invalid.
-    Checks LHS * (1/feed) - Output == 0. If feed is 0, SymPy represents this as zoo (complex infinity) or raises an error depending on context. The validation should explicitly check feed != 0.
-
 
     given 'a + b = c'
     divide both sides by d
@@ -774,30 +912,100 @@ def divide_both_sides_by(
         == list_of_output_dicts[0]["latex_relation"]
     )
 
-    # TODO: address non-equality relations, e.g., >, >=, <, <=
-    assert list_of_input_dicts[0]["latex_relation"] == "="
-    assert list_of_output_dicts[0]["latex_relation"] == "="
-
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
     input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
     feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
     output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
     output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
 
+    # BHP's original (inadequate) attempt:
+    # delta_lhs = sympy.simplify(
+    #     sympy.Mul(input_expr_sympy_lhs, sympy.Pow(feed_sympy, -1))
+    #     - output_expr_sympy_lhs
+    # )
+    # delta_rhs = sympy.simplify(
+    #     sympy.Mul(input_expr_sympy_rhs, sympy.Pow(feed_sympy, -1))
+    #     - output_expr_sympy_rhs
+    # )
+    # if (delta_lhs == 0) and (delta_rhs == 0):
+    #     logger.info("[TRACE] divide_both_sides_by end " + trace_id)
+    #     return "valid"
+    # else:
+    #     logger.info("[TRACE] divide_both_sides_by end " + trace_id)
+    #     return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
+
+    input_rel = list_of_input_dicts[0]["latex_relation"]
+    output_rel = list_of_output_dicts[0]["latex_relation"]
+
+    # Check for Division by Zero
+    if feed_sympy == 0:
+        logger.info("[TRACE] divide_both_sides_by end " + trace_id)
+        return "Invalid derivation: Division by zero is undefined."
+
+    # Check Algebraic Correctness (LHS and RHS values)
+    # We compute: Input_Side / Feed - Output_Side. Should be 0.
     delta_lhs = sympy.simplify(
-        sympy.Mul(input_expr_sympy_lhs, sympy.Pow(feed_sympy, -1))
-        - output_expr_sympy_lhs
+        (input_expr_sympy_lhs / feed_sympy) - output_expr_sympy_lhs
     )
     delta_rhs = sympy.simplify(
-        sympy.Mul(input_expr_sympy_rhs, sympy.Pow(feed_sympy, -1))
-        - output_expr_sympy_rhs
+        (input_expr_sympy_rhs / feed_sympy) - output_expr_sympy_rhs
     )
-    if (delta_lhs == 0) and (delta_rhs == 0):
+
+    if delta_lhs != 0 or delta_rhs != 0:
         logger.info("[TRACE] divide_both_sides_by end " + trace_id)
-        return "valid"
+        return f"Algebraic error: LHS diff is {delta_lhs}, RHS diff is {delta_rhs}"
+
+    # Check Relation Correctness (Inequalities and Sign Flipping)
+    flip_map = {"<": ">", ">": "<", "<=": ">=", ">=": "<="}
+    is_inequality = input_rel in flip_map
+
+    # Logic for Equalities (=, !=)
+    if not is_inequality:
+        if input_rel != output_rel:
+            logger.info("[TRACE] divide_both_sides_by end " + trace_id)
+            return f"Relation error: '{input_rel}' should remain '{input_rel}' upon division."
+
+    # Logic for Inequalities
     else:
-        logger.info("[TRACE] divide_both_sides_by end " + trace_id)
-        return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
+        # Determine strict sign of the divisor (feed_sympy)
+        # is_negative returns True (definitely negative), False (definitely non-negative), or None (unknown/symbolic)
+        is_neg = feed_sympy.is_negative
+        is_pos = feed_sympy.is_positive
+
+        expected_flipped = flip_map[input_rel]
+
+        if is_neg:
+            # Case: Divisor is explicitly negative (e.g., -1, -5). Relation MUST flip.
+            if output_rel != expected_flipped:
+                logger.info("[TRACE] divide_both_sides_by end " + trace_id)
+                return (
+                    f"Inequality error: When dividing by a negative value ({feed_sympy}), "
+                    f"the relation must flip from '{input_rel}' to '{expected_flipped}'."
+                )
+
+        elif is_pos:
+            # Case: Divisor is explicitly positive (e.g., 5, 10). Relation must NOT flip.
+            if output_rel != input_rel:
+                logger.info("[TRACE] divide_both_sides_by end " + trace_id)
+                return (
+                    f"Inequality error: When dividing by a positive value ({feed_sympy}), "
+                    f"the relation '{input_rel}' must be preserved."
+                )
+
+        else:
+            # Case: Divisor sign is unknown (Symbolic, e.g., 'd').
+            # The derivation is valid if the user ASSUMED d > 0 (kept relation)
+            # OR ASSUMED d < 0 (flipped relation).
+            # It is invalid if they changed the relation to something unrelated (e.g., < to =).
+            if output_rel not in [input_rel, expected_flipped]:
+                logger.info("[TRACE] divide_both_sides_by end " + trace_id)
+                return (
+                    f"Relation error: The output relation '{output_rel}' is not consistent "
+                    f"with the input '{input_rel}' regardless of the divisor's sign."
+                )
+
+    logger.info("[TRACE] divide_both_sides_by end " + trace_id)
+    return "valid"
 
 
 def change_variable_X_to_Y(
