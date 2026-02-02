@@ -18,7 +18,7 @@
         display: inline;
       }
     </style>
-
+    {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
   </head>
 
 <!-- inserted by Ben on 2023-08-03, based on snippet from https://analytics.google.com/ -->
@@ -49,26 +49,26 @@
             <td width="300">
               Navigation:
               <OL>
-                <LI><a href="{{url_for('roadmap', which_layer="lecture")}}">lecture video</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="handwritten")}}">hand-written notes</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="latex")}}">Latex document</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='lecture')}}">lecture video</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='handwritten')}}">hand-written notes</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='latex')}}">Latex document</a></LI>
                 <LI>Content tags
                   <UL>
-                    <LI><a href="{{url_for('roadmap', which_layer="tag_sections")}}">section document structure</a></LI>
-                    <LI><a href="{{url_for('roadmap', which_layer="tag_words")}}">tagging words</a></LI>
-                    <LI><a href="{{url_for('roadmap', which_layer="tag_expressions")}}">expression semantics</a></LI>
+                    <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='tag_sections')}}">section document structure</a></LI>
+                    <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer="tag_words")}}">tagging words</a></LI>
+                    <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='tag_expressions')}}">expression semantics</a></LI>
                   </UL>
                 </LI>
-                <LI><a href="{{url_for('roadmap', which_layer="tag_all")}}">tags for sections and words and expressions</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="variables")}}">concepts to variables</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="all_steps")}}">all steps</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="pdg")}}">derivation graph</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="numeric_id")}}">replace symbols with numeric ID</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='tag_all')}}">tags for sections and words and expressions</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='variables')}}">concepts to variables</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='all_steps')}}">all steps</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='pdg')}}">derivation graph</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='numeric_id')}}">replace symbols with numeric ID</a></LI>
                 <LI><strong>validation of steps</strong></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="dimensional_validation")}}">validation of dimension</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="proof")}}">proof of inference rule</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='dimensional_validation')}}">validation of dimension</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='proof')}}">proof of inference rule</a></LI>
               </OL>
-              Back to <a href="{{url_for('roadmap', which_layer="overview")}}">layers overview</a><BR/>
+              Back to <a href="{{url_for('to_spectrum_of_precision_layer', which_layer='overview')}}">layers overview</a><BR/>
             </td>
           </tr>
         </table>

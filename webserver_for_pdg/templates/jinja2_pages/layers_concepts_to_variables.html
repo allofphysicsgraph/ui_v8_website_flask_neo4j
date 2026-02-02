@@ -15,7 +15,7 @@
         display: inline;
       }
     </style>
-
+    {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
   </head>
   <body>
 
@@ -28,7 +28,7 @@
           <tr>
             <td valign="top">
               <P>&nbsp;</P>
-              <P><em><strong>Explanation</strong></em>: Establishing the relation between keywords and symbols is distinct from <a href="{{url_for('roadmap', which_layer="tag_words")}}">tagging keywords</a> and identifying symbols.
+              <P><em><strong>Explanation</strong></em>: Establishing the relation between keywords and symbols is distinct from <a href="{{url_for('to_spectrum_of_precision_layer', which_layer="tag_words")}}">tagging keywords</a> and identifying symbols.
                 Not all symbols will have a related keyword, as the author may rely on the reader to grasp the relation between symbol \(\infty\) and <a href="https://en.wikipedia.org/wiki/Infinity">infinity</a>.
                 While some symbols like \(\infty\) are relatively standard, most symbols are overloaded. The context for a symbol may be only within a single paper.
                 <P>In this page the relation between "measure" and "symbol" pairs is illustrated visually. (The section, word, and expression tags have been suppressed for readability.) The underlying data structure for these relations could be a bipartite graph.
@@ -38,26 +38,26 @@
             <td width="300">
               Navigation:
               <OL>
-                <LI><a href="{{url_for('roadmap', which_layer="lecture")}}">lecture video</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="handwritten")}}">hand-written notes</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="latex")}}">Latex document</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='lecture')}}">lecture video</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='handwritten')}}">hand-written notes</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='latex')}}">Latex document</a></LI>
                 <LI>Content tags
                   <UL>
-                    <LI><a href="{{url_for('roadmap', which_layer="tag_sections")}}">section document structure</a></LI>
-                    <LI><a href="{{url_for('roadmap', which_layer="tag_words")}}">tagging words</a></LI>
-                    <LI><a href="{{url_for('roadmap', which_layer="tag_expressions")}}">expression semantics</a></LI>
+                    <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='tag_sections')}}">section document structure</a></LI>
+                    <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer="tag_words")}}">tagging words</a></LI>
+                    <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='tag_expressions')}}">expression semantics</a></LI>
                   </UL>
                 </LI>
-                <LI><a href="{{url_for('roadmap', which_layer="tag_all")}}">tags for sections and words and expressions</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='tag_all')}}">tags for sections and words and expressions</a></LI>
                 <LI><strong>concepts to variables</strong></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="all_steps")}}">all steps</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="pdg")}}">derivation graph</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="numeric_id")}}">replace symbols with numeric ID</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="CAS_validation")}}">validation of steps</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="dimensional_validation")}}">validation of dimension</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="proof")}}">proof of inference rule</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='all_steps')}}">all steps</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='pdg')}}">derivation graph</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='numeric_id')}}">replace symbols with numeric ID</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='CAS_validation')}}">validation of steps</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='dimensional_validation')}}">validation of dimension</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='proof')}}">proof of inference rule</a></LI>
               </OL>
-              Back to <a href="{{url_for('roadmap', which_layer="overview")}}">layers overview</a><BR/>
+              Back to <a href="{{url_for('to_spectrum_of_precision_layer', which_layer='overview')}}">layers overview</a><BR/>
             </td>
           </tr>
         </table>

@@ -15,7 +15,7 @@
         display: inline;
       }
     </style>
-
+    {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
   </head>
   <body>
 
@@ -26,36 +26,36 @@
       <center>
         <table border="1" width="80%">
           <tr>
-            <td valign="top"><P>&nbsp;</P><P><em><strong>Explanation</strong></em>: While the tagging of content in a Latex document (e.g., <a href="{{url_for('roadmap', which_layer="tag_sections")}}">sections</a>, <a href="{{url_for('roadmap', which_layer="tag_words")}}">words</a>, <a href="{{url_for('roadmap', which_layer="tag_expressions")}}">expressions</a>) can be useful for linking and searches,
+            <td valign="top"><P>&nbsp;</P><P><em><strong>Explanation</strong></em>: While the tagging of content in a Latex document (e.g., <a href="{{url_for('to_spectrum_of_precision_layer', which_layer='tag_sections')}}">sections</a>, <a href="{{url_for('to_spectrum_of_precision_layer', which_layer="tag_words")}}">words</a>, <a href="{{url_for('to_spectrum_of_precision_layer', which_layer='tag_expressions')}}">expressions</a>) can be useful for linking and searches,
               there are many implied steps in <a href="">the original Latex document</a> that are undocumented.
               The Physics Derivation Graph is a way to document all the implied steps and
               their associated inference rules.
               <P><em>Who does the work</em>: manual entry using a webform.
-              <P><em>Motivation for the work</em>: clearer connectivity of derivation steps. Enables <a href="{{url_for('roadmap', which_layer="CAS_validation")}}">validation of steps</a>.
+              <P><em>Motivation for the work</em>: clearer connectivity of derivation steps. Enables <a href="{{url_for('to_spectrum_of_precision_layer', which_layer='CAS_validation')}}">validation of steps</a>.
             </td>
             <td width="300">
               Navigation:
               <OL>
-                <LI><a href="{{url_for('roadmap', which_layer="lecture")}}">lecture video</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="handwritten")}}">hand-written notes</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="latex")}}">Latex document</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='lecture')}}">lecture video</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='handwritten')}}">hand-written notes</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='latex')}}">Latex document</a></LI>
                 <LI>Content tags
                   <UL>
-                    <LI><a href="{{url_for('roadmap', which_layer="tag_sections")}}">section document structure</a></LI>
-                    <LI><a href="{{url_for('roadmap', which_layer="tag_words")}}">tagging words</a></LI>
-                    <LI><a href="{{url_for('roadmap', which_layer="tag_expressions")}}">expression semantics</a></LI>
+                    <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='tag_sections')}}">section document structure</a></LI>
+                    <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer="tag_words")}}">tagging words</a></LI>
+                    <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='tag_expressions')}}">expression semantics</a></LI>
                   </UL>
                 </LI>
-                <LI><a href="{{url_for('roadmap', which_layer="tag_all")}}">tags for sections and words and expressions</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="variables")}}">concepts to variables</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="all_steps")}}">all steps</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='tag_all')}}">tags for sections and words and expressions</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='variables')}}">concepts to variables</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='all_steps')}}">all steps</a></LI>
                 <LI><strong>derivation graph</strong></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="numeric_id")}}">replace symbols with numeric ID</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="CAS_validation")}}">validation of steps</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="dimensional_validation")}}">validation of dimension</a></LI>
-                <LI><a href="{{url_for('roadmap', which_layer="proof")}}">proof of inference rule</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='numeric_id')}}">replace symbols with numeric ID</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='CAS_validation')}}">validation of steps</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='dimensional_validation')}}">validation of dimension</a></LI>
+                <LI><a href="{{url_for('to_spectrum_of_precision_layer', which_layer='proof')}}">proof of inference rule</a></LI>
               </OL>
-              Back to <a href="{{url_for('roadmap', which_layer="overview")}}">layers overview</a><BR/>
+              Back to <a href="{{url_for('to_spectrum_of_precision_layer', which_layer='overview')}}">layers overview</a><BR/>
             </td>
           </tr>
         </table>
@@ -98,7 +98,7 @@
       <!-- from https://jameshfisher.com/2017/08/30/how-do-i-make-a-full-width-iframe/ -->
       <div>
         <div style="position:relative;padding-top:56.25%;">
-          <iframe src="https://derivationmap.net/review_derivation/374317/?referrer=layers_derivation_graph" frameborder="0" allowfullscreen
+          <iframe src="https://derivationmap.net/review_derivation/374317?referrer=layers_derivation_graph" frameborder="0" allowfullscreen
             style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
         </div>
       </div>
