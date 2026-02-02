@@ -7486,16 +7486,16 @@ def to_literature_review():
     )
 
 
-@web_app.route("/site_map", methods=["GET", "POST"])
-@web_app.route("/documentation/site_map", methods=["GET", "POST"])
-def to_site_map():
-    """
-    a static page for site content
+# @web_app.route("/site_map", methods=["GET", "POST"])
+# @web_app.route("/documentation/site_map", methods=["GET", "POST"])
+# def to_site_map():
+#     """
+#     a static page for site content
 
-    >>> static_map()
-    """
-    logger.info("[TRACE] ")
-    return render_template("jinja2_pages/site_map.html", title="Site Map")
+#     >>> static_map()
+#     """
+#     logger.info("[TRACE] ")
+#     return render_template("jinja2_pages/site_map.html", title="Site Map")
 
 
 ###########################################################################
