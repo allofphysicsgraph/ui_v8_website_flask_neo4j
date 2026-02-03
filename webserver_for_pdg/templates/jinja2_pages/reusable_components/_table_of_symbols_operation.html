@@ -1,7 +1,7 @@
 <!--
 <P>For debugging purposes, here is the all the info available:
 
-<!- - { { list_of_symbol_dicts } } - ->
+<!- - { { list_of_operation_dicts } } - ->
 
 <ul>
 { % for this_symbol_dict in list_of_operation_dicts %}
@@ -54,7 +54,7 @@
         {% endfor %}
         </UL>
     </td> <!-- used in derivation -->
-    <td>{{ symbol_dict['symbol_reference'] }}</td>
+    <td>{{ symbol_dict['reference_latex'] }}</td>
   </tr>
   {% endfor %}
 </table>
