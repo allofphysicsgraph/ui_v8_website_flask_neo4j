@@ -1,7 +1,52 @@
 
+cypher export does not produce a consistent order. As a result, diff isn't feasible
+
 ---
 
-Which architecture (x86, arm) does pdg build on?
+hyperbolic secant function is defined as the reciprocal of the hyperbolic cosine function
+
+Edits to operations do not take effecthttps://localhost/list_operations
+
+---
+
+Including a reference when adding an operation does not take effect
+https://localhost/list_operations
+
+---
+
+email alerts - https://github.com/allofphysicsgraph/task-tracker/issues/137
+
+---
+
+Display the AST for equation review
+
+---
+
+add column for status on other projects for categories like active, idle, unavailable
+
+---
+
+Move content out of "todo.md"
+
+---
+
+validates lean capability using T, f
+https://github.com/allofphysicsgraph/task-tracker/issues/105
+
+---
+
+Enter a novel derivation
+
+---
+
+(manually) eliminate all errors on webpageshttps://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues?q=is%3Aissue%20state%3Aopen%20type%3ABug
+write tests to validate that on front-end and back-end
+Use selenium to automate opening all pages from site map
+
+---
+
+write tests for API
+authenticate for API writes
 
 ---
 
@@ -15,6 +60,8 @@ Create a function in the compute library that creates a list of all symbol dicti
 In the compute library, create a function that converts a list of dictionaries into a dictionary dictionaries, with key of ID
 
 ---
+
+List of symbol dicts in this derivation would be useful to display both in the derivation review step list as well as the entering a new step review
 
 For each derivation, list all of the symbols and operations used in that derivation
 
@@ -89,9 +136,11 @@ https://lists.informatik.uni-erlangen.de/mailman/listinfo/sigmathling
 
 ---
 
-TODO: Document how each inference rule operates on ASTs
+Document how each inference rule operates on ASTs
 
-TO INVESTIGATE: In the corpus, are there tuples or triples of inference rules that imply a larger inference rule?
+---
+
+Are there tuples or triples of inference rules that imply a larger inference rule?
 
 ---
 
@@ -137,6 +186,8 @@ what errors does PDG address?
 Here's a list
 <https://math.vanderbilt.edu/schectex/commerrs/>
 <https://news.ycombinator.com/item?id=25135418>
+
+---
 
 
 EOF
