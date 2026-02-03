@@ -23,7 +23,7 @@
   Contributions to the project are welcome; see <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/CONTRIBUTING.md">CONTRIBUTING.md</a> on how to get started.
   The Physics Derivation Graph is covered by the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>, so if you don't like a choice that was made you are welcome to <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/fork">fork the Physics Derivation Graph project</a>.
 
-<h1>Design Principles Documentation for the Physics Derivation Graph</h1>
+<h1 id="principles">Design Principles Documentation for the Physics Derivation Graph</h1>
 
 <P>This page enumerates design principles and goals for the Physics Derivation Graph (PDG).<BR>
   The list is unordered.
@@ -154,30 +154,29 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: Which Computer Algebra System(s) to use?</H2>
+<H2><a name="which cas"><i>Decision</i>: Which Computer Algebra System(s) to use?</H2>
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/117">https://github.com/allofphysicsgraph/task-tracker/issues/117</a></p>
 
-<p>Mathematica, MathCad, Sage</p>
+<p>See <a href="{{ url_for('to_comparison_of_design_options_cas') }}">comparison of CAS like Mathematica, MathCad, Sage</a>.</p>
 
 <P>&nbsp;</P>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: Which proof assistant(s) to use?</H2>
+<H2><a name="which proof assistant"><i>Decision</i>: Which proof assistant(s) to use?</H2>
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/106">https://github.com/allofphysicsgraph/task-tracker/issues/106</a></p>
 
-<p>COQ, Isabelle, Lean</p>
+<p>See <a href="{{ url_for('to_comparison_of_design_options_proofs') }}">comparison of Rocq, Isabelle, Lean</a></p>
 
 <P>&nbsp;</P>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: How to represent expressions?</H2>
+<H2><a name="which syntax"><i>Decision</i>: How to represent expressions?</H2>
 
-<p>Latex, Content MathML, Presentation ML, Mathematica,&nbsp;</p>
-
+<p>See <a href="{{ url_for('to_comparison_of_design_options_syntax') }}">comparison of Latex, Content MathML, Presentation ML</a></p>
 
 <P>&nbsp;</P>
 <HR/>
@@ -193,9 +192,22 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
+<H2><a name=""><i>Decision</i>: Which data structure?</H2>
+
+<p>See <a href="{{ url_for('to_comparison_of_design_options_database') }}">comparison of txt, XML, CSV, SQL, property graph</a></p>
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
 <H2><a name=""><i>Decision</i>: Which Property Graph database?</H2>
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/43">https://github.com/allofphysicsgraph/task-tracker/issues/43</a></p>
+
+<p>See <a href="{{ url_for('to_comparison_of_design_options_database') }}">comparison of Neo4j</a></p>
+
+
 
 <P>&nbsp;</P>
 <HR/>
