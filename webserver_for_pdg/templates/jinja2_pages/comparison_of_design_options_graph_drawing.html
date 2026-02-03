@@ -82,20 +82,20 @@
   <P>http://jsplumbtoolkit.com/demo/home/dom.html
 
 
-<H2 id="">GraphViz</H2>
+<H2 id="graphviz">GraphViz</H2>
 <P>produces static output (cannot be manipulated through GUI)
 <P>https://en.wikipedia.org/wiki/Graphviz
   <P><a href="https://en.wikipedia.org/wiki/DOT_(graph_description_language)">https://en.wikipedia.org/wiki/DOT_(graph_description_language)</a>
   <P>http://www.graphviz.org/
 
-<H2 id="">Gephi</H2>
+<H2 id="gephi">Gephi</H2>
   <P>meant for analysis of graph properties, not graph manipulation
   <P>https://gephi.org/
   <P>https://gephi.org/users/supported-graph-formats/
     <P>GEXF, GDF, GML, GraphML, Pajek NET, GraphViz DOT, CSV, UCINET DL, Tulip TPL, Netdraw VNA, Spreadsheet
   <P>pictures as nodes:
     <P>https://gephi.org/plugins/image-preview/
-<H2 id="">yEd</H2>
+<H2 id="yEd">yEd</H2>
   <P>good for editing the visual graph. Offers multiple layout options
   <P>https://en.wikipedia.org/wiki/YEd
   <P>http://www.yworks.com/en/products_yed_download.html
@@ -103,19 +103,27 @@
   <P>pictures (SVG) as nodes:
     <P>http://yed.yworks.com/support/qa/48/how-can-i-use-my-own-node-symbols-in-yed
     <P>http://yed.yworks.com/support/qa/7/can-i-use-latex-to-format-labels
-<H2 id="">Dia</H2>
+<H2 id="Dia">Dia</H2>
   <P>doesn't support force-based layout. 
   <P>http://live.gnome.org/Dia/
   <P>http://projects.gnome.org/dia/
   <P>https://en.wikipedia.org/wiki/Dia_(software)
-<H2 id="">Calligra Flow (formerly Kivio)</H2>
+<H2 id="Calligra">Calligra Flow (formerly Kivio)</H2>
   <P>https://en.wikipedia.org/wiki/Calligra_Flow
   <P>http://www.calligra.org/get-calligra/
-<H2 id="">Processing</H2>
+<H2 id="processing">Processing</H2>
   <P>Example of Pre-existing graph: http://www.openprocessing.org/visuals/?visualID=9379
   <P>would need to use pictures for nodes instead of Latex
     <P>See <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/sandbox/processing">https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/sandbox/processing</a>
 
-  
+<H2 id="NetworkX">NetworkX</H2>
+<P>See <a href="{{ url_for('to_comparison_of_design_options_database') }}#networkx">NetworkX on database options</a>
+
+<H2 id="bokeh">Bokeh</H2>
+
+<P>Bokeh seems to support Latex via MathJax (see <a href="https://docs.bokeh.org/en/latest/docs/user_guide/styling.html#adding-mathematical-notations">https://docs.bokeh.org/en/latest/docs/user_guide/styling.html#adding-mathematical-notations</a>) but not for node labels on graphs.
+
+<P><a href="https://docs.bokeh.org/en/latest/docs/reference/models/graphs.html">https://docs.bokeh.org/en/latest/docs/reference/models/graphs.html</a>
+
 
 {% endblock %}
