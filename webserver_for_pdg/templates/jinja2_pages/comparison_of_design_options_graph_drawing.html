@@ -1,0 +1,118 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
+<h1>Comparison of Graph Drawing Options for the Physics Derivation Graph</h1>
+
+<P><a href="{{ url_for('to_navigation') }}?referrer=comparison_of_CAS">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=comparison_of_CAS">documentation overview</a> / 
+   <a href="{{ url_for('to_design_documentation') }}?referrer=comparison_of_syntax">design choices</a> /
+   Graph drawing comparison
+
+<P>
+  <em>Recommendation</em>: Read the
+  <a href="{{ url_for('to_user_documentation') }}?referrer=comparison_of_CAS">user documentation</a>
+  and <a href="{{ url_for('to_faq') }}?referrer=comparison_of_CAS">FAQ</a> first.
+  This page assumes familiarity with the <a href="{{ url_for('to_conventions_documentation') }}?referrer=comparison_of_CAS">jargon</a> used in the Physics Derivation Graph.
+</P>
+
+<P><em>Constraints</em>: Graph drawing that is free and open source. (See <a href="{{ url_for('to_design_documentation') }}#principles">Design Principles</a>.)
+
+<P>d3js and graphviz are currently used.
+
+<P>See <a href="https://en.wikipedia.org/wiki/Diagramming_software">https://en.wikipedia.org/wiki/Diagramming_software</a>
+
+<H2 id="jsplumbtoolkit"><a href="https://jsplumbtoolkit.com/">https://jsplumbtoolkit.com/</a></H2>
+
+<P><a href="https://github.com/jsplumb/community-edition">https://github.com/jsplumb/community-edition</a>
+
+<P>Used by <a href="https://pythontutor.com/visualize.html#mode=display">https://pythontutor.com/visualize.html#mode=display</a>
+
+<P>Write-up: <a href="https://pg.ucsd.edu/publications/Online-Python-Tutor-web-based-program-visualization_SIGCSE-2013.pdf">https://pg.ucsd.edu/publications/Online-Python-Tutor-web-based-program-visualization_SIGCSE-2013.pdf</a>
+
+<H2 id="gephi"><a href="https://gephi.org/gephi-lite/">https://gephi.org/gephi-lite/</a></H2>
+
+<P>See <a href="https://github.com/allofphysicsgraph/task-tracker/issues/65">https://github.com/allofphysicsgraph/task-tracker/issues/65</a>
+
+<P>Gephi has a web interface that provides intuitive interactive creation of nodes and edges
+
+<P>Gephi uses a custom format, https://gexf.net/, and Neo4j has a plugin for exporting to gexf:
+<a href="https://neo4j.com/labs/apoc/4.2/export/gephi/">https://neo4j.com/labs/apoc/4.2/export/gephi/</a><BR>
+<a href="https://neo4j.com/labs/apoc/5/import/gexf/">https://neo4j.com/labs/apoc/5/import/gexf/</a>
+
+
+<H2 id="gojs"><a href="https://gojs.net/latest/">https://gojs.net/latest/</a></H2>
+
+<P>As of Oct 2020, 3 year distribution: $3,495
+
+
+<H1 id="">open source, free browser-based graph rendering</H1>
+<P>See <a href="https://stackoverflow.com/questions/7034/graph-visualization-library-in-javascript">https://stackoverflow.com/questions/7034/graph-visualization-library-in-javascript</a>
+<H2 id="">JS-Graph-It</H2>
+  <P>http://js-graph-it.sourceforge.net/index.html
+<H2 id="">Cytoscape</H2>
+  <P>http://cytoscape.github.io/cytoscape.js/
+  <P>https://github.com/cytoscape/cytoscape.js
+  <P>supports pictures as nodes: http://jsbin.com/kahar/6/edit
+<H2 id="">Dracula</H2>
+  <P>http://www.graphdracula.net/
+  <P>supports PNG and SVG as nodes, see http://www.graphdracula.net/documentation/
+<H2 id="">Canviz</H2>
+  <P>https://code.google.com/p/canviz/
+<H2 id="">ArborJS</H2>
+  <P>http://arborjs.org/
+  <P>force-directed layout algorithm 
+<H2 id="">SigmaJS</H2>
+  <P>http://sigmajs.org/
+<H2 id="">D3JS</H2>
+  <P>http://d3js.org/
+<H2 id="">JointJS</H2>
+  <P>http://jointjs.com/download
+<H2 id="">Springy</H2>
+  <P>https://github.com/dhotson/springy
+  <P>http://dhotson.github.io/springy/demo.html
+<H2 id="">arbor</H2>
+  <P>https://github.com/samizdatco/arbor
+<H2 id="">Gilad</H2>
+  <P>http://giladlotan.com/html5-interactive-directed-graph/
+<H2 id="">large graph viz HTML5</H2>
+  <P>https://gitorious.org/web-based-large-graph-visualization-with-html-5/web-based-large-graph-visualization-with-html-5/source/HEAD:
+<H2 id="">JSPlumbToolkit</H2>
+  <P>http://jsplumbtoolkit.com/demo/home/dom.html
+
+
+<H2 id="">GraphViz</H2>
+<P>produces static output (cannot be manipulated through GUI)
+<P>https://en.wikipedia.org/wiki/Graphviz
+  <P><a href="https://en.wikipedia.org/wiki/DOT_(graph_description_language)">https://en.wikipedia.org/wiki/DOT_(graph_description_language)</a>
+  <P>http://www.graphviz.org/
+
+<H2 id="">Gephi</H2>
+  <P>meant for analysis of graph properties, not graph manipulation
+  <P>https://gephi.org/
+  <P>https://gephi.org/users/supported-graph-formats/
+    <P>GEXF, GDF, GML, GraphML, Pajek NET, GraphViz DOT, CSV, UCINET DL, Tulip TPL, Netdraw VNA, Spreadsheet
+  <P>pictures as nodes:
+    <P>https://gephi.org/plugins/image-preview/
+<H2 id="">yEd</H2>
+  <P>good for editing the visual graph. Offers multiple layout options
+  <P>https://en.wikipedia.org/wiki/YEd
+  <P>http://www.yworks.com/en/products_yed_download.html
+  <P>works with GraphML
+  <P>pictures (SVG) as nodes:
+    <P>http://yed.yworks.com/support/qa/48/how-can-i-use-my-own-node-symbols-in-yed
+    <P>http://yed.yworks.com/support/qa/7/can-i-use-latex-to-format-labels
+<H2 id="">Dia</H2>
+  <P>doesn't support force-based layout. 
+  <P>http://live.gnome.org/Dia/
+  <P>http://projects.gnome.org/dia/
+  <P>https://en.wikipedia.org/wiki/Dia_(software)
+<H2 id="">Calligra Flow (formerly Kivio)</H2>
+  <P>https://en.wikipedia.org/wiki/Calligra_Flow
+  <P>http://www.calligra.org/get-calligra/
+<H2 id="">Processing</H2>
+  <P>Example of Pre-existing graph: http://www.openprocessing.org/visuals/?visualID=9379
+  <P>would need to use pictures for nodes instead of Latex
+
+{% endblock %}
