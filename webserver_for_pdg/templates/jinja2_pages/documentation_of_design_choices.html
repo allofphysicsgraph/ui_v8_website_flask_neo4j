@@ -128,7 +128,7 @@ cat developer_documentation.html |\
 
 
 
-<H2><a name=""><i>Decision</i>: What constitutes "all known mathematical physics"?</H2>
+<H2 id=""><i>Decision</i>: What constitutes "all known mathematical physics"?</H2>
 
 <p>Dirac notation, calculus, differential equations, algebra, trigonometry.<br />
 Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
@@ -137,7 +137,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: What does "human-readable" mean?</H2>
+<H2 id=""><i>Decision</i>: What does "human-readable" mean?</H2>
 
 <p>Reasonable for a human to understand without use of specialized knowledge.<br />
 \int_0^{\infty} is not understandable to everyone, and neither is contentML</p>
@@ -146,7 +146,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: What does "checkable by CAS" mean?</H2>
+<H2 id=""><i>Decision</i>: What does "checkable by CAS" mean?</H2>
 
 <p>Just writing down symbols and expressions is not meaningful.</p>
 
@@ -182,7 +182,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: How to render graphs visually?</H2>
+<H2 id=""><i>Decision</i>: How to render graphs visually?</H2>
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/97">https://github.com/allofphysicsgraph/task-tracker/issues/97</a></p>
 
@@ -192,7 +192,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: Which data structure?</H2>
+<H2 id=""><i>Decision</i>: Which data structure?</H2>
 
 <p>See <a href="{{ url_for('to_comparison_of_design_options_database') }}">comparison of txt, XML, CSV, SQL, property graph</a></p>
 
@@ -201,7 +201,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: Which Property Graph database?</H2>
+<H2 id=""><i>Decision</i>: Which Property Graph database?</H2>
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/43">https://github.com/allofphysicsgraph/task-tracker/issues/43</a></p>
 
@@ -213,7 +213,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: Upgrade path from JSON/SQL to Neo4j</H2>
+<H2 id=""><i>Decision</i>: Upgrade path from JSON/SQL to Neo4j</H2>
 
 <p>I had ui_v7 for JSON/SQL and ui_v8 for Neo4j. The ui_v7 had a working implementation of Google authentication. I had trouble getting Google authentication working in ui_v8, and I didn't want to have to refactor all the static content from ui_v7, so I decided to create a new repo, "allofphysics.com".</p>
 
@@ -223,7 +223,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: Naming of repo</H2>
+<H2 id=""><i>Decision</i>: Naming of repo</H2>
   
 <p>I decided to name the repo "allofphysics.com" to make it clear which repo hosted the website on the Internet. Also, the alternative repo name "a mashup of v7 and v8" wasn't a good name, though it would have been more descriptive.
 </p>
@@ -234,7 +234,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: Page scope</H2>
+<H2 id=""><i>Decision</i>: Page scope</H2>
 
 <p>Rendered HTML pages should have a single scope. (As opposed to a single-page website.)</p>
 
@@ -242,7 +242,21 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: Which VPS provider service company to use?</H2>
+
+<H2 id=""><i>Decision</i>: How to display Latex on webpages?</H2>
+
+<UL>
+  <LI><a href="https://jojozhuang.github.io/tutorial/mathjax-cheat-sheet-for-mathematical-notation/">https://jojozhuang.github.io/tutorial/mathjax-cheat-sheet-for-mathematical-notation/</a>
+  <LI><a href="https://math.meta.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference">https://math.meta.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference</a>
+  <LI><a href="https://docs.mathjax.org/en/latest/input/tex/macros/index.html">https://docs.mathjax.org/en/latest/input/tex/macros/index.html</a>
+  <LI><a href="https://www.onemathematicalcat.org/MathJaxDocumentation/TeXSyntax.htm">https://www.onemathematicalcat.org/MathJaxDocumentation/TeXSyntax.htm</a>
+  </UL>
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id=""><i>Decision</i>: Which VPS provider service company to use?</H2>
 
 <p>DigitalOcean, AWS, Oracle, Azure</p>
 
@@ -255,7 +269,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: Separate non-interactive workflow pages (e.g., user_documentation) into a separate Python file?</H2>
+<H2 id=""><i>Decision</i>: Separate non-interactive workflow pages (e.g., user_documentation) into a separate Python file?</H2>
 
 <p>Having all the routes in a single file (e.g., pdg_app.py) results in a huge file with thousands of lines.</p>
 
@@ -287,7 +301,7 @@ def to_api_via_js() -&gt; str:
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: Which languages to use?</H2>
+<H2 id=""><i>Decision</i>: Which languages to use?</H2>
 <p>Languages I'm comfortable with and are widely used - Python; HTML; Docker</p>
 
 
@@ -295,7 +309,7 @@ def to_api_via_js() -&gt; str:
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name=""><i>Decision</i>: Interface</H2>
+<H2 id=""><i>Decision</i>: Interface</H2>
 
 <p>Why web ui? Why not a GUI? Or command line?
 </p>
@@ -332,7 +346,7 @@ def to_api_via_js() -&gt; str:
 <P>&nbsp;</P>
 
 
-<H2><a name=""><i>Decision</i>: How to represent the objects</H2>
+<H2 id=""><i>Decision</i>: How to represent the objects</H2>
   <P>(e.g., <a href="{{ url_for('to_user_documentation')}}?referrer=design_documentation#inference rules">inference rules</a>
   and <a href="{{ url_for('to_user_documentation')}}?referrer=design_documentation#expressions">expressions</a>
   and symbols)
