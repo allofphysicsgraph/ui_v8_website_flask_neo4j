@@ -88,6 +88,8 @@ def validate_step(
 
     name_latex = inference_rule_dict["name_latex"]
 
+
+    # CATEGORY: derivation mechanics
     if name_latex in [
         "declare initial expression",
         "declare final expression",
@@ -99,6 +101,7 @@ def validate_step(
         logger.info("[TRACE] validate_step end " + trace_id + " " + str(time.time()))
         return "no validation is available for declarations"
 
+    # CATEGORY: assumptions
     elif name_latex in [
         "assume N dimensions",
         "normalization condition",
@@ -1282,6 +1285,8 @@ def indefinite_integral_over(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    CATEGORY: calculus
+
     ((out_lhs0 == (\int in_lhs0 feed0)) and (out_rhs0 == \int in_rhs0 feed0))
 
     Given a = b
@@ -1297,6 +1302,8 @@ def indefinite_integration(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    CATEGORY: calculus
+
     ((out_lhs0 == (\int in_lhs0 )) and (out_rhs0 == \int in_rhs0 ))
     """
     return "recognized infrule but not yet supported"
@@ -1308,6 +1315,8 @@ def indefinite_integrate_LHS_over(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    CATEGORY: calculus
+
     ((out_lhs0 == (\int in_lhs0 feed0)) and (out_rhs0 == in_rhs0))
     """
     return "recognized infrule but not yet supported"
@@ -1319,6 +1328,8 @@ def indefinite_integrate_RHS_over(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    CATEGORY: calculus
+
     ((out_lhs0 == in_lhs0) and (out_rhs0 == \int in_rhs0 feed0))
     """
     return "recognized infrule but not yet supported"
@@ -1330,6 +1341,8 @@ def integrate_over_from_to(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    CATEGORY: calculus
+
     ((out_lhs0 == (\int_{feed1}^{feed2} in_lhs0 feed0)) and (out_rhs0 == \int_{feed1}^{feed2} in_rhs0 feed0))
     """
     return "recognized infrule but not yet supported"
@@ -1341,6 +1354,8 @@ def partially_differentiate_with_respect_to(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    CATEGORY: calculus
+
     \frac{\partial}{\partial #1}
     """
     return "recognized infrule but not yet supported"
@@ -2502,6 +2517,8 @@ def evaluate_definite_integral(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    CATEGORY: calculus
+
     Given   a = \int_0^x dx
     Get     a = x
 
