@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://derivationmap.net/sitemap.txt
+Sitemap: https://allofphysiscs.com/sitemap.txt
 

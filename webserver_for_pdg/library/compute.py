@@ -1096,8 +1096,11 @@ def get_dict_of_steps_in_derivation(
             "list of feed dicts": list_of_feed_dicts,
             "list of output dicts": list_of_output_dicts,
         }
+
+    sorted_all_steps = dict(sorted(all_steps.items()))
+
     logger.info("[TRACE] compute/get_dict_of_steps_in_derivation end " + trace_id)
-    return all_steps, query_time_dict
+    return sorted_all_steps, query_time_dict
 
 
 def input_feed_output_infrule_for_step(

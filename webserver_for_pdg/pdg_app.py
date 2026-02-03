@@ -6,13 +6,7 @@
 # https://creativecommons.org/licenses/by/4.0/
 
 """
-This is a from-scratch rewrite of the front-end and back-end of
-https://derivationmap.net/
-and will eventually replace that website. (The current site
-uses a JSON file for the back-end and has a poor
-model-view-controller implementation.)
-
-This new iteration is based on a property graph (specifically Neo4j)
+This iteration is based on a property graph (specifically Neo4j)
 with cleaner separation between the MVC and the database.
 
 Previous versions had a "local ID" which is needed when including
@@ -1530,7 +1524,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
     * edit step in derivation
     * delete derivation
 
-    https://derivationmap.net/static/property_graph_schema.png
+    https://allofphysiscs.com/static/property_graph_schema.png
 
     >>> to_review_derivation()
     """

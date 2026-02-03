@@ -233,7 +233,7 @@ Figure 2.
   When errors occur, there's a Flask function <code>flash</code> used to convey the error summary to the user (displayed at the bottom of the webpage).
 
 <P>
-  The website <a href="http://derivationmap.net">derivationmap.net</a> is run using docker-compose; see <code>ui_v8_website_flask_neo4j</code>
+  The website <a href="{{ url_for('to_index') }}">allofphysiscs.com</a> is run using docker-compose; see <code>ui_v8_website_flask_neo4j</code>
 
 <center>
 <P>
@@ -251,7 +251,7 @@ Figure 3. State diagram for the web interface.
 
 <P>
   When a web browser requests the page
-  <a href="{{ url_for('to_developer_documentation') }}?referrer=developer_documentation">https://derivationmap.net/developer_documentation</a>
+  <a href="{{ url_for('to_developer_documentation') }}?referrer=developer_documentation">https://allofphysiscs.com/developer_documentation</a>
   nginx calls gunicorn calls
   <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/flask/controller.py">controller.py</a>
   with the URL string. The Python flask package uses the URL information to
