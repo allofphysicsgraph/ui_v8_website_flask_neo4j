@@ -7,7 +7,7 @@
 
 <P><a href="{{ url_for('to_navigation') }}?referrer=comparison_of_syntax">navigation</a> / 
    <a href="{{ url_for('to_documentation_overview')}}?referrer=comparison_of_syntax">documentation overview</a> / 
-   <a href="{{ url_for('to_developer_documentation') }}?referrer=comparison_of_syntax">developer documentation</a> /
+   <a href="{{ url_for('to_design_documentation') }}?referrer=comparison_of_syntax">design choices</a> /
    syntax comparison
 
 <P>
@@ -208,5 +208,28 @@ All of these are equivalent.
 <HR/>
 <P>&nbsp;</P>
 
+<pre>
+Instead of storing equations as Latex, store them as MathML (http://www.w3.org/Math/). Then
+
+convert from MathML to Latex for rendering in graph: http://xsltml.sourceforge.net/
+better: MathML directly to pictures (SVG, PNG)
+http://sourceforge.net/projects/pmml2svg/
+http://sourceforge.net/projects/jeuclid/
+http://sourceforge.net/projects/svgmath/
+convert from MathML to CAS input https://www.google.com/search?q=mathml+to+latex
+It's not reasonable to have a human generate the MathML manually
+
+https://en.wikipedia.org/wiki/MathML#Example_and_comparison_to_other_formats Thus we need Latex to MathML
+http://www.mathtoweb.com/cgi-bin/mathtoweb_home.pl
+http://www.w3.org/Math/Software/mathml_software_cat_converters.html
+
+http://latex2mathml.freewebmaster.fr/
+
+http://tbookdtd.sourceforge.net/
+
+http://www.w3.org/Math/Software/
+
+http://fred-wang.github.io/TeXZilla/
+</pre>
 
 {% endblock %}

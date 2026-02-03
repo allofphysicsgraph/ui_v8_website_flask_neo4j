@@ -7,7 +7,7 @@
 
 <P><a href="{{ url_for('to_navigation') }}?referrer=comparison_of_databases">navigation</a> / 
    <a href="{{ url_for('to_documentation_overview')}}?referrer=comparison_of_databases">documentation overview</a> / 
-   <a href="{{ url_for('to_developer_documentation') }}?referrer=comparison_of_databases">developer documentation</a> /
+   <a href="{{ url_for('to_design_documentation') }}?referrer=comparison_of_syntax">design choices</a> /
    database comparison
 
 <P>
@@ -30,9 +30,18 @@
       <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v1_plain_text">plain text</a>:
          databases for comments, connections, equations, operators. Perl script to convert database content to images.
       One line per entry in each database.
+      <UL>
+        <LI>human readable
+        <LI>non-standard structure
+      </UL>
     </LI>
     <LI>
       <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v2_XML">XML</a>:
+      <UL>
+        <LI>human readable
+        <LI>structured text
+        <LI>non-standard tags not recognized by any other programs
+      </UL>
     </LI>
     <LI>
       <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v3_CSV">CSV</a>:
@@ -73,7 +82,7 @@
       TODO: is this schema in <a href="https://en.wikipedia.org/wiki/Third_normal_form">3NF</a>?
     </LI>
     <LI>
-      <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/">web interface</a>:
+      <a href="https://github.com/allofphysicsgraph/ui_v7_website_flask_json">JSON-based</a>:
       the current implementation.
       Uses Python, <a href="https://flask.palletsprojects.com/">Flask</a>, Docker.
       Data is stored in a JSON file.
@@ -85,6 +94,9 @@
         <LI>nested Python dictionaries and lists stored as a JSON file stored in Redis. Retains the schema validation of JSON while preventing concurrent writes to file; see https://redis.io/topics/transactions
         <LI>nested Python dictionaries and lists stored as a JSON file stored in SQLite3. Part of the migration towards table-based implementation. SQLite3 is better than Redis because Redis requires a Redis server to be running whereas SQLite3 is a file.
       </OL>
+    </LI>
+    <LI>
+      <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/">Neo4j-based</a>
     </LI>
   </OL>
 <P>Each of these have required a rewrite of the code from scratch, as well as transfer code (to move from n to n+1).
@@ -98,11 +110,13 @@ The author didn't know about property graphs when implementing v1, v2, and v3.
   Knowledge gained through evolutionary iteration is expensive and takes a lot of time.
 </P>
 
+<H1 id="datbases not used">Databases NOT used</H1>
+
 <P>
   A few storage methods were considered and then rejected without a full implementation.
 
-<H3><a name="other avenues">Other approaches</a></H3>
-<H4><a name="networkx">Networkx</a></H4>
+
+<H3><a name="networkx">Networkx</a></H3>
 <!-- from https://allofphysicsgraph.github.io/proofofconcept/site/more_aspects/example_T_f_networkx.html -->
 <pre>
 import networkx as nx
@@ -119,12 +133,20 @@ nx.plot()
 plt.show()
 </pre>
 
-<H4><a name="graphml">GraphML</a></H4>
+<H3><a name="graphml">GraphML</a></H3>
 
 <!-- from https://allofphysicsgraph.github.io/proofofconcept/site/more_aspects/example_T_f_graphml.html -->
 
-<P>
-  See <a href="http://graphml.graphdrawing.org/">GraphML file format</a>.
+<P>https://en.wikipedia.org/wiki/GraphML
+<P>http://graphml.graphdrawing.org/primer/graphml-primer.html
+<P>GraphML is an specification in XML
+<P>human readable
+<P>structured text
+<P>GraphML supports SVG
+
+  <P><a href="https://dl.acm.org/doi/10.1016/j.entcs.2004.12.037">https://dl.acm.org/doi/10.1016/j.entcs.2004.12.037</a>: "GXL to GraphML and Vice Versa with XSLT"
+
+<P>See <a href="http://graphml.graphdrawing.org/">GraphML file format</a>.
 
 <!-- the following didn't work:
   <pre lang="xml">
@@ -170,7 +192,13 @@ http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 </textarea>
 
 
-<H4><a name="rdf">RDF/OWL</a></H4>
+<H3 id="">GXL (Graph eXchange Language)</H3>
+<P>https://en.wikipedia.org/wiki/GXL
+<P>http://www.gupro.de/GXL/
+<H3 id="">Trivial Graph Format</H3>
+<P>https://en.wikipedia.org/wiki/Trivial_Graph_Format
+
+<H3 id="rdf">RDF/OWL</a></H3>
 
 <P>
   The Physics Derivation Graph can be expressed in <a href="https://en.wikipedia.org/wiki/Resource_Description_Framework">RDF</a>.

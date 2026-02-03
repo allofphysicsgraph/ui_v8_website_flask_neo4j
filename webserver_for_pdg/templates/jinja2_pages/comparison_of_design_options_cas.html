@@ -7,7 +7,7 @@
 
 <P><a href="{{ url_for('to_navigation') }}?referrer=comparison_of_CAS">navigation</a> / 
    <a href="{{ url_for('to_documentation_overview')}}?referrer=comparison_of_CAS">documentation overview</a> / 
-   <a href="{{ url_for('to_developer_documentation') }}?referrer=comparison_of_CAS">developer documentation</a> /
+   <a href="{{ url_for('to_design_documentation') }}?referrer=comparison_of_syntax">design choices</a> /
    Computer Algebra System (CAS) comparison
 
 <P>
@@ -17,10 +17,18 @@
   This page assumes familiarity with the <a href="{{ url_for('to_conventions_documentation') }}?referrer=comparison_of_CAS">jargon</a> used in the Physics Derivation Graph.
 </P>
 
+<P><em>Constraints</em>: Use a CAS which is free and open source. (See <a href="{{ url_for('to_design_documentation') }}#principles">Design Principles</a>.)
+
 <P>
   Sage, Mathematica, and SymPy are candidates capable of checking the correctness of derivations.
 
 <H2 id="cas:sage">Sage</H2>
+
+<UL>
+  <LI>Free, Open Source. Large community of active users for support
+  <LI>http://www.sagemath.org/doc/tutorial/latex.html
+  <LI>gives Latex as output</LI>
+</UL>
 
 <P>
   The following Sage code checks that the claimed step as stated by the inference rule is carried out correctly:
@@ -49,8 +57,13 @@ True
 
 <H2 id="cas:mathematica">Mathematica</H2>
 <!-- from https://allofphysicsgraph.github.io/proofofconcept/site/more_aspects/example_T_f_mathematica.html -->
-<P>
-  A computer algebra system like Mathematica can validate the steps of a derivation.
+
+<UL>
+  <LI>http://reference.wolfram.com/mathematica/tutorial/GeneratingAndImportingTeX.html
+  <LI>Why not Mathematica: it's not open source
+</UL>
+
+<P>A computer algebra system like Mathematica can validate the steps of a derivation.
 <pre>
 Input:
 
@@ -102,10 +115,41 @@ func = subtractXfromBothSides [func, b/(2 a)]
 <P>
   The motives for using Sympy are the cost (free), the code (open source), the integration (Python), support for Physics, and the support for parsing Latex.
 
-<P>
-  The snippets of SymPy can be run in <a href="http://live.sympy.org/">http://live.sympy.org/</a>
+<P><a href="https://docs.sympy.org/latest/tutorials/intro-tutorial/intro.html">https://docs.sympy.org/latest/tutorials/intro-tutorial/intro.html</a>
+
+<P>The snippets of SymPy can be run in <a href="http://live.sympy.org/">http://live.sympy.org/</a>
 
 <P>TODO: add more examples here.
+
+
+<H2 id="cas:axiom">Axiom</H2>
+
+<P><a href="http://savannah.nongnu.org/projects/axiom/">http://savannah.nongnu.org/projects/axiom/</a>
+<!-- no longer valid:
+http://www.axiom-developer.org/
+http://page.axiom-developer.org/
+-->
+
+<H2 id="cas:maxima">Maxima</H2>
+
+<P><a href="http://maxima.sourceforge.net/documentation.html">http://maxima.sourceforge.net/documentation.html</a>
+<P>SnuggleTeX converts Latex to Maxima via MathML; see 
+<a href="http://www2.ph.ed.ac.uk/snuggletex/documentation/generating-maxima-input.html">http://www2.ph.ed.ac.uk/snuggletex/documentation/generating-maxima-input.html</a>
+
+<H2 id="">Giac/Xcas</H2>
+
+<P><a href="https://xcas.univ-grenoble-alpes.fr/backup/giac.html">https://xcas.univ-grenoble-alpes.fr/backup/giac.html</a>
+<!-- also https://www-fourier.univ-grenoble-alpes.fr/~parisse/giac.html -->
+
+<H2 id="LaTeXCalc">LaTeXCalc</H2>
+
+<P>latexcalc is a "LaTeX Calculator" that calculates values inside your LaTeX files before typesetting them. 
+
+<P>LINCAS: LaTeXCalc is not a Computer Algebra System
+
+<P><a href="https://latexcalc.sourceforge.net/">https://latexcalc.sourceforge.net/</a>
+
+<H2 id=""></H2>
 
 
 {% endblock %}
