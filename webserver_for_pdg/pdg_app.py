@@ -899,7 +899,7 @@ class SpecifyNewSymbolOperationForm(FlaskForm):
         "description (LaTeX)",
         validators=[validators.Length(max=1000)],
     )
-    operation_reference_latex = StringField("reference")
+    operation_reference_latex = StringField("reference (LaTeX)")
 
 
 class SpecifyNewSymbolRelationForm(FlaskForm):
@@ -916,7 +916,7 @@ class SpecifyNewSymbolRelationForm(FlaskForm):
         "description (LaTeX)",
         validators=[validators.Length(max=1000)],
     )
-    relation_reference_latex = StringField("reference")
+    relation_reference_latex = StringField("reference (LaTeX)")
 
 
 # class SpecifyNewSymbolForm(FlaskForm):
