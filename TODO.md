@@ -1,8 +1,4 @@
 
-cypher export does not produce a consistent order. As a result, diff isn't feasible
-
----
-
 hyperbolic secant function is defined as the reciprocal of the hyperbolic cosine function
 
 Edits to operations do not take effecthttps://localhost/list_operations
@@ -23,6 +19,10 @@ Display the AST for equation review
 ---
 
 add column for status on other projects for categories like active, idle, unavailable
+
+---
+
+cypher export does not produce a consistent order. As a result, diff isn't feasible
 
 ---
 

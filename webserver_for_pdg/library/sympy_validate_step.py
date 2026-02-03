@@ -1416,7 +1416,7 @@ def integrate_over_from_to(
 
     latex_expansion
         Integrate Eq.~\ref{eq:#4} over $#1$ from lower limit $#2$ to upper limit $#3$.</latex_expansion
-        
+
     comment
         $\int_{#2}^{#3}\ d #1$
     number_of_arguments: 4
@@ -1620,6 +1620,7 @@ def swap_LHS_with_RHS(
 # TODO: is there no "sum_exponents"?
 # Example:
 #      given "(A^x)*(A^y)=(C^3)*(C^r)+2", sum_exponents yields "A^(x+y)=(C^(3+r))+2"
+
 
 def sum_exponents_LHS(
     list_of_input_dicts: List[dict],
@@ -1840,7 +1841,7 @@ def LHS_of_expr_1_eq_LHS_of_expr_2(
 
     description: combine 2 expressions
 
-    latex_expansion: 
+    latex_expansion:
         LHS of Eq.~\ref{eq:#1} is equal to LHS of Eq.~\ref{eq:#2}.
 
     >>> latex_dict = {}
@@ -2047,7 +2048,7 @@ def function_is_odd(
         $#1$ is odd with respect to $#2$, so replace $#1$ with $#3$ in Eq.~\ref{eq:#4}.
 
     -f(x) = f(-x)
-    
+
     colloquially,
     sympy.sin(-x) == -sympy.sin(x)
 
