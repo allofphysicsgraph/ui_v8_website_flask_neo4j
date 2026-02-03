@@ -43,82 +43,272 @@ This comparison is between syntax methods which do not serve the same purpose. L
 <P>
 We can ignore syntax methods which do not support notation necessary for describing physics. Example of this include <a href="#cite:ascii">ASCII</a> and <a href="#cite:html">HTML</a>. Storage of the generated content (essentially a knowledge base for all of physics) isn't expected to exceed a Gigabyte, so compactness in terms of storage isn't a criterion in this evaluation.
 
-<H3><a name="test cases">Test Cases</a></H3>
-<P>
-  to demonstrate the variety of uses in distinct domains of Physics, a set of test cases are provided in this section. These cases are not meant to be exhaustive of either the syntax or the scientific domain. Rather, they are examples of both capability requirements of the Physics Derivation Graph and of the syntax methods.
+<H2 id="test cases">Test Cases</H2>
+<P>To demonstrate the variety of uses in distinct domains of Physics, a set of test cases are provided in this section. These cases are not meant to be exhaustive of either the syntax or the scientific domain. Rather, they are examples of both capability requirements of the Physics Derivation Graph and of the syntax methods.
 </P>
 <!-- https://www.physicsforums.com/threads/formulae-of-various-topics.102736/ -->
 
-<a name="test case 1"/>
-<P>
-Case 1 is a second order polynomial. Algebra
+
+<P>See sourcecode for this page for the underlying syntax for Latex and Presentation MathML.
+
+<H3 id="test case 1">Case 1: A second order polynomial (Algebra)</h3>
+<P>Latex:
 \begin{equation}
 a x^2 + b x + c = 0
 \label{eq:polynomial_case1_body}
 \end{equation}
 </P>
 
-<a name="test case 2"/>
+<P>Sympy:
+  <!-- https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/DEPRECATED/doc/syntax_comparison/sympy_case1_polynomial.py -->
+<pre>
+#!/bin/python
+import sympy
+a = sympy.Symbol('a')
+b = sympy.Symbol('b')
+c = sympy.Symbol('c')
+x = sympy.Symbol('x')
+
+a*(x**2) + b*x + c == 0
+</pre>
+
+<P>Presentation MathML; see <a href="http://www.mathmlcentral.com/Tools/FromMathML.jsp">http://www.mathmlcentral.com/Tools/FromMathML.jsp</a>
+  <!-- https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/DEPRECATED/doc/syntax_comparison/mathML_presentation_case1_polynomial.xml -->
 <P>
-Case 2, <a href="https://en.wikipedia.org/wiki/Stokes%27_theorem">Stokes' theorem</a>, includes integrals, cross products, and vectors. Calculus
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow>
+  <mrow>
+    <mn>a</mn>
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>+</mo>
+    <mrow>
+      <mn>b</mn>
+      <mo>&InvisibleTimes;</mo>
+      <mi>x</mi>
+    </mrow>
+    <mo>+</mo>
+    <mn>c</mn>
+  </mrow>
+  <mo>=</mo>
+  <mn>0</mn>
+</mrow>
+</math>
+
+
+<P>Content MathML
+  <!-- https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/DEPRECATED/doc/syntax_comparison/mathML_content_case1_polynomial.xml -->
+
+<pre>
+&lt;math xmlns="http://www.w3.org/1998/Math/MathML"&gt;
+&lt;apply&gt;
+ &lt;eq/&gt;
+  &lt;apply&gt;
+   &lt;plus/&gt;
+    &lt;apply&gt;
+     &lt;ci&gt;a&lt;/ci&gt; 
+     &lt;power/&gt;&lt;ci&gt; x &lt;/ci&gt;&lt;ci&gt; 2 &lt;/ci&gt;
+     &lt;/apply&gt;
+    &lt;apply&gt;
+     &lt;ci&gt;b&lt;/ci&gt; &lt;ci&gt; x &lt;/ci&gt;                    
+     &lt;/apply&gt;
+    &lt;apply&gt;
+    &lt;ci&gt;c&lt;/ci&gt;                                 
+    &lt;/apply&gt;
+   &lt;/apply&gt;
+   &lt;apply&gt;
+    &lt;cn&gt;0&lt;/cn&gt;
+  &lt;/apply&gt;
+&lt;/apply&gt;
+&lt;/math&gt;
+</pre>
+
+
+<H3 id="test case 2">Case 2: <a href="https://en.wikipedia.org/wiki/Stokes%27_theorem">Stokes' theorem</a> (Calculus)</H3>
+<P>Includes integrals, cross products, and vectors. 
+<P>Latex:
 \begin{equation}
 \int \int_{\sum} \vec{\nabla} \times \vec{F} \dot d\sum = \oint_{\partial \sum} \vec{F}\dot d\vec{r}
 \label{eq:stokes_case2_body}
 \end{equation}
 </P>
 
-<a name="test case 3"/>
+<P>SymPy; See <a href="http://docs.sympy.org/0.7.3/tutorial/calculus.html#integrals">http://docs.sympy.org/0.7.3/tutorial/calculus.html#integrals</a>
+  <!-- https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/DEPRECATED/doc/syntax_comparison/sympy_case2_stokes.py -->
+  <pre>
+#!/bin/python
+import sympy
+# \int \int_{\sum} \vec{\nabla} \times \vec{F} \dot d\sum = \oint_{\partial \sum} \vec{F}\dot d\vec{r}
+x = sympy.Symbol('x')
+sympy.integrate(x,x) == sympy.integrate(x,x)
+</pre>
+
+<P>Presentation MathML
+  <!-- https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/DEPRECATED/doc/syntax_comparison/mathML_presentation_case2_stokes.xml -->
 <P>
-Case 3: Tensor analysis. <a href="https://en.wikipedia.org/wiki/Einstein_notation">Einstein notation</a>: contravariant = superscript, covariant = subscript. Used in electrodynamics
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<mo>&#x222B;</mo>
+<msub>
+    <mo>&#x222B;</mo>
+    <mo>&#x3A3;</mo>
+</msub>
+<mover>
+  <mo>&#x2207;</mo>
+  <mo>&rarr;</mo>
+</mover>
+<mo>&#x2A2F;</mo>
+<mover>
+<mi>F</mi>
+<mo>&rarr;</mo>
+ </mover>
+<mi>&#xB7;</mi>
+<mi>d</mi>
+<mo>&#x3A3;</mo>
+<mo>=</mo>
+<msub>
+    <mo>&#x222E;</mo>
+    <mrow>
+        <mo>&#x2202;</mo>
+        <mo>&#x3A3;</mo>
+    </mrow>
+</msub>
+ <mover>
+<mi>F</mi>
+<mo>&rarr;</mo>
+ </mover>
+<mi>&#xB7;</mi>
+<mi>d</mi>   
+<mover>
+<mi>r</mi>
+<mo>&rarr;</mo>
+</mover>
+</math>
+
+
+<H3 id="test case 3">Case 3: Tensor analysis; <a href="https://en.wikipedia.org/wiki/Einstein_notation">Einstein notation</a></h3>
+  <P>contravariant = superscript, covariant = subscript. Used in electrodynamics
+<P>Latex:
 \begin{equation}
 Y^i(X_j) = \delta^i_{\ j}
 \label{eq:tensor_analysis_case3_body}
 \end{equation}
 </P>
 
+<P>Presentation MathML:
+  <!-- https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/DEPRECATED/doc/syntax_comparison/mathML_presentation_case3_tensor.xml -->
+<P>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<msup>
+    <mi>Y</mi>
+    <mi>i</mi>
+</msup>
+<mo maxsize='1'>(</mo>
+<msub>
+    <mi>X</mi>
+    <mi>j</mi>
+</msub>
+<mo maxsize='1'>)</mo>
+<mo>=</mo>
+<msubsup>
+    <mtext>&#x394;</mtext>
+    <mrow>
+        <mspace width='1em'></mspace>
+        <mi>j</mi>
+    </mrow>
+    <mi>i</mi>
+</msubsup>
+</math>
+
 <P>
 Case 4 covers notation used in Quantum Mechanics. Symbols such as \(\hbar\) and Dirac notation are typically used.
 </P>
 
-<a name="test case 4a"/>
-<P>
-Case 4a is the creation operator
+<H3 id="test case 4a">Case 4a: creation operator (Quantum)</H3>
+
+<P>Latex:
 \begin{equation}
 \hat{a}^+ |n\rangle = \sqrt{n+1} |n+1\rangle
 \label{eq:creation_operator_case4a_body}
 \end{equation}
 </P>
 
-<a name="test case 4b"/>
-<P>
-Case 4b is the uncertainty principle
+<P>Presentation MathML:
+  <!-- https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/DEPRECATED/doc/syntax_comparison/mathML_presentation_case4a_creation.xml -->
+  <P>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<msup>
+<mover>
+    <mtext>a</mtext>
+<mo>&#x5E;</mo>
+</mover>
+    <mo>&#x2020;</mo>
+</msup>
+<mo maxsize='1'>|</mo>
+<mi>n</mi>
+<mo maxsize='1'>&#x232A;</mo>
+<mo>=</mo>
+<msqrt>
+    <mi>n</mi>
+    <mo>+</mo>
+    <mn>1</mn>
+</msqrt>
+<mo maxsize='1'>|</mo>
+<mi>n</mi>
+<mo>+</mo>
+<mn>1</mn>
+<mo maxsize='1'>&#x232A;</mo>
+</math>
+
+<h3 id="test case 4b">Case 4b: uncertainty principle (Quantum)</H3>
+<P>Latex:
 \begin{equation}
 \sigma_x \sigma_p \geq \frac{\hbar}{2}
 \label{eq:uncertainty_principle_case4b_body}
 \end{equation}
 </P>
 
-<a name="test case 4c"/>
+<P>Presentation MathML:
+<!-- https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/DEPRECATED/doc/syntax_comparison/mathML_presentation_case4b_uncertainty.xml -->
 <P>
-Case 4c: L&uuml;ders projection
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<msub>
+    <mtext>&#x3C3;</mtext>
+    <mi>x</mi>
+</msub>
+<msub>
+    <mtext>&#x3C3;</mtext>
+    <mi>p</mi>
+</msub>
+<mo>&#x2265;</mo>
+<mfrac>
+    <mtext>&#x210F;</mtext>
+    <mn>2</mn>
+</mfrac>
+</math>
+
+<H3 id="test case 4c">Case 4c: L&uuml;ders projection</H3>
+
+<P>Latex:
 \begin{equation}
  |\psi\rangle \rightarrow \sum_n  |c_n|^2 P_n,\ \rm{where}\ P_n = \sum_i |\psi_{ni}\rangle \langle \psi_{ni}|
 \label{eq:Luders_projection_case4c_body}
 \end{equation}
 </p>
 
-<H3><a name="quantitative comparison of syntax">Quantitative Comparison of Test Cases</a></H3>
+<H3 id="quantitative comparison of syntax">Quantitative Comparison of Test Cases</H3>
 
 <div align="center">
 <table border="1" class="sortable">
   <tr>
     <th>Name</th>
-    <th>case 1</th>
-    <th>case 2</th>
-    <th>case 3</th>
-    <th>case 4a</th>
-    <th>case 4b</th>
-    <th>case 4c</th>
+    <th>case 1:<BR>\( a x^2 + b x + c = 0 \)</th>
+    <th>case 2:<BR>\( \int \int_{\sum} \vec{\nabla} \times \vec{F} \dot d\sum = \oint_{\partial \sum} \vec{F}\dot d\vec{r} \)</th>
+    <th>case 3:<BR>\( Y^i(X_j) = \delta^i_{\ j} \)</th>
+    <th>case 4a:<BR>\( \hat{a}^+ |n\rangle = \sqrt{n+1} |n+1\rangle \)</th>
+    <th>case 4b:<BR>\( \sigma_x \sigma_p \geq \frac{\hbar}{2} \)</th>
+    <th>case 4c:<BR>\( |\psi\rangle \rightarrow \sum_n  |c_n|^2 P_n,\ \rm{where}\ P_n = \sum_i |\psi_{ni}\rangle \langle \psi_{ni}| \)</th>
   </tr>
   <tr>
     <td>Latex</td>
@@ -208,28 +398,66 @@ All of these are equivalent.
 <HR/>
 <P>&nbsp;</P>
 
-<pre>
-Instead of storing equations as Latex, store them as MathML (http://www.w3.org/Math/). Then
+<H1>More Sample Expressions</H1>
 
-convert from MathML to Latex for rendering in graph: http://xsltml.sourceforge.net/
-better: MathML directly to pictures (SVG, PNG)
-http://sourceforge.net/projects/pmml2svg/
-http://sourceforge.net/projects/jeuclid/
-http://sourceforge.net/projects/svgmath/
-convert from MathML to CAS input https://www.google.com/search?q=mathml+to+latex
-It's not reasonable to have a human generate the MathML manually
+<P>
+\begin{equation}
+f(x) = \left(x+ \frac{b}{2}\right)^2 - \left(\sqrt{\left(\frac{b}{2}\right)^2 + c}\right)^2
+\end{equation}
 
-https://en.wikipedia.org/wiki/MathML#Example_and_comparison_to_other_formats Thus we need Latex to MathML
-http://www.mathtoweb.com/cgi-bin/mathtoweb_home.pl
-http://www.w3.org/Math/Software/mathml_software_cat_converters.html
+<P>
+\begin{equation}
+f(x) = \left(x+ \frac{b}{2}\right)^2 - \left(\frac{b}{2}\right)^2 + c
+\end{equation}
 
-http://latex2mathml.freewebmaster.fr/
+<P>
+\begin{equation}
+f(x) = (x^2+bx)+c
+\end{equation}
 
-http://tbookdtd.sourceforge.net/
+<P>
+\begin{equation}
+f(x)=x^2+bx+c
+\end{equation}
 
-http://www.w3.org/Math/Software/
+<P>
+\begin{equation}
+\left(\frac{b}{2}\right)^2-\left(\frac{b}{2}\right)^2
+\end{equation}
 
-http://fred-wang.github.io/TeXZilla/
-</pre>
+<P>
+\begin{equation}
+f(x) = \left(x^2+bx+\left(\frac{b}{2}\right)^2\right)-\left(\frac{b}{2}\right)^2+c
+\end{equation}
+
+<HR>
+
+<H1 id="mathML">MathML</H1>
+
+<P>Instead of storing equations as Latex, store them as MathML (<a href="http://www.w3.org/Math/">http://www.w3.org/Math/</a>). 
+  Then convert from MathML to Latex for rendering in graph: <a href="http://xsltml.sourceforge.net/">http://xsltml.sourceforge.net/</a>
+
+<P>Also, MathML directly to pictures (SVG, PNG)
+<UL>
+  <LI><a href="http://sourceforge.net/projects/pmml2svg/">http://sourceforge.net/projects/pmml2svg/</a>
+  <LI><a href="http://sourceforge.net/projects/jeuclid/">http://sourceforge.net/projects/jeuclid/</a>
+  <LI><a href="http://sourceforge.net/projects/svgmath/">http://sourceforge.net/projects/svgmath/</a>
+</UL>
+<P>convert from MathML to CAS input <a href="https://www.google.com/search?q=mathml+to+latex">https://www.google.com/search?q=mathml+to+latex</a>
+
+<P>Does not seem reasonable to have a human generate the MathML manually. need Latex to MathML
+
+<P><a href="https://en.wikipedia.org/wiki/MathML#Example_and_comparison_to_other_formats">https://en.wikipedia.org/wiki/MathML#Example_and_comparison_to_other_formats</a>
+<P><a href="http://www.mathtoweb.com/cgi-bin/mathtoweb_home.pl">http://www.mathtoweb.com/cgi-bin/mathtoweb_home.pl</a>
+<P><a href="http://www.w3.org/Math/Software/mathml_software_cat_converters.html">http://www.w3.org/Math/Software/mathml_software_cat_converters.html</a>
+
+<P><a href="http://latex2mathml.freewebmaster.fr/">http://latex2mathml.freewebmaster.fr/</a>
+
+<P><a href="http://tbookdtd.sourceforge.net/">http://tbookdtd.sourceforge.net/</a>
+
+<P><a href="http://www.w3.org/Math/Software/">http://www.w3.org/Math/Software/</a>
+
+<P><a href="http://fred-wang.github.io/TeXZilla/">http://fred-wang.github.io/TeXZilla/</a>
+
 
 {% endblock %}

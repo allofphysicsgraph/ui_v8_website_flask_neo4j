@@ -22,12 +22,11 @@
 <P>
   Sage, Mathematica, and SymPy are candidates capable of checking the correctness of derivations.
 
-<H2 id="cas:sage">Sage</H2>
+<H2 id="cas:sage"><a href="https://www.sagemath.org/">Sage</a></H2>
 
 <UL>
-  <LI>Free, Open Source. Large community of active users for support
-  <LI>http://www.sagemath.org/doc/tutorial/latex.html
-  <LI>gives Latex as output</LI>
+  <LI>Pros: Free, Open Source. Large community of active users for support. Can produce Latex as output (see <a href="http://www.sagemath.org/doc/tutorial/latex.html">http://www.sagemath.org/doc/tutorial/latex.html</a>)
+  <LI>Cons: </LI>
 </UL>
 
 <P>
@@ -55,15 +54,16 @@ True
 <P>
   In this <a href="https://physicsderivationgraph.blogspot.com/2015/12/sage-isnt-robust-computer-algebra.html">analysis of Sage</a> the support for standard operations wasn't sufficient.
 
-<H2 id="cas:mathematica">Mathematica</H2>
+<H2 id="cas:mathematica"><a href="https://www.wolfram.com/mathematica/">Mathematica</a></H2>
 <!-- from https://allofphysicsgraph.github.io/proofofconcept/site/more_aspects/example_T_f_mathematica.html -->
 
 <UL>
-  <LI>http://reference.wolfram.com/mathematica/tutorial/GeneratingAndImportingTeX.html
-  <LI>Why not Mathematica: it's not open source
+  <LI>Pros: can work with Latex (see <a href="http://reference.wolfram.com/mathematica/tutorial/GeneratingAndImportingTeX.html">http://reference.wolfram.com/mathematica/tutorial/GeneratingAndImportingTeX.html</a>)
+  <LI>Cons: not open source, not free, proprietary interface
 </UL>
 
 <P>A computer algebra system like Mathematica can validate the steps of a derivation.
+  <!-- https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/DEPRECATED/inference_rules_mathematica.nb -->
 <pre>
 Input:
 
@@ -89,6 +89,7 @@ Output:
 
 <P>Quadratic equation derivation<BR/>
 First, set up the inference rules:
+<!-- https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/DEPRECATED/inference_rules_mathematica.nb -->
 <pre>
 dividebothsidesby[expr_, x_] := Apart[First[expr]/x] == Apart[Last[expr]/x];
 subtractXfromBothSides [expr_, x_] := First[expr]-x == Last[expr]-x;
@@ -111,7 +112,7 @@ func = subXforY[func, Last[func], ±Last[func]]
 func = subtractXfromBothSides [func, b/(2 a)]
 </pre>
 
-<H2 id="cas:sympy">Sympy</H2>
+<H2 id="cas:sympy"><a href="https://www.sympy.org/en/index.html">Sympy</a></H2>
 <P>
   The motives for using Sympy are the cost (free), the code (open source), the integration (Python), support for Physics, and the support for parsing Latex.
 

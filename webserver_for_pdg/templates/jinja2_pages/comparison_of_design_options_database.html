@@ -18,11 +18,11 @@
 </P>
 
 <P>
-  This page compares databases that could be used for the Physics Derivation Graph (PDG).
+  This page compares databases that have been used and could be used for the Physics Derivation Graph (PDG).
 
 
 
-<H2><a name="historical evolution">Historical design evolution</a></H2>
+<H2 id="historical evolution">Historical design evolution</H2>
 <P>
   The Physics Derivation Graph has progressed through multiple architectures, with data structure changes keeping pace with the developer's knowledge.
   <OL>
@@ -31,29 +31,29 @@
          databases for comments, connections, equations, operators. Perl script to convert database content to images.
       One line per entry in each database.
       <UL>
-        <LI>human readable
-        <LI>non-standard structure
+        <LI>Pro: human readable
+        <LI>Con: non-standard structure
       </UL>
     </LI>
     <LI>
       <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v2_XML">XML</a>:
       <UL>
-        <LI>human readable
-        <LI>structured text
-        <LI>non-standard tags not recognized by any other programs
+        <LI>Pros: human readable, structured text
+        <LI>Cons: non-standard tags not recognized by any other programs
       </UL>
     </LI>
     <LI>
       <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v3_CSV">CSV</a>:
+      <UL>
+        <LI>Pros: human readable, structured text
+        <LI>Cons: queries are awkward to enact; users cannot specify queries.
     </LI>
     <LI>
-      <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v4_file_per_expression">file per expression</a>:
+      <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v4_file_per_expression">file per expression</a>
     </LI>
     <LI>
       <a href="https://github.com/allofphysicsgraph/proofofconcept/tree/gh-pages/DEPRECATED/v5_property_graph">property graph</a>:
-      a very limited exploration.
-      Written in Cypher/Neo4j but could also use Gremlin/<a href="https://tinkerpop.apache.org/">TinkerPop</a>.
-      No significant code base.
+      a very limited exploration.  Written in Cypher/Neo4j. No significant code base.
       Schema: <BR/>
       <img src="{{ url_for('static', filename='property_graph_schema.png') }}">
       <BR/>
@@ -83,11 +83,10 @@
     </LI>
     <LI>
       <a href="https://github.com/allofphysicsgraph/ui_v7_website_flask_json">JSON-based</a>:
-      the current implementation.
       Uses Python, <a href="https://flask.palletsprojects.com/">Flask</a>, Docker.
       Data is stored in a JSON file.
       Limited support for checking inference rules using Sympy.
-      Storage formats evolved:
+      Within this iteration the storage formats evolved:
       <OL>
         <LI>nested Python dictionaries and lists stored as a Python Pickle
         <LI>nested Python dictionaries and lists stored as a JSON file. With this approach the schema can be validated
@@ -97,8 +96,13 @@
     </LI>
     <LI>
       <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/">Neo4j-based</a>
+      <UL>
+        <LI>Pros:
+        <LI>Cons: having an additional container for Neo4j uses more memory. Previous iterations (above) used 1GB. With Neo4j the VPS is required to have 2GB of RAM.
+      </UL>
     </LI>
   </OL>
+  <HR>
 <P>Each of these have required a rewrite of the code from scratch, as well as transfer code (to move from n to n+1).
 The author didn't know about property graphs when implementing v1, v2, and v3.
 </p>
@@ -116,8 +120,9 @@ The author didn't know about property graphs when implementing v1, v2, and v3.
   A few storage methods were considered and then rejected without a full implementation.
 
 
-<H3><a name="networkx">Networkx</a></H3>
+<H3 id="networkx">Networkx</H3>
 <!-- from https://allofphysicsgraph.github.io/proofofconcept/site/more_aspects/example_T_f_networkx.html -->
+<!-- also https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/sandbox/sample_directed_graph_using_networkx.py -->
 <pre>
 import networkx as nx
 G=nx.digraph()
@@ -133,16 +138,16 @@ nx.plot()
 plt.show()
 </pre>
 
-<H3><a name="graphml">GraphML</a></H3>
+<H3 id="graphml">GraphML</H3>
 
 <!-- from https://allofphysicsgraph.github.io/proofofconcept/site/more_aspects/example_T_f_graphml.html -->
 
 <P>https://en.wikipedia.org/wiki/GraphML
 <P>http://graphml.graphdrawing.org/primer/graphml-primer.html
-<P>GraphML is an specification in XML
-<P>human readable
-<P>structured text
-<P>GraphML supports SVG
+  <UL>
+    <LI>Pros: GraphML is an specification in XML, human readable, structured text, GraphML supports SVG
+    <LI>Cons: no native query language. (GraphML is imported to Neo4j or TinkerPop for use with Cypher and Gremlin, respectively.)
+  </UL>
 
   <P><a href="https://dl.acm.org/doi/10.1016/j.entcs.2004.12.037">https://dl.acm.org/doi/10.1016/j.entcs.2004.12.037</a>: "GXL to GraphML and Vice Versa with XSLT"
 
@@ -156,7 +161,8 @@ and https://stackoverflow.com/questions/5134242/semantics-standards-and-using-th
 which points to https://www.w3.org/TR/html401/struct/dirlang.html#langcodes
 -->
 <P>
-<textarea rows="20" cols="90" style="border:none;">
+<!--<textarea rows="20" cols="90" style="border:none;">-->
+  <pre>
 <?xml version="1.0" encoding="UTF-8"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -189,22 +195,21 @@ http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <edge source="2103023049" target="2384942"/>
 </graph>
 </graphml>
-</textarea>
+</pre>
+<!--</textarea>-->
 
 
-<H3 id="">GXL (Graph eXchange Language)</H3>
-<P>https://en.wikipedia.org/wiki/GXL
-<P>http://www.gupro.de/GXL/
-<H3 id="">Trivial Graph Format</H3>
-<P>https://en.wikipedia.org/wiki/Trivial_Graph_Format
+<H3 id="gxl">GXL (Graph eXchange Language)</H3>
+<P><a href="https://en.wikipedia.org/wiki/GXL">https://en.wikipedia.org/wiki/GXL</a>
+<P><a href="http://www.gupro.de/GXL/">http://www.gupro.de/GXL/</a>
+<H3 id="trivial graph format">Trivial Graph Format</H3>
+<P><a href="https://en.wikipedia.org/wiki/Trivial_Graph_Format">https://en.wikipedia.org/wiki/Trivial_Graph_Format</a>
 
 <H3 id="rdf">RDF/OWL</a></H3>
 
-<P>
-  The Physics Derivation Graph can be expressed in <a href="https://en.wikipedia.org/wiki/Resource_Description_Framework">RDF</a>.
+<P>The Physics Derivation Graph can be expressed in <a href="https://en.wikipedia.org/wiki/Resource_Description_Framework">RDF</a>.
 
-<P>
-  Each step in a derivation could be put in the subject–predicate–object triple form. For example, suppose the step is
+<P>Each step in a derivation could be put in the subject–predicate–object triple form. For example, suppose the step is
 <Pre>
 Input 1: y=mx+b
 inference rule: multiply both sides by
@@ -220,11 +225,64 @@ step 1 | has output | 2*y = 2*m*x + 2*b
 </pre>
 <P>  While it's easy to convert, I am unaware of the advantages of using RDF.
   The Physics Derivation Graph is oriented towards visualization.
-  SPARQL is the query language for RDF. I don't see much use for querying the graph.
-  Using RDF doesn't help with using a computer algebra system for validation of the step.
+  SPARQL is the query language for RDF. 
+  Using RDF independent of using a computer algebra system for validation of the step.
 </P>
 
+<H2 id="property graphs not used">Property Graph databases NOT used</H2>
+
+<P><a href="https://db-engines.com/en/ranking/graph+dbms">https://db-engines.com/en/ranking/graph+dbms</a>
+
+<P>See also "Demystifying Graph Databases: Analysis and Taxonomy of Data Organization, System Designs, and Graph Queries", <a href="https://arxiv.org/pdf/1910.09017.pdf">https://arxiv.org/pdf/1910.09017.pdf</a>
+
+<P>Example comparison: <a href="https://db-engines.com/en/system/Blazegraph%3BNeo4j%3BOrientDB">https://db-engines.com/en/system/Blazegraph%3BNeo4j%3BOrientDB</a>
 
 
+<H3 id="tinkerpop"><a href="https://tinkerpop.apache.org/">TinkerPop</a></H3>
+
+<P>Gremlin query language for TinkerPop. 
+
+  <P>See <a href="https://stackoverflow.com/questions/13824962/neo4j-cypher-vs-gremlin-query-language">https://stackoverflow.com/questions/13824962/neo4j-cypher-vs-gremlin-query-language</a><BR>
+    and <a href="https://www.nebula-graph.io/posts/graph-query-language-comparison-cypher-gremlin-ngql">https://www.nebula-graph.io/posts/graph-query-language-comparison-cypher-gremlin-ngql</a>
+
+<P><a href="https://tinkerpop.incubator.apache.org/">https://tinkerpop.incubator.apache.org/</a>
+
+
+
+<H3 id="memgraph"><a href="https://memgraph.com/">memgraph.com</a></H3>
+
+<P>"Drop-in replacement for Neo4j graph database with full Cypher and Bolt compatibility."
+
+has open-source and free repos: <a href="https://github.com/memgraph/memgraph">https://github.com/memgraph/memgraph</a> 
+and <a href="https://github.com/memgraph/documentation">https://github.com/memgraph/documentation</a>
+
+<P>4 years old? No entry on wikipedia
+
+Not much traffic on <a href="https://news.ycombinator.com">https://news.ycombinator.com</a> beyond <a href="https://news.ycombinator.com/item?id=23165172">https://news.ycombinator.com/item?id=23165172</a> and <a href="https://news.ycombinator.com/item?id=24651091">https://news.ycombinator.com/item?id=24651091</a>
+
+<H3 id="graphdb COTS"><a href="https://www.ontotext.com/products/graphdb/">GraphDB</a></H3>
+
+<P>Not free; not open source
+
+<H3 id="orientdb"><a href="https://orientdb.org/">OrientDB</a></H3>
+
+<P>open source and free: <a href="https://github.com/orientechnologies/orientdb">https://github.com/orientechnologies/orientdb</a>
+
+
+<H3 id="titan">Titan (INACTIVE)</H3>
+
+<P><a href="https://github.com/thinkaurelius/titan/">https://github.com/thinkaurelius/titan/</a>
+
+<P>Aimed at multi-node scalability
+
+<H3 id="blazegraph"><a href="https://blazegraph.com/">blazegraph</a></H3>
+
+<P>Supports RDF and SPARQL APIs
+
+<H3 id="tinkerpop-in-blazegraph"><a href="https://github.com/blazegraph/tinkerpop3">Blazegraph TinkerPop3 Implementation (blazegraph-gremlin)</a></H3>
+
+<blockquote>"The concept behind blazegraph-gremlin is that property graph (PG) data can be loaded and accessed via the TinkerPop3 API, but underneath the hood the data will be stored as RDF using the PG data model described in this document. Once PG data has been loaded you can interact with it just like you would interact with ordinary RDF - you can run SPARQL queries or interact with the data via the SAIL API."</blockquote>
+
+<P>Status: no activity since 2020.
 
 {% endblock %}
