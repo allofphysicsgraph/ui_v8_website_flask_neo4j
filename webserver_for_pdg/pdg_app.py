@@ -7547,7 +7547,7 @@ def to_literature_review():
 
 
 @web_app.route(
-    "/documentation/developer/comparison_of_design_options/cas", methods=["GET", "POST"]
+    "/documentation/comparison_of_design_options/cas", methods=["GET", "POST"]
 )
 def to_comparison_of_design_options_cas():
     """
@@ -7561,7 +7561,21 @@ def to_comparison_of_design_options_cas():
 
 
 @web_app.route(
-    "/documentation/developer/comparison_of_design_options/proofs",
+    "/documentation/comparison_of_design_options/graph_drawing", methods=["GET", "POST"]
+)
+def to_comparison_of_design_options_graph_drawing():
+    """
+    a static page
+    """
+    logger.info("[TRACE] ")
+    return render_template(
+        "jinja2_pages/comparison_of_design_options_graph_drawing.html",
+        title="Comparison of Design Options: Graph Drawing",
+    )
+
+
+@web_app.route(
+    "/documentation/comparison_of_design_options/proofs",
     methods=["GET", "POST"],
 )
 def to_comparison_of_design_options_proofs():
@@ -7576,7 +7590,7 @@ def to_comparison_of_design_options_proofs():
 
 
 @web_app.route(
-    "/documentation/developer/comparison_of_design_options/syntax",
+    "/documentation/comparison_of_design_options/syntax",
     methods=["GET", "POST"],
 )
 def to_comparison_of_design_options_syntax():
@@ -7591,7 +7605,7 @@ def to_comparison_of_design_options_syntax():
 
 
 @web_app.route(
-    "/documentation/developer/comparison_of_design_options/database",
+    "/documentation/comparison_of_design_options/database",
     methods=["GET", "POST"],
 )
 def to_comparison_of_design_options_database():
