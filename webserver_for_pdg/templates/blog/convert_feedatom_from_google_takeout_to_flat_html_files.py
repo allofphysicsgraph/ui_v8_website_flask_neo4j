@@ -12,6 +12,11 @@ with open("feed.atom") as file_handle:
     file_content = xmltodict.parse(file_handle.read())
 
 for this_entry_dict in file_content['feed']['entry']:
+
+    # make blog title and content safe for jinja2; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/79
+    safe_blog_title = blog_title.replace("{{", "&#123;&#123;").replace("}}","&#125;&#125;").replace("{%", "&#123;%").replace("%}", "%&#125;")
+    safe_content = this_entry_dict['content']['#text'].replace("{{", "&#123;&#123;").replace("}}","&#125;&#125;").replace("{%", "&#123;%").replace("%}", "%&#125;")
+
     if this_entry_dict['blogger:type']=='POST': # don't include 'COMMENT'
         YYYY = this_entry_dict['published'][0:4]
         MM = this_entry_dict['published'][5:7]
@@ -20,10 +25,10 @@ for this_entry_dict in file_content['feed']['entry']:
         str_to_write  = ""
         str_to_write += '{% extends "jinja2_pages/reusable_components/_base.html" %}\n'
         str_to_write += '{% block content %}\n\n'
-        str_to_write += "<H1>"+blog_title+"</H1>\n\n"
+        str_to_write += "<H1>"+safe_blog_title+"</H1>\n\n"
         str_to_write += "<P><small>Published "+this_entry_dict['published']+" by Physics Derivation Graph</small></P>\n\n"
         # TODO: in the entry body image URLs are not correctly linked to local images
-        str_to_write += this_entry_dict['content']['#text'] + "\n\n"
+        str_to_write += safe_content + "\n\n"
         str_to_write += '{% endblock %}'
 
         blog_title_with_dash = blog_title.replace(' ','-').replace('/','-').replace('(','').replace(')','').replace('!','').replace(";","").replace(',','').replace('"','').replace("'","").replace("?","")
