@@ -7517,6 +7517,23 @@ def to_other_projects():
     )
 
 
+@web_app.route("/documentation/common_errors_in_college_math", methods=["GET", "POST"])
+def common_errors_in_college_math():
+    """
+    From https://math.vanderbilt.edu/schectex/commerrs/
+    """
+    logger.info("[TRACE] ")
+    return render_template(
+        "webpage_snapshots/common_errors_in_college_math.html",
+        title="Errors",
+    )
+    # return send_from_directory(
+    #     web_app.static_folder + "webpage_snapshots/",
+    #     "common_errors_in_college_math.html",
+    # )
+    # TODO: elsewhere in this file I've hardcoded to "/code/static" which breaks the abstraction
+
+
 @web_app.route("/literature_review", methods=["GET", "POST"])
 @web_app.route("/documentation/literature_review", methods=["GET", "POST"])
 def to_literature_review():
