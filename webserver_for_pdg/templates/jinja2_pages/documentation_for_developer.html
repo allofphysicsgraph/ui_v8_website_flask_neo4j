@@ -253,13 +253,13 @@ Figure 3. State diagram for the web interface.
   When a web browser requests the page
   <a href="{{ url_for('to_developer_documentation') }}?referrer=developer_documentation">https://allofphysiscs.com/developer_documentation</a>
   nginx calls gunicorn calls
-  <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/flask/controller.py">controller.py</a>
+  <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/webserver_for_pdg/pdg_app.py">pdg_app.py</a>
   with the URL string. The Python flask package uses the URL information to
   call the relevant Python function. For example, requesting <code>list_all_derivations</code>
-  invokes the function <code>def list_all_derivations():</code>. That
+  invokes the function <code>def to_list_all_derivations():</code>. That
   Python function relies on functions in
-  <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/flask/compute.py">computer.py</a>
-  to get data from the <code>data.json</code> database.
+  <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/webserver_for_pdg/library/neo4j_query.py">neo4j_query.py</a>
+  to get data from the Neo4j database.
 
 <P>&nbsp;</P>
 <HR/>
@@ -478,6 +478,34 @@ WS: [ \t] -&gt; skip;
 NEWLINE: '\n' -&gt; skip;
 
 </pre>
+
+
+<H2 id="docker maintenance">maintenance of Docker</H2>
+
+<P>clean up docker images using
+<pre>
+  docker images | grep "<none>                              <none>" | tr -s " " | cut -d' ' -f3 | xargs docker rmi
+</pre>
+
+
+<P>on a Mac the files get stored in a QEMU image,
+  <pre>
+$ ls -hal /Users/bhp/Library/Containers/com.docker.docker/Data/vms/0/data/
+  </pre>
+
+
+For an overview of where disk space is being used,
+<pre>
+$ docker system df
+TYPE                TOTAL               ACTIVE              SIZE                RECLAIMABLE
+Images              45                  17                  34GB                21.62GB (63%)
+Containers          621                 0                   8.129GB             8.129GB (100%)
+Local Volumes       5                   3                   251.1kB             20.79kB (8%)
+Build Cache         0                   0                   0B                  0B
+</pre>
+
+<P>For an explanation of RECLAIMABLE, see <a href="https://stackoverflow.com/a/51520627/1164295">https://stackoverflow.com/a/51520627/1164295</a>
+
 
 
 <P>&nbsp;</P>
