@@ -13,6 +13,10 @@ https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/v2_XML/databas
 
 Convention: every inference rule validation function has the same arguments
 
+Observations:
+- there are pairs which undo each other -- "divide both sides by" versus "multiply both sides by"
+- there are triplets -- "add X to LHS" and "add X to RHS" and "add X to both sides"
+
 TODO: although some functions have doctests, these doctests rely on the previous argument structures
 rather than the current "list of dicts"x3.
         # Implementation expects:
@@ -87,7 +91,6 @@ def validate_step(
     # logger.debug(str(list_of_output_dicts))
 
     name_latex = inference_rule_dict["name_latex"]
-
 
     # CATEGORY: derivation mechanics
     if name_latex in [
@@ -533,6 +536,9 @@ def add_X_to_both_sides(
     add c to both sides
     get a + c = b + c
 
+    latex_expansion
+        Add $#1$ to both sides of Eq.~\ref{eq:#2}.
+
     >>> input_expr = parse_latex("a = b")
     >>> feed = parse_latex("c")
     >>> output_expr = parse_latex("a + c = b + c")
@@ -587,6 +593,9 @@ def subtract_X_from_both_sides(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Subtract $#1$ from both sides of Eq.~\ref{eq:#2}.
+
     https://docs.sympy.org/latest/tutorial/manipulation.html
 
     Rather than have "add X to both sides" and "subtract X from both sides"
@@ -653,6 +662,20 @@ def multiply_both_sides_by(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Multiply both sides of Eq.~\ref{eq:#2} by $#1$.
+
+    see also dividebothsidesby
+
+    x*y = Mul(x,y)
+
+    Example:
+        given "A*x=B", multbothsidesby(feed=2) yields "A*x*2=B*2"
+
+    another example:
+        given 'a + b = c'
+        multiply both sides by d
+        to get '(a + b)*d = c*d'
 
     Validates the operation of multiplying both sides of an equation or inequality by a term.
 
@@ -700,13 +723,6 @@ def multiply_both_sides_by(
                           'reference_latex': '', 'latex_condition': '', 'lean': '',
                           'author_name_latex': 'ben.is.located@gmail.com', 'description_latex': '', 'id': '2131616531'}]
 
-
-    see also dividebothsidesby
-    x*y = Mul(x,y)
-
-    given 'a + b = c'
-    multiply both sides by d
-    to get '(a + b)*d = c*d'
 
     >>> input_expr = parse_latex("a + b = c")
     >>> feed = parse_latex("d")
@@ -872,7 +888,25 @@ def divide_both_sides_by(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Divide both sides of Eq.~\ref{eq:#2} by $#1$.
+
     see also multiply_both_sides_by
+
+    Example:
+        given "A*x=B", dividebothsidesby(feed=2) yields "(A*x)/2=B/2"
+
+    another example:
+        given 'a + b = c'
+        divide both sides by d
+        to get '(a + b)/d = c/d'
+
+
+    https://docs.sympy.org/latest/tutorial/manipulation.html
+
+    x/y = Mul(x, Pow(y, -1))
+
+
 
     Validates dividing both sides of an equation or inequality by a value (feed).
     Handles edge cases: division by zero and inequality sign flipping.
@@ -892,13 +926,6 @@ def divide_both_sides_by(
 
 
 
-    https://docs.sympy.org/latest/tutorial/manipulation.html
-
-    x/y = Mul(x, Pow(y, -1))
-
-    given 'a + b = c'
-    divide both sides by d
-    to get '(a + b)/d = c/d'
 
     >>> input_expr = parse_latex("a + b = c")
     >>> feed = parse_latex("d")
@@ -1017,6 +1044,9 @@ def change_variable_X_to_Y(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Substitute $#1$ for $#2$ in Eq.~\ref{eq:#3}.
+
     given 'a + b = c',
     substitute b --> d
     to get 'a + d = c'
@@ -1064,6 +1094,9 @@ def multiply_LHS_by_unity(
 ) -> str:
     """
     see also multRHSbyUnity
+
+    latex_expansion
+        Multiply LHS of Eq.~\ref{eq:#2} by 1, which in this case is $#1$
 
     Given a = b
     mult LHS by (c/c)
@@ -1121,6 +1154,9 @@ def multiply_RHS_by_unity(
     """
     see also multLHSbyUnity
 
+    latex_expansion
+        Multiply RHS of Eq.~\ref{eq:#2} by 1, which in this case is $#1$
+
     Given a = b
     mult by (c/c)
     get a = (b*c)/c
@@ -1170,7 +1206,15 @@ def add_zero_to_LHS(
 ) -> str:
     """
     see also add_zero_to_RHS
+
     ((feed==0) and (out_lhs0 == (in_lhs0+zero)) and (out_rhs0 == in_rhs0))
+
+    Example:
+        given "A*x=B", addZerotoLHS(feed=C-C) yields "A*x+C-C=B"
+
+
+    latex_expansion:
+        Add zero to LHS of Eq.~\ref{eq:#2}, where $0=#1$.
 
     >>> latex_dict = {}
     >>> latex_dict['input'] = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
@@ -1216,8 +1260,14 @@ def add_zero_to_RHS(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    Example:
+        given "A*x=B", addZerotoRHS(feed=C-C) yields "A*x=B+C-C"
+
+
     ((feed==0) and (out_rhs0 == (in_rhs0+zero)) and (out_lhs0 == in_lhs0))
 
+    latex_expansion:
+        Add zero to RHS of Eq.~\ref{eq:#2}, where $0=#1$.
 
     >>> latex_dict = {}
     >>> latex_dict['input'] = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
@@ -1263,6 +1313,9 @@ def take_curl_of_both_sides(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Apply curl to both sides of Eq.~\ref{eq:#1}.
+
     ((out_lhs0 == (\nabla \times in_lhs0)) and (out_rhs0 == \nabla \times in_rhs0))
     """
     return "recognized infrule but not yet supported"
@@ -1287,6 +1340,9 @@ def indefinite_integral_over(
     """
     CATEGORY: calculus
 
+    latex_expansion
+        Indefinite integral of both sides of Eq.~\ref{eq:#2} over $#1$.
+
     ((out_lhs0 == (\int in_lhs0 feed0)) and (out_rhs0 == \int in_rhs0 feed0))
 
     Given a = b
@@ -1302,6 +1358,9 @@ def indefinite_integration(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Indefinite integral of both sides of Eq.~\ref{eq:#1}.
+
     CATEGORY: calculus
 
     ((out_lhs0 == (\int in_lhs0 )) and (out_rhs0 == \int in_rhs0 ))
@@ -1317,6 +1376,9 @@ def indefinite_integrate_LHS_over(
     """
     CATEGORY: calculus
 
+    latex_expansion
+        Indefinite integral of LHS of Eq.~\ref{eq:#2} over $#1$.
+
     ((out_lhs0 == (\int in_lhs0 feed0)) and (out_rhs0 == in_rhs0))
     """
     return "recognized infrule but not yet supported"
@@ -1328,9 +1390,15 @@ def indefinite_integrate_RHS_over(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Indefinite integral of RHS of Eq.~\ref{eq:#2} over $#1$.
+
     CATEGORY: calculus
 
     ((out_lhs0 == in_lhs0) and (out_rhs0 == \int in_rhs0 feed0))
+
+    mathematica:
+        Integrate[#2,#1]
     """
     return "recognized infrule but not yet supported"
 
@@ -1344,6 +1412,18 @@ def integrate_over_from_to(
     CATEGORY: calculus
 
     ((out_lhs0 == (\int_{feed1}^{feed2} in_lhs0 feed0)) and (out_rhs0 == \int_{feed1}^{feed2} in_rhs0 feed0))
+
+
+    latex_expansion
+        Integrate Eq.~\ref{eq:#4} over $#1$ from lower limit $#2$ to upper limit $#3$.</latex_expansion
+        
+    comment
+        $\int_{#2}^{#3}\ d #1$
+    number_of_arguments: 4
+    number_of_feeds: 3
+    number_of_input_statements: 1
+    number_of_output_statements: 1
+
     """
     return "recognized infrule but not yet supported"
 
@@ -1411,6 +1491,9 @@ def make_expr_power(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Make Eq.~\ref{eq:#2} the power of $#1$.
+
     ((out_lhs0 == (feed0)**(in_lhs0)) and (out_rhs0 == (feed0)**(in_rhs0)))
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -1442,6 +1525,9 @@ def select_real_parts(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Select real parts of Eq.~\ref{eq:#1}.
+
     sympy.re(2+3*sympy.I)==2
 
     Given a+i*b = c+i*d
@@ -1472,6 +1558,9 @@ def select_imag_parts(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Select imaginary parts of Eq.~\ref{eq:#1}.
+
     sympy.im(2+3*sympy.I)==3
 
     Given a+i*b = c+i*d
@@ -1502,6 +1591,9 @@ def swap_LHS_with_RHS(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Swap LHS of Eq.~\ref{eq:#1} with RHS.
+
     ((in_lhs0 == out_rhs0) and (in_rhs0 == out_lhs0))
 
     given 'a + b = c'
@@ -1525,12 +1617,23 @@ def swap_LHS_with_RHS(
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
+# TODO: is there no "sum_exponents"?
+# Example:
+#      given "(A^x)*(A^y)=(C^3)*(C^r)+2", sum_exponents yields "A^(x+y)=(C^(3+r))+2"
+
 def sum_exponents_LHS(
     list_of_input_dicts: List[dict],
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Sum exponents on LHS of Eq.~\ref{eq:#1}.
+
+    Example:
+        given "(A^x)*(A^y)=(C^3)*(C^r)+2", sumExponents_LHS yields "A^(x+y)=(C^3)*(C^r)+2"
+
+
     see also sum_exponents_RHS
     (in_rhs0 == out_rhs0)
     """
@@ -1543,6 +1646,13 @@ def sum_exponents_RHS(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Sum exponents on RHS of Eq.~\ref{eq:#1}.
+
+    Example:
+        given "(A^x)*(A^y)=(C^3)*(C^r)+2", sumExponents_RHS yields "(A^x)*(A^y)=(C^(3+r))+2"
+
+
     see also sum_exponents_LHS
     (in_lhs0 == out_lhs0)
     """
@@ -1557,7 +1667,15 @@ def add_expr_1_to_expr_2(
     """
     assumes result form LHS(X)+LHS(Y)=RHS(X)+RHS(Y)
 
+    Example:
+        given "A*x=B" and "C*y=F", add_expr_1_to_expr_2 yields "A*x+C*y=B+F"
+
+
     (((in_lhs0+in_lhs1)==out_lhs0) and ((in_rhs0+in_rhs1)==out_rhs0))
+
+    latex_expansion:
+        Add Eq.~\ref{eq:#1} to Eq.~\ref{eq:#2}.
+
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[trace add_expr_1_to_expr_2 start " + trace_id + "]")
@@ -1594,6 +1712,10 @@ def substitute_RHS_of_expr_1_into_expr_2(
     Given a = b
     and c = b*d
     get c = a*d
+
+    Another example:
+        given "A*x=B" and "C*y=A*x", subRHSofEqXintoEqY yields "C*y=B"
+
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[trace substitute_RHS_of_expr_1_into_expr_2 start " + trace_id + "]")
@@ -1631,6 +1753,10 @@ def substitute_LHS_of_expr_1_into_expr_2(
     Given a = b
     and   c = a*d
     get   c = b*d
+
+    another example:
+        given "A*x=B" and "C*y=B", subLHSofEqXintoEqY yields "C*y=A*x"
+
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[trace substitute_LHS_of_expr_1_into_expr_2 start " + trace_id + "]")
@@ -1665,6 +1791,9 @@ def mult_expr_1_by_expr_2(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Multiply Eq.~\ref{eq:#1} by Eq.~\ref{eq:#2}.
+
     Given a = b
     and   c = d
     get a*c = b*d
@@ -1708,6 +1837,11 @@ def LHS_of_expr_1_eq_LHS_of_expr_2(
     get   b = d
 
     ((in_lhs0 == in_lhs1) and (out_lhs0 == in_rhs0) and (out_rhs0 == in_rhs1))
+
+    description: combine 2 expressions
+
+    latex_expansion: 
+        LHS of Eq.~\ref{eq:#1} is equal to LHS of Eq.~\ref{eq:#2}.
 
     >>> latex_dict = {}
     >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')},
@@ -1755,6 +1889,13 @@ def RHS_of_expr_1_eq_RHS_of_expr_2(
 ) -> str:
     """
     ((in_rhs0 == in_rhs1) and (out_lhs0 == in_lhs0) and (out_rhs0 == in_lhs1))
+
+    latex_expansion:
+        RHS of Eq.~\ref{eq:#1} is equal to RHS of Eq.~\ref{eq:#2}.
+
+    Example:
+        given "A*x=B" and "C=B", RHSofEqXeqRHSofEqY yields "A*x=C"
+
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[trace RHS_of_expr_1_eq_RHS_of_expr_2 start " + trace_id + "]")
@@ -1792,6 +1933,9 @@ def raise_both_sides_to_power(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Raise both sides of Eq.~\ref{eq:#2} to $#1$.
+
     ((out_lhs0 == (in_lhs0)**(feed0)) and (out_rhs0 == (in_rhs0)**(feed0)))
     """
     return "recognized infrule but not yet supported"
@@ -1804,6 +1948,9 @@ def claim_expr_1_equals_expr_2(
 ) -> str:
     """
     ((in_lhs0 == in_lhs1) and (in_rhs0 == in_rhs1))
+
+    latex_expansion:
+        Thus we see that Eq.~\ref{eq:#1} is equivalent to Eq.~\ref{eq:#2}.
 
     TODO: issue detected by Gemini 3 Pro on 2026-02-02:
     The function name suggests comparing two inputs, but the code ignores the second input entirely.
@@ -1843,6 +1990,11 @@ def claim_LHS_equals_RHS(
     """
     (in_lhs0 == in_rhs0)
 
+    latex_expansion
+        Thus we see that LHS of Eq.~\ref{eq:#1} is equal to RHS.
+
+    Note: this infrule terminates a derivation.
+
     TODO: issue detected by Gemini 3 Pro on 2026-02-02:
     This function checks if the Input's LHS equals the Input's RHS (checking for a tautology). However, it ignores the list_of_output_dicts entirely in the logic check.
     If a user inputs a valid tautology (e.g., x = x) but asserts a completely unrelated output (e.g., y = z), the function will return 'valid', creating a break in the derivation chain.
@@ -1872,6 +2024,11 @@ def function_is_even(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        $#1$ is even with respect to $#2$, so replace $#1$ with $#3$ in Eq.~\ref{eq:#4}.
+
+    f(x)=f(-x)
+
     colloquially,
     sympy.cos(x)==sympy.cos(-x)
 
@@ -1886,6 +2043,11 @@ def function_is_odd(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        $#1$ is odd with respect to $#2$, so replace $#1$ with $#3$ in Eq.~\ref{eq:#4}.
+
+    -f(x) = f(-x)
+    
     colloquially,
     sympy.sin(-x) == -sympy.sin(x)
 
@@ -1900,6 +2062,9 @@ def conjugate_function_X(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Conjugate $#1$ in Eq.~\ref{eq:#2}.
+
     colloquially,
     sympy.conjugate(sympy.I)==-sympy.I
 
@@ -1914,6 +2079,9 @@ def conjugate_both_sides(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Conjugate both sides of Eq.~\ref{eq:#1}.
+
     colloquially,
     sympy.conjugate(sympy.I)==-sympy.I
 
@@ -1928,6 +2096,9 @@ def conjugate_transpose_both_sides(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
+    latex_expansion
+        Conjugate transpose of both sides of Eq.~\ref{eq:#1}.
+
     Apply ^+; replace $i$ with $-i$ and transpose matrices
     """
     return "recognized infrule but not yet supported"
