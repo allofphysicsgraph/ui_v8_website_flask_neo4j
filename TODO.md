@@ -1,14 +1,4 @@
 
-hyperbolic secant function is defined as the reciprocal of the hyperbolic cosine function
-
-Edits to operations do not take effecthttps://localhost/list_operations
-
----
-
-Including a reference when adding an operation does not take effect
-https://localhost/list_operations
-
----
 
 email alerts - https://github.com/allofphysicsgraph/task-tracker/issues/137
 
