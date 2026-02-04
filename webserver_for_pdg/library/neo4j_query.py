@@ -795,16 +795,16 @@ def get_node_properties(tx, node_type: str, node_id: str) -> dict:
         "[TRACE] node_properties start " + str(trace_id) + " " + str(time.time())
     )
 
-    logger.info("neo4j_query/node_properties: node_type=" + node_type)
+    logger.info("node_type=" + node_type)
     assert node_type in list_of_valid.node_types
-    logger.info("neo4j_query/node_properties: node_id:" + node_id)
+    logger.info("node_id:" + node_id)
 
     result = tx.run(
         "MATCH (n: " + str(node_type) + ') WHERE n.id = "' + str(node_id) + '" RETURN n'
     )
     # node_data = result.data()['n']
     node_data = result.data()[0]["n"]
-    logger.info("neo4j_query/node_properties: node_data=" + str(node_data))
+    logger.info("node_data=" + str(node_data))
 
     logger.info("[TRACE] node_properties end " + str(trace_id) + " " + str(time.time()))
     return node_data
@@ -1465,6 +1465,8 @@ def add_expression(
     """
     nothing returned by function because action is to write change to Neo4j database
 
+    TODO: add Lean and SymPy.LHS and SymPy.RHS
+
     >>> add_expression(tx,)
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -1472,21 +1474,56 @@ def add_expression(
         "[TRACE] add_expression start " + str(trace_id) + " " + str(time.time())
     )
 
-    result = tx.run(
-        "MERGE (:expression "
-        '{name_latex:"' + str(expression_name_latex) + '", '
-        ' latex_lhs:"' + str(expression_latex_lhs) + '", '
-        ' latex_relation:"' + str(expression_latex_relation) + '", '
-        ' latex_rhs:"' + str(expression_latex_rhs) + '", '
-        ' latex_condition: "' + str(expression_latex_condition) + '", '
-        ' created_datetime:"' + now_str + '",'
-        #' lean:"' + str(expression_lean) + '", '
-        #' sympy:"' + str(expression_sympy) + '", '
-        ' description_latex:"' + str(expression_description_latex) + '", '
-        ' reference_latex:"' + str(expression_reference_latex) + '", '
-        ' author_name_latex:"' + str(author_name_latex) + '", '
-        ' id:"' + str(expression_id) + '"})'
-    )
+    # result = tx.run(
+    #     "MERGE (:expression "
+    #     '{name_latex:"' + str(expression_name_latex) + '", '
+    #     ' latex_lhs:"' + str(expression_latex_lhs) + '", '
+    #     ' latex_relation:"' + str(expression_latex_relation) + '", '
+    #     ' latex_rhs:"' + str(expression_latex_rhs) + '", '
+    #     ' latex_condition: "' + str(expression_latex_condition) + '", '
+    #     ' created_datetime:"' + now_str + '",'
+    #     ' description_latex:"' + str(expression_description_latex) + '", '
+    #     ' reference_latex:"' + str(expression_reference_latex) + '", '
+    #     ' author_name_latex:"' + str(author_name_latex) + '", '
+    #     ' id:"' + str(expression_id) + '"})'
+    # )
+
+    params = {
+        "id": str(expression_id),
+        "name": str(expression_name_latex),
+        "lhs": str(expression_latex_lhs),
+        "relation": str(expression_latex_relation),
+        "rhs": str(expression_latex_rhs),
+        "condition": str(expression_latex_condition),
+        "created": now_str,
+        "desc": str(expression_description_latex),
+        "ref": str(expression_reference_latex),
+        "author": str(author_name_latex)
+    }
+
+    query = """
+        MERGE (e:expression {id: $id})
+        ON CREATE SET 
+            e.created_datetime = $created,
+            e.name_latex = $name,
+            e.latex_lhs = $lhs,
+            e.latex_relation = $relation,
+            e.latex_rhs = $rhs,
+            e.latex_condition = $condition,
+            e.description_latex = $desc,
+            e.reference_latex = $ref,
+            e.author_name_latex = $author
+        ON MATCH SET 
+            e.name_latex = $name,
+            e.latex_lhs = $lhs,
+            e.latex_relation = $relation,
+            e.latex_rhs = $rhs,
+            e.latex_condition = $condition,
+            e.description_latex = $desc,
+            e.reference_latex = $ref,
+            e.author_name_latex = $author
+    """
+    tx.run(query, params)
 
     logger.info("[TRACE] add_expression end " + str(trace_id) + " " + str(time.time()))
     return
@@ -1509,15 +1546,41 @@ def add_feed(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] add_feed start " + str(trace_id) + " " + str(time.time()))
 
-    result = tx.run(
-        "merge (:feed "
-        '{latex:"' + str(feed_latex) + '", '
-        ' author_name_latex:"' + str(author_name_latex) + '", '
-        ' created_datetime:"' + now_str + '",'
-        ' sympy:"' + str(feed_sympy) + '", '
-        ' lean:"' + str(feed_lean) + '", '
-        ' id:"' + str(feed_id) + '"})'
-    )
+    # result = tx.run(
+    #     "merge (:feed "
+    #     '{latex:"' + str(feed_latex) + '", '
+    #     ' author_name_latex:"' + str(author_name_latex) + '", '
+    #     ' created_datetime:"' + now_str + '",'
+    #     ' sympy:"' + str(feed_sympy) + '", '
+    #     ' lean:"' + str(feed_lean) + '", '
+    #     ' id:"' + str(feed_id) + '"})'
+    # )
+
+    params = {
+        "id": str(feed_id),
+        "latex": str(feed_latex),
+        "author": str(author_name_latex),
+        "created": now_str,
+        "sympy": str(feed_sympy),
+        "lean": str(feed_lean)
+    }
+
+    query = """
+        MERGE (f:feed {id: $id})
+        ON CREATE SET 
+            f.created_datetime = $created,
+            f.latex = $latex,
+            f.author_name_latex = $author,
+            f.sympy = $sympy,
+            f.lean = $lean
+        ON MATCH SET 
+            f.latex = $latex,
+            f.author_name_latex = $author,
+            f.sympy = $sympy,
+            f.lean = $lean
+    """
+
+    result = tx.run(query, params)
 
     logger.info("[TRACE] add_feed end " + str(trace_id) + " " + str(time.time()))
     return
@@ -1547,17 +1610,49 @@ def add_quantum_operator_symbol(
         + str(time.time())
     )
 
-    result = tx.run(
-        "merge (:quantum_operator "
-        '{name_latex:"' + str(symbol_name) + '", '
-        ' latex:"' + str(symbol_latex) + '", '
-        ' description_latex:"' + str(symbol_description) + '", '
-        ' created_datetime:"' + now_str + '",'
-        ' author_name_latex:"' + str(author_name_latex) + '", '
-        " requires_arguments:" + str(symbol_requires_arguments) + ", "
-        ' reference_latex:"' + str(symbol_reference) + '", '
-        ' id:"' + str(symbol_id) + '"})'
-    )
+    # result = tx.run(
+    #     "merge (:quantum_operator "
+    #     '{name_latex:"' + str(symbol_name) + '", '
+    #     ' latex:"' + str(symbol_latex) + '", '
+    #     ' description_latex:"' + str(symbol_description) + '", '
+    #     ' created_datetime:"' + now_str + '",'
+    #     ' author_name_latex:"' + str(author_name_latex) + '", '
+    #     " requires_arguments:" + str(symbol_requires_arguments) + ", "
+    #     ' reference_latex:"' + str(symbol_reference) + '", '
+    #     ' id:"' + str(symbol_id) + '"})'
+    # )
+
+    params = {
+        "id": str(symbol_id),
+        "name": str(symbol_name),
+        "latex": str(symbol_latex),
+        "desc": str(symbol_description),
+        "created": now_str,
+        "author": str(author_name_latex),
+        "req_args": symbol_requires_arguments,
+        "ref": str(symbol_reference)
+    }
+
+    query = """
+        MERGE (qo:quantum_operator {id: $id})
+        ON CREATE SET 
+            qo.created_datetime = $created,
+            qo.name_latex = $name,
+            qo.latex = $latex,
+            qo.description_latex = $desc,
+            qo.author_name_latex = $author,
+            qo.requires_arguments = $req_args,
+            qo.reference_latex = $ref
+        ON MATCH SET 
+            qo.name_latex = $name,
+            qo.latex = $latex,
+            qo.description_latex = $desc,
+            qo.author_name_latex = $author,
+            qo.requires_arguments = $req_args,
+            qo.reference_latex = $ref
+            // Note: created_datetime is NOT updated here
+    """
+    tx.run(query, params)
 
     logger.info(
         "[TRACE] add_quantum_operator_symbol end "
@@ -1579,6 +1674,9 @@ def add_constant_value_with_units(
     author_name_latex: str,
 ) -> None:
     """
+    This function may suffice for creating new constants 
+    but is not expected to work for editing constants. See Gemini 3 Pro's observation inline below.
+
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -1609,6 +1707,38 @@ def add_constant_value_with_units(
         + str(author_name_latex)
         + '"})'
     )
+
+    # TODO, pointed out by Gemini 3 Pro on 2026-02-03:
+    # In a parameterized query, you cannot inject raw string fragments for property names. 
+    # You must add the specific values (e.g., unit information) directly into the params dictionary and the SET clauses.
+
+    # params = {
+    #     "id": str(value_with_units_id),
+    #     "num_dec": number_decimal,   
+    #     "num_pow": number_power,     
+    #     "created": now_str,
+    #     "author": str(author_name_latex)
+    #     # You must extract the values from 'str_to_add' and put them here.
+    #     # Example: "unit": str(unit_variable)
+    # }
+    # query = """
+    #     MERGE (v:value_with_units {id: $id})
+    #     ON CREATE SET 
+    #         v.created_datetime = $created,
+    #         v.number_decimal = $num_dec,
+    #         v.number_power = $num_pow,
+    #         v.author_name_latex = $author
+    #         // Add specific properties from str_to_add here
+    #         // Example: v.unit_latex = $unit
+    #     ON MATCH SET 
+    #         v.number_decimal = $num_dec,
+    #         v.number_power = $num_pow,
+    #         v.author_name_latex = $author
+    #         // Add specific properties from str_to_add here
+    #         // Example: v.unit_latex = $unit
+    #         // Note: created_datetime is NOT updated here
+    # """
+    # tx.run(query, params)
 
     # create edge between scalar and value
     result = tx.run(
@@ -1663,26 +1793,85 @@ def add_scalar_symbol(
     assert len(symbol_scope) > 0
     assert len(symbol_variable_or_constant) > 0
 
-    result = tx.run(
-        "merge (:symbol:scalar "
-        '{name_latex:"' + str(symbol_name) + '", '
-        ' latex:"' + str(symbol_latex) + '", '
-        ' description_latex:"' + str(symbol_description) + '", '
-        ' reference_latex:"' + str(symbol_reference) + '",'
-        ' scope:"' + str(symbol_scope) + '",'
-        ' variable_or_constant:"' + str(symbol_variable_or_constant) + '",'
-        ' domain:"' + str(symbol_domain) + '",'
-        " dimension_length: " + str(dimension_length) + ", "
-        " dimension_time: " + str(dimension_time) + ", "
-        " dimension_mass: " + str(dimension_mass) + ", "
-        " dimension_temperature: " + str(dimension_temperature) + ", "
-        " dimension_electric_charge: " + str(dimension_electric_charge) + ", "
-        " dimension_amount_of_substance: " + str(dimension_amount_of_substance) + ", "
-        " dimension_luminous_intensity: " + str(dimension_luminous_intensity) + ", "
-        ' created_datetime:"' + now_str + '",'
-        ' author_name_latex:"' + str(author_name_latex) + '", '
-        ' id:"' + str(symbol_id) + '"})'
-    )
+    # result = tx.run(
+    #     "merge (:symbol:scalar "
+    #     '{name_latex:"' + str(symbol_name) + '", '
+    #     ' latex:"' + str(symbol_latex) + '", '
+    #     ' description_latex:"' + str(symbol_description) + '", '
+    #     ' reference_latex:"' + str(symbol_reference) + '",'
+    #     ' scope:"' + str(symbol_scope) + '",'
+    #     ' variable_or_constant:"' + str(symbol_variable_or_constant) + '",'
+    #     ' domain:"' + str(symbol_domain) + '",'
+    #     " dimension_length: " + str(dimension_length) + ", "
+    #     " dimension_time: " + str(dimension_time) + ", "
+    #     " dimension_mass: " + str(dimension_mass) + ", "
+    #     " dimension_temperature: " + str(dimension_temperature) + ", "
+    #     " dimension_electric_charge: " + str(dimension_electric_charge) + ", "
+    #     " dimension_amount_of_substance: " + str(dimension_amount_of_substance) + ", "
+    #     " dimension_luminous_intensity: " + str(dimension_luminous_intensity) + ", "
+    #     ' created_datetime:"' + now_str + '",'
+    #     ' author_name_latex:"' + str(author_name_latex) + '", '
+    #     ' id:"' + str(symbol_id) + '"})'
+    # )
+
+    params = {
+        "id": str(symbol_id),
+        "name": str(symbol_name),
+        "latex": str(symbol_latex),
+        "desc": str(symbol_description),
+        "ref": str(symbol_reference),
+        "scope": str(symbol_scope),
+        "var_const": str(symbol_variable_or_constant),
+        "domain": str(symbol_domain),
+        "dim_len": dimension_length,
+        "dim_time": dimension_time,
+        "dim_mass": dimension_mass,
+        "dim_temp": dimension_temperature,
+        "dim_charge": dimension_electric_charge,
+        "dim_amt": dimension_amount_of_substance,
+        "dim_lum": dimension_luminous_intensity,
+        "created": now_str,
+        "author": str(author_name_latex)
+    }
+
+    query = """
+        MERGE (s:symbol:scalar {id: $id})
+        ON CREATE SET 
+            s.created_datetime = $created,
+            s.name_latex = $name,
+            s.latex = $latex,
+            s.description_latex = $desc,
+            s.reference_latex = $ref,
+            s.scope = $scope,
+            s.variable_or_constant = $var_const,
+            s.domain = $domain,
+            s.dimension_length = $dim_len,
+            s.dimension_time = $dim_time,
+            s.dimension_mass = $dim_mass,
+            s.dimension_temperature = $dim_temp,
+            s.dimension_electric_charge = $dim_charge,
+            s.dimension_amount_of_substance = $dim_amt,
+            s.dimension_luminous_intensity = $dim_lum,
+            s.author_name_latex = $author
+        ON MATCH SET 
+            s.name_latex = $name,
+            s.latex = $latex,
+            s.description_latex = $desc,
+            s.reference_latex = $ref,
+            s.scope = $scope,
+            s.variable_or_constant = $var_const,
+            s.domain = $domain,
+            s.dimension_length = $dim_len,
+            s.dimension_time = $dim_time,
+            s.dimension_mass = $dim_mass,
+            s.dimension_temperature = $dim_temp,
+            s.dimension_electric_charge = $dim_charge,
+            s.dimension_amount_of_substance = $dim_amt,
+            s.dimension_luminous_intensity = $dim_lum,
+            s.author_name_latex = $author
+    """
+
+    tx.run(query, params)
 
     logger.info(
         "[TRACE] add_scalar_symbol end " + str(trace_id) + " " + str(time.time())
@@ -1716,34 +1905,110 @@ def add_vector_symbol(
     assert len(symbol_latex) > 0
 
     if symbol_size == "arbitrary":
-        result = tx.run(
-            "merge (:symbol:vector "
-            '{name_latex:"' + str(symbol_name) + '", '
-            ' latex:"' + str(symbol_latex) + '", '
-            ' description_latex:"' + str(symbol_description) + '", '
-            ' reference_latex:"' + str(symbol_reference) + '", '
-            'orientation:"' + str(symbol_orientation) + '", '
-            " size: '" + str(symbol_size) + "',"
-            "is_composite:" + str(symbol_is_composite) + ","
-            ' created_datetime:"' + now_str + '",'
-            ' author_name_latex:"' + str(author_name_latex) + '", '
-            ' id:"' + str(symbol_id) + '"})'
-        )
+        # result = tx.run(
+        #     "merge (:symbol:vector "
+        #     '{name_latex:"' + str(symbol_name) + '", '
+        #     ' latex:"' + str(symbol_latex) + '", '
+        #     ' description_latex:"' + str(symbol_description) + '", '
+        #     ' reference_latex:"' + str(symbol_reference) + '", '
+        #     'orientation:"' + str(symbol_orientation) + '", '
+        #     " size: '" + str(symbol_size) + "',"
+        #     "is_composite:" + str(symbol_is_composite) + ","
+        #     ' created_datetime:"' + now_str + '",'
+        #     ' author_name_latex:"' + str(author_name_latex) + '", '
+        #     ' id:"' + str(symbol_id) + '"})'
+        # )
+        params = {
+            "id": str(symbol_id),
+            "name": str(symbol_name),
+            "latex": str(symbol_latex),
+            "desc": str(symbol_description),
+            "ref": str(symbol_reference),
+            "orientation": str(symbol_orientation),
+            "size": str(symbol_size),
+            "is_composite": symbol_is_composite, 
+            "created": now_str,
+            "author": str(author_name_latex)
+        }
+
+        query = """
+            MERGE (s:symbol:vector {id: $id})
+            ON CREATE SET 
+                s.created_datetime = $created,
+                s.name_latex = $name,
+                s.latex = $latex,
+                s.description_latex = $desc,
+                s.reference_latex = $ref,
+                s.orientation = $orientation,
+                s.size = $size,
+                s.is_composite = $is_composite,
+                s.author_name_latex = $author
+            ON MATCH SET 
+                s.name_latex = $name,
+                s.latex = $latex,
+                s.description_latex = $desc,
+                s.reference_latex = $ref,
+                s.orientation = $orientation,
+                s.size = $size,
+                s.is_composite = $is_composite,
+                s.author_name_latex = $author
+        """
+        result = tx.run(query, params)
+
     else:  # fixed size
-        result = tx.run(
-            "merge (:symbol:vector "
-            '{name_latex:"' + str(symbol_name) + '", '
-            ' latex:"' + str(symbol_latex) + '", '
-            ' description_latex:"' + str(symbol_description) + '", '
-            ' reference_latex:"' + str(symbol_reference) + '", '
-            'orientation:"' + str(symbol_orientation) + '", '
-            " size: '" + str(symbol_size) + "',"
-            'number_of_entries:"' + str(symbol_number_of_entries) + '", '
-            "is_composite:" + str(symbol_is_composite) + ","
-            ' created_datetime:"' + now_str + '",'
-            ' author_name_latex:"' + str(author_name_latex) + '", '
-            ' id:"' + str(symbol_id) + '"})'
-        )
+        # result = tx.run(
+        #     "merge (:symbol:vector "
+        #     '{name_latex:"' + str(symbol_name) + '", '
+        #     ' latex:"' + str(symbol_latex) + '", '
+        #     ' description_latex:"' + str(symbol_description) + '", '
+        #     ' reference_latex:"' + str(symbol_reference) + '", '
+        #     'orientation:"' + str(symbol_orientation) + '", '
+        #     " size: '" + str(symbol_size) + "',"
+        #     'number_of_entries:"' + str(symbol_number_of_entries) + '", '
+        #     "is_composite:" + str(symbol_is_composite) + ","
+        #     ' created_datetime:"' + now_str + '",'
+        #     ' author_name_latex:"' + str(author_name_latex) + '", '
+        #     ' id:"' + str(symbol_id) + '"})'
+        # )
+        params = {
+            "id": str(symbol_id),
+            "name": str(symbol_name),
+            "latex": str(symbol_latex),
+            "desc": str(symbol_description),
+            "ref": str(symbol_reference),
+            "orientation": str(symbol_orientation),
+            "size": str(symbol_size),
+            "num_entries": str(symbol_number_of_entries),
+            "is_composite": symbol_is_composite, 
+            "created": now_str,
+            "author": str(author_name_latex)
+        }
+
+        query = """
+            MERGE (s:symbol:vector {id: $id})
+            ON CREATE SET 
+                s.created_datetime = $created,
+                s.name_latex = $name,
+                s.latex = $latex,
+                s.description_latex = $desc,
+                s.reference_latex = $ref,
+                s.orientation = $orientation,
+                s.size = $size,
+                s.number_of_entries = $num_entries,
+                s.is_composite = $is_composite,
+                s.author_name_latex = $author
+            ON MATCH SET 
+                s.name_latex = $name,
+                s.latex = $latex,
+                s.description_latex = $desc,
+                s.reference_latex = $ref,
+                s.orientation = $orientation,
+                s.size = $size,
+                s.number_of_entries = $num_entries,
+                s.is_composite = $is_composite,
+                s.author_name_latex = $author
+        """
+        result = tx.run(query, params)
 
     logger.info(
         "[TRACE] add_vector_symbol end " + str(trace_id) + " " + str(time.time())
@@ -1777,33 +2042,106 @@ def add_matrix_symbol(
     assert len(symbol_latex) > 0
 
     if symbol_size == "arbitrary":
-        result = tx.run(
-            "merge (:symbol:matrix "
-            '{name_latex:"' + str(symbol_name) + '", '
-            ' latex:"' + str(symbol_latex) + '", '
-            ' description_latex:"' + str(symbol_description) + '", '
-            ' reference_latex:"' + str(symbol_reference) + '", '
-            " size: '" + str(symbol_size) + "',"
-            "is_composite:" + str(symbol_is_composite) + ","
-            ' created_datetime:"' + now_str + '",'
-            ' author_name_latex:"' + str(author_name_latex) + '", '
-            ' id:"' + str(symbol_id) + '"})'
-        )
+        # result = tx.run(
+        #     "merge (:symbol:matrix "
+        #     '{name_latex:"' + str(symbol_name) + '", '
+        #     ' latex:"' + str(symbol_latex) + '", '
+        #     ' description_latex:"' + str(symbol_description) + '", '
+        #     ' reference_latex:"' + str(symbol_reference) + '", '
+        #     " size: '" + str(symbol_size) + "',"
+        #     " is_composite:" + str(symbol_is_composite) + ","
+        #     ' created_datetime:"' + now_str + '",'
+        #     ' author_name_latex:"' + str(author_name_latex) + '", '
+        #     ' id:"' + str(symbol_id) + '"})'
+        # )
+        query = """
+            MERGE (m:symbol:matrix {id: $id})
+            ON CREATE SET
+                m.created_datetime = $created_datetime,
+                m.name_latex = $name_latex,
+                m.latex = $latex,
+                m.description_latex = $description_latex,
+                m.reference_latex = $reference_latex,
+                m.size = $size,
+                m.is_composite = $is_composite,
+                m.author_name_latex = $author_name_latex
+            ON MATCH SET
+                m.name_latex = $name_latex,
+                m.latex = $latex,
+                m.description_latex = $description_latex,
+                m.reference_latex = $reference_latex,
+                m.size = $size,
+                m.is_composite = $is_composite,
+                m.author_name_latex = $author_name_latex
+        """
+        parameters = {
+            "id": str(symbol_id),
+            "name_latex": str(symbol_name),
+            "latex": str(symbol_latex),
+            "description_latex": str(symbol_description),
+            "reference_latex": str(symbol_reference),
+            "size": str(symbol_size),
+            "is_composite": symbol_is_composite, # Assuming this is a boolean/int, usually better not to str() it
+            "created_datetime": now_str,
+            "author_name_latex": str(author_name_latex)
+        }
+
+        result = tx.run(query, parameters)
+
     else:  # fixed size
-        result = tx.run(
-            "merge (:matrix "
-            '{name_latex:"' + str(symbol_name) + '", '
-            ' latex:"' + str(symbol_latex) + '", '
-            ' description_latex:"' + str(symbol_description) + '", '
-            ' reference_latex:"' + str(symbol_reference) + '", '
-            " size: '" + str(symbol_size) + "',"
-            'number_of_rows:"' + str(symbol_number_of_rows) + '", '
-            'number_of_columns:"' + str(symbol_number_of_columns) + '", '
-            "is_composite:" + str(symbol_is_composite) + ","
-            ' created_datetime:"' + now_str + '",'
-            ' author_name_latex:"' + str(author_name_latex) + '", '
-            ' id:"' + str(symbol_id) + '"})'
-        )
+        # result = tx.run(
+        #     "merge (:matrix "
+        #     '{name_latex:"' + str(symbol_name) + '", '
+        #     ' latex:"' + str(symbol_latex) + '", '
+        #     ' description_latex:"' + str(symbol_description) + '", '
+        #     ' reference_latex:"' + str(symbol_reference) + '", '
+        #     " size: '" + str(symbol_size) + "',"
+        #     'number_of_rows:"' + str(symbol_number_of_rows) + '", '
+        #     'number_of_columns:"' + str(symbol_number_of_columns) + '", '
+        #     "is_composite:" + str(symbol_is_composite) + ","
+        #     ' created_datetime:"' + now_str + '",'
+        #     ' author_name_latex:"' + str(author_name_latex) + '", '
+        #     ' id:"' + str(symbol_id) + '"})'
+        # )
+        query = """
+            MERGE (m:matrix {id: $id})
+            ON CREATE SET
+                m.created_datetime = $created_datetime,
+                m.name_latex = $name_latex,
+                m.latex = $latex,
+                m.description_latex = $description_latex,
+                m.reference_latex = $reference_latex,
+                m.size = $size,
+                m.number_of_rows = $number_of_rows,
+                m.number_of_columns = $number_of_columns,
+                m.is_composite = $is_composite,
+                m.author_name_latex = $author_name_latex
+            ON MATCH SET
+                m.name_latex = $name_latex,
+                m.latex = $latex,
+                m.description_latex = $description_latex,
+                m.reference_latex = $reference_latex,
+                m.size = $size,
+                m.number_of_rows = $number_of_rows,
+                m.number_of_columns = $number_of_columns,
+                m.is_composite = $is_composite,
+                m.author_name_latex = $author_name_latex
+        """
+        parameters = {
+            "id": str(symbol_id),
+            "name_latex": str(symbol_name),
+            "latex": str(symbol_latex),
+            "description_latex": str(symbol_description),
+            "reference_latex": str(symbol_reference),
+            "size": str(symbol_size),
+            "number_of_rows": str(symbol_number_of_rows),
+            "number_of_columns": str(symbol_number_of_columns),
+            "is_composite": symbol_is_composite, # Assuming this is a boolean/int, usually better not to str() it
+            "created_datetime": now_str,
+            "author_name_latex": str(author_name_latex)
+        }
+
+        result = tx.run(query, parameters)
 
     logger.info(
         "[TRACE] add_matrix_symbol end " + str(trace_id) + " " + str(time.time())
@@ -1837,17 +2175,67 @@ def add_operation_symbol(
     assert len(operation_latex) > 0
     assert int(operation_argument_count) > 0
 
-    result = tx.run(
-        "merge (:operation "
-        '{name_latex:"' + str(operation_name) + '", '
-        ' latex:"' + str(operation_latex) + '", '
-        ' description_latex:"' + str(operation_description_latex) + '", '
-        ' reference_latex:"' + str(operation_reference_latex) + '", '
-        " argument_count:" + str(operation_argument_count) + ", "
-        ' created_datetime:"' + now_str + '",'
-        ' author_name_latex:"' + str(author_name_latex) + '", '
-        ' id:"' + str(operation_id) + '"})'
-    )
+    # BHP's (inadequate) attempt:
+    # result = tx.run(
+    #     "merge (:operation "
+    #     '{name_latex:"' + str(operation_name) + '", '
+    #     ' latex:"' + str(operation_latex) + '", '
+    #     ' description_latex:"' + str(operation_description_latex) + '", '
+    #     ' reference_latex:"' + str(operation_reference_latex) + '", '
+    #     " argument_count:" + str(operation_argument_count) + ", "
+    #     ' created_datetime:"' + now_str + '",'
+    #     ' author_name_latex:"' + str(author_name_latex) + '", '
+    #     ' id:"' + str(operation_id) + '"})'
+    # )
+    # Gemini 3 Pro's explanation of the inadequacy:
+    # The error happens because your current MERGE statement is trying to
+    # match a node that has all those specific properties at once.
+    #
+    # If any property (like the description or latex) is different from what
+    # is currently in the database, MERGE tries to create a new node. However,
+    # since you have a database constraint that says id must be unique,
+    # the database blocks this creation.
+    #
+    # To fix this, you need to:
+    # - MERGE only on the unique ID.
+    # - SET the other properties afterwards.
+    #
+    # You should also stop using string concatenation (+ str(x) +) to build queries.
+    # It causes syntax errors if your strings contain quotes and leaves you
+    # open to code injection attacks. Use parameters instead.
+
+    query = """
+        MERGE (o:operation {id: $id})
+        ON CREATE SET 
+            o.created_datetime = $created,
+            o.name_latex = $name,
+            o.latex = $latex,
+            o.description_latex = $desc,
+            o.reference_latex = $ref,
+            o.argument_count = $arg_count,
+            o.author_name_latex = $author
+        ON MATCH SET 
+            o.name_latex = $name,
+            o.latex = $latex,
+            o.description_latex = $desc,
+            o.reference_latex = $ref,
+            o.argument_count = $arg_count,
+            o.author_name_latex = $author
+            // Note: created_datetime is NOT updated here
+    """
+
+    params = {
+        "id": str(operation_id),
+        "name": str(operation_name),
+        "latex": str(operation_latex),
+        "desc": str(operation_description_latex),
+        "ref": str(operation_reference_latex),
+        "arg_count": operation_argument_count,  # Integers don't need str()
+        "created": str(now_str),
+        "author": str(author_name_latex),
+    }
+
+    result = tx.run(query, params)
 
     logger.info(
         "[TRACE] add_operation_symbol end " + str(trace_id) + " " + str(time.time())
@@ -1879,16 +2267,37 @@ def add_relation_symbol(
     assert len(relation_name_latex) > 0
     assert len(relation_latex) > 0
 
-    result = tx.run(
-        "merge (:relation "
-        '{name_latex:"' + str(relation_name_latex) + '", '
-        ' latex:"' + str(relation_latex) + '", '
-        ' description_latex:"' + str(relation_description_latex) + '", '
-        ' reference_latex:"' + str(relation_reference_latex) + '", '
-        ' created_datetime:"' + now_str + '",'
-        ' author_name_latex:"' + str(author_name_latex) + '", '
-        ' id:"' + str(relation_id) + '"})'
-    )
+    query = """
+        MERGE (o:relation {id: $id})
+        ON CREATE SET 
+            o.created_datetime = $created,
+            o.name_latex = $name,
+            o.latex = $latex,
+            o.description_latex = $desc,
+            o.reference_latex = $ref,
+            o.author_name_latex = $author
+        ON MATCH SET 
+            o.name_latex = $name,
+            o.latex = $latex,
+            o.description_latex = $desc,
+            o.reference_latex = $ref,
+            o.author_name_latex = $author
+            // Note: created_datetime is NOT updated here
+    """
+
+    params = {
+        "id": str(relation_id),
+        "name": str(relation_name_latex),
+        "latex": str(relation_latex),
+        "desc": str(relation_description_latex),
+        "ref": str(relation_reference_latex),
+        "created": str(now_str),
+        "author": str(author_name_latex),
+    }
+
+    result = tx.run(query, params)
+
+
 
     logger.info(
         "[TRACE] add_relation_symbol end " + str(trace_id) + " " + str(time.time())
