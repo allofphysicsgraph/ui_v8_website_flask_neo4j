@@ -1498,7 +1498,7 @@ def add_expression(
         "created": now_str,
         "desc": str(expression_description_latex),
         "ref": str(expression_reference_latex),
-        "author": str(author_name_latex)
+        "author": str(author_name_latex),
     }
 
     query = """
@@ -1562,7 +1562,7 @@ def add_feed(
         "author": str(author_name_latex),
         "created": now_str,
         "sympy": str(feed_sympy),
-        "lean": str(feed_lean)
+        "lean": str(feed_lean),
     }
 
     query = """
@@ -1630,7 +1630,7 @@ def add_quantum_operator_symbol(
         "created": now_str,
         "author": str(author_name_latex),
         "req_args": symbol_requires_arguments,
-        "ref": str(symbol_reference)
+        "ref": str(symbol_reference),
     }
 
     query = """
@@ -1674,7 +1674,7 @@ def add_constant_value_with_units(
     author_name_latex: str,
 ) -> None:
     """
-    This function may suffice for creating new constants 
+    This function may suffice for creating new constants
     but is not expected to work for editing constants. See Gemini 3 Pro's observation inline below.
 
     >>>
@@ -1709,13 +1709,13 @@ def add_constant_value_with_units(
     )
 
     # TODO, pointed out by Gemini 3 Pro on 2026-02-03:
-    # In a parameterized query, you cannot inject raw string fragments for property names. 
+    # In a parameterized query, you cannot inject raw string fragments for property names.
     # You must add the specific values (e.g., unit information) directly into the params dictionary and the SET clauses.
 
     # params = {
     #     "id": str(value_with_units_id),
-    #     "num_dec": number_decimal,   
-    #     "num_pow": number_power,     
+    #     "num_dec": number_decimal,
+    #     "num_pow": number_power,
     #     "created": now_str,
     #     "author": str(author_name_latex)
     #     # You must extract the values from 'str_to_add' and put them here.
@@ -1723,14 +1723,14 @@ def add_constant_value_with_units(
     # }
     # query = """
     #     MERGE (v:value_with_units {id: $id})
-    #     ON CREATE SET 
+    #     ON CREATE SET
     #         v.created_datetime = $created,
     #         v.number_decimal = $num_dec,
     #         v.number_power = $num_pow,
     #         v.author_name_latex = $author
     #         // Add specific properties from str_to_add here
     #         // Example: v.unit_latex = $unit
-    #     ON MATCH SET 
+    #     ON MATCH SET
     #         v.number_decimal = $num_dec,
     #         v.number_power = $num_pow,
     #         v.author_name_latex = $author
@@ -1831,7 +1831,7 @@ def add_scalar_symbol(
         "dim_amt": dimension_amount_of_substance,
         "dim_lum": dimension_luminous_intensity,
         "created": now_str,
-        "author": str(author_name_latex)
+        "author": str(author_name_latex),
     }
 
     query = """
@@ -1926,9 +1926,9 @@ def add_vector_symbol(
             "ref": str(symbol_reference),
             "orientation": str(symbol_orientation),
             "size": str(symbol_size),
-            "is_composite": symbol_is_composite, 
+            "is_composite": symbol_is_composite,
             "created": now_str,
-            "author": str(author_name_latex)
+            "author": str(author_name_latex),
         }
 
         query = """
@@ -1979,9 +1979,9 @@ def add_vector_symbol(
             "orientation": str(symbol_orientation),
             "size": str(symbol_size),
             "num_entries": str(symbol_number_of_entries),
-            "is_composite": symbol_is_composite, 
+            "is_composite": symbol_is_composite,
             "created": now_str,
-            "author": str(author_name_latex)
+            "author": str(author_name_latex),
         }
 
         query = """
@@ -2081,9 +2081,9 @@ def add_matrix_symbol(
             "description_latex": str(symbol_description),
             "reference_latex": str(symbol_reference),
             "size": str(symbol_size),
-            "is_composite": symbol_is_composite, # Assuming this is a boolean/int, usually better not to str() it
+            "is_composite": symbol_is_composite,  # Assuming this is a boolean/int, usually better not to str() it
             "created_datetime": now_str,
-            "author_name_latex": str(author_name_latex)
+            "author_name_latex": str(author_name_latex),
         }
 
         result = tx.run(query, parameters)
@@ -2136,9 +2136,9 @@ def add_matrix_symbol(
             "size": str(symbol_size),
             "number_of_rows": str(symbol_number_of_rows),
             "number_of_columns": str(symbol_number_of_columns),
-            "is_composite": symbol_is_composite, # Assuming this is a boolean/int, usually better not to str() it
+            "is_composite": symbol_is_composite,  # Assuming this is a boolean/int, usually better not to str() it
             "created_datetime": now_str,
-            "author_name_latex": str(author_name_latex)
+            "author_name_latex": str(author_name_latex),
         }
 
         result = tx.run(query, parameters)
@@ -2296,8 +2296,6 @@ def add_relation_symbol(
     }
 
     result = tx.run(query, params)
-
-
 
     logger.info(
         "[TRACE] add_relation_symbol end " + str(trace_id) + " " + str(time.time())
