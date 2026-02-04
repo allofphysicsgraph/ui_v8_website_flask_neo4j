@@ -1085,7 +1085,7 @@ def before_request():
     """
     g.start = time.time()
     g.request_start_time = time.time()
-    logger.info("[TRACE] before_request: created elapsed_time function")
+    logger.info("[TRACE] created elapsed_time function")
     elapsed_time = lambda: round(time.time() - g.request_start_time, 3)
     g.request_time = elapsed_time
     return
@@ -1420,19 +1420,19 @@ def to_add_derivation() -> werkzeug.Response:
     #     logger.info("derivation_name_from_URL:" + str(derivation_name_from_URL))
     #     logger.info("derivation_abstract_from_URL:" + str(derivation_abstract_from_URL))
 
-    logger.info("to_add_derivation: request.form=" + str(request.form))
+    logger.info("request.form=" + str(request.form))
     # request.form= ('derivation_name_latex', 'this is a new derivation'),
     #               ('derivation_reference_latex', ''), ('abstract_latex', 'my summary')])
 
     web_form = SpecifyNewDerivationForm(request.form)
 
-    logger.info("to_add_derivation: request.method=" + str(request.method))  # POST
-    logger.info(
-        "to_add_derivation: web_form.validate()=" + str(web_form.validate())
-    )  # True
+    logger.info("request.method=" + str(request.method))  # POST
 
+    if request.method == "POST" and not web_form.validate():
+        flash(str(web_form.errors))
+        logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
-        logger.info("to_add_derivation: request.form =" + str(request.form))
+        logger.info("request.form =" + str(request.form))
         derivation_name_latex = str(web_form.derivation_name_latex.data).strip()
         derivation_reference_latex = str(
             web_form.derivation_reference_latex.data
@@ -1878,6 +1878,10 @@ def to_edit_derivation_metadata(
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form = SpecifyNewDerivationForm(request.form)
+
+    if request.method == "POST" and not web_form.validate():
+        flash(str(web_form.errors))
+        logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info("to_edit_derivation_metadata: request.form = " + str(request.form))
 
@@ -2142,6 +2146,10 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     # deleting the old expression and creating a new expression
     # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
     web_form_new_expression = SpecifyNewExpressionForm(request.form)
+
+    if request.method == "POST" and not web_form_new_expression.validate():
+        flash(str(web_form_new_expression.errors))
+        logger.info(str(web_form_new_expression.errors))
     if request.method == "POST" and web_form_new_expression.validate():
         logger.info(
             "to_edit_expression: with web_form_new_expression, request.form = "
@@ -2415,6 +2423,10 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     #         )
 
     web_form_new_feed = SpecifyEditFeedForm(request.form)
+
+    if request.method == "POST" and not web_form_new_feed.validate():
+        flash(str(web_form_new_feed.errors))
+        logger.info(str(web_form_new_feed.errors))
     if request.method == "POST" and web_form_new_feed.validate():
         logger.info("to_edit_feed: with web_form, request.form = " + str(request.form))
 
@@ -2686,9 +2698,10 @@ def to_add_expression() -> werkzeug.Response:
 
     # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
     web_form = SpecifyNewExpressionForm(request.form)
-    if request.method == "POST":
-        logger.info("to_add_expression: POSTED!")
-        logger.info("to_add_expression: request.form = " + str(request.form))
+
+    if request.method == "POST" and not web_form.validate():
+        flash(str(web_form.errors))
+        logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info("to_add_expression: request.form = " + str(request.form))
 
@@ -2834,6 +2847,10 @@ def to_add_feed() -> werkzeug.Response:
     )
 
     web_form = SpecifyNewFeedForm(request.form)
+
+    if request.method == "POST" and not web_form.validate():
+        flash(str(web_form.errors))
+        logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info("to_add_feed: request.form = " + str(request.form))
 
@@ -3042,10 +3059,13 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
 
     web_form = SpecifyNewSymbolOperationForm(request.form)
     web_form_no_options = NoOptionsForm(request.form)
-    logger.info("to_edit_operation: request.method =" + str(request.method))
-    logger.info("to_edit_operation: request.form = " + str(request.form))
+    logger.info("request.method =" + str(request.method))
+
+    if request.method == "POST" and not web_form.validate():
+        flash(str(web_form.errors))
+        logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
-        logger.info("to_edit_operation in POST the request.form = " + str(request.form))
+        logger.info("request.form = " + str(request.form))
 
         operation_latex = str(web_form.operation_latex.data).strip()
         operation_name_latex = str(web_form.operation_name_latex.data).strip()
@@ -3053,7 +3073,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
             web_form.operation_description_latex.data
         ).strip()
         operation_reference_latex = str(web_form.operation_reference_latex.data).strip()
-        operation_number_of_arguments = int(web_form.operation_number_of_arguments.data)
+        operation_number_of_arguments = int(web_form.operation_argument_count.data)
 
         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
@@ -3116,6 +3136,10 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
     web_form_new_symbol = SpecifyNewSymbolRelationForm(request.form)
     logger.info("to_edit_relation: request.method =" + str(request.method))
     logger.info("to_edit_relation: request.form = " + str(request.form))
+
+    if request.method == "POST" and not web_form_new_symbol.validate():
+        flash(str(web_form_new_symbol.errors))
+        logger.info(str(web_form_new_symbol.errors))
     if request.method == "POST" and web_form_new_symbol.validate():
         logger.info("to_edit_relation: in POST the request.form = " + str(request.form))
 
@@ -3201,6 +3225,9 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
         # ('scalar_description_latex', 'description of scalar'),
         # ('scalar_reference_latex', 'this is a referec')])
 
+    if request.method == "POST" and not web_form_symbol_properties.validate():
+        flash(str(web_form_symbol_properties.errors))
+        logger.info(str(web_form_symbol_properties.errors))
     if request.method == "POST" and web_form_symbol_properties.validate():
         logger.info("to_edit_scalar: request.form validated")
 
@@ -3370,6 +3397,10 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
     logger.info("to_add_value_and_units: request.form = " + str(request.form))
     web_form_constant_properties = SpecifyNewConstantNumberForm(request.form)
+
+    if request.method == "POST" and not web_form_constant_properties.validate():
+        flash(str(web_form_constant_properties.errors))
+        logger.info(str(web_form_constant_properties.errors))
     if request.method == "POST" and web_form_constant_properties.validate():
         logger.info("to_add_value_and_units: request.form = " + str(request.form))
 
@@ -3515,6 +3546,10 @@ def to_add_symbol_scalar() -> werkzeug.Response:
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_scalar_properties = SpecifyNewSymbolScalarForm(request.form)
+
+    if request.method == "POST" and not web_form_scalar_properties.validate():
+        flash(str(web_form_scalar_properties.errors))
+        logger.info(str(web_form_scalar_properties.errors))
     if request.method == "POST" and web_form_scalar_properties.validate():
         logger.info("to_add_symbol_scalar: request.form = " + str(request.form))
 
@@ -3690,6 +3725,10 @@ def to_add_symbol_vector() -> werkzeug.Response:
         )
 
     web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
+
+    if request.method == "POST" and not web_form_vector_properties.validate():
+        flash(str(web_form_vector_properties.errors))
+        logger.info(str(web_form_vector_properties.errors))
     if request.method == "POST" and web_form_vector_properties.validate():
         logger.info("to_add_symbol_vector: request.form = " + str(request.form))
 
@@ -3805,6 +3844,10 @@ def to_add_symbol_matrix() -> werkzeug.Response:
         )
 
     web_form_matrix_properties = SpecifyNewSymbolMatrixForm(request.form)
+
+    if request.method == "POST" and not web_form_matrix_properties.validate():
+        flash(str(web_form_matrix_properties.errors))
+        logger.info(str(web_form_matrix_properties.errors))
     if request.method == "POST" and web_form_matrix_properties.validate():
         logger.info("to_add_symbol_matrix: request.form = " + str(request.form))
 
@@ -4545,6 +4588,10 @@ def to_add_operation() -> werkzeug.Response:
         )
 
     web_form = SpecifyNewSymbolOperationForm(request.form)
+
+    if request.method == "POST" and not web_form.validate():
+        flash(str(web_form.errors))
+        logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info("to_add_operation: request.form = " + str(request.form))
 
@@ -4645,6 +4692,10 @@ def to_add_relation() -> werkzeug.Response:
 
     logger.info("to_add_relation before validate - request.form = " + str(request.form))
     web_form = SpecifyNewSymbolRelationForm(request.form)
+
+    if request.method == "POST" and not web_form.validate():
+        flash(str(web_form.errors))
+        logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info(
             "to_add_relation after validate - request.form = " + str(request.form)
@@ -4792,6 +4843,10 @@ def to_add_step_select_expressions(
     )
 
     web_form = SpecifyNewStepForm(request.form)
+
+    if request.method == "POST" and not web_form.validate():
+        flash(str(web_form.errors))
+        logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info(
             "to_add_step_select_expressions: request.form = " + str(request.form)
@@ -5766,6 +5821,10 @@ def to_add_inference_rule() -> werkzeug.Response:
     )
 
     web_form = SpecifyNewInferenceRuleForm(request.form)
+
+    if request.method == "POST" and not web_form.validate():
+        flash(str(web_form.errors))
+        logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info("to_add_inference_rule request.form = " + str(request.form))
 
@@ -5917,6 +5976,10 @@ def to_edit_step(
     logger.info("to_edit_step: this_step_dict=" + str(this_step_dict))
 
     web_form = SpecifyNewStepForm(request.form)
+
+    if request.method == "POST" and not web_form.validate():
+        flash(str(web_form.errors))
+        logger.info(str(web_form.errors))
     if (
         request.method == "POST" and web_form.validate()
     ):  # form always validates because no field is required
@@ -5985,6 +6048,9 @@ def to_edit_inference_rule(
 
             return redirect(url_for("to_list_inference_rules"))
 
+    if request.method == "POST" and not web_form_edit.validate():
+        flash(str(web_form_edit.errors))
+        logger.info(str(web_form_edit.errors))
     if request.method == "POST" and web_form_edit.validate():
         logger.info("to_edit_inference_rule validated")
         logger.info("to_edit_inference_rule request.form valid = " + str(request.form))
@@ -6152,6 +6218,10 @@ def to_query() -> werkzeug.Response:
     logger.info("to_query: request.method=" + str(request.method))
 
     web_form = CypherQueryForm(request.form)
+
+    if request.method == "POST" and not web_form.validate():
+        flash(str(web_form.errors))
+        logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         query = str(web_form.query.data).strip()
         logger.info("to_query: form valid; query via web form: " + str(query))
@@ -7435,7 +7505,7 @@ def to_user_documentation():
 
     >>> user_documentation()
     """
-    logger.info("[TRACE] ")
+    logger.info("[TRACE] to_user_documentation ")
     return render_template(
         "jinja2_pages/documentation_for_user.html", title="User Documentation"
     )
