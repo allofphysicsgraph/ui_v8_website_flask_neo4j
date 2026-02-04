@@ -13,7 +13,7 @@
 
 <fieldset>
   <legend>
-    <H2>Edit Symbol</h2>
+    <H2>Edit Constant \( {{ symbol_dict['latex'] }} \)</h2>
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
@@ -21,9 +21,9 @@
     <P>
       {{ form_symbol_properties.symbol_latex.label}}: {{ form_symbol_properties.symbol_latex(size=50, maxlength=1000, value=symbol_dict['latex']) }} <BR/>
       &nbsp;<BR/>
-      {{form_symbol_properties.symbol_name.label }}: {{ form_symbol_properties.symbol_name(size=50, maxlength=1000, value=symbol_dict['name']) }}<BR/>
+      {{form_symbol_properties.symbol_name.label }}: {{ form_symbol_properties.symbol_name(size=50, maxlength=1000, value=symbol_dict['name_latex']) }}<BR/>
       &nbsp;<BR/>
-      {{form_symbol_properties.symbol_description.label }}: {{ form_symbol_properties.symbol_description(size=50, maxlength=1000, value=symbol_dict['description']) }}<BR/>
+      {{form_symbol_properties.symbol_description.label }}: {{ form_symbol_properties.symbol_description(size=50, maxlength=1000, value=symbol_dict['description_latex']) }}<BR/>
       &nbsp;<BR/>
       <input type="submit" value="Edit symbol">
     </P>
@@ -35,7 +35,7 @@ TODO: edit dimension
 
 <fieldset>
   <legend>
-    <H2>Delete Symbol</H2>
+    <H2>Delete Constant  \( {{ symbol_dict['latex'] }} \)</H2>
   </legend>
 
 <form method="post" action="" onsubmit="return checkForm(this);">
