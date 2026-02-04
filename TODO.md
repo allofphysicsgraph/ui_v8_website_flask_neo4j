@@ -29,8 +29,13 @@ Enter a novel derivation
 
 ---
 
-(manually) eliminate all errors on webpageshttps://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues?q=is%3Aissue%20state%3Aopen%20type%3ABug
+(manually) eliminate all errors on webpages
+https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues?q=is%3Aissue%20state%3Aopen%20type%3ABug
+
+- on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
+
 write tests to validate that on front-end and back-end
+
 Use selenium to automate opening all pages from site map
 
 ---
