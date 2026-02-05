@@ -16,7 +16,7 @@ import list_of_valid
 
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
-from typing import NewType, Dict, List, Tuple
+from typing import NewType, Dict, List, Tuple, Any, Union  # for type hinting
 
 # ORDERING: this has to come before the functions that use this type
 unique_numeric_id_as_str = NewType("unique_numeric_id_as_str", str)
@@ -66,6 +66,86 @@ def generate_random_id(
         "[TRACE] compute/generate_random_id end " + trace_id + " " + str(time.time())
     )
     return str(new_id), query_time_dict
+
+
+def send_email_with_msmtp(
+    recipients: Union[str, List[str]], subject: str, body: str, from_address: str = None
+):
+    """
+    Sends an email using the system's msmtp command.
+
+    Args:
+        recipients: The email address of the recipient, or a list of emails.
+        subject (str): The subject line of the email.
+        body (str): The plain text body of the email.
+        from_address (str, optional): The From: address. If None, msmtp will
+                                      use the default from your .msmtprc.
+                                      It's good practice to set it.
+    Returns:
+        bool: True for success, False for failure.
+    """
+    logger.info("[TRACE]")
+
+    if isinstance(recipients, str):
+        recipients_list = [recipients]
+    else:
+        recipients_list = recipients
+
+    if not recipients_list:
+        print("Error: No recipients specified.", file=sys.stderr)
+        return False
+
+    headers = f"Subject: {subject}\n"
+    if from_address:
+        headers += f"From: {from_address}\n"
+
+    # Join the list of recipients with a comma for the 'To:' header
+    headers += f"To: {', '.join(recipients_list)}\n"
+
+    # The full email message must have headers and body separated by a blank line.
+    message = f"{headers}\n{body}"
+
+    # print("\n")
+    # print(message)
+    # print("\n")
+
+    # The command to execute. We pass the recipient as a command-line argument.
+    command = ["msmtp"] + recipients_list
+
+    try:
+        # We run the command and pipe the message to its standard input (stdin).
+        # `input` needs bytes, so we encode the message string.
+        # `check=True` will raise a CalledProcessError if msmtp returns a non-zero exit code.
+        # `capture_output=True` will capture stdout and stderr.
+        process = subprocess.run(
+            command, input=message.encode("utf-8"), check=True, capture_output=True
+        )
+        # print(f"Email sent successfully to: {', '.join(recipients_list)}")
+        # For debugging, you can print the output from msmtp
+        # print("STDOUT:", process.stdout.decode())
+        return True
+
+    except FileNotFoundError:
+        print("Error: 'msmtp' command not found.", file=sys.stderr)
+        print(
+            "Please ensure msmtp is installed and in your system's PATH.",
+            file=sys.stderr,
+        )
+        print("\nhere what was going to be sent:\n")
+        print(message)
+        return False
+
+    except subprocess.CalledProcessError as e:
+        # This block runs if msmtp fails (e.g., auth error, network issue).
+        print("Error sending email:", file=sys.stderr)
+        print(f"msmtp exit code: {e.returncode}", file=sys.stderr)
+        print("\n--- msmtp STDOUT ---", file=sys.stderr)
+        print(e.stdout.decode(), file=sys.stderr)
+        print("\n--- msmtp STDERR ---", file=sys.stderr)
+        print(e.stderr.decode(), file=sys.stderr)
+        return False
+
+    return
 
 
 def get_dict_of_node_type_for_every_id(
