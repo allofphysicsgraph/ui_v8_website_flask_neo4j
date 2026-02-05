@@ -1,10 +1,46 @@
+Enter a novel derivation
+
+What's preventing me from doing so now?
+- cypher export does not produce a consistent order. As a result, diff isn't feasible
+    - can CSV or GraphML output be diff'd?
+    - The missing expressions in step 17
+- Display the AST for equation review
+- on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
+
+Create a function in the compute library that creates a list of all symbol dictionaries
+In the compute library, create a function that converts a list of dictionaries into a dictionary dictionaries, with key of ID
 
 
-email alerts - https://github.com/allofphysicsgraph/task-tracker/issues/137
+List of symbol dicts in this derivation would be useful to display both in the derivation review step list as well as the entering a new step review
+
+For each derivation, list all of the symbols and operations used in that derivation
+
+
+New function in compute:
+List of all non-operation symbols
+Used by new feed when promoting existing symbol
 
 ---
 
-Display the AST for equation review
+For the decision design decisions, each question should be clear about which one is the current state of the practice and which ones were tried
+
+---
+
+Can I export all of the step and expression edges and then visualize that in graph is
+
+---
+
+There's dimensional consistency of length and time and mass 
+And there's a dimensional consistency of vectors equal vectors, scalars equal scalars, matrix equals matrix
+
+---
+
+hide (javascript) the output of "timing of Neo4j queries:" per page since the list can be long
+
+
+---
+
+email alerts - https://github.com/allofphysicsgraph/task-tracker/issues/137
 
 ---
 
@@ -12,9 +48,6 @@ add column for status on other projects for categories like active, idle, unavai
 
 ---
 
-cypher export does not produce a consistent order. As a result, diff isn't feasible
-
----
 
 Move content out of "todo.md"
 
@@ -25,25 +58,15 @@ https://github.com/allofphysicsgraph/task-tracker/issues/105
 
 ---
 
-Enter a novel derivation
-
----
-
 (manually) eliminate all errors on webpages
 https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues?q=is%3Aissue%20state%3Aopen%20type%3ABug
 
-- on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
-
-write tests to validate that on front-end and back-end
 
 Use selenium to automate opening all pages from site map
 
 ---
 
-write tests for API
-authenticate for API writes
-
----
+add to other projects
 
 <https://www.facebook.com/AssumptionsOfPhysics>
 
@@ -51,22 +74,6 @@ authenticate for API writes
 
 ---
 
-Create a function in the compute library that creates a list of all symbol dictionaries
-In the compute library, create a function that converts a list of dictionaries into a dictionary dictionaries, with key of ID
-
----
-
-List of symbol dicts in this derivation would be useful to display both in the derivation review step list as well as the entering a new step review
-
-For each derivation, list all of the symbols and operations used in that derivation
-
----
-
-New function in compute:
-List of all non-operation symbols
-Used by new feed when promoting existing symbol
-
----
 
 Lean to C++
 https://proofassistants.stackexchange.com/questions/1388/how-to-run-the-main-function-in-lean-4
