@@ -50,12 +50,6 @@ where the key-value pairs are properties.
 [x] Facilitate Collaboration and Sharing by using open source and publicly accessible information.
 [x] Enable programmatic interaction with the data using both a web interface and API.
 
-# Debugging
-
-To enter the container for debugging purposes,
-```bash
-docker exec -it `docker ps | grep ui_v8_website_flask_neo4j_webserver | cut -d' ' -f1` /bin/bash
-```
 
 # Licensing
 
@@ -72,22 +66,33 @@ The content of this repo is covered by the
 
 ## Key features
 
-The Docker images include the software needed for the webserver (Python Flask) and everything else 
+The architecture is Neo4j-Flask-Gunicorn-Nginx all inside a Docker container on an Ubuntu VPS that includes UFW
+
+The Docker images include the software needed for the webserver (Python Flask) 
 * Latex for rendering equations as PNG and PDF
 * SymPy for validating steps in derivations
-* TODO: Lean
+* Lean
 * Graphviz for static visualization of graphs
 * d3js for interactive visualizations of graphs
 
-See VERSIONS.md for details
+See VERSIONS.md for details.
+
+## Debugging
+
+To enter the container for debugging purposes,
+```bash
+docker exec -it `docker ps | grep ui_v8_website_flask_neo4j_webserver | cut -d' ' -f1` /bin/bash
+```
+
+## Contributing
+
+See CONTRIBUTING.md for guidance.
+
 
 # Licensing
 
 Unless otherwise noted, all source code is covered by the [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/)
 
 
-# Contributing
-
-See CONTRIBUTING.md for guidance.
 
 #EOF
