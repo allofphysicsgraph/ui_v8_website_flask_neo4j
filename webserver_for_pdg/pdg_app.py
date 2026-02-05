@@ -71,9 +71,11 @@ import time
 import random
 import datetime
 
+import xmltodict
+
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
-from typing import NewType, Dict, List
+from typing import NewType, Dict, List, Any, Tuple, Union  # for type hinting
 
 # https://docs.python.org/3/library/re.html
 import re
@@ -7585,6 +7587,149 @@ def to_other_projects():
     return render_template(
         "jinja2_pages/documentation_other_projects.html", title="Other projects"
     )
+
+
+@web_app.route("/arxiv_scraper", methods=["GET", "POST"])
+def scrape_arxiv():
+    """
+    allofphysics.com/arxiv_scraper?q=feynman
+    """
+    logger.info("[TRACE] ")
+
+    user_query_title = request.args.get("title", "")
+    logger.info("user_query_title: " + user_query_title)
+    user_query_title_list = user_query_title.split(",")
+
+    user_query_description = request.args.get("description", "")
+    logger.info("user_query_description: " + user_query_description)
+    user_query_description_list = user_query_description.split(",")
+
+    user_query_author = request.args.get("author", "")
+    logger.info("user_query_author: " + user_query_author)
+    user_query_author_list = user_query_author.split(",")
+
+    # flash(user_query) # flash doesn't work since this isn't a jinja2 page :(
+
+    ARXIV_URL = "https://export.arxiv.org/rss/quant-ph"
+
+    def _format_match_message(entry: Dict[str, Any], reason: str) -> str:
+        """Formats a consistent message for a found match."""
+        title = entry.get("title", "N/A")
+        link = entry.get("link", "N/A")
+        # Creator can sometimes be a list or a single string
+        creator_data = entry.get("dc:creator", "N/A")
+        authors = (
+            ", ".join(creator_data) if isinstance(creator_data, list) else creator_data
+        )
+
+        return f"{reason} of {link}\n" f'"{title}"\n' f"by {authors}\n\n"
+
+    def find_arxiv_matches(
+        entries: List[Dict[str, Any]],  # each entry is an arxiv post
+        title_keywords_list: List[str],
+        description_keywords_list: List[str],
+        author_list: List[str],
+    ) -> str:
+        """
+        Finds matches in arXiv entries based on a set of keyword and author rules.
+
+        Returns a single string with all formatted match messages.
+        """
+        str_to_print = ""
+        for (
+            entry
+        ) in entries:  # entries is outmost loop so that a match is only identified once
+            title_to_search = entry.get("title", None).lower()
+            for this_title_keyword in title_keywords_list:
+                if this_title_keyword in title_to_search:
+                    str_to_print += (
+                        "<P>"
+                        + this_title_keyword
+                        + " (title): "
+                        + title_to_search
+                        + "\n<BR>"
+                        + entry.get("dc:creator")
+                        + '<BR>\n<a href="'
+                        + entry.get("link", "link not found")
+                        + '">'
+                        + entry.get("link", "link not found")
+                        + "</a>\n"
+                    )
+
+            description_to_search = entry.get("description", None).lower()
+            for this_description_keyword in description_keywords_list:
+                if this_description_keyword in description_to_search:
+                    str_to_print += (
+                        "<P>"
+                        + this_description_keyword
+                        + " (description): "
+                        + title_to_search
+                        + "\n<BR>"
+                        + entry.get("dc:creator")
+                        + '<BR>\n<a href="'
+                        + entry.get("link", "link not found")
+                        + '">'
+                        + entry.get("link", "link not found")
+                        + "</a>\n"
+                    )
+
+            authors_to_search = entry.get("dc:creator", None).lower()
+            for this_author in author_list:
+                if this_author in authors_to_search:
+                    str_to_print += (
+                        "<P>"
+                        + this_author
+                        + " (author): "
+                        + title_to_search
+                        + "\n<BR>"
+                        + entry.get("dc:creator")
+                        + '<BR>\n<a href="'
+                        + entry.get("link", "link not found")
+                        + '">'
+                        + entry.get("link", "link not found")
+                        + "</a>\n"
+                    )
+
+        return str_to_print
+
+    def get_arxiv_report():
+        """
+        Main function to fetch arXiv data and generate a report of interesting papers.
+        """
+
+        # Fetch the RSS feed and parses it into a list of paper entries.
+        try:
+            r = requests.get(ARXIV_URL)
+            r.raise_for_status()  # Raises an exception for bad status codes (4xx or 5xx)
+            rss_as_dict = xmltodict.parse(r.text)
+            logger.info("rss_as_dict")
+            logger.info(str(rss_as_dict))
+            arxiv_entries = (
+                rss_as_dict.get("rss", {}).get("channel", {}).get("item", [])
+            )
+            logger.info("arxiv_entries")
+            logger.info(str(arxiv_entries))
+        except requests.exceptions.RequestException as e:
+            logger.info(f"Error fetching data from {ARXIV_URL}: {e}")
+            arxiv_entries = []
+        except Exception as e:
+            logger.info(f"Error parsing XML: {e}")
+            arxiv_entries = []
+
+        if not arxiv_entries:
+            return "Could not retrieve or parse arXiv feed."
+
+        report = find_arxiv_matches(
+            arxiv_entries,
+            user_query_title_list,
+            user_query_description_list,
+            user_query_author_list,
+        )
+        return report
+
+    str_to_send = get_arxiv_report()
+
+    return str_to_send
 
 
 @web_app.route("/documentation/common_errors_in_college_math", methods=["GET", "POST"])
