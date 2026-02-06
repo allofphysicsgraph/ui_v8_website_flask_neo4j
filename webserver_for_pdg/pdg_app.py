@@ -7590,120 +7590,126 @@ def to_other_projects():
 @web_app.route("/arxiv_scraper", methods=["GET", "POST"])
 def scrape_arxiv():
     """
-    allofphysics.com/arxiv_scraper?q=feynman
+    allofphysics.com/arxiv_scraper?title=state
+
     """
     logger.info("[TRACE] ")
 
+    ARXIV_URL = "https://export.arxiv.org/rss/quant-ph"
+
+    if not request.args:
+        return (
+            '<P>Search <a href="'
+            + ARXIV_URL
+            + '">'
+            + ARXIV_URL
+            + "</a>"
+            + " by title, author, description\n"
+            + '<P>For example, <a href="/arxiv_scraper?title=state">allofphysics.com/arxiv_scraper?title=state</a>'
+        )
+
     user_query_title = request.args.get("title", "")
     logger.info("user_query_title: " + user_query_title)
-    user_query_title_list = user_query_title.split(",")
-    logger.info(str(user_query_title_list))
+    if len(user_query_title) > 0:
+        user_query_title_list = user_query_title.split(",")
+        logger.info(str(user_query_title_list))
+    else:
+        user_query_title_list = None
 
     user_query_description = request.args.get("description", "")
     logger.info("user_query_description: " + user_query_description)
-    user_query_description_list = user_query_description.split(",")
-    logger.info(str(user_query_description_list))
+    if len(user_query_description) > 0:
+        user_query_description_list = user_query_description.split(",")
+        logger.info(str(user_query_description_list))
+    else:
+        user_query_description_list = None
 
     user_query_author = request.args.get("author", "")
     logger.info("user_query_author: " + user_query_author)
-    user_query_author_list = user_query_author.split(",")
-    logger.info(str(user_query_author_list))
+    if len(user_query_author) > 0:
+        user_query_author_list = user_query_author.split(",")
+        logger.info(str(user_query_author_list))
+    else:
+        user_query_author_list = None
 
     # flash(user_query) # flash doesn't work since this isn't a jinja2 page :(
 
-    ARXIV_URL = "https://export.arxiv.org/rss/quant-ph"
-
     def _format_match_message(entry: Dict[str, Any], reason: str) -> str:
         """Formats a consistent message for a found match."""
-        title = entry.get("title", "N/A")
-        link = entry.get("link", "N/A")
-        # Creator can sometimes be a list or a single string
-        creator_data = entry.get("dc:creator", "N/A")
-        authors = (
-            ", ".join(creator_data) if isinstance(creator_data, list) else creator_data
+        return (
+            "<P>"
+            + reason +": <B>"
+            + entry.get("title", "?? no title ??")
+            + "</B>\n<BR>"
+            + str(entry.get("dc:creator"))
+            + '<BR>\n<a href="'
+            + str(entry.get("link", "link not found"))
+            + '">'
+            + str(entry.get("link", "link not found"))
+            + "</a>\n"
         )
 
-        return f"{reason} of {link}\n" f'"{title}"\n' f"by {authors}\n\n"
-
     def find_arxiv_matches(
-        entries: List[Dict[str, Any]],  # each entry is an arxiv post
-        title_keywords_list: List[str],
-        description_keywords_list: List[str],
-        author_list: List[str],
+        rss_entries: List[Dict[str, Any]],  # each entry is an arxiv post
+        user_provided_title_keywords_list: List[str],
+        user_provided_description_keywords_list: List[str],
+        user_provided_author_list: List[str],
     ) -> str:
         """
         Finds matches in arXiv entries based on a set of keyword and author rules.
 
         Returns a single string with all formatted match messages.
         """
-        str_to_print = ""
+        results = []
 
         # entries is outermost loop so that a match is only identified once
-        for entry in entries:
+        for entry in rss_entries:
+            reason = ""
 
-            title_to_search = entry.get("title", None).lower()
+            rss_title_to_search = entry.get("title", None).lower()
 
-            logger.info(str(len(title_keywords_list)))
-            if len(title_keywords_list) > 0:
-                for this_title_keyword in title_keywords_list:
-                    if this_title_keyword in title_to_search:
-                        str_to_print += (
-                            "<P>"
-                            + this_title_keyword
-                            + " (title): "
-                            + title_to_search
-                            + "\n<BR>"
-                            + entry.get("dc:creator")
-                            + '<BR>\n<a href="'
-                            + entry.get("link", "link not found")
-                            + '">'
-                            + entry.get("link", "link not found")
-                            + "</a>\n"
-                        )
+            logger.info(
+                "user_provided_title_keywords_list: "
+                + str(user_provided_title_keywords_list)
+            )
+            if user_provided_title_keywords_list:
+                for users_title_keyword in user_provided_title_keywords_list:
+                    if users_title_keyword in rss_title_to_search:
+                        reason += users_title_keyword + " (title) AND "
 
-            description_to_search = entry.get("description", None).lower()
+            rss_description_to_search = entry.get("description", None).lower()
 
-            logger.info(str(description_keywords_list))
-            if len(description_keywords_list) > 0:
-                for this_description_keyword in description_keywords_list:
-                    if this_description_keyword in description_to_search:
-                        str_to_print += (
-                            "<P>"
-                            + this_description_keyword
-                            + " (description): "
-                            + title_to_search
-                            + "\n<BR>"
-                            + entry.get("dc:creator")
-                            + '<BR>\n<a href="'
-                            + entry.get("link", "link not found")
-                            + '">'
-                            + entry.get("link", "link not found")
-                            + "</a>\n"
-                        )
+            logger.info(
+                "user_provided_description_keywords_list: "
+                + str(user_provided_description_keywords_list)
+            )
+            if user_provided_description_keywords_list:
+                for users_description_keyword in rss_description_keywords_list:
+                    if users_description_keyword in rss_description_to_search:
+                        reason += users_description_keyword + " (description) AND "
 
-            authors_to_search = entry.get("dc:creator", None).lower()
+            rss_authors_to_search = entry.get("dc:creator", None).lower()
 
-            logger.info(str(author_list))
-            if len(authors_to_search) > 0:
-                for this_author in author_list:
-                    if this_author in authors_to_search:
-                        str_to_print += (
-                            "<P>"
-                            + this_author
-                            + " (author): "
-                            + title_to_search
-                            + "\n<BR>"
-                            + entry.get("dc:creator")
-                            + '<BR>\n<a href="'
-                            + entry.get("link", "link not found")
-                            + '">'
-                            + entry.get("link", "link not found")
-                            + "</a>\n"
-                        )
+            logger.info("user_provided_author_list: " + str(user_provided_author_list))
+            if user_provided_author_list:
+                for users_author in user_provided_author_list:
+                    if users_author in rss_authors_to_search:
+                        reason += users_author + " (author) AND "
 
-        return str_to_print
+            if len(reason) > 3:  # not empty, so there are 1 or more matches
+                reason_without_trailing_AND = reason[:-5]
+                number_ANDs = reason_without_trailing_AND.count("AND")
+                reason_with_count = (
+                    str(number_ANDs + 1) + "x: " + reason_without_trailing_AND
+                )
+            else:
+                reason_with_count = "0:"
 
-    def get_arxiv_report():
+            results.append(_format_match_message(entry, reason_with_count))
+
+        return results
+
+    def get_arxiv_rss(ARXIV_URL: str):
         """
         Main function to fetch arXiv data and generate a report of interesting papers.
         """
@@ -7713,13 +7719,13 @@ def scrape_arxiv():
             r = requests.get(ARXIV_URL)
             r.raise_for_status()  # Raises an exception for bad status codes (4xx or 5xx)
             rss_as_dict = xmltodict.parse(r.text)
-            logger.info("rss_as_dict")
-            logger.info(str(rss_as_dict))
+            # logger.info("rss_as_dict")
+            # logger.info(str(rss_as_dict))
             arxiv_entries = (
                 rss_as_dict.get("rss", {}).get("channel", {}).get("item", [])
             )
-            logger.info("arxiv_entries")
-            logger.info(str(arxiv_entries))
+            # logger.info("arxiv_entries")
+            # logger.info(str(arxiv_entries))
         except requests.exceptions.RequestException as e:
             logger.info(f"Error fetching data from {ARXIV_URL}: {e}")
             arxiv_entries = []
@@ -7730,17 +7736,20 @@ def scrape_arxiv():
         if not arxiv_entries:
             return "Could not retrieve or parse arXiv feed."
 
-        report = find_arxiv_matches(
-            arxiv_entries,
-            user_query_title_list,
-            user_query_description_list,
-            user_query_author_list,
-        )
-        return report
+        return arxiv_entries
 
-    str_to_send = get_arxiv_report()
+    arxiv_entries = get_arxiv_rss(ARXIV_URL)
 
-    return str_to_send
+    results = find_arxiv_matches(
+        arxiv_entries,
+        user_query_title_list,
+        user_query_description_list,
+        user_query_author_list,
+    )
+
+    results.sort(reverse=True)  # highest count to lowest
+
+    return "".join(results)
 
 
 @web_app.route("/documentation/common_errors_in_college_math", methods=["GET", "POST"])

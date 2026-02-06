@@ -130,8 +130,7 @@ def api_start_here():
             "expressions": {
                 "href": url_for(".api_list_expressions", _external=True),
                 "title": "List expressions",
-                "type": "GET"
-
+                "type": "GET",
             },
             "operation_symbols": {
                 "href": url_for(".api_list_operation_symbols", _external=True),
@@ -162,10 +161,9 @@ def api_start_here():
                 "href": url_for(".api_cypher_query", _external=True),
                 "title": "Cypher query",
                 "type": "GET",
-            }
-
-            # TODO: to add: export as {cypher, JSON, CSV, GraphML} 
-        }
+            },
+            # TODO: to add: export as {cypher, JSON, CSV, GraphML}
+        },
     }
     # The `.` prefix tells Flask to look for these functions within the current Blueprint.
     # use `_external=True` to generate absolute URLs (e.g., http://servername/v1/...) rather than relative paths. This is best practice for APIs, as clients may not know the base domain context.
