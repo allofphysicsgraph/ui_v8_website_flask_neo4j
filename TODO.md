@@ -50,7 +50,9 @@ A significant use case is supplemental material for any paper that includes equa
 There's dimensional consistency of length and time and mass 
 And there's a dimensional consistency of vectors equal vectors, scalars equal scalars, matrix equals matrix
 
-I bet Gemini can come up with a clearer naming distinction
+Gemini's suggestion:
+- Dimensional consistency of base quantities (mass, length, time, etc)
+- shape Compatibility for vectors and matricies; Refers to the number of degrees of freedom or independent components in a mathematical object
 
 ---
 
