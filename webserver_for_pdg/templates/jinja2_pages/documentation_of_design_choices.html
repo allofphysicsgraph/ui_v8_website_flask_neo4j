@@ -50,34 +50,37 @@
 <div id="toc_container">
 <p class="toc_title">Contents</p>
 <!-- the following table was generated on the command line using
-cat developer_documentation.html |\
-     grep "<H" |\
+cat documentation_of_design_choices.html |\
+     grep "<H1\|<H2\|<H3\|<H4" |\
      sed 's/<\/H.*>/<\/a><\/LI>/' |\
-     sed 's/<H2><a name="/  <LI><a href="#/' |\
-     sed 's/<H3><a name="/    <LI><a href="#/' |\
-     sed 's/<H4><a name="/      <LI><a href="#/'
+     sed 's/<H2 id="/  <LI><a href="#/' |\
+     sed 's/<H3 id="/    <LI><a href="#/' |\
+     sed 's/<H4 id="/      <LI><a href="#/'
 -->
 <UL class="toc_list">
-  <LI><a href="#">What constitutes "all known mathematical physics"?</a></LI>
-  <LI><a href="#">What does "human-readable" mean?</a></LI>
-  <LI><a href="#">What does "checkable by CAS" mean?</a></LI>
-  <LI><a href="#">Which Computer Algebra System(s) to use?</a></LI>
-  <LI><a href="#">Which proof assistant(s) to use?</a></LI>
-  <LI><a href="#">How to represent expressions?</a></LI>
-  <LI><a href="#">How to render graphs visually?</a></LI>
-  <LI><a href="#">Which Property Graph database?</a></LI>
-  <LI><a href="#">Upgrade path from JSON/SQL to Neo4j</a></LI>
-  <LI><a href="#">Naming of repo</a></LI>
-  <LI><a href="#">Page scope</a></LI>
-  <LI><a href="#">Which VPS provider service company to use?</a></LI>
-  <LI><a href="#">Separate non-interactive workflow pages (e.g., user_documentation) into a separate Python file?</a></LI>
-  <LI><a href="#">Which languages to use?</a></LI>
-  <LI><a href="#">Interface</a></LI>
-  <LI><a href="#data structure">Data structure used in the Physics Derivation Graph</a></a></LI>
+  <LI><a href="#design decisions">Goal</a></a></LI>
+  <LI><a href="#all known math physics"><i>Decision</i>: What constitutes "all known mathematical physics"?</a></LI>
+  <LI><a href="#human readable"><i>Decision</i>: What does "human-readable" mean?</a></LI>
+  <LI><a href="#checkable by CAS"><i>Decision</i>: What does "checkable by CAS" mean?</a></LI>
+  <LI><a href="#which cas"><i>Decision</i>: Which Computer Algebra System(s) to use?</a></LI>
+  <LI><a href="#which proof assistant"><i>Decision</i>: Which proof assistant(s) to use?</a></LI>
+  <LI><a href="#which syntax"><i>Decision</i>: How to represent expressions?</a></LI>
+  <LI><a href="#render graphs viz"><i>Decision</i>: How to render graphs visually?</a></LI>
+  <LI><a href="#data structure"><i>Decision</i>: Which data structure?</a></LI>
+  <LI><a href="#property graph"><i>Decision</i>: Which Property Graph database?</a></LI>
+  <LI><a href="#JSON to Neo4j"><i>Decision</i>: Upgrade path from JSON/SQL to Neo4j</a></LI>
+  <LI><a href="#naming of repo"><i>Decision</i>: Naming of repo</a></LI>
+  <LI><a href="#page scope"><i>Decision</i>: Page scope</a></LI>
+  <LI><a href="#display latex"><i>Decision</i>: How to display Latex on webpages?</a></LI>
+  <LI><a href="#which VPS"><i>Decision</i>: Which VPS provider service company to use?</a></LI>
+  <LI><a href="#separate static dynamic"><i>Decision</i>: Separate non-interactive workflow pages (e.g., user_documentation) into a separate Python file?</a></LI>
+  <LI><a href="#which languages"><i>Decision</i>: Which languages to use?</a></LI>
+  <LI><a href="#interface"><i>Decision</i>: Interface</a></LI>
+  <LI><a href="#data structure"><i>Decision</i>: Data structure used in the Physics Derivation Graph</a></a></LI>
   <LI><a href="#latex for expressions">\(\rm\LaTeX\) representation of expressions</a></a></LI>
-  <LI><a href="#">How to represent the objects</a></LI>
-  <LI><a href="#supported math features">Supported Mathematical features</a></a></LI>
-  <LI><a href="#not in scope">Outside of Current Scope</a></a></LI>
+  <LI><a href="#represent objects"><i>Decision</i>: How to represent the objects</a></LI>
+  <LI><a href="#supported math features"><i>Decision</i>: Supported Mathematical features</a></a></LI>
+  <LI><a href="#not in scope"><i>Decision</i>: Outside of Current Scope</a></a></LI>
 </UL>
 </div>
 
@@ -85,11 +88,11 @@ cat developer_documentation.html |\
 
 
 
-<H2><a name="design decisions">Goal</a></H2>
+<H2 id="design decisions">Goal</a></H2>
 
 <p>Restating the goal from the front page of <a href="https://allofphysics.com/">https://allofphysics.com/</a>,
 </p>
-<blockquote><i>Goal</i>: Write down all known mathematical physics in a way that can be both read by humans and checked by a computer algebra system.</blockquote>
+<blockquote>"Write down all known mathematical physics in a way that can be both read by humans and checked by a computer algebra system."</blockquote>
 
 <P>
   This page describes the current status and historical evolution of design
@@ -99,6 +102,7 @@ cat developer_documentation.html |\
 <HR/>
 <P>&nbsp;</P>
 
+<P>Decisions are not made independently; one choice informs others. Below is a visual overview of the relations among various decisions.</P>
 
 <img src="{{ url_for('static', filename='design_decisions.svg') }}">
 
@@ -128,43 +132,59 @@ cat developer_documentation.html |\
 
 
 
-<H2 id=""><i>Decision</i>: What constitutes "all known mathematical physics"?</H2>
+<H2 id="all known math physics"><i>Decision</i>: What constitutes "all known mathematical physics"?</H2>
 
 <p>Dirac notation, calculus, differential equations, algebra, trigonometry.<br />
 Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 
-<P>&nbsp;</P>
-<HR/>
-<P>&nbsp;</P>
-
-<H2 id=""><i>Decision</i>: What does "human-readable" mean?</H2>
-
-<p>Reasonable for a human to understand without use of specialized knowledge.<br />
-\int_0^{\infty} is not understandable to everyone, and neither is contentML</p>
+<P>See also <a href="#supported math features">Supported mathematical features</a> and
+  <a href="#not in scope">not in scope</a>.
 
 <P>&nbsp;</P>
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id=""><i>Decision</i>: What does "checkable by CAS" mean?</H2>
+<H2 id="human readable"><i>Decision</i>: What does "human-readable" mean?</H2>
+
+<p>Reasonable for a human to understand without use of specialized knowledge.
+
+<P>\int_0^{\infty} is not understandable to everyone, and neither is contentML.</p>
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id="checkable by CAS"><i>Decision</i>: What does "checkable by CAS" mean?</H2>
+
+<P>The mathematical steps, identity, or solution can be verified as correct using symbolic mathematical software. (See <a href="#which cas"> for examples.)
 
 <p>Just writing down symbols and expressions is not meaningful.</p>
 
+<P>Why this matters: Reliability of machine-verified logic, Reproducibility, and Accessibility (no leaps of logic).
+
+<H2 id="cas is not enough"><i>Decision</i>: a CAS is not sufficient verification</H2>
+
+<P>A CAS is not sufficient as it may report \( 1 = x/x \) as true, even though \( x = 0 \) is false. That is why a proof assistant is necessary. (See <a href="#which proof assistant">which proof assistant?</a>.)
+
 <P>&nbsp;</P>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name="which cas"><i>Decision</i>: Which Computer Algebra System(s) to use?</H2>
+<H2 id="which cas"><i>Decision</i>: Which Computer Algebra System(s) to use?</H2>
+
+<P>Currently using SymPy.
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/117">https://github.com/allofphysicsgraph/task-tracker/issues/117</a></p>
 
-<p>See <a href="{{ url_for('to_comparison_of_design_options_cas') }}">comparison of CAS like Mathematica, MathCad, Sage</a>.</p>
+<p>See <a href="{{ url_for('to_comparison_of_design_options_cas') }}">comparison of CAS like Mathematica, MathCad, Sage, Maple, SymPy</a>.</p>
 
 <P>&nbsp;</P>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name="which proof assistant"><i>Decision</i>: Which proof assistant(s) to use?</H2>
+<H2 id="which proof assistant"><i>Decision</i>: Which proof assistant(s) to use?</H2>
+
+<P>Currently using Lean 4.
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/106">https://github.com/allofphysicsgraph/task-tracker/issues/106</a></p>
 
@@ -174,7 +194,9 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name="which syntax"><i>Decision</i>: How to represent expressions?</H2>
+<H2 id="which syntax"><i>Decision</i>: How to represent expressions?</H2>
+
+<P>Currently using Latex.
 
 <p>See <a href="{{ url_for('to_comparison_of_design_options_syntax') }}">comparison of Latex, Content MathML, Presentation ML</a></p>
 
@@ -182,7 +204,9 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id=""><i>Decision</i>: How to render graphs visually?</H2>
+<H2 id="render graphs viz"><i>Decision</i>: How to render graphs visually?</H2>
+
+<P>Currently using d3js and graphviz.
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/97">https://github.com/allofphysicsgraph/task-tracker/issues/97</a></p>
 
@@ -192,7 +216,9 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id=""><i>Decision</i>: Which data structure?</H2>
+<H2 id="data structure"><i>Decision</i>: Which data structure?</H2>
+
+<P>Currently using Neo4j.
 
 <p>See <a href="{{ url_for('to_comparison_of_design_options_database') }}">comparison of txt, XML, CSV, SQL, property graph</a></p>
 
@@ -201,7 +227,9 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id=""><i>Decision</i>: Which Property Graph database?</H2>
+<H2 id="property graph"><i>Decision</i>: Which Property Graph database?</H2>
+
+<P>Currently using Neo4j.
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/43">https://github.com/allofphysicsgraph/task-tracker/issues/43</a></p>
 
@@ -213,7 +241,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id=""><i>Decision</i>: Upgrade path from JSON/SQL to Neo4j</H2>
+<H2 id="JSON to Neo4j"><i>Decision</i>: Upgrade path from JSON/SQL to Neo4j</H2>
 
 <p>I had ui_v7 for JSON/SQL and ui_v8 for Neo4j. The ui_v7 had a working implementation of Google authentication. I had trouble getting Google authentication working in ui_v8, and I didn't want to have to refactor all the static content from ui_v7, so I decided to create a new repo, "allofphysics.com".</p>
 
@@ -223,7 +251,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id=""><i>Decision</i>: Naming of repo</H2>
+<H2 id="naming of repo"><i>Decision</i>: Naming of repo</H2>
   
 <p>I decided to name the repo "allofphysics.com" to make it clear which repo hosted the website on the Internet. Also, the alternative repo name "a mashup of v7 and v8" wasn't a good name, though it would have been more descriptive.
 </p>
@@ -234,7 +262,9 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id=""><i>Decision</i>: Page scope</H2>
+<H2 id="page scope"><i>Decision</i>: Page scope</H2>
+
+<P>Currently using page-per-decision.
 
 <p>Rendered HTML pages should have a single scope. (As opposed to a single-page website.)</p>
 
@@ -243,7 +273,9 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <P>&nbsp;</P>
 
 
-<H2 id=""><i>Decision</i>: How to display Latex on webpages?</H2>
+<H2 id="display latex"><i>Decision</i>: How to display Latex on webpages?</H2>
+
+<P>Currently using MathJax.
 
 <UL>
   <LI><a href="https://jojozhuang.github.io/tutorial/mathjax-cheat-sheet-for-mathematical-notation/">https://jojozhuang.github.io/tutorial/mathjax-cheat-sheet-for-mathematical-notation/</a>
@@ -256,7 +288,9 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id=""><i>Decision</i>: Which VPS provider service company to use?</H2>
+<H2 id="which VPS"><i>Decision</i>: Which VPS provider service company to use?</H2>
+
+<P>Currently using Hetzner.
 
 <p>DigitalOcean, AWS, Oracle, Azure</p>
 
@@ -269,7 +303,9 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id=""><i>Decision</i>: Separate non-interactive workflow pages (e.g., user_documentation) into a separate Python file?</H2>
+<H2 id="separate static dynamic"><i>Decision</i>: Separate non-interactive workflow pages (e.g., user_documentation) into a separate Python file?</H2>
+
+<P>Currently using single file (pdg_app.py).
 
 <p>Having all the routes in a single file (e.g., pdg_app.py) results in a huge file with thousands of lines.</p>
 
@@ -301,7 +337,10 @@ def to_api_via_js() -&gt; str:
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id=""><i>Decision</i>: Which languages to use?</H2>
+<H2 id="which languages"><i>Decision</i>: Which languages to use?</H2>
+
+<P>Currently using Python, HTML, Latex.
+
 <p>Languages I'm comfortable with and are widely used - Python; HTML; Docker</p>
 
 
@@ -309,7 +348,9 @@ def to_api_via_js() -&gt; str:
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id=""><i>Decision</i>: Interface</H2>
+<H2 id="interface"><i>Decision</i>: Interface</H2>
+
+<P>Currently using web UI.
 
 <p>Why web ui? Why not a GUI? Or command line?
 </p>
@@ -321,7 +362,7 @@ def to_api_via_js() -&gt; str:
 <P>&nbsp;</P>
 
 
-<H2><a name="data structure"><i>Decision</i>: Data structure used in the Physics Derivation Graph</a></H2>
+<H2 id="data structure"><i>Decision</i>: Data structure used in the Physics Derivation Graph</a></H2>
 <P>
   The Physics Derivation Graph is stored in a Neo4j Property Graph database.
 </P>
@@ -332,7 +373,7 @@ def to_api_via_js() -&gt; str:
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name="latex for expressions">\(\rm\LaTeX\) representation of expressions</a></H2>
+<H2 id="latex for expressions">\(\rm\LaTeX\) representation of expressions</a></H2>
 <P>
   There are multiple choices of how to represent a mathematical expression.
   The choices feature trade-offs between conciseness, ability to express the range of notations necessary for Physics, symantic meaning, and ability to use the expression in a computer algebra system (CAS).
@@ -346,7 +387,7 @@ def to_api_via_js() -&gt; str:
 <P>&nbsp;</P>
 
 
-<H2 id=""><i>Decision</i>: How to represent the objects</H2>
+<H2 id="represent objects"><i>Decision</i>: How to represent the objects</H2>
   <P>(e.g., <a href="{{ url_for('to_user_documentation')}}?referrer=design_documentation#inference rules">inference rules</a>
   and <a href="{{ url_for('to_user_documentation')}}?referrer=design_documentation#expressions">expressions</a>
   and symbols)
@@ -356,7 +397,7 @@ def to_api_via_js() -&gt; str:
 <HR/>
 <P>&nbsp;</P>
 
-<H2><a name="supported math features"><i>Decision</i>: Supported Mathematical features</a></H2>
+<H2 id="supported math features"><i>Decision</i>: Supported Mathematical features</a></H2>
 
 <P>Many but not all symbols are supported. Here are some categories of supported symbols. (Symbols exist on the left side or right side of an expression and can also appear in a feed.)
 <UL>
@@ -391,7 +432,7 @@ def to_api_via_js() -&gt; str:
 <P>&nbsp;</P>
 
 
-<H2><a name="not in scope"><i>Decision</i>: Outside of Current Scope</a></H2>
+<H2 id="not in scope"><i>Decision</i>: Outside of Current Scope</a></H2>
 
 <P>Although the Physics Derivation Graph is intended to be comprehensive
   across domains, there are aspect of Physics not within the current scope of the project:
@@ -421,70 +462,6 @@ def to_api_via_js() -&gt; str:
 <P>These aspects could be included if the data structure and workflow were adapted
 to an expanded scope.
 
-<!--
-<h2 id="bibliography">Citations</a></H2>
 
-<a name="cite:xml"/>
-<pre>
-@misc{2008_XML,
-url = {http://www.w3.org/TR/REC-xml/},
-title = {Extensible Markup Language (XML) 1.0 (Fifth Edition)},
-version = {W3C Recommendation 26 November 2008},
-year={2008}
-}
-</pre>
-
-<a name="cite:mathematica"/>
-<pre>
-@manual{2014_mathematica,
-title = {Mathematica},
-author = {Wolfram Research, Inc.},
-edition = {Version 10.0},
-publisher = {Wolfram Research, Inc.},
-address = {Champaign, Illinois},
-year = {2014},
-url = {http://support.wolfram.com/kb/472}
-}
-</pre>
-
-<a name="cite:sympy"/>
-<pre>
-@manual{2014_SymPy,
-title = {SymPy: Python library for symbolic mathematics},
-author = {SymPy Development Team},
-year = {2014},
-url = {http://www.sympy.org}
-}
-</pre>
-
-<a name="cite:ascii"/>
-<pre>
-@misc{1968_ASCII,
-title = {American Standard Code for Information Interchange},
-url={http://www.itl.nist.gov/History%20Documents/FIPS%201.pdf},
-year = {1968}
-}
-</pre>
-
-<a name="cite:html"/>
-<pre>
-@misc{1999_HTML,
-title = {HTML 4.01 Specification},
-url = {http://www.w3.org/TR/html4/},
-version = {W3C Recommendation 24 December 1999},
-year={1999}
-}
-</pre>
-
-<a name="cite:mathml"/>
-<pre>
-@misc{2014_MathML,
-url = {http://www.w3.org/TR/MathML/},
-title = {Mathematical Markup Language (MathML) Version 3.0 2nd Edition},
-version = {W3C Recommendation 10 April 2014},
-year = {2014}
-}
-</pre>
--->
 
 {% endblock %}
