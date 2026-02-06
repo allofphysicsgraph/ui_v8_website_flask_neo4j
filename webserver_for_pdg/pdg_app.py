@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 # Ben Payne
 # Physics Derivation Graph
 # https://allofphysics.com
@@ -208,10 +209,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-
-import initialize_neo4j
 from initialize_neo4j import graphDB_Driver
-
 
 import initialize_version_log
 
@@ -7599,14 +7597,17 @@ def scrape_arxiv():
     user_query_title = request.args.get("title", "")
     logger.info("user_query_title: " + user_query_title)
     user_query_title_list = user_query_title.split(",")
+    logger.info(str(user_query_title_list))
 
     user_query_description = request.args.get("description", "")
     logger.info("user_query_description: " + user_query_description)
     user_query_description_list = user_query_description.split(",")
+    logger.info(str(user_query_description_list))
 
     user_query_author = request.args.get("author", "")
     logger.info("user_query_author: " + user_query_author)
     user_query_author_list = user_query_author.split(",")
+    logger.info(str(user_query_author_list))
 
     # flash(user_query) # flash doesn't work since this isn't a jinja2 page :(
 
@@ -7636,59 +7637,69 @@ def scrape_arxiv():
         Returns a single string with all formatted match messages.
         """
         str_to_print = ""
-        for (
-            entry
-        ) in entries:  # entries is outmost loop so that a match is only identified once
+
+        # entries is outermost loop so that a match is only identified once
+        for entry in entries:
+
             title_to_search = entry.get("title", None).lower()
-            for this_title_keyword in title_keywords_list:
-                if this_title_keyword in title_to_search:
-                    str_to_print += (
-                        "<P>"
-                        + this_title_keyword
-                        + " (title): "
-                        + title_to_search
-                        + "\n<BR>"
-                        + entry.get("dc:creator")
-                        + '<BR>\n<a href="'
-                        + entry.get("link", "link not found")
-                        + '">'
-                        + entry.get("link", "link not found")
-                        + "</a>\n"
-                    )
+
+            logger.info(str(len(title_keywords_list)))
+            if len(title_keywords_list) > 0:
+                for this_title_keyword in title_keywords_list:
+                    if this_title_keyword in title_to_search:
+                        str_to_print += (
+                            "<P>"
+                            + this_title_keyword
+                            + " (title): "
+                            + title_to_search
+                            + "\n<BR>"
+                            + entry.get("dc:creator")
+                            + '<BR>\n<a href="'
+                            + entry.get("link", "link not found")
+                            + '">'
+                            + entry.get("link", "link not found")
+                            + "</a>\n"
+                        )
 
             description_to_search = entry.get("description", None).lower()
-            for this_description_keyword in description_keywords_list:
-                if this_description_keyword in description_to_search:
-                    str_to_print += (
-                        "<P>"
-                        + this_description_keyword
-                        + " (description): "
-                        + title_to_search
-                        + "\n<BR>"
-                        + entry.get("dc:creator")
-                        + '<BR>\n<a href="'
-                        + entry.get("link", "link not found")
-                        + '">'
-                        + entry.get("link", "link not found")
-                        + "</a>\n"
-                    )
+
+            logger.info(str(description_keywords_list))
+            if len(description_keywords_list) > 0:
+                for this_description_keyword in description_keywords_list:
+                    if this_description_keyword in description_to_search:
+                        str_to_print += (
+                            "<P>"
+                            + this_description_keyword
+                            + " (description): "
+                            + title_to_search
+                            + "\n<BR>"
+                            + entry.get("dc:creator")
+                            + '<BR>\n<a href="'
+                            + entry.get("link", "link not found")
+                            + '">'
+                            + entry.get("link", "link not found")
+                            + "</a>\n"
+                        )
 
             authors_to_search = entry.get("dc:creator", None).lower()
-            for this_author in author_list:
-                if this_author in authors_to_search:
-                    str_to_print += (
-                        "<P>"
-                        + this_author
-                        + " (author): "
-                        + title_to_search
-                        + "\n<BR>"
-                        + entry.get("dc:creator")
-                        + '<BR>\n<a href="'
-                        + entry.get("link", "link not found")
-                        + '">'
-                        + entry.get("link", "link not found")
-                        + "</a>\n"
-                    )
+
+            logger.info(str(author_list))
+            if len(authors_to_search) > 0:
+                for this_author in author_list:
+                    if this_author in authors_to_search:
+                        str_to_print += (
+                            "<P>"
+                            + this_author
+                            + " (author): "
+                            + title_to_search
+                            + "\n<BR>"
+                            + entry.get("dc:creator")
+                            + '<BR>\n<a href="'
+                            + entry.get("link", "link not found")
+                            + '">'
+                            + entry.get("link", "link not found")
+                            + "</a>\n"
+                        )
 
         return str_to_print
 
