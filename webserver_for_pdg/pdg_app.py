@@ -7605,10 +7605,11 @@ def scrape_arxiv():
             + ARXIV_URL
             + "</a>"
             + " by title, author, description\n"
-            + '<P>For example, <a href="/arxiv_scraper?title=state">allofphysics.com/arxiv_scraper?title=state</a>'
+            + '<P>For example, <a href="/arxiv_scraper?title=state">allofphysics.com/arxiv_scraper?title=state</a>\n'
+            + '<P>Or <a href="/arxiv_scraper?title=state&author=bob">allofphysics.com/arxiv_scraper?title=state&author=bob</a>'
         )
 
-    user_query_title = request.args.get("title", "")
+    user_query_title = request.args.get("title", "").lower()
     logger.info("user_query_title: " + user_query_title)
     if len(user_query_title) > 0:
         user_query_title_list = user_query_title.split(",")
@@ -7616,7 +7617,7 @@ def scrape_arxiv():
     else:
         user_query_title_list = None
 
-    user_query_description = request.args.get("description", "")
+    user_query_description = request.args.get("description", "").lower()
     logger.info("user_query_description: " + user_query_description)
     if len(user_query_description) > 0:
         user_query_description_list = user_query_description.split(",")
@@ -7624,7 +7625,7 @@ def scrape_arxiv():
     else:
         user_query_description_list = None
 
-    user_query_author = request.args.get("author", "")
+    user_query_author = request.args.get("author", "").lower()
     logger.info("user_query_author: " + user_query_author)
     if len(user_query_author) > 0:
         user_query_author_list = user_query_author.split(",")
@@ -7638,7 +7639,8 @@ def scrape_arxiv():
         """Formats a consistent message for a found match."""
         return (
             "<P>"
-            + reason +": <B>"
+            + reason
+            + ": <B>"
             + entry.get("title", "?? no title ??")
             + "</B>\n<BR>"
             + str(entry.get("dc:creator"))
