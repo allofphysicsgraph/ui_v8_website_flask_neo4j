@@ -116,6 +116,7 @@ def api_start_here():
             "self": {
                 "href": url_for(".api_start_here", _external=True),
                 "title": "API Entry Point",
+                "type": "GET",
             },
             "derivations": {
                 "href": url_for(".api_list_derivations", _external=True),
@@ -259,8 +260,6 @@ def api_list_derivations():
                 "href": url_for(
                     ".api_edit_derivation", derivation_id=item_id, _external=True
                 ),
-                "title": "Edit this derivation",
-                "method": "PUT",
             },
             "view_steps": {
                 "href": url_for(
@@ -308,7 +307,7 @@ def api_list_derivations():
     return response
 
 
-@api_bp.route("/v1/resources/derivation/edit/<id>", methods=["GET"])
+@api_bp.route("/v1/resources/derivation/edit/<derivation_id>", methods=["GET"])
 def api_edit_derivation(derivation_id: str):
     return "Nothing here yet"
 
@@ -645,23 +644,23 @@ def api_create_derivation():
             derivation_reference_latex = ""
 
     else:  # "Content-Type: application/x-www-form-urlencoded"
-        print("request.args=" + str(request.args))  # returns a dict
+        logger.info("request.args=" + str(request.args))  # returns a dict
 
         derivation_name_latex = request.args.get("derivation_name_latex")
         if derivation_name_latex:
-            print("derivation_name:" + str(derivation_name_latex))
+            logger.info("derivation_name:" + str(derivation_name_latex))
         else:  # was not provided
             return jsonify({"ERROR": "need to provide derivation_name_latex"})
 
         derivation_abstract_latex = request.args.get("derivation_abstract_latex")
         if derivation_abstract_latex:
-            print("derivation_abstract_latex " + str(derivation_abstract_latex))
+            logger.info("derivation_abstract_latex " + str(derivation_abstract_latex))
         else:
             return jsonify({"ERROR": "need to provide derivation_abstract_latex"})
 
         derivation_reference_latex = request.args.get("derivation_reference_latex")
         if derivation_reference_latex:
-            print("derivation_reference_latex " + str(derivation_reference_latex))
+            logger.info("derivation_reference_latex " + str(derivation_reference_latex))
         else:
             derivation_reference_latex = ""
 
@@ -696,7 +695,7 @@ def api_create_derivation():
     derivation_id, query_time_dict = compute.generate_random_id(
         graphDB_Driver, query_time_dict, "derivation"
     )
-    print("pdg_app/api_create_derivation: derivation_id=", derivation_id)
+    logger.info("pdg_app/api_create_derivation: derivation_id="+ derivation_id)
 
     # as per https://strftime.org/
     # %f = Microsecond as a decimal number, zero-padded on the left.
@@ -754,7 +753,7 @@ def api_create_expression():
 
     if request.is_json:  # "Content-Type: application/json"
         data_from_user = request.get_json()
-        print("data_from_user = " + str(data_from_user))
+        logger.info("data_from_user = " + str(data_from_user))
 
         # required
         if "expression_latex_lhs" in data_from_user.keys():
@@ -801,54 +800,54 @@ def api_create_expression():
             expression_description_latex = ""
 
     else:  # "Content-Type: application/x-www-form-urlencoded"
-        print("request.args=" + str(request.args))  # returns a dict
+        logger.info("request.args=" + str(request.args))  # returns a dict
 
         # required
         expression_latex_lhs = request.args.get("expression_latex_lhs")
         if expression_latex_lhs:
-            print("expression_latex_lhs =" + expression_latex_lhs)
+            logger.info("expression_latex_lhs =" + expression_latex_lhs)
         else:
             return jsonify({"ERROR": "need to provide expression_latex_lhs"})
 
         # required
         expression_relation_latex = request.args.get("expression_relation_latex")
         if expression_relation_latex:
-            print("expression_relation_latex =" + expression_relation_latex)
+            logger.info("expression_relation_latex =" + expression_relation_latex)
         else:
             return jsonify({"ERROR": "need to provide expression_relation_latex"})
 
         # required
         expression_latex_rhs = request.args.get("expression_latex_rhs")
         if expression_latex_rhs:
-            print("expression_latex_rhs =" + expression_latex_rhs)
+            logger.info("expression_latex_rhs =" + expression_latex_rhs)
         else:
             return jsonify({"ERROR": "need to provide expression_latex_rhs"})
 
         # optional
         expression_latex_condition = request.args.get("expression_latex_condition")
         if expression_latex_condition:
-            print("expression_latex_condition =" + expression_latex_condition)
+            logger.info("expression_latex_condition =" + expression_latex_condition)
         else:
             expression_latex_condition = ""
 
         # optional
         expression_name_latex = request.args.get("expression_name_latex")
         if expression_name_latex:
-            print("expression_name_latex =" + expression_name_latex)
+            logger.info("expression_name_latex =" + expression_name_latex)
         else:
             expression_name_latex = ""
 
         # optional
         expression_reference_latex = request.args.get("expression_reference_latex")
         if expression_reference_latex:
-            print("expression_reference_latex =" + expression_reference_latex)
+            logger.info("expression_reference_latex =" + expression_reference_latex)
         else:
             expression_reference_latex = ""
 
         # optional
         expression_description_latex = request.args.get("expression_description_latex")
         if expression_description_latex:
-            print("expression_description_latex =" + expression_description_latex)
+            logger.info("expression_description_latex =" + expression_description_latex)
         else:
             expression_description_latex = ""
 
@@ -862,7 +861,7 @@ def api_create_expression():
             time.time() - query_start_time, 3
         )
 
-    print("list_of_expression_dicts=", list_of_expression_dicts)
+    logger.info("list_of_expression_dicts="+ str(list_of_expression_dicts))
 
     # if lhs and relation and rhs are same, then reject
     for expression_dict in list_of_expression_dicts:
@@ -943,7 +942,7 @@ def api_create_scalar_symbol():
 
     if request.is_json:  # "Content-Type: application/json"
         data_from_user = request.get_json()
-        print("data_from_user = " + str(data_from_user))
+        logger.info("data_from_user = " + str(data_from_user))
 
         # required
         if "scalar_latex" in data_from_user.keys():
@@ -1058,40 +1057,40 @@ def api_create_scalar_symbol():
             dimension_luminous_intensity = 0
 
     else:  # "Content-Type: application/x-www-form-urlencoded"
-        print("request.args=" + str(request.args))  # returns a dict
+        logger.info("request.args=" + str(request.args))  # returns a dict
 
         # required
         scalar_latex = request.args.get("scalar_latex")
         if scalar_latex:
-            print("scalar_latex =" + scalar_latex)
+            logger.info("scalar_latex =" + scalar_latex)
         else:
             return jsonify({"ERROR": "need to provide scalar_latex"})
 
         # optional
         scalar_name_latex = request.args.get("scalar_name_latex")
         if scalar_name_latex:
-            print("scalar_name_latex =" + scalar_name_latex)
+            logger.info("scalar_name_latex =" + scalar_name_latex)
         else:
             scalar_name_latex = ""
 
         # optional
         scalar_description_latex = request.args.get("scalar_description_latex")
         if scalar_description_latex:
-            print("scalar_description_latex =" + scalar_description_latex)
+            logger.info("scalar_description_latex =" + scalar_description_latex)
         else:
             scalar_description_latex = ""
 
         # optional
         scalar_reference_latex = request.args.get("scalar_reference_latex")
         if scalar_reference_latex:
-            print("scalar_reference_latex =" + scalar_reference_latex)
+            logger.info("scalar_reference_latex =" + scalar_reference_latex)
         else:
             scalar_reference_latex = ""
 
         # optional
         scalar_scope = request.args.get("scalar_scope")
         if scalar_scope:
-            print("scalar_scope =" + scalar_scope)
+            logger.info("scalar_scope =" + scalar_scope)
             if scalar_scope not in list_of_valid.scalar_scope:
                 return jsonify(
                     {
@@ -1107,7 +1106,7 @@ def api_create_scalar_symbol():
         # optional
         scalar_variable_or_constant = request.args.get("scalar_variable_or_constant")
         if scalar_variable_or_constant:
-            print("scalar_variable_or_constant =" + scalar_variable_or_constant)
+            logger.info("scalar_variable_or_constant =" + scalar_variable_or_constant)
             if scalar_variable_or_constant not in ["variable", "constant"]:
                 return jsonify(
                     {
@@ -1121,7 +1120,7 @@ def api_create_scalar_symbol():
         # optional
         scalar_domain = request.args.get("scalar_domain")
         if scalar_domain:
-            print("scalar_domain =" + scalar_domain)
+            logger.info("scalar_domain =" + scalar_domain)
             if scalar_domain not in list_of_valid.scalar_domain:
                 return jsonify(
                     {
@@ -1136,35 +1135,35 @@ def api_create_scalar_symbol():
         # optional
         dimension_length = request.args.get("dimension_length")
         if dimension_length:
-            print("dimension_length =" + dimension_length)
+            logger.info("dimension_length =" + dimension_length)
         else:
             dimension_length = 0
 
         # optional
         dimension_time = request.args.get("dimension_time")
         if dimension_time:
-            print("dimension_time =" + dimension_time)
+            logger.info("dimension_time =" + dimension_time)
         else:
             dimension_time = 0
 
         # optional
         dimension_mass = request.args.get("dimension_mass")
         if dimension_mass:
-            print("dimension_mass =" + dimension_mass)
+            logger.info("dimension_mass =" + dimension_mass)
         else:
             dimension_mass = 0
 
         # optional
         dimension_temperature = request.args.get("dimension_temperature")
         if dimension_temperature:
-            print("dimension_temperature =" + dimension_temperature)
+            logger.info("dimension_temperature =" + dimension_temperature)
         else:
             dimension_temperature = 0
 
         # optional
         dimension_electric_charge = request.args.get("dimension_electric_charge")
         if dimension_electric_charge:
-            print("dimension_electric_charge =" + dimension_electric_charge)
+            logger.info("dimension_electric_charge =" + dimension_electric_charge)
         else:
             dimension_electric_charge = 0
 
@@ -1173,14 +1172,14 @@ def api_create_scalar_symbol():
             "dimension_amount_of_substance"
         )
         if dimension_amount_of_substance:
-            print("dimension_amount_of_substance =" + dimension_amount_of_substance)
+            logger.info("dimension_amount_of_substance =" + dimension_amount_of_substance)
         else:
             dimension_amount_of_substance = 0
 
         # optional
         dimension_luminous_intensity = request.args.get("dimension_luminous_intensity")
         if dimension_luminous_intensity:
-            print("dimension_luminous_intensity =" + dimension_luminous_intensity)
+            logger.info("dimension_luminous_intensity =" + dimension_luminous_intensity)
         else:
             dimension_luminous_intensity = 0
 
@@ -1268,7 +1267,7 @@ def api_create_operation_symbol():
 
     if request.is_json:  # "Content-Type: application/json"
         data_from_user = request.get_json()
-        print("data_from_user = " + str(data_from_user))
+        logger.info("data_from_user = " + str(data_from_user))
 
         # required
         if "operation_name_latex" in data_from_user.keys():
@@ -1301,39 +1300,39 @@ def api_create_operation_symbol():
             return jsonify({"ERROR": "need to provide operation_argument_count"})
 
     else:  # "Content-Type: application/x-www-form-urlencoded"
-        print("request.args=" + str(request.args))  # returns a dict
+        logger.info("request.args=" + str(request.args))  # returns a dict
         # required
         operation_name_latex = request.args.get("operation_name_latex")
         if operation_name_latex:
-            print("operation_name_latex =" + operation_name_latex)
+            logger.info("operation_name_latex =" + operation_name_latex)
         else:
             return jsonify({"ERROR": "need to provide operation_name_latex"})
 
         # required
         operation_latex = request.args.get("operation_latex")
         if operation_latex:
-            print("operation_latex =" + operation_latex)
+            logger.info("operation_latex =" + operation_latex)
         else:
             return jsonify({"ERROR": "need to provide operation_latex"})
 
         # required
         operation_description_latex = request.args.get("operation_description_latex")
         if operation_description_latex:
-            print("operation_description_latex =" + operation_description_latex)
+            logger.info("operation_description_latex =" + operation_description_latex)
         else:
             return jsonify({"ERROR": "need to provide operation_description_latex"})
 
         # optional
         operation_reference_latex = request.args.get("operation_reference_latex")
         if operation_reference_latex:
-            print("operation_reference_latex =" + operation_reference_latex)
+            logger.info("operation_reference_latex =" + operation_reference_latex)
         else:
             operation_reference_latex = ""
 
         # required
         operation_argument_count = request.args.get("operation_argument_count")
         if operation_argument_count:
-            print("operation_argument_count =" + operation_argument_count)
+            logger.info("operation_argument_count =" + operation_argument_count)
         else:
             return jsonify({"ERROR": "need to provide operation_argument_count"})
 
@@ -1360,7 +1359,7 @@ def api_create_operation_symbol():
             now_str,
             author_name_latex,
         )
-        print(
+        logger.info(
             "[TRACE] pdg_app/to_add_operation end " + trace_id + " " + str(time.time())
         )
 
@@ -1385,7 +1384,7 @@ def api_create_relation_symbol():
 
     if request.is_json:  # "Content-Type: application/json"
         data_from_user = request.get_json()
-        print("data_from_user = " + str(data_from_user))
+        logger.info("data_from_user = " + str(data_from_user))
 
         # required
         if "relation_name_latex" in data_from_user.keys():
@@ -1412,32 +1411,32 @@ def api_create_relation_symbol():
             relation_reference_latex = ""
 
     else:  # "Content-Type: application/x-www-form-urlencoded"
-        print("request.args=" + str(request.args))  # returns a dict
+        logger.info("request.args=" + str(request.args))  # returns a dict
         # required
         relation_name_latex = request.args.get("relation_name_latex")
         if relation_name_latex:
-            print("relation_name_latex =" + relation_name_latex)
+            logger.info("relation_name_latex =" + relation_name_latex)
         else:
             return jsonify({"ERROR": "need to provide relation_name_latex"})
 
         # required
         relation_latex = request.args.get("relation_latex")
         if relation_latex:
-            print("relation_latex =" + relation_latex)
+            logger.info("relation_latex =" + relation_latex)
         else:
             return jsonify({"ERROR": "need to provide relation_latex"})
 
         # required
         relation_description_latex = request.args.get("relation_description_latex")
         if relation_description_latex:
-            print("relation_description_latex =" + relation_description_latex)
+            logger.info("relation_description_latex =" + relation_description_latex)
         else:
             return jsonify({"ERROR": "need to provide relation_description_latex"})
 
         # optional
         relation_reference_latex = request.args.get("relation_reference_latex")
         if relation_reference_latex:
-            print("relation_reference_latex =" + relation_reference_latex)
+            logger.info("relation_reference_latex =" + relation_reference_latex)
         else:
             relation_reference_latex = ""
 
@@ -1463,7 +1462,7 @@ def api_create_relation_symbol():
             now_str,
             author_name_latex,
         )
-        print(
+        logger.info(
             "[TRACE] pdg_app/to_add_relation end " + trace_id + " " + str(time.time())
         )
 
@@ -1485,7 +1484,7 @@ def api_create_inference_rule():
 
     if request.is_json:  # "Content-Type: application/json"
         data_from_user = request.get_json()
-        print("data_from_user = " + str(data_from_user))
+        logger.info("data_from_user = " + str(data_from_user))
 
         # required
         if "_latex" in data_from_user.keys():
@@ -1494,11 +1493,11 @@ def api_create_inference_rule():
             return jsonify({"ERROR": "need to provide _latex"})
 
     else:  # "Content-Type: application/x-www-form-urlencoded"
-        print("request.args=" + str(request.args))  # returns a dict
+        logger.info("request.args=" + str(request.args))  # returns a dict
         # required
         _latex = request.args.get("_latex")
         if _latex:
-            print("_latex =" + _latex)
+            logger.info("_latex =" + _latex)
         else:
             return jsonify({"ERROR": "need to provide _latex"})
 
@@ -1520,7 +1519,7 @@ def api_delete_derivation():
 
     if request.is_json:  # "Content-Type: application/json"
         data_from_user = request.get_json()
-        print("data_from_user = " + str(data_from_user))
+        logger.info("data_from_user = " + str(data_from_user))
 
         # required
         if "derivation_id" in data_from_user.keys():
@@ -1529,11 +1528,11 @@ def api_delete_derivation():
             return jsonify({"ERROR": "need to provide derivation_id"})
 
     else:  # "Content-Type: application/x-www-form-urlencoded"
-        print("request.args=" + str(request.args))  # returns a dict
+        logger.info("request.args=" + str(request.args))  # returns a dict
         # required
         derivation_id = request.args.get("derivation_id")
         if derivation_id:
-            print("derivation_id =" + derivation_id)
+            logger.info("derivation_id =" + derivation_id)
         else:
             return jsonify({"ERROR": "need to provide derivation_id"})
 
@@ -1587,7 +1586,7 @@ def api_delete_derivation():
         query_time_dict["to_review_derivation: node_properties, derivation"] = round(
             time.time() - query_start_time, 3
         )
-    print("derivation_dict:", derivation_dict)
+    logger.info("derivation_dict:"+ str(derivation_dict))
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -1595,7 +1594,7 @@ def api_delete_derivation():
         query_time_dict["pdg_app/to_review_derivation: delete_node derivation"] = round(
             time.time() - query_start_time, 3
         )
-    print(
+    logger.info(
         "[TRACE] pdg_app/to_review_derivation end " + trace_id + " " + str(time.time())
     )
 
@@ -1632,7 +1631,7 @@ def api_derivation_metadata():
     else:
         return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
 
-    print("derivation_id=", derivation_id)
+    logger.info("derivation_id="+ derivation_id)
 
     # try provided derivation_id; might not be a valid ID
     with graphDB_Driver.session() as session:
@@ -1641,7 +1640,7 @@ def api_derivation_metadata():
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
         query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    print("derivation_dict=", derivation_dict)
+    logger.info("derivation_dict="+ str(derivation_dict))
 
     logger.info("[TRACE] pdg_api/api_derivation_metadata end " + trace_id)
     return jsonify(derivation_dict)
@@ -1671,7 +1670,7 @@ def api_derivation_steps():
     else:
         return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
 
-    print("derivation_id=", derivation_id)
+    logger.info("derivation_id="+ derivation_id)
 
     # try provided derivation_id; might not be a valid ID
     with graphDB_Driver.session() as session:
@@ -1680,7 +1679,7 @@ def api_derivation_steps():
             neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
         )
         query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    print("list_of_steps=", list_of_steps)
+    logger.info("list_of_steps="+str(list_of_steps))
 
     logger.info("[TRACE] pdg_api/api_derivation_steps end " + trace_id)
     return jsonify(list_of_steps)
@@ -1697,7 +1696,7 @@ def api_cypher_query():
 
     user_query = request.args.get("query")
 
-    print("user_query:", user_query)
+    logger.info("user_query:"+ user_query)
 
     list_of_records = []  # type: List[str]
     if user_query:
