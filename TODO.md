@@ -22,13 +22,11 @@ Used by new feed when promoting existing symbol
 
 ---
 
-For the decision design decisions, each question should be clear about which one is the current state of the practice and which ones were tried
+Update symbols and operators
+https://en.wikipedia.org/wiki/List_of_common_physics_notations
 
 ---
 
-Can I export all of the step and expression edges and then visualize that in graph is
-
----
 Submit neo4j query Python file to Gemini for a code review of suggestions and criticism
 
 Same for the API file
