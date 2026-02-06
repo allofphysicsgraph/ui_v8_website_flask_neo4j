@@ -29,9 +29,28 @@ For the decision design decisions, each question should be clear about which one
 Can I export all of the step and expression edges and then visualize that in graph is
 
 ---
+Submit neo4j query Python file to Gemini for a code review of suggestions and criticism
+
+Same for the API file
+
+---
+
+Given the existing HTML page for expression entry, I bet Gemini could figure out how to automate the live analysis of math jacks output rather than pushing the button manually
+
+---
+
+In the lean repo, do I have examples of multiply both sides by and divide both sides by?
+
+A significant use case is supplemental material for any paper that includes equations. There are two sub cases 
+- Documenting the derivations within the paper such that the supplemental material is self-contained 
+- The second sub case is indicating the relation between the equations used in this paper and equations used in any other paper
+
+---
 
 There's dimensional consistency of length and time and mass 
 And there's a dimensional consistency of vectors equal vectors, scalars equal scalars, matrix equals matrix
+
+I bet Gemini can come up with a clearer naming distinction
 
 ---
 
