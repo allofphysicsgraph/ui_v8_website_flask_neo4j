@@ -29,7 +29,17 @@ import time
 import random
 import datetime
 
-from flask import Blueprint, flash, g, redirect, render_template, jsonify, request
+from flask import (
+    Blueprint,
+    flash,
+    g,
+    redirect,
+    render_template,
+    url_for,
+    jsonify,
+    request,
+    make_response,
+)
 
 import sys
 from typing import NewType, Dict, List
@@ -50,14 +60,7 @@ import list_of_valid
 
 from compute import query_timing_result_type
 
-# the following creates a circular dependency since `pdg_app.py` imports this file.
-from pdg_app import graphDB_Driver
-
-# a fix that BHP hasn't enacted would be to create a new file, `initialization.py`
-# which contains the creation of `graphDB_Driver`
-# Then both `pdg_app.py` and `pdg_api.py` could import that common variable.
-# Since this circular dependency isn't causing a problem as of 2025-01-09,
-# BHP is going to leave the circular dependency in place.
+from initialize_neo4j import graphDB_Driver
 
 # this works because app.py loads this file first
 
@@ -77,12 +80,12 @@ api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 def api_do_nothing():
     """
     to use session cookies,
-    curl --head -c cookies.txt http://localhost:5000/api/v1/resources/do_nothing
+    curl --head -c cookies.txt https://localhost:5000/api/v1/resources/do_nothing
     where
     `--head`: only fetch the headers of the response.
     `-c cookies.txt`: save the cookies received in the response to a file named cookies.txt.
     Then
-    curl -b cookies.txt http://localhost:5000/api/v1/resources/derivation/create
+    curl -b cookies.txt https://localhost:5000/api/v1/resources/derivation/create
 
 
     """
@@ -91,6 +94,91 @@ def api_do_nothing():
         "[TRACE] pdg_api/api_do_nothing start " + trace_id + " " + str(time.time())
     )
     return
+
+
+@api_bp.route("/v1/resources/start_here", methods=["GET"])
+def api_start_here():
+    """
+    Entry point for the API using HATEOAS (HAL format).
+
+    https://github.com/allofphysicsgraph/task-tracker/issues/134
+
+    Hypermedia as the Engine of Application State (HATEOAS)
+    https://en.wikipedia.org/wiki/HATEOAS
+
+    """
+    # Construct the HAL payload
+    # HAL requires a "_links" key.
+    # "self" is mandatory and points to the current resource.
+    payload = {
+        "message": "Welcome to the Physics Derivation Graph API. Please explore the available resources.",
+        "_links": {
+            "self": {
+                "href": url_for(".api_start_here", _external=True),
+                "title": "API Entry Point",
+            },
+            "derivations": {
+                "href": url_for(".api_list_derivations", _external=True),
+                "title": "List derivations",
+                "type": "GET",
+            },
+            "inference_rules": {
+                "href": url_for(".api_list_inference_rules", _external=True),
+                "title": "List inference rules",
+                "type": "GET",
+            },
+            "expressions": {
+                "href": url_for(".api_list_expressions", _external=True),
+                "title": "List expressions",
+                "type": "GET"
+
+            },
+            "operation_symbols": {
+                "href": url_for(".api_list_operation_symbols", _external=True),
+                "title": "List operations",
+                "type": "GET",
+            },
+            "relation_symbols": {
+                "href": url_for(".api_list_relation_symbols", _external=True),
+                "title": "List relations",
+                "type": "GET",
+            },
+            "scalar_symbols": {
+                "href": url_for(".api_list_scalar_symbols", _external=True),
+                "title": "List scalars",
+                "type": "GET",
+            },
+            "vector_symbols": {
+                "href": url_for(".api_list_vector_symbols", _external=True),
+                "title": "List vectors",
+                "type": "GET",
+            },
+            "matrix_symbols": {
+                "href": url_for(".api_list_matrix_symbols", _external=True),
+                "title": "List matrices",
+                "type": "GET",
+            },
+            "cypher_query": {
+                "href": url_for(".api_cypher_query", _external=True),
+                "title": "Cypher query",
+                "type": "GET",
+            }
+
+            # TODO: to add: export as {cypher, JSON, CSV, GraphML} 
+        }
+    }
+    # The `.` prefix tells Flask to look for these functions within the current Blueprint.
+    # use `_external=True` to generate absolute URLs (e.g., http://servername/v1/...) rather than relative paths. This is best practice for APIs, as clients may not know the base domain context.
+
+    # Flask's jsonify defaults to application/json. Since we want HAL compliance,
+    # wrap the json in `make_response` and manually override the header to `application/hal+json`.
+
+    response = make_response(jsonify(payload))
+
+    # Set the Content-Type to application/hal+json
+    response.headers["Content-Type"] = "application/hal+json"
+
+    return response
 
 
 @api_bp.route("/v1/resources/register_csrf", methods=["GET"])
@@ -107,7 +195,7 @@ def api_register():
     https://stackoverflow.com/a/35205378/1164295
     for creating cookies when submitting forms
 
-    curl -s http://localhost:5000/api/v1/resources/register | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/register | python3 -m json.tool
 
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -126,7 +214,7 @@ def api_register():
 @api_bp.route("/v1/resources/derivation/list", methods=["GET"])
 def api_list_derivations():
     """
-    curl -s http://localhost:5000/api/v1/resources/derivation/list | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/derivation/list | python3 -m json.tool
     [
         {
             "abstract_latex": "my summary",
@@ -157,14 +245,80 @@ def api_list_derivations():
             "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
         ] = (time.time() - query_start_time)
 
+    # For HATEOAS, Transform the raw data to include item-level links
+    embedded_items = []
+    for item in list_of_dicts:
+        # Create a copy to avoid mutating the original database result
+        resource = item.copy()
+        item_id = resource.get("id")
+
+        # Add links specific to this individual resource
+        resource["_links"] = {
+            "self": {
+                "href": url_for(".api_list_derivations", _external=True)  # Placeholder
+            },
+            "edit": {
+                "href": url_for(
+                    ".api_edit_derivation", derivation_id=item_id, _external=True
+                ),
+                "title": "Edit this derivation",
+                "method": "PUT",
+            },
+            "view_steps": {
+                "href": url_for(
+                    ".api_derivation_steps", derivation_id=item_id, _external=True
+                )
+            },
+            "view_metadata": {
+                "href": url_for(
+                    ".api_derivation_metadata", derivation_id=item_id, _external=True
+                )
+            },
+            "delete": {
+                "href": url_for(
+                    ".api_delete_derivation", derivation_id=item_id, _external=True
+                )
+            },
+        }
+        embedded_items.append(resource)
+
+    # For HATEOAS, Construct the Collection-level HAL payload
+    payload = {
+        "count": len(embedded_items),
+        "_links": {
+            "self": {
+                "href": url_for(".api_list_derivations", _external=True),
+                "title": "List of Derivations",
+            },
+            "up": {
+                "href": url_for(".api_start_here", _external=True),
+                "title": "API Home",
+            },
+            "create": {
+                "href": url_for(".api_create_derivation", _external=True),
+                "title": "Create a new derivation",
+                "method": "POST",
+            },
+        },
+        "_embedded": {"derivations": embedded_items},
+    }
+
+    response = make_response(jsonify(payload))
+    response.headers["Content-Type"] = "application/hal+json"
+
     logger.info("[TRACE] pdg_api/api_list_derivations end " + trace_id)
-    return jsonify(list_of_dicts)
+    return response
+
+
+@api_bp.route("/v1/resources/derivation/edit/<id>", methods=["GET"])
+def api_edit_derivation(derivation_id: str):
+    return "Nothing here yet"
 
 
 @api_bp.route("/v1/resources/inference_rule/list", methods=["GET"])
 def api_list_inference_rules():
     """
-    curl -s http://localhost:5000/api/v1/resources/inference_rule/list | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/inference_rule/list | python3 -m json.tool
     [
         {
             "author_name_latex": "ben",
@@ -190,16 +344,64 @@ def api_list_inference_rules():
         query_time_dict[
             "pdg_api/api_list_inference_rules: get_list_node_dicts_of_type"
         ] = (time.time() - query_start_time)
-    # print("list_of_dicts=", list_of_dicts)
+
+    # 1. Transform the raw data to include item-level links
+    embedded_items = []
+    for item in list_of_dicts:
+        resource = item.copy()
+        item_id = resource.get("id")
+
+        resource["_links"] = {
+            "self": {
+                # Placeholder for view single inference rule
+                "href": url_for(".api_list_inference_rules", _external=True)
+            },
+            "edit": {
+                # Link to action: Edit Existing Inference Rule
+                "href": url_for(".api_edit_inference_rule", id=item_id, _external=True),
+                "title": "Edit this inference rule",
+                "method": "PUT",
+            },
+        }
+        embedded_items.append(resource)
+
+    # 2. Construct the Collection-level HAL payload
+    payload = {
+        "count": len(embedded_items),
+        "_links": {
+            "self": {
+                "href": url_for(".api_list_inference_rules", _external=True),
+                "title": "List of Inference Rules",
+            },
+            "up": {
+                "href": url_for(".api_start_here", _external=True),
+                "title": "API Home",
+            },
+            "create": {
+                "href": url_for(".api_create_inference_rule", _external=True),
+                "title": "Create a new inference rule",
+                "method": "POST",
+            },
+        },
+        "_embedded": {"inference_rules": embedded_items},
+    }
+
+    response = make_response(jsonify(payload))
+    response.headers["Content-Type"] = "application/hal+json"
 
     logger.info("[TRACE] pdg_api/api_list_inference_rules end " + trace_id)
-    return jsonify(list_of_dicts)
+    return response
+
+
+@api_bp.route("/v1/resources/inference_rule/edit/<id>", methods=["GET"])
+def api_edit_inference_rule(id: str):
+    return "Nothing here yet"
 
 
 @api_bp.route("/v1/resources/symbol/operation/list", methods=["GET"])
 def api_list_operation_symbols():
     """
-    curl -s http://localhost:5000/api/v1/resources/operation/list | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/operation/list | python3 -m json.tool
     [
         {
             "argument_count": 2,
@@ -234,7 +436,7 @@ def api_list_operation_symbols():
 @api_bp.route("/v1/resources/symbol/relation/list", methods=["GET"])
 def api_list_relation_symbols():
     """
-    curl -s http://localhost:5000/api/v1/resources/symbol/relation/list | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/list | python3 -m json.tool
 
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -258,7 +460,7 @@ def api_list_relation_symbols():
 @api_bp.route("/v1/resources/symbol/scalar/list", methods=["GET"])
 def api_list_scalar_symbols():
     """
-    curl -s http://localhost:5000/api/v1/resources/scalar/list | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/scalar/list | python3 -m json.tool
     [
         {
             "argument_count": 2,
@@ -293,7 +495,7 @@ def api_list_scalar_symbols():
 @api_bp.route("/v1/resources/symbol/vector/list", methods=["GET"])
 def api_list_vector_symbols():
     """
-    curl -s http://localhost:5000/api/v1/resources/vector/list | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/vector/list | python3 -m json.tool
     [
         {
             "argument_count": 2,
@@ -328,7 +530,7 @@ def api_list_vector_symbols():
 @api_bp.route("/v1/resources/symbol/matrix/list", methods=["GET"])
 def api_list_matrix_symbols():
     """
-    curl -s http://localhost:5000/api/v1/resources/matrix/list | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/matrix/list | python3 -m json.tool
     [
         {
             "argument_count": 2,
@@ -363,7 +565,7 @@ def api_list_matrix_symbols():
 @api_bp.route("/v1/resources/expression/list", methods=["GET"])
 def api_list_expressions():
     """
-    curl -s http://localhost:5000/api/v1/resources/expression/list | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/expression/list | python3 -m json.tool
     [
         {
             "author_name_latex": "ben",
@@ -409,13 +611,13 @@ def api_create_derivation():
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-     http://localhost:5000/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
+     https://localhost:5000/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
 
     curl --request POST \
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"derivation_name_latex":"hello again", "derivation_reference_latex":"this was", "derivation_abstract_latex": "yes no"}' \
-     http://localhost:5000/api/v1/resources/derivation/create
+     https://localhost:5000/api/v1/resources/derivation/create
 
 
     """
@@ -531,7 +733,7 @@ def api_create_expression():
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-    http://localhost:5000/api/v1/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9 \
+    https://localhost:5000/api/v1/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9 \
      | python3 -m json.tool
 
 
@@ -539,7 +741,7 @@ def api_create_expression():
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"expression_latex_lhs": "4^3", "expression_relation_latex": "=", "expression_latex_rhs": "k"}' \
-     http://localhost:5000/api/v1/resources/expression/create | python3 -m json.tool
+     https://localhost:5000/api/v1/resources/expression/create | python3 -m json.tool
 
     user-provided dictionary is required to have latex and name
 
@@ -724,14 +926,14 @@ def api_create_scalar_symbol():
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-    http://localhost:5000/api/v1/resources/symbol/scalar/create?scalar_latex=a | python3 -m json.tool
+    https://localhost:5000/api/v1/resources/symbol/scalar/create?scalar_latex=a | python3 -m json.tool
 
 
     curl --request POST \
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"scalar_latex": "b"}' \
-     http://localhost:5000/api/v1/resources/symbol/scalar/create | python3 -m json.tool
+     https://localhost:5000/api/v1/resources/symbol/scalar/create | python3 -m json.tool
 
 
     see `to_add_symbol_scalar`
@@ -1025,7 +1227,7 @@ def api_create_scalar_symbol():
 @api_bp.route("/v1/resources/symbol/vector/create", methods=["POST"])
 def api_create_vector_symbol():
     """
-    curl -s http://localhost:5000/api/v1/resources/symbol/vector/create
+    curl --silent --insecure https://localhost/api/v1/resources/symbol/vector/create
 
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -1041,7 +1243,7 @@ def api_create_vector_symbol():
 @api_bp.route("/v1/resources/symbol/matrix/create", methods=["POST"])
 def api_create_matrix_symbol():
     """
-    curl -s http://localhost:5000/api/v1/resources/symbol/matrix/create
+    curl --silent --insecure https://localhost/api/v1/resources/symbol/matrix/create
 
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -1057,7 +1259,7 @@ def api_create_matrix_symbol():
 @api_bp.route("/v1/resources/symbol/operation/create", methods=["POST"])
 def api_create_operation_symbol():
     """
-    curl -s http://localhost:5000/api/v1/resources/symbol/operation/create
+    curl --silent --insecure https://localhost/api/v1/resources/symbol/operation/create
 
     see `to_add_operation`
 
@@ -1175,7 +1377,7 @@ def api_create_operation_symbol():
 @api_bp.route("/v1/resources/symbol/relation/create", methods=["POST"])
 def api_create_relation_symbol():
     """
-    curl -s http://localhost:5000/api/v1/resources/symbol/relation/create
+    curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/create
 
     see `to_add_relation`
     """
@@ -1275,7 +1477,7 @@ def api_create_relation_symbol():
 @api_bp.route("/v1/resources/inference_rule/create", methods=["POST"])
 def api_create_inference_rule():
     """
-    curl -s http://localhost:5000/api/v1/resources/inference_rule/create
+    curl --silent --insecure https://localhost/api/v1/resources/inference_rule/create
 
     >>>
     """
@@ -1312,7 +1514,7 @@ def api_delete_derivation():
     """
     derivation and all steps
 
-    curl -s http://localhost:5000/api/v1/resources//delete
+    curl --silent --insecure https://localhost/api/v1/resources//delete
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] pdg_api/ start " + trace_id)
@@ -1413,7 +1615,7 @@ def api_delete_expression():
 @api_bp.route("/v1/resources/derivation/metadata", methods=["GET"])
 def api_derivation_metadata():
     """
-    curl -s http://localhost:5000/api/v1/resources/derivation/metadata?derivation_id=3445848 | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/derivation/metadata?derivation_id=3445848 | python3 -m json.tool
     {
         "abstract_latex": "my summary",
         "author_name_latex": "ben",
@@ -1450,7 +1652,7 @@ def api_derivation_metadata():
 @api_bp.route("/v1/resources/derivation/step/list", methods=["GET"])
 def api_derivation_steps():
     """
-    curl -s http://localhost:5000/api/v1/resources/derivation/step/list?derivation_id=3445848 | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/derivation/step/list?derivation_id=3445848 | python3 -m json.tool
     [
         {
             "author_name_latex": "benno",
@@ -1489,7 +1691,7 @@ def api_derivation_steps():
 @api_bp.route("/v1/resources/cypher/", methods=["GET"])
 def api_cypher_query():
     """
-    curl -s http://localhost:5000/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] pdg_api/api_cypher_query start " + trace_id)
@@ -1517,7 +1719,7 @@ def api_cypher_query():
             list_of_records = ["not a valid Cypher query (TransactionError)"]
     else:
         list_of_records = [
-            "use: curl -s http://localhost:5000/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\)"
+            "use: curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\)"
         ]
 
     logger.info("[TRACE] pdg_api/api_cypher_query end " + trace_id)
