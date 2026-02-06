@@ -1,6 +1,14 @@
+#!/usr/bin/env python3
+
+# Ben Payne
+# Physics Derivation Graph
+# https://allofphysics.com
+# Creative Commons Attribution 4.0 International License
+# https://creativecommons.org/licenses/by/4.0/
+
 import time
 
-import neo4j
+import neo4j  # for the exceptions
 from neo4j import GraphDatabase
 
 import neo4j_query
@@ -42,3 +50,5 @@ try:
 
 except neo4j.exceptions.ClientError as er:
     print("Neo4j exception: " + str(er))
+
+# EOF
