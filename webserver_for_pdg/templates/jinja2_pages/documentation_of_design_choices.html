@@ -134,11 +134,13 @@ cat documentation_of_design_choices.html |\
 
 <H2 id="all known math physics"><i>Decision</i>: What constitutes "all known mathematical physics"?</H2>
 
-<p>Dirac notation, calculus, differential equations, algebra, trigonometry.<br />
-Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
+<P>For a list of topics, see <a href="https://en.wikipedia.org/wiki/Branches_of_physics">https://en.wikipedia.org/wiki/Branches_of_physics</a>.
 
-<P>See also <a href="#supported math features">Supported mathematical features</a> and
-  <a href="#not in scope">not in scope</a>.
+<p>Notationally, mathematical physics includes Dirac notation, calculus, differential equations, algebra, trigonometry. (There is <a href="https://en.wikipedia.org/wiki/List_of_common_physics_notations">https://en.wikipedia.org/wiki/List_of_common_physics_notations</a> but there's not comprehensive coverage. <BR>
+  See also <a href="#supported math features">Supported mathematical features</a><P> 
+
+<P>Geometry is certainly part of mathematical physics but the developer of this project hasn't figure out how to incorporate geometry.<BR>
+See the full list of  <a href="#not in scope">not in scope</a>.
 
 <P>&nbsp;</P>
 <HR/>
@@ -148,7 +150,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 
 <p>Reasonable for a human to understand without use of specialized knowledge.
 
-<P>\int_0^{\infty} is not understandable to everyone, and neither is contentML.</p>
+<P>Raw Latex (like \int_0^{\infty}) is not understandable to everyone, whereas \( \int_0^{\infty} \) is). Similarly, raw contentML is not human-readable.</p>
 
 <P>&nbsp;</P>
 <HR/>
@@ -156,7 +158,7 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 
 <H2 id="checkable by CAS"><i>Decision</i>: What does "checkable by CAS" mean?</H2>
 
-<P>The mathematical steps, identity, or solution can be verified as correct using symbolic mathematical software. (See <a href="#which cas"> for examples.)
+<P>The mathematical steps, identity, or solution can be verified as correct using symbolic mathematical software. (See <a href="#which cas">which CAS</a> for examples.)
 
 <p>Just writing down symbols and expressions is not meaningful.</p>
 
@@ -241,9 +243,9 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id="JSON to Neo4j"><i>Decision</i>: Upgrade path from JSON/SQL to Neo4j</H2>
+<H2 id="JSON to Neo4j"><i>Historical Decision</i>: Upgrade path from JSON/SQL to Neo4j</H2>
 
-<p>I had ui_v7 for JSON/SQL and ui_v8 for Neo4j. The ui_v7 had a working implementation of Google authentication. I had trouble getting Google authentication working in ui_v8, and I didn't want to have to refactor all the static content from ui_v7, so I decided to create a new repo, "allofphysics.com".</p>
+<p>The repo <a href="https://github.com/allofphysicsgraph/ui_v7_website_flask_json">ui_v7</a> used JSON/SQL and <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j">ui_v8</a> used Neo4j. The ui_v7 repo had a working implementation of Google authentication. I had trouble getting Google authentication working in ui_v8, and I didn't want to have to refactor all the static content from ui_v7, so I decided to create a new repo, "allofphysics.com" (now renamed to <a href="https://github.com/allofphysicsgraph/combined_v7_JSON_and_v8_neo4j">https://github.com/allofphysicsgraph/combined_v7_JSON_and_v8_neo4j</a>.</p>
 
 <p>Although getting Neo4j into ui_v7 was do-able, the "mash together to repos" ended up being a bad decision from a troubleshooting and cleanliness-of-design experience.</p>
 
@@ -257,6 +259,10 @@ Geometry is but the developer hasn't figure out how to incorporate geometry.</p>
 </p>
 
   <p>In retrospect, that was a bad naming convention because I later reverted to using ui_v7 for the website.</p>
+
+<P>The "allofphysics.com" has been renamed to <a href="https://github.com/allofphysicsgraph/combined_v7_JSON_and_v8_neo4j">https://github.com/allofphysicsgraph/combined_v7_JSON_and_v8_neo4j</a>.</p>
+
+<P>As of 2026-02-06, <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j">ui_v8</a> is in use.
 
 <P>&nbsp;</P>
 <HR/>
@@ -351,6 +357,8 @@ def to_api_via_js() -&gt; str:
 <H2 id="interface"><i>Decision</i>: Interface</H2>
 
 <P>Currently using web UI.
+
+<P>Plan to support API.
 
 <p>Why web ui? Why not a GUI? Or command line?
 </p>
