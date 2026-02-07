@@ -695,7 +695,7 @@ def api_create_derivation():
     derivation_id, query_time_dict = compute.generate_random_id(
         graphDB_Driver, query_time_dict, "derivation"
     )
-    logger.info("pdg_app/api_create_derivation: derivation_id="+ derivation_id)
+    logger.info("pdg_app/api_create_derivation: derivation_id=" + derivation_id)
 
     # as per https://strftime.org/
     # %f = Microsecond as a decimal number, zero-padded on the left.
@@ -861,7 +861,7 @@ def api_create_expression():
             time.time() - query_start_time, 3
         )
 
-    logger.info("list_of_expression_dicts="+ str(list_of_expression_dicts))
+    logger.info("list_of_expression_dicts=" + str(list_of_expression_dicts))
 
     # if lhs and relation and rhs are same, then reject
     for expression_dict in list_of_expression_dicts:
@@ -1172,7 +1172,9 @@ def api_create_scalar_symbol():
             "dimension_amount_of_substance"
         )
         if dimension_amount_of_substance:
-            logger.info("dimension_amount_of_substance =" + dimension_amount_of_substance)
+            logger.info(
+                "dimension_amount_of_substance =" + dimension_amount_of_substance
+            )
         else:
             dimension_amount_of_substance = 0
 
@@ -1586,7 +1588,7 @@ def api_delete_derivation():
         query_time_dict["to_review_derivation: node_properties, derivation"] = round(
             time.time() - query_start_time, 3
         )
-    logger.info("derivation_dict:"+ str(derivation_dict))
+    logger.info("derivation_dict:" + str(derivation_dict))
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -1631,7 +1633,7 @@ def api_derivation_metadata():
     else:
         return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
 
-    logger.info("derivation_id="+ derivation_id)
+    logger.info("derivation_id=" + derivation_id)
 
     # try provided derivation_id; might not be a valid ID
     with graphDB_Driver.session() as session:
@@ -1640,7 +1642,7 @@ def api_derivation_metadata():
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
         query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    logger.info("derivation_dict="+ str(derivation_dict))
+    logger.info("derivation_dict=" + str(derivation_dict))
 
     logger.info("[TRACE] pdg_api/api_derivation_metadata end " + trace_id)
     return jsonify(derivation_dict)
@@ -1670,7 +1672,7 @@ def api_derivation_steps():
     else:
         return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
 
-    logger.info("derivation_id="+ derivation_id)
+    logger.info("derivation_id=" + derivation_id)
 
     # try provided derivation_id; might not be a valid ID
     with graphDB_Driver.session() as session:
@@ -1679,7 +1681,7 @@ def api_derivation_steps():
             neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
         )
         query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    logger.info("list_of_steps="+str(list_of_steps))
+    logger.info("list_of_steps=" + str(list_of_steps))
 
     logger.info("[TRACE] pdg_api/api_derivation_steps end " + trace_id)
     return jsonify(list_of_steps)
@@ -1696,7 +1698,7 @@ def api_cypher_query():
 
     user_query = request.args.get("query")
 
-    logger.info("user_query:"+ user_query)
+    logger.info("user_query:" + user_query)
 
     list_of_records = []  # type: List[str]
     if user_query:
