@@ -90,13 +90,12 @@ def api_do_nothing():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] pdg_api/api_do_nothing start " + trace_id + " " + str(time.time())
-    )
+    logger.info("[TRACE] api_do_nothing start " + trace_id + " " + str(time.time()))
     return
 
 
-@api_bp.route("/v1/resources/start_here", methods=["GET"])
+@api_bp.route("/v1", methods=["GET"])
+@api_bp.route("/v1/", methods=["GET"])
 def api_start_here():
     """
     Entry point for the API using HATEOAS (HAL format).
@@ -105,6 +104,26 @@ def api_start_here():
 
     Hypermedia as the Engine of Application State (HATEOAS)
     https://en.wikipedia.org/wiki/HATEOAS
+
+    ```
+    $ curl --silent --insecure https://localhost/api/v1/resources/start_here
+
+    {
+      "_links": {
+        "cypher_query": {
+          "href": "https://localhost/api/v1/resources/cypher/",
+          "title": "Cypher query",
+          "type": "GET"
+        },
+        "derivations": {
+          "href": "https://localhost/api/v1/resources/derivations,
+          "title": "List derivations",
+          "type": "GET"
+        }
+      }
+      "message": "Welcome to the Physics Derivation Graph API. Please explore the available resources."
+    }
+    ```
 
     """
     # Construct the HAL payload
@@ -180,7 +199,7 @@ def api_start_here():
     return response
 
 
-@api_bp.route("/v1/resources/register_csrf", methods=["GET"])
+@api_bp.route("/v1/auth/csrf", methods=["GET"])
 def api_register():
     """
     a CSRF token can be generated manually as per
@@ -198,9 +217,7 @@ def api_register():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] pdg_api/api_register start " + trace_id + " " + str(time.time())
-    )
+    logger.info("[TRACE] api_register start " + trace_id + " " + str(time.time()))
     # csrf_token = csrf.generate_csrf() # AttributeError: 'CSRFProtect' object has no attribute 'generate_csrf'
 
     # current_token = g.csrf_token
@@ -210,7 +227,7 @@ def api_register():
     return jsonify({"csrf token": csrf_token})
 
 
-@api_bp.route("/v1/resources/derivation/list", methods=["GET"])
+@api_bp.route("/v1/resources/derivations", methods=["GET"])
 def api_list_derivations():
     """
     curl --silent --insecure https://localhost/api/v1/resources/derivation/list | python3 -m json.tool
@@ -228,10 +245,7 @@ def api_list_derivations():
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] pdg_api/api_list_derivations start "
-        + trace_id
-        + " "
-        + str(time.time())
+        "[TRACE] api_list_derivations start " + trace_id + " " + str(time.time())
     )
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -251,30 +265,41 @@ def api_list_derivations():
         resource = item.copy()
         item_id = resource.get("id")
 
+        if not item_id:
+            logger.critical("Found derivation without ID")
+            raise Exception("Found derivation without ID")
+
         # Add links specific to this individual resource
         resource["_links"] = {
             "self": {
-                "href": url_for(".api_list_derivations", _external=True)  # Placeholder
+                "href": url_for(
+                    ".api_derivation_metadata", derivation_id=item_id, _external=True
+                ),
+                "title": "Get derivation metadata",
+                "type": "GET",
             },
             "edit": {
                 "href": url_for(
                     ".api_edit_derivation", derivation_id=item_id, _external=True
                 ),
+                "title": "Edit derivation",
+                "type": "GET",
             },
-            "view_steps": {
+            "steps": {
                 "href": url_for(
                     ".api_derivation_steps", derivation_id=item_id, _external=True
-                )
-            },
-            "view_metadata": {
-                "href": url_for(
-                    ".api_derivation_metadata", derivation_id=item_id, _external=True
-                )
+                ),
+                "title": "View derivation steps",
+                "type": "GET",
             },
             "delete": {
+                # Note: This API uses POST for delete, not the standard HTTP DELETE verb.
+                # Explicitly stating the method helps the client know how to interact.
                 "href": url_for(
                     ".api_delete_derivation", derivation_id=item_id, _external=True
-                )
+                ),
+                "title": "Delete derivation",
+                "method": "DELETE",
             },
         }
         embedded_items.append(resource)
@@ -286,10 +311,12 @@ def api_list_derivations():
             "self": {
                 "href": url_for(".api_list_derivations", _external=True),
                 "title": "List of Derivations",
+                "type": "GET",
             },
             "up": {
                 "href": url_for(".api_start_here", _external=True),
-                "title": "API Home",
+                "title": "API Entry Point",
+                "type": "GET",
             },
             "create": {
                 "href": url_for(".api_create_derivation", _external=True),
@@ -303,16 +330,11 @@ def api_list_derivations():
     response = make_response(jsonify(payload))
     response.headers["Content-Type"] = "application/hal+json"
 
-    logger.info("[TRACE] pdg_api/api_list_derivations end " + trace_id)
+    logger.info("[TRACE] api_list_derivations end " + trace_id)
     return response
 
 
-@api_bp.route("/v1/resources/derivation/edit/<derivation_id>", methods=["GET"])
-def api_edit_derivation(derivation_id: str):
-    return "Nothing here yet"
-
-
-@api_bp.route("/v1/resources/inference_rule/list", methods=["GET"])
+@api_bp.route("/v1/resources/inference_rules", methods=["GET"])
 def api_list_inference_rules():
     """
     curl --silent --insecure https://localhost/api/v1/resources/inference_rule/list | python3 -m json.tool
@@ -330,7 +352,7 @@ def api_list_inference_rules():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_list_inference_rules start " + trace_id)
+    logger.info("[TRACE] api_list_inference_rules start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -386,16 +408,43 @@ def api_list_inference_rules():
     response = make_response(jsonify(payload))
     response.headers["Content-Type"] = "application/hal+json"
 
-    logger.info("[TRACE] pdg_api/api_list_inference_rules end " + trace_id)
+    logger.info("[TRACE] api_list_inference_rules end " + trace_id)
     return response
 
 
-@api_bp.route("/v1/resources/inference_rule/edit/<id>", methods=["GET"])
-def api_edit_inference_rule(id: str):
-    return "Nothing here yet"
+@api_bp.route("/v1/resources/expressions", methods=["GET"])
+def api_list_expressions():
+    """
+    curl --silent --insecure https://localhost/api/v1/resources/expression/list | python3 -m json.tool
+    [
+        {
+            "author_name_latex": "ben",
+            "description_latex": "",
+            "id": "1852486",
+            "latex": "a+b=2",
+            "name_latex": ""
+        },
+    ]
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] api_list_expressions start " + trace_id)
+    query_time_dict = {}  # type: query_timing_result_type
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "expression"
+        )
+        query_time_dict["pdg_api/api_list_expressions: get_list_node_dicts_of_type"] = (
+            time.time() - query_start_time
+        )
+    # print("list_of_dicts=", list_of_dicts)
+
+    logger.info("[TRACE] api_list_expressions end " + trace_id)
+    return jsonify(list_of_dicts)
 
 
-@api_bp.route("/v1/resources/symbol/operation/list", methods=["GET"])
+@api_bp.route("/v1/resources/symbol/operations", methods=["GET"])
 def api_list_operation_symbols():
     """
     curl --silent --insecure https://localhost/api/v1/resources/operation/list | python3 -m json.tool
@@ -413,7 +462,7 @@ def api_list_operation_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_list_symbols start " + trace_id)
+    logger.info("[TRACE] api_list_symbols start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -426,18 +475,18 @@ def api_list_operation_symbols():
         ] = (time.time() - query_start_time)
     # print("list_of_dicts=", list_of_dicts)
 
-    logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
+    logger.info("[TRACE] api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
-@api_bp.route("/v1/resources/symbol/relation/list", methods=["GET"])
+@api_bp.route("/v1/resources/symbol/relations", methods=["GET"])
 def api_list_relation_symbols():
     """
     curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/list | python3 -m json.tool
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_list_relation_symbols start " + trace_id)
+    logger.info("[TRACE] api_list_relation_symbols start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -450,11 +499,11 @@ def api_list_relation_symbols():
         ] = (time.time() - query_start_time)
     # print("list_of_dicts=", list_of_dicts)
 
-    logger.info("[TRACE] pdg_api/api_list_relation_symbols end " + trace_id)
+    logger.info("[TRACE] api_list_relation_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
-@api_bp.route("/v1/resources/symbol/scalar/list", methods=["GET"])
+@api_bp.route("/v1/resources/symbol/scalars", methods=["GET"])
 def api_list_scalar_symbols():
     """
     curl --silent --insecure https://localhost/api/v1/resources/scalar/list | python3 -m json.tool
@@ -472,7 +521,7 @@ def api_list_scalar_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_list_symbols start " + trace_id)
+    logger.info("[TRACE] api_list_symbols start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -485,11 +534,11 @@ def api_list_scalar_symbols():
         ] = (time.time() - query_start_time)
     # print("list_of_dicts=", list_of_dicts)
 
-    logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
+    logger.info("[TRACE] api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
-@api_bp.route("/v1/resources/symbol/vector/list", methods=["GET"])
+@api_bp.route("/v1/resources/symbol/vectors", methods=["GET"])
 def api_list_vector_symbols():
     """
     curl --silent --insecure https://localhost/api/v1/resources/vector/list | python3 -m json.tool
@@ -507,7 +556,7 @@ def api_list_vector_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_list_symbols start " + trace_id)
+    logger.info("[TRACE] api_list_symbols start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -520,11 +569,11 @@ def api_list_vector_symbols():
         ] = (time.time() - query_start_time)
     # print("list_of_dicts=", list_of_dicts)
 
-    logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
+    logger.info("[TRACE] api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
-@api_bp.route("/v1/resources/symbol/matrix/list", methods=["GET"])
+@api_bp.route("/v1/resources/symbol/matrices", methods=["GET"])
 def api_list_matrix_symbols():
     """
     curl --silent --insecure https://localhost/api/v1/resources/matrix/list | python3 -m json.tool
@@ -542,7 +591,7 @@ def api_list_matrix_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_list_symbols start " + trace_id)
+    logger.info("[TRACE] api_list_symbols start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -555,43 +604,11 @@ def api_list_matrix_symbols():
         ] = (time.time() - query_start_time)
     # print("list_of_dicts=", list_of_dicts)
 
-    logger.info("[TRACE] pdg_api/api_list_symbols end " + trace_id)
+    logger.info("[TRACE] api_list_symbols end " + trace_id)
     return jsonify(list_of_dicts)
 
 
-@api_bp.route("/v1/resources/expression/list", methods=["GET"])
-def api_list_expressions():
-    """
-    curl --silent --insecure https://localhost/api/v1/resources/expression/list | python3 -m json.tool
-    [
-        {
-            "author_name_latex": "ben",
-            "description_latex": "",
-            "id": "1852486",
-            "latex": "a+b=2",
-            "name_latex": ""
-        },
-    ]
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_list_expressions start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "expression"
-        )
-        query_time_dict["pdg_api/api_list_expressions: get_list_node_dicts_of_type"] = (
-            time.time() - query_start_time
-        )
-    # print("list_of_dicts=", list_of_dicts)
-
-    logger.info("[TRACE] pdg_api/api_list_expressions end " + trace_id)
-    return jsonify(list_of_dicts)
-
-
-@api_bp.route("/v1/resources/derivation/create", methods=["POST"])
+@api_bp.route("/v1/resources/derivation", methods=["POST"])
 def api_create_derivation():
     """
     required inputs:
@@ -619,7 +636,7 @@ def api_create_derivation():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_create_derivation start " + trace_id)
+    logger.info("[TRACE] api_create_derivation start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # print("request=" + str(request)) # shows the user-submitted URL and type (POST)
@@ -723,7 +740,42 @@ def api_create_derivation():
     )
 
 
-@api_bp.route("/v1/resources/expression/create", methods=["POST"])
+@api_bp.route("/v1/resources/inference_rule", methods=["POST"])
+def api_create_inference_rule():
+    """
+    curl --silent --insecure https://localhost/api/v1/resources/inference_rule/create
+
+    >>>
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE]  start " + trace_id)
+    query_time_dict = {}  # type: query_timing_result_type
+
+    if request.is_json:  # "Content-Type: application/json"
+        data_from_user = request.get_json()
+        logger.info("data_from_user = " + str(data_from_user))
+
+        # required
+        if "_latex" in data_from_user.keys():
+            _latex = data_from_user[""]
+        else:
+            return jsonify({"ERROR": "need to provide _latex"})
+
+    else:  # "Content-Type: application/x-www-form-urlencoded"
+        logger.info("request.args=" + str(request.args))  # returns a dict
+        # required
+        _latex = request.args.get("_latex")
+        if _latex:
+            logger.info("_latex =" + _latex)
+        else:
+            return jsonify({"ERROR": "need to provide _latex"})
+
+    return jsonify(
+        {"STATUS": "inference rule added successfully", "query times": query_time_dict}
+    )
+
+
+@api_bp.route("/v1/resources/expression", methods=["POST"])
 def api_create_expression():
     """
 
@@ -748,7 +800,7 @@ def api_create_expression():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_create_expression start " + trace_id)
+    logger.info("[TRACE] api_create_expression start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     if request.is_json:  # "Content-Type: application/json"
@@ -916,7 +968,7 @@ def api_create_expression():
     )
 
 
-@api_bp.route("/v1/resources/symbol/scalar/create", methods=["POST"])
+@api_bp.route("/v1/resources/symbol/scalar", methods=["POST"])
 def api_create_scalar_symbol():
     """
 
@@ -937,7 +989,7 @@ def api_create_scalar_symbol():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     if request.is_json:  # "Content-Type: application/json"
@@ -1223,14 +1275,14 @@ def api_create_scalar_symbol():
     )
 
 
-@api_bp.route("/v1/resources/symbol/vector/create", methods=["POST"])
+@api_bp.route("/v1/resources/symbol/vector", methods=["POST"])
 def api_create_vector_symbol():
     """
     curl --silent --insecure https://localhost/api/v1/resources/symbol/vector/create
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # %f = Microsecond as a decimal number, zero-padded on the left.
@@ -1239,14 +1291,14 @@ def api_create_vector_symbol():
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route("/v1/resources/symbol/matrix/create", methods=["POST"])
+@api_bp.route("/v1/resources/symbol/matrix", methods=["POST"])
 def api_create_matrix_symbol():
     """
     curl --silent --insecure https://localhost/api/v1/resources/symbol/matrix/create
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # %f = Microsecond as a decimal number, zero-padded on the left.
@@ -1255,7 +1307,7 @@ def api_create_matrix_symbol():
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route("/v1/resources/symbol/operation/create", methods=["POST"])
+@api_bp.route("/v1/resources/symbol/operation", methods=["POST"])
 def api_create_operation_symbol():
     """
     curl --silent --insecure https://localhost/api/v1/resources/symbol/operation/create
@@ -1264,7 +1316,7 @@ def api_create_operation_symbol():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     if request.is_json:  # "Content-Type: application/json"
@@ -1373,7 +1425,7 @@ def api_create_operation_symbol():
     )
 
 
-@api_bp.route("/v1/resources/symbol/relation/create", methods=["POST"])
+@api_bp.route("/v1/resources/symbol/relation", methods=["POST"])
 def api_create_relation_symbol():
     """
     curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/create
@@ -1381,7 +1433,7 @@ def api_create_relation_symbol():
     see `to_add_relation`
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     if request.is_json:  # "Content-Type: application/json"
@@ -1473,70 +1525,206 @@ def api_create_relation_symbol():
     )
 
 
-@api_bp.route("/v1/resources/inference_rule/create", methods=["POST"])
-def api_create_inference_rule():
-    """
-    curl --silent --insecure https://localhost/api/v1/resources/inference_rule/create
+@api_bp.route("/v1/resources/derivation/<string:derivation_id>/edit", methods=["POST"])
+def api_edit_derivation(derivation_id: str):
+    return jsonify({"STATUS": "Nothing here yet"})
 
-    >>>
+
+@api_bp.route("/v1/resources/inference_rule/<string:infrule_id>/edit", methods=["POST"])
+def api_edit_inference_rule(infrule_id: str):
+    return jsonify({"STATUS": "Nothing here yet"})
+
+
+@api_bp.route("/v1/resources/expression/<string:expression_id>/edit", methods=["POST"])
+def api_edit_expression(expression_id: str):
+    return jsonify({"STATUS": "Nothing here yet"})
+
+
+@api_bp.route("/v1/resources/symbol/scalar/<string:symbol_id>/edit", methods=["POST"])
+def api_edit_scalar(symbol_id: str):
+    return jsonify({"STATUS": "Nothing here yet"})
+
+
+@api_bp.route("/v1/resources/symbol/vector/<string:symbol_id>/edit", methods=["POST"])
+def api_edit_vector(symbol_id: str):
+    return jsonify({"STATUS": "Nothing here yet"})
+
+
+@api_bp.route("/v1/resources/symbol/matrix/<string:symbol_id>/edit", methods=["POST"])
+def api_edit_matrix(symbol_id: str):
+    return jsonify({"STATUS": "Nothing here yet"})
+
+
+@api_bp.route(
+    "/v1/resources/symbol/operation/<string:symbol_id>/edit", methods=["POST"]
+)
+def api_edit_operation(symbol_id: str):
+    return jsonify({"STATUS": "Nothing here yet"})
+
+
+@api_bp.route("/v1/resources/symbol/relation/<string:symbol_id>/edit", methods=["POST"])
+def api_edit_relation(symbol_id: str):
+    return jsonify({"STATUS": "Nothing here yet"})
+
+
+@api_bp.route(
+    "/v1/resources/derivation/<string:derivation_id>/metadata", methods=["GET"]
+)
+def api_derivation_metadata(derivation_id: str):
+    """
+    curl --silent --insecure https://localhost/api/v1/resources/derivation/3445848/metadata | python3 -m json.tool
+    {
+        "abstract_latex": "my summary",
+        "author_name_latex": "ben",
+        "created_datetime": "2024-05-19_21-16-29-085813",
+        "id": "3445848",
+        "name_latex": "this is a new derivation"
+    }
+
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE] api_derivation_metadata start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
-    if request.is_json:  # "Content-Type: application/json"
-        data_from_user = request.get_json()
-        logger.info("data_from_user = " + str(data_from_user))
+    if "derivation_id" in request.args:
+        derivation_id = str(request.args["derivation_id"])
+    else:
+        return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
 
-        # required
-        if "_latex" in data_from_user.keys():
-            _latex = data_from_user[""]
-        else:
-            return jsonify({"ERROR": "need to provide _latex"})
+    logger.info("derivation_id=" + derivation_id)
 
-    else:  # "Content-Type: application/x-www-form-urlencoded"
-        logger.info("request.args=" + str(request.args))  # returns a dict
-        # required
-        _latex = request.args.get("_latex")
-        if _latex:
-            logger.info("_latex =" + _latex)
-        else:
-            return jsonify({"ERROR": "need to provide _latex"})
+    # try provided derivation_id; might not be a valid ID
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        derivation_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "derivation", derivation_id
+        )
+        query_time_dict["pdg_api/: "] = time.time() - query_start_time
+    logger.info("derivation_dict=" + str(derivation_dict))
 
-    return jsonify(
-        {"STATUS": "inference rule added successfully", "query times": query_time_dict}
-    )
+    logger.info("[TRACE] api_derivation_metadata end " + trace_id)
+    return jsonify(derivation_dict)
 
 
-@api_bp.route("/v1/resources/derivation/delete", methods=["POST"])
-def api_delete_derivation():
+@api_bp.route(
+    "/v1/resources/inference_rule/<string:infrule_id>/metadata", methods=["GET"]
+)
+def api_inference_rule_metadata(expression_id: str):
+    return jsonify({"STATUS": "TODO"})
+
+
+@api_bp.route(
+    "/v1/resources/expression/<string:expression_id>/metadata", methods=["GET"]
+)
+def api_expression_metadata(expression_id: str):
+    return jsonify({"STATUS": "TODO"})
+
+
+@api_bp.route(
+    "/v1/resources/symbol/scalar/<string:symbol_id>/metadata", methods=["GET"]
+)
+def api_scalar_metadata(symbol_id: str):
+    return jsonify({"STATUS": "TODO"})
+
+
+@api_bp.route(
+    "/v1/resources/symbol/vector/<string:symbol_id>/metadata", methods=["GET"]
+)
+def api_vector_metadata(symbol_id: str):
+    return jsonify({"STATUS": "TODO"})
+
+
+@api_bp.route(
+    "/v1/resources/symbol/matrix/<string:symbol_id>/metadata", methods=["GET"]
+)
+def api_matrix_metadata(symbol_id: str):
+    return jsonify({"STATUS": "TODO"})
+
+
+@api_bp.route(
+    "/v1/resources/symbol/operation/<string:symbol_id>/metadata", methods=["GET"]
+)
+def api_operation_metadata(symbol_id: str):
+    return jsonify({"STATUS": "TODO"})
+
+
+@api_bp.route(
+    "/v1/resources/symbol/relation/<string:symbol_id>/metadata", methods=["GET"]
+)
+def api_relation_metadata(symbol_id: str):
+    return jsonify({"STATUS": "TODO"})
+
+
+@api_bp.route("/v1/resources/derivation/<string:derivation_id>/steps", methods=["GET"])
+def api_derivation_steps(derivation_id: str):
+    """
+    curl --silent --insecure https://localhost/api/v1/resources/derivation/3445848/step/list | python3 -m json.tool
+    [
+        {
+            "author_name_latex": "benno",
+            "created_datetime": "2024-05-19_23-23-11-337900",
+            "id": "1800596",
+            "note_after_step_latex": "",
+            "note_before_step_latex": ""
+        }
+    ]
+
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] api_derivation_steps start " + trace_id)
+    query_time_dict = {}  # type: query_timing_result_type
+
+    # if "derivation_id" in request.args:
+    #     derivation_id = str(request.args["derivation_id"])
+    # else:
+    #     return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
+
+    logger.info("derivation_id=" + derivation_id)
+
+    # try provided derivation_id; might not be a valid ID
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_steps = session.read_transaction(
+            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+        )
+        query_time_dict["pdg_api/: "] = time.time() - query_start_time
+    # logger.info("list_of_steps=" + str(list_of_steps))
+
+    logger.info("[TRACE] api_derivation_steps end " + trace_id)
+    return jsonify(list_of_steps)
+
+
+@api_bp.route(
+    "/v1/resources/derivation/<string:derivation_id>/delete", methods=["DELETE"]
+)
+def api_delete_derivation(derivation_id: str):
     """
     derivation and all steps
 
-    curl --silent --insecure https://localhost/api/v1/resources//delete
+    curl --silent --insecure https://localhost/api/v1/resources/derivation/<string:derivation_id>/delete
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/ start " + trace_id)
+    logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
-    if request.is_json:  # "Content-Type: application/json"
-        data_from_user = request.get_json()
-        logger.info("data_from_user = " + str(data_from_user))
+    # if request.is_json:  # "Content-Type: application/json"
+    #     data_from_user = request.get_json()
+    #     logger.info("data_from_user = " + str(data_from_user))
 
-        # required
-        if "derivation_id" in data_from_user.keys():
-            derivation_id = data_from_user["derivation_id"]
-        else:
-            return jsonify({"ERROR": "need to provide derivation_id"})
+    #     # required
+    #     if "derivation_id" in data_from_user.keys():
+    #         derivation_id = data_from_user["derivation_id"]
+    #     else:
+    #         return jsonify({"ERROR": "need to provide derivation_id"})
 
-    else:  # "Content-Type: application/x-www-form-urlencoded"
-        logger.info("request.args=" + str(request.args))  # returns a dict
-        # required
-        derivation_id = request.args.get("derivation_id")
-        if derivation_id:
-            logger.info("derivation_id =" + derivation_id)
-        else:
-            return jsonify({"ERROR": "need to provide derivation_id"})
+    # else:  # "Content-Type: application/x-www-form-urlencoded"
+    #     logger.info("request.args=" + str(request.args))  # returns a dict
+    #     # required
+    #     derivation_id = request.args.get("derivation_id")
+    #     if derivation_id:
+    #         logger.info("derivation_id =" + derivation_id)
+    #     else:
+    #         return jsonify({"ERROR": "need to provide derivation_id"})
 
     # does this derivation_id exist?
 
@@ -1603,88 +1791,49 @@ def api_delete_derivation():
     return jsonify({"STATUS": "successfully deleted" + derivation_id})
 
 
-@api_bp.route("/v1/resources/expression/delete", methods=["POST"])
+@api_bp.route(
+    "/v1/resources/expression/<string:expression_id>/delete", methods=["DELETE"]
+)
 def api_delete_expression():
     """
-    derivation and all steps
+    delete expression
     """
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route("/v1/resources/derivation/metadata", methods=["GET"])
-def api_derivation_metadata():
-    """
-    curl --silent --insecure https://localhost/api/v1/resources/derivation/metadata?derivation_id=3445848 | python3 -m json.tool
-    {
-        "abstract_latex": "my summary",
-        "author_name_latex": "ben",
-        "created_datetime": "2024-05-19_21-16-29-085813",
-        "id": "3445848",
-        "name_latex": "this is a new derivation"
-    }
-
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_derivation_metadata start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
-
-    if "derivation_id" in request.args:
-        derivation_id = str(request.args["derivation_id"])
-    else:
-        return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
-
-    logger.info("derivation_id=" + derivation_id)
-
-    # try provided derivation_id; might not be a valid ID
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        derivation_dict = session.read_transaction(
-            neo4j_query.get_node_properties, "derivation", derivation_id
-        )
-        query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    logger.info("derivation_dict=" + str(derivation_dict))
-
-    logger.info("[TRACE] pdg_api/api_derivation_metadata end " + trace_id)
-    return jsonify(derivation_dict)
+@api_bp.route(
+    "/v1/resources/symbol/scalar/<string:symbol_id>/delete", methods=["DELETE"]
+)
+def api_delete_scalar(symbol_id: str):
+    return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route("/v1/resources/derivation/step/list", methods=["GET"])
-def api_derivation_steps():
-    """
-    curl --silent --insecure https://localhost/api/v1/resources/derivation/step/list?derivation_id=3445848 | python3 -m json.tool
-    [
-        {
-            "author_name_latex": "benno",
-            "created_datetime": "2024-05-19_23-23-11-337900",
-            "id": "1800596",
-            "note_after_step_latex": "",
-            "note_before_step_latex": ""
-        }
-    ]
+@api_bp.route(
+    "/v1/resources/symbol/vector/<string:symbol_id>/delete", methods=["DELETE"]
+)
+def api_delete_vector(symbol_id: str):
+    return jsonify({"STATUS": "TODO"})
 
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_derivation_steps start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
 
-    if "derivation_id" in request.args:
-        derivation_id = str(request.args["derivation_id"])
-    else:
-        return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
+@api_bp.route(
+    "/v1/resources/symbol/matrix/<string:symbol_id>/delete", methods=["DELETE"]
+)
+def api_delete_matrix(symbol_id: str):
+    return jsonify({"STATUS": "TODO"})
 
-    logger.info("derivation_id=" + derivation_id)
 
-    # try provided derivation_id; might not be a valid ID
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_steps = session.read_transaction(
-            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
-        )
-        query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    logger.info("list_of_steps=" + str(list_of_steps))
+@api_bp.route(
+    "/v1/resources/symbol/operation/<string:symbol_id>/delete", methods=["DELETE"]
+)
+def api_delete_operation(symbol_id: str):
+    return jsonify({"STATUS": "TODO"})
 
-    logger.info("[TRACE] pdg_api/api_derivation_steps end " + trace_id)
-    return jsonify(list_of_steps)
+
+@api_bp.route(
+    "/v1/resources/symbol/relation/<string:symbol_id>/delete", methods=["DELETE"]
+)
+def api_delete_relation(symbol_id: str):
+    return jsonify({"STATUS": "TODO"})
 
 
 @api_bp.route("/v1/resources/cypher/", methods=["GET"])
@@ -1693,7 +1842,7 @@ def api_cypher_query():
     curl --silent --insecure https://localhost/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_api/api_cypher_query start " + trace_id)
+    logger.info("[TRACE] api_cypher_query start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     user_query = request.args.get("query")
@@ -1721,7 +1870,7 @@ def api_cypher_query():
             "use: curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\)"
         ]
 
-    logger.info("[TRACE] pdg_api/api_cypher_query end " + trace_id)
+    logger.info("[TRACE] api_cypher_query end " + trace_id)
     return jsonify(list_of_records)
 
 
