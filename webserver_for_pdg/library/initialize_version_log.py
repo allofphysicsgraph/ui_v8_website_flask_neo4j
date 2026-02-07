@@ -12,7 +12,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-proc_timeout = 20
+proc_timeout = 10
 
 process = subprocess.run(
     ["lsb_release", "-a"], stdout=PIPE, stderr=PIPE, timeout=proc_timeout
