@@ -364,7 +364,7 @@ def api_list_inference_rules():
             "pdg_api/api_list_inference_rules: get_list_node_dicts_of_type"
         ] = (time.time() - query_start_time)
 
-    # 1. Transform the raw data to include item-level links
+    # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
     for item in list_of_dicts:
         resource = item.copy()
@@ -372,19 +372,30 @@ def api_list_inference_rules():
 
         resource["_links"] = {
             "self": {
-                # Placeholder for view single inference rule
-                "href": url_for(".api_list_inference_rules", _external=True)
+                "href": url_for(
+                    ".api_inference_rule_metadata", infrule_id=item_id, _external=True
+                ),
+                "title": "Get inference rule metadata",
+                "type": "GET",
             },
             "edit": {
-                # Link to action: Edit Existing Inference Rule
-                "href": url_for(".api_edit_inference_rule", id=item_id, _external=True),
+                "href": url_for(
+                    ".api_edit_inference_rule", infrule_id=item_id, _external=True
+                ),
                 "title": "Edit this inference rule",
                 "method": "PUT",
+            },
+            "delete": {
+                "href": url_for(
+                    ".api_delete_inference_rule", infrule_id=item_id, _external=True
+                ),
+                "title": "Delete inference rule",
+                "method": "DELETE",
             },
         }
         embedded_items.append(resource)
 
-    # 2. Construct the Collection-level HAL payload
+    # For HATEOAS, Construct the Collection-level HAL payload
     payload = {
         "count": len(embedded_items),
         "_links": {
@@ -438,10 +449,70 @@ def api_list_expressions():
         query_time_dict["pdg_api/api_list_expressions: get_list_node_dicts_of_type"] = (
             time.time() - query_start_time
         )
-    # print("list_of_dicts=", list_of_dicts)
+
+    # For HATEOAS, Transform the raw data to include item-level links
+    embedded_items = []
+    for item in list_of_dicts:
+        resource = item.copy()
+        item_id = resource.get("id")
+
+        if not item_id:
+            logger.warning("Found expression without ID during API list generation.")
+            continue
+
+        resource["_links"] = {
+            "self": {
+                "href": url_for(
+                    ".api_expression_metadata", expression_id=item_id, _external=True
+                ),
+                "title": "Get expression metadata",
+                "type": "GET",
+            },
+            "edit": {
+                "href": url_for(
+                    ".api_edit_expression", expression_id=item_id, _external=True
+                ),
+                "title": "Edit this expression",
+                "method": "POST",
+            },
+            "delete": {
+                "href": url_for(
+                    ".api_delete_expression", expression_id=item_id, _external=True
+                ),
+                "title": "Delete expression",
+                "method": "DELETE",
+            },
+        }
+        embedded_items.append(resource)
+
+    # For HATEOAS, Construct the Collection-level HAL payload
+    payload = {
+        "count": len(embedded_items),
+        "_links": {
+            "self": {
+                "href": url_for(".api_list_expressions", _external=True),
+                "title": "List of Expressions",
+                "type": "GET",
+            },
+            "up": {
+                "href": url_for(".api_start_here", _external=True),
+                "title": "API Home",
+                "type": "GET",
+            },
+            "create": {
+                "href": url_for(".api_create_expression", _external=True),
+                "title": "Create a new expression",
+                "method": "POST",
+            },
+        },
+        "_embedded": {"expressions": embedded_items},
+    }
+
+    response = make_response(jsonify(payload))
+    response.headers["Content-Type"] = "application/hal+json"
 
     logger.info("[TRACE] api_list_expressions end " + trace_id)
-    return jsonify(list_of_dicts)
+    return response
 
 
 @api_bp.route("/v1/resources/symbol/operations", methods=["GET"])
@@ -473,10 +544,72 @@ def api_list_operation_symbols():
         query_time_dict[
             "pdg_api/api_list_operation_symbols: get_list_node_dicts_of_type"
         ] = (time.time() - query_start_time)
-    # print("list_of_dicts=", list_of_dicts)
 
-    logger.info("[TRACE] api_list_symbols end " + trace_id)
-    return jsonify(list_of_dicts)
+    # For HATEOAS, Transform the raw data to include item-level links
+    embedded_items = []
+    for item in list_of_dicts:
+        resource = item.copy()
+        item_id = resource.get("id")
+
+        if not item_id:
+            logger.warning(
+                "Found operation symbol without ID during API list generation."
+            )
+            continue
+
+        resource["_links"] = {
+            "self": {
+                "href": url_for(
+                    ".api_operation_metadata", symbol_id=item_id, _external=True
+                ),
+                "title": "Get operation metadata",
+                "type": "GET",
+            },
+            "edit": {
+                "href": url_for(
+                    ".api_edit_operation", symbol_id=item_id, _external=True
+                ),
+                "title": "Edit this operation",
+                "method": "POST",
+            },
+            "delete": {
+                "href": url_for(
+                    ".api_delete_operation", symbol_id=item_id, _external=True
+                ),
+                "title": "Delete operation",
+                "method": "DELETE",
+            },
+        }
+        embedded_items.append(resource)
+
+    # For HATEOAS, Construct the Collection-level HAL payload
+    payload = {
+        "count": len(embedded_items),
+        "_links": {
+            "self": {
+                "href": url_for(".api_list_operation_symbols", _external=True),
+                "title": "List of Operation Symbols",
+                "type": "GET",
+            },
+            "up": {
+                "href": url_for(".api_start_here", _external=True),
+                "title": "API Home",
+                "type": "GET",
+            },
+            "create": {
+                "href": url_for(".api_create_operation_symbol", _external=True),
+                "title": "Create a new operation symbol",
+                "method": "POST",
+            },
+        },
+        "_embedded": {"operation_symbols": embedded_items},
+    }
+
+    response = make_response(jsonify(payload))
+    response.headers["Content-Type"] = "application/hal+json"
+
+    logger.info("[TRACE] api_list_operation_symbols end " + trace_id)
+    return response
 
 
 @api_bp.route("/v1/resources/symbol/relations", methods=["GET"])
@@ -497,10 +630,72 @@ def api_list_relation_symbols():
         query_time_dict[
             "pdg_api/api_list_relation_symbols: api_list_relation_symbols"
         ] = (time.time() - query_start_time)
-    # print("list_of_dicts=", list_of_dicts)
+
+    # For HATEOAS, Transform the raw data to include item-level links
+    embedded_items = []
+    for item in list_of_dicts:
+        resource = item.copy()
+        item_id = resource.get("id")
+
+        if not item_id:
+            logger.warning(
+                "Found relation symbol without ID during API list generation."
+            )
+            continue
+
+        resource["_links"] = {
+            "self": {
+                "href": url_for(
+                    ".api_relation_metadata", symbol_id=item_id, _external=True
+                ),
+                "title": "Get relation metadata",
+                "type": "GET",
+            },
+            "edit": {
+                "href": url_for(
+                    ".api_edit_relation", symbol_id=item_id, _external=True
+                ),
+                "title": "Edit this relation",
+                "method": "POST",
+            },
+            "delete": {
+                "href": url_for(
+                    ".api_delete_relation", symbol_id=item_id, _external=True
+                ),
+                "title": "Delete relation",
+                "method": "DELETE",
+            },
+        }
+        embedded_items.append(resource)
+
+    # For HATEOAS, Construct the Collection-level HAL payload
+    payload = {
+        "count": len(embedded_items),
+        "_links": {
+            "self": {
+                "href": url_for(".api_list_relation_symbols", _external=True),
+                "title": "List of Relation Symbols",
+                "type": "GET",
+            },
+            "up": {
+                "href": url_for(".api_start_here", _external=True),
+                "title": "API Home",
+                "type": "GET",
+            },
+            "create": {
+                "href": url_for(".api_create_relation_symbol", _external=True),
+                "title": "Create a new relation symbol",
+                "method": "POST",
+            },
+        },
+        "_embedded": {"relation_symbols": embedded_items},
+    }
+
+    response = make_response(jsonify(payload))
+    response.headers["Content-Type"] = "application/hal+json"
 
     logger.info("[TRACE] api_list_relation_symbols end " + trace_id)
-    return jsonify(list_of_dicts)
+    return response
 
 
 @api_bp.route("/v1/resources/symbol/scalars", methods=["GET"])
@@ -532,10 +727,68 @@ def api_list_scalar_symbols():
         query_time_dict[
             "pdg_api/api_list_scalar_symbols: get_list_node_dicts_of_type"
         ] = (time.time() - query_start_time)
-    # print("list_of_dicts=", list_of_dicts)
 
-    logger.info("[TRACE] api_list_symbols end " + trace_id)
-    return jsonify(list_of_dicts)
+    # For HATEOAS, Transform the raw data to include item-level links
+    embedded_items = []
+    for item in list_of_dicts:
+        resource = item.copy()
+        item_id = resource.get("id")
+
+        if not item_id:
+            logger.warning("Found scalar symbol without ID during API list generation.")
+            continue
+
+        resource["_links"] = {
+            "self": {
+                "href": url_for(
+                    ".api_scalar_metadata", symbol_id=item_id, _external=True
+                ),
+                "title": "Get scalar metadata",
+                "type": "GET",
+            },
+            "edit": {
+                "href": url_for(".api_edit_scalar", symbol_id=item_id, _external=True),
+                "title": "Edit this scalar",
+                "method": "POST",
+            },
+            "delete": {
+                "href": url_for(
+                    ".api_delete_scalar", symbol_id=item_id, _external=True
+                ),
+                "title": "Delete scalar",
+                "method": "DELETE",
+            },
+        }
+        embedded_items.append(resource)
+
+    # For HATEOAS, Construct the Collection-level HAL payload
+    payload = {
+        "count": len(embedded_items),
+        "_links": {
+            "self": {
+                "href": url_for(".api_list_scalar_symbols", _external=True),
+                "title": "List of Scalar Symbols",
+                "type": "GET",
+            },
+            "up": {
+                "href": url_for(".api_start_here", _external=True),
+                "title": "API Home",
+                "type": "GET",
+            },
+            "create": {
+                "href": url_for(".api_create_scalar_symbol", _external=True),
+                "title": "Create a new scalar symbol",
+                "method": "POST",
+            },
+        },
+        "_embedded": {"scalar_symbols": embedded_items},
+    }
+
+    response = make_response(jsonify(payload))
+    response.headers["Content-Type"] = "application/hal+json"
+
+    logger.info("[TRACE] api_list_scalar_symbols end " + trace_id)
+    return response
 
 
 @api_bp.route("/v1/resources/symbol/vectors", methods=["GET"])
@@ -567,10 +820,68 @@ def api_list_vector_symbols():
         query_time_dict[
             "pdg_api/api_list_vector_symbols: get_list_node_dicts_of_type"
         ] = (time.time() - query_start_time)
-    # print("list_of_dicts=", list_of_dicts)
 
-    logger.info("[TRACE] api_list_symbols end " + trace_id)
-    return jsonify(list_of_dicts)
+    # For HATEOAS, Transform the raw data to include item-level links
+    embedded_items = []
+    for item in list_of_dicts:
+        resource = item.copy()
+        item_id = resource.get("id")
+
+        if not item_id:
+            logger.warning("Found vector symbol without ID during API list generation.")
+            continue
+
+        resource["_links"] = {
+            "self": {
+                "href": url_for(
+                    ".api_vector_metadata", symbol_id=item_id, _external=True
+                ),
+                "title": "Get vector metadata",
+                "type": "GET",
+            },
+            "edit": {
+                "href": url_for(".api_edit_vector", symbol_id=item_id, _external=True),
+                "title": "Edit this vector",
+                "method": "POST",
+            },
+            "delete": {
+                "href": url_for(
+                    ".api_delete_vector", symbol_id=item_id, _external=True
+                ),
+                "title": "Delete vector",
+                "method": "DELETE",
+            },
+        }
+        embedded_items.append(resource)
+
+    # For HATEOAS, Construct the Collection-level HAL payload
+    payload = {
+        "count": len(embedded_items),
+        "_links": {
+            "self": {
+                "href": url_for(".api_list_vector_symbols", _external=True),
+                "title": "List of Vector Symbols",
+                "type": "GET",
+            },
+            "up": {
+                "href": url_for(".api_start_here", _external=True),
+                "title": "API Home",
+                "type": "GET",
+            },
+            "create": {
+                "href": url_for(".api_create_vector_symbol", _external=True),
+                "title": "Create a new vector symbol",
+                "method": "POST",
+            },
+        },
+        "_embedded": {"vector_symbols": embedded_items},
+    }
+
+    response = make_response(jsonify(payload))
+    response.headers["Content-Type"] = "application/hal+json"
+
+    logger.info("[TRACE] api_list_vector_symbols end " + trace_id)
+    return response
 
 
 @api_bp.route("/v1/resources/symbol/matrices", methods=["GET"])
@@ -602,10 +913,68 @@ def api_list_matrix_symbols():
         query_time_dict[
             "pdg_api/api_list_matrix_symbols: get_list_node_dicts_of_type"
         ] = (time.time() - query_start_time)
-    # print("list_of_dicts=", list_of_dicts)
 
-    logger.info("[TRACE] api_list_symbols end " + trace_id)
-    return jsonify(list_of_dicts)
+    # For HATEOAS, Transform the raw data to include item-level links
+    embedded_items = []
+    for item in list_of_dicts:
+        resource = item.copy()
+        item_id = resource.get("id")
+
+        if not item_id:
+            logger.warning("Found matrix symbol without ID during API list generation.")
+            continue
+
+        resource["_links"] = {
+            "self": {
+                "href": url_for(
+                    ".api_matrix_metadata", symbol_id=item_id, _external=True
+                ),
+                "title": "Get matrix metadata",
+                "type": "GET",
+            },
+            "edit": {
+                "href": url_for(".api_edit_matrix", symbol_id=item_id, _external=True),
+                "title": "Edit this matrix",
+                "method": "POST",
+            },
+            "delete": {
+                "href": url_for(
+                    ".api_delete_matrix", symbol_id=item_id, _external=True
+                ),
+                "title": "Delete matrix",
+                "method": "DELETE",
+            },
+        }
+        embedded_items.append(resource)
+
+    # For HATEOAS, Construct the Collection-level HAL payload
+    payload = {
+        "count": len(embedded_items),
+        "_links": {
+            "self": {
+                "href": url_for(".api_list_matrix_symbols", _external=True),
+                "title": "List of Matrix Symbols",
+                "type": "GET",
+            },
+            "up": {
+                "href": url_for(".api_start_here", _external=True),
+                "title": "API Home",
+                "type": "GET",
+            },
+            "create": {
+                "href": url_for(".api_create_matrix_symbol", _external=True),
+                "title": "Create a new matrix symbol",
+                "method": "POST",
+            },
+        },
+        "_embedded": {"matrix_symbols": embedded_items},
+    }
+
+    response = make_response(jsonify(payload))
+    response.headers["Content-Type"] = "application/hal+json"
+
+    logger.info("[TRACE] api_list_matrix_symbols end " + trace_id)
+    return response
 
 
 @api_bp.route("/v1/resources/derivation", methods=["POST"])
@@ -707,6 +1076,7 @@ def api_create_derivation():
 
     # at this point the inputs are valid and we can proceed to add the content to the database
 
+    # TODO
     author_name_latex = "ben"
 
     derivation_id, query_time_dict = compute.generate_random_id(
@@ -1789,6 +2159,16 @@ def api_delete_derivation(derivation_id: str):
     )
 
     return jsonify({"STATUS": "successfully deleted" + derivation_id})
+
+
+@api_bp.route(
+    "/v1/resources/inference_rule/<string:expression_id>/delete", methods=["DELETE"]
+)
+def api_delete_inference_rule():
+    """
+    delete inference rule
+    """
+    return jsonify({"STATUS": "TODO"})
 
 
 @api_bp.route(
