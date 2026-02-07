@@ -1,4 +1,4 @@
-Enter a novel derivation
+Enter a novel derivation: https://github.com/allofphysicsgraph/task-tracker/issues/162 (F=ma)
 
 What's preventing me from doing so now?
 - cypher export does not produce a consistent order. As a result, diff isn't feasible
@@ -7,14 +7,14 @@ What's preventing me from doing so now?
 - Display the AST for equation review
 - on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
 
+- currently there's no use of HAS_SYMBOL edges
+
 Create a function in the compute library that creates a list of all symbol dictionaries
 In the compute library, create a function that converts a list of dictionaries into a dictionary dictionaries, with key of ID
-
 
 List of symbol dicts in this derivation would be useful to display both in the derivation review step list as well as the entering a new step review
 
 For each derivation, list all of the symbols and operations used in that derivation
-
 
 New function in compute:
 List of all non-operation symbols
@@ -33,7 +33,7 @@ Same for the API file
 
 ---
 
-Given the existing HTML page for expression entry, I bet Gemini could figure out how to automate the live analysis of math jacks output rather than pushing the button manually
+Given the existing HTML page for expression entry, I bet Gemini could figure out how to automate the live analysis of mathjax output rather than pushing the button manually
 
 ---
 
@@ -51,10 +51,6 @@ And there's a dimensional consistency of vectors equal vectors, scalars equal sc
 Gemini's suggestion:
 - Dimensional consistency of base quantities (mass, length, time, etc)
 - shape Compatibility for vectors and matricies; Refers to the number of degrees of freedom or independent components in a mathematical object
-
----
-
-hide (javascript) the output of "timing of Neo4j queries:" per page since the list can be long
 
 
 ---
