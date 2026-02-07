@@ -76,14 +76,14 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
         symp_expr = parse_latex(expr_latex)
     except sympy.SympifyError as err:
         # logger.error(err)
-        logger.info("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
+        logger.critical("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
         raise Exception("Sympy unable to parse latex (1): " + expr_latex)
     except sympy.parsing.latex.errors.LaTeXParsingError as err:
         # logger.error(err)
-        logger.info("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
+        logger.critical("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
         raise Exception("Sympy unable to parse latex (2): " + expr_latex)
     except sympy.core.sympify.SympifyError as err:
-        logger.info("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
+        logger.critical("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
         raise Exception("Sympy unable to parse latex (3): " + expr_latex)
 
     logger.info(
@@ -114,7 +114,11 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     # for symb in sympy_expr.atoms(sympy.Symbol):
     #     list_of_symbols.append(str(symb))
     # list_of_symbols = list(set(list_of_symbols))
-    list_of_sympy_symbols = sympy_expr.atoms(sympy.Symbol)
+    try:
+        list_of_sympy_symbols = sympy_expr.atoms(sympy.Symbol)
+    except AttributeError as e:
+        logger.critical(str(e))
+        return []
 
     # >>> type(list_of_sympy_symbols)
     # <class 'set'>
