@@ -47,6 +47,13 @@ For the query <BR>
     <th>comment</th>
   </tr>
 
+<!--
+  </tr>
+    <td id=""><a href="#">#</a></td>
+    <td><a href=""></a></td>
+    <td></td>
+  <tr>
+-->
 
   <tr>
     <td id="list all distinct node labels">list all distinct node labels <!--(<a href="https://stackoverflow.com/a/24058571/1164295">citation</a>)--> 
@@ -62,8 +69,6 @@ For the query <BR>
                                                   MATCH (a)-[r]->(b) RETURN DISTINCT type(r)</a></td>
     <td>what is the schema for edges?</td>
   </tr>
-
-
 
   <tr>
     <td id="list the node count for each label">list the node count for each label <!--(<a href="https://stackoverflow.com/a/24058571/1164295">citation</a>)-->
@@ -180,6 +185,10 @@ For the query <BR>
 MATCH (s:step)-[r]->(e) WHERE s.id='{{step_id}}' RETURN e</a></td>
     <td>all input expressions, feeds, and output expressions</td>
   </tr>
+    <td id="list pairs of nodes with edge HAS_VALUE">list pairs of nodes with edge HAS_VALUE<a href="#list pairs of nodes with edge HAS_VALUE">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH%20(a)-[r]->(b)%20RETURN%20DISTINCT%20type(r)">
+                               MATCH (a)-[:HAS_VALUE]->(b) RETURN a, b</a></td>
+    <td>See also <a href="#list%20all%20distinct%20edge%20labels">list all distinct edge labels</a>.</td>
   <tr>
     <td id="list inference rule used in a specific step">list inference rule used in a specific step
      <a href="#list inference rule used in a specific step">#</a></td>
@@ -261,10 +270,6 @@ MATCH (n:expression), (m:inference_rule) WHERE m.id='{{inference_rule_id}}' RETU
     </a></td>
     <td>replace ID values with your desired nodes</td>
   </tr>
-
-
-
-
 
 </table>
 <P>
