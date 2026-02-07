@@ -5044,16 +5044,24 @@ def to_add_symbols_and_operations_for_expression(
     )
     logger.info("cleaned_latex_str_relation=" + str(cleaned_latex_str_relation))
     logger.info("cleaned_latex_str_rhs=" + str(cleaned_latex_str_rhs))
-    sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
-        cleaned_latex_str_lhs
-    )
+    try:
+        sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
+            cleaned_latex_str_lhs
+        )
+    except Exception as e:
+        flash(str(e))
+        sympy_expr_lhs = None
     # ERROR: SymPy can't convert "="
     # sympy_expr_relation = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
     #     cleaned_latex_str_relation
     # )
-    sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
-        cleaned_latex_str_rhs
-    )
+    try:
+        sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
+            cleaned_latex_str_rhs
+        )
+    except Exception as e:
+        flash(str(e))
+        sympy_expr_rhs = None
     logger.info(
         "to_add_symbols_and_operations_for_expression sympy_expr_lhs="
         + str(sympy_expr_lhs)
@@ -5293,12 +5301,23 @@ def to_add_sympy_and_lean_for_expression(
         + " "
         + str(cleaned_latex_rhs_str)
     )
-    sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
-        cleaned_latex_lhs_str
-    )
-    sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
-        cleaned_latex_rhs_str
-    )
+    try:
+        sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
+            cleaned_latex_lhs_str
+        )
+    except Exception as e:
+        logger.critical(str(e))
+        flash(str(e))
+        sympy_expr_lhs = None
+    try:
+        sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
+            cleaned_latex_rhs_str
+        )
+    except Exception as e:
+        logger.critical(str(e))
+        flash(str(e))
+        sympy_expr_rhs = None
+
     logger.info(
         "to_add_sympy_and_lean_for_expression: sympy_expr="
         + str(sympy_expr_lhs)
@@ -5310,12 +5329,22 @@ def to_add_sympy_and_lean_for_expression(
 
     # look at each sympy_symbol replaced with PDG symbol
 
-    revised_expr_lhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
-        sympy_expr_lhs, symbol_id_dict
-    )
-    revised_expr_rhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
-        sympy_expr_rhs, symbol_id_dict
-    )
+    try:
+        revised_expr_lhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
+            sympy_expr_lhs, symbol_id_dict
+        )
+    except Exception as e:
+        logger.critical(str(e))
+        flash(str(e))
+        revised_expr_lhs = None
+    try:
+        revised_expr_rhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
+            sympy_expr_rhs, symbol_id_dict
+        )
+    except Exception as e:
+        logger.critical(str(e))
+        flash(str(e))
+        revised_expr_lhs = None
 
     logger.info(
         "to_add_sympy_and_lean_for_expression: revised_expr_lhs,rhs="
@@ -5324,22 +5353,27 @@ def to_add_sympy_and_lean_for_expression(
         + str(revised_expr_rhs)
     )
 
-    revised_expr_lhs_with_str = re.sub(
-        r"(pdg\d\d\d\d\d\d\d)", r"sympy.Symbol('\1')", str(revised_expr_lhs)
-    )
-    revised_expr_rhs_with_str = re.sub(
-        r"(pdg\d\d\d\d\d\d\d)", r"sympy.Symbol('\1')", str(revised_expr_rhs)
-    )
+    if revised_expr_lhs:
+        revised_expr_lhs_with_str = re.sub(
+            r"(pdg\d\d\d\d\d\d\d)", r"sympy.Symbol('\1')", str(revised_expr_lhs)
+        )
+    else:
+        revised_expr_lhs_with_str = None
+    if revised_expr_rhs:
+        revised_expr_rhs_with_str = re.sub(
+            r"(pdg\d\d\d\d\d\d\d)", r"sympy.Symbol('\1')", str(revised_expr_rhs)
+        )
+        revised_expr_rhs_with_str = None
 
-    # revised_expr_with_str = re.sub(r"^Eq", "sympy.Eq", revised_expr_with_str)
-    revised_expr_with_str = (
-        "sympy.Eq(" + revised_expr_lhs_with_str + "," + revised_expr_rhs_with_str + ")"
-    )
+    # # revised_expr_with_str = re.sub(r"^Eq", "sympy.Eq", revised_expr_with_str)
+    # revised_expr_with_str = (
+    #     "sympy.Eq(" + revised_expr_lhs_with_str + "," + revised_expr_rhs_with_str + ")"
+    # )
 
-    logger.info(
-        "to_add_sympy_and_lean_for_expression: revised_expr_with_str="
-        + str(revised_expr_with_str)
-    )
+    # logger.info(
+    #     "to_add_sympy_and_lean_for_expression: revised_expr_with_str="
+    #     + str(revised_expr_with_str)
+    # )
 
     web_form = SpecifyNewExpressionSympyLeanForm(request.form)
     if request.method == "POST":
@@ -5703,15 +5737,15 @@ def to_add_sympy_and_lean_for_feed(
 
     logger.info("to_add_sympy_and_lean_for_feed revised_expr=" + str(revised_expr))
 
-    revised_expr_with_str = re.sub(
+    revised_feed_with_str = re.sub(
         r"(pdg\d\d\d\d\d\d\d)", r"sympy.Symbol('\1')", str(revised_expr)
     )
 
-    revised_expr_with_str = re.sub(r"^Eq", "sympy.Eq", revised_expr_with_str)
+    revised_feed_with_str = re.sub(r"^Eq", "sympy.Eq", revised_feed_with_str)
 
     logger.info(
-        "to_add_sympy_and_lean_for_feed revised_expr_with_str="
-        + str(revised_expr_with_str)
+        "to_add_sympy_and_lean_for_feed revised_feed_with_str="
+        + str(revised_feed_with_str)
     )
 
     web_form = SpecifyNewFeedSympyLeanForm(request.form)
@@ -5775,7 +5809,7 @@ def to_add_sympy_and_lean_for_feed(
         )
         return redirect(url_for("to_list_feeds"))
 
-    web_form.sympy_str.data = revised_expr_with_str
+    web_form.sympy_str.data = revised_feed_with_str
     logger.info(
         "[TRACE] to_add_sympy_and_lean_for_feed end "
         + str(trace_id)
@@ -5787,7 +5821,7 @@ def to_add_sympy_and_lean_for_feed(
         query_time_dict=query_time_dict,
         sympy_expr=sympy_expr,
         revised_expr=revised_expr,
-        revised_expr_with_str=revised_expr_with_str,
+        revised_feed_with_str=revised_feed_with_str,
         symbol_id_dict=symbol_id_dict,
         form=web_form,
         feed_dict=feed_dict,
