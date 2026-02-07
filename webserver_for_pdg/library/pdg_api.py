@@ -16,11 +16,35 @@ HTTP methods supported by the APIs in this file:
 - POST is used to send data to a server to create/update a resource.
 
 
-
 When sending data via a POST or PUT request, two common formats
 (specified via the Content-Type header) are:
 - application/json
 - application/x-www-form-urlencoded
+
+---
+
+<https://www.google.com/search?q=how+flask+json+api+authentication+works>
+
+on 2026-02-07, Gemini 3 Pro says
+To require authentication for your API, you have two primary paths based
+on your specific question: API Keys or Google Auth Cookies.
+
+Given that you are designing a RESTful API (/api/v1/...) intended to be
+accessed via methods like curl, API Keys (or Bearer Tokens) are the correct choice.
+
+- The server verifies the API key for every call.
+- With API Keys the identity is proven by the X-API-KEY header.
+- For API keys CSRF Status is Disabled (Exempt).
+
+https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221Yd8spj4XZd5UvzITMJL-ndwxeWtGh5uS%22%5D,%22action%22:%22open%22,%22userId%22:%22101193243042884231058%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing, https://drive.google.com/file/d/1db9dcvjqzTAIyieLzOMvxmOrS3bslSyw/view?usp=sharing
+
+IN CONTRAST,
+CSRF token relies on Google Authentiation. To use curl with CSRF,
+the script must first "log in" to get a cookie, save the cookie to a "cookie jar,"
+extract the CSRF token from the HTML, and then send both the
+cookie and the token with the POST request.
+
+Instead of the `@require_api_key` decorator you would use Flask-Login's `@login_required`.
 
 
 """
@@ -45,8 +69,8 @@ import sys
 from typing import NewType, Dict, List
 import neo4j
 
-
-from flask_wtf.csrf import generate_csrf
+# from flask_wtf.csrf import generate_csrf
+# from initialize_flask import csrf  # imported so that we can set .exempt(bp)
 
 import logging
 
@@ -56,7 +80,6 @@ import neo4j_query
 import compute
 import list_of_valid
 
-# from initialize_flask import csrf  # imported so that we can set .exempt(bp)
 
 from compute import query_timing_result_type
 
@@ -67,31 +90,58 @@ from initialize_neo4j import graphDB_Driver
 # http://flask.palletsprojects.com/en/1.1.x/tutorial/views/
 api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 
+
 # BHP, 2025-01-09: I am not dealing with log-in requirements,
 # so I am disabling csrf for the APIs as per
 # https://flask-wtf.readthedocs.io/en/0.15.x/csrf/#exclude-views-from-protection
 # https://flask-wtf.readthedocs.io/en/0.15.x/api/
 # csrf.exempt(bp)
-# also, CSRF isn't how API authentication is done. See
-# https://www.google.com/search?q=how+flask+json+api+authentication+works
 
 
-@api_bp.route("/v1/resources/do_nothing", methods=["GET"])
-def api_do_nothing():
-    """
-    to use session cookies,
-    curl --head -c cookies.txt https://localhost:5000/api/v1/resources/do_nothing
-    where
-    `--head`: only fetch the headers of the response.
-    `-c cookies.txt`: save the cookies received in the response to a file named cookies.txt.
-    Then
-    curl -b cookies.txt https://localhost:5000/api/v1/resources/derivation/create
+# @api_bp.route("/v1/resources/do_nothing", methods=["GET"])
+# def api_do_nothing():
+#     """
+#     to use session cookies,
+#     curl --head -c cookies.txt https://localhost:5000/api/v1/resources/do_nothing
+#     where
+#     `--head`: only fetch the headers of the response.
+#     `-c cookies.txt`: save the cookies received in the response to a file named cookies.txt.
+#     Then
+#     curl -b cookies.txt https://localhost:5000/api/v1/resources/derivation/create
 
 
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_do_nothing start " + trace_id + " " + str(time.time()))
-    return
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     logger.info("[TRACE] api_do_nothing start " + trace_id + " " + str(time.time()))
+#     return
+
+
+# @api_bp.route("/v1/auth/csrf", methods=["GET"])
+# def api_register():
+#     """
+#     a CSRF token can be generated manually as per
+#     https://stackoverflow.com/a/76495384/1164295
+
+#     However, CSRF has been exempted for the blueprint routes in this file.
+#     This API endpoint shouldn't normally be relevant
+
+#     if the web UI is being tested using CURL, see
+#     https://stackoverflow.com/a/18772355/1164295
+#     https://stackoverflow.com/a/35205378/1164295
+#     for creating cookies when submitting forms
+
+#     curl --silent --insecure https://localhost/api/v1/resources/register | python3 -m json.tool
+
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     logger.info("[TRACE] api_register start " + trace_id + " " + str(time.time()))
+#     # csrf_token = csrf.generate_csrf() # AttributeError: 'CSRFProtect' object has no attribute 'generate_csrf'
+
+#     # current_token = g.csrf_token
+
+#     csrf_token = generate_csrf(token_key="your key here")
+
+#     return jsonify({"csrf token": csrf_token})
 
 
 @api_bp.route("/v1", methods=["GET"])
@@ -197,34 +247,6 @@ def api_start_here():
     response.headers["Content-Type"] = "application/hal+json"
 
     return response
-
-
-@api_bp.route("/v1/auth/csrf", methods=["GET"])
-def api_register():
-    """
-    a CSRF token can be generated manually as per
-    https://stackoverflow.com/a/76495384/1164295
-
-    However, CSRF has been exempted for the blueprint routes in this file.
-    This API endpoint shouldn't normally be relevant
-
-    if the web UI is being tested using CURL, see
-    https://stackoverflow.com/a/18772355/1164295
-    https://stackoverflow.com/a/35205378/1164295
-    for creating cookies when submitting forms
-
-    curl --silent --insecure https://localhost/api/v1/resources/register | python3 -m json.tool
-
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_register start " + trace_id + " " + str(time.time()))
-    # csrf_token = csrf.generate_csrf() # AttributeError: 'CSRFProtect' object has no attribute 'generate_csrf'
-
-    # current_token = g.csrf_token
-
-    csrf_token = generate_csrf(token_key="your key here")
-
-    return jsonify({"csrf token": csrf_token})
 
 
 @api_bp.route("/v1/resources/derivations", methods=["GET"])
@@ -1077,6 +1099,7 @@ def api_create_derivation():
     # at this point the inputs are valid and we can proceed to add the content to the database
 
     # TODO
+    # author_name_latex = latex.make_string_safe_for_latex(current_user.email)
     author_name_latex = "ben"
 
     derivation_id, query_time_dict = compute.generate_random_id(

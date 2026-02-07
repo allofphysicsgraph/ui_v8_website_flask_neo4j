@@ -37,7 +37,8 @@ curl --silent --insecure http://localhost{{ url_for('pdg_api.api_start_here') }}
     </Pre>
     
 
-    <h3>GET <a href="{{ url_for('pdg_api.api_do_nothing') }}">{{ url_for('pdg_api.api_do_nothing') }}</a></h3>
+<!--
+    <h3>GET <a href="{ { url_for('pdg_api.api_do_nothing') }}">{ { url_for('pdg_api.api_do_nothing') }}</a></h3>
     <p>
         This endpoint does nothing. It can be used to test if the API is running.
     </p>
@@ -45,21 +46,22 @@ curl --silent --insecure http://localhost{{ url_for('pdg_api.api_start_here') }}
         Example usage to use session cookies:
     </p>
     <pre>
-curl --head -c cookies.txt http://localhost{{ url_for('pdg_api.api_do_nothing') }}
+curl --head -c cookies.txt http://localhost{ { url_for('pdg_api.api_do_nothing') }}
 curl -b cookies.txt http://localhost/api/v1/resources/derivation/
     </pre>
 
 
-    <h3>GET <a href="{{ url_for('pdg_api.api_register') }}">{{ url_for('pdg_api.api_register') }}</a></h3>
+    <h3>GET <a href="{ { url_for('pdg_api.api_register') }}">{ { url_for('pdg_api.api_register') }}</a></h3>
      <p>This endpoint generates a CSRF token. However, CSRF is disabled for the API endpoints. This endpoint should not be necessary for API use, see <a href="https://www.google.com/search?q=how+flask+json+api+authentication+works">here</a> for API authentication.</p>
 
     <p>Example usage:</p>
-    <pre>curl -s http://localhost{{ url_for('pdg_api.api_register') }} | python3 -m json.tool</pre>
+    <pre>curl -s http://localhost{ { url_for('pdg_api.api_register') }} | python3 -m json.tool</pre>
     <p>Response:</p>
     <pre>{
     "csrf token": "some token"
     }
     </pre>
+-->
 
     <h3>GET <a href="{{ url_for('pdg_api.api_list_derivations') }}">{{ url_for('pdg_api.api_list_derivations') }}</a></h3>
     <p>This endpoint retrieves a list of all derivations.</p>
