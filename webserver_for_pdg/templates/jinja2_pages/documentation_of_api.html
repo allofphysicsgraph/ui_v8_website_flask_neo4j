@@ -25,92 +25,103 @@ The following is a set of API endpoints for Flask. Please create documentation f
 
     <h2>API Endpoints: GET</h2>
 
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/do_nothing">http://localhost:5000/api/v1/resources/do_nothing</a></h3>
+
+    <h3>GET <a href="{{ url_for('pdg_api.api_start_here') }}">{{ url_for('pdg_api.api_start_here') }}</a></h3>
+
+    <P>    Entry point for the API using <a href="https://en.wikipedia.org/wiki/HATEOAS">Hypermedia as the Engine of Application State (HATEOAS)</a>
+
+    <P>Uses HAL format.
+
+    <Pre>
+curl --silent --insecure http://localhost{{ url_for('pdg_api.api_start_here') }}
+    </Pre>
+    
+
+    <h3>GET <a href="{{ url_for('pdg_api.api_do_nothing') }}">{{ url_for('pdg_api.api_do_nothing') }}</a></h3>
     <p>
         This endpoint does nothing. It can be used to test if the API is running.
     </p>
     <p>
         Example usage to use session cookies:
     </p>
-    <pre><code>
-        curl --head -c cookies.txt http://localhost:5000/api/v1/resources/do_nothing
-        curl -b cookies.txt http://localhost:5000/api/v1/resources/derivation/create
-    </code></pre>
+    <pre>
+curl --head -c cookies.txt http://localhost{{ url_for('pdg_api.api_do_nothing') }}
+curl -b cookies.txt http://localhost/api/v1/resources/derivation/
+    </pre>
 
 
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/register_csrf">http://localhost:5000/api/v1/resources/register_csrf</a></h3>
+    <h3>GET <a href="{{ url_for('pdg_api.api_register') }}">{{ url_for('pdg_api.api_register') }}</a></h3>
      <p>This endpoint generates a CSRF token. However, CSRF is disabled for the API endpoints. This endpoint should not be necessary for API use, see <a href="https://www.google.com/search?q=how+flask+json+api+authentication+works">here</a> for API authentication.</p>
 
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/register_csrf | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_register') }} | python3 -m json.tool</pre>
     <p>Response:</p>
-    <pre><code>
-    {
-        "csrf token": "some token"
+    <pre>{
+    "csrf token": "some token"
     }
-    </code></pre>
+    </pre>
 
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/derivation/list">http://localhost:5000/api/v1/resources/derivation/list</a></h3>
+    <h3>GET <a href="{{ url_for('pdg_api.api_list_derivations') }}">{{ url_for('pdg_api.api_list_derivations') }}</a></h3>
     <p>This endpoint retrieves a list of all derivations.</p>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/derivation/list | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_list_derivations') }} | python3 -m json.tool</pre>
     <p>Response:</p>
-    <pre><code>
-    [
-        {
-            "abstract_latex": "my summary",
-            "author_name_latex": "ben",
-            "created_datetime": "2024-05-19_21-16-29-085813",
-            "id": "3445848",
-            "name_latex": "this is a new derivation"
-        }
-    ]
-    </code></pre>
+    <pre>
+[
+    {
+        "abstract_latex": "my summary",
+        "author_name_latex": "ben",
+        "created_datetime": "2024-05-19_21-16-29-085813",
+        "id": "3445848",
+        "name_latex": "this is a new derivation"
+    }
+]
+    </pre>
 
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/inference_rule/list">http://localhost:5000/api/v1/resources/inference_rule/list</a></h3>
+    <h3>GET <a href="{{ url_for('pdg_api.api_list_inference_rules') }}">{{ url_for('pdg_api.api_list_inference_rules') }}</a></h3>
     <p>This endpoint retrieves a list of all inference rules.</p>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/inference_rule/list | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_list_inference_rules') }} | python3 -m json.tool</pre>
     <p>Response:</p>
-    <pre><code>
-    [
-        {
-            "author_name_latex": "ben",
-            "id": "7681529",
-            "latex": "ADD _ to BOTH sides",
-            "name_latex": "add x to both sides",
-            "number_of_feeds": 1,
-            "number_of_inputs": 1,
-            "number_of_outputs": 1
-        }
-    ]
-    </code></pre>
+    <pre>
+[
+    {
+        "author_name_latex": "ben",
+        "id": "7681529",
+        "latex": "ADD _ to BOTH sides",
+        "name_latex": "add x to both sides",
+        "number_of_feeds": 1,
+        "number_of_inputs": 1,
+        "number_of_outputs": 1
+    }
+]
+    </pre>
 
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/symbol/operation/list">http://localhost:5000/api/v1/resources/symbol/operation/list</a></h3>
+    <h3>GET <a href="{{ url_for('pdg_api.api_list_operation_symbols') }}">{{ url_for('pdg_api.api_list_operation_symbols') }}</a></h3>
     <p>This endpoint retrieves a list of all operation symbols.</p>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/operation/list | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_list_operation_symbols') }} | python3 -m json.tool</pre>
     <p>Response:</p>
-    <pre><code>
-    [
-        {
-            "argument_count": 2,
-            "author_name_latex": "ben",
-            "description_latex": "",
-            "id": "7052411",
-            "latex": "=",
-            "name_latex": "equals",
-            "requires_arguments": true
-        }
-    ]
-    </code></pre>
+    <pre>
+[
+    {
+        "argument_count": 2,
+        "author_name_latex": "ben",
+        "description_latex": "",
+        "id": "7052411",
+        "latex": "=",
+        "name_latex": "equals",
+        "requires_arguments": true
+    }
+]
+    </pre>
 
-   <h3>GET <a href="http://localhost:5000/api/v1/resources/symbol/relation/list">http://localhost:5000/api/v1/resources/symbol/relation/list</a></h3>
+   <h3>GET <a href="{{ url_for('pdg_api.api_list_relation_symbols') }}">{{ url_for('pdg_api.api_list_relation_symbols') }}</a></h3>
     <p>This endpoint retrieves a list of all relation symbols.</p>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/relation/list | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_list_relation_symbols') }} | python3 -m json.tool</pre>
     <p>Response:</p>
-    <pre><code>
+    <pre>
     [
         {
             "author_name_latex": "ben",
@@ -120,14 +131,14 @@ The following is a set of API endpoints for Flask. Please create documentation f
             "name_latex": "equals",
         }
     ]
-    </code></pre>
+    </pre>
 
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/symbol/scalar/list">http://localhost:5000/api/v1/resources/symbol/scalar/list</a></h3>
+    <h3>GET <a href="{{ url_for('pdg_api.api_list_scalar_symbols') }}">{{ url_for('pdg_api.api_list_scalar_symbols') }}</a></h3>
     <p>This endpoint retrieves a list of all scalar symbols.</p>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/scalar/list | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_list_scalar_symbols') }} | python3 -m json.tool</pre>
     <p>Response:</p>
-    <pre><code>
+    <pre>
     [
         {
             "argument_count": 2,
@@ -139,14 +150,14 @@ The following is a set of API endpoints for Flask. Please create documentation f
             "requires_arguments": true
         }
     ]
-    </code></pre>
+    </pre>
 
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/symbol/vector/list">http://localhost:5000/api/v1/resources/symbol/vector/list</a></h3>
+    <h3>GET <a href="{{ url_for('pdg_api.api_list_vector_symbols') }}">{{ url_for('pdg_api.api_list_vector_symbols') }}</a></h3>
     <p>This endpoint retrieves a list of all vector symbols.</p>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/vector/list | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_list_vector_symbols') }} | python3 -m json.tool</pre>
     <p>Response:</p>
-    <pre><code>
+    <pre>
     [
         {
             "argument_count": 2,
@@ -158,15 +169,15 @@ The following is a set of API endpoints for Flask. Please create documentation f
             "requires_arguments": true
         }
     ]
-    </code></pre>
+    </pre>
 
 
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/symbol/matrix/list">http://localhost:5000/api/v1/resources/symbol/matrix/list</a></h3>
+    <h3>GET <a href="{{ url_for('pdg_api.api_list_matrix_symbols') }}">{{ url_for('pdg_api.api_list_matrix_symbols') }}</a></h3>
     <p>This endpoint retrieves a list of all matrix symbols.</p>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/matrix/list | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_list_matrix_symbols') }} | python3 -m json.tool</pre>
     <p>Response:</p>
-    <pre><code>
+    <pre>
     [
         {
             "argument_count": 2,
@@ -178,15 +189,15 @@ The following is a set of API endpoints for Flask. Please create documentation f
             "requires_arguments": true
         }
     ]
-    </code></pre>
+    </pre>
 
 
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/expression/list">http://localhost:5000/api/v1/resources/expression/list</a></h3>
+    <h3>GET <a href="{{ url_for('pdg_api.api_list_expressions') }}">{{ url_for('pdg_api.api_list_expressions') }}</a></h3>
     <p>This endpoint retrieves a list of all expressions.</p>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/expression/list | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_list_expressions') }} | python3 -m json.tool</pre>
      <p>Response:</p>
-    <pre><code>
+    <pre>
     [
         {
             "author_name_latex": "ben",
@@ -196,18 +207,18 @@ The following is a set of API endpoints for Flask. Please create documentation f
             "name_latex": ""
         },
     ]
-    </code></pre>
+    </pre>
 
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/derivation/metadata">http://localhost:5000/api/v1/resources/derivation/metadata</a></h3>
+    <h3>GET <a href="{{ url_for('pdg_api.api_derivation_metadata', derivation_id='3445848') }}">{{ url_for('pdg_api.api_derivation_metadata', derivation_id='3445848' ) }}</a></h3>
     <p>This endpoint retrieves the metadata of a specified derivation.</p>
      <p>Required parameter:</p>
       <ul>
         <li><code>derivation_id</code>: The ID of the derivation to retrieve.</li>
       </ul>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/derivation/metadata?derivation_id=3445848 | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_derivation_metadata', derivation_id='3445848') }} | python3 -m json.tool</pre>
     <p>Response:</p>
-    <pre><code>
+    <pre>
     {
         "abstract_latex": "my summary",
         "author_name_latex": "ben",
@@ -215,18 +226,18 @@ The following is a set of API endpoints for Flask. Please create documentation f
         "id": "3445848",
         "name_latex": "this is a new derivation"
     }
-    </code></pre>
+    </pre>
 
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/derivation/step/list">http://localhost:5000/api/v1/resources/derivation/step/list</a></h3>
+    <h3>GET <a href="{{ url_for('pdg_api.api_derivation_steps', derivation_id='3445848') }}">{{ url_for('pdg_api.api_derivation_steps', derivation_id='3445848') }}</a></h3>
     <p>This endpoint retrieves a list of steps in a specified derivation.</p>
     <p>Required parameter:</p>
       <ul>
         <li><code>derivation_id</code>: The ID of the derivation whose steps to retrieve.</li>
       </ul>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/derivation/step/list?derivation_id=3445848 | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_derivation_steps', derivation_id='3445848') }} | python3 -m json.tool</pre>
      <p>Response:</p>
-    <pre><code>
+    <pre>
     [
         {
             "author_name_latex": "benno",
@@ -236,15 +247,15 @@ The following is a set of API endpoints for Flask. Please create documentation f
             "note_before_step_latex": ""
         }
     ]
-    </code></pre>
-    <h3>GET <a href="http://localhost:5000/api/v1/resources/cypher/">http://localhost:5000/api/v1/resources/cypher/</a></h3>
+    </pre>
+    <h3>GET <a href="{{ url_for('pdg_api.api_cypher_query') }}">{{ url_for('pdg_api.api_cypher_query') }}</a></h3>
         <p>This endpoint allows users to send arbitrary Cypher queries. Use this endpoint with caution.</p>
     <p>Required parameter:</p>
       <ul>
         <li><code>query</code>: The Cypher query to run.</li>
       </ul>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool</code></pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api.api_cypher_query') }} | python3 -m json.tool</pre>
 
 
     <h3>POST <a href="http://localhost:5000/api/v1/resources/derivation/create">http://localhost:5000/api/v1/resources/derivation/create</a></h3>
@@ -259,26 +270,26 @@ The following is a set of API endpoints for Flask. Please create documentation f
              <li><code>derivation_reference_latex</code>: A reference for the derivation in LaTeX format.</li>
         </ul>
     <p>Example usage (x-www-form-urlencoded):</p>
-    <pre><code>
+    <pre>
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
      http://localhost:5000/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
-    </code></pre>
+    </pre>
     <p>Example usage (application/json):</p>
-    <pre><code>
+    <pre>
     curl --request POST \
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"derivation_name_latex":"hello again", "derivation_reference_latex":"this was", "derivation_abstract_latex": "yes no"}' \
      http://localhost:5000/api/v1/resources/derivation/create
-    </code></pre>
+    </pre>
     <p>Response:</p>
-    <pre><code>
+    <pre>
     {
         "STATUS": "derivation 'derivation_name' added successfully"
     }
-    </code></pre>
+    </pre>
 
      <h3>POST <a href="http://localhost:5000/api/v1/resources/expression/create">http://localhost:5000/api/v1/resources/expression/create</a></h3>
     <p>This endpoint creates a new expression.</p>
@@ -296,22 +307,22 @@ The following is a set of API endpoints for Flask. Please create documentation f
              <li><code>expression_description_latex</code>: Description of the expression in LaTeX format.</li>
          </ul>
     <p>Example usage (x-www-form-urlencoded):</p>
-    <pre><code>
+    <pre>
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
     http://localhost:5000/api/v1/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9
-    </code></pre>
+    </pre>
     <p>Example usage (application/json):</p>
-      <pre><code>
+      <pre>
       curl --request POST \
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"expression_latex_lhs": "4^3", "expression_relation_latex": "=", "expression_latex_rhs": "k"}' \
-     http://localhost:5000/api/v1/resources/expression/create | python3 -m json.tool
-    </code></pre>
+     http://localhost{{ url_for('pdg_api.api_create_expression') }} | python3 -m json.tool
+    </pre>
     <p>Response:</p>
-    <pre><code>
+    <pre>
     {
         "STATUS": "expression added successfully",
         "query times": {
@@ -319,7 +330,7 @@ The following is a set of API endpoints for Flask. Please create documentation f
             "pdg_app/to_add_expression: add_expression": 0.002
         }
     }
-    </code></pre>
+    </pre>
 
 
    <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/scalar/create">http://localhost:5000/api/v1/resources/symbol/scalar/create</a></h3>
@@ -345,49 +356,49 @@ The following is a set of API endpoints for Flask. Please create documentation f
              <li><code>dimension_luminous_intensity</code>: The luminous intensity dimension exponent (default 0).</li>
         </ul>
     <p>Example usage (x-www-form-urlencoded):</p>
-     <pre><code>
+     <pre>
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
     http://localhost:5000/api/v1/resources/symbol/scalar/create?scalar_latex=a&scalar_scope=arbitrary&dimension_length=1&dimension_time=-2
-    </code></pre>
+    </pre>
      <p>Example usage (application/json):</p>
-    <pre><code>
-    curl --request POST \
+    <pre>
+curl --request POST \
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"scalar_latex": "b", "scalar_scope":"local", "dimension_mass":1}' \
-     http://localhost:5000/api/v1/resources/symbol/scalar/create | python3 -m json.tool
-    </code></pre>
+     http://localhost{{ url_for('pdg_api.api_create_scalar_symbol') }} | python3 -m json.tool
+    </pre>
     <p>Response:</p>
-     <pre><code>
+     <pre>
      {
         "STATUS": "scalar symbol added successfully",
         "query times": {}
     }
-     </code></pre>
+     </pre>
 
     <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/vector/create">http://localhost:5000/api/v1/resources/symbol/vector/create</a></h3>
     <p>This endpoint creates a new vector symbol. Not implemented.</p>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/vector/create</code></pre>
+    <pre>curl -s http://localhost:5000/api/v1/resources/symbol/vector/create</pre>
     <p>Response:</p>
-    <pre><code>
-        {
-            "STATUS": "TODO"
-        }
-    </code></pre>
+    <pre>
+{
+    "STATUS": "TODO"
+}
+    </pre>
 
     <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/matrix/create">http://localhost:5000/api/v1/resources/symbol/matrix/create</a></h3>
     <p>This endpoint creates a new matrix symbol. Not implemented.</p>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/symbol/matrix/create</code></pre>
+    <pre>curl -s http://localhost:5000/api/v1/resources/symbol/matrix/create</pre>
      <p>Response:</p>
-    <pre><code>
-        {
-            "STATUS": "TODO"
-        }
-    </code></pre>
+    <pre>
+{
+    "STATUS": "TODO"
+}
+    </pre>
 
     <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/operation/create">http://localhost:5000/api/v1/resources/symbol/operation/create</a></h3>
     <p>This endpoint creates a new operation symbol.</p>
@@ -403,26 +414,26 @@ The following is a set of API endpoints for Flask. Please create documentation f
              <li><code>operation_reference_latex</code>: A reference for the operation in LaTeX format.</li>
           </ul>
     <p>Example usage:</p>
-    <pre><code>
-    curl --request POST \
+    <pre>
+curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
      http://localhost:5000/api/v1/resources/symbol/operation/create?operation_name_latex=equals&operation_latex==&operation_description_latex=equality&operation_argument_count=2
-    </code></pre>
-      <pre><code>
-      curl --request POST \
+    </pre>
+      <pre>
+curl --request POST \
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"operation_name_latex":"equals", "operation_latex":"=", "operation_description_latex": "equality", "operation_argument_count": 2}' \
-     http://localhost:5000/api/v1/resources/symbol/operation/create | python3 -m json.tool
-    </code></pre>
+     http://localhost{{ url_for('pdg_api.api_create_operation_symbol') }} | python3 -m json.tool
+    </pre>
     <p>Response:</p>
-    <pre><code>
-    {
-        "STATUS": "operation symbol added successfully",
-        "query times": {}
-    }
-    </code></pre>
+    <pre>
+{
+    "STATUS": "operation symbol added successfully",
+    "query times": {}
+}
+    </pre>
 
 
     <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/relation/create">http://localhost:5000/api/v1/resources/symbol/relation/create</a></h3>
@@ -438,75 +449,75 @@ The following is a set of API endpoints for Flask. Please create documentation f
          <li><code>relation_reference_latex</code>: A reference for the relation in LaTeX format.</li>
       </ul>
     <p>Example usage:</p>
-    <pre><code>
-    curl --request POST \
+    <pre>
+curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
      http://localhost:5000/api/v1/resources/symbol/relation/create?relation_name_latex=equal&relation_latex==&relation_description_latex=equality
-    </code></pre>
-      <pre><code>
-      curl --request POST \
+    </pre>
+      <pre>
+curl --request POST \
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"relation_name_latex":"equal", "relation_latex":"=", "relation_description_latex": "equality"}' \
-     http://localhost:5000/api/v1/resources/symbol/relation/create | python3 -m json.tool
-    </code></pre>
+     http://localhost{{ url_for('pdg_api.api_create_relation_symbol') }} | python3 -m json.tool
+    </pre>
     <p>Response:</p>
-    <pre><code>
-    {
-        "STATUS": "relation symbol added successfully",
-        "query times": {}
-    }
-    </code></pre>
+    <pre>
+{
+"STATUS": "relation symbol added successfully",
+"query times": {}
+}
+    </pre>
 
 
      <h3>POST <a href="http://localhost:5000/api/v1/resources/inference_rule/create">http://localhost:5000/api/v1/resources/inference_rule/create</a></h3>
     <p>This endpoint creates a new inference rule. Not implemented.</p>
     <p>Example usage:</p>
-    <pre><code>curl -s http://localhost:5000/api/v1/resources/inference_rule/create</code></pre>
+    <pre>curl -s http://localhost:5000/api/v1/resources/inference_rule/create</pre>
     <p>Response:</p>
-    <pre><code>
-        {
-            "STATUS": "inference rule added successfully",
-            "query times": {}
-        }
-    </code></pre>
+    <pre>
+{
+    "STATUS": "inference rule added successfully",
+    "query times": {}
+}
+    </pre>
 
 
-    <h3>POST <a href="http://localhost:5000/api/v1/resources/derivation/delete">http://localhost:5000/api/v1/resources/derivation/delete</a></h3>
+    <h3>DELETE <a href="http://localhost:5000/api/v1/resources/derivation/delete">http://localhost:5000/api/v1/resources/derivation/delete</a></h3>
     <p>This endpoint deletes a specified derivation and all its steps.</p>
     <p>Required parameters:</p>
         <ul>
              <li><code>derivation_id</code>: The ID of the derivation to delete.</li>
         </ul>
     <p>Example usage:</p>
-    <pre><code>
-     curl --request POST \
+    <pre>
+curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
     http://localhost:5000/api/v1/resources/derivation/delete?derivation_id=3445848
-    </code></pre>
-     <pre><code>
-    curl --request POST \
+    </pre>
+     <pre>
+curl --request POST \
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"derivation_id":"3445848"}' \
     http://localhost:5000/api/v1/resources/derivation/delete
-    </code></pre>
+    </pre>
      <p>Response:</p>
-     <pre><code>
-        {
-            "STATUS": "successfully deleted"
-        }
-    </code></pre>
+     <pre>
+{
+    "STATUS": "successfully deleted"
+}
+    </pre>
 
-    <h3>POST <a href="http://localhost:5000/api/v1/resources/expression/delete">http://localhost:5000/api/v1/resources/expression/delete</a></h3>
+    <h3>DELETE <a href="http://localhost:5000/api/v1/resources/expression/delete">http://localhost:5000/api/v1/resources/expression/delete</a></h3>
     <p>This endpoint deletes an expression. Not implemented.</p>
      <p>Response:</p>
-    <pre><code>
-        {
-            "STATUS": "TODO"
-        }
-    </code></pre>
+    <pre>
+{
+    "STATUS": "TODO"
+}
+    </pre>
 
 {% endblock %}
