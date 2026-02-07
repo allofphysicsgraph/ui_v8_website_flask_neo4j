@@ -18,11 +18,26 @@
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_matrix_properties.csrf_token }}
 
-    
-
-
     <P>{{ form_matrix_properties.matrix_latex.label}} (<B>required</B>): 
        {{ form_matrix_properties.matrix_latex(size=50, minlength=1, maxlength=1000) }}</P>
+
+<input type="checkbox" 
+              id="display_input_latex" 
+              checked="" 
+              onchange="convert('matrix_latex',
+                                'display_input_latex', 
+                                'preview_input_latex',
+                                'render_input_latex')">
+       <small><label id="display_input_latex">Display style</label></small>
+       <input type="button" 
+              value="optional preview of TeX before submitting" 
+              id="preview_input_latex" 
+              onclick="convert('matrix_latex',
+                               'display_input_latex', 
+                               'preview_input_latex',
+                               'render_input_latex')">
+              <br clear="all">
+        <div id="render_input_latex"></div>
 
     <P>{{ form_matrix_properties.matrix_is_composite.label }} (<B><em>required</em></B>): 
        {{ form_matrix_properties.matrix_is_composite }} &nbsp;&nbsp;
