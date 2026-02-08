@@ -20,6 +20,7 @@ from sympy.physics.units import (
     charge,
 )  # type: ignore
 from sympy.physics.units.systems.si import dimsys_SI  # type: ignore
+from sympy.parsing.sympy_parser import parse_expr
 
 import logging
 
@@ -43,18 +44,9 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
     Eq(sympy.Symbol('pdg99'), sympy.Symbol('pdg00'))
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] sympy_validate_expression/convert_sympy_expr_to_pdg_symbols start "
-        + trace_id
-    )
-    logger.info(
-        "sympy_validate_expression/convert_sympy_expr_to_pdg_symbols: sympy_expr="
-        + str(sympy_expr)
-    )
-    logger.info(
-        "sympy_validate_expression/convert_sympy_expr_to_pdg_symbols: symbol_id_dict="
-        + str(symbol_id_dict)
-    )
+    logger.info("[TRACE] start " + trace_id)
+    logger.info("sympy_expr=" + str(sympy_expr))
+    logger.info("symbol_id_dict=" + str(symbol_id_dict))
 
     logger.info("sympy_expr.atoms=" + str(sympy_expr.atoms()))
     for this_atom in sympy_expr.atoms():
@@ -79,10 +71,7 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
             revised_expr = revised_expr.subs(this_symb, sympy.Symbol(pdg_id))
 
     logger.info("type(revised_expr)=" + str(type(revised_expr)))
-    logger.info(
-        "[TRACE] sympy_validate_expression/convert_sympy_expr_to_pdg_symbols end "
-        + trace_id
-    )
+    logger.info("[TRACE] end " + trace_id)
     return revised_expr
 
 
@@ -92,6 +81,8 @@ def dimensional_consistency(
     dict_of_all_symbol_dicts: dict,
 ):
     """
+    # TODO: this function handles "sympy" instead of "sympy_lhs" and "sympy_rhs"
+
     see sympy_validate_expression.README.md for more explanation.
 
     >>> expression_dict = {'id': '9942'}
@@ -101,38 +92,36 @@ def dimensional_consistency(
     unknown
     """
     trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + trace_id)
+    logger.info("expression_dict = " + str(expression_dict))
     logger.info(
-        "[TRACE] sympy_validate_expression/dimensional_consistency start " + trace_id
+        "list_of_symbol_IDs_in_expression = " + str(list_of_symbol_IDs_in_expression)
     )
-    logger.info("expression_dict=" + str(expression_dict))
-    logger.info(
-        "list_of_symbol_IDs_in_expression" + str(list_of_symbol_IDs_in_expression)
-    )
+    logger.info("dict_of_all_symbol_dicts = " + str(dict_of_all_symbol_dicts))
 
     if "sympy" not in expression_dict.keys():
         return "sympy not provided for expression"
 
     try:
-        sympy_expr = eval(expression_dict["sympy"])
+        # sympy_expr = eval(expression_dict["sympy"])
+        sympy_expr = parse_expr(expression_dict["sympy"])
     except NameError as err:
         return (
-            "NE: unable to parse "
+            "NameError: unable to parse "
             + expression_dict["sympy"]
             + " as SymPy; error="
             + str(err)
         )  # ths is what shows up in the HTML table
     except SyntaxError as err:
         return (
-            "SE: unable to parse "
+            "SyntaxError: unable to parse "
             + expression_dict["sympy"]
             + " as SymPy; error="
             + str(err)
         )  # ths is what shows up in the HTML table
 
-    logger.info(
-        "sympy_validate_expression/dimensional_consistency: sympy_expr="
-        + str(sympy_expr)
-    )
+    logger.info("sympy_expr = " + str(sympy_expr))
+    # sympy_expr = Eq(pdg4223281, pdg3715170*pdg6035023)
 
     # the split below could be replaced by expression_dict['sympy_lhs'] and expression_dict['sympy_rhs']
     try:
@@ -142,8 +131,8 @@ def dimensional_consistency(
         logger.info(str(err))
         return "unable to determine LHS,RHS for" + str(sympy_expr)
 
-    logger.info("sympy_validate_expression/dimensional_consistency: LHS=" + str(LHS))
-    logger.info("sympy_validate_expression/dimensional_consistency: RHS=" + str(RHS))
+    logger.info("LHS=" + str(LHS))
+    logger.info("RHS=" + str(RHS))
 
     # for each symbol used in the expression,
     # convert the numeric value for each dimension
@@ -197,10 +186,14 @@ def dimensional_consistency(
 
         logger.info("symbol_dim_powers_result=" + str(symbol_dim_powers_result))
 
+        # TODO: `exec` seems bad?
         exec("pdg" + str(symbol_id) + " = " + symbol_dim_powers_result)
 
     # now that the symbol dimensions have been set,
     # evaluate the dimensionality of the expression
+
+    logger.info("LHS = " + str(LHS))
+    logger.info("RHS = " + str(RHS))
 
     try:
         determine_consistency_bool = dimsys_SI.equivalent_dims(
@@ -214,9 +207,7 @@ def dimensional_consistency(
     else:
         return "inconsistent dimensions"
 
-    logger.info(
-        "[TRACE] sympy_validate_expression/dimensional_consistency end " + trace_id
-    )
+    logger.info("[TRACE] end " + trace_id)
     return "unknown"
 
 
