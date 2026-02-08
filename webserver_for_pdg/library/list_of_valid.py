@@ -71,7 +71,7 @@ dimension_luminous_intensity_units = ["candela"]
 
 
 # Would it be appropriate to constrain list of valid latex relations?
-# =, \lt, \leq, \gt, \geq, <<, >>
+# =, \lt, <, \leq, \gt, >, \geq, <<, >>, \propto, \approx, \neq
 # https://en.wikipedia.org/wiki/Equals_sign
 # https://en.wikipedia.org/wiki/Glossary_of_mathematical_symbols
 
