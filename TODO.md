@@ -1,25 +1,48 @@
 Enter a novel derivation: https://github.com/allofphysicsgraph/task-tracker/issues/162 (F=ma)
 
-
 What's preventing me from doing so now?
-- https://localhost/list_expressions should show Latex-from-Sympy in the Sympy column
-- cypher export does not produce a consistent order. As a result, diff isn't feasible
-    - can CSV or GraphML output be diff'd?
-    - The missing expressions in step 17
-- Display the AST for equation review - https://localhost/edit_expression/6709044
-- on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
 
-- currently there's no use of HAS_SYMBOL edges. (Because in ui_v7 the JSON deduced the symbol membership from "AST")
+
+# step 0
+display AST from SymPy on "edit_expression" HTML page
+- Display the AST for equation review - https://localhost/edit_expression/6709044
+
+ui_v7's compute.create_AST_png_per_expression_in_step
+which points to
+ui_v7's latex_to_sympy.create_AST_png_for_latex
+
+# step 1
+in the imported content there's no use of HAS_SYMBOL edges. (Because in ui_v7 the JSON deduced the symbol membership from "AST")
+
+Write a one-time function that
+1) detects all 'pdg' in the sympy for expr and feed
+2) adds 'HAS_SYMBOL' edge to the expression and symbol
+Then save pdg.cypher
+
+# step 2
+On the "review_derivation" HTML list all symbols (and operations and relations) for the derivation.
 
 Create a function in the compute library that creates a list of all symbol dictionaries
-In the compute library, create a function that converts a list of dictionaries into a dictionary dictionaries, with key of ID
 
 List of symbol dicts in this derivation would be useful to display both in the derivation review step list as well as the entering a new step review
 
-For each derivation, list all of the symbols and operations used in that derivation
 
-New function in compute:
-List of all non-operation symbols
+# step n
+- https://localhost/list_expressions should show Latex-from-Sympy in the Sympy column
+
+
+- cypher export does not produce a consistent order. As a result, diff isn't feasible
+    - can CSV or GraphML output be diff'd?
+
+- BUG: The missing expressions in step 17
+
+- BUG: on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
+
+
+In the compute library, create a function that converts a list of dictionaries into a dictionary dictionaries, with key of ID
+
+
+New function in compute: List of all non-operation symbols
 Used by new feed when promoting existing symbol
 
 ---
@@ -47,15 +70,6 @@ A significant use case is supplemental material for any paper that includes equa
 
 ---
 
-There's dimensional consistency of length and time and mass 
-And there's a dimensional consistency of vectors equal vectors, scalars equal scalars, matrix equals matrix
-
-Gemini's suggestion:
-- Dimensional consistency of base quantities (mass, length, time, etc)
-- shape Compatibility for vectors and matricies; Refers to the number of degrees of freedom or independent components in a mathematical object
-
-
----
 
 email alerts - https://github.com/allofphysicsgraph/task-tracker/issues/137
 
