@@ -34,7 +34,7 @@ while not neo4j_available:
         neo4j_available = True
         time.sleep(1)
     except ValueError:
-        print("waiting 5 seconds for neo4j connection")
+        logger.info("waiting 5 seconds for neo4j connection")
         time.sleep(5)
 
 try:
@@ -49,6 +49,6 @@ try:
             number_of_derivations = 0
 
 except neo4j.exceptions.ClientError as er:
-    print("Neo4j exception: " + str(er))
+    logger.info("Neo4j exception: " + str(er))
 
 # EOF
