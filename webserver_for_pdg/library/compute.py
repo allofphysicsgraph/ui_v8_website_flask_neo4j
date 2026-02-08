@@ -187,50 +187,19 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
 def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] get_sympy_as_latex_per_expr_id start "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
-    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
-    for this_expression_dict in list_of_expression_dicts:
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    for index, this_expression_dict in enumerate(list_of_expression_dicts):
         if "sympy_lhs" in this_expression_dict.keys():
-            try:
-                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
-                    latex_and_sympy.sympy_to_latex_str(
-                        this_expression_dict["sympy_lhs"]
-                    )
-                )
-            except Exception as err:
-                logger.critical(
-                    "ERROR converting to Sympy in get_sympy_as_latex_per_expr_id: "
-                    + str(err)
-                )
-                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
+            list_of_expression_dicts[index]["latex_as_sympy_LHS"] = (
+                latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy_lhs"])
+            )
         if "sympy_rhs" in this_expression_dict.keys():
-            try:
-                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
-                    latex_and_sympy.sympy_to_latex_str(
-                        this_expression_dict["sympy_lhs"]
-                    )
-                )
-            except Exception as err:
-                logger.critical(
-                    "ERROR converting to Sympy in get_sympy_as_latex_per_expr_id: "
-                    + str(err)
-                )
-                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
-        else:
-            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
+            list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
+                latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy_rhs"])
+            )
 
-    logger.info(
-        "[TRACE] get_sympy_as_latex_per_expr_id end "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
-    return sympy_as_latex_per_expr_id
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+    return list_of_expression_dicts
 
 
 def get_dimensional_consistency_per_expression_id(
@@ -238,12 +207,8 @@ def get_dimensional_consistency_per_expression_id(
 ):
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] get_dimensional_consistency_per_expression_id start "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+
     dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
 
     list_of_expression_dicts = []
@@ -255,6 +220,10 @@ def get_dimensional_consistency_per_expression_id(
         query_time_dict["pdg_app/to_add_expression: list_nodes_of_type" + trace_id] = (
             round(time.time() - query_start_time, 3)
         )
+
+    dict_of_all_symbol_dicts = get_dict_of_all_symbol_dicts(
+        graphDB_Driver, query_time_dict
+    )
 
     for this_expression_dict in list_of_expression_dicts:
         with graphDB_Driver.session() as session:
@@ -274,6 +243,24 @@ def get_dimensional_consistency_per_expression_id(
             + str(list_of_symbol_scalar_IDs_in_expression)
         )
 
+        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/83
+        # # TODO
+        # with graphDB_Driver.session() as session:
+        #     query_start_time = time.time()
+        #     list_of_symbol_vector_IDs_in_expression = session.read_transaction(
+        #         neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+        #         "expression",
+        #         this_expression_dict["id"],
+        #         "vector",
+        #     )
+        #     query_time_dict["pdg_app/symbols_in_expression: " + trace_id] = round(
+        #         time.time() - query_start_time, 3
+        #     )
+
+        # TODO: vector dimensions should be consistent
+
+        # TODO: vector shape should be consistent
+
         try:
             dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
                 sympy_validate_expression.dimensional_consistency(
@@ -287,12 +274,7 @@ def get_dimensional_consistency_per_expression_id(
                 err
             )
 
-    logger.info(
-        "[TRACE] get_dimensional_consistency_per_expression_id end "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return dimensional_consistency_per_expression_id, query_time_dict
 
 
@@ -303,12 +285,7 @@ def get_dict_of_node_type_for_every_id(
     >>> get_node_type_from_id()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] get_dict_of_node_type_for_every_id start "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -342,12 +319,7 @@ def get_dict_of_node_type_for_every_id(
         else:  # there's just one node label
             dict_of_symbol_id_and_type[this_dict["n.id"]] = this_dict["labels(n)"][0]
 
-    logger.info(
-        "[TRACE] get_dict_of_node_type_for_every_id end "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return dict_of_symbol_id_and_type, query_time_dict
 
 
@@ -370,18 +342,14 @@ def remove_file_debris(
     >>> remove_file_debris(['/path/to/file/'],['filename_without_extension'], ['ext1', 'ext2'])
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/remove_file_debris start " + trace_id + " " + str(time.time())
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     for path_to_file in list_of_paths_to_files:
         for file_name in list_of_file_names:
             for file_ext in list_of_file_extensions:
                 if os.path.isfile(path_to_file + file_name + "." + file_ext):
                     os.remove(path_to_file + file_name + "." + file_ext)
-    logger.info(
-        "[TRACE] compute/remove_file_debris end " + trace_id + " " + str(time.time())
-    )
+    logger.info("[TRACE] end " + trace_id)
     return
 
 
@@ -395,9 +363,7 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
     >>> get_list_of_symbol_IDs_in_expression_or_feed()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_list_of_symbol_IDs_in_expression_or_feed start " + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -464,9 +430,7 @@ def get_list_of_symbol_IDs_in_expression_or_feed(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info(
-        "[TRACE] compute/get_list_of_symbol_IDs_in_expression_or_feed end " + trace_id
-    )
+    logger.info("[TRACE] end " + trace_id)
     return list_of_symbol_IDs_in_expression_or_feed, query_time_dict
 
 
@@ -480,10 +444,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
     >>> get_list_of_nonoperation_symbol_IDs_in_expression_or_feed()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_list_of_nonoperation_symbol_IDs_in_expression_or_feed start "
-        + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -537,9 +498,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info(
-        "[TRACE] compute/get_list_of_symbol_IDs_in_expression_or_feed end " + trace_id
-    )
+    logger.info("[TRACE] end " + trace_id)
     return list_of_symbol_IDs_in_expression_or_feed, query_time_dict
 
 
@@ -558,10 +517,7 @@ def get_list_of_expression_dicts_that_use_symbol_id(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_list_of_expression_dicts_that_use_symbol_id start "
-        + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     list_of_expression_dicts = []  # type: List[dict]
     with graphDB_Driver.session() as session:
@@ -609,10 +565,7 @@ def get_list_of_expression_dicts_that_use_symbol_id(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info(
-        "[TRACE] compute/get_list_of_expression_dicts_that_use_symbol_id end "
-        + trace_id
-    )
+    logger.info("[TRACE] end " + trace_id)
     return list_of_expression_dicts, query_time_dict
 
 
@@ -623,10 +576,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_list_of_derivation_dicts_that_use_symbol_id start "
-        + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     list_of_derivation_dicts = []  # type: List[dict]
     with graphDB_Driver.session() as session:
@@ -674,10 +624,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info(
-        "[TRACE] compute/get_list_of_derivation_dicts_that_use_symbol_id end "
-        + trace_id
-    )
+    logger.info("[TRACE] end " + trace_id)
     return list_of_derivation_dicts, query_time_dict
 
 
@@ -708,7 +655,7 @@ def get_list_of_all_symbol_dicts(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] compute/get_list_of_all_symbol_dicts start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
 
     list_of_symbol_dicts = []  # type: List[dict]
     with graphDB_Driver.session() as session:
@@ -759,7 +706,7 @@ def get_list_of_all_symbol_dicts(
         this_symbol_dict["symbol_category"] = "matrix"
         list_of_symbol_dicts.append(this_symbol_dict)
 
-    logger.info("[TRACE] compute/get_list_of_all_symbol_dicts end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return list_of_symbol_dicts, query_time_dict
 
 
@@ -780,9 +727,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
     >>> get_list_of_all_nonoperation_symbol_dicts
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_list_of_all_nonoperation_symbol_dicts start " + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     list_of_nonoperation_symbol_dicts = []  # type: List[dict]
 
@@ -825,9 +770,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
         this_symbol_dict["symbol_category"] = "matrix"
         list_of_nonoperation_symbol_dicts.append(this_symbol_dict)
 
-    logger.info(
-        "[TRACE] compute/get_list_of_all_nonoperation_symbol_dicts end " + trace_id
-    )
+    logger.info("[TRACE] end " + trace_id)
     return list_of_nonoperation_symbol_dicts, query_time_dict
 
 
@@ -846,7 +789,7 @@ def get_dict_of_all_symbol_dicts(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] compute/get_dict_of_all_symbol_dicts start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
 
     dict_of_all_symbol_dicts = {}  # type: Dict[str,dict]
 
@@ -874,6 +817,7 @@ def get_dict_of_all_symbol_dicts(
     for ke, val in dict_of_all_matrix_dicts.items():
         dict_of_all_symbol_dicts[ke] = val
 
+    logger.info("[TRACE] end " + trace_id)
     return dict_of_all_symbol_dicts, query_time_dict
 
 
@@ -892,9 +836,7 @@ def get_dict_of_all_nonoperation_symbol_dicts(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_dict_of_all_nonoperation_symbol_dicts start " + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     dict_of_all_nonoperation_symbol_dicts = {}  # type: Dict[str,dict]
 
@@ -916,6 +858,7 @@ def get_dict_of_all_nonoperation_symbol_dicts(
     for ke, val in dict_of_all_matrix_dicts.items():
         dict_of_all_nonoperation_symbol_dicts[ke] = val
 
+    logger.info("[TRACE] end " + trace_id)
     return dict_of_all_nonoperation_symbol_dicts, query_time_dict
 
 
@@ -924,10 +867,7 @@ def get_dict_of_nonoperation_symbol_dicts_in_expression(
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_dict_of_nonoperation_symbol_dicts_in_expression start "
-        + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
     dict_of_all_nonoperation_symbol_dicts, query_time_dict = (
         get_dict_of_all_nonoperation_symbol_dicts(graphDB_Driver, query_time_dict)
     )
@@ -957,10 +897,7 @@ def get_dict_of_nonoperation_symbol_dicts_not_in_expression(
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_dict_of_snonoperation_ymbol_dicts_not_in_expression start "
-        + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
     dict_of_all_nonoperation_symbol_dicts, query_time_dict = (
         get_dict_of_all_nonoperation_symbol_dicts(graphDB_Driver, query_time_dict)
     )
@@ -993,9 +930,7 @@ def get_dict_of_operation_dicts_in_expression(
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_dict_of_operation_dicts_in_expression start " + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
         graphDB_Driver, query_time_dict, "operation"
@@ -1036,10 +971,7 @@ def get_dict_of_operation_dicts_not_in_expression(
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_dict_of_operation_dicts_not_in_expression start "
-        + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
         graphDB_Driver, query_time_dict, "operation"
@@ -1080,9 +1012,7 @@ def get_dict_of_relation_dicts_not_in_expression(
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_dict_of_relation_dicts_not_in_expression start " + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     dict_of_all_relation_dicts, query_time_dict = get_dict_of_node_dicts(
         graphDB_Driver, query_time_dict, "relation"
@@ -1121,7 +1051,7 @@ def get_dict_of_node_dicts(
     >>> get_dict_of_node_dicts()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] compute/get_dict_of_node_dicts start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
 
     assert node_type in list_of_valid.node_types
     # print("compute/get_dict_of_node_dicts: node type=", node_type)
@@ -1143,7 +1073,7 @@ def get_dict_of_node_dicts(
         dict_of_all_node_dicts[this_node_dict["id"]] = this_node_dict
     # print("dict_of_all_node_dicts=", dict_of_all_node_dicts)
 
-    logger.info("[TRACE] compute/get_dict_of_node_dicts end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return dict_of_all_node_dicts, query_time_dict
 
 
@@ -1154,10 +1084,7 @@ def get_dict_of_derivations_used_per_inference_rule(
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/get_dict_of_derivations_used_per_inference_rule start "
-        + trace_id
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     dict_of_derivations_used_per_inference_rule = {}
     for this_inference_rule_dict in list_of_inference_rule_dicts:
@@ -1276,7 +1203,7 @@ def get_dict_of_steps_in_derivation(
     >>> get_dict_of_steps_in_derivation()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] compute/get_dict_of_steps_in_derivation start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
 
     # list all steps in this derivation
     list_of_step_dicts = []
@@ -1338,7 +1265,7 @@ def input_feed_output_infrule_for_step(
     >>> input_feed_output_infrule_for_step()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] compute/input_feed_output_infrule_for_step start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
 
     inference_rule_dict = {}
     list_of_input_dicts = []
@@ -1393,7 +1320,7 @@ def input_feed_output_infrule_for_step(
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_output_dicts=", list_of_output_dicts)
 
-    logger.info("[TRACE] compute/input_feed_output_infrule_for_step end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return (
         inference_rule_dict,
         list_of_input_dicts,
@@ -1415,7 +1342,7 @@ def remove_latex_presention_markings(latex_str: str) -> str:
     'a b = c'
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] compute/remove_latex_presention_markings start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
 
     logger.info("latex to be cleaned: " + latex_str)
 
@@ -1458,7 +1385,7 @@ def remove_latex_presention_markings(latex_str: str) -> str:
 
     logger.info("latex after cleaning: " + latex_str)
 
-    logger.info("[TRACE] compute/remove_latex_presention_markings end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return latex_str
 
 
