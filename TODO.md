@@ -1,13 +1,15 @@
 Enter a novel derivation: https://github.com/allofphysicsgraph/task-tracker/issues/162 (F=ma)
 
+
 What's preventing me from doing so now?
+- https://localhost/list_expressions should show Latex-from-Sympy in the Sympy column
 - cypher export does not produce a consistent order. As a result, diff isn't feasible
     - can CSV or GraphML output be diff'd?
     - The missing expressions in step 17
-- Display the AST for equation review
+- Display the AST for equation review - https://localhost/edit_expression/6709044
 - on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
 
-- currently there's no use of HAS_SYMBOL edges
+- currently there's no use of HAS_SYMBOL edges. (Because in ui_v7 the JSON deduced the symbol membership from "AST")
 
 Create a function in the compute library that creates a list of all symbol dictionaries
 In the compute library, create a function that converts a list of dictionaries into a dictionary dictionaries, with key of ID
