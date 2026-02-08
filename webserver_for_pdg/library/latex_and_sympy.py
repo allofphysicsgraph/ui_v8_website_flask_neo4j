@@ -16,6 +16,9 @@ In the situation where another CAS like Sage is used, a separate "latex_and_sage
 import random
 import time
 
+# move and copy files
+import shutil
+
 import sympy  # type: ignore
 from sympy.parsing.latex import parse_latex  # type: ignore
 from sympy.parsing.sympy_parser import parse_expr  # type: ignore
@@ -43,9 +46,7 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id)
 
-    logger.info(
-        "sympy_to_latex_str: SymPy to be converted to Latex: " + str(sympy_expr)
-    )
+    logger.info("SymPy to be converted to Latex: " + str(sympy_expr))
 
     expr = parse_expr(sympy_expr)
 
@@ -55,7 +56,7 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
     # TODO: sometimes the above files, like on a string with no SymPy formatting:
     #    NameError: name 'b' is not defined
 
-    logger.info("sympy_to_latex_str: latex_str=" + latex_str)
+    logger.info("latex_str=" + latex_str)
 
     logger.info("[TRACE] end " + trace_id)
     return latex_str
@@ -142,10 +143,14 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str):
     with open(dot_filename, "w") as fil:
         fil.write(graphviz_of_AST_for_expr)
 
+    output_filename_with_extension = output_filename + ".png"
+
+    logger.info("dot -Tpng " + dot_filename + " -o " + output_filename_with_extension)
     # neato -Tpng graphviz.dot > /home/appuser/app/static/graphviz.png
     # if not os.path.exists("/code/static/" + output_filename):
     process = subprocess.run(
-        ["dot", "-Tpng", dot_filename, "-o /code/static/" + output_filename + ".png"],
+        # ["dot", "-Tpng", dot_filename, "-o","/code/static/" + output_filename_with_extension],
+        ["dot", "-Tpng", dot_filename, "-o", output_filename_with_extension],
         stdout=PIPE,
         stderr=PIPE,
         timeout=proc_timeout,
@@ -157,7 +162,10 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str):
     if len(neato_stderr) > 0:
         logger.debug("neato_stderr = " + str(neato_stderr))
 
-        # shutil.move(output_filename, "/code/static/" + output_filename)
+    shutil.move(
+        output_filename_with_extension, "/code/static/" + output_filename_with_extension
+    )
+
     logger.info("[TRACE] end " + trace_id)
     return
 
