@@ -2071,7 +2071,19 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     )
     query_time_dict = {}  # type: query_timing_result_type
 
-    logger.info("to_edit_expression: expression_id: " + str(expression_id))
+    logger.info("expression_id: " + str(expression_id))
+
+    if request.method == "POST" and "delete_expression" in request.form:
+        logger.info("Deleting expression: " + str(expression_id))
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            session.write_transaction(
+                neo4j_query.delete_node, "expression", expression_id
+            )
+            query_time_dict["to_edit_expression: delete_node"] = round(
+                time.time() - query_start_time, 3
+            )
+        return redirect(url_for("to_list_expressions"))
 
     expression_dict = {}
     with graphDB_Driver.session() as session:
@@ -2094,7 +2106,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     )
 
     logger.info(
-        "to_edit_expression: dict_of_nonoperation_symbol_dicts_in_expression"
+        "dict_of_nonoperation_symbol_dicts_in_expression: "
         + str(dict_of_nonoperation_symbol_dicts_in_expression)
     )
 
@@ -2105,7 +2117,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     )
 
     logger.info(
-        "to_edit_expression: dict_of_nonoperation_symbol_dicts_not_in_expression"
+        "dict_of_nonoperation_symbol_dicts_not_in_expression: "
         + str(dict_of_nonoperation_symbol_dicts_not_in_expression)
     )
 
@@ -2116,7 +2128,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     )
 
     logger.info(
-        "to_edit_expression: dict_of_operation_dicts_in_expression"
+        "dict_of_operation_dicts_in_expression: "
         + str(dict_of_operation_dicts_in_expression)
     )
 
@@ -2127,7 +2139,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     )
 
     logger.info(
-        "to_edit_expression: dict_of_operation_dicts_not_in_expression"
+        "dict_of_operation_dicts_not_in_expression: "
         + str(dict_of_operation_dicts_not_in_expression)
     )
 
@@ -2138,7 +2150,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     )
 
     logger.info(
-        "to_edit_expression: dict_of_relation_dicts_not_in_expression"
+        "dict_of_relation_dicts_not_in_expression: "
         + str(dict_of_relation_dicts_not_in_expression)
     )
 
@@ -2149,30 +2161,54 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
     if request.method == "POST" and not web_form_new_expression.validate():
         flash(str(web_form_new_expression.errors))
-        logger.info(str(web_form_new_expression.errors))
-    if request.method == "POST" and web_form_new_expression.validate():
         logger.info(
-            "to_edit_expression: with web_form_new_expression, request.form = "
-            + str(request.form)
+            "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
         )
+
+    if request.method == "POST" and web_form_new_expression.validate():
+        logger.info("with web_form_new_expression, request.form = " + str(request.form))
 
         # sanitize latex
         # TODO: notify user if text was edited
+        # expression_latex_lhs = latex.make_string_safe_for_latex(
+        #     str(web_form_new_expression.expression_latex_lhs.data)
+        #     .strip()
+        #     .replace("\\", "\\\\")  # due to Neo4j
+        # )
         expression_latex_lhs = latex.make_string_safe_for_latex(
-            str(web_form_new_expression.expression_latex_lhs.data)
-            .strip()
-            .replace("\\", "\\\\")  # due to Neo4j
+            str(web_form_new_expression.expression_latex_lhs.data).strip()
         )
-        expression_relation = latex.make_string_safe_for_latex("=")  # TODO
+
+        # the web UI dropdown returns the symbol ID (and not Latex string)
+        #'symbol_relation_id_to_add', '2222545'
+        expression_relation_id = request.form["symbol_relation_id_to_add"]
+
+        # look up the Latex string. (The other option is to change the schema to expr -> HAS_RELATION -> symbol)
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            expression_relation = session.read_transaction(
+                neo4j_query.get_relation_latex, expression_relation_id
+            )
+            query_time_dict[
+                "pdg_app/to_edit_expression: get_relation_latex" + trace_id
+            ] = round(time.time() - query_start_time, 3)
+
+        # expression_latex_rhs = latex.make_string_safe_for_latex(
+        #     str(web_form_new_expression.expression_latex_rhs.data)
+        #     .strip()
+        #     .replace("\\", "\\\\")  # due to Neo4j
+        # )
         expression_latex_rhs = latex.make_string_safe_for_latex(
-            str(web_form_new_expression.expression_latex_rhs.data)
-            .strip()
-            .replace("\\", "\\\\")  # due to Neo4j
+            str(web_form_new_expression.expression_latex_rhs.data).strip()
         )
+        # expression_latex_condition = latex.make_string_safe_for_latex(
+        #     str(web_form_new_expression.expression_latex_condition.data)
+        #     .strip()
+        #     .replace("\\", "\\\\")  # due to Neo4j
+        # )
         expression_latex_condition = latex.make_string_safe_for_latex(
-            str(web_form_new_expression.expression_latex_condition.data)
-            .strip()
-            .replace("\\", "\\\\")  # due to Neo4j
+            str(web_form_new_expression.expression_latex_condition.data).strip()
+            # .replace("\\", "\\\\")  # due to Neo4j
         )
         expression_name_latex = latex.make_string_safe_for_latex(
             str(web_form_new_expression.expression_name_latex.data).strip()
@@ -2239,23 +2275,6 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         #     compute.get_dict_of_node_type_for_every_id(graphDB_Driver, query_time_dict)
         # )
 
-        # # the "delete" button returns a dict with only the csrf token, so len==1
-        # if len(request.form.keys()) == 1:
-        #     logger.info("request.form=" + str(request.form))
-
-        #     # https://neo4j.com/docs/python-manual/current/session-api/
-        #     with graphDB_Driver.session() as session:
-        #         query_start_time = time.time()
-        #         session.write_transaction(
-        #             neo4j_query.delete_node,
-        #             expression_id,
-        #             "expression",
-        #         )
-        #         query_time_dict["to_edit_expression: delete_node"] = round(
-        #             time.time() - query_start_time, 3
-        #         )
-        #     return redirect(url_for("to_list_expressions"))
-
         # if "symbol_select_id_to_disconnect" in request.form.keys():
         #     symbol_id_to_disconnect = str(
         #         request.form["symbol_select_id_to_disconnect"]
@@ -2312,9 +2331,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
                     time.time() - query_start_time, 3
                 )
 
-    logger.info(
-        "[TRACE] to_edit_expression end " + str(trace_id) + " " + str(time.time())
-    )
+    logger.info("[TRACE] end " + str(trace_id) + " " + str(time.time()))
     return render_template(
         "jinja2_pages/user_workflow/expression_edit.html",
         query_time_dict=query_time_dict,
@@ -2337,7 +2354,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     edit feed
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_feed start " + str(trace_id) + " " + str(time.time()))
+    logger.info("[TRACE] start " + str(trace_id) + " " + str(time.time()))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("to_edit_feed: feed_id: " + str(feed_id))
@@ -2351,7 +2368,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         query_time_dict["pdg_app/to_edit_feed: get_node_properties feed" + trace_id] = (
             round(time.time() - query_start_time, 3)
         )
-    logger.info("to_edit_feed: feed_dict:" + str(feed_dict))
+    logger.info("feed_dict:" + str(feed_dict))
 
     # editing the feed includes modifying the symbols present.
 
@@ -2365,7 +2382,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         )
     )
 
-    logger.info("to_edit_feed: feed_id=" + str(feed_id))
+    logger.info("feed_id=" + str(feed_id))
     logger.info("list_of_symbol_IDs_in_feed=" + str(list_of_symbol_IDs_in_feed))
 
     list_of_feed_dicts = []
@@ -2378,23 +2395,14 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
             time.time() - query_start_time, 3
         )
 
-    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
-    for this_feed_dict in list_of_feed_dicts:
-        if "sympy" in this_feed_dict.keys():
-            try:
-                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = (
-                    latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
-                )
-            except Exception as err:
-                flash("ERROR converting to Sympy in to_edit_feed: " + str(err))
-                logger.info("ERROR converting to Sympy in to_edit_feed: " + str(err))
-                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
-        else:
-            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
+    # Used in _table_of_feeds.html
+    sympy_as_latex_per_feed_id = compute.get_sympy_as_latex_per_feed_id(
+        list_of_feed_dicts
+    )
 
     dict_of_symbol_dicts_in_feed = {}
     for this_symbol_ID in list_of_symbol_IDs_in_feed:
-        logger.info("to_edit_feed: this_symbol_ID=" + str(this_symbol_ID))
+        logger.info("this_symbol_ID=" + str(this_symbol_ID))
         logger.info(
             "dict_of_all_symbol_dicts.keys()=" + str(dict_of_all_symbol_dicts.keys())
         )
@@ -2438,9 +2446,9 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         )
         feed_lean = str(web_form_new_feed.feed_lean.data).strip().replace("\\", "\\\\")
 
-        logger.info("to_edit_feed: feed_latex=" + str(feed_latex))
-        logger.info("to_edit_feed: feed_sympy=" + str(feed_sympy))
-        logger.info("to_edit_feed: feed_lean=" + str(feed_lean))
+        logger.info("feed_latex=" + str(feed_latex))
+        logger.info("feed_sympy=" + str(feed_sympy))
+        logger.info("feed_lean=" + str(feed_lean))
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -2478,9 +2486,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 query_time_dict[
                     "pdg_app/to_edit_feed: edit_node_property feed lean" + trace_id
                 ] = round(time.time() - query_start_time, 3)
-        logger.info(
-            "[TRACE] to_edit_feed end " + str(trace_id) + " " + str(time.time())
-        )
+        logger.info("[TRACE] end " + str(trace_id) + " " + str(time.time()))
         return redirect(url_for("to_list_feeds"))
 
     web_form_no_options = NoOptionsForm(request.form)
@@ -2570,7 +2576,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         dict_of_symbol_dicts_in_feed=dict_of_symbol_dicts_in_feed,
         dict_of_symbol_dicts_not_in_feed=dict_of_symbol_dicts_not_in_feed,
         feed_dict=feed_dict,
-        sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
+        sympy_as_latex_per_feed_id=sympy_as_latex_per_feed_id,  # Used in _table_of_feeds.html
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
     )
     # return redirect(url_for("to_list_feeds"))
@@ -2588,6 +2594,7 @@ def to_add_expression() -> werkzeug.Response:
     )
     query_time_dict = {}  # type: query_timing_result_type
 
+    # Used in _table_of_expressions.html which is referenced in expression_create.html
     list_of_expression_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -2598,6 +2605,7 @@ def to_add_expression() -> werkzeug.Response:
             round(time.time() - query_start_time, 3)
         )
 
+    # Used in _table_of_expressions.html which is referenced in expression_create.html
     symbol_IDs_per_expression_id = (
         {}
     )  # type: Dict[str,list] # _table_of_expressions.html
@@ -2611,66 +2619,33 @@ def to_add_expression() -> werkzeug.Response:
             )
         )
 
+    # Used in _table_of_expressions.html which is referenced in expression_create.html
     dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
         graphDB_Driver, query_time_dict
     )
 
-    dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
-    for this_expression_dict in list_of_expression_dicts:
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_symbol_scalar_IDs_in_expression = session.read_transaction(
-                neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-                "expression",
-                this_expression_dict["id"],
-                "scalar",
-            )
-            query_time_dict["pdg_app/symbols_in_expression: " + trace_id] = round(
-                time.time() - query_start_time, 3
-            )
-
-        logger.info(
-            "list_of_symbol_scalar_IDs_in_expression="
-            + str(list_of_symbol_scalar_IDs_in_expression)
+    # Used in _table_of_expressions.html which is referenced in expression_create.html
+    dimensional_consistency_per_expression_id, query_time_dict = (
+        compute.get_dimensional_consistency_per_expression_id(
+            graphDB_Driver, query_time_dict
         )
-
-        try:
-            dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
-                sympy_validate_expression.dimensional_consistency(
-                    this_expression_dict,
-                    list_of_symbol_scalar_IDs_in_expression,
-                    dict_of_all_symbol_dicts,
-                )
-            )
-        except Exception as err:
-            dimensional_consistency_per_expression_id[this_expression_dict["id"]] = str(
-                err
-            )
-    logger.info(
-        "dimensional_consistency_per_expression_id="
-        + str(dimensional_consistency_per_expression_id)
     )
 
-    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
-    for this_expression_dict in list_of_expression_dicts:
-        if "sympy" in this_expression_dict.keys():
-            try:
-                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
-                    latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
-                )
-            except Exception as err:
-                flash("ERROR converting to Sympy in to_add_expression: " + str(err))
-                logger.info(
-                    "ERROR converting to Sympy in to_add_expression: " + str(err)
-                )
-                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
-        else:
-            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
+    # logger.info(
+    #     "dimensional_consistency_per_expression_id="
+    #     + str(dimensional_consistency_per_expression_id)
+    # )
 
-    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
-        graphDB_Driver, query_time_dict
+    # Used in _table_of_expressions.html which is referenced in expression_create.html
+    sympy_as_latex_per_expr_id = compute.get_sympy_as_latex_per_expr_id(
+        list_of_expression_dicts
     )
 
+    # dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
+    #     graphDB_Driver, query_time_dict
+    # )
+
+    # Used in expression_create.html
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_relation_dicts = session.read_transaction(
@@ -2686,11 +2661,14 @@ def to_add_expression() -> werkzeug.Response:
         return redirect(url_for("to_add_relation"))
 
     # logger.info("list_of_relation_dicts=",list_of_relation_dicts)
+
+    # `to_add_expression` is the only function in which the following "sort" is used
     # sort list_of_relation_dicts such that "=" is in position 0
     sorted_list_of_relation_dicts = []  # type: List[dict]
     for this_relation_dict in list_of_relation_dicts:
         if this_relation_dict["latex"] == "=":
             sorted_list_of_relation_dicts.append(this_relation_dict)
+
     for this_relation_dict in list_of_relation_dicts:
         if this_relation_dict["latex"] != "=":
             sorted_list_of_relation_dicts.append(this_relation_dict)
@@ -2705,20 +2683,43 @@ def to_add_expression() -> werkzeug.Response:
     if request.method == "POST" and web_form.validate():
         logger.info("to_add_expression: request.form = " + str(request.form))
 
-        # request.form =  ImmutableMultiDict([('input1', 'a = b'), ('submit_button', 'Submit')])
+        # ('expression_latex_lhs', '\\vec{F}'), ('symbol_relation_id_to_add', '2903733'),
+        # ('expression_latex_rhs', 'm \\vec{a}'), ('expression_latex_condition', ''),
+        # ('expression_name_latex', ''), ('expression_reference_latex', ''), ('expression_description_latex', '')])
 
-        expression_latex_lhs = (
-            str(web_form.expression_latex_lhs.data).strip().replace("\\", "\\\\")
-        )
-        expression_relation = (
-            "="  # TODO -- dropdown of ["=", "\leq", "\lt", "\gt", "\geq"]
-        )
-        expression_latex_rhs = (
-            str(web_form.expression_latex_rhs.data).strip().replace("\\", "\\\\")
-        )
-        expression_latex_condition = (
-            str(web_form.expression_latex_condition.data).strip().replace("\\", "\\\\")
-        )
+        # expression_latex_lhs = (
+        #     str(web_form.expression_latex_lhs.data).strip().replace("\\", "\\\\")
+        # )
+        expression_latex_lhs = str(web_form.expression_latex_lhs.data).strip()
+
+        # the web UI dropdown returns the symbol ID (and not Latex string)
+        #'symbol_relation_id_to_add', '2222545'
+        expression_relation_id = request.form["symbol_relation_id_to_add"]
+
+        logger.info("expression_relation_id: " + expression_relation_id)
+
+        # look up the Latex string. (The other option is to change the schema to expr -> HAS_RELATION -> symbol)
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            expression_relation = session.read_transaction(
+                neo4j_query.get_relation_latex, expression_relation_id
+            )
+            query_time_dict[
+                "pdg_app/to_edit_expression: get_relation_latex" + trace_id
+            ] = round(time.time() - query_start_time, 3)
+
+        logger.info(str(expression_relation))
+
+        # expression_latex_rhs = (
+        #     str(web_form.expression_latex_rhs.data).strip().replace("\\", "\\\\")
+        # )
+        expression_latex_rhs = str(web_form.expression_latex_rhs.data).strip()
+        # expression_latex_condition = (
+        #     str(web_form.expression_latex_condition.data).strip().replace("\\", "\\\\")
+        # )
+        expression_latex_condition = str(
+            web_form.expression_latex_condition.data
+        ).strip()
         expression_name_latex = str(web_form.expression_name_latex.data).strip()
         expression_reference_latex = str(
             web_form.expression_reference_latex.data
@@ -2785,12 +2786,12 @@ def to_add_expression() -> werkzeug.Response:
         "jinja2_pages/user_workflow/expression_create.html",
         query_time_dict=query_time_dict,
         form=web_form,
-        dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
-        list_of_relation_dicts=list_of_relation_dicts,
-        symbol_IDs_per_expression_id=symbol_IDs_per_expression_id,  # _table_of_expressions.html
-        list_of_expression_dicts=list_of_expression_dicts,
-        sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
-        dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,
+        dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,  # Used in _table_of_expressions.html which is referenced in expression_create.html
+        list_of_relation_dicts=list_of_relation_dicts,  # Used in expression_create.html
+        symbol_IDs_per_expression_id=symbol_IDs_per_expression_id,  # Used in _table_of_expressions.html which is referenced in expression_create.html
+        list_of_expression_dicts=list_of_expression_dicts,  # Used in _table_of_expressions.html which is referenced in expression_create.html
+        sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,  # Used in _table_of_expressions.html which is referenced in expression_create.html
+        dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,  # Used in _table_of_expressions.html which is referenced in expression_create.html
     )
 
 
@@ -2826,19 +2827,9 @@ def to_add_feed() -> werkzeug.Response:
         graphDB_Driver, query_time_dict
     )
 
-    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
-    for this_feed_dict in list_of_feed_dicts:
-        if "sympy" in this_feed_dict.keys():
-            try:
-                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = (
-                    latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
-                )
-            except Exception as err:
-                flash("ERROR converting to Sympy in to_add_feed: " + str(err))
-                logger.info("ERROR converting to Sympy in to_add_feed: " + str(err))
-                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
-        else:
-            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
+    sympy_as_latex_per_feed_id = compute.get_sympy_as_latex_per_feed_id(
+        list_of_feed_dicts
+    )
 
     list_of_nonoperation_symbol_dicts, query_time_dict = (
         compute.get_list_of_all_nonoperation_symbol_dicts(
@@ -2937,7 +2928,7 @@ def to_add_feed() -> werkzeug.Response:
         list_of_nonoperation_symbol_dicts=list_of_nonoperation_symbol_dicts,
         symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,  # _table_of_feeds.html
         list_of_feed_dicts=list_of_feed_dicts,
-        sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
+        sympy_as_latex_per_feed_id=sympy_as_latex_per_feed_id,
     )
 
 
@@ -6513,19 +6504,9 @@ def to_list_feeds() -> werkzeug.Response:
             )
         )
 
-    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
-    for this_feed_dict in list_of_feed_dicts:
-        if "sympy" in this_feed_dict.keys():
-            try:
-                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = (
-                    latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
-                )
-            except Exception as err:
-                flash("ERROR converting to Sympy in to_list_feeds: " + str(err))
-                logger.info("ERROR converting to Sympy in to_list_feeds: " + str(err))
-                sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
-        else:
-            sympy_as_latex_per_expr_id[this_feed_dict["id"]] = ""
+    sympy_as_latex_per_feed_id = compute.get_sympy_as_latex_per_feed_id(
+        list_of_feed_dicts
+    )
 
     dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
         graphDB_Driver, query_time_dict
@@ -6537,7 +6518,7 @@ def to_list_feeds() -> werkzeug.Response:
         query_time_dict=query_time_dict,
         list_of_feed_dicts=list_of_feed_dicts,
         symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,
-        sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
+        sympy_as_latex_per_feed_id=sympy_as_latex_per_feed_id,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
         dict_of_derivation_dicts_that_use_feed=dict_of_derivation_dicts_that_use_feed,
     )
@@ -6979,48 +6960,19 @@ def to_list_expressions() -> str:
         "to_list_expressions: dict_of_all_symbol_dicts=" + str(dict_of_all_symbol_dicts)
     )
 
-    dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
-    for this_expression_dict in list_of_expression_dicts:
-
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_symbol_IDs_in_expression = session.read_transaction(
-                neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-                "expression",
-                this_expression_dict["id"],
-                "scalar",
-            )
-            query_time_dict[
-                "pdg_app/to_list_expressions: get_list_of_symbol_IDs_per_category_in_expression_or_feed expression scalar"
-                + trace_id
-            ] = round(time.time() - query_start_time, 3)
-        dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
-            sympy_validate_expression.dimensional_consistency(
-                this_expression_dict,
-                list_of_symbol_IDs_in_expression,
-                dict_of_all_symbol_dicts,
-            )
+    dimensional_consistency_per_expression_id, query_time_dict = (
+        compute.get_dimensional_consistency_per_expression_id(
+            graphDB_Driver, query_time_dict
         )
-    logger.info(
-        "dimensional_consistency_per_expression_id="
-        + str(dimensional_consistency_per_expression_id)
     )
+    # logger.info(
+    #     "dimensional_consistency_per_expression_id="
+    #     + str(dimensional_consistency_per_expression_id)
+    # )
 
-    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
-    for this_expression_dict in list_of_expression_dicts:
-        if "sympy" in this_expression_dict.keys():
-            try:
-                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
-                    latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy"])
-                )
-            except Exception as err:
-                flash("ERROR converting to Sympy in to_list_expressions: " + str(err))
-                logger.info(
-                    "ERROR converting to Sympy in to_list_expressions: " + str(err)
-                )
-                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
-        else:
-            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
+    sympy_as_latex_per_expr_id = compute.get_sympy_as_latex_per_expr_id(
+        list_of_expression_dicts
+    )
 
     logger.info(
         "[TRACE] to_list_expressions end " + str(trace_id) + " " + str(time.time())
@@ -7031,7 +6983,7 @@ def to_list_expressions() -> str:
         list_of_expression_dicts=list_of_expression_dicts,
         symbol_IDs_per_expression_id=symbol_IDs_per_expression_id,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
-        dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,
+        dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,  # Used in _table_of_expressions.html which is referenced in expression_list.html
         sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,
     )
 

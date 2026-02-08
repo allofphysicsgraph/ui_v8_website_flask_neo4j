@@ -193,6 +193,35 @@ def constrain_unique_id(tx) -> None:
     return
 
 
+def get_relation_latex(tx, relation_id: str):
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info(
+        "[TRACE] get_relation_latex start " + str(trace_id) + " " + str(time.time())
+    )
+
+    # string concatenation is a security risk (Cypher injection)
+    # result = tx.run(
+    #     "MATCH (r:relation) WHERE r.id='" + relation_id + "' RETURN r.latex"
+    # )
+
+    result = tx.run(
+        "MATCH (r:relation) WHERE r.id = $rid RETURN r.latex", rid=relation_id
+    )
+
+    # The method result.data() returns a list of dictionaries.
+    list_of_dicts = result.data()
+
+    if list_of_dicts:
+        relation_latex = list_of_dicts[0]["r.latex"]
+    else:
+        raise Exception("relation_id not found")
+    logger.info(
+        "[TRACE] get_relation_latex end " + str(trace_id) + " " + str(time.time())
+    )
+    return relation_latex
+
+
 def get_scalar_id_that_has_value_and_units_id(tx, value_and_units_id: str):
     """
     >>>

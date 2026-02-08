@@ -13,6 +13,8 @@ import random
 import time
 import neo4j_query
 import list_of_valid
+import sympy_validate_expression
+import latex_and_sympy
 
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
@@ -148,6 +150,152 @@ def send_email_with_msmtp(
     return
 
 
+def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info(
+        "[TRACE] get_sympy_as_latex_per_feed_id start "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
+    sympy_as_latex_per_feed_id = {}  # type: Dict[str, str]
+    for this_dict in list_of_feed_or_expr_dicts:
+        if "sympy" in this_feed_dict.keys():
+            try:
+                sympy_as_latex_per_feed_id[this_feed_dict["id"]] = (
+                    latex_and_sympy.sympy_to_latex_str(this_dict["sympy"])
+                )
+            except Exception as err:
+                logger.critical(
+                    "ERROR converting to Sympy in get_sympy_as_latex_per_feed_id: "
+                    + str(err)
+                )
+                sympy_as_latex_per_feed_id[this_dict["id"]] = "error converting"
+        else:
+            sympy_as_latex_per_feed_id[this_dict["id"]] = "no 'sympy' key"
+
+    logger.info(
+        "[TRACE] get_sympy_as_latex_per_feed_id end "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
+    return sympy_as_latex_per_feed_id
+
+
+def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info(
+        "[TRACE] get_sympy_as_latex_per_expr_id start "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
+    sympy_as_latex_per_expr_id = {}  # type: Dict[str, str]
+    for this_expression_dict in list_of_expression_dicts:
+        if "sympy_lhs" in this_expression_dict.keys():
+            try:
+                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
+                    latex_and_sympy.sympy_to_latex_str(
+                        this_expression_dict["sympy_lhs"]
+                    )
+                )
+            except Exception as err:
+                logger.critical(
+                    "ERROR converting to Sympy in get_sympy_as_latex_per_expr_id: "
+                    + str(err)
+                )
+                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
+        if "sympy_rhs" in this_expression_dict.keys():
+            try:
+                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = (
+                    latex_and_sympy.sympy_to_latex_str(
+                        this_expression_dict["sympy_lhs"]
+                    )
+                )
+            except Exception as err:
+                logger.critical(
+                    "ERROR converting to Sympy in get_sympy_as_latex_per_expr_id: "
+                    + str(err)
+                )
+                sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
+        else:
+            sympy_as_latex_per_expr_id[this_expression_dict["id"]] = ""
+
+    logger.info(
+        "[TRACE] get_sympy_as_latex_per_expr_id end "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
+    return sympy_as_latex_per_expr_id
+
+
+def get_dimensional_consistency_per_expression_id(
+    graphDB_Driver, query_time_dict: query_timing_result_type
+):
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info(
+        "[TRACE] get_dimensional_consistency_per_expression_id start "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
+    dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
+
+    list_of_expression_dicts = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_expression_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "expression"
+        )
+        query_time_dict["pdg_app/to_add_expression: list_nodes_of_type" + trace_id] = (
+            round(time.time() - query_start_time, 3)
+        )
+
+    for this_expression_dict in list_of_expression_dicts:
+        with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_symbol_scalar_IDs_in_expression = session.read_transaction(
+                neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+                "expression",
+                this_expression_dict["id"],
+                "scalar",
+            )
+            query_time_dict["pdg_app/symbols_in_expression: " + trace_id] = round(
+                time.time() - query_start_time, 3
+            )
+
+        logger.info(
+            "list_of_symbol_scalar_IDs_in_expression="
+            + str(list_of_symbol_scalar_IDs_in_expression)
+        )
+
+        try:
+            dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
+                sympy_validate_expression.dimensional_consistency(
+                    this_expression_dict,
+                    list_of_symbol_scalar_IDs_in_expression,
+                    dict_of_all_symbol_dicts,
+                )
+            )
+        except Exception as err:
+            dimensional_consistency_per_expression_id[this_expression_dict["id"]] = str(
+                err
+            )
+
+    logger.info(
+        "[TRACE] get_dimensional_consistency_per_expression_id end "
+        + trace_id
+        + " "
+        + str(time.time())
+    )
+    return dimensional_consistency_per_expression_id, query_time_dict
+
+
 def get_dict_of_node_type_for_every_id(
     graphDB_Driver, query_time_dict: query_timing_result_type
 ) -> Tuple[dict, query_timing_result_type]:
@@ -156,7 +304,7 @@ def get_dict_of_node_type_for_every_id(
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] compute/get_dict_of_node_type_for_every_id start "
+        "[TRACE] get_dict_of_node_type_for_every_id start "
         + trace_id
         + " "
         + str(time.time())
@@ -195,7 +343,7 @@ def get_dict_of_node_type_for_every_id(
             dict_of_symbol_id_and_type[this_dict["n.id"]] = this_dict["labels(n)"][0]
 
     logger.info(
-        "[TRACE] compute/get_dict_of_node_type_for_every_id end "
+        "[TRACE] get_dict_of_node_type_for_every_id end "
         + trace_id
         + " "
         + str(time.time())

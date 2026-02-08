@@ -149,7 +149,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
       <option value="{{ symbol_id }}">{{ symbol_id }}, {{ symbol_dict['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" value="add operation to expression">
+    <input type="submit" name="add operation" value="add operation to expression">
   </form>
 
   <P>Operation not listed? <a href="{{ url_for('to_add_operation') }}">Create a new operation</a>
@@ -167,7 +167,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
       <option value="{{ symbol_id }}">{{ symbol_id }}, {{ symbol_dict['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" value="remove operation from expression">
+    <input type="submit" name="remove operation" value="remove operation from expression">
   </form>
 </fieldset>
 </fieldset>
@@ -191,7 +191,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
       <option value="{{ symbol_id }}">{{ symbol_id }}, {{ symbol_dict['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" value="update relation used in expression">
+    <input type="submit" name="update relation" value="update relation used in expression">
   </form>
 
 </fieldset>
@@ -263,7 +263,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     <P>{{ form_new_expression.expression_description_latex.label }} (optional): 
        {{ form_new_expression.expression_description_latex(size=50, maxlength=1000, value=expression_dict['descdescription_latexription']) }}<BR/>
       &nbsp;<BR/>
-      <input type="submit" value="Edit expression">
+      <input type="submit" name="edit expr" value="Edit expression">
     </P>
   </form>
 </fieldset>
@@ -282,7 +282,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
 
-    <input type="submit" value="Delete expression">
+    <input type="submit" name="delete expr" value="Delete expression">
     </form>
 </fieldset>
 
