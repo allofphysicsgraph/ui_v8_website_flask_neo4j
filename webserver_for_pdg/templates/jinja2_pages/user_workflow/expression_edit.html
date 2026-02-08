@@ -14,6 +14,8 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 
 <P>TODO: list derivations that use this expression. That would provide context.
 
+<P>expression_dict: <BR>{{ expression_dict }}
+
 <fieldset>
   <legend>
     <H1>Non-operation Symbols in Expression \({{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}\)</h1>
@@ -22,6 +24,9 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 <!--
 <P>{{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}
 -->
+
+dict_of_nonoperation_symbol_dicts_in_expression: <BR>
+{{dict_of_nonoperation_symbol_dicts_in_expression}}
 
 <table border="1" id="symbol_table" class="sortable">
   <tr>
@@ -69,6 +74,10 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   <legend>
     <H3>Add Non-operation Symbol used in Expression</h3>
   </legend>
+
+dict_of_nonoperation_symbol_dicts_not_in_expression:<BR>
+{{ dict_of_nonoperation_symbol_dicts_not_in_expression }}
+
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P><!--symbol count: { { list_of_symbol_IDs|length } }-->
@@ -117,6 +126,8 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
      { % endfor % }
    -->
 
+dict_of_operation_dicts_in_expression:<BR>
+{{ dict_of_operation_dicts_in_expression }}
 
 <table border="1" id="operation_table" class="sortable">
   <tr>
@@ -141,6 +152,10 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   <legend>
     <H3>Add operation used in Expression</h3>
   </legend>
+
+dict_of_operation_dicts_not_in_expression<BR>
+{{ dict_of_operation_dicts_not_in_expression }}
+
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P>
@@ -159,6 +174,10 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   <legend>
     <H3>Remove operation used in Expression</h3>
   </legend>
+
+dict_of_operation_dicts_in_expression<BR>
+{{ dict_of_operation_dicts_in_expression }}
+
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P><!-- operation count: { { list_of_operation_IDs|length } } -->
@@ -183,6 +202,9 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     <H3>Change Relation used in Expression</h3>
   </legend>
 
+dict_of_relation_dicts_not_in_expression<BR>
+{{ dict_of_relation_dicts_not_in_expression }}
+
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P><!-- operation count: { { list_of_operation_IDs|length } } -->
@@ -199,7 +221,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 
   <fieldset>
     <legend>
-      <H1>Edit Expression and metadata</h1>
+      <H1>Edit Expression Latex and metadata</h1>
     </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
@@ -268,6 +290,21 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   </form>
 </fieldset>
 
+  <fieldset>
+    <legend>
+      <H1>Edit Expression SymPy and Lean</h1>
+    </legend>
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form_expression_sympy.csrf_token }}
+
+    <P>{{form_expression_sympy.sympy_str_lhs.label}}: {{ form_expression_sympy.sympy_str_lhs(size=50, maxlength=1000, value=expression_dict['sympy_lhs']) }}
+    <P>{{form_expression_sympy.sympy_str_rhs.label}}: {{ form_expression_sympy.sympy_str_rhs(size=50, maxlength=1000, value=expression_dict['sympy_rhs']) }}
+    <P>{{form_expression_sympy.lean_str.label}}:      {{ form_expression_sympy.lean_str(size=50, maxlength=1000, value=expression_dict['lean']) }}
+  
+  <P><input type="submit" name="edit expr sympy" value="Edit expression SymPy and Lean">
+  </form>
+
+</fieldset>
 
 
   <fieldset>
