@@ -14,13 +14,21 @@ In the situation where another CAS like Sage is used, a separate "latex_and_sage
 """
 
 import random
+import time
+
 import sympy  # type: ignore
 from sympy.parsing.latex import parse_latex  # type: ignore
-import time
+from sympy.parsing.sympy_parser import parse_expr  # type: ignore
+
+from subprocess import PIPE  # https://docs.python.org/3/library/subprocess.html
+import subprocess  # https://stackoverflow.com/questions/39187886/what-is-the-difference-between-subprocess-popen-and-subprocess-run/39187984
+
 
 import logging
 
 logger = logging.getLogger(__name__)
+
+proc_timeout = 10
 
 
 def sympy_to_latex_str(sympy_expr: str) -> str:
@@ -33,20 +41,23 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] sympy_to_latex_str start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] start " + trace_id)
 
     logger.info(
         "sympy_to_latex_str: SymPy to be converted to Latex: " + str(sympy_expr)
     )
 
-    latex_str = sympy.latex(eval(sympy_expr))
+    expr = parse_expr(sympy_expr)
+
+    # latex_str = sympy.latex(eval(sympy_expr))
+    latex_str = sympy.latex(expr)
 
     # TODO: sometimes the above files, like on a string with no SymPy formatting:
     #    NameError: name 'b' is not defined
 
     logger.info("sympy_to_latex_str: latex_str=" + latex_str)
 
-    logger.info("[TRACE] sympy_to_latex_str end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] end " + trace_id)
     return latex_str
 
 
@@ -63,12 +74,7 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
     Eq(a, b)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] cleaned_latex_str_to_sympy_expression start "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] start " + trace_id)
 
     logger.info("latex to be converted to SymPy: " + expr_latex)
 
@@ -86,12 +92,7 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
         logger.critical("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
         raise Exception("Sympy unable to parse latex (3): " + expr_latex)
 
-    logger.info(
-        "[TRACE] cleaned_latex_str_to_sympy_expression start "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] end " + trace_id)
     return symp_expr
     # >>> type(symp_expr)
     # <class 'sympy.core.relational.Equality'>
@@ -104,12 +105,7 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     >>> list_of_sympy_symbols_in_sympy_expression(sympy_expr)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] list_of_sympy_symbols_in_sympy_expression start "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] start " + trace_id)
     # list_of_symbols = []
     # for symb in sympy_expr.atoms(sympy.Symbol):
     #     list_of_symbols.append(str(symb))
@@ -126,13 +122,44 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     # >>> type(list(list_of_sympy_symbols)[0])
     # <class 'sympy.core.symbol.Symbol'>
 
-    logger.info(
-        "[TRACE] list_of_sympy_symbols_in_sympy_expression end "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] end " + trace_id)
     return list(list_of_sympy_symbols)
+
+
+def create_AST_png_for_latex(sympy_expr: str, output_filename: str):
+    """
+    >>> create_AST_png_for_latex('Eq(Symbol('a'),Symbol('b'))','filename')
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + trace_id)
+
+    logger.info("output_filename = " + output_filename)
+
+    expr = parse_expr(sympy_expr, evaluate=False)
+
+    graphviz_of_AST_for_expr = sympy.printing.dot.dotprint(expr)
+    dot_filename = "tmp.dot"
+    with open(dot_filename, "w") as fil:
+        fil.write(graphviz_of_AST_for_expr)
+
+    # neato -Tpng graphviz.dot > /home/appuser/app/static/graphviz.png
+    # if not os.path.exists("/code/static/" + output_filename):
+    process = subprocess.run(
+        ["dot", "-Tpng", dot_filename, "-o /code/static/" + output_filename + ".png"],
+        stdout=PIPE,
+        stderr=PIPE,
+        timeout=proc_timeout,
+    )
+    neato_stdout = process.stdout.decode("utf-8")
+    if len(neato_stdout) > 0:
+        logger.debug("neato_stdout = " + str(neato_stdout))
+    neato_stderr = process.stderr.decode("utf-8")
+    if len(neato_stderr) > 0:
+        logger.debug("neato_stderr = " + str(neato_stderr))
+
+        # shutil.move(output_filename, "/code/static/" + output_filename)
+    logger.info("[TRACE] end " + trace_id)
+    return
 
 
 # For the difference between "free_symbols" and "atoms" see
