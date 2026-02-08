@@ -11,6 +11,13 @@
 </ul>
 -->
 
+<P>list_of_expression_dicts:<BR>
+  {{ list_of_expression_dicts }}
+
+
+<P>dimensional_consistency_per_expression_id:<BR>
+  {{dimensional_consistency_per_expression_id}}
+
 <table border="1" id="expression_table" class="sortable">
   <tr>
     <th>ID</th>
@@ -57,7 +64,15 @@
     </td>  --> <!-- operations -->
     <td>
       <P>{{ expression_dict['sympy'] }}
-      <P>{{ sympy_as_latex_per_expr_id[expression_dict['id']] }}
+      <P>{% if 'latex_as_sympy_LHS' in expression_dict %}
+             {{ expression_dict['latex_as_sympy_LHS'] }}
+         {% endif %}
+         {% if 'latex_relation' in expression_dict %}
+             {{ expression_dict['latex_relation'] }}
+         {% endif %}
+         {% if 'latex_as_sympy_RHS' in expression_dict %}
+             {{ expression_dict['latex_as_sympy_RHS'] }}
+         {% endif %}
     </td>
     <TD>
       <a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id'] ) }}" title="see more about this expression">
