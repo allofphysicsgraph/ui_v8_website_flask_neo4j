@@ -39,9 +39,7 @@ def generate_random_id(
     so they can't be used for the Physics Derivation Graph
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] compute/generate_random_id start " + trace_id + " " + str(time.time())
-    )
+    logger.info("[TRACE] compute/generate_random_id start " + trace_id)
     # print("node_type=", node_type)
 
     try:
@@ -64,9 +62,7 @@ def generate_random_id(
             found_new_ID = True
 
     logger.info("new_id=" + str(new_id))
-    logger.info(
-        "[TRACE] compute/generate_random_id end " + trace_id + " " + str(time.time())
-    )
+    logger.info("[TRACE] compute/generate_random_id end " + trace_id)
     return str(new_id), query_time_dict
 
 
@@ -187,7 +183,7 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
 def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] start " + trace_id)
     for index, this_expression_dict in enumerate(list_of_expression_dicts):
         if "sympy_lhs" in this_expression_dict.keys():
             list_of_expression_dicts[index]["latex_as_sympy_LHS"] = (
@@ -198,16 +194,23 @@ def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
                 latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy_rhs"])
             )
 
-    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] end " + trace_id)
     return list_of_expression_dicts
 
 
 def get_dimensional_consistency_per_expression_id(
     graphDB_Driver, query_time_dict: query_timing_result_type
 ):
-    """ """
+    """
+    This function checks the dimensional consistency of ALL expressions in PDG
+    That is appropriate for 'list_expressions' and 'create_expression'
+
+    TODO: a similar function for a restricted scope, like
+    - all expressions for a specific derivation
+    - editing one expression
+    """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] start " + trace_id)
 
     dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
 
@@ -221,7 +224,7 @@ def get_dimensional_consistency_per_expression_id(
             round(time.time() - query_start_time, 3)
         )
 
-    dict_of_all_symbol_dicts = get_dict_of_all_symbol_dicts(
+    dict_of_all_symbol_dicts, query_time_dict = get_dict_of_all_symbol_dicts(
         graphDB_Driver, query_time_dict
     )
 
@@ -261,20 +264,21 @@ def get_dimensional_consistency_per_expression_id(
 
         # TODO: vector shape should be consistent
 
-        try:
-            dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
-                sympy_validate_expression.dimensional_consistency(
-                    this_expression_dict,
-                    list_of_symbol_scalar_IDs_in_expression,
-                    dict_of_all_symbol_dicts,
-                )
+        # try:
+        dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
+            sympy_validate_expression.dimensional_consistency(
+                this_expression_dict,
+                list_of_symbol_scalar_IDs_in_expression,
+                dict_of_all_symbol_dicts,
             )
-        except Exception as err:
-            dimensional_consistency_per_expression_id[this_expression_dict["id"]] = str(
-                err
-            )
+        )
+        # except Exception as err:
 
-    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        #     dimensional_consistency_per_expression_id[this_expression_dict["id"]] = str(
+        #         err
+        #     )
+
+    logger.info("[TRACE] end " + trace_id)
     return dimensional_consistency_per_expression_id, query_time_dict
 
 
@@ -285,7 +289,7 @@ def get_dict_of_node_type_for_every_id(
     >>> get_node_type_from_id()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] start " + trace_id)
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -319,7 +323,7 @@ def get_dict_of_node_type_for_every_id(
         else:  # there's just one node label
             dict_of_symbol_id_and_type[this_dict["n.id"]] = this_dict["labels(n)"][0]
 
-    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] end " + trace_id)
     return dict_of_symbol_id_and_type, query_time_dict
 
 
