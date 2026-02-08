@@ -1831,12 +1831,7 @@ def to_edit_derivation_metadata(
 ) -> werkzeug.Response:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] to_edit_derivation_metadata start "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_edit_derivation_metadata start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form = SpecifyNewDerivationForm(request.form)
@@ -1896,12 +1891,7 @@ def to_edit_derivation_metadata(
         ] = round(time.time() - query_start_time, 3)
     logger.info("to_edit_derivation_metadata: derivation_dict:" + str(derivation_dict))
 
-    logger.info(
-        "[TRACE] to_edit_derivation_metadata end "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_edit_derivation_metadata end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/derivation_edit_metadata.html",
         query_time_dict=query_time_dict,
@@ -1922,12 +1912,7 @@ def to_add_step_select_inference_rule(
     What inference rule should be used for this step?
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] to_add_step_select_inference_rule start "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_add_step_select_inference_rule start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info(
@@ -1992,12 +1977,7 @@ def to_add_step_select_inference_rule(
         "to_add_step_select_inference_rule: derivation_dict:" + str(derivation_dict)
     )
 
-    logger.info(
-        "[TRACE] to_add_step_select_inference_rule end "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_add_step_select_inference_rule end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/new_step_select_inference_rule.html",
         query_time_dict=query_time_dict,
@@ -2057,12 +2037,14 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     # 'id': '6709044', 'sympy': "sympy.Eq(Symbol('pdg5401487'),Mul(Symbol('pdg3031455'),Symbol('pdg5028085')))",
     # 'latex_relation': '='}
 
-    latex_and_sympy.create_AST_png_for_latex(
-        expression_dict["sympy_lhs"], expression_dict["id"] + "_LHS"
-    )
-    latex_and_sympy.create_AST_png_for_latex(
-        expression_dict["sympy_rhs"], expression_dict["id"] + "_RHS"
-    )
+    if "sympy_lhs" in expression_dict.keys():
+        latex_and_sympy.create_AST_png_for_latex(
+            expression_dict["sympy_lhs"], expression_dict["id"] + "_LHS"
+        )
+    if "sympy_rhs" in expression_dict.keys():
+        latex_and_sympy.create_AST_png_for_latex(
+            expression_dict["sympy_rhs"], expression_dict["id"] + "_RHS"
+        )
 
     dict_of_nonoperation_symbol_dicts_in_expression, query_time_dict = (
         compute.get_dict_of_nonoperation_symbol_dicts_in_expression(
@@ -2123,6 +2105,8 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     # deleting the old expression and creating a new expression
     # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
     web_form_new_expression = SpecifyNewExpressionForm(request.form)
+
+    web_form_expression_sympy = SpecifyNewExpressionSympyLeanForm(request.form)
 
     if request.method == "POST" and not web_form_new_expression.validate():
         flash(str(web_form_new_expression.errors))
@@ -2303,6 +2287,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         expression_dict=expression_dict,
         form_no_options=web_form_no_options,
         form_new_expression=web_form_new_expression,
+        form_expression_sympy=web_form_expression_sympy,
         dict_of_nonoperation_symbol_dicts_in_expression=dict_of_nonoperation_symbol_dicts_in_expression,
         dict_of_nonoperation_symbol_dicts_not_in_expression=dict_of_nonoperation_symbol_dicts_not_in_expression,
         dict_of_operation_dicts_in_expression=dict_of_operation_dicts_in_expression,
@@ -2642,7 +2627,7 @@ def to_add_expression() -> werkzeug.Response:
         flash(str(web_form.errors))
         logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
-        logger.info("to_add_expression: request.form = " + str(request.form))
+        logger.info("request.form = " + str(request.form))
 
         # ('expression_latex_lhs', '\\vec{F}'), ('symbol_relation_id_to_add', '2903733'),
         # ('expression_latex_rhs', 'm \\vec{a}'), ('expression_latex_condition', ''),
@@ -2689,15 +2674,11 @@ def to_add_expression() -> werkzeug.Response:
             web_form.expression_description_latex.data
         ).strip()
 
-        logger.info(
-            "to_add_expression: expression_latex_lhs:" + str(expression_latex_lhs)
-        )
+        logger.info("expression_latex_lhs:" + str(expression_latex_lhs))
         logger.info("expression_latex_rhs:" + str(expression_latex_rhs))
         # TODO: validate that this string is actually Latex before adding to database
 
-        logger.info(
-            "to_add_expression: expression_name_latex:" + str(expression_name_latex)
-        )
+        logger.info("expression_name_latex:" + str(expression_name_latex))
         logger.info("expression_description_latex" + str(expression_description_latex))
 
         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
@@ -2730,7 +2711,7 @@ def to_add_expression() -> werkzeug.Response:
             )
 
         # after user provides latex for expression have them provide symbol count
-        logger.info("[TRACE] to_add_expression end " + str(trace_id))
+        logger.info("[TRACE]  end " + str(trace_id))
         return redirect(
             url_for(
                 "to_add_symbols_and_operations_for_expression",
@@ -2738,7 +2719,7 @@ def to_add_expression() -> werkzeug.Response:
             )
         )
 
-    logger.info("[TRACE] to_add_expression end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/expression_create.html",
         query_time_dict=query_time_dict,
@@ -3368,12 +3349,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
                 author_name_latex,
             )
 
-        logger.info(
-            "[TRACE] to_add_value_and_units end "
-            + str(trace_id)
-            + " "
-            + str(time.time())
-        )
+        logger.info("[TRACE] to_add_value_and_units end " + str(trace_id))
         return redirect(url_for("to_list_scalars"))
 
     with graphDB_Driver.session() as session:
@@ -3422,7 +3398,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
         dict_of_derivations_that_use_scalar[scalar_id] = list_of_derivation_names
     dict_of_derivation_dicts_that_use_scalar = dict_of_derivations_that_use_scalar
 
-    logger.info("[TRACE] to_add_value_and_units end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_constant_values_create.html",
         query_time_dict=query_time_dict,
@@ -3448,7 +3424,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
     novel scalar symbol
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_symbol_scalar start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_scalar_properties = SpecifyNewSymbolScalarForm(request.form)
@@ -3540,9 +3516,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info(
-        "to_add_symbol_scalar: list_of_scalar_dicts =" + str(list_of_scalar_dicts)
-    )
+    logger.info("list_of_scalar_dicts =" + str(list_of_scalar_dicts))
 
     dict_of_expression_dicts_that_use_scalar = {}  # type: Dict[str,list]
     for this_scalar_dict in list_of_scalar_dicts:
@@ -3595,7 +3569,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
     novel vector
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_symbol_vector start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -3632,7 +3606,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
         flash(str(web_form_vector_properties.errors))
         logger.info(str(web_form_vector_properties.errors))
     if request.method == "POST" and web_form_vector_properties.validate():
-        logger.info("to_add_symbol_vector: request.form = " + str(request.form))
+        logger.info("request.form = " + str(request.form))
 
         vector_latex = str(web_form_vector_properties.vector_latex.data).strip()
         vector_name_latex = str(
@@ -3651,12 +3625,9 @@ def to_add_symbol_vector() -> werkzeug.Response:
             web_form_vector_properties.vector_orientation.data
         ).strip()
 
-        logger.info("to_add_symbol_vector: vector_latex:" + str(vector_latex))
-        logger.info("to_add_symbol_vector: vector_name_latex:" + str(vector_name_latex))
-        logger.info(
-            "to_add_symbol_vector: vector_description_latex"
-            + str(vector_description_latex)
-        )
+        logger.info("vector_latex:" + str(vector_latex))
+        logger.info("vector_name_latex:" + str(vector_name_latex))
+        logger.info("vector_description_latex" + str(vector_description_latex))
 
         vector_number_of_entries = str(
             web_form_vector_properties.vector_number_of_entries.data
@@ -3690,7 +3661,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
             )
         return redirect(url_for("to_list_vectors"))
 
-    logger.info("[TRACE] to_add_symbol_vector end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_vector_create.html",
         query_time_dict=query_time_dict,
@@ -3708,7 +3679,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
     novel matrix
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_symbol_matrix start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -3719,9 +3690,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
         query_time_dict[
             "pdg_app/to_add_symbol_matrix: list_nodes_of_type matrix" + trace_id
         ] = round(time.time() - query_start_time, 3)
-    logger.info(
-        "to_add_symbol_matrix: list_of_matrix_dicts=" + str(list_of_matrix_dicts)
-    )
+    logger.info("list_of_matrix_dicts=" + str(list_of_matrix_dicts))
 
     dict_of_expression_dicts_that_use_matrix = {}  # type: Dict[str,list]
     for this_matrix_dict in list_of_matrix_dicts:
@@ -3769,7 +3738,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 
         matrix_size = str(web_form_matrix_properties.matrix_size.data).strip()
 
-        logger.info("to_add_symbol_matrix matrix_latex:" + str(matrix_latex))
+        logger.info("matrix_latex:" + str(matrix_latex))
         logger.info("matrix_name_latex:" + str(matrix_name_latex))
         logger.info("matrix_description_latex" + str(matrix_description_latex))
 
@@ -3806,10 +3775,10 @@ def to_add_symbol_matrix() -> werkzeug.Response:
                 now_str,
                 author_name_latex,
             )
-        logger.info("[TRACE] to_add_symbol_matrix end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_list_matrices"))
 
-    logger.info("[TRACE] to_add_symbol_matrix end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_matrix_create.html",
         query_time_dict=query_time_dict,
@@ -3826,620 +3795,6 @@ def to_add_symbol() -> werkzeug.Response:
     novel symbol
     """
     return render_template("jinja2_pages/user_workflow/symbol_create_pick_type.html")
-
-
-# @web_app.route("/new_symbol", methods=["GET", "POST"])
-# def to_add_symbol() -> werkzeug.Response:
-#     """
-#     novel symbol
-#     """
-#     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] to_add_symbol start " + str(trace_id))
-#     query_time_dict = {}  # type: query_timing_result_type
-
-#     web_form_symbol_properties = SpecifyNewSymbolForm(request.form)
-#     if request.method == "POST" and web_form_symbol_properties.validate():
-#         logger.info("request.form = " + str(request.form))
-
-#         symbol_latex = str(web_form_symbol_properties.symbol_latex.data).strip()
-#         symbol_name = str(web_form_symbol_properties.symbol_name.data).strip()
-#         symbol_description = str(
-#             web_form_symbol_properties.symbol_description.data
-#         ).strip()
-#         symbol_requires_arguments = (
-#             web_form_symbol_properties.symbol_requires_arguments.data
-#         )
-#         symbol_reference = str(web_form_symbol_properties.symbol_reference.data).strip()
-
-#         logger.info("symbol_latex:" + str(symbol_latex))
-#         logger.info("symbol_name:" + str(symbol_name))
-#         logger.info("symbol_description" + str(symbol_description))
-
-#         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
-
-#         list_of_symbol_IDs = []
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             list_of_symbol_IDs = session.read_transaction(
-#                 neo4j_query.list_IDs, "symbol"
-#             )
-#         symbol_id = compute.generate_random_id(list_of_symbol_IDs)
-
-#         # https://neo4j.com/docs/python-manual/current/session-api/
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.add_symbol,
-#                 symbol_id,
-#                 symbol_name,
-#                 symbol_latex,
-#                 symbol_description,
-#                 symbol_requires_arguments,
-#                 symbol_reference,
-#                 author_name_latex,
-#                 # symbol_scope,
-#                 # symbol_variable_or_constant,
-#                 # symbol_domain,
-#                 # dimension_length,
-#                 # dimension_time,
-#                 # dimension_mass,
-#                 # dimension_temperature,
-#                 # dimension_electric_charge,
-#                 # dimension_amount_of_substance,
-#                 # dimension_luminous_intensity,
-#             )
-
-#         logger.info("[TRACE] to_add_symbol end " + str(trace_id))
-#         if symbol_requires_arguments:
-#             return redirect(
-#                 url_for("to_add_symbol_required_argument_count", symbol_id=symbol_id)
-#             )
-#         else:
-#             return redirect(
-#                 url_for("to_add_symbol_dimension_count", symbol_id=symbol_id)
-#             )
-
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         list_of_operation_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "operation"
-#         )
-#         query_time_dict["to_list_scalars: list_nodes_of_type operation"] = (
-#             round(time.time() - query_start_time,3)
-#         )
-
-#     (
-#         dict_of_expression_dicts_that_use_operation_symbol,
-#         query_time_dict,
-#     ) = compute.get_dict_of_expression_dicts_that_use_symbol(
-#         graphDB_Driver, query_time_dict, list_of_operation_dicts
-#     )
-#     (
-#         dict_of_derivation_dicts_that_use_operation_symbol,
-#         query_time_dict,
-#     ) = compute.get_dict_of_derivation_dicts_that_use_symbol(
-#         graphDB_Driver, query_time_dict, list_of_operation_dicts
-#     )
-
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         list_of_dimension0_symbol_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "scalar"
-#         )
-#         query_time_dict["to_list_scalars: list_nodes_of_type scalar"] = (
-#             round(time.time() - query_start_time,3)
-#         )
-
-#     (
-#         dict_of_expression_dicts_that_use_scalar_symbol,
-#         query_time_dict,
-#     ) = compute.get_dict_of_expression_dicts_that_use_symbol(
-#         graphDB_Driver, query_time_dict, list_of_dimension0_symbol_dicts
-#     )
-#     (
-#         dict_of_derivation_dicts_that_use_scalar_symbol,
-#         query_time_dict,
-#     ) = compute.get_dict_of_derivation_dicts_that_use_symbol(
-#         graphDB_Driver, query_time_dict, list_of_dimension0_symbol_dicts
-#     )
-
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         list_of_dimension1_symbol_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "vector"
-#         )
-#         query_time_dict["to_list_scalars: list_nodes_of_type vector"] = (
-#             round(time.time() - query_start_time,3)
-#         )
-
-#     (
-#         dict_of_expression_dicts_that_use_vector_symbol,
-#         query_time_dict,
-#     ) = compute.get_dict_of_expression_dicts_that_use_symbol(
-#         graphDB_Driver, query_time_dict, list_of_dimension1_symbol_dicts
-#     )
-#     (
-#         dict_of_derivation_dicts_that_use_vector_symbol,
-#         query_time_dict,
-#     ) = compute.get_dict_of_derivation_dicts_that_use_symbol(
-#         graphDB_Driver, query_time_dict, list_of_dimension1_symbol_dicts
-#     )
-
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         list_of_dimension2ormore_symbol_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "matrix"
-#         )
-#         query_time_dict["to_list_scalars: list_nodes_of_type matrix"] = (
-#             round(time.time() - query_start_time,3)
-#         )
-
-#     (
-#         dict_of_expression_dicts_that_use_matrix_symbol,
-#         query_time_dict,
-#     ) = compute.get_dict_of_expression_dicts_that_use_symbol(
-#         graphDB_Driver, query_time_dict, list_of_dimension2ormore_symbol_dicts
-#     )
-#     (
-#         dict_of_derivation_dicts_that_use_matrix_symbol,
-#         query_time_dict,
-#     ) = compute.get_dict_of_derivation_dicts_that_use_symbol(
-#         graphDB_Driver, query_time_dict, list_of_dimension2ormore_symbol_dicts
-#     )
-
-#     logger.info("[TRACE] to_add_symbol end " + str(trace_id))
-#     return render_template(
-#         "symbol_create.html",
-#         query_time_dict=query_time_dict,
-#         form_symbol_properties=web_form_symbol_properties,
-#         dict_of_expression_dicts_that_use_operation_symbol=dict_of_expression_dicts_that_use_symbol,
-#         dict_of_derivation_dicts_that_use_operation_symbol=dict_of_derivation_dicts_that_use_symbol,
-#         dict_of_expression_dicts_that_use_scalar_symbol=dict_of_expression_dicts_that_use_symbol,
-#         dict_of_derivation_dicts_that_use_scalar_symbol=dict_of_derivation_dicts_that_use_symbol,
-#         dict_of_expression_dicts_that_use_vector_symbol=dict_of_expression_dicts_that_use_symbol,
-#         dict_of_derivation_dicts_that_use_vector_symbol=dict_of_derivation_dicts_that_use_symbol,
-#         dict_of_expression_dicts_that_use_matrix_symbol=dict_of_expression_dicts_that_use_symbol,
-#         dict_of_derivation_dicts_that_use_matrix_symbol=dict_of_derivation_dicts_that_use_symbol,
-#         list_of_operation_dicts=list_of_operation_dicts,
-#         list_of_dimension0_symbol_dicts=list_of_dimension0_symbol_dicts,
-#         list_of_dimension1_symbol_dicts=list_of_dimension1_symbol_dicts,
-#         list_of_dimension2ormore_symbol_dicts=list_of_dimension2ormore_symbol_dicts,
-#     )
-
-
-# @web_app.route(
-#     "/new_symbol_required_argument_count/<symbol_id>", methods=["GET", "POST"]
-# )
-# def to_add_symbol_required_argument_count(symbol_id: unique_numeric_id_as_str) -> werkzeug.Response:
-#     """
-#     novel symbol: how many arguments?
-#     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
-#     """
-#     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] to_add_symbol_required_argument_count start " + str(trace_id))
-#     query_time_dict = {}  # type: query_timing_result_type
-
-#     symbol_dict = {}
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         symbol_dict = session.read_transaction(
-#             neo4j_query.get_node_properties, "symbol", symbol_id
-#         )
-#         query_time_dict[
-#             "to_add_symbol_required_argument_count: node_properties, symbol"
-#         ] = (round(time.time() - query_start_time,3))
-#     logger.info("symbol_dict:" + str(symbol_dict))
-
-#     web_form_symbol_properties = SpecifyNewSymbolArgumentCountForm(request.form)
-#     if request.method == "POST" and web_form_symbol_properties.validate():
-#         logger.info("request.form = " + str(request.form))
-
-#         argument_count = str(web_form_symbol_properties.argument_count.data).strip()
-#         # return redirect(url_for("to_list_symbols"))
-
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "symbol",
-#                 symbol_id,
-#                 "argument_count",
-#                 argument_count,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_required_argument_count: edit_node_property, argument_count"
-#             ] = (round(time.time() - query_start_time,3))
-
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         list_of_operation_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "operation"
-#         )
-#         query_time_dict["to_list_scalars: list_nodes_of_type operation"] = (
-#             round(time.time() - query_start_time,3)
-#         )
-
-#     (
-#         dict_of_expression_dicts_that_use_symbol,
-#         query_time_dict,
-#     ) = compute.get_dict_of_expression_dicts_that_use_symbol(
-#         graphDB_Driver, query_time_dict, list_of_operation_dicts
-#     )
-#     (
-#         dict_of_derivation_dicts_that_use_symbol,
-#         query_time_dict,
-#     ) = compute.get_dict_of_derivation_dicts_that_use_symbol(
-#         graphDB_Driver, query_time_dict, list_of_operation_dicts
-#     )
-
-#     logger.info("[TRACE] to_add_symbol_required_argument_count end " + str(trace_id))
-#     return render_template(
-#         "symbol_create_required_argument_count.html",
-#         form_symbol_properties=web_form_symbol_properties,
-#         dict_of_expression_dicts_that_use_symbol=dict_of_expression_dicts_that_use_symbol,
-#         dict_of_derivation_dicts_that_use_symbol=dict_of_derivation_dicts_that_use_symbol,
-#         symbol_dict=symbol_dict,
-#         query_time_dict=query_time_dict,
-#         list_of_operation_dicts=list_of_operation_dicts,
-#     )
-
-
-# @web_app.route(
-#     "/new_symbol_specify_dimension_count/<symbol_id>", methods=["GET", "POST"]
-# )
-# def to_add_symbol_dimension_count(symbol_id: unique_numeric_id_as_str):
-#     """
-#     novel symbol: how many dimensions?
-#     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
-#     """
-#     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] to_add_symbol_dimension_count start " + str(trace_id))
-#     query_time_dict = {}  # type: query_timing_result_type
-
-#     symbol_dict = {}
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         symbol_dict = session.read_transaction(
-#             neo4j_query.get_node_properties, "symbol", symbol_id
-#         )
-#         query_time_dict["to_add_symbol_dimension_count: node_properties, symbol"] = (
-#             round(time.time() - query_start_time,3)
-#         )
-#     logger.info("symbol_dict:" + str(symbol_dict))
-
-#     web_form_symbol_properties = SpecifyNewSymbolDimensionCountForm(request.form)
-#     if request.method == "POST" and web_form_symbol_properties.validate():
-#         logger.info("request.form = " + str(request.form))
-
-#         symbol_dimension_count = int(web_form_symbol_properties.dimension_count.data)
-
-#         logger.info("symbol_dimension_count=" + str(symbol_dimension_count))
-
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "symbol",
-#                 symbol_id,
-#                 "dimension_count",
-#                 symbol_dimension_count,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_dimension_count: edit_node_property, symbol"
-#             ] = (round(time.time() - query_start_time,3))
-
-#         if symbol_dimension_count == 0:  # scalar
-#             logger.info(
-#                 "[TRACE] to_add_symbol_dimension_count end; redirect to to_add_symbol_dimension0_properties"
-#                 + str(trace_id)
-#             )
-#             return redirect(
-#                 url_for("to_add_symbol_dimension0_properties", symbol_id=symbol_id)
-#             )
-#         elif symbol_dimension_count == 1:  # vector
-#             logger.info(
-#                 "[TRACE] to_add_symbol_dimension_count end; redirect to to_add_symbol_dimension1_properties"
-#                 + str(trace_id)
-#             )
-#             return redirect(
-#                 url_for("to_add_symbol_dimension1_properties", symbol_id=symbol_id)
-#             )
-#         elif symbol_dimension_count == 2:  # vector
-#             logger.info(
-#                 "[TRACE] to_add_symbol_dimension_count end; redirect to to_add_symbol_dimension2_properties"
-#                 + str(trace_id)
-#             )
-#             return redirect(
-#                 url_for("to_add_symbol_dimension2_properties", symbol_id=symbol_id)
-#             )
-
-#     logger.info(
-#         "[TRACE] to_add_symbol_dimension_count end; render template "
-#         + str(trace_id)
-#     )
-#     return render_template(
-#         "symbol_create_specify_dimension_count.html",
-#         form_symbol_properties=web_form_symbol_properties,
-#         symbol_dict=symbol_dict,
-#         query_time_dict=query_time_dict,
-#         # list_of_dimension0_symbol_dicts=list_of_dimension0_symbol_dicts,
-#         # list_of_dimension1_symbol_dicts=list_of_dimension1_symbol_dicts,
-#         # list_of_dimension2ormore_symbol_dicts=list_of_dimension2ormore_symbol_dicts,
-#     )
-
-
-# @web_app.route("/new_symbol_dimension0_properties/<scalar_id>", methods=["GET", "POST"])
-# def to_add_symbol_dimension0_properties(scalar_id: unique_numeric_id_as_str):
-#     """
-#     novel symbol: how many dimensions?
-#     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
-#     """
-#     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] to_add_symbol_dimension0_properties start " + str(trace_id))
-#     query_time_dict = {}  # type: query_timing_result_type
-
-#     symbol_dict = {}
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         symbol_dict = session.read_transaction(
-#             neo4j_query.get_node_properties, "scalar", scalar_id
-#         )
-#         query_time_dict[
-#             "to_add_symbol_dimension0_properties: node_properties, symbol"
-#         ] = (round(time.time() - query_start_time,3))
-#     logger.info("symbol_dict:" + str(symbol_dict))
-
-#     web_form_symbol_properties = SpecifyNewSymbolDimension0Form(request.form)
-#     if request.method == "POST" and web_form_symbol_properties.validate():
-#         logger.info("request.form = " + str(request.form))
-
-#         symbol_scope = str(web_form_symbol_properties.symbol_scope.data).strip()
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "scalar",
-#                 scalar_id,
-#                 "scope",
-#                 symbol_scope,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_dimension0_properties: edit_node_property, symbol_scope"
-#             ] = (round(time.time() - query_start_time,3))
-
-#         symbol_variable_or_constant = str(
-#             web_form_symbol_properties.symbol_variable_or_constant.data
-#         ).strip()
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "scalar",
-#                 scalar_id,
-#                 "variable_or_constant",
-#                 symbol_variable_or_constant,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_dimension0_properties: edit_node_property, symbol_variable_or_constant"
-#             ] = (round(time.time() - query_start_time,3))
-
-#         symbol_domain = str(web_form_symbol_properties.symbol_domain.data).strip()
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "scalar",
-#                 scalar_id,
-#                 "domain",
-#                 symbol_domain,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_dimension0_properties: edit_node_property, symbol_domain"
-#             ] = (round(time.time() - query_start_time,3))
-
-#         dimension_length = int(web_form_symbol_properties.dimension_length.data)
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "scalar",
-#                 scalar_id,
-#                 "dimension_length",
-#                 dimension_length,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_length"
-#             ] = (round(time.time() - query_start_time,3))
-
-#         dimension_time = int(web_form_symbol_properties.dimension_time.data)
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "scalar",
-#                 scalar_id,
-#                 "dimension_time",
-#                 dimension_time,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_time"
-#             ] = (round(time.time() - query_start_time,3))
-
-#         dimension_mass = int(web_form_symbol_properties.dimension_mass.data)
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "scalar",
-#                 scalar_id,
-#                 "dimension_mass",
-#                 dimension_mass,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_mass"
-#             ] = (round(time.time() - query_start_time,3))
-
-#         dimension_temperature = int(
-#             web_form_symbol_properties.dimension_temperature.data
-#         )
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "scalar",
-#                 scalar_id,
-#                 "dimension_temperature",
-#                 dimension_temperature,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_temperature"
-#             ] = (round(time.time() - query_start_time,3))
-
-#         dimension_electric_charge = int(
-#             web_form_symbol_properties.dimension_electric_charge.data
-#         )
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "scalar",
-#                 scalar_id,
-#                 "dimension_electric_charge",
-#                 dimension_electric_charge,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_electric_charge"
-#             ] = (round(time.time() - query_start_time,3))
-
-#         dimension_amount_of_substance = int(
-#             web_form_symbol_properties.dimension_amount_of_substance.data
-#         )
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "scalar",
-#                 scalar_id,
-#                 "dimension_amount_of_substance",
-#                 dimension_amount_of_substance,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_amount_of_substance"
-#             ] = (round(time.time() - query_start_time,3))
-
-#         dimension_luminous_intensity = int(
-#             web_form_symbol_properties.dimension_luminous_intensity.data
-#         )
-#         with graphDB_Driver.session() as session:
-#             query_start_time = time.time()
-#             session.write_transaction(
-#                 neo4j_query.edit_node_property,
-#                 "scalar",
-#                 scalar_id,
-#                 "dimension_luminous_intensity",
-#                 dimension_luminous_intensity,
-#             )
-#             query_time_dict[
-#                 "to_add_symbol_dimension0_properties: edit_node_property, dimension_luminous_intensity"
-#             ] = (round(time.time() - query_start_time,3))
-
-#         return redirect(url_for("to_list_scalars"))
-
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         list_of_dimension0_symbol_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "scalar"
-#         )
-#         query_time_dict["to_list_scalars: list_nodes_of_type scalar"] = (
-#             round(time.time() - query_start_time,3)
-#         )
-
-#     logger.info("[TRACE] to_add_symbol_dimension0_properties end " + str(trace_id))
-#     return render_template(
-#         "symbol_create_dimension0.html",
-#         form_symbol_properties=web_form_symbol_properties,
-#         symbol_dict=symbol_dict,
-#         query_time_dict=query_time_dict,
-#         list_of_dimension0_symbol_dicts=list_of_dimension0_symbol_dicts,
-#     )
-
-
-# @web_app.route("/new_symbol_dimension1_properties/<vector_id>", methods=["GET", "POST"])
-# def to_add_symbol_dimension1_properties(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
-#     """
-
-#     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
-#     """
-#     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] to_add_symbol_dimension1_properties start " + str(trace_id))
-#     query_time_dict = {}  # type: query_timing_result_type
-
-#     symbol_dict = {}
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         symbol_dict = session.read_transaction(
-#             neo4j_query.get_node_properties, "vector", vector_id
-#         )
-#         query_time_dict[
-#             "to_add_symbol_dimension1_properties: node_properties, symbol"
-#         ] = (round(time.time() - query_start_time,3))
-#     logger.info("symbol_dict:" + str(symbol_dict))
-
-#     web_form_symbol_properties = SpecifyNewSymbolDimension1Form(request.form)
-#     if request.method == "POST" and web_form_symbol_properties.validate():
-#         logger.info("request.form = " + str(request.form))
-
-#         symbol_is_composite = web_form_symbol_properties.symbol_is_composite.data
-#         logger.info("symbol_is_composite=" + str(symbol_is_composite))
-
-#         return redirect(url_for("to_list_vectors"))
-
-#     logger.info("[TRACE] to_add_symbol_dimension1_properties end " + str(trace_id))
-#     return render_template(
-#         "symbol_create_dimension1.html",
-#         form_symbol_properties=web_form_symbol_properties,
-#         symbol_dict=symbol_dict,
-#         query_time_dict=query_time_dict,
-#     )
-
-
-# @web_app.route("/new_symbol_dimension2_properties/<matrix_id>", methods=["GET", "POST"])
-# def to_add_symbol_dimension2_properties(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
-#     """
-
-#     see https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
-#     """
-#     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] to_add_symbol_dimension2_properties start " + str(trace_id))
-#     query_time_dict = {}  # type: query_timing_result_type
-
-#     symbol_dict = {}
-#     with graphDB_Driver.session() as session:
-#         query_start_time = time.time()
-#         symbol_dict = session.read_transaction(
-#             neo4j_query.get_node_properties, "matrix", matrix_id
-#         )
-#         query_time_dict[
-#             "to_add_symbol_dimension2_properties: node_properties, symbol"
-#         ] = (round(time.time() - query_start_time,3))
-#     logger.info("symbol_dict:" + str(symbol_dict))
-
-#     web_form_symbol_properties = SpecifyNewSymbolDimension2Form(request.form)
-#     if request.method == "POST" and web_form_symbol_properties.validate():
-#         logger.info("request.form = " + str(request.form))
-
-#         symbol_is_composite = web_form_symbol_properties.symbol_is_composite.data
-#         logger.info("symbol_is_composite=" + str(symbol_is_composite))
-
-#         return redirect(url_for("to_list_matrices"))
-
-#     logger.info("[TRACE] to_add_symbol_dimension2_properties end " + str(trace_id))
-#     return render_template(
-#         "symbol_create_dimension2.html",
-#         form_symbol_properties=web_form_symbol_properties,
-#         symbol_dict=symbol_dict,
-#         query_time_dict=query_time_dict,
-#     )
 
 
 @web_app.route("/new_operation", methods=["GET", "POST"])
@@ -4652,12 +4007,7 @@ def to_add_step_select_expressions(
     here we assume all expressions already exist
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] to_add_step_select_expressions start "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_add_step_select_expressions start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("derivation_id:" + str(derivation_id))
@@ -4831,12 +4181,7 @@ def to_add_step_select_expressions(
         )
 
     # first visit to this page
-    logger.info(
-        "[TRACE] to_add_step_select_expressions end "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_add_step_select_expressions end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/new_step_select_expressions_for_inference_rule.html",
         query_time_dict=query_time_dict,
@@ -4925,7 +4270,8 @@ def to_add_symbols_and_operations_for_expression(
             cleaned_latex_str_lhs
         )
     except Exception as e:
-        flash(str(e))
+        flash("sympy_expr_lhs: " + str(e))
+        logger.critical("sympy_expr_lhs: " + str(e))
         sympy_expr_lhs = None
     # ERROR: SymPy can't convert "="
     # sympy_expr_relation = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
@@ -4936,7 +4282,8 @@ def to_add_symbols_and_operations_for_expression(
             cleaned_latex_str_rhs
         )
     except Exception as e:
-        flash(str(e))
+        flash("sympy_expr_rhs: " + str(e))
+        logger.critical("sympy_expr_rhs: " + str(e))
         sympy_expr_rhs = None
     logger.info("sympy_expr_lhs=" + str(sympy_expr_lhs))
     # logger.info("sympy_expr_relation=", str(sympy_expr_relation))
@@ -5088,16 +4435,12 @@ def to_add_symbols_and_operations_for_expression(
 
                 symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
 
-        logger.info(
-            "to_add_symbols_and_operations_for_expression symbol_id_dict="
-            + str(symbol_id_dict)
-        )
+        logger.info(" symbol_id_dict=" + str(symbol_id_dict))
         # example output: {'a': '5638458', 'b': '7152159'}
+        #         or      {'m': '3973021', '\\vec{a}': '3506734', '\\vec{F}': '3235432'}
 
-        logger.info(
-            "[TRACE] to_add_symbols_and_operations_for_expression end " + str(trace_id)
-        )
         if next_page_enter_SymPy_and_Lean:
+            logger.info("[TRACE] end " + str(trace_id))
             return redirect(
                 url_for(
                     "to_add_sympy_and_lean_for_expression",
@@ -5106,8 +4449,10 @@ def to_add_symbols_and_operations_for_expression(
                 )
             )
         else:
+            logger.info("[TRACE] end " + str(trace_id))
             return redirect(url_for("to_list_expressions"))
 
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/expression_create_symbols_and_operations.html",
         query_time_dict=query_time_dict,
@@ -5120,7 +4465,7 @@ def to_add_symbols_and_operations_for_expression(
 
 
 @web_app.route(
-    "/sympy_and_latex_for_expression/<expression_id>/<symbol_id_dict>",
+    "/sympy_and_lean_for_expression/<expression_id>/<symbol_id_dict>",
     methods=["GET", "POST"],
 )
 def to_add_sympy_and_lean_for_expression(
@@ -5128,20 +4473,23 @@ def to_add_sympy_and_lean_for_expression(
     symbol_id_dict: dict,
 ) -> werkzeug.Response:
     """
-    derivation_id is the numeric ID of the derivation being edited
+    add sympy and lean for expression_id
+
+    example symbol_id_dict
+        {'a': '5638458', 'b': '7152159'}
+    or
+        {'m': '3973021', '\\vec{a}': '3506734', '\\vec{F}': '3235432'}
+
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_sympy_and_lean_for_expression start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    logger.info(
-        "to_add_sympy_and_lean_for_expression: type(symbol_id_dict)="
-        + str(type(symbol_id_dict))
-    )
+    logger.info("type(symbol_id_dict)=" + str(type(symbol_id_dict)))
+    # TODO this is a security risk - evaluating user-provided string from URL
+    # To fix this, pass the arguments as key-value pairs ?a=5638458&b=7152159
     symbol_id_dict = eval(symbol_id_dict)
-    logger.info(
-        "to_add_sympy_and_lean_for_expression: symbol_id_dict=" + str(symbol_id_dict)
-    )
+    logger.info("symbol_id_dict=" + str(symbol_id_dict))
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -5151,52 +4499,39 @@ def to_add_sympy_and_lean_for_expression(
         query_time_dict[
             "pdg_app/to_add_sympy_and_lean_for_expression, node_properties" + trace_id
         ] = round(time.time() - query_start_time, 3)
-    logger.info(
-        "to_add_sympy_and_lean_for_expression: expression_dict=" + str(expression_dict)
-    )
+    logger.info("expression_dict=" + str(expression_dict))
 
-    logger.info(
-        "to_add_sympy_and_lean_for_expression: symbol_id_dict=" + str(symbol_id_dict)
-    )
-    # symbol_id_dict= {'a': '5638458', 'b': '7152159'}
-
-    # provide a guess for the SymPy based on the Latex provided
-
+    # guess the SymPy based on the Latex provided
     cleaned_latex_lhs_str = compute.remove_latex_presention_markings(
         expression_dict["latex_lhs"]
     )
+    logger.info("cleaned_latex_lhs_str=" + str(cleaned_latex_lhs_str))
+
     cleaned_latex_rhs_str = compute.remove_latex_presention_markings(
         expression_dict["latex_rhs"]
     )
-    logger.info(
-        "to_add_sympy_and_lean_for_expression: cleaned_latex_str="
-        + str(cleaned_latex_lhs_str)
-        + " "
-        + str(cleaned_latex_rhs_str)
-    )
+    logger.info("cleaned_latex_rhs_str=" + str(cleaned_latex_rhs_str))
     try:
         sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
             cleaned_latex_lhs_str
         )
     except Exception as e:
-        logger.critical(str(e))
-        flash(str(e))
+        logger.critical("sympy_expr_lhs: " + str(e))
+        flash("sympy_expr_lhs: " + str(e))
         sympy_expr_lhs = None
+    logger.info("sympy_expr_lhs=" + str(sympy_expr_lhs))
+
     try:
         sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
             cleaned_latex_rhs_str
         )
     except Exception as e:
-        logger.critical(str(e))
-        flash(str(e))
+        logger.critical("sympy_expr_rhs: " + str(e))
+        flash("sympy_expr_rhs: " + str(e))
         sympy_expr_rhs = None
 
-    logger.info(
-        "to_add_sympy_and_lean_for_expression: sympy_expr="
-        + str(sympy_expr_lhs)
-        + " "
-        + str(sympy_expr_rhs)
-    )
+    logger.info("sympy_expr_rhs=" + str(sympy_expr_rhs))
+
     # list_of_sympy_symbols = latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr)
     # logger.info("list_of_sympy_symbols=",list_of_sympy_symbols)
 
@@ -5207,23 +4542,20 @@ def to_add_sympy_and_lean_for_expression(
             sympy_expr_lhs, symbol_id_dict
         )
     except Exception as e:
-        logger.critical(str(e))
-        flash(str(e))
+        logger.critical("revised_expr_lhs = " + str(e))
+        flash("revised_expr_lhs: " + str(e))
         revised_expr_lhs = None
     try:
         revised_expr_rhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
             sympy_expr_rhs, symbol_id_dict
         )
     except Exception as e:
-        logger.critical(str(e))
-        flash(str(e))
+        logger.critical("revised_expr_rhs = " + str(e))
+        flash("revised_expr_rhs: " + str(e))
         revised_expr_lhs = None
 
     logger.info(
-        "to_add_sympy_and_lean_for_expression: revised_expr_lhs,rhs="
-        + str(revised_expr_lhs)
-        + " "
-        + str(revised_expr_rhs)
+        "revised_expr_lhs,rhs=" + str(revised_expr_lhs) + " " + str(revised_expr_rhs)
     )
 
     if revised_expr_lhs:
@@ -5250,20 +4582,14 @@ def to_add_sympy_and_lean_for_expression(
 
     web_form = SpecifyNewExpressionSympyLeanForm(request.form)
     if request.method == "POST":
-        logger.info(
-            "to_add_sympy_and_lean_for_expression: request.form = " + str(request.form)
-        )
+        logger.info("request.form = " + str(request.form))
 
         sympy_str_lhs = str(web_form.sympy_str_lhs.data).strip()
         sympy_str_rhs = str(web_form.sympy_str_rhs.data).strip()
         lean_str = str(web_form.lean_str.data).strip()
 
-        logger.info(
-            "to_add_sympy_and_lean_for_expression: submitted sympy_str="
-            + str(sympy_str_lhs)
-            + " "
-            + str(sympy_str_rhs)
-        )
+        logger.info("submitted sympy_str_lhs = " + str(sympy_str_lhs))
+        logger.info("submitted sympy_str_rhs = " + str(sympy_str_rhs))
 
         if expression_dict["latex_relation"] == "=":
             sympy_str_combined = "Eq(" + sympy_str_lhs + "," + sympy_str_rhs + ")"
@@ -5339,7 +4665,7 @@ def to_add_sympy_and_lean_for_expression(
                 )
             )
 
-        logger.info("[TRACE] to_add_sympy_and_lean_for_expression end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_list_expressions"))
 
     # set the default text
@@ -5377,12 +4703,7 @@ def to_add_symbols_and_operations_for_feed(
     r_{\rm Earth} = 6
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] symbols_and_operations_for_feed start "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     # get the Latex for this expression_id
@@ -5561,12 +4882,7 @@ def to_add_sympy_and_lean_for_feed(
     derivation_id is the numeric ID of the derivation being edited
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] to_add_sympy_and_lean_for_feed start "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_add_sympy_and_lean_for_feed start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info(
@@ -5678,12 +4994,7 @@ def to_add_sympy_and_lean_for_feed(
         return redirect(url_for("to_list_feeds"))
 
     web_form.sympy_str.data = revised_feed_with_str
-    logger.info(
-        "[TRACE] to_add_sympy_and_lean_for_feed end "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_add_sympy_and_lean_for_feed end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/feed_create_sympy_and_lean.html",
         query_time_dict=query_time_dict,
@@ -5821,12 +5132,7 @@ def to_add_inference_rule() -> werkzeug.Response:
                 now_str=now_str,
                 author_name_latex=author_name_latex,
             )
-        logger.info(
-            "[TRACE] to_add_inference_rule end "
-            + str(trace_id)
-            + " "
-            + str(time.time())
-        )
+        logger.info("[TRACE] to_add_inference_rule end " + str(trace_id))
         return redirect(url_for("to_list_inference_rules"))
 
     logger.info("[TRACE] to_add_inference_rule end " + str(trace_id))
@@ -6445,7 +5751,7 @@ def to_list_relations() -> werkzeug.Response:
     logger.info("list_of_relation_dicts: " + str(list_of_relation_dicts))
     # no relations exist, so create one
     if len(list_of_relation_dicts) == 0:
-        redirect(url_for("to_add_relation"))
+        return redirect(url_for("to_add_relation"))
 
     dict_of_expression_dicts_that_use_relation = {}  # type: Dict[str,list]
     for this_relation_dict in list_of_relation_dicts:
@@ -6481,12 +5787,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
     >>> to_list_constant_values()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] to_list_constant_values start "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_list_constant_values start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6529,12 +5830,7 @@ def to_edit_constant_value_and_units(
     >>> to_edit_constant_value_and_units()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] to_edit_constant_value_and_units start "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_edit_constant_value_and_units start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6570,12 +5866,7 @@ def to_edit_constant_value_and_units(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info(
-        "[TRACE] to_edit_constant_value_and_units start "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_edit_constant_value_and_units start " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_constant_values_edit.html",
         query_time_dict=query_time_dict,
@@ -6677,7 +5968,7 @@ def to_list_vectors() -> str:
     logger.info("list_of_vector_dicts: " + str(list_of_vector_dicts))
 
     if len(list_of_vector_dicts) == 0:
-        redirect(url_for("to_add_symbol_vector"))
+        return redirect(url_for("to_add_symbol_vector"))
 
     dict_of_expression_dicts_that_use_vector = {}  # type: Dict[str,list]
     for this_vector_dict in list_of_vector_dicts:
@@ -6726,7 +6017,7 @@ def to_list_matrices() -> str:
         ] = round(time.time() - query_start_time, 3)
 
     if len(list_of_matrix_dicts) == 0:
-        redirect(url_for("to_add_symbol_matrix"))
+        return redirect(url_for("to_add_symbol_matrix"))
 
     dict_of_expression_dicts_that_use_matrix = {}  # type: Dict[str,list]
     for this_matrix_dict in list_of_matrix_dicts:
@@ -6781,10 +6072,8 @@ def to_list_expressions() -> str:
         ] = round(time.time() - query_start_time, 3)
     logger.info("list_of_expression_dicts = " + str(list_of_expression_dicts))
 
-    logger.info("len(list_of_expression_dicts)=" + str(len(list_of_expression_dicts)))
     if len(list_of_expression_dicts) == 0:
-        logger.info("redirecting to_add_expression")
-        redirect(url_for("to_add_expression"))
+        return redirect(url_for("to_add_expression"))
 
     symbol_IDs_per_expression_id = (
         {}
@@ -6798,17 +6087,12 @@ def to_list_expressions() -> str:
                 this_expression_dict["id"],
             )
         )
-    logger.info(
-        "to_list_expressions: symbol_IDs_per_expression_id="
-        + str(symbol_IDs_per_expression_id)
-    )
+    logger.info("symbol_IDs_per_expression_id=" + str(symbol_IDs_per_expression_id))
 
     dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
         graphDB_Driver, query_time_dict
     )
-    logger.info(
-        "to_list_expressions: dict_of_all_symbol_dicts=" + str(dict_of_all_symbol_dicts)
-    )
+    logger.info("dict_of_all_symbol_dicts=" + str(dict_of_all_symbol_dicts))
 
     dimensional_consistency_per_expression_id, query_time_dict = (
         compute.get_dimensional_consistency_per_expression_id(
@@ -6873,7 +6157,7 @@ def to_list_derivations() -> str:
     logger.info("    list_of_derivation_dicts = " + str(list_of_derivation_dicts))
 
     if len(list_of_derivation_dicts) == 0:
-        redirect(url_for("to_add_derivation"))
+        return redirect(url_for("to_add_derivation"))
 
     number_of_steps_per_derivation = {}
     for derivation_dict in list_of_derivation_dicts:
@@ -6912,12 +6196,7 @@ def to_list_inference_rules() -> str:
     >>> to_show_all_inference_rules()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] to_list_inference_rules start "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_list_inference_rules start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_inference_rule_dicts = []
@@ -6957,12 +6236,7 @@ def to_delete_graph_content() -> werkzeug.Response:
     https://neo4j.com/developer/kb/large-delete-transaction-best-practices-in-neo4j/
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] to_delete_graph_content start "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] to_delete_graph_content start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     # https://neo4j.com/docs/python-manual/current/session-api/
@@ -7176,12 +6450,7 @@ def search_redirect_to_google():
     This search only works via webform since the value is grabbed from form value "search"
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] search_redirect_to_google start "
-        + str(trace_id)
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] search_redirect_to_google start " + str(trace_id))
     logger.info(
         "request.url: " + str(request.url)
     )  # https://stackoverflow.com/a/46176337/1164295
@@ -7877,8 +7146,6 @@ def to_spectrum_of_precision_layer(which_layer):
         return render_template("jinja2_pages/layers_overview.html", title=page_title)
     return render_template("jinja2_pages/layers_overview.html", title=page_title)
 
-
-###########################################################################
 
 ###########################################################################
 
