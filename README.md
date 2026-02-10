@@ -15,11 +15,20 @@ The website and back-end work. The Docker images are not currently in use for <h
 
 # Quickstart
 
+Launching locally will require generating the certificates for https. See <certs/README.md>
+
 To start the containers, run
 ```bash
 make up
 ```
 and then, in a web browser, go to <http://localhost:5000>
+
+
+Some pages require Google authentication. You can either
+- edit your Google Auth Platform Clients on <https://console.cloud.google.com/>
+or 
+- remove the `@login_required` decorator in `pdg_app.py`
+
 
 
 Because software is in Docker containers (for reproducibility), the versions of the Docker software you're using matter. The software in this repo has been tested with
@@ -83,6 +92,8 @@ To enter the container for debugging purposes,
 ```bash
 docker exec -it `docker ps | grep ui_v8_website_flask_neo4j_webserver | cut -d' ' -f1` /bin/bash
 ```
+
+Stuck? Contact the author for help! (See the bottom of <https://allofphysics.com/>.)
 
 ## Contributing
 
