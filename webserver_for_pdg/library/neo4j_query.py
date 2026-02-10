@@ -40,16 +40,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def list_IDs(tx, node_type: str) -> List[str]:
+def get_list_IDs(tx, node_type: str) -> List[str]:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a list of all PDG IDs for the nodes
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] list_IDs start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
-    logger.info("neo4j_query/list_IDs: node_type=" + str(node_type))
+    logger.info("node_type=" + str(node_type))
     assert node_type in list_of_valid.node_types
 
     list_of_IDs = []  # type: List[str]
@@ -57,7 +57,7 @@ def list_IDs(tx, node_type: str) -> List[str]:
         # print(result.data())
         list_of_IDs.append(result.data()["n.id"])
 
-    logger.info("[TRACE] list_IDs end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return list_of_IDs
 
 
@@ -68,12 +68,12 @@ def apoc_export_csv(tx, output_filename: str):
     https://neo4j.com/docs/apoc/current/overview/apoc.export/apoc.export.csv.all/
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] apoc_export_csv start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     for result in tx.run(
         "CALL apoc.export.csv.all('" + output_filename + "',{useTypes:true})"
     ):
         pass
-    logger.info("[TRACE] apoc_export_csv end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return result
 
 
@@ -82,12 +82,12 @@ def apoc_export_graphml(tx, output_filename: str):
     https://neo4j.com/docs/apoc/current/overview/apoc.export/
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] apoc_export_graphml start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     for result in tx.run(
         "CALL apoc.export.graphml.all('" + output_filename + "',{useTypes:true})"
     ):
         pass
-    logger.info("[TRACE] apoc_export_graphml end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return result
 
 
@@ -104,14 +104,14 @@ def apoc_export_json(tx, output_filename: str):
     >>> apoc_export_json(tx)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] apoc_export_json start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     for result in tx.run(
         "CALL apoc.export.json.all('" + output_filename + "',{useTypes:true})"
     ):
         pass
 
-    logger.info("[TRACE] apoc_export_json end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return result
 
 
@@ -127,7 +127,7 @@ def apoc_export_cypher(tx, output_filename: str):
     >>> apoc_export_cypher(tx)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] apoc_export_cypher start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # "cypher.all" produces 1 file with constraints
     # https://neo4j.com/labs/apoc/4.4/overview/apoc.export/apoc.export.cypher.all/
@@ -146,7 +146,7 @@ def apoc_export_cypher(tx, output_filename: str):
     ):
         pass
 
-    logger.info("[TRACE] apoc_export_cypher end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return result
 
 
@@ -171,14 +171,14 @@ def constrain_unique_id(tx) -> None:
         # except Exception as err:
         #     print("neo4j/constrain_unique_id: WARNING:", err)
 
-    logger.info("[TRACE] constrain_unique_id end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
 def get_relation_latex(tx, relation_id: str):
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] get_relation_latex start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # string concatenation is a security risk (Cypher injection)
     # result = tx.run(
@@ -196,7 +196,7 @@ def get_relation_latex(tx, relation_id: str):
         relation_latex = list_of_dicts[0]["r.latex"]
     else:
         raise Exception("relation_id not found")
-    logger.info("[TRACE] get_relation_latex end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return relation_latex
 
 
@@ -205,9 +205,7 @@ def get_scalar_id_that_has_value_and_units_id(tx, value_and_units_id: str):
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] get_scalar_id_that_has_value_and_units_id start " + str(trace_id)
-    )
+    logger.info("[TRACE] start " + str(trace_id))
     result = tx.run(
         "MATCH (s:scalar)-[]->(v:value_with_units) WHERE v.id='"
         + value_and_units_id
@@ -215,13 +213,9 @@ def get_scalar_id_that_has_value_and_units_id(tx, value_and_units_id: str):
     )
 
     scalar_id = result.data()
-    logger.info(
-        "neo4j_query/get_scalar_id_that_has_value_and_units_id: scalar_id" + scalar_id
-    )
+    logger.info(" scalar_id" + scalar_id)
 
-    logger.info(
-        "[TRACE] get_scalar_id_that_has_value_and_units_id end " + str(trace_id)
-    )
+    logger.info("[TRACE] end " + str(trace_id))
     return scalar_id
 
 
@@ -237,18 +231,13 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     >>> get_list_of_symbol_IDs_in_expression_or_feed()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] get_list_of_symbol_IDs_in_expression_or_feed start " + str(trace_id)
-    )
+    logger.info("[TRACE] start " + str(trace_id))
 
-    logger.info(
-        "neo4j_query/get_list_of_symbol_IDs_in_expression_or_feed: symbol_category="
-        + symbol_category
-    )
+    logger.info("symbol_category=" + symbol_category)
 
-    logger.info("neo4j_query/list_IDs: expression_or_feed=" + expression_or_feed)
+    logger.info("expression_or_feed=" + expression_or_feed)
     assert expression_or_feed in ["expression", "feed"]
-    logger.info("neo4j_query/list_IDs: symbol_category=" + symbol_category)
+    logger.info("symbol_category=" + symbol_category)
     assert symbol_category in list_of_valid.symbol_categories
 
     symbol_list = []  # type: List[str]
@@ -269,9 +258,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
         + str(symbol_list)
     )
 
-    logger.info(
-        "[TRACE] get_list_of_symbol_IDs_in_expression_or_feed end " + str(trace_id)
-    )
+    logger.info("[TRACE] end " + str(trace_id))
     return symbol_list
 
 
@@ -316,7 +303,8 @@ def get_list_node_dicts_of_type(tx, node_type: str) -> list:
     logger.info("[TRACE] start " + str(trace_id))
 
     # must be one of these node types. See also 'schema.log' file
-    logger.info("neo4j_query/get_list_node_dicts_of_type:  node type:" + node_type)
+    logger.info("node type:" + node_type)
+
     assert node_type in list_of_valid.node_types
 
     node_list = []  # type: List[dict]
@@ -328,7 +316,7 @@ def get_list_node_dicts_of_type(tx, node_type: str) -> list:
     return node_list
 
 
-def count_nodes_of_type(tx, node_type: str) -> int:
+def get_count_nodes_of_type(tx, node_type: str) -> int:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a count of all nodes
@@ -339,7 +327,7 @@ def count_nodes_of_type(tx, node_type: str) -> int:
     logger.info("[TRACE] start " + str(trace_id))
 
     # must be one of these node types. See also 'schema.log' file
-    logger.info("neo4j_query/count_nodes_of_type:  node type:" + node_type)
+    logger.info("neo4j_query/get_count_nodes_of_type:  node type:" + node_type)
     assert node_type in list_of_valid.node_types
 
     node_count = -1
@@ -370,7 +358,7 @@ def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
     return list_of_derivation_dicts
 
 
-def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
+def get_derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
     """
     which derivations contain this inference rule?
 
@@ -379,10 +367,7 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
 
-    logger.info(
-        "neo4j_query/derivations_that_use_inference_rule: inference_rule_id="
-        + inference_rule_id
-    )
+    logger.info("inference_rule_id=" + inference_rule_id)
 
     list_of_derivation_dicts = []  # type: List[dict]
     for result in tx.run(
@@ -400,7 +385,7 @@ def derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
     #     list_of_derivation_dicts,
     # )
 
-    logger.info("[TRACE] derivations_that_use_inference_rule end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return list_of_derivation_dicts
 
 
@@ -415,10 +400,7 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
 
-    logger.info(
-        "neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_category="
-        + str(symbol_category)
-    )
+    logger.info("symbol_category=" + str(symbol_category))
 
     assert symbol_category in list_of_valid.symbol_categories
 
@@ -433,12 +415,8 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(
     ):
         list_of_expression_dicts.append(result.data()["e"])
 
-    logger.info(
-        "neo4j_query/get_list_of_expression_dicts_that_use_symbol_id_by_category: symbol_id="
-        + symbol_id
-        + "list_of_expressions="
-        + str(list_of_expression_dicts)
-    )
+    logger.info("symbol_id = " + symbol_id)
+    logger.info("list_of_expressions = " + str(list_of_expression_dicts))
 
     logger.info("[TRACE] end " + str(trace_id))
     return list_of_expression_dicts
@@ -539,7 +517,13 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
     return list_of_step_dicts
 
 
-def step_has_sequence_index(tx, step_id: str) -> int:
+def get_list_of_symbol_IDs_per_derivation(tx, derivation_id: str):
+    """ """
+    # TODO
+    return list_of_symbol_IDs
+
+
+def get_step_has_sequence_index(tx, step_id: str) -> int:
     """
     >>> step_has_sequence_index()
     """
@@ -559,7 +543,7 @@ def step_has_sequence_index(tx, step_id: str) -> int:
     return sequence_index
 
 
-def step_has_inference_rule(tx, step_id: str):
+def get_step_has_inference_rule(tx, step_id: str):
     """
     use case: when displaying a derivation, user wants to see inference rule per step
 
@@ -1062,6 +1046,34 @@ def disconnect_symbol_from_feed(
 
     logger.info("[TRACE]  end " + str(trace_id))
     return
+
+
+def get_node_labels_from_property(tx, property_key: str, property_value: str):
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE]  start " + str(trace_id))
+
+    # UNSAFE:
+    # result = tx.run(
+    # "MATCH (n)"
+    # "WHERE n."+property_key+" = '"+property_value+"'"
+    # "RETURN DISTINCT labels(n) AS NodeLabel, n"
+    # )
+
+    # https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%22116092343D0xessOtQA9vha4u7SzIrLno%22%5D,%22action%22:%22open%22,%22userId%22:%22101193243042884231058%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing
+    # use n[$key] to access the property dynamically
+    # use $value to pass the value safely
+    query = """
+    MATCH (n)
+    WHERE n[$key] = $value
+    RETURN DISTINCT labels(n) AS NodeLabel, n
+    """
+
+    # Pass both variables as parameters in the dictionary
+    result = tx.run(query, key=property_key, value=property_value)
+
+    logger.info("[TRACE]  end " + str(trace_id))
+    return result.data()
 
 
 def add_symbol_to_expression_or_feed(
@@ -2078,7 +2090,7 @@ def add_relation_symbol(
     return
 
 
-def list_of_all_node_IDs_and_labels(tx) -> list:
+def get_list_of_all_node_IDs_and_labels(tx) -> list:
     """
     >>> list_of_all_nodes()
     """

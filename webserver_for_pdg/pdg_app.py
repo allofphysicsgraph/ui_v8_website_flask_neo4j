@@ -209,7 +209,11 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+# When a Python file (a module) is imported, the Python interpreter executes every line of code in that file, from top to bottom.
+# graphDB_Driver isn't a function
 from initialize_neo4j import graphDB_Driver
+
+# look at `flask_critical_and_error_and_warning_and_info.log` and you'll see the initialize_neo4j is the first entry
 
 import initialize_version_log
 
@@ -1266,7 +1270,7 @@ def to_navigation():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         number_of_derivations = session.read_transaction(
-            neo4j_query.count_nodes_of_type, "derivation"
+            neo4j_query.get_count_nodes_of_type, "derivation"
         )
         query_time_dict["pdg_app/main: count_nodes_of_type, derivation" + trace_id] = (
             round(time.time() - query_start_time, 3)
@@ -1274,7 +1278,7 @@ def to_navigation():
 
         query_start_time = time.time()
         number_of_inference_rules = session.read_transaction(
-            neo4j_query.count_nodes_of_type, "inference_rule"
+            neo4j_query.get_count_nodes_of_type, "inference_rule"
         )
         query_time_dict[
             "pdg_app/main: count_nodes_of_type, inference_rule" + trace_id
@@ -1282,7 +1286,7 @@ def to_navigation():
 
         query_start_time = time.time()
         number_of_expressions = session.read_transaction(
-            neo4j_query.count_nodes_of_type, "expression"
+            neo4j_query.get_count_nodes_of_type, "expression"
         )
         query_time_dict["pdg_app/main: count_nodes_of_type, expression" + trace_id] = (
             round(time.time() - query_start_time, 3)
@@ -1290,7 +1294,7 @@ def to_navigation():
 
         query_start_time = time.time()
         number_of_scalars = session.read_transaction(
-            neo4j_query.count_nodes_of_type, "scalar"
+            neo4j_query.get_count_nodes_of_type, "scalar"
         )
 
         query_time_dict["pdg_app/main: count_nodes_of_type, scalar" + trace_id] = round(
@@ -1299,7 +1303,7 @@ def to_navigation():
 
         query_start_time = time.time()
         number_of_vectors = session.read_transaction(
-            neo4j_query.count_nodes_of_type, "vector"
+            neo4j_query.get_count_nodes_of_type, "vector"
         )
         query_time_dict["pdg_app/main: count_nodes_of_type, vector" + trace_id] = round(
             time.time() - query_start_time, 3
@@ -1307,7 +1311,7 @@ def to_navigation():
 
         query_start_time = time.time()
         number_of_matrices = session.read_transaction(
-            neo4j_query.count_nodes_of_type, "matrix"
+            neo4j_query.get_count_nodes_of_type, "matrix"
         )
         query_time_dict["pdg_app/main: count_nodes_of_type, matrix" + trace_id] = round(
             time.time() - query_start_time, 3
@@ -1315,7 +1319,7 @@ def to_navigation():
 
         query_start_time = time.time()
         number_of_operations = session.read_transaction(
-            neo4j_query.count_nodes_of_type, "operation"
+            neo4j_query.get_count_nodes_of_type, "operation"
         )
         query_time_dict["pdg_app/main: count_nodes_of_type, operation" + trace_id] = (
             round(time.time() - query_start_time, 3)
@@ -1323,7 +1327,7 @@ def to_navigation():
 
         query_start_time = time.time()
         number_of_relations = session.read_transaction(
-            neo4j_query.count_nodes_of_type, "relation"
+            neo4j_query.get_count_nodes_of_type, "relation"
         )
         query_time_dict["pdg_app/main: count_nodes_of_type, relation" + trace_id] = (
             round(time.time() - query_start_time, 3)
@@ -1331,7 +1335,7 @@ def to_navigation():
 
         query_start_time = time.time()
         number_of_feeds = session.read_transaction(
-            neo4j_query.count_nodes_of_type, "feed"
+            neo4j_query.get_count_nodes_of_type, "feed"
         )
         query_time_dict["pdg_app/main: count_nodes_of_type, feed" + trace_id] = round(
             time.time() - query_start_time, 3
@@ -1805,10 +1809,10 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
     # inference_rule_per_step = {}
     # for this_step_dict in list_of_step_dicts:
     #    with graphDB_Driver.session() as session:
-    #        neo4j_query.step_has_inference_rule,
+    #        neo4j_query.get_step_has_inference_rule,
 
     #    with graphDB_Driver.session() as session:
-    #        neo4j_query.step_has_expressions
+    #        neo4j_query.get_step_has_expressions
 
     all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
         graphDB_Driver, derivation_id, query_time_dict
@@ -5332,12 +5336,12 @@ def to_edit_inference_rule(
         query_start_time = time.time()
         list_of_derivation_dicts_that_use_this_inference_rule_id = (
             session.read_transaction(
-                neo4j_query.derivations_that_use_inference_rule,
+                neo4j_query.get_derivations_that_use_inference_rule,
                 inference_rule_id,
             )
         )
         query_time_dict[
-            "pdg_app/to_edit_inference_rule: derivations_that_use_inference_rule"
+            "pdg_app/to_edit_inference_rule: get_derivations_that_use_inference_rule"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
@@ -6132,6 +6136,10 @@ def to_list_derivations() -> str:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] to_list_derivations start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
+
+    query_time_dict = compute.convert_expr_sympy_pdg_symbols_to_neo4j_edge(
+        graphDB_Driver, query_time_dict
+    )
 
     # The following is irrelevant since the page doesn't submit anything back to the server
     # if request.method == "POST":
