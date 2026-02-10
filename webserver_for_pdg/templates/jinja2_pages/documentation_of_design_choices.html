@@ -214,15 +214,6 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 
 <p>d3js, graphviz, networkx</p>
 
-<P>&nbsp;</P>
-<HR/>
-<P>&nbsp;</P>
-
-<H2 id="data structure"><i>Decision</i>: Which data structure?</H2>
-
-<P>Currently using Neo4j.
-
-<p>See <a href="{{ url_for('to_comparison_of_design_options_database') }}">comparison of txt, XML, CSV, SQL, property graph</a></p>
 
 
 <P>&nbsp;</P>
@@ -370,7 +361,10 @@ def to_api_via_js() -&gt; str:
 <P>&nbsp;</P>
 
 
-<H2 id="data structure"><i>Decision</i>: Data structure used in the Physics Derivation Graph</a></H2>
+<H2 id="data structure"><i>Decision</i>: Which data structure to use in the Physics Derivation Graph</a></H2>
+
+<P>Currently using Neo4j.
+
 <P>
   The Physics Derivation Graph is stored in a Neo4j Property Graph database.
 </P>
@@ -395,11 +389,20 @@ def to_api_via_js() -&gt; str:
 <P>&nbsp;</P>
 
 
-<H2 id="represent objects"><i>Decision</i>: How to represent the objects</H2>
-  <P>(e.g., <a href="{{ url_for('to_user_documentation')}}?referrer=design_documentation#inference rules">inference rules</a>
-  and <a href="{{ url_for('to_user_documentation')}}?referrer=design_documentation#expressions">expressions</a>
-  and symbols)
+<H2 id="represent objects"><i>Decision</i>: Which objects should be represented?</H2>
 
+<P>There are a few obvious objects that need to be accounted for, like derivation, steps, <a href="{{ url_for('to_user_documentation')}}?referrer=design_documentation#inference rules">inference rule</a>, feed, 
+  and <a href="{{ url_for('to_user_documentation')}}?referrer=design_documentation#expressions">expression</a>.
+
+<P>Beyond those there are objects that could be a either node in the graph or a property of a node. For example, should (LHS, relation, RHS) be separate nodes or properties of an expression? A framing that motivates the choice is whether a user may want to query LHS separately from the expression. The trade-off is that additional nodes better support custom queries but then incur more queries to extract information relevant for typical workflows. 
+
+  <P>Another framing to motivate the node-or-property decision is the nodes can have properties but properties cannot have edges. For example, if LHS is a property of expression, then a symbol-as-node has to be related to the expression rather than LHS.
+    <pre>:expression (LHS) -> HAS_SYMBOL -> :symbol (x)</pre>
+    <P>versus
+    <pre>:expression -> HAS_SIDE -> LHS -> HAS_SYMBOL -> :symbol (x)</pre>
+
+<P>If "symbol" is a node, then is a relation is a symbol? Should the relation be a property of the expression-as-node, or should the schema be
+  <pre>:expression -> HAS_RELATION -> :relation (=)</pre>
 
 <P>&nbsp;</P>
 <HR/>
