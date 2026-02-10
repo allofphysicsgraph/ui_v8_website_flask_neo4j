@@ -2,14 +2,8 @@ Enter a novel derivation: https://github.com/allofphysicsgraph/task-tracker/issu
 
 What's preventing me from doing so now?
 
+https://localhost/new_symbol_vector is missing dimensions (length, time, mass)
 
-# step 0
-display AST from SymPy on "edit_expression" HTML page
-- Display the AST for equation review - https://localhost/edit_expression/6709044
-
-ui_v7's compute.create_AST_png_per_expression_in_step
-which points to
-ui_v7's latex_to_sympy.create_AST_png_for_latex
 
 # step 1
 in the imported content there's no use of HAS_SYMBOL edges. (Because in ui_v7 the JSON deduced the symbol membership from "AST")
@@ -23,27 +17,36 @@ Then save pdg.cypher
 On the "review_derivation" HTML list all symbols (and operations and relations) for the derivation.
 
 Create a function in the compute library that creates a list of all symbol dictionaries
+See neo4j_query: `get_list_of_symbol_IDs_per_derivation`
 
-List of symbol dicts in this derivation would be useful to display both in the derivation review step list as well as the entering a new step review
-
-
-# step n
+# step 3
 - https://localhost/list_expressions should show Latex-from-Sympy in the Sympy column
 
-
+# step 4
 - cypher export does not produce a consistent order. As a result, diff isn't feasible
     - can CSV or GraphML output be diff'd?
+
+- BUG: SymPy-to-be-edited not displayed in https://localhost/edit_expression/6709044
 
 - BUG: The missing expressions in step 17
 
 - BUG: on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
 
 
-In the compute library, create a function that converts a list of dictionaries into a dictionary dictionaries, with key of ID
-
-
+?
 New function in compute: List of all non-operation symbols
 Used by new feed when promoting existing symbol
+
+---
+
+document the design decision to put all routes in a single Python script
+
+More design decision documentation:
+
+In the choices about data structures, note that there is actually a neo4j data structure and the intermediate list and dictionaries that get used by their web pages 
+It's not clear to me whether I could just be using neo4j and am that directly to the web UI 
+
+I've made a design decision to not hire someone as a designer for the web front end because that would be premature at this point. I'm still in the exploration prototyping phase to figure out what the front end will need to be able to do
 
 ---
 
