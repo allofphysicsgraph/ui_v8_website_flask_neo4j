@@ -16,8 +16,15 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 
 <P>expression_dict: <BR>{{ expression_dict }}
 
-<P><img src="{{ url_for('static', filename=expression_dict['id']~'_LHS.png')}}">
-<P><img src="{{ url_for('static', filename=expression_dict['id']~'_RHS.png')}}">
+
+<table border="1">
+  <tr>
+    <TD>LHS AST from SymPy:<BR><img src="{{ url_for('static', filename=expression_dict['id']~'_LHS.png')}}">
+    </TD>
+    <TD>RHS AST from SymPy:<BR><img src="{{ url_for('static', filename=expression_dict['id']~'_RHS.png')}}">
+    </TD>
+  </tr>
+</table>
 
 
 <fieldset>
@@ -298,6 +305,11 @@ dict_of_relation_dicts_not_in_expression<BR>
     <legend>
       <H1>Edit Expression SymPy and Lean</h1>
     </legend>
+
+<P>expression_dict['sympy_lhs']: <BR>{{expression_dict['sympy_lhs']}}
+<P>expression_dict['sympy_rhs']: <BR>{{expression_dict['sympy_rhs']}}
+
+
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_expression_sympy.csrf_token }}
 
