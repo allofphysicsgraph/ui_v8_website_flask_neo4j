@@ -1,4 +1,4 @@
-symbol_categories = ["operation", "relation", "scalar", "vector", "matrix"]
+symbol_categories = ["operation", "relation", "scalar", "vector", "matrix", "symbol"]
 
 scalar_scope = ["real", "complex", "integer", "arbitrary"]
 
