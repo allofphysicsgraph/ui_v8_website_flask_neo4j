@@ -15,6 +15,7 @@ import neo4j_query
 import list_of_valid
 import sympy_validate_expression
 import latex_and_sympy
+import re
 
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
@@ -39,7 +40,7 @@ def generate_random_id(
     so they can't be used for the Physics Derivation Graph
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] compute/generate_random_id start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     # print("node_type=", node_type)
 
     try:
@@ -50,9 +51,11 @@ def generate_random_id(
     list_of_existing_IDs = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_existing_IDs = session.read_transaction(neo4j_query.list_IDs, node_type)
+        list_of_existing_IDs = session.read_transaction(
+            neo4j_query.get_list_IDs, node_type
+        )
         query_time_dict[
-            "compute/generate_random_id: list_IDs" + node_type + " " + trace_id
+            "compute/generate_random_id: get_list_IDs" + node_type + " " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     found_new_ID = False
@@ -64,6 +67,108 @@ def generate_random_id(
     logger.info("new_id=" + str(new_id))
     logger.info("[TRACE] compute/generate_random_id end " + trace_id)
     return str(new_id), query_time_dict
+
+
+def convert_expr_sympy_pdg_symbols_to_neo4j_edge(
+    graphDB_Driver, query_time_dict: query_timing_result_type
+):
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + trace_id)
+
+    # get all expressions
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_expression_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "expression"
+        )
+        query_time_dict[
+            "pdg_app/convert_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type expression"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    # get all symbols
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_symbol_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "symbol"
+        )
+        query_time_dict[
+            "pdg_app/convert_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type symbol"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    for this_expression_dict in list_of_expression_dicts:
+        list_of_pdg_symbols_found = []
+        if "sympy_lhs" in this_expression_dict.keys():
+            list_of_pdg_symbols_found += re.findall(
+                r"pdg\d\d\d\d\d\d\d", this_expression_dict["sympy_lhs"]
+            )
+        if "sympy_rhs" in this_expression_dict.keys():
+            list_of_pdg_symbols_found += re.findall(
+                r"pdg\d\d\d\d\d\d\d", this_expression_dict["sympy_rhs"]
+            )
+        if "sympy" in this_expression_dict.keys():
+            list_of_pdg_symbols_found += re.findall(
+                r"pdg\d\d\d\d\d\d\d", this_expression_dict["sympy"]
+            )
+        list_of_pdg_symbols_found = list(set(list_of_pdg_symbols_found))
+
+        logger.info("list_of_pdg_symbols_found = " + str(list_of_pdg_symbols_found))
+
+        expression_id = this_expression_dict["id"]
+
+        for this_pdg_symbol in list_of_pdg_symbols_found:
+
+            symbol_id_to_add = this_pdg_symbol[3:]
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                list_of_node_labels = session.read_transaction(
+                    neo4j_query.get_node_labels_from_property, "id", symbol_id_to_add
+                )
+                query_time_dict[
+                    "pdg_app/convert_sympy_pdg_symbols_to_neo4j_edge: get_node_labels_from_property"
+                    + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+            # logger.info("list_of_node_labels = " + str(list_of_node_labels))
+
+            if len(list_of_node_labels) > 1:
+                logger.critical("WARNING: multiple nodes with same ID found")
+                logger.critical("list_of_node_labels = " + str(list_of_node_labels))
+
+            node_label = list_of_node_labels[0]["NodeLabel"]
+
+            if isinstance(node_label, List):
+                if "symbol" in node_label:
+                    node_label.remove("symbol")
+                    # logger.info("what remains: " + str(node_label[0]))
+                    symbol_category = node_label[0]
+            else:
+                # logger.info("not a list: " + str(node_label))
+                symbol_category = node_label
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                str_to_print = session.write_transaction(
+                    neo4j_query.add_symbol_to_expression_or_feed,
+                    "expression",
+                    symbol_id_to_add,
+                    expression_id,
+                    symbol_category,
+                )
+                query_time_dict[
+                    "pdg_app/main: convert_sympy_pdg_symbols_to_neo4j_edge" + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+    return query_time_dict
+
+
+def convert_feed_sympy_pdg_symbols_to_neo4j_edge(
+    graphDB_Driver, query_time_dict: query_timing_result_type
+):
+    return
 
 
 def send_email_with_msmtp(
@@ -294,10 +399,10 @@ def get_dict_of_node_type_for_every_id(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_records = session.read_transaction(
-            neo4j_query.list_of_all_node_IDs_and_labels
+            neo4j_query.get_list_of_all_node_IDs_and_labels
         )
         query_time_dict[
-            "compute/to_edit_node: list_of_all_node_IDs_and_labels" + trace_id
+            "compute/to_edit_node: get_list_of_all_node_IDs_and_labels" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     # [{'n.id': '8379131', 'labels(n)': ['relation']},
@@ -1097,12 +1202,12 @@ def get_dict_of_derivations_used_per_inference_rule(
             query_start_time = time.time()
             list_of_derivations_that_use_this_inference_rule_id = (
                 session.read_transaction(
-                    neo4j_query.derivations_that_use_inference_rule,
+                    neo4j_query.get_derivations_that_use_inference_rule,
                     this_inference_rule_dict["id"],
                 )
             )
             query_time_dict[
-                "compute/get_dict_of_derivations_used_per_inference_rule: derivations_that_use_inference_rule"
+                "compute/get_dict_of_derivations_used_per_inference_rule: get_derivations_that_use_inference_rule"
                 + trace_id
             ] = round(time.time() - query_start_time, 3)
         logger.info(
@@ -1240,10 +1345,10 @@ def get_dict_of_steps_in_derivation(
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             sequence_index = session.read_transaction(
-                neo4j_query.step_has_sequence_index, this_step_dict["id"]
+                neo4j_query.get_step_has_sequence_index, this_step_dict["id"]
             )
             query_time_dict[
-                "compute/get_dict_of_steps_in_derivation: step_has_sequence_index"
+                "compute/get_dict_of_steps_in_derivation: get_step_has_sequence_index"
                 + trace_id
             ] = round(time.time() - query_start_time, 3)
         # print("sequence_index=", sequence_index)
@@ -1258,7 +1363,7 @@ def get_dict_of_steps_in_derivation(
 
     sorted_all_steps = dict(sorted(all_steps.items()))
 
-    logger.info("[TRACE] compute/get_dict_of_steps_in_derivation end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return sorted_all_steps, query_time_dict
 
 
@@ -1280,7 +1385,7 @@ def input_feed_output_infrule_for_step(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         inference_rule_dict = session.read_transaction(
-            neo4j_query.step_has_inference_rule, step_id
+            neo4j_query.get_step_has_inference_rule, step_id
         )
         query_time_dict[
             "compute/get_dict_of_steps_in_derivation: step_has_inference_rule"
