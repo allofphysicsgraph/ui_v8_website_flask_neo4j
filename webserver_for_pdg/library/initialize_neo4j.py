@@ -28,7 +28,7 @@ uri = "bolt://neo4j_docker:7687"
 # Connect to the neo4j database server
 neo4j_available = False
 while not neo4j_available:
-    logger.info("TRACE: started while loop")
+    logger.info("[TRACE] started while loop")
     try:
         graphDB_Driver = GraphDatabase.driver(uri)
         neo4j_available = True
