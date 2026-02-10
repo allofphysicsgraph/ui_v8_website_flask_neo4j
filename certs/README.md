@@ -1,8 +1,4 @@
 
-# Generate certs for site on Internet
-
-See <https://physicsderivationgraph.blogspot.com/2021/10/periodic-renewal-of-https-letsencrypt.html>
-
 # How to generate local certificates
 
 ```bash
@@ -16,3 +12,12 @@ and, separately,
 openssl dhparam -out dhparam.pem 2048
 ```
 as per <https://stackoverflow.com/a/58221273/1164295>
+
+
+# Hosting a website on the Internet
+
+Use Certbot to generate certificates. See <https://physicsderivationgraph.blogspot.com/2026/01/hetzner-vps-initial-configuration-notes.html>
+
+# Renewing certs for website on the Internet
+
+See <https://physicsderivationgraph.blogspot.com/2021/10/periodic-renewal-of-https-letsencrypt.html>
