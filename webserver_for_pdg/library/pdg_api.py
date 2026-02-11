@@ -102,12 +102,12 @@ api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 # def api_do_nothing():
 #     """
 #     to use session cookies,
-#     curl --head -c cookies.txt https://localhost:5000/api/v1/resources/do_nothing
+#     curl --head -c cookies.txt https://localhost/api/v1/resources/do_nothing
 #     where
 #     `--head`: only fetch the headers of the response.
 #     `-c cookies.txt`: save the cookies received in the response to a file named cookies.txt.
 #     Then
-#     curl -b cookies.txt https://localhost:5000/api/v1/resources/derivation/create
+#     curl -b cookies.txt https://localhost/api/v1/resources/derivation/create
 
 
 #     """
@@ -156,7 +156,7 @@ def api_start_here():
     https://en.wikipedia.org/wiki/HATEOAS
 
     ```
-    $ curl --silent --insecure https://localhost/api/v1/resources/start_here
+    $ curl --silent --insecure https://localhost/api/v1/ | python3 -m json.tool
 
     {
       "_links": {
@@ -1016,13 +1016,13 @@ def api_create_derivation():
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-     https://localhost:5000/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
+     https://localhost/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
 
     curl --request POST \
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"derivation_name_latex":"hello again", "derivation_reference_latex":"this was", "derivation_abstract_latex": "yes no"}' \
-     https://localhost:5000/api/v1/resources/derivation/create
+     https://localhost/api/v1/resources/derivation/create
 
 
     """
@@ -1175,7 +1175,7 @@ def api_create_expression():
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-    https://localhost:5000/api/v1/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9 \
+    https://localhost/api/v1/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9 \
      | python3 -m json.tool
 
 
@@ -1183,7 +1183,7 @@ def api_create_expression():
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"expression_latex_lhs": "4^3", "expression_relation_latex": "=", "expression_latex_rhs": "k"}' \
-     https://localhost:5000/api/v1/resources/expression/create | python3 -m json.tool
+     https://localhost/api/v1/resources/expression/create | python3 -m json.tool
 
     user-provided dictionary is required to have latex and name
 
@@ -1368,14 +1368,14 @@ def api_create_scalar_symbol():
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-    https://localhost:5000/api/v1/resources/symbol/scalar/create?scalar_latex=a | python3 -m json.tool
+    https://localhost/api/v1/resources/symbol/scalar/create?scalar_latex=a | python3 -m json.tool
 
 
     curl --request POST \
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"scalar_latex": "b"}' \
-     https://localhost:5000/api/v1/resources/symbol/scalar/create | python3 -m json.tool
+     https://localhost/api/v1/resources/symbol/scalar/create | python3 -m json.tool
 
 
     see `to_add_symbol_scalar`
