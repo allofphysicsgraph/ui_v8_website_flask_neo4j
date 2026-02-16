@@ -6,6 +6,7 @@
 # Attribution 4.0 International (CC BY 4.0)
 
 import random
+import tokenize
 
 # import time  # this creates a conflict with sympy's `time`
 
@@ -83,6 +84,8 @@ def dimensional_consistency(
     """
     see sympy_validate_expression.README.md for more explanation.
 
+    The error handling here is similar to `compute/get_sympy_as_latex_per_expr_id`
+
     >>> expression_dict = {'id': '9942'}
     >>> dict_of_all_symbol_dicts = {'9942': {'id': '9942'}}
     >>> dimensional_consistency(expression_dict,
@@ -137,6 +140,14 @@ def dimensional_consistency(
             + " as SymPy; error="
             + str(err)
         )
+    except tokenize.TokenError as err:
+        return (
+            str(type(err).__name__)
+            + ": unable to parse "
+            + expression_dict["sympy_lhs"]
+            + " as SymPy; error="
+            + str(err)
+        )
 
     logger.info("sympy_expr_lhs = " + str(LHS))
     # sympy_expr = Eq(pdg4223281, pdg3715170*pdg6035023)
@@ -169,6 +180,14 @@ def dimensional_consistency(
             + str(err)
         )
     except TypeError as err:
+        return (
+            str(type(err).__name__)
+            + ": unable to parse "
+            + expression_dict["sympy_rhs"]
+            + " as SymPy; error="
+            + str(err)
+        )
+    except tokenize.TokenError as err:
         return (
             str(type(err).__name__)
             + ": unable to parse "
