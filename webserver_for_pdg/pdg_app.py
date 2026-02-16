@@ -2642,6 +2642,13 @@ def to_add_expression() -> werkzeug.Response:
         # )
         expression_latex_lhs = str(web_form.expression_latex_lhs.data).strip()
 
+        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+        if not expression_latex_lhs.isascii():
+            logger.critical(
+                "Non-ascii expression_latex_lhs: " + str(expression_latex_lhs)
+            )
+            return "<H1>Input must be ASCII only</H1>\n" + str(expression_latex_lhs)
+
         # the web UI dropdown returns the symbol ID (and not Latex string)
         #'symbol_relation_id_to_add', '2222545'
         expression_relation_id = request.form["symbol_relation_id_to_add"]
@@ -2667,16 +2674,56 @@ def to_add_expression() -> werkzeug.Response:
         # expression_latex_condition = (
         #     str(web_form.expression_latex_condition.data).strip().replace("\\", "\\\\")
         # )
+
+        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+        if not expression_latex_rhs.isascii():
+            logger.critical(
+                "Non-ascii expression_latex_rhs: " + str(expression_latex_rhs)
+            )
+            return "<H1>Input must be ASCII only</H1>\n" + str(expression_latex_rhs)
+
         expression_latex_condition = str(
             web_form.expression_latex_condition.data
         ).strip()
+        if not expression_latex_condition.isascii():
+            logger.critical(
+                "Non-ascii expression_latex_condition: "
+                + str(expression_latex_condition)
+            )
+            return "<H1>Input must be ASCII only</H1>\n" + str(
+                expression_latex_condition
+            )
+
         expression_name_latex = str(web_form.expression_name_latex.data).strip()
+        if not expression_name_latex.isascii():
+            logger.critical(
+                "Non-ascii expression_name_latex: " + str(expression_name_latex)
+            )
+            return "<H1>Input must be ASCII only</H1>\n" + str(expression_name_latex)
+
         expression_reference_latex = str(
             web_form.expression_reference_latex.data
         ).strip()
+        if not expression_reference_latex.isascii():
+            logger.critical(
+                "Non-ascii expression_reference_latex: "
+                + str(expression_reference_latex)
+            )
+            return "<H1>Input must be ASCII only</H1>\n" + str(
+                expression_reference_latex
+            )
+
         expression_description_latex = str(
             web_form.expression_description_latex.data
         ).strip()
+        if not expression_description_latex.isascii():
+            logger.critical(
+                "Non-ascii expression_description_latex: "
+                + str(expression_description_latex)
+            )
+            return "<H1>Input must be ASCII only</H1>\n" + str(
+                expression_description_latex
+            )
 
         logger.info("expression_latex_lhs:" + str(expression_latex_lhs))
         logger.info("expression_latex_rhs:" + str(expression_latex_rhs))
