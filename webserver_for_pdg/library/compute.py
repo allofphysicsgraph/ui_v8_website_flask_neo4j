@@ -83,7 +83,7 @@ def convert_expr_sympy_pdg_symbols_to_neo4j_edge(
             neo4j_query.get_list_node_dicts_of_type, "expression"
         )
         query_time_dict[
-            "pdg_app/convert_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type expression"
+            "compute/convert_expr_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type expression"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
@@ -94,7 +94,7 @@ def convert_expr_sympy_pdg_symbols_to_neo4j_edge(
             neo4j_query.get_list_node_dicts_of_type, "symbol"
         )
         query_time_dict[
-            "pdg_app/convert_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type symbol"
+            "compute/convert_expr_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type symbol"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
@@ -128,7 +128,7 @@ def convert_expr_sympy_pdg_symbols_to_neo4j_edge(
                     neo4j_query.get_node_labels_from_property, "id", symbol_id_to_add
                 )
                 query_time_dict[
-                    "pdg_app/convert_sympy_pdg_symbols_to_neo4j_edge: get_node_labels_from_property"
+                    "compute/convert_expr_sympy_pdg_symbols_to_neo4j_edge: get_node_labels_from_property"
                     + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
@@ -159,7 +159,8 @@ def convert_expr_sympy_pdg_symbols_to_neo4j_edge(
                     symbol_category,
                 )
                 query_time_dict[
-                    "pdg_app/main: convert_sympy_pdg_symbols_to_neo4j_edge" + trace_id
+                    "compute/convert_expr_sympy_pdg_symbols_to_neo4j_edge: convert_sympy_pdg_symbols_to_neo4j_edge expr"
+                    + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
     return query_time_dict
@@ -168,7 +169,98 @@ def convert_expr_sympy_pdg_symbols_to_neo4j_edge(
 def convert_feed_sympy_pdg_symbols_to_neo4j_edge(
     graphDB_Driver, query_time_dict: query_timing_result_type
 ):
-    return
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + trace_id)
+
+    # get all expressions
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_expression_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "feed"
+        )
+        query_time_dict[
+            "compute/convert_feed_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type feed"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    # get all symbols
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_symbol_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "symbol"
+        )
+        query_time_dict[
+            "compute/convert_feed_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type symbol"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    for this_expression_dict in list_of_expression_dicts:
+        list_of_pdg_symbols_found = []
+        if "sympy_lhs" in this_expression_dict.keys():
+            raise Exception(
+                "why does FEED have LHS sympy?" + this_expression_dict["id"]
+            )
+        if "sympy_rhs" in this_expression_dict.keys():
+            raise Exception(
+                "why does FEED have LHS sympy?" + this_expression_dict["id"]
+            )
+        if "sympy" in this_expression_dict.keys():
+            list_of_pdg_symbols_found += re.findall(
+                r"pdg\d\d\d\d\d\d\d", this_expression_dict["sympy"]
+            )
+        list_of_pdg_symbols_found = list(set(list_of_pdg_symbols_found))
+
+        logger.info("list_of_pdg_symbols_found = " + str(list_of_pdg_symbols_found))
+
+        expression_id = this_expression_dict["id"]
+
+        for this_pdg_symbol in list_of_pdg_symbols_found:
+
+            symbol_id_to_add = this_pdg_symbol[3:]
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                list_of_node_labels = session.read_transaction(
+                    neo4j_query.get_node_labels_from_property, "id", symbol_id_to_add
+                )
+                query_time_dict[
+                    "compute/convert_feed_sympy_pdg_symbols_to_neo4j_edge: get_node_labels_from_property"
+                    + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+            # logger.info("list_of_node_labels = " + str(list_of_node_labels))
+
+            if len(list_of_node_labels) > 1:
+                logger.critical("WARNING: multiple nodes with same ID found")
+                logger.critical("list_of_node_labels = " + str(list_of_node_labels))
+
+            node_label = list_of_node_labels[0]["NodeLabel"]
+
+            if isinstance(node_label, List):
+                if "symbol" in node_label:
+                    node_label.remove("symbol")
+                    # logger.info("what remains: " + str(node_label[0]))
+                    symbol_category = node_label[0]
+            else:
+                # logger.info("not a list: " + str(node_label))
+                symbol_category = node_label
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                str_to_print = session.write_transaction(
+                    neo4j_query.add_symbol_to_expression_or_feed,
+                    "feed",
+                    symbol_id_to_add,
+                    expression_id,
+                    symbol_category,
+                )
+                query_time_dict[
+                    "compute/convert_feed_sympy_pdg_symbols_to_neo4j_edge: convert_sympy_pdg_symbols_to_neo4j_edge feed"
+                    + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+    return query_time_dict
 
 
 def send_email_with_msmtp(

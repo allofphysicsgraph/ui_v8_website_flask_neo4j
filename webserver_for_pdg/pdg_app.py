@@ -1950,10 +1950,10 @@ def to_add_step_select_inference_rule(
             "pdg_app/to_add_step_select_inference_rule: get_list_node_dicts_of_type inference_rule"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
-    logger.info(
-        "to_add_step_select_inference_rule: list_of_inference_rule_dicts="
-        + str(list_of_inference_rule_dicts)
-    )
+    logger.info("list_of_inference_rule_dicts=" + str(list_of_inference_rule_dicts))
+
+    if len(list_of_inference_rule_dicts) == 0:
+        redirect(url_for("to_add_inference_rule"))
 
     # Inference rules have the schema
     # [{'id': '7616707',
@@ -6185,6 +6185,9 @@ def to_list_derivations() -> str:
     query_time_dict = {}  # type: query_timing_result_type
 
     query_time_dict = compute.convert_expr_sympy_pdg_symbols_to_neo4j_edge(
+        graphDB_Driver, query_time_dict
+    )
+    query_time_dict = compute.convert_feed_sympy_pdg_symbols_to_neo4j_edge(
         graphDB_Driver, query_time_dict
     )
 

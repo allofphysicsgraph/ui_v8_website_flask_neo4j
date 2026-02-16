@@ -13,6 +13,13 @@ Write a one-time function that
 2) adds 'HAS_SYMBOL' edge to the expression and symbol
 Then save pdg.cypher
 
+REMOVE
+```
+    query_time_dict = compute.convert_expr_sympy_pdg_symbols_to_neo4j_edge(
+        graphDB_Driver, query_time_dict
+```
+from `pdg_app.py` when done!
+
 # step 2
 On the "review_derivation" HTML list all symbols (and operations and relations) for the derivation.
 
@@ -24,7 +31,15 @@ See neo4j_query: `get_list_of_symbol_IDs_per_derivation`
 
 # step 4
 - cypher export does not produce a consistent order. As a result, diff isn't feasible
-    - can CSV or GraphML output be diff'd?
+  CSV output can be diff'd, 
+  - but the index is different in the two CSVs. As a result, each line differs. Also, edges get altered. 
+     See `static/compare_pdg_CSV.py` and out-of-memory error https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%2215PkKO0LBjymJ1-DvwAFL1Hqp4SObx6fx%22%5D,%22action%22:%22open%22,%22userId%22:%22101193243042884231058%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing
+  - Some nodes contain `\r` (as in `\ref{}`) or `\n` (as in `\nabla`) and that renders in CSV as a new-line; `\t` is expanded to a tab; the Latex isn't properly escaped. 
+
+
+# step 5: 
+on "new_step_expressions" the dropdown of expressions should be scoped; see <https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/76>
+
 
 - BUG: SymPy-to-be-edited not displayed in https://localhost/edit_expression/6709044
 
