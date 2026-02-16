@@ -20,6 +20,13 @@ can be constructed using md5hash(<derivation_id>_<expression_id>).
 # convention: every call to flash must be either a string or the content must be wrapped in str()
 # reason: when content is passed to flash() that cannot be serialized, the Flask error and the website crashes
 
+# convention:
+- DEBUG    = detailed technical data for diagnostics. Not normally be relevant to collect.
+- INFO     = routine, healthy operations. Usually don't care about under normal circumstances. Default level for log entries.
+- WARNING  = unexpected, potentially problematic events. Anything that can potentially cause application oddities, but for which there is automatic recovery.
+- ERROR    = failed operations affecting functionality. Errors force user intervention.
+- CRITICAL = unrecoverable system failure; data corruption or data loss occurred.
+
 
 # convention: every Python function starts with
 ```
@@ -1114,7 +1121,7 @@ def to_index():
         d3js_json_filename = T_and_f_derivation_ID + ".json"
     except Exception as err:
         logger.error(str(err))
-        flash(str(err))
+        flash("pdg_app/to_index: " + str(err))
         d3js_json_filename = ""
 
     logger.info("[TRACE] to_index end " + str(trace_id))
@@ -1160,7 +1167,7 @@ def to_navigation():
         # check if the post request has the file part
         if "file" not in request.files:
             error_message_for_user = "ERROR: file not in request files"
-            logger.info("to_navigation: ERROR: file not in request files")
+            logger.error("file not in request files")
             logger.info("[TRACE] to_navigation end " + str(trace_id))
             return redirect(request.url)
         file_obj = request.files["file"]
@@ -1191,7 +1198,7 @@ def to_navigation():
                 file_obj.save(path_to_uploaded_file)
             except FileNotFoundError as e:
                 error_message_for_user = "ERROR: unable to save file" + str(e)
-                logger.info("ERROR: unable to save file" + str(e))
+                logger.error("unable to save file" + str(e))
                 return redirect(request.url)
 
             # shutil.copy(path_to_uploaded_file, "/code/" + path_to_db)
@@ -1425,8 +1432,8 @@ def to_add_derivation() -> werkzeug.Response:
     logger.info("request.method=" + str(request.method))  # POST
 
     if request.method == "POST" and not web_form.validate():
-        flash(str(web_form.errors))
-        logger.info(str(web_form.errors))
+        flash("pdg_app/to_add_derivation: " + str(web_form.errors))
+        logger.error(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info("request.form =" + str(request.form))
 
@@ -1434,7 +1441,7 @@ def to_add_derivation() -> werkzeug.Response:
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not derivation_name_latex.isascii():
-            logger.critical(
+            logger.error(
                 "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
             )
             return "<H1>Input must be ASCII only</H1>\n" + str(derivation_name_latex)
@@ -1445,7 +1452,7 @@ def to_add_derivation() -> werkzeug.Response:
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not derivation_reference_latex.isascii():
-            logger.critical(
+            logger.error(
                 "Non-ascii derivation_reference_latex: "
                 + str(derivation_reference_latex)
             )
@@ -1457,7 +1464,7 @@ def to_add_derivation() -> werkzeug.Response:
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not abstract_latex.isascii():
-            logger.critical("Non-ascii abstract_latex: " + str(abstract_latex))
+            logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
             return "<H1>Input must be ASCII only</H1>\n" + str(abstract_latex)
 
         # 2025-01-04, BHP: the following has been commented out
@@ -1624,8 +1631,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                 )
             except Exception as err:
                 # logger.error(str(err))
-                flash(str(err))
-                logger.info("ERROR to_review_derivation: " + str(err))
+                flash("pdg_app/to_review_derivation: " + str(err))
+                logger.error(str(err))
                 pdf_filename = "error.pdf"
 
             logger.info("[TRACE] to_review_derivation end " + str(trace_id))
@@ -1656,8 +1663,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                 tex_filename = str(derivation_id)
             except Exception as err:
                 # logger.error(str(err))
-                flash(str(err))
-                logger.info("ERROR: to_review_derivation:" + str(err))
+                flash("pdg_app/to_review_derivation" + str(err))
+                logger.error(str(err))
                 logger.info("[TRACE] end " + str(trace_id))
                 return redirect(url_for("select_from_existing_derivations"))
 
@@ -1699,17 +1706,18 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             return redirect(url_for("to_list_derivations"))
         else:
             flash(
-                "pdg_app/to_review_derivation: unrecongized button in"
+                "pdg_app/to_review_derivation: unrecognized button in"
                 + str(request.form)
             )
+            logger.error("unrecognized button in" + str(request.form))
 
     # only create d3js JSON if the HTML page is going to be rendered
     try:
         latex.create_d3js_json(derivation_id, all_steps, "/code/static/")
         # if that function fails then there's no JSON file for d3js
     except Exception as err:
-        flash(str(err))
-        logger.info("ERROR: to_review_derivation " + str(err))
+        flash("pdg_app/to_review_derivation: " + str(err))
+        logger.error("to_review_derivation " + str(err))
 
     d3js_json_filename = derivation_id + ".json"
 
@@ -1776,8 +1784,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                 list_of_output_dicts,
             )
         except Exception as err:
-            flash(str(err))
-            logger.info("ERROR: to_review_derivation " + str(err))
+            flash("pdg_app/to_review_derivation: " + str(err))
+            logger.error(str(err))
             derivation_step_validity_dict[step_id] = err
 
     logger.info("[TRACE] to_review_derivation end " + str(trace_id))
@@ -1880,8 +1888,8 @@ def to_edit_derivation_metadata(
     web_form = SpecifyNewDerivationForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
-        flash(str(web_form.errors))
-        logger.info(str(web_form.errors))
+        flash("pdg_app/to_edit_derivation_metadata: " + str(web_form.errors))
+        logger.error(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info("to_edit_derivation_metadata: request.form = " + str(request.form))
 
@@ -1894,7 +1902,7 @@ def to_edit_derivation_metadata(
         )
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not derivation_name_latex.isascii():
-            logger.critical(
+            logger.error(
                 "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
             )
             return "<H1>Input must be ASCII only</H1>\n" + str(derivation_name_latex)
@@ -1904,7 +1912,7 @@ def to_edit_derivation_metadata(
         )
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not derivation_reference_latex.isascii():
-            logger.critical(
+            logger.error(
                 "Non-ascii derivation_reference_latex: "
                 + str(derivation_reference_latex)
             )
@@ -1917,7 +1925,7 @@ def to_edit_derivation_metadata(
         )
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not abstract_latex.isascii():
-            logger.critical("Non-ascii abstract_latex: " + str(abstract_latex))
+            logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
             return "<H1>Input must be ASCII only</H1>\n" + str(abstract_latex)
 
         # as per https://strftime.org/
@@ -2169,8 +2177,8 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     web_form_expression_sympy = SpecifyNewExpressionSympyLeanForm(request.form)
 
     if request.method == "POST" and not web_form_new_expression.validate():
-        flash(str(web_form_new_expression.errors))
-        logger.info(
+        flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
+        logger.error(
             "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
         )
 
@@ -2445,8 +2453,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     web_form_new_feed = SpecifyEditFeedForm(request.form)
 
     if request.method == "POST" and not web_form_new_feed.validate():
-        flash(str(web_form_new_feed.errors))
-        logger.info(str(web_form_new_feed.errors))
+        flash("pdg_app/to_edit_feed: " + str(web_form_new_feed.errors))
+        logger.error(str(web_form_new_feed.errors))
     if request.method == "POST" and web_form_new_feed.validate():
         logger.info("to_edit_feed: with web_form, request.form = " + str(request.form))
 
@@ -2665,7 +2673,10 @@ def to_add_expression() -> werkzeug.Response:
 
     # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/66
     if len(list_of_relation_dicts) == 0:
-        flash("Need to have at least on relation before entering an Expression")
+        flash(
+            "pdg_app/to_add_expression: Need to have at least on relation before entering an Expression"
+        )
+        logger.error("Need to have at least on relation before entering an Expression")
         return redirect(url_for("to_add_relation"))
 
     # logger.info("list_of_relation_dicts=",list_of_relation_dicts)
@@ -2686,8 +2697,8 @@ def to_add_expression() -> werkzeug.Response:
     web_form = SpecifyNewExpressionForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
-        flash(str(web_form.errors))
-        logger.info(str(web_form.errors))
+        flash("pdg_app/to_add_expression: " + str(web_form.errors))
+        logger.error(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info("request.form = " + str(request.form))
 
@@ -2702,9 +2713,7 @@ def to_add_expression() -> werkzeug.Response:
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not expression_latex_lhs.isascii():
-            logger.critical(
-                "Non-ascii expression_latex_lhs: " + str(expression_latex_lhs)
-            )
+            logger.error("Non-ascii expression_latex_lhs: " + str(expression_latex_lhs))
             return "<H1>Input must be ASCII only</H1>\n" + str(expression_latex_lhs)
 
         # the web UI dropdown returns the symbol ID (and not Latex string)
@@ -2735,16 +2744,14 @@ def to_add_expression() -> werkzeug.Response:
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not expression_latex_rhs.isascii():
-            logger.critical(
-                "Non-ascii expression_latex_rhs: " + str(expression_latex_rhs)
-            )
+            logger.error("Non-ascii expression_latex_rhs: " + str(expression_latex_rhs))
             return "<H1>Input must be ASCII only</H1>\n" + str(expression_latex_rhs)
 
         expression_latex_condition = str(
             web_form.expression_latex_condition.data
         ).strip()
         if not expression_latex_condition.isascii():
-            logger.critical(
+            logger.error(
                 "Non-ascii expression_latex_condition: "
                 + str(expression_latex_condition)
             )
@@ -2754,7 +2761,7 @@ def to_add_expression() -> werkzeug.Response:
 
         expression_name_latex = str(web_form.expression_name_latex.data).strip()
         if not expression_name_latex.isascii():
-            logger.critical(
+            logger.error(
                 "Non-ascii expression_name_latex: " + str(expression_name_latex)
             )
             return "<H1>Input must be ASCII only</H1>\n" + str(expression_name_latex)
@@ -2763,7 +2770,7 @@ def to_add_expression() -> werkzeug.Response:
             web_form.expression_reference_latex.data
         ).strip()
         if not expression_reference_latex.isascii():
-            logger.critical(
+            logger.error(
                 "Non-ascii expression_reference_latex: "
                 + str(expression_reference_latex)
             )
@@ -2775,7 +2782,7 @@ def to_add_expression() -> werkzeug.Response:
             web_form.expression_description_latex.data
         ).strip()
         if not expression_description_latex.isascii():
-            logger.critical(
+            logger.error(
                 "Non-ascii expression_description_latex: "
                 + str(expression_description_latex)
             )
@@ -2887,14 +2894,14 @@ def to_add_feed() -> werkzeug.Response:
     web_form = SpecifyNewFeedForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
-        flash(str(web_form.errors))
-        logger.info(str(web_form.errors))
+        flash("pdg_app/to_add_feed: " + str(web_form.errors))
+        logger.error(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
-        logger.info("to_add_feed: request.form = " + str(request.form))
+        logger.info("request.form = " + str(request.form))
 
         feed_latex = str(web_form.feed_latex.data).strip().replace("\\", "\\\\")
 
-        logger.info("to_add_feed: feed_latex:" + str(feed_latex))
+        logger.info("feed_latex:" + str(feed_latex))
         # TODO: validate that this string is actually Latex before adding to database
 
         feed_sympy = "TODO"  # TODO: if promoting existing symbol, this can be filled in immediately
@@ -3046,7 +3053,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
             url_for("to_edit_constant_value_and_units", value_with_units=node_id)
         )
     else:
-        logger.info("ERROR: shouldn't reach here")
+        logger.error("shouldn't reach here")
         raise Exception("ERROR: shouldn't reach here 9942892424")
 
     raise Exception("ERROR: shouldn't reach here 01948138481")
@@ -3084,8 +3091,8 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
     logger.info("request.method =" + str(request.method))
 
     if request.method == "POST" and not web_form.validate():
-        flash(str(web_form.errors))
-        logger.info(str(web_form.errors))
+        flash("pdg_app/to_edit_operation: " + str(web_form.errors))
+        logger.error(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info("request.form = " + str(request.form))
 
@@ -3156,14 +3163,14 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
 
     web_form_no_options = NoOptionsForm(request.form)
     web_form_new_symbol = SpecifyNewSymbolRelationForm(request.form)
-    logger.info("to_edit_relation: request.method =" + str(request.method))
-    logger.info("to_edit_relation: request.form = " + str(request.form))
+    logger.info("request.method =" + str(request.method))
+    logger.info("request.form = " + str(request.form))
 
     if request.method == "POST" and not web_form_new_symbol.validate():
-        flash(str(web_form_new_symbol.errors))
-        logger.info(str(web_form_new_symbol.errors))
+        flash("pdg_app/to_edit_relation: " + str(web_form_new_symbol.errors))
+        logger.error(str(web_form_new_symbol.errors))
     if request.method == "POST" and web_form_new_symbol.validate():
-        logger.info("to_edit_relation: in POST the request.form = " + str(request.form))
+        logger.info("in POST the request.form = " + str(request.form))
 
         relation_latex = str(web_form_new_symbol.relation_latex.data).strip()
         relation_name_latex = str(web_form_new_symbol.relation_name_latex.data).strip()
@@ -3231,7 +3238,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
         query_time_dict["pdg_app/to_edit_scalar_symbol: node_properties" + trace_id] = (
             round(time.time() - query_start_time, 3)
         )
-    logger.info("to_edit_scalar scalar_dict:" + str(scalar_dict))
+    logger.info("scalar_dict:" + str(scalar_dict))
 
     if scalar_dict is None:
         return "<H1>Scalar ID " + str(scalar_id) + " does not exist in database</H1>."
@@ -3240,16 +3247,16 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
     web_form_no_options = NoOptionsForm(request.form)
 
     if request.method == "POST":
-        logger.info("to_edit_scalar: request.form = " + str(request.form))
+        logger.info("request.form = " + str(request.form))
         # ('scalar_latex', 'a'), ('scalar_name_latex', 'name of scalar'),
         # ('scalar_description_latex', 'description of scalar'),
         # ('scalar_reference_latex', 'this is a referec')])
 
     if request.method == "POST" and not web_form_symbol_properties.validate():
-        flash(str(web_form_symbol_properties.errors))
-        logger.info(str(web_form_symbol_properties.errors))
+        flash("pdg_app/to_edit_scalar: " + str(web_form_symbol_properties.errors))
+        logger.error(str(web_form_symbol_properties.errors))
     if request.method == "POST" and web_form_symbol_properties.validate():
-        logger.info("to_edit_scalar: request.form validated")
+        logger.info("request.form validated")
 
         symbol_latex = str(
             web_form_symbol_properties.symbol_latex.data
@@ -3273,7 +3280,8 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
             logger.info("to_edit_scalar: symbol_property=" + str(symbol_property))
             logger.info("symbol_property_value=" + str(symbol_property_value))
 
-            flash("to_edit_scalar: NOT ENACTED YET 942492482324")
+            flash("pdg_app/to_edit_scalar: NOT ENACTED YET 942492482324")
+            logger.error("NOT ENACTED YET 942492482324")
             # TODO: check which properties are different
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
@@ -3344,7 +3352,8 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     logger.info("vector_id: " + str(vector_id))
 
-    flash("to_edit_vector: NOT ENACTED YET 13942942392")
+    flash("pdg_app/to_edit_vector: NOT ENACTED YET 13942942392")
+    logger.error("NOT ENACTED YET 13942942392")
     # TODO
 
     vector_dict = {}
@@ -3374,7 +3383,8 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     logger.info("matrix_id: " + str(matrix_id))
 
-    flash("to_edit_matrix: NOT ENACTED YET 94294111111")
+    flash("pdg_app/to_edit_matrix: NOT ENACTED YET 94294111111")
+    logger.error("NOT ENACTED YET 94294111111")
     # TODO
 
     matrix_dict = {}
@@ -3407,14 +3417,17 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
             "pdg_app/to_add_value_and_units: list_nodes_of_type scalar" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("to_add_value_and_units: request.form = " + str(request.form))
+    logger.info("request.form = " + str(request.form))
     web_form_constant_properties = SpecifyNewConstantNumberForm(request.form)
 
     if request.method == "POST" and not web_form_constant_properties.validate():
-        flash(str(web_form_constant_properties.errors))
-        logger.info(str(web_form_constant_properties.errors))
+        flash(
+            "pdg_app/to_add_value_and_units: "
+            + str(web_form_constant_properties.errors)
+        )
+        logger.error(str(web_form_constant_properties.errors))
     if request.method == "POST" and web_form_constant_properties.validate():
-        logger.info("to_add_value_and_units: request.form = " + str(request.form))
+        logger.info("request.form = " + str(request.form))
 
         # request.form =  ImmutableMultiDict([('number_decimal', '5'),
         #        ('number_power', '0.00'), ('mass_select_unit', 'stone'),
@@ -3551,10 +3564,10 @@ def to_add_symbol_scalar() -> werkzeug.Response:
     web_form_scalar_properties = SpecifyNewSymbolScalarForm(request.form)
 
     if request.method == "POST" and not web_form_scalar_properties.validate():
-        flash(str(web_form_scalar_properties.errors))
-        logger.info(str(web_form_scalar_properties.errors))
+        flash("pdg_app/to_add_symbol_scalar: " + str(web_form_scalar_properties.errors))
+        logger.error(str(web_form_scalar_properties.errors))
     if request.method == "POST" and web_form_scalar_properties.validate():
-        logger.info("to_add_symbol_scalar: request.form = " + str(request.form))
+        logger.info("request.form = " + str(request.form))
 
         scalar_latex = str(web_form_scalar_properties.scalar_latex.data).strip()
         scalar_name_latex = str(
@@ -3567,7 +3580,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
             web_form_scalar_properties.scalar_reference_latex.data
         ).strip()
 
-        logger.info("to_add_symbol_scalar: scalar_latex:" + str(scalar_latex))
+        logger.info("scalar_latex:" + str(scalar_latex))
         logger.info("scalar_name_latex:" + str(scalar_name_latex))
         logger.info("scalar_description_latex" + str(scalar_description_latex))
 
@@ -3724,8 +3737,8 @@ def to_add_symbol_vector() -> werkzeug.Response:
     web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
 
     if request.method == "POST" and not web_form_vector_properties.validate():
-        flash(str(web_form_vector_properties.errors))
-        logger.info(str(web_form_vector_properties.errors))
+        flash("pdg_app/to_add_symbol_vector: " + str(web_form_vector_properties.errors))
+        logger.error(str(web_form_vector_properties.errors))
     if request.method == "POST" and web_form_vector_properties.validate():
         logger.info("request.form = " + str(request.form))
 
@@ -3834,10 +3847,10 @@ def to_add_symbol_matrix() -> werkzeug.Response:
     web_form_matrix_properties = SpecifyNewSymbolMatrixForm(request.form)
 
     if request.method == "POST" and not web_form_matrix_properties.validate():
-        flash(str(web_form_matrix_properties.errors))
-        logger.info(str(web_form_matrix_properties.errors))
+        flash("pdg_app/to_add_symbol_matrix: " + str(web_form_matrix_properties.errors))
+        logger.error(str(web_form_matrix_properties.errors))
     if request.method == "POST" and web_form_matrix_properties.validate():
-        logger.info("to_add_symbol_matrix: request.form = " + str(request.form))
+        logger.info("request.form = " + str(request.form))
 
         # request.form =  ImmutableMultiDict([('matrix_latex', '\\hat{p}'),
         #       ('matrix_name_latex', ''), ('matrix_description_latex', ''),
@@ -3958,10 +3971,10 @@ def to_add_operation() -> werkzeug.Response:
     web_form = SpecifyNewSymbolOperationForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
-        flash(str(web_form.errors))
-        logger.info(str(web_form.errors))
+        flash("pdg_app/to_add_operation: " + str(web_form.errors))
+        logger.error(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
-        logger.info("to_add_operation: request.form = " + str(request.form))
+        logger.info("request.form = " + str(request.form))
 
         # request.form =  ImmutableMultiDict([('input1', 'a = b'), ('submit_button', 'Submit')])
 
@@ -3973,7 +3986,7 @@ def to_add_operation() -> werkzeug.Response:
         operation_reference_latex = str(web_form.operation_reference_latex.data).strip()
         operation_argument_count = int(web_form.operation_argument_count.data)
 
-        logger.info("to_add_operation operation_latex:" + str(operation_latex))
+        logger.info("operation_latex:" + str(operation_latex))
         logger.info("operation_name_latex:" + str(operation_name_latex))
         logger.info("operation_description_latex" + str(operation_description_latex))
         logger.info("operation_argument_count" + str(operation_argument_count))
@@ -4052,16 +4065,14 @@ def to_add_relation() -> werkzeug.Response:
             graphDB_Driver, query_time_dict, this_relation_dict["id"]
         )
 
-    logger.info("to_add_relation before validate - request.form = " + str(request.form))
+    logger.info("before validate - request.form = " + str(request.form))
     web_form = SpecifyNewSymbolRelationForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
-        flash(str(web_form.errors))
-        logger.info(str(web_form.errors))
+        flash("pdg_app/to_add_relation: " + str(web_form.errors))
+        logger.error(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
-        logger.info(
-            "to_add_relation after validate - request.form = " + str(request.form)
-        )
+        logger.info(" after validate - request.form = " + str(request.form))
 
         # request.form =
 
@@ -4073,7 +4084,7 @@ def to_add_relation() -> werkzeug.Response:
         relation_reference_latex = str(web_form.relation_reference_latex.data).strip()
         relation_argument_count = 2
 
-        logger.info("to_add_relation relation_latex:" + str(relation_latex))
+        logger.info("relation_latex:" + str(relation_latex))
         logger.info("relation_name_latex:" + str(relation_name_latex))
         logger.info("relation_description_latex" + str(relation_description_latex))
         logger.info("relation_argument_count" + str(relation_argument_count))
@@ -4181,9 +4192,7 @@ def to_add_step_select_expressions(
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "derivation", derivation_id
         )
-    logger.info(
-        "to_add_step_select_expressions: derivation_dict is " + str(derivation_dict)
-    )
+    logger.info("derivation_dict is " + str(derivation_dict))
 
     inference_rule_dict = {}
     with graphDB_Driver.session() as session:
@@ -4192,20 +4201,15 @@ def to_add_step_select_expressions(
             neo4j_query.get_node_properties, "inference_rule", inference_rule_id
         )
 
-    logger.info(
-        "to_add_step_select_expressions: inference_rule_dict is "
-        + str(inference_rule_dict)
-    )
+    logger.info("inference_rule_dict is " + str(inference_rule_dict))
 
     web_form = SpecifyNewStepForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
-        flash(str(web_form.errors))
-        logger.info(str(web_form.errors))
+        flash("pdg_app/to_add_step_select_expressions: " + str(web_form.errors))
+        logger.error(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
-        logger.info(
-            "to_add_step_select_expressions: request.form = " + str(request.form)
-        )
+        logger.info("request.form = " + str(request.form))
 
         note_before_step_latex = str(web_form.note_before_step_latex.data).strip()
         note_after_step_latex = str(web_form.note_after_step_latex.data).strip()
@@ -4258,8 +4262,8 @@ def to_add_step_select_expressions(
                 or (len(list_of_output_expression_IDs) > 0)
             )
         except AssertionError as err:
-            flash(str(err))
-            logger.info(str(err))
+            flash("pdg_app/to_add_step_select_expressions: " + str(err))
+            logger.error(str(err))
             return redirect(
                 url_for(
                     "to_add_step_select_expressions",
@@ -4334,9 +4338,7 @@ def to_add_symbols_and_operations_for_expression(
     r_{\rm Earth} = 6
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] to_add_symbols_and_operations_for_expression start " + str(trace_id)
-    )
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     # get the Latex for this expression_id
@@ -4391,8 +4393,11 @@ def to_add_symbols_and_operations_for_expression(
             cleaned_latex_str_lhs
         )
     except Exception as e:
-        flash("sympy_expr_lhs: " + str(e))
-        logger.critical("sympy_expr_lhs: " + str(e))
+        flash(
+            "pdg_app/to_add_symbols_and_operations_for_expression: sympy_expr_lhs: "
+            + str(e)
+        )
+        logger.error("sympy_expr_lhs: " + str(e))
         sympy_expr_lhs = None
     # ERROR: SymPy can't convert "="
     # sympy_expr_relation = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
@@ -4403,8 +4408,11 @@ def to_add_symbols_and_operations_for_expression(
             cleaned_latex_str_rhs
         )
     except Exception as e:
-        flash("sympy_expr_rhs: " + str(e))
-        logger.critical("sympy_expr_rhs: " + str(e))
+        flash(
+            "pdg_app/to_add_symbols_and_operations_for_expression: sympy_expr_rhs: "
+            + str(e)
+        )
+        logger.error("sympy_expr_rhs: " + str(e))
         sympy_expr_rhs = None
     logger.info("sympy_expr_lhs=" + str(sympy_expr_lhs))
     # logger.info("sympy_expr_relation=", str(sympy_expr_relation))
@@ -4637,8 +4645,8 @@ def to_add_sympy_and_lean_for_expression(
             cleaned_latex_lhs_str
         )
     except Exception as e:
-        logger.critical("sympy_expr_lhs: " + str(e))
-        flash("sympy_expr_lhs: " + str(e))
+        flash("pdg_app/to_add_sympy_and_lean_for_expression: sympy_expr_lhs: " + str(e))
+        logger.error("sympy_expr_lhs: " + str(e))
         sympy_expr_lhs = None
     logger.info("sympy_expr_lhs=" + str(sympy_expr_lhs))
 
@@ -4647,8 +4655,8 @@ def to_add_sympy_and_lean_for_expression(
             cleaned_latex_rhs_str
         )
     except Exception as e:
-        logger.critical("sympy_expr_rhs: " + str(e))
-        flash("sympy_expr_rhs: " + str(e))
+        flash("pdg_app/to_add_sympy_and_lean_for_expression: sympy_expr_rhs: " + str(e))
+        logger.error("sympy_expr_rhs: " + str(e))
         sympy_expr_rhs = None
 
     logger.info("sympy_expr_rhs=" + str(sympy_expr_rhs))
@@ -4663,16 +4671,20 @@ def to_add_sympy_and_lean_for_expression(
             sympy_expr_lhs, symbol_id_dict
         )
     except Exception as e:
-        logger.critical("revised_expr_lhs = " + str(e))
-        flash("revised_expr_lhs: " + str(e))
+        flash(
+            "pdg_app/to_add_sympy_and_lean_for_expression: revised_expr_lhs: " + str(e)
+        )
+        logger.error("revised_expr_lhs = " + str(e))
         revised_expr_lhs = None
     try:
         revised_expr_rhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
             sympy_expr_rhs, symbol_id_dict
         )
     except Exception as e:
-        logger.critical("revised_expr_rhs = " + str(e))
-        flash("revised_expr_rhs: " + str(e))
+        flash(
+            "pdg_app/to_add_sympy_and_lean_for_expression: revised_expr_rhs: " + str(e)
+        )
+        logger.error("revised_expr_rhs = " + str(e))
         revised_expr_lhs = None
 
     logger.info(
@@ -4777,8 +4789,8 @@ def to_add_sympy_and_lean_for_expression(
                 ] = round(time.time() - query_start_time, 3)
 
         except neo4j.exceptions.CypherSyntaxError as err:
-            logger.info("ERROR to_add_sympy_and_lean_for_expression:" + str(err))
-            flash("ERROR to_add_sympy_and_lean_for_expression:" + str(err))
+            flash("pdg_app/to_add_sympy_and_lean_for_expression ERROR: " + str(err))
+            logger.error(str(err))
             return redirect(
                 url_for(
                     "to_add_sympy_and_lean_for_expression",
@@ -5101,8 +5113,8 @@ def to_add_sympy_and_lean_for_feed(
                     + trace_id
                 ] = round(time.time() - query_start_time, 3)
         except neo4j.exceptions.CypherSyntaxError as err:
-            logger.info("to_add_sympy_and_lean_for_feed ERROR:" + str(err))
-            flash("to_add_sympy_and_lean_for_feed ERROR:" + str(err))
+            flash("pdg_app/to_add_sympy_and_lean_for_feed ERROR:" + str(err))
+            logger.error(str(err))
             logger.info("[TRACE] to_add_sympy_and_lean_for_feed end " + str(trace_id))
             return redirect(
                 url_for(
@@ -5155,10 +5167,10 @@ def to_add_inference_rule() -> werkzeug.Response:
     web_form = SpecifyNewInferenceRuleForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
-        flash(str(web_form.errors))
-        logger.info(str(web_form.errors))
+        flash("pdg_app/to_add_inference_rule" + str(web_form.errors))
+        logger.error(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
-        logger.info("to_add_inference_rule request.form = " + str(request.form))
+        logger.info("request.form = " + str(request.form))
 
         # request.form =  ImmutableMultiDict([('inference_rule_name', 'add x to both sides'),
         # ('inference_rule_latex', 'add _ to both sides'),
@@ -5191,8 +5203,8 @@ def to_add_inference_rule() -> werkzeug.Response:
                 + str(inference_rule_dict["name_latex"])
             )
             if inference_rule_name == inference_rule_dict["name_latex"]:
-                logger.info(
-                    "to_add_inference_rule INVALID INPUT: inference rule with that name already exists"
+                logger.error(
+                    "INVALID INPUT: inference rule with that name already exists"
                 )
                 # TODO: a notice should be provided to the user
                 flash(
@@ -5202,8 +5214,8 @@ def to_add_inference_rule() -> werkzeug.Response:
                 logger.info("[TRACE] to_add_inference_rule end " + str(trace_id))
                 return redirect(url_for("to_add_inference_rule"))
             if inference_rule_latex == inference_rule_dict["latex"]:
-                logger.info(
-                    "to_add_inference_rule INVALID INPUT: inference rule with that latex already exists"
+                logger.error(
+                    "INVALID INPUT: inference rule with that latex already exists"
                 )
                 # TODO: a notice should be provided to the user
                 flash(
@@ -5231,8 +5243,10 @@ def to_add_inference_rule() -> werkzeug.Response:
             assert int(number_of_outputs) >= 0
         except AssertionError as err:
             # TODO: getting assertion error wipes whatever the user provided. That's bad.
-            flash("Assertion error; try again. " + str(err))
-            logger.info(str(err))
+            flash(
+                "pdg_app/to_add_inference_rule Assertion error; try again. " + str(err)
+            )
+            logger.error(str(err))
             return redirect(url_for("to_add_inference_rule"))
 
         # as per https://strftime.org/
@@ -5273,7 +5287,7 @@ def to_edit_step(
 ) -> werkzeug.Response:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_step start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     # TODO: Verify that derivation_id exists
@@ -5297,8 +5311,8 @@ def to_edit_step(
     web_form = SpecifyNewStepForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
-        flash(str(web_form.errors))
-        logger.info(str(web_form.errors))
+        flash("pdg_app/to_edit_step: " + str(web_form.errors))
+        logger.error(str(web_form.errors))
     if (
         request.method == "POST" and web_form.validate()
     ):  # form always validates because no field is required
@@ -5348,9 +5362,7 @@ def to_edit_inference_rule(
     web_form_edit = SpecifyNewInferenceRuleForm(request.form)
     web_form_delete = NoOptionsForm(request.form)
     if request.method == "POST":
-        logger.info(
-            "to_edit_inference_rule request.form no validate = " + str(request.form)
-        )
+        logger.info(" request.form no validate = " + str(request.form))
 
         if request.form["submit_button"] == "delete inference rule":
             logger.info("delete inf rule")
@@ -5368,8 +5380,8 @@ def to_edit_inference_rule(
             return redirect(url_for("to_list_inference_rules"))
 
     if request.method == "POST" and not web_form_edit.validate():
-        flash(str(web_form_edit.errors))
-        logger.info(str(web_form_edit.errors))
+        flash("pdg_app/to_edit_inference_rule: " + str(web_form_edit.errors))
+        logger.error(str(web_form_edit.errors))
     if request.method == "POST" and web_form_edit.validate():
         logger.info("to_edit_inference_rule validated")
         logger.info("to_edit_inference_rule request.form valid = " + str(request.form))
@@ -5415,20 +5427,24 @@ def to_edit_inference_rule(
                 + str(inference_rule_dict["inference_rule_name"])
             )
             if inference_rule_name == inference_rule_dict["inference_rule_name"]:
-                logger.info(
+                logger.error(
                     "INVALID INPUT: inference rule with that name already exists"
                 )
                 # TODO: a notice should be provided to the user
-                flash("INVALID INPUT: inference rule with that name already exists")
+                flash(
+                    "pdg_app/to_edit_inference_rule INVALID INPUT: inference rule with that name already exists"
+                )
 
                 logger.info("[TRACE] to_edit_inference_rule end " + str(trace_id))
                 return redirect(url_for("to_add_inference_rule"))
             if inference_rule_latex == inference_rule_dict["latex"]:
-                logger.info(
+                logger.error(
                     "INVALID INPUT: inference rule with that latex already exists"
                 )
                 # TODO: a notice should be provided to the user
-                flash("INVALID INPUT: inference rule with that latex already exists")
+                flash(
+                    "pdg_app/to_edit_inference_ruleINVALID INPUT: inference rule with that latex already exists"
+                )
 
                 logger.info("[TRACE] to_edit_inference_rule end " + str(trace_id))
                 return redirect(url_for("to_add_inference_rule"))
@@ -5527,8 +5543,8 @@ def to_query() -> werkzeug.Response:
     web_form = CypherQueryForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
-        flash(str(web_form.errors))
-        logger.info(str(web_form.errors))
+        flash("pdg_app/to_query: " + str(web_form.errors))
+        logger.error(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         query = str(web_form.query.data).strip()
         logger.info("to_query: form valid; query via web form: " + str(query))
@@ -6237,19 +6253,30 @@ def to_list_expressions() -> str:
     )
     logger.info("dict_of_all_symbol_dicts=" + str(dict_of_all_symbol_dicts))
 
+    # try:
     dimensional_consistency_per_expression_id, query_time_dict = (
         compute.get_dimensional_consistency_per_expression_id(
             graphDB_Driver, query_time_dict
         )
     )
+    # except Exception as e:
+    #     flash("ERROR in to_list_expressions: " + str(e))
+    #     logger.error(str(e))
+    #     dimensional_consistency_per_expression_id = {}
+
     # logger.info(
     #     "dimensional_consistency_per_expression_id="
     #     + str(dimensional_consistency_per_expression_id)
     # )
 
+    # try:
     list_of_expression_dicts = compute.get_sympy_as_latex_per_expr_id(
         list_of_expression_dicts
     )
+    # except Exception as e:
+    #     flash("ERROR in to_list_expressions: " + str(e))
+    #     logger.error(str(e))
+    #     list_of_expression_dicts = []
 
     logger.info("[TRACE] to_list_expressions end " + str(trace_id))
     return render_template(
@@ -7291,8 +7318,11 @@ def to_spectrum_of_precision_layer(which_layer):
             "jinja2_pages/layers_proof_of_inference_rule.html", title=page_title
         )
     else:
-        flash("unrecognized argument: " + which_layer)
-        logger.debug("unrecognized argument: " + which_layer)
+        flash(
+            "pdg_app/to_spectrum_of_precision_layer: unrecognized argument: "
+            + which_layer
+        )
+        logger.error("unrecognized argument: " + which_layer)
         return render_template("jinja2_pages/layers_overview.html", title=page_title)
     return render_template("jinja2_pages/layers_overview.html", title=page_title)
 
