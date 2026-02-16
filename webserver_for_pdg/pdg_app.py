@@ -6184,12 +6184,12 @@ def to_list_derivations() -> str:
     logger.info("[TRACE] to_list_derivations start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    query_time_dict = compute.convert_expr_sympy_pdg_symbols_to_neo4j_edge(
-        graphDB_Driver, query_time_dict
-    )
-    query_time_dict = compute.convert_feed_sympy_pdg_symbols_to_neo4j_edge(
-        graphDB_Driver, query_time_dict
-    )
+    # query_time_dict = compute.convert_expr_sympy_pdg_symbols_to_neo4j_edge(
+    #     graphDB_Driver, query_time_dict
+    # )
+    # query_time_dict = compute.convert_feed_sympy_pdg_symbols_to_neo4j_edge(
+    #     graphDB_Driver, query_time_dict
+    # )
 
     # The following is irrelevant since the page doesn't submit anything back to the server
     # if request.method == "POST":
