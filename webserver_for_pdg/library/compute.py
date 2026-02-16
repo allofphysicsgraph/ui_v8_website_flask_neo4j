@@ -47,7 +47,7 @@ def generate_random_id(
     try:
         assert node_type in list_of_valid.node_types
     except Exception as err:
-        logger.info("error=" + str(err))
+        logger.error(str(type(err).__name__) + ": " + str(err))
 
     list_of_existing_IDs = []
     with graphDB_Driver.session() as session:
@@ -347,7 +347,7 @@ def send_email_with_msmtp(
         print(message)
         return False
 
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError as err:
         # This block runs if msmtp fails (e.g., auth error, network issue).
         print("Error sending email:", file=sys.stderr)
         print(f"msmtp exit code: {e.returncode}", file=sys.stderr)
@@ -365,30 +365,38 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
     sympy_as_latex_per_feed_id = {}  # type: Dict[str, str]
-    for this_dict in list_of_feed_dicts:
+    for this_feed_dict in list_of_feed_dicts:
         if "sympy" in this_feed_dict.keys():
-            if len(this_dict["sympy"]) > 0:
+            if len(this_feed_dict["sympy"]) > 0:
                 try:
                     sympy_as_latex_per_feed_id[this_feed_dict["id"]] = (
-                        latex_and_sympy.sympy_to_latex_str(this_dict["sympy"])
+                        latex_and_sympy.sympy_to_latex_str(this_feed_dict["sympy"])
                     )
                 except Exception as err:
                     logger.error(
-                        "converting to Sympy in get_sympy_as_latex_per_feed_id: "
-                        + str(err)
+                        "converting to Sympy: "
+                        + str(type(err).__name__)
+                        + ": "
+                        + +str(err)
                     )
-                    sympy_as_latex_per_feed_id[this_dict["id"]] = "error converting"
+                    sympy_as_latex_per_feed_id[this_feed_dict["id"]] = (
+                        "error converting"
+                    )
             else:
-                sympy_as_latex_per_feed_id[this_dict["id"]] = "'sympy' key is empty"
+                sympy_as_latex_per_feed_id[this_feed_dict["id"]] = (
+                    "'sympy' key is empty"
+                )
         else:
-            sympy_as_latex_per_feed_id[this_dict["id"]] = "no 'sympy' key"
+            sympy_as_latex_per_feed_id[this_feed_dict["id"]] = "no 'sympy' key"
 
     logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return sympy_as_latex_per_feed_id
 
 
 def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
-    """ """
+    """
+    This function edits the input argument, whereas the `feed` version does not.
+    """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id)
     for index, this_expression_dict in enumerate(list_of_expression_dicts):
@@ -399,17 +407,17 @@ def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
                         this_expression_dict["sympy_lhs"]
                     )
                 )
-            except AttributeError as e:
+            except AttributeError as err:
                 list_of_expression_dicts[index]["latex_as_sympy_LHS"] = (
-                    "AttributeError in get_sympy_as_latex_per_expr_id: " + str(e)
+                    "AttributeError in get_sympy_as_latex_per_expr_id: " + str(err)
                 )
-            except TypeError as e:
+            except TypeError as err:
                 list_of_expression_dicts[index]["latex_as_sympy_LHS"] = (
-                    "TypeError in get_sympy_as_latex_per_expr_id: " + str(e)
+                    "TypeError in get_sympy_as_latex_per_expr_id: " + str(err)
                 )
-            except tokenize.TokenError as e:
+            except tokenize.TokenError as err:
                 list_of_expression_dicts[index]["latex_as_sympy_LHS"] = (
-                    "tokenize.TokenError in get_sympy_as_latex_per_expr_id: " + str(e)
+                    "tokenize.TokenError in get_sympy_as_latex_per_expr_id: " + str(err)
                 )
         if "sympy_rhs" in this_expression_dict.keys():
             try:
@@ -418,17 +426,17 @@ def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
                         this_expression_dict["sympy_rhs"]
                     )
                 )
-            except AttributeError as e:
+            except AttributeError as err:
                 list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
-                    "AttributeError in get_sympy_as_latex_per_expr_id: " + str(e)
+                    "AttributeError in get_sympy_as_latex_per_expr_id: " + str(err)
                 )
-            except TypeError as e:
+            except TypeError as err:
                 list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
-                    "TypeError in get_sympy_as_latex_per_expr_id: " + str(e)
+                    "TypeError in get_sympy_as_latex_per_expr_id: " + str(err)
                 )
-            except tokenize.TokenError as e:
+            except tokenize.TokenError as err:
                 list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
-                    "tokenize.TokenError in get_sympy_as_latex_per_expr_id: " + str(e)
+                    "tokenize.TokenError in get_sympy_as_latex_per_expr_id: " + str(err)
                 )
     logger.info("[TRACE] end " + trace_id)
     return list_of_expression_dicts
