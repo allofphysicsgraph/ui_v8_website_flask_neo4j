@@ -174,7 +174,7 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 
 <H2 id="which cas"><i>Decision</i>: Which Computer Algebra System(s) to use?</H2>
 
-<P>Currently using SymPy.
+<P><em>current status</em>:  using SymPy.
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/117">https://github.com/allofphysicsgraph/task-tracker/issues/117</a></p>
 
@@ -186,7 +186,7 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 
 <H2 id="which proof assistant"><i>Decision</i>: Which proof assistant(s) to use?</H2>
 
-<P>Currently using Lean 4.
+<P><em>current status</em>:  using Lean 4.
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/106">https://github.com/allofphysicsgraph/task-tracker/issues/106</a></p>
 
@@ -198,7 +198,7 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 
 <H2 id="which syntax"><i>Decision</i>: How to represent expressions?</H2>
 
-<P>Currently using Latex.
+<P><em>current status</em>:  using Latex.
 
 <p>See <a href="{{ url_for('to_comparison_of_design_options_syntax') }}">comparison of Latex, Content MathML, Presentation ML</a></p>
 
@@ -208,7 +208,7 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 
 <H2 id="render graphs viz"><i>Decision</i>: How to render graphs visually?</H2>
 
-<P>Currently using d3js and graphviz.
+<P><em>current status</em>:  using d3js and graphviz.
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/97">https://github.com/allofphysicsgraph/task-tracker/issues/97</a></p>
 
@@ -222,7 +222,7 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 
 <H2 id="property graph"><i>Decision</i>: Which Property Graph database?</H2>
 
-<P>Currently using Neo4j.
+<P><em>current status</em>:  using Neo4j.
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/43">https://github.com/allofphysicsgraph/task-tracker/issues/43</a></p>
 
@@ -261,7 +261,7 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 
 <H2 id="page scope"><i>Decision</i>: Page scope</H2>
 
-<P>Currently using page-per-decision.
+<P><em>current status</em>:  using page-per-decision.
 
 <p>Rendered HTML pages should have a single scope. (As opposed to a single-page website.)</p>
 
@@ -272,7 +272,7 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 
 <H2 id="display latex"><i>Decision</i>: How to display Latex on webpages?</H2>
 
-<P>Currently using MathJax.
+<P><em>current status</em>:  using MathJax.
 
 <UL>
   <LI><a href="https://jojozhuang.github.io/tutorial/mathjax-cheat-sheet-for-mathematical-notation/">https://jojozhuang.github.io/tutorial/mathjax-cheat-sheet-for-mathematical-notation/</a>
@@ -287,9 +287,9 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 
 <H2 id="which VPS"><i>Decision</i>: Which VPS provider service company to use?</H2>
 
-<P>Currently using Hetzner.
+<P><em>current status</em>: Currently using Hetzner.
 
-<p>DigitalOcean, AWS, Oracle, Azure</p>
+<p>Example options: DigitalOcean, AWS, Oracle, Azure</p>
 
 <p><a href="https://github.com/allofphysicsgraph/task-tracker/issues/56">https://github.com/allofphysicsgraph/task-tracker/issues/56</a></p>
 
@@ -300,19 +300,20 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id="separate static dynamic"><i>Decision</i>: Separate non-interactive workflow pages (e.g., user_documentation) into a separate Python file?</H2>
+<H2 id="separate static dynamic"><i>Decision</i>: Separate some pages into a separate Python file?</H2>
 
-<P>Currently using single file (pdg_app.py).
+<P><em>current status</em>: flask routes are in single file (<code>pdg_app.py</code>).
 
-<p>Having all the routes in a single file (e.g., pdg_app.py) results in a huge file with thousands of lines.</p>
+<P>Options: have different categories of routes in separate .py scripts, or have all routes in a single .py script.
 
-<p>Happily, Flask provides a way to separate routes into separate files (e.g., pdg_other_routes.py) using blueprints.</p>
+<p>Having all the routes in a single file (e.g., <code>pdg_app.py</code>) results in a huge file with thousands of lines.<BR>
+To make this more managable, Flask provides a way to separate routes into separate files (e.g., pdg_other_routes.py) using blueprints.</p>
 
-<P>The file pdg_app.py contains
+<P>As an example of how this woule be enacted, suppose the file <code>pdg_app.py</code> contains
 <pre>from pdg_other_routes import other_routes_bp
 web_app.register_blueprint(other_routes_bp)
 </pre>
-<P>and then pdg_other_routes.py contains
+<P>and <code>pdg_other_routes.py</code> contains
 <pre>other_routes_bp = Blueprint("other_routes", __name__)
 
 @other_routes_bp.route("/api_via_js")
@@ -320,14 +321,16 @@ def to_api_via_js() -&gt; str:
     return render_template("js_with_api/api_js.html")
 </pre>
 
-<p>So far, so good. The cost of this separation is that Flask namespaces the endpoints to ensure there are no name collisions between different files. The <code>url_for</code> function in Jinja2 templates (and in the Python code) now expects the format:
-</p><pre>other_routes.function_name
+<p>The cost of this separation is that Flask namespaces the endpoints to ensure there are no name collisions between different files. 
+  The <code>url_for</code> function in Jinja2 templates (and in the Python code) now expects the format:
+</p>
+<pre>other_routes.function_name
 </pre>
 
 <p>That would require figuring out which <code>url_for</code> functions point to routes in pdg_other_routes.py and which routes are in pdg_app.py
 </p>
 
-<p>Therefore, having all routes in pdg_app.py is easiest.</p>
+<p>Therefore, having all routes in <code>pdg_app.py</code> is easier.</p>
 
 
 <P>&nbsp;</P>
@@ -336,7 +339,7 @@ def to_api_via_js() -&gt; str:
 
 <H2 id="which languages"><i>Decision</i>: Which languages to use?</H2>
 
-<P>Currently using Python, HTML, Latex.
+<P><em>current status</em>: using Python, HTML, Latex.
 
 <p>Languages I'm comfortable with and are widely used - Python; HTML; Docker</p>
 
@@ -347,7 +350,7 @@ def to_api_via_js() -&gt; str:
 
 <H2 id="interface"><i>Decision</i>: Interface</H2>
 
-<P>Currently using web UI.
+<P><em>current status</em>: primarily using web UI. Exploring use of API.
 
 <P>Plan to support API.
 
@@ -361,13 +364,22 @@ def to_api_via_js() -&gt; str:
 <P>&nbsp;</P>
 
 
+<H2 id="interface"><i>Decision</i>: Not hiring contractors to enact features</H2>
+
+<P><em>current status</em>: I am not hiring a designer for the web front-end because that would be premature at this point. I'm still in the exploration prototyping phase to figure out what the front end will need to be able to do.
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
 <H2 id="data structure"><i>Decision</i>: Which data structure to use in the Physics Derivation Graph</a></H2>
 
-<P>Currently using Neo4j.
+<P><em>current status</em>: the Physics Derivation Graph is stored in a Neo4j Property Graph database.</P>
 
-<P>
-  The Physics Derivation Graph is stored in a Neo4j Property Graph database.
-</P>
+<P>(There are intermediate data structures in <code>pdg_app.py</code> that interface with the jinja2 HTML pages.)<BR>
+Not clear whether the site could just be using Neo4j directly by the web UI. </P>
+
 <P>
   The many alternatives data storage options (e.g., SQLite, Redis, Python Pickle, CSV, GraphML) offer trade-offs, a few of which <a href="{{ url_for('to_comparison_of_design_options_database') }}?referrer=design_documentation">have been explored</a>.
 
