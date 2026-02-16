@@ -79,7 +79,7 @@ def dimensional_consistency(
     expression_dict: dict,
     list_of_symbol_IDs_in_expression: list,
     dict_of_all_symbol_dicts: dict,
-):
+) -> str:
     """
     # TODO: this function handles "sympy" instead of "sympy_lhs" and "sympy_rhs"
 
@@ -93,11 +93,11 @@ def dimensional_consistency(
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id)
-    logger.info("expression_dict = " + str(expression_dict))
-    logger.info(
-        "list_of_symbol_IDs_in_expression = " + str(list_of_symbol_IDs_in_expression)
-    )
-    logger.info("dict_of_all_symbol_dicts = " + str(dict_of_all_symbol_dicts))
+    # logger.info("expression_dict = " + str(expression_dict))
+    # logger.info(
+    #     "list_of_symbol_IDs_in_expression = " + str(list_of_symbol_IDs_in_expression)
+    # )
+    # logger.info("dict_of_all_symbol_dicts = " + str(dict_of_all_symbol_dicts))
 
     if "sympy" not in expression_dict.keys():
         return "sympy not provided for expression"
