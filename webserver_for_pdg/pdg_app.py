@@ -1860,6 +1860,23 @@ def to_edit_derivation_metadata(
     logger.info("[TRACE] to_edit_derivation_metadata start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        derivation_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "derivation", derivation_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_derivation_metadata: node_properties" + trace_id
+        ] = round(time.time() - query_start_time, 3)
+    logger.info("to_edit_derivation_metadata: derivation_dict:" + str(derivation_dict))
+
+    if derivation_dict is None:
+        return (
+            "<H1>Derivation ID "
+            + str(derivation_id)
+            + " does not exist in database</H1>."
+        )
+
     web_form = SpecifyNewDerivationForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
@@ -1925,18 +1942,6 @@ def to_edit_derivation_metadata(
             ] = round(time.time() - query_start_time, 3)
         logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_review_derivation", derivation_id=derivation_id))
-
-    # get properties for derivation ID
-    derivation_dict = {}
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        derivation_dict = session.read_transaction(
-            neo4j_query.get_node_properties, "derivation", derivation_id
-        )
-        query_time_dict[
-            "pdg_app/to_edit_derivation_metadata: node_properties" + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    logger.info("to_edit_derivation_metadata: derivation_dict:" + str(derivation_dict))
 
     logger.info("[TRACE] to_edit_derivation_metadata end " + str(trace_id))
     return render_template(
@@ -2055,6 +2060,24 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
     logger.info("expression_id: " + str(expression_id))
 
+    expression_dict = {}
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        expression_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "expression", expression_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_expression: get_node_properties expression" + trace_id
+        ] = round(time.time() - query_start_time, 3)
+    logger.info("expression_dict:" + str(expression_dict))
+
+    if expression_dict is None:
+        return (
+            "<H1>Expression ID "
+            + str(expression_id)
+            + " does not exist in database</H1>."
+        )
+
     if request.method == "POST" and "delete_expression" in request.form:
         logger.info("Deleting expression: " + str(expression_id))
         with graphDB_Driver.session() as session:
@@ -2067,16 +2090,6 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             )
         return redirect(url_for("to_list_expressions"))
 
-    expression_dict = {}
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        expression_dict = session.read_transaction(
-            neo4j_query.get_node_properties, "expression", expression_id
-        )
-        query_time_dict[
-            "pdg_app/to_edit_expression: get_node_properties expression" + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    logger.info("expression_dict:" + str(expression_dict))
     # {'sympy_lhs': "Symbol('pdg5401487')", 'reference_latex': '', 'latex_condition': '',
     #  'sympy_rhs': "Mul(Symbol('pdg3031455'),Symbol('pdg5028085'))", 'description_latex': '',
     #  'created_datetime': '2026-02-08_01-59-31-990045', 'latex_lhs': '\\vec{F}', 'name_latex': '',
@@ -2356,7 +2369,6 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     logger.info("to_edit_feed: feed_id: " + str(feed_id))
 
-    feed_dict = {}
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         feed_dict = session.read_transaction(
@@ -2366,6 +2378,9 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
             round(time.time() - query_start_time, 3)
         )
     logger.info("feed_dict:" + str(feed_dict))
+
+    if feed_dict is None:
+        return "<H1>Feed ID " + str(feed_id) + " does not exist in database</H1>."
 
     # editing the feed includes modifying the symbols present.
 
@@ -3050,12 +3065,18 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
 
     logger.info("operation_id: " + str(operation_id))
 
-    operation_dict = {}
     # get properties of this operation
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         operation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "operation", operation_id
+        )
+
+    if operation_dict is None:
+        return (
+            "<H1>operation ID "
+            + str(operation_id)
+            + " does not exist in database</H1>."
         )
 
     web_form = SpecifyNewSymbolOperationForm(request.form)
@@ -3121,12 +3142,16 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
 
     logger.info("relation_id: " + str(relation_id))
 
-    relation_dict = {}
     # get properties of this relation
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         relation_dict = session.read_transaction(
             neo4j_query.get_node_properties, "relation", relation_id
+        )
+
+    if relation_dict is None:
+        return (
+            "<H1>Relation ID " + str(relation_id) + " does not exist in database</H1>."
         )
 
     web_form_no_options = NoOptionsForm(request.form)
@@ -3198,7 +3223,6 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     logger.info("scalar_id: " + str(scalar_id))
 
-    scalar_dict = {}
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         scalar_dict = session.read_transaction(
@@ -3208,6 +3232,9 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
             round(time.time() - query_start_time, 3)
         )
     logger.info("to_edit_scalar scalar_dict:" + str(scalar_dict))
+
+    if scalar_dict is None:
+        return "<H1>Scalar ID " + str(scalar_id) + " does not exist in database</H1>."
 
     web_form_symbol_properties = SpecifyNewSymbolScalarForm(request.form)
     web_form_no_options = NoOptionsForm(request.form)
@@ -5249,6 +5276,10 @@ def to_edit_step(
     logger.info("[TRACE] to_edit_step start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    # TODO: Verify that derivation_id exists
+    # TODO: verify that step_id exists
+    # TODO: verify that step_id is associated with Derivation_id
+
     # list all steps in this derivation
     list_of_step_dicts = []
     with graphDB_Driver.session() as session:
@@ -5311,6 +5342,8 @@ def to_edit_inference_rule(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] to_edit_inference_rule start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
+
+    # TODO: verify that inference_rule_id exists before editing
 
     web_form_edit = SpecifyNewInferenceRuleForm(request.form)
     web_form_delete = NoOptionsForm(request.form)
@@ -5932,6 +5965,17 @@ def to_edit_constant_value_and_units(
         value_and_units_dict = session.read_transaction(
             neo4j_query.get_node_properties, "value_with_units", value_and_units_id
         )
+        query_time_dict[
+            "pdg_app/to_edit_constant_value_and_units get_node_properties value_with_units"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    if value_and_units_dict is None:
+        return (
+            "<H1>value_and_units ID "
+            + str(value_and_units_id)
+            + " does not exist in database</H1>."
+        )
 
     # which scalar has this value?
     with graphDB_Driver.session() as session:
@@ -5939,6 +5983,10 @@ def to_edit_constant_value_and_units(
         scalar_id = session.read_transaction(
             neo4j_query.get_scalar_id_that_has_value_and_units_id, value_and_units_id
         )
+        query_time_dict[
+            "pdg_app/to_edit_constant_value_and_units get_scalar_id_that_has_value_and_units_id"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -5946,7 +5994,8 @@ def to_edit_constant_value_and_units(
             neo4j_query.get_node_properties, "scalar", scalar_id
         )
         query_time_dict[
-            "pdg_app/to_add_value_and_units get_node_properties" + trace_id
+            "pdg_app/to_edit_constant_value_and_units get_node_properties scalar"
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     # to compare with other existing values:
