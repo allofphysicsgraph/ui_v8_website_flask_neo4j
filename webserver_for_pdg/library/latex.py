@@ -1064,7 +1064,7 @@ def create_derivation_png(
     graphDB_Driver,
     query_time_dict: query_timing_result_type,
     derivation_id: unique_numeric_id_as_str,
-    derivation_dict: dict,
+    derivation_name_latex: str,
     list_of_step_dicts_in_this_derivation: dict,
     path_to_output_png: str,
 ) -> Tuple[str, query_timing_result_type]:
@@ -1096,7 +1096,7 @@ def create_derivation_png(
         file_handle.write("overlap = false;\n")
         file_handle.write(
             'label="derivation: '
-            + derivation_dict["name_latex"]
+            + derivation_name_latex
             + '\nhttps://allofphysiscs.com";\n'
         )
         file_handle.write("fontsize=12;\n")

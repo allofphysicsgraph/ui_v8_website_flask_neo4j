@@ -1429,11 +1429,36 @@ def to_add_derivation() -> werkzeug.Response:
         logger.info(str(web_form.errors))
     if request.method == "POST" and web_form.validate():
         logger.info("request.form =" + str(request.form))
+
         derivation_name_latex = str(web_form.derivation_name_latex.data).strip()
+
+        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+        if not derivation_name_latex.isascii():
+            logger.critical(
+                "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
+            )
+            return "<H1>Input must be ASCII only</H1>\n" + str(derivation_name_latex)
+
         derivation_reference_latex = str(
             web_form.derivation_reference_latex.data
         ).strip()
+
+        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+        if not derivation_reference_latex.isascii():
+            logger.critical(
+                "Non-ascii derivation_reference_latex: "
+                + str(derivation_reference_latex)
+            )
+            return "<H1>Input must be ASCII only</H1>\n" + str(
+                derivation_reference_latex
+            )
+
         abstract_latex = str(web_form.abstract_latex.data).strip()
+
+        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+        if not abstract_latex.isascii():
+            logger.critical("Non-ascii abstract_latex: " + str(abstract_latex))
+            return "<H1>Input must be ASCII only</H1>\n" + str(abstract_latex)
 
         # 2025-01-04, BHP: the following has been commented out
         # because the safety of string should be applied on writing, not reading
@@ -1703,15 +1728,12 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
     # only create graphviz PNG if the HTML page is going to be rendered
     # SVG isn't available yet; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/14
 
-    (
-        derivation_graphviz_png_filename,
-        # derivation_graphviz_svg_filename,
-        query_time_dict,
-    ) = latex.create_derivation_png(
+    derivation_name_latex = derivation_dict["name_latex"]
+    derivation_graphviz_png_filename, query_time_dict = latex.create_derivation_png(
         graphDB_Driver,
         query_time_dict,
         derivation_id,
-        derivation_dict,
+        derivation_name_latex,
         list_of_step_dicts,
         "/code/static/",
     )
@@ -1853,12 +1875,33 @@ def to_edit_derivation_metadata(
         derivation_name_latex = latex.make_string_safe_for_latex(
             str(web_form.derivation_name_latex.data).strip()
         )
+        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+        if not derivation_name_latex.isascii():
+            logger.critical(
+                "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
+            )
+            return "<H1>Input must be ASCII only</H1>\n" + str(derivation_name_latex)
+
         derivation_reference_latex = latex.make_string_safe_for_latex(
             str(web_form.derivation_reference_latex.data).strip()
         )
+        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+        if not derivation_reference_latex.isascii():
+            logger.critical(
+                "Non-ascii derivation_reference_latex: "
+                + str(derivation_reference_latex)
+            )
+            return "<H1>Input must be ASCII only</H1>\n" + str(
+                derivation_reference_latex
+            )
+
         abstract_latex = latex.make_string_safe_for_latex(
             str(web_form.abstract_latex.data).strip()
         )
+        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+        if not abstract_latex.isascii():
+            logger.critical("Non-ascii abstract_latex: " + str(abstract_latex))
+            return "<H1>Input must be ASCII only</H1>\n" + str(abstract_latex)
 
         # as per https://strftime.org/
         # %f = Microsecond as a decimal number, zero-padded on the left.
