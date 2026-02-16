@@ -19,7 +19,11 @@
     {{ form_matrix_properties.csrf_token }}
 
     <P>{{ form_matrix_properties.matrix_latex.label}} (<B>required</B>): 
-       {{ form_matrix_properties.matrix_latex(size=50, minlength=1, maxlength=1000) }}</P>
+       {{ form_matrix_properties.matrix_latex(size=50, 
+                                type="text",
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
+     minlength=1, maxlength=1000) }}</P>
 
 <input type="checkbox" 
               id="display_input_latex" 

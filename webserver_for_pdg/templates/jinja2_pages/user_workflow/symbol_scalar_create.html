@@ -23,6 +23,9 @@
                                            minlength=1, 
                                            maxlength=1000,
                                            id="inputID_symbol_latex",
+                                type="text",
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
                                            onchange="onChangeFunction();") }}</P>
     
 <P>

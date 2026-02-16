@@ -18,7 +18,12 @@
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_vector_properties.csrf_token }}
 
-    <P>{{ form_vector_properties.vector_latex.label}} (<B>required</B>): {{ form_vector_properties.vector_latex(size=50, minlength=1, maxlength=1000) }}</P>
+    <P>{{ form_vector_properties.vector_latex.label}} (<B>required</B>): 
+       {{ form_vector_properties.vector_latex(size=50, 
+                                type="text",
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
+     minlength=1, maxlength=1000) }}</P>
 
     <P><input type="checkbox" 
               id="display_input_latex" 
@@ -43,22 +48,36 @@
      e.g., \(\vec{x}\) is not composite; [4 2 9] is composite.</p>
     
     <P>{{ form_vector_properties.vector_name_latex.label }} (<small><em>optional</em></small>): 
-       {{ form_vector_properties.vector_name_latex(size=50, maxlength=1000) }}</p>
+       {{ form_vector_properties.vector_name_latex(size=50, 
+                                type="text",
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
+     maxlength=1000) }}</p>
     
     <P>{{ form_vector_properties.vector_description_latex.label }} (<small><em>optional</em></small>): 
-       {{ form_vector_properties.vector_description_latex(size=50, maxlength=1000) }}</p>
+       {{ form_vector_properties.vector_description_latex(size=50, 
+                                type="text",
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
+     maxlength=1000) }}</p>
 
     <P>{{ form_vector_properties.vector_reference_latex.label }} (<small><em>optional</em></small>): 
-       {{ form_vector_properties.vector_reference_latex(size=50, maxlength=1000) }}</p>
+       {{ form_vector_properties.vector_reference_latex(size=50, 
+                                type="text",
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
+     maxlength=1000) }}</p>
 
 <table>
 <table border="0" id="scope_table" class="sortable">
   <tr>
     <td>{{ form_vector_properties.vector_size.label}} (<B>required</B>): {{ form_vector_properties.vector_size }}
-    <P>{{ form_vector_properties.vector_number_of_entries.label }} (<small><em>optional</em></small>): {{ form_vector_properties.vector_number_of_entries }}
+    <P>{{ form_vector_properties.vector_number_of_entries.label }} (<small><em>optional</em></small>): 
+       {{ form_vector_properties.vector_number_of_entries }}
 
     </td>
-    <td>{{ form_vector_properties.vector_orientation.label }} (<small><em>optional</em></small>): {{ form_vector_properties.vector_orientation }}
+    <td>{{ form_vector_properties.vector_orientation.label }} (<small><em>optional</em></small>): 
+        {{ form_vector_properties.vector_orientation }}
     </td>
   </tr>
 </table>

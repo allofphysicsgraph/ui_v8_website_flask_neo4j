@@ -6,6 +6,7 @@
   Return to <a href="{{ url_for('to_navigation') }}?referrer=expression_create">navigation page</a>
 </P>
 
+
 <fieldset>
   <legend>
     Create expression
@@ -21,7 +22,11 @@ Latex:
     <td>{{ form.expression_latex_lhs(size=50, 
                                 maxlength=1000,
                                 id="input_latex_lhs", 
+                                type="text",
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
                                 onchange="onChangeFunction();") }}</td>
+<!-- https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84 -->
     <td>
 
 <!--
@@ -40,12 +45,19 @@ Latex:
     <td>{{ form.expression_latex_rhs(size=50, 
                                 maxlength=1000,
                                 id="input_latex_rhs", 
+                                type="text",
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
                                 onchange="onChangeFunction();") }}</td>
     <td>when</td>
     <td>{{ form.expression_latex_condition(size=50, 
                                 maxlength=1000,
                                 id="input_latex_condition", 
+                                type="text",
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
                                 onchange="onChangeFunction();") }}</td>
+<!-- https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84 -->
   </tr>
   <tr>
     <td>{{ form.expression_latex_lhs.label}} (<B>required</B>)</td> <!-- LHS -->
@@ -117,14 +129,26 @@ Latex:
 
 
     <P>{{ form.expression_name_latex.label }} (optional): 
-       {{ form.expression_name_latex(size=50, maxlength=1000) }}
+       {{ form.expression_name_latex(size=50, 
+                                     type="text",
+                                     pattern="^[\x20-\x7F]+$", 
+                                     oninput="validateASCII(this)", 
+                                     maxlength=1000) }}
 
     <P>{{ form.expression_reference_latex.label }} (optional): 
-       {{ form.expression_reference_latex(size=50, maxlength=1000) }}
+       {{ form.expression_reference_latex(size=50, 
+                                          type="text",
+                                          pattern="^[\x20-\x7F]+$", 
+                                          oninput="validateASCII(this)", 
+                                          maxlength=1000) }}
 
 
     <P>{{ form.expression_description_latex.label }} (optional): 
-       {{ form.expression_description_latex(size=50, maxlength=1000) }}
+       {{ form.expression_description_latex(size=50, 
+                                            type="text",
+                                            pattern="^[\x20-\x7F]+$", 
+                                            oninput="validateASCII(this)", 
+                                            maxlength=1000) }}
 
     <P><input type="submit" value="add expression">
     </P>

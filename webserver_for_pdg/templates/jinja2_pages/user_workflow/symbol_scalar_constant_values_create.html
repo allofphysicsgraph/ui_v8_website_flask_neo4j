@@ -25,7 +25,11 @@
   <tr>
     <td>{{ form_constant_properties.number_decimal(size=50) }}</td>
     <td>*10^</td>
-    <td>{{ form_constant_properties.number_power(size=50, minlength=1, maxlength=100) }}</td>
+    <td>{{ form_constant_properties.number_power(size=50, 
+                                type="text",
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
+    minlength=1, maxlength=100) }}</td>
   </tr>
   <tr>
     <td>{{ form_constant_properties.number_decimal.label}} (<B>required</B>)</td>

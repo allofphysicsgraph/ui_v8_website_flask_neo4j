@@ -20,6 +20,9 @@
 
     <P>{{ form_relation_properties.relation_latex.label}} (<B>required</B>): 
        {{ form_relation_properties.relation_latex(size=50, 
+                                type="text",
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
                       minlength=1, 
                       maxlength=1000,
                       id="input_latex", 
