@@ -46,6 +46,9 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id)
 
+    if sympy_expr == "":
+        return "empty str sent to sympy_to_latex_str"
+
     logger.info("SymPy to be converted to Latex: " + str(sympy_expr))
 
     expr = parse_expr(sympy_expr)
@@ -83,14 +86,14 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
         symp_expr = parse_latex(expr_latex)
     except sympy.SympifyError as err:
         # logger.error(err)
-        logger.critical("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
+        logger.error(str(err))
         raise Exception("Sympy unable to parse latex (1): " + expr_latex)
     except sympy.parsing.latex.errors.LaTeXParsingError as err:
         # logger.error(err)
-        logger.critical("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
+        logger.error(str(err))
         raise Exception("Sympy unable to parse latex (2): " + expr_latex)
     except sympy.core.sympify.SympifyError as err:
-        logger.critical("ERROR cleaned_latex_str_to_sympy_expression" + str(err))
+        logger.error(str(err))
         raise Exception("Sympy unable to parse latex (3): " + expr_latex)
 
     logger.info("[TRACE] end " + trace_id)
@@ -114,7 +117,7 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     try:
         list_of_sympy_symbols = sympy_expr.atoms(sympy.Symbol)
     except AttributeError as e:
-        logger.critical(str(e))
+        logger.error(str(e))
         return []
 
     # >>> type(list_of_sympy_symbols)
