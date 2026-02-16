@@ -11,6 +11,7 @@
 import os
 import random
 import time
+import tokenize
 import neo4j_query
 import list_of_valid
 import sympy_validate_expression
@@ -363,13 +364,13 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info(
-        "[TRACE] get_sympy_as_latex_per_feed_id start "
+        "[TRACE] start "
         + trace_id
         + " "
         + str(time.time())
     )
     sympy_as_latex_per_feed_id = {}  # type: Dict[str, str]
-    for this_dict in list_of_feed_or_expr_dicts:
+    for this_dict in list_of_feed_dicts:
         if "sympy" in this_feed_dict.keys():
             if len(this_dict["sympy"]) > 0:
                 try:
@@ -388,7 +389,7 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
             sympy_as_latex_per_feed_id[this_dict["id"]] = "no 'sympy' key"
 
     logger.info(
-        "[TRACE] get_sympy_as_latex_per_feed_id end "
+        "[TRACE] end "
         + trace_id
         + " "
         + str(time.time())
@@ -416,6 +417,10 @@ def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
                 list_of_expression_dicts[index]["latex_as_sympy_LHS"] = (
                     "TypeError in get_sympy_as_latex_per_expr_id: " + str(e)
                 )
+            except tokenize.TokenError as e:
+                list_of_expression_dicts[index]["latex_as_sympy_LHS"] = (
+                    "tokenize.TokenError in get_sympy_as_latex_per_expr_id: " + str(e)
+                )
         if "sympy_rhs" in this_expression_dict.keys():
             try:
                 list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
@@ -431,6 +436,10 @@ def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
                 list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
                     "TypeError in get_sympy_as_latex_per_expr_id: " + str(e)
                 )
+            except tokenize.TokenError as e:
+                list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
+                    "tokenize.TokenError in get_sympy_as_latex_per_expr_id: " + str(e)
+                )
     logger.info("[TRACE] end " + trace_id)
     return list_of_expression_dicts
 
@@ -440,7 +449,7 @@ def get_dimensional_consistency_per_expression_id(
 ):
     """
     This function checks the dimensional consistency of ALL expressions in PDG
-    That is appropriate for 'list_expressions' and 'create_expression'
+    That is relevant for 'list_expressions' and 'create_expression'
 
     TODO: a similar function for a restricted scope, like
     - all expressions for a specific derivation
