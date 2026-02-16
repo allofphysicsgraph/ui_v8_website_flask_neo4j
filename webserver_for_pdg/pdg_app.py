@@ -5470,7 +5470,6 @@ def to_edit_inference_rule(
                 "pdg_app/to_edit_inference_rule: add_inference_rule" + trace_id
             ] = round(time.time() - query_start_time, 3)
 
-    list_of_derivation_dicts_that_use_this_inference_rule_id = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_derivation_dicts_that_use_this_inference_rule_id = (
@@ -5484,9 +5483,12 @@ def to_edit_inference_rule(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    # list_of_derivation_dicts_that_use_this_inference_rule_id = list(
-    #     set(list_of_derivations_that_use_this_inference_rule_id)
-    # )
+    # This will keep the last dictionary encountered for each ID.
+    list_of_derivation_dicts_that_use_this_inference_rule_id = list(
+        {
+            v["id"]: v for v in list_of_derivation_dicts_that_use_this_inference_rule_id
+        }.values()
+    )
 
     # get properties for inference rule
     inference_rule_dict = {}
