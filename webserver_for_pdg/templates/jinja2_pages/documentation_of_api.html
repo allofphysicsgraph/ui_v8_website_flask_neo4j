@@ -260,7 +260,7 @@ curl -b cookies.txt http://localhost/api/v1/resources/derivation/
     <pre>curl -s http://localhost{{ url_for('pdg_api.api_cypher_query') }} | python3 -m json.tool</pre>
 
 
-    <h3>POST <a href="http://localhost:5000/api/v1/resources/derivation/create">http://localhost:5000/api/v1/resources/derivation/create</a></h3>
+    <h3>POST <a href="http://localhost/api/v1/resources/derivation/create">http://localhost/api/v1/resources/derivation/create</a></h3>
     <p>This endpoint creates a new derivation.</p>
      <p>Required parameters:</p>
         <ul>
@@ -276,7 +276,7 @@ curl -b cookies.txt http://localhost/api/v1/resources/derivation/
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-     http://localhost:5000/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
+     http://localhost/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
     </pre>
     <p>Example usage (application/json):</p>
     <pre>
@@ -284,7 +284,7 @@ curl -b cookies.txt http://localhost/api/v1/resources/derivation/
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"derivation_name_latex":"hello again", "derivation_reference_latex":"this was", "derivation_abstract_latex": "yes no"}' \
-     http://localhost:5000/api/v1/resources/derivation/create
+     http://localhost/api/v1/resources/derivation/create
     </pre>
     <p>Response:</p>
     <pre>
@@ -293,7 +293,7 @@ curl -b cookies.txt http://localhost/api/v1/resources/derivation/
     }
     </pre>
 
-     <h3>POST <a href="http://localhost:5000/api/v1/resources/expression/create">http://localhost:5000/api/v1/resources/expression/create</a></h3>
+     <h3>POST <a href="http://localhost/api/v1/resources/expression/create">http://localhost/api/v1/resources/expression/create</a></h3>
     <p>This endpoint creates a new expression.</p>
     <p>Required parameters:</p>
          <ul>
@@ -313,7 +313,7 @@ curl -b cookies.txt http://localhost/api/v1/resources/derivation/
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-    http://localhost:5000/api/v1/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9
+    http://localhost/api/v1/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9
     </pre>
     <p>Example usage (application/json):</p>
       <pre>
@@ -335,7 +335,7 @@ curl -b cookies.txt http://localhost/api/v1/resources/derivation/
     </pre>
 
 
-   <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/scalar/create">http://localhost:5000/api/v1/resources/symbol/scalar/create</a></h3>
+   <h3>POST <a href="http://localhost/api/v1/resources/symbol/scalar/create">http://localhost/api/v1/resources/symbol/scalar/create</a></h3>
     <p>This endpoint creates a new scalar symbol.</p>
     <p>Required parameters:</p>
         <ul>
@@ -362,7 +362,7 @@ curl -b cookies.txt http://localhost/api/v1/resources/derivation/
     curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-    http://localhost:5000/api/v1/resources/symbol/scalar/create?scalar_latex=a&scalar_scope=arbitrary&dimension_length=1&dimension_time=-2
+    http://localhost/api/v1/resources/symbol/scalar/create?scalar_latex=a&scalar_scope=arbitrary&dimension_length=1&dimension_time=-2
     </pre>
      <p>Example usage (application/json):</p>
     <pre>
@@ -380,10 +380,10 @@ curl --request POST \
     }
      </pre>
 
-    <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/vector/create">http://localhost:5000/api/v1/resources/symbol/vector/create</a></h3>
+    <h3>POST <a href="http://localhost/api/v1/resources/symbol/vector/create">http://localhost/api/v1/resources/symbol/vector/create</a></h3>
     <p>This endpoint creates a new vector symbol. Not implemented.</p>
     <p>Example usage:</p>
-    <pre>curl -s http://localhost:5000/api/v1/resources/symbol/vector/create</pre>
+    <pre>curl -s http://localhost/api/v1/resources/symbol/vector/create</pre>
     <p>Response:</p>
     <pre>
 {
@@ -391,10 +391,10 @@ curl --request POST \
 }
     </pre>
 
-    <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/matrix/create">http://localhost:5000/api/v1/resources/symbol/matrix/create</a></h3>
+    <h3>POST <a href="http://localhost/api/v1/resources/symbol/matrix/create">http://localhost/api/v1/resources/symbol/matrix/create</a></h3>
     <p>This endpoint creates a new matrix symbol. Not implemented.</p>
     <p>Example usage:</p>
-    <pre>curl -s http://localhost:5000/api/v1/resources/symbol/matrix/create</pre>
+    <pre>curl -s http://localhost/api/v1/resources/symbol/matrix/create</pre>
      <p>Response:</p>
     <pre>
 {
@@ -402,7 +402,7 @@ curl --request POST \
 }
     </pre>
 
-    <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/operation/create">http://localhost:5000/api/v1/resources/symbol/operation/create</a></h3>
+    <h3>POST <a href="http://localhost/api/v1/resources/symbol/operation/create">http://localhost/api/v1/resources/symbol/operation/create</a></h3>
     <p>This endpoint creates a new operation symbol.</p>
     <p>Required parameters:</p>
          <ul>
@@ -420,7 +420,7 @@ curl --request POST \
 curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-     http://localhost:5000/api/v1/resources/symbol/operation/create?operation_name_latex=equals&operation_latex==&operation_description_latex=equality&operation_argument_count=2
+     http://localhost/api/v1/resources/symbol/operation/create?operation_name_latex=equals&operation_latex==&operation_description_latex=equality&operation_argument_count=2
     </pre>
       <pre>
 curl --request POST \
@@ -438,7 +438,7 @@ curl --request POST \
     </pre>
 
 
-    <h3>POST <a href="http://localhost:5000/api/v1/resources/symbol/relation/create">http://localhost:5000/api/v1/resources/symbol/relation/create</a></h3>
+    <h3>POST <a href="http://localhost/api/v1/resources/symbol/relation/create">http://localhost/api/v1/resources/symbol/relation/create</a></h3>
     <p>This endpoint creates a new relation symbol.</p>
     <p>Required parameters:</p>
        <ul>
@@ -455,7 +455,7 @@ curl --request POST \
 curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-     http://localhost:5000/api/v1/resources/symbol/relation/create?relation_name_latex=equal&relation_latex==&relation_description_latex=equality
+     http://localhost/api/v1/resources/symbol/relation/create?relation_name_latex=equal&relation_latex==&relation_description_latex=equality
     </pre>
       <pre>
 curl --request POST \
@@ -473,10 +473,10 @@ curl --request POST \
     </pre>
 
 
-     <h3>POST <a href="http://localhost:5000/api/v1/resources/inference_rule/create">http://localhost:5000/api/v1/resources/inference_rule/create</a></h3>
+     <h3>POST <a href="http://localhost/api/v1/resources/inference_rule/create">http://localhost/api/v1/resources/inference_rule/create</a></h3>
     <p>This endpoint creates a new inference rule. Not implemented.</p>
     <p>Example usage:</p>
-    <pre>curl -s http://localhost:5000/api/v1/resources/inference_rule/create</pre>
+    <pre>curl -s http://localhost/api/v1/resources/inference_rule/create</pre>
     <p>Response:</p>
     <pre>
 {
@@ -486,7 +486,7 @@ curl --request POST \
     </pre>
 
 
-    <h3>DELETE <a href="http://localhost:5000/api/v1/resources/derivation/delete">http://localhost:5000/api/v1/resources/derivation/delete</a></h3>
+    <h3>DELETE <a href="http://localhost/api/v1/resources/derivation/delete">http://localhost/api/v1/resources/derivation/delete</a></h3>
     <p>This endpoint deletes a specified derivation and all its steps.</p>
     <p>Required parameters:</p>
         <ul>
@@ -497,14 +497,14 @@ curl --request POST \
 curl --request POST \
     --header "Content-Type: application/x-www-form-urlencoded" \
     --show-error --silent \
-    http://localhost:5000/api/v1/resources/derivation/delete?derivation_id=3445848
+    http://localhost/api/v1/resources/derivation/delete?derivation_id=3445848
     </pre>
      <pre>
 curl --request POST \
     --header "Content-Type: application/json" \
     --show-error --silent \
     --data '{"derivation_id":"3445848"}' \
-    http://localhost:5000/api/v1/resources/derivation/delete
+    http://localhost/api/v1/resources/derivation/delete
     </pre>
      <p>Response:</p>
      <pre>
@@ -513,7 +513,7 @@ curl --request POST \
 }
     </pre>
 
-    <h3>DELETE <a href="http://localhost:5000/api/v1/resources/expression/delete">http://localhost:5000/api/v1/resources/expression/delete</a></h3>
+    <h3>DELETE <a href="http://localhost/api/v1/resources/expression/delete">http://localhost/api/v1/resources/expression/delete</a></h3>
     <p>This endpoint deletes an expression. Not implemented.</p>
      <p>Response:</p>
     <pre>
