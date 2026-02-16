@@ -5,41 +5,7 @@ What's preventing me from doing so now?
 https://localhost/new_symbol_vector is missing dimensions (length, time, mass)
 
 
-# step 1
-in the imported content there's no use of HAS_SYMBOL edges. (Because in ui_v7 the JSON deduced the symbol membership from "AST")
-
-Write a one-time function that
-1) detects all 'pdg' in the sympy for expr and feed
-2) adds 'HAS_SYMBOL' edge to the expression and symbol
-Then save pdg.cypher
-
-REMOVE
-```
-    query_time_dict = compute.convert_expr_sympy_pdg_symbols_to_neo4j_edge(
-        graphDB_Driver, query_time_dict
-```
-from `pdg_app.py` when done!
-
-# step 2
-On the "review_derivation" HTML list all symbols (and operations and relations) for the derivation.
-
-Create a function in the compute library that creates a list of all symbol dictionaries
-See neo4j_query: `get_list_of_symbol_IDs_per_derivation`
-
-# step 3
 - https://localhost/list_expressions should show Latex-from-Sympy in the Sympy column
-
-# step 4
-- cypher export does not produce a consistent order. As a result, diff isn't feasible
-  CSV output can be diff'd, 
-  - but the index is different in the two CSVs. As a result, each line differs. Also, edges get altered. 
-     See `static/compare_pdg_CSV.py` and out-of-memory error https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%2215PkKO0LBjymJ1-DvwAFL1Hqp4SObx6fx%22%5D,%22action%22:%22open%22,%22userId%22:%22101193243042884231058%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing
-  - Some nodes contain `\r` (as in `\ref{}`) or `\n` (as in `\nabla`) and that renders in CSV as a new-line; `\t` is expanded to a tab; the Latex isn't properly escaped. 
-
-
-# step 5: 
-on "new_step_expressions" the dropdown of expressions should be scoped; see <https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/76>
-
 
 - BUG: SymPy-to-be-edited not displayed in https://localhost/edit_expression/6709044
 
@@ -48,7 +14,6 @@ on "new_step_expressions" the dropdown of expressions should be scoped; see <htt
 - BUG: on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
 
 
-?
 New function in compute: List of all non-operation symbols
 Used by new feed when promoting existing symbol
 
