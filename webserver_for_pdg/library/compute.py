@@ -396,6 +396,8 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
 def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
     """
     This function edits the input argument, whereas the `feed` version does not.
+
+    The error handling here is similar to `sympy_validate_expression/dimensional_consistency`
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id)
