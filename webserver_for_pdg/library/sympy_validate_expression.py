@@ -81,8 +81,6 @@ def dimensional_consistency(
     dict_of_all_symbol_dicts: dict,
 ) -> str:
     """
-    # TODO: this function handles "sympy" instead of "sympy_lhs" and "sympy_rhs"
-
     see sympy_validate_expression.README.md for more explanation.
 
     >>> expression_dict = {'id': '9942'}
@@ -99,40 +97,66 @@ def dimensional_consistency(
     # )
     # logger.info("dict_of_all_symbol_dicts = " + str(dict_of_all_symbol_dicts))
 
-    if "sympy" not in expression_dict.keys():
-        return "sympy not provided for expression"
+    if "sympy_lhs" not in expression_dict.keys():
+        return "sympy_lhs not provided for expression"
+    if "sympy_rhs" not in expression_dict.keys():
+        return "sympy_rhs not provided for expression"
 
     try:
         # sympy_expr = eval(expression_dict["sympy"])
-        sympy_expr = parse_expr(expression_dict["sympy"])
+        LHS = parse_expr(expression_dict["sympy_lhs"])
     except NameError as err:
         return (
             "NameError: unable to parse "
-            + expression_dict["sympy"]
+            + expression_dict["sympy_lhs"]
             + " as SymPy; error="
             + str(err)
-        )  # ths is what shows up in the HTML table
+        )  # this shows up in the HTML table
     except SyntaxError as err:
         return (
             "SyntaxError: unable to parse "
-            + expression_dict["sympy"]
+            + expression_dict["sympy_lhs"]
             + " as SymPy; error="
             + str(err)
-        )  # ths is what shows up in the HTML table
+        )  # this shows up in the HTML table
+    except AttributeError as err:
+        return (
+            "AttributeError: unable to parse "
+            + expression_dict["sympy_lhs"]
+            + "; error="
+            + str(err)
+        )
 
-    logger.info("sympy_expr = " + str(sympy_expr))
+    logger.info("sympy_expr_lhs = " + str(LHS))
     # sympy_expr = Eq(pdg4223281, pdg3715170*pdg6035023)
 
-    # the split below could be replaced by expression_dict['sympy_lhs'] and expression_dict['sympy_rhs']
     try:
-        LHS = sympy_expr.lhs
-        RHS = sympy_expr.rhs
-    except Exception as err:
-        logger.info(str(err))
-        return "unable to determine LHS,RHS for" + str(sympy_expr)
+        # sympy_expr = eval(expression_dict["sympy"])
+        RHS = parse_expr(expression_dict["sympy_rhs"])
+    except NameError as err:
+        return (
+            "NameError: unable to parse "
+            + expression_dict["sympy_rhs"]
+            + " as SymPy; error="
+            + str(err)
+        )  # this shows up in the HTML table
+    except SyntaxError as err:
+        return (
+            "SyntaxError: unable to parse "
+            + expression_dict["sympy_rhs"]
+            + " as SymPy; error="
+            + str(err)
+        )  # this shows up in the HTML table
+    except AttributeError as err:
+        return (
+            "AttributeError: unable to parse "
+            + expression_dict["sympy_lhs"]
+            + "; error="
+            + str(err)
+        )
 
-    logger.info("LHS=" + str(LHS))
-    logger.info("RHS=" + str(RHS))
+    logger.info("sympy_expr_lhs = " + str(RHS))
+    # sympy_expr = Eq(pdg4223281, pdg3715170*pdg6035023)
 
     # for each symbol used in the expression,
     # convert the numeric value for each dimension
