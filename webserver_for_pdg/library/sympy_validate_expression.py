@@ -107,23 +107,34 @@ def dimensional_consistency(
         LHS = parse_expr(expression_dict["sympy_lhs"])
     except NameError as err:
         return (
-            "NameError: unable to parse "
+            str(type(err).__name__)
+            + ": unable to parse "
             + expression_dict["sympy_lhs"]
             + " as SymPy; error="
             + str(err)
         )  # this shows up in the HTML table
     except SyntaxError as err:
         return (
-            "SyntaxError: unable to parse "
+            str(type(err).__name__)
+            + ": unable to parse "
             + expression_dict["sympy_lhs"]
             + " as SymPy; error="
             + str(err)
         )  # this shows up in the HTML table
     except AttributeError as err:
         return (
-            "AttributeError: unable to parse "
+            str(type(err).__name__)
+            + ": unable to parse "
             + expression_dict["sympy_lhs"]
-            + "; error="
+            + " as SymPy; error="
+            + str(err)
+        )
+    except TypeError as err:
+        return (
+            str(type(err).__name__)
+            + ": unable to parse "
+            + expression_dict["sympy_lhs"]
+            + " as SymPy; error="
             + str(err)
         )
 
@@ -135,23 +146,34 @@ def dimensional_consistency(
         RHS = parse_expr(expression_dict["sympy_rhs"])
     except NameError as err:
         return (
-            "NameError: unable to parse "
+            str(type(err).__name__)
+            + ": unable to parse "
             + expression_dict["sympy_rhs"]
             + " as SymPy; error="
             + str(err)
         )  # this shows up in the HTML table
     except SyntaxError as err:
         return (
-            "SyntaxError: unable to parse "
+            str(type(err).__name__)
+            + ": unable to parse "
             + expression_dict["sympy_rhs"]
             + " as SymPy; error="
             + str(err)
         )  # this shows up in the HTML table
     except AttributeError as err:
         return (
-            "AttributeError: unable to parse "
-            + expression_dict["sympy_lhs"]
-            + "; error="
+            str(type(err).__name__)
+            + ": unable to parse "
+            + expression_dict["sympy_rhs"]
+            + " as SymPy; error="
+            + str(err)
+        )
+    except TypeError as err:
+        return (
+            str(type(err).__name__)
+            + ": unable to parse "
+            + expression_dict["sympy_rhs"]
+            + " as SymPy; error="
             + str(err)
         )
 
