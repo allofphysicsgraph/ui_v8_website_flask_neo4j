@@ -1120,8 +1120,8 @@ def to_index():
         latex.create_d3js_json(T_and_f_derivation_ID, all_steps, "/code/static/")
         d3js_json_filename = T_and_f_derivation_ID + ".json"
     except Exception as err:
-        logger.error(str(err))
-        flash("pdg_app/to_index: " + str(err))
+        logger.error(str(type(err).__name__) + ":" + str(err))
+        flash("pdg_app/to_index: " + str(type(err).__name__) + str(err))
         d3js_json_filename = ""
 
     logger.info("[TRACE] to_index end " + str(trace_id))
@@ -1196,9 +1196,9 @@ def to_navigation():
             logger.info("path_to_uploaded_file=" + str(path_to_uploaded_file))
             try:
                 file_obj.save(path_to_uploaded_file)
-            except FileNotFoundError as e:
-                error_message_for_user = "ERROR: unable to save file" + str(e)
-                logger.error("unable to save file" + str(e))
+            except FileNotFoundError as err:
+                error_message_for_user = "ERROR: unable to save file" + str(err)
+                logger.error("unable to save file" + str(err))
                 return redirect(request.url)
 
             # shutil.copy(path_to_uploaded_file, "/code/" + path_to_db)
@@ -1631,8 +1631,12 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                 )
             except Exception as err:
                 # logger.error(str(err))
-                flash("pdg_app/to_review_derivation: " + str(err))
-                logger.error(str(err))
+                flash(
+                    "pdg_app/to_review_derivation: "
+                    + str(type(err).__name__)
+                    + str(err)
+                )
+                logger.error(str(type(err).__name__) + str(err))
                 pdf_filename = "error.pdf"
 
             logger.info("[TRACE] to_review_derivation end " + str(trace_id))
@@ -1663,8 +1667,12 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                 tex_filename = str(derivation_id)
             except Exception as err:
                 # logger.error(str(err))
-                flash("pdg_app/to_review_derivation" + str(err))
-                logger.error(str(err))
+                flash(
+                    "pdg_app/to_review_derivation: "
+                    + str(type(err).__name__)
+                    + str(err)
+                )
+                logger.error(str(type(err).__name__) + str(err))
                 logger.info("[TRACE] end " + str(trace_id))
                 return redirect(url_for("select_from_existing_derivations"))
 
@@ -1716,8 +1724,8 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
         latex.create_d3js_json(derivation_id, all_steps, "/code/static/")
         # if that function fails then there's no JSON file for d3js
     except Exception as err:
-        flash("pdg_app/to_review_derivation: " + str(err))
-        logger.error("to_review_derivation " + str(err))
+        flash("pdg_app/to_review_derivation: " + str(type(err).__name__) + str(err))
+        logger.error(str(type(err).__name__) + str(err))
 
     d3js_json_filename = derivation_id + ".json"
 
@@ -1784,8 +1792,12 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                 list_of_output_dicts,
             )
         except Exception as err:
-            flash("pdg_app/to_review_derivation: " + str(err))
-            logger.error(str(err))
+            flash(
+                "pdg_app/to_review_derivation sympy_validate_step.validate_step: "
+                + str(type(err).__name__)
+                + str(err)
+            )
+            logger.error(str(type(err).__name__) + str(err))
             derivation_step_validity_dict[step_id] = err
 
     logger.info("[TRACE] to_review_derivation end " + str(trace_id))
@@ -4392,12 +4404,13 @@ def to_add_symbols_and_operations_for_expression(
         sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
             cleaned_latex_str_lhs
         )
-    except Exception as e:
+    except Exception as err:
         flash(
             "pdg_app/to_add_symbols_and_operations_for_expression: sympy_expr_lhs: "
-            + str(e)
+            + str(type(err).__name__)
+            + str(err)
         )
-        logger.error("sympy_expr_lhs: " + str(e))
+        logger.error("sympy_expr_lhs: " + str(err))
         sympy_expr_lhs = None
     # ERROR: SymPy can't convert "="
     # sympy_expr_relation = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
@@ -4407,12 +4420,13 @@ def to_add_symbols_and_operations_for_expression(
         sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
             cleaned_latex_str_rhs
         )
-    except Exception as e:
+    except Exception as err:
         flash(
             "pdg_app/to_add_symbols_and_operations_for_expression: sympy_expr_rhs: "
-            + str(e)
+            + str(type(err).__name__)
+            + str(err)
         )
-        logger.error("sympy_expr_rhs: " + str(e))
+        logger.error("sympy_expr_rhs: " + str(err))
         sympy_expr_rhs = None
     logger.info("sympy_expr_lhs=" + str(sympy_expr_lhs))
     # logger.info("sympy_expr_relation=", str(sympy_expr_relation))
@@ -4644,9 +4658,13 @@ def to_add_sympy_and_lean_for_expression(
         sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
             cleaned_latex_lhs_str
         )
-    except Exception as e:
-        flash("pdg_app/to_add_sympy_and_lean_for_expression: sympy_expr_lhs: " + str(e))
-        logger.error("sympy_expr_lhs: " + str(e))
+    except Exception as err:
+        flash(
+            "pdg_app/to_add_sympy_and_lean_for_expression: sympy_expr_lhs: "
+            + str(type(err).__name__)
+            + str(err)
+        )
+        logger.error("sympy_expr_lhs: " + str(type(err).__name__) + str(err))
         sympy_expr_lhs = None
     logger.info("sympy_expr_lhs=" + str(sympy_expr_lhs))
 
@@ -4654,9 +4672,13 @@ def to_add_sympy_and_lean_for_expression(
         sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
             cleaned_latex_rhs_str
         )
-    except Exception as e:
-        flash("pdg_app/to_add_sympy_and_lean_for_expression: sympy_expr_rhs: " + str(e))
-        logger.error("sympy_expr_rhs: " + str(e))
+    except Exception as err:
+        flash(
+            "pdg_app/to_add_sympy_and_lean_for_expression: sympy_expr_rhs: "
+            + str(type(err).__name__)
+            + str(err)
+        )
+        logger.error("sympy_expr_rhs: " + str(type(err).__name__) + str(err))
         sympy_expr_rhs = None
 
     logger.info("sympy_expr_rhs=" + str(sympy_expr_rhs))
@@ -4670,21 +4692,25 @@ def to_add_sympy_and_lean_for_expression(
         revised_expr_lhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
             sympy_expr_lhs, symbol_id_dict
         )
-    except Exception as e:
+    except Exception as err:
         flash(
-            "pdg_app/to_add_sympy_and_lean_for_expression: revised_expr_lhs: " + str(e)
+            "pdg_app/to_add_sympy_and_lean_for_expression: revised_expr_lhs: "
+            + str(type(err).__name__)
+            + str(err)
         )
-        logger.error("revised_expr_lhs = " + str(e))
+        logger.error("revised_expr_lhs = " + str(type(err).__name__) + str(err))
         revised_expr_lhs = None
     try:
         revised_expr_rhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
             sympy_expr_rhs, symbol_id_dict
         )
-    except Exception as e:
+    except Exception as err:
         flash(
-            "pdg_app/to_add_sympy_and_lean_for_expression: revised_expr_rhs: " + str(e)
+            "pdg_app/to_add_sympy_and_lean_for_expression: revised_expr_rhs: "
+            + str(type(err).__name__)
+            + str(err)
         )
-        logger.error("revised_expr_rhs = " + str(e))
+        logger.error("revised_expr_rhs = " + str(type(err).__name__) + str(err))
         revised_expr_lhs = None
 
     logger.info(
@@ -6261,9 +6287,9 @@ def to_list_expressions() -> str:
             graphDB_Driver, query_time_dict
         )
     )
-    # except Exception as e:
-    #     flash("ERROR in to_list_expressions: " + str(e))
-    #     logger.error(str(e))
+    # except Exception as err:
+    #     flash("ERROR in to_list_expressions: " + str(err))
+    #     logger.error(str(type(err).__name__) + str(err))
     #     dimensional_consistency_per_expression_id = {}
 
     # logger.info(
@@ -6275,9 +6301,9 @@ def to_list_expressions() -> str:
     list_of_expression_dicts = compute.get_sympy_as_latex_per_expr_id(
         list_of_expression_dicts
     )
-    # except Exception as e:
-    #     flash("ERROR in to_list_expressions: " + str(e))
-    #     logger.error(str(e))
+    # except Exception as err:
+    #     flash("ERROR in to_list_expressions: " + str(err))
+    #     logger.error(str(type(err).__name__) + str(err))
     #     list_of_expression_dicts = []
 
     logger.info("[TRACE] to_list_expressions end " + str(trace_id))
@@ -6995,11 +7021,11 @@ def scrape_arxiv():
             )
             # logger.info("arxiv_entries")
             # logger.info(str(arxiv_entries))
-        except requests.exceptions.RequestException as e:
-            logger.info(f"Error fetching data from {ARXIV_URL}: {e}")
+        except requests.exceptions.RequestException as err:
+            logger.error(f"Error fetching data from {ARXIV_URL}: {err}")
             arxiv_entries = []
-        except Exception as e:
-            logger.info(f"Error parsing XML: {e}")
+        except Exception as err:
+            logger.error(f"Error parsing XML: {err}")
             arxiv_entries = []
 
         if not arxiv_entries:
