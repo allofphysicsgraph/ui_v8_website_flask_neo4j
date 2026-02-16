@@ -363,12 +363,7 @@ def send_email_with_msmtp(
 def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] start "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
     sympy_as_latex_per_feed_id = {}  # type: Dict[str, str]
     for this_dict in list_of_feed_dicts:
         if "sympy" in this_feed_dict.keys():
@@ -388,12 +383,7 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
         else:
             sympy_as_latex_per_feed_id[this_dict["id"]] = "no 'sympy' key"
 
-    logger.info(
-        "[TRACE] end "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return sympy_as_latex_per_feed_id
 
 
