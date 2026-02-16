@@ -1469,7 +1469,12 @@ def get_dict_of_steps_in_derivation(
             "list of output dicts": list_of_output_dicts,
         }
 
-    sorted_all_steps = dict(sorted(all_steps.items()))
+    # sorting on `id` isn't relevant to rendered HTML tables.
+    # sorted_all_steps = dict(sorted(all_steps.items()))
+    # The `step index` is what matters to the user
+    sorted_all_steps = dict(
+        sorted(all_steps.items(), key=lambda item: item[1]["sequence index"])
+    )
 
     logger.info("[TRACE] end " + trace_id)
     return sorted_all_steps, query_time_dict
