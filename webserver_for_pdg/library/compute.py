@@ -371,16 +371,19 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
     sympy_as_latex_per_feed_id = {}  # type: Dict[str, str]
     for this_dict in list_of_feed_or_expr_dicts:
         if "sympy" in this_feed_dict.keys():
-            try:
-                sympy_as_latex_per_feed_id[this_feed_dict["id"]] = (
-                    latex_and_sympy.sympy_to_latex_str(this_dict["sympy"])
-                )
-            except Exception as err:
-                logger.critical(
-                    "ERROR converting to Sympy in get_sympy_as_latex_per_feed_id: "
-                    + str(err)
-                )
-                sympy_as_latex_per_feed_id[this_dict["id"]] = "error converting"
+            if len(this_dict["sympy"]) > 0:
+                try:
+                    sympy_as_latex_per_feed_id[this_feed_dict["id"]] = (
+                        latex_and_sympy.sympy_to_latex_str(this_dict["sympy"])
+                    )
+                except Exception as err:
+                    logger.error(
+                        "converting to Sympy in get_sympy_as_latex_per_feed_id: "
+                        + str(err)
+                    )
+                    sympy_as_latex_per_feed_id[this_dict["id"]] = "error converting"
+            else:
+                sympy_as_latex_per_feed_id[this_dict["id"]] = "'sympy' key is empty"
         else:
             sympy_as_latex_per_feed_id[this_dict["id"]] = "no 'sympy' key"
 
@@ -399,14 +402,35 @@ def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
     logger.info("[TRACE] start " + trace_id)
     for index, this_expression_dict in enumerate(list_of_expression_dicts):
         if "sympy_lhs" in this_expression_dict.keys():
-            list_of_expression_dicts[index]["latex_as_sympy_LHS"] = (
-                latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy_lhs"])
-            )
+            try:
+                list_of_expression_dicts[index]["latex_as_sympy_LHS"] = (
+                    latex_and_sympy.sympy_to_latex_str(
+                        this_expression_dict["sympy_lhs"]
+                    )
+                )
+            except AttributeError as e:
+                list_of_expression_dicts[index]["latex_as_sympy_LHS"] = (
+                    "AttributeError in get_sympy_as_latex_per_expr_id: " + str(e)
+                )
+            except TypeError as e:
+                list_of_expression_dicts[index]["latex_as_sympy_LHS"] = (
+                    "TypeError in get_sympy_as_latex_per_expr_id: " + str(e)
+                )
         if "sympy_rhs" in this_expression_dict.keys():
-            list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
-                latex_and_sympy.sympy_to_latex_str(this_expression_dict["sympy_rhs"])
-            )
-
+            try:
+                list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
+                    latex_and_sympy.sympy_to_latex_str(
+                        this_expression_dict["sympy_rhs"]
+                    )
+                )
+            except AttributeError as e:
+                list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
+                    "AttributeError in get_sympy_as_latex_per_expr_id: " + str(e)
+                )
+            except TypeError as e:
+                list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
+                    "TypeError in get_sympy_as_latex_per_expr_id: " + str(e)
+                )
     logger.info("[TRACE] end " + trace_id)
     return list_of_expression_dicts
 
@@ -796,6 +820,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
     logger.info("[TRACE] start " + trace_id)
 
     list_of_derivation_dicts = []  # type: List[dict]
+
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_derivation_dicts += session.read_transaction(
@@ -841,8 +866,13 @@ def get_list_of_derivation_dicts_that_use_symbol_id(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
+    # This will keep the last dictionary encountered for each ID.
+    list_of_unique_derivations = list(
+        {v["id"]: v for v in list_of_derivation_dicts}.values()
+    )
+
     logger.info("[TRACE] end " + trace_id)
-    return list_of_derivation_dicts, query_time_dict
+    return list_of_unique_derivations, query_time_dict
 
 
 # def get_list_of_derivation_dicts_that_use_feed_id(
