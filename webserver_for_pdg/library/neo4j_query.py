@@ -681,8 +681,17 @@ def get_node_properties(tx, node_type: str, node_id: str) -> dict:
     result = tx.run(
         "MATCH (n: " + str(node_type) + ') WHERE n.id = "' + str(node_id) + '" RETURN n'
     )
-    # node_data = result.data()['n']
-    node_data = result.data()[0]["n"]
+    res_data = result.data()
+
+    # logger.info("result.data() =" + str(res_data))
+
+    if len(res_data) == 0:
+        logger.info("result.data() is an empty list")
+        return None
+
+    # logger.info("result.data()[0] =" + str(res_data[0]))
+
+    node_data = res_data[0]["n"]
     logger.info("node_data=" + str(node_data))
 
     logger.info("[TRACE]  end " + str(trace_id))
