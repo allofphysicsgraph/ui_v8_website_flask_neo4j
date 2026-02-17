@@ -63,8 +63,8 @@ dict_of_nonoperation_symbol_dicts_in_expression: <BR>
           {{ symbol_id }}
       </a>
     </td>
-    <td>{{ symbol_dict['latex']}}<BR>
-      \({{ symbol_dict['latex']}}\)</td>
+    <td>{{ symbol_dict['latex']|e }}<BR>
+      \({{ symbol_dict['latex']|e }}\)</td>
     <td>{{ symbol_dict['name_latex'] }}</td>
     <td>{{ symbol_dict['description_latex'] }}</td>
     <td>{{ symbol_dict['reference_latex'] }}</td>
