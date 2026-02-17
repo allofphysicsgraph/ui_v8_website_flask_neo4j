@@ -19,11 +19,11 @@
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
     <P>
-      {{ form.matrix_latex.label}}: {{ form.matrix_latex(size=50, maxlength=1000, value=matrix_dict['latex']) }} <BR/>
+      {{ form.matrix_latex.label}}: {{ form.matrix_latex(size=50, maxlength=1000, value=matrix_dict['latex']|e) }} <BR/>
       &nbsp;<BR/>
-      {{form.matrix_name.label }}: {{ form.matrix_name(size=50, maxlength=1000, value=matrix_dict['name']) }}<BR/>
+      {{form.matrix_name_latex.label }}: {{ form.matrix_name_latex(size=50, maxlength=1000, value=matrix_dict['name_latex']|e) }}<BR/>
       &nbsp;<BR/>
-      {{form.matrix_description.label }}: {{ form.matrix_description(size=50, maxlength=1000, value=matrix_dict['description']) }}<BR/>
+      {{form.matrix_description_latex.label }}: {{ form.matrix_description_latex(size=50, maxlength=1000, value=matrix_dict['description_latex']|e) }}<BR/>
       &nbsp;<BR/>
       <input type="submit" value="Edit matrix">
     </P>
