@@ -112,7 +112,7 @@ api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] api_do_nothing start " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 #     return
 
 
@@ -134,7 +134,7 @@ api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] api_register start " + trace_id + " " + str(time.time()))
+#     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 #     # csrf_token = csrf.generate_csrf() # AttributeError: 'CSRFProtect' object has no attribute 'generate_csrf'
 
 #     # current_token = g.csrf_token
@@ -266,9 +266,7 @@ def api_list_derivations():
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info(
-        "[TRACE] api_list_derivations start " + trace_id + " " + str(time.time())
-    )
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -352,7 +350,7 @@ def api_list_derivations():
     response = make_response(jsonify(payload))
     response.headers["Content-Type"] = "application/hal+json"
 
-    logger.info("[TRACE] api_list_derivations end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return response
 
 
@@ -374,7 +372,7 @@ def api_list_inference_rules():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_list_inference_rules start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -441,7 +439,7 @@ def api_list_inference_rules():
     response = make_response(jsonify(payload))
     response.headers["Content-Type"] = "application/hal+json"
 
-    logger.info("[TRACE] api_list_inference_rules end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return response
 
 
@@ -460,7 +458,7 @@ def api_list_expressions():
     ]
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_list_expressions start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -533,7 +531,7 @@ def api_list_expressions():
     response = make_response(jsonify(payload))
     response.headers["Content-Type"] = "application/hal+json"
 
-    logger.info("[TRACE] api_list_expressions end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return response
 
 
@@ -555,7 +553,7 @@ def api_list_operation_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_list_symbols start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -630,7 +628,7 @@ def api_list_operation_symbols():
     response = make_response(jsonify(payload))
     response.headers["Content-Type"] = "application/hal+json"
 
-    logger.info("[TRACE] api_list_operation_symbols end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return response
 
 
@@ -641,7 +639,7 @@ def api_list_relation_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_list_relation_symbols start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -716,7 +714,7 @@ def api_list_relation_symbols():
     response = make_response(jsonify(payload))
     response.headers["Content-Type"] = "application/hal+json"
 
-    logger.info("[TRACE] api_list_relation_symbols end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return response
 
 
@@ -738,7 +736,7 @@ def api_list_scalar_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_list_symbols start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -809,7 +807,7 @@ def api_list_scalar_symbols():
     response = make_response(jsonify(payload))
     response.headers["Content-Type"] = "application/hal+json"
 
-    logger.info("[TRACE] api_list_scalar_symbols end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return response
 
 
@@ -831,7 +829,7 @@ def api_list_vector_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_list_symbols start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -902,7 +900,7 @@ def api_list_vector_symbols():
     response = make_response(jsonify(payload))
     response.headers["Content-Type"] = "application/hal+json"
 
-    logger.info("[TRACE] api_list_vector_symbols end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return response
 
 
@@ -924,7 +922,7 @@ def api_list_matrix_symbols():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_list_symbols start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -995,7 +993,7 @@ def api_list_matrix_symbols():
     response = make_response(jsonify(payload))
     response.headers["Content-Type"] = "application/hal+json"
 
-    logger.info("[TRACE] api_list_matrix_symbols end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return response
 
 
@@ -1027,7 +1025,7 @@ def api_create_derivation():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_create_derivation start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # print("request=" + str(request)) # shows the user-submitted URL and type (POST)
@@ -1193,7 +1191,7 @@ def api_create_expression():
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_create_expression start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     if request.is_json:  # "Content-Type: application/json"
@@ -1806,9 +1804,7 @@ def api_create_operation_symbol():
             now_str,
             author_name_latex,
         )
-        logger.info(
-            "[TRACE] pdg_app/to_add_operation end " + trace_id + " " + str(time.time())
-        )
+        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
 
     return jsonify(
         {
@@ -1909,9 +1905,7 @@ def api_create_relation_symbol():
             now_str,
             author_name_latex,
         )
-        logger.info(
-            "[TRACE] pdg_app/to_add_relation end " + trace_id + " " + str(time.time())
-        )
+        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
 
     return jsonify(
         {"STATUS": "relation symbol added successfully", "query times": query_time_dict}
@@ -1976,7 +1970,7 @@ def api_derivation_metadata(derivation_id: str):
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_derivation_metadata start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     if "derivation_id" in request.args:
@@ -1995,7 +1989,7 @@ def api_derivation_metadata(derivation_id: str):
         query_time_dict["pdg_api/: "] = time.time() - query_start_time
     logger.info("derivation_dict=" + str(derivation_dict))
 
-    logger.info("[TRACE] api_derivation_metadata end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return jsonify(derivation_dict)
 
 
@@ -2064,7 +2058,7 @@ def api_derivation_steps(derivation_id: str):
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_derivation_steps start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # if "derivation_id" in request.args:
@@ -2083,7 +2077,7 @@ def api_derivation_steps(derivation_id: str):
         query_time_dict["pdg_api/: "] = time.time() - query_start_time
     # logger.info("list_of_steps=" + str(list_of_steps))
 
-    logger.info("[TRACE] api_derivation_steps end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return jsonify(list_of_steps)
 
 
@@ -2177,9 +2171,7 @@ def api_delete_derivation(derivation_id: str):
         query_time_dict["pdg_app/to_review_derivation: delete_node derivation"] = round(
             time.time() - query_start_time, 3
         )
-    logger.info(
-        "[TRACE] pdg_app/to_review_derivation end " + trace_id + " " + str(time.time())
-    )
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
 
     return jsonify({"STATUS": "successfully deleted" + derivation_id})
 
@@ -2245,7 +2237,7 @@ def api_cypher_query():
     curl --silent --insecure https://localhost/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] api_cypher_query start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     user_query = request.args.get("query")
@@ -2273,7 +2265,7 @@ def api_cypher_query():
             "use: curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\)"
         ]
 
-    logger.info("[TRACE] api_cypher_query end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return jsonify(list_of_records)
 
 

@@ -362,7 +362,7 @@ def callback():
     https://realpython.com/flask-google-login/
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] pdg_login/callback start " + str(trace_id) + "]")
+    logger.info("[TRACE] start " + str(trace_id) + "]")
     # Get authorization code Google sent back to you
     code = request.args.get("code")
 
@@ -428,7 +428,7 @@ def callback():
     flash("logged in")
 
     # Send user back to homepage
-    logger.info("[TRACE] pdg_login/callback end " + str(trace_id) + "]")
+    logger.info("[TRACE] end " + str(trace_id) + "]")
     return redirect(url_for("to_navigation", referrer="login"))
     # TODO: rather than return the user to navigation, put them back on the original page they came from
     # This seems tricky; https://www.reddit.com/r/flask/comments/67lu0m/flasklogin_why_do_you_have_to_validate_a_next_url/
@@ -1109,7 +1109,7 @@ def to_index():
     placeholder for landing page that provides context before user goes to_navigation
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_index start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     query_time_dict = {}  # type: query_timing_result_type
     T_and_f_derivation_ID = "884319"
@@ -1120,11 +1120,11 @@ def to_index():
         latex.create_d3js_json(T_and_f_derivation_ID, all_steps, "/code/static/")
         d3js_json_filename = T_and_f_derivation_ID + ".json"
     except Exception as err:
-        logger.error(str(type(err).__name__) + ":" + str(err))
+        logger.error(str(type(err).__name__) + ": " + str(err))
         flash("pdg_app/to_index: " + str(type(err).__name__) + str(err))
         d3js_json_filename = ""
 
-    logger.info("[TRACE] to_index end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template("jinja2_pages/index.html", json_for_d3js=d3js_json_filename)
 
 
@@ -1168,7 +1168,7 @@ def to_navigation():
         if "file" not in request.files:
             error_message_for_user = "ERROR: file not in request files"
             logger.error("file not in request files")
-            logger.info("[TRACE] to_navigation end " + str(trace_id))
+            logger.info("[TRACE] end " + str(trace_id))
             return redirect(request.url)
         file_obj = request.files["file"]
 
@@ -1178,12 +1178,12 @@ def to_navigation():
         if file_obj.filename == "":
             error_message_for_user = "WARN: no selected file"
             logger.info("to_navigation: WARN: no selected file")
-            logger.info("[TRACE] to_navigation end " + str(trace_id))
+            logger.info("[TRACE] end " + str(trace_id))
             return redirect(request.url)
         if "upload_cypher" in request.form.keys():
             allowed_bool = True
         else:
-            logger.info("[TRACE] to_navigation end " + str(trace_id))
+            logger.info("[TRACE] end " + str(trace_id))
             raise Exception("unrecognized button")
 
         if file_obj and allowed_bool:
@@ -1348,7 +1348,7 @@ def to_navigation():
             time.time() - query_start_time, 3
         )
 
-    logger.info("[TRACE] to_navigation end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
 
     # TODO: leverage content from navigation_OLD.html
     return render_template(
@@ -1378,7 +1378,7 @@ def to_add_derivation() -> werkzeug.Response:
     http://localhost:5000/new_derivation?derivation_name=asdf123&derivation_abstract=4924858miminginasf
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_derivation start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     # TODO: check that the name of the derivation doesn't
@@ -1437,6 +1437,7 @@ def to_add_derivation() -> werkzeug.Response:
     if request.method == "POST" and web_form.validate():
         logger.info("request.form =" + str(request.form))
 
+        # this preserves the LaTeX backslashes exactly as the user typed them.
         derivation_name_latex = str(web_form.derivation_name_latex.data).strip()
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
@@ -1446,6 +1447,7 @@ def to_add_derivation() -> werkzeug.Response:
             )
             return "<H1>Input must be ASCII only</H1>\n" + str(derivation_name_latex)
 
+        # this preserves the LaTeX backslashes exactly as the user typed them.
         derivation_reference_latex = str(
             web_form.derivation_reference_latex.data
         ).strip()
@@ -1460,6 +1462,7 @@ def to_add_derivation() -> werkzeug.Response:
                 derivation_reference_latex
             )
 
+        # this preserves the LaTeX backslashes exactly as the user typed them.
         abstract_latex = str(web_form.abstract_latex.data).strip()
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
@@ -1521,7 +1524,7 @@ def to_add_derivation() -> werkzeug.Response:
             query_time_dict["pdg_app/to_add_derivation: add_derivation" + trace_id] = (
                 round(time.time() - query_start_time, 3)
             )
-        logger.info("[TRACE] to_add_derivation end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(
             url_for(
                 "to_add_step_select_inference_rule",
@@ -1529,7 +1532,7 @@ def to_add_derivation() -> werkzeug.Response:
             )
         )
 
-    logger.info("[TRACE] to_add_derivation end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/derivation_create.html",
         query_time_dict=query_time_dict,
@@ -1553,7 +1556,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
     >>> to_review_derivation()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_review_derivation start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     derivation_dict = {}
@@ -1639,7 +1642,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                 logger.error(str(type(err).__name__) + str(err))
                 pdf_filename = "error.pdf"
 
-            logger.info("[TRACE] to_review_derivation end " + str(trace_id))
+            logger.info("[TRACE] end " + str(trace_id))
             return redirect(
                 url_for(
                     "static",
@@ -1800,7 +1803,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             logger.error(str(type(err).__name__) + str(err))
             derivation_step_validity_dict[step_id] = err
 
-    logger.info("[TRACE] to_review_derivation end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/derivation_review.html",
         query_time_dict=query_time_dict,
@@ -1821,7 +1824,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
     User wants to delete step or edit step
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_select_step start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     # get properties for derivation ID
@@ -1860,7 +1863,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
         graphDB_Driver, derivation_id, query_time_dict
     )
 
-    logger.info("[TRACE] to_select_step end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/derivation_select_step.html",
         derivation_dict=derivation_dict,
@@ -1877,7 +1880,7 @@ def to_edit_derivation_metadata(
 ) -> werkzeug.Response:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_derivation_metadata start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -1963,7 +1966,7 @@ def to_edit_derivation_metadata(
         logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_review_derivation", derivation_id=derivation_id))
 
-    logger.info("[TRACE] to_edit_derivation_metadata end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/derivation_edit_metadata.html",
         query_time_dict=query_time_dict,
@@ -1984,7 +1987,7 @@ def to_add_step_select_inference_rule(
     What inference rule should be used for this step?
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_step_select_inference_rule start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info(
@@ -1999,7 +2002,7 @@ def to_add_step_select_inference_rule(
     #     # inference_rule_id =
     #     logger.info(str(inference_rule_id))
 
-    #     logger.info("[TRACE] to_add_step_select_inference_rule end " + str(trace_id))
+    #     logger.info("[TRACE] end " + str(trace_id))
     #     redirect(
     #         url_for(
     #             "to_add_step_select_expressions",
@@ -2049,7 +2052,7 @@ def to_add_step_select_inference_rule(
         "to_add_step_select_inference_rule: derivation_dict:" + str(derivation_dict)
     )
 
-    logger.info("[TRACE] to_add_step_select_inference_rule end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/new_step_select_inference_rule.html",
         query_time_dict=query_time_dict,
@@ -2057,10 +2060,10 @@ def to_add_step_select_inference_rule(
         derivation_dict=derivation_dict,
     )
     # # workflow shouldn't reach this condition, but if it does,
-    # logger.info("[TRACE] to_add_step_select_inference_rule end " + str(trace_id))
+    # logger.info("[TRACE] end " + str(trace_id))
     # raise Exception("How did you reach this?")
 
-    # logger.info("[TRACE] to_add_step_select_inference_rule end " + str(trace_id))
+    # logger.info("[TRACE] end " + str(trace_id))
     # return redirect(url_for("to_review_derivation", derivation_id=derivation_id))
 
 
@@ -2075,7 +2078,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     - delete the expression
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_expression start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("expression_id: " + str(expression_id))
@@ -2597,7 +2600,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_list_feeds"))
 
-    logger.info("[TRACE] to_edit_feed end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/feed_edit.html",
         query_time_dict=query_time_dict,
@@ -2619,7 +2622,7 @@ def to_add_expression() -> werkzeug.Response:
     novel expression
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_expression start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     # Used in _table_of_expressions.html which is referenced in expression_create.html
@@ -2868,7 +2871,7 @@ def to_add_feed() -> werkzeug.Response:
     novel feed
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_feed start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_feed_dicts = []
@@ -2985,7 +2988,7 @@ def to_add_feed() -> werkzeug.Response:
                         "pdg_app/to_add_feed: add_feed promoted symbol" + trace_id
                     ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] to_add_feed end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/feed_create.html",
         query_time_dict=query_time_dict,
@@ -3007,7 +3010,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
     >>> to_edit_node()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_node start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     # dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
@@ -3020,7 +3023,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
     logger.info("dict_of_symbol_id_and_type=" + str(dict_of_symbol_id_and_type))
 
     if dict_of_symbol_id_and_type[node_id] == "derivation":
-        logger.info("[TRACE] to_edit_node end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_review_derivation", derivation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "step":
         # which derivation is this step in?
@@ -3034,33 +3037,33 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 "pdg_app/to_edit_node: get_derivation_id_from_step_id" + trace_id
             ] = round(time.time() - query_start_time, 3)
 
-        logger.info("[TRACE] to_edit_node end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(
             url_for("to_edit_step", derivation_id=derivation_id, step_id=node_id)
         )
     elif dict_of_symbol_id_and_type[node_id] == "inference_rule":
-        logger.info("[TRACE] to_edit_node end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_edit_inference_rule", inference_rule_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "feed":
-        logger.info("[TRACE] to_edit_node end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_edit_feed", feed_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "operation":
-        logger.info("[TRACE] to_edit_node end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_edit_operation", operation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "relation":
-        logger.info("[TRACE] to_edit_node end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_edit_relation", relation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "scalar":
-        logger.info("[TRACE] to_edit_node end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_edit_scalar", scalar_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "vector":
-        logger.info("[TRACE] to_edit_node end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_edit_vector", vector_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "matrix":
-        logger.info("[TRACE] to_edit_node end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_edit_matrix", matrix_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "value_with_units":
-        logger.info("[TRACE] to_edit_node end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(
             url_for("to_edit_constant_value_and_units", value_with_units=node_id)
         )
@@ -3079,7 +3082,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
     edit operation
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_operation start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("operation_id: " + str(operation_id))
@@ -3139,7 +3142,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
 
     # logger.info("operation_dict:", operation_dict)
 
-    logger.info("[TRACE] to_edit_operation end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_operation_edit.html",
         query_time_dict=query_time_dict,
@@ -3156,7 +3159,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
     edit relation
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_relation start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("relation_id: " + str(relation_id))
@@ -3214,7 +3217,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
 
         return redirect(url_for("to_list_relations"))
 
-    logger.info("[TRACE] to_edit_relation end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_relation_edit.html",
         query_time_dict=query_time_dict,
@@ -3237,7 +3240,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
     >>> to_edit_scalar()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_scalar start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("scalar_id: " + str(scalar_id))
@@ -3289,7 +3292,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
         # only change the properties that are different from symbol_dict
         for symbol_property, symbol_property_value in scalar_dict.items():
 
-            logger.info("to_edit_scalar: symbol_property=" + str(symbol_property))
+            logger.info("symbol_property=" + str(symbol_property))
             logger.info("symbol_property_value=" + str(symbol_property_value))
 
             flash("pdg_app/to_edit_scalar: NOT ENACTED YET 942492482324")
@@ -3325,7 +3328,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
     # elif request.method == "POST" and web_form_symbol_properties_vector.validate():
     #     logger.info("request.form = ", request.form)
 
-    #     logger.info("[TRACE] to_edit_scalar_symbol end " + str(trace_id))
+    #     logger.info("[TRACE] end " + str(trace_id))
     #     return redirect(url_for("to_list_symbols"))
 
     elif request.method == "POST":
@@ -3337,10 +3340,10 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
         # TODO: delete symbol
 
-        logger.info("[TRACE] to_edit_scalar end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_list_scalars"))
 
-    logger.info("[TRACE] to_edit_scalar end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_edit.html",
         query_time_dict=query_time_dict,
@@ -3359,7 +3362,7 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
     >>> to_edit_vector()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_vector start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("vector_id: " + str(vector_id))
@@ -3368,15 +3371,26 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
     logger.error("NOT ENACTED YET 13942942392")
     # TODO
 
-    vector_dict = {}
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        vector_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "vector", vector_id
+        )
+        query_time_dict["pdg_app/to_edit_vector_symbol: node_properties" + trace_id] = (
+            round(time.time() - query_start_time, 3)
+        )
+    logger.info("vector_dict:" + str(vector_dict))
 
-    web_form = ""
+    if scalar_dict is None:
+        return "<H1>Vector ID " + str(vector_id) + " does not exist in database</H1>."
 
-    logger.info("[TRACE] to_edit_vector end " + str(trace_id))
+    web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
+
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_vector_edit.html",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form=web_form_vector_properties,
         vector_dict=vector_dict,
     )
 
@@ -3390,7 +3404,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
     >>> to_edit_matrix()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_matrix start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("matrix_id: " + str(matrix_id))
@@ -3399,15 +3413,26 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
     logger.error("NOT ENACTED YET 94294111111")
     # TODO
 
-    matrix_dict = {}
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        matrix_dict = session.read_transaction(
+            neo4j_query.get_node_properties, "matrix", matrix_id
+        )
+        query_time_dict["pdg_app/to_edit_matrix_symbol: node_properties" + trace_id] = (
+            round(time.time() - query_start_time, 3)
+        )
+    logger.info("matrix_dict:" + str(matrix_dict))
 
-    web_form = ""
+    if matrix_dict is None:
+        return "<H1>Matrix ID " + str(matrix_id) + " does not exist in database</H1>."
 
-    logger.info("[TRACE] to_edit_matrix end " + str(trace_id))
+    web_form_matrix_properties = SpecifyNewSymbolMatrixForm(request.form)
+
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_matrix_edit.html",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form=web_form_matrix_properties,
         matrix_dict=matrix_dict,
     )
 
@@ -3417,7 +3442,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
 )
 def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_value_and_units start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -3495,7 +3520,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
                 author_name_latex,
             )
 
-        logger.info("[TRACE] to_add_value_and_units end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_list_scalars"))
 
     with graphDB_Driver.session() as session:
@@ -3697,7 +3722,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
         dict_of_derivations_that_use_scalar[scalar_id] = list_of_derivation_names
     dict_of_derivation_dicts_that_use_scalar = dict_of_derivations_that_use_scalar
 
-    logger.info("[TRACE] to_add_symbol_scalar end " + str(trace_id))
+    logger.info("[trace] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_create.html",
         query_time_dict=query_time_dict,
@@ -3950,7 +3975,7 @@ def to_add_operation() -> werkzeug.Response:
     novel operation
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_operation start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -4026,10 +4051,10 @@ def to_add_operation() -> werkzeug.Response:
                 now_str,
                 author_name_latex,
             )
-            logger.info("[TRACE] to_add_operation end " + str(trace_id))
+            logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_list_operations"))
 
-    logger.info("[TRACE] to_add_operation end " + str(trace_id))
+    logger.info("[trace] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_operation_create.html",
         query_time_dict=query_time_dict,
@@ -4047,7 +4072,7 @@ def to_add_relation() -> werkzeug.Response:
     novel relation
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_relation start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -4123,10 +4148,10 @@ def to_add_relation() -> werkzeug.Response:
                 now_str,
                 author_name_latex,
             )
-            logger.info("[TRACE] to_add_relation end " + str(trace_id))
+            logger.info("[trace] end " + str(trace_id))
         return redirect(url_for("to_list_relations"))
 
-    logger.info("[TRACE] to_add_relation end " + str(trace_id))
+    logger.info("[trace] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_relation_create.html",
         query_time_dict=query_time_dict,
@@ -4151,7 +4176,7 @@ def to_add_step_select_expressions(
     here we assume all expressions already exist
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_step_select_expressions start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("derivation_id:" + str(derivation_id))
@@ -4318,7 +4343,7 @@ def to_add_step_select_expressions(
         )
 
     # first visit to this page
-    logger.info("[TRACE] to_add_step_select_expressions end " + str(trace_id))
+    logger.info("[trace] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/new_step_select_expressions_for_inference_rule.html",
         query_time_dict=query_time_dict,
@@ -5006,9 +5031,7 @@ def to_add_symbols_and_operations_for_feed(
         )
         # example output: {'a': '5638458', 'b': '7152159'}
 
-        logger.info(
-            "[TRACE] to_add_symbols_and_operations_for_feed end " + str(trace_id)
-        )
+        logger.info("[trace] end " + str(trace_id))
         return redirect(
             url_for(
                 "to_add_sympy_and_lean_for_feed",
@@ -5017,7 +5040,7 @@ def to_add_symbols_and_operations_for_feed(
             )
         )
 
-    logger.info("[TRACE] to_add_symbols_and_operations_for_feed end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/feed_create_symbols_and_operations.html",
         query_time_dict=query_time_dict,
@@ -5041,7 +5064,7 @@ def to_add_sympy_and_lean_for_feed(
     derivation_id is the numeric ID of the derivation being edited
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_sympy_and_lean_for_feed start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info(
@@ -5141,7 +5164,7 @@ def to_add_sympy_and_lean_for_feed(
         except neo4j.exceptions.CypherSyntaxError as err:
             flash("pdg_app/to_add_sympy_and_lean_for_feed ERROR:" + str(err))
             logger.error(str(err))
-            logger.info("[TRACE] to_add_sympy_and_lean_for_feed end " + str(trace_id))
+            logger.info("[TRACE] end " + str(trace_id))
             return redirect(
                 url_for(
                     "to_add_symbols_and_operations_for_feed",
@@ -5149,11 +5172,11 @@ def to_add_sympy_and_lean_for_feed(
                 )
             )
 
-        logger.info("[TRACE] to_add_sympy_and_lean_for_feed end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_list_feeds"))
 
     web_form.sympy_str.data = revised_feed_with_str
-    logger.info("[TRACE] to_add_sympy_and_lean_for_feed end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/feed_create_sympy_and_lean.html",
         query_time_dict=query_time_dict,
@@ -5174,7 +5197,7 @@ def to_add_inference_rule() -> werkzeug.Response:
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_add_inference_rule start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_inference_rule_dicts = []
@@ -5237,7 +5260,7 @@ def to_add_inference_rule() -> werkzeug.Response:
                     "pdg_app/to_add_inference_rule INVALID INPUT: inference rule with that name already exists"
                 )
 
-                logger.info("[TRACE] to_add_inference_rule end " + str(trace_id))
+                logger.info("[TRACE] end " + str(trace_id))
                 return redirect(url_for("to_add_inference_rule"))
             if inference_rule_latex == inference_rule_dict["latex"]:
                 logger.error(
@@ -5248,7 +5271,7 @@ def to_add_inference_rule() -> werkzeug.Response:
                     "pdg_app/to_add_inference_rule INVALID INPUT: inference rule with that latex already exists"
                 )
 
-                logger.info("[TRACE] to_add_inference_rule end " + str(trace_id))
+                logger.info("[TRACE] end " + str(trace_id))
                 return redirect(url_for("to_add_inference_rule"))
 
         logger.info("status: No conflicting name or latex detected")
@@ -5293,10 +5316,10 @@ def to_add_inference_rule() -> werkzeug.Response:
                 now_str=now_str,
                 author_name_latex=author_name_latex,
             )
-        logger.info("[TRACE] to_add_inference_rule end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_list_inference_rules"))
 
-    logger.info("[TRACE] to_add_inference_rule end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/inference_rule_create.html",
         query_time_dict=query_time_dict,
@@ -5364,7 +5387,7 @@ def to_edit_step(
                 note_after_step_latex,
             )
 
-    logger.info("[TRACE] to_edit_step end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/step_edit.html",
         query_time_dict=query_time_dict,
@@ -5380,7 +5403,7 @@ def to_edit_inference_rule(
 ) -> werkzeug.Response:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_inference_rule start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     # TODO: verify that inference_rule_id exists before editing
@@ -5461,7 +5484,7 @@ def to_edit_inference_rule(
                     "pdg_app/to_edit_inference_rule INVALID INPUT: inference rule with that name already exists"
                 )
 
-                logger.info("[TRACE] to_edit_inference_rule end " + str(trace_id))
+                logger.info("[TRACE] end " + str(trace_id))
                 return redirect(url_for("to_add_inference_rule"))
             if inference_rule_latex == inference_rule_dict["latex"]:
                 logger.error(
@@ -5472,7 +5495,7 @@ def to_edit_inference_rule(
                     "pdg_app/to_edit_inference_ruleINVALID INPUT: inference rule with that latex already exists"
                 )
 
-                logger.info("[TRACE] to_edit_inference_rule end " + str(trace_id))
+                logger.info("[TRACE] end " + str(trace_id))
                 return redirect(url_for("to_add_inference_rule"))
 
         logger.info(
@@ -5531,7 +5554,7 @@ def to_edit_inference_rule(
         "to_edit_inference_rule inference_rule_dict " + str(inference_rule_dict)
     )
 
-    logger.info("[TRACE] to_edit_inference_rule end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/inference_rule_edit.html",
         query_time_dict=query_time_dict,
@@ -5557,7 +5580,7 @@ def to_query() -> werkzeug.Response:
     When there is no pipe then the string is converted to HTML safe text
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_query start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_records_with_hyperlinks = ["nothing returned from Neo4j"]  # type: List[str]
@@ -5774,7 +5797,7 @@ def to_query() -> werkzeug.Response:
     else:
         step_id = "THEREARENOSTEPS"
 
-    logger.info("[TRACE] to_query end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/query.html",
         query_time_dict=query_time_dict,
@@ -5793,7 +5816,7 @@ def to_list_feeds() -> werkzeug.Response:
     >>> to_list_feeds()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_list_feeds start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_feed_dicts = []
@@ -5838,7 +5861,7 @@ def to_list_feeds() -> werkzeug.Response:
         graphDB_Driver, query_time_dict
     )
 
-    logger.info("[TRACE] to_list_feeds end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/feed_list.html",
         query_time_dict=query_time_dict,
@@ -5856,7 +5879,7 @@ def to_list_operations() -> werkzeug.Response:
     >>> to_list_operations()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_list_operations start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_operation_dicts = []
@@ -5890,7 +5913,7 @@ def to_list_operations() -> werkzeug.Response:
             graphDB_Driver, query_time_dict, this_operation_dict["id"]
         )
 
-    logger.info("[TRACE] to_list_operations end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_operation_list.html",
         query_time_dict=query_time_dict,
@@ -5906,7 +5929,7 @@ def to_list_relations() -> werkzeug.Response:
     >>> to_list_relations()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_list_relations start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_relation_dicts = []  # type: List[dict]
@@ -5942,7 +5965,7 @@ def to_list_relations() -> werkzeug.Response:
             graphDB_Driver, query_time_dict, this_relation_dict["id"]
         )
 
-    logger.info("[TRACE] to_list_relations end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_relation_list.html",
         query_time_dict=query_time_dict,
@@ -5958,7 +5981,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
     >>> to_list_constant_values()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_list_constant_values start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -5980,7 +6003,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
             "pdg_app/to_add_value_and_units get_node_properties" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] to_list_constant_values end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_constant_values_list.html",
         query_time_dict=query_time_dict,
@@ -6001,7 +6024,7 @@ def to_edit_constant_value_and_units(
     >>> to_edit_constant_value_and_units()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_edit_constant_value_and_units start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6053,7 +6076,7 @@ def to_edit_constant_value_and_units(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] to_edit_constant_value_and_units start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_constant_values_edit.html",
         query_time_dict=query_time_dict,
@@ -6071,7 +6094,7 @@ def to_list_scalars() -> str:
     >>> to_list_scalars()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_list_scalars start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6124,7 +6147,7 @@ def to_list_scalars() -> str:
         dict_of_derivations_that_use_scalar[scalar_id] = list_of_derivation_names
     dict_of_derivation_dicts_that_use_scalar = dict_of_derivations_that_use_scalar
 
-    logger.info("[TRACE] to_list_scalars end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_list.html",
         query_time_dict=query_time_dict,
@@ -6140,7 +6163,7 @@ def to_list_vectors() -> str:
     >>> to_list_vectors()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_list_vectors start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6175,7 +6198,7 @@ def to_list_vectors() -> str:
             graphDB_Driver, query_time_dict, this_vector_dict["id"]
         )
 
-    logger.info("[TRACE] to_list_vectors end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_vector_list.html",
         query_time_dict=query_time_dict,
@@ -6191,7 +6214,7 @@ def to_list_matrices() -> str:
     >>> to_list_matrices()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_list_matrices start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6224,7 +6247,7 @@ def to_list_matrices() -> str:
             graphDB_Driver, query_time_dict, this_matrix_dict["id"]
         )
 
-    logger.info("[TRACE] to_list_matrices end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_matrix_list.html",
         query_time_dict=query_time_dict,
@@ -6243,7 +6266,7 @@ def to_list_expressions() -> str:
     >>> to_list_expressions()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_list_expressions start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6306,7 +6329,7 @@ def to_list_expressions() -> str:
     #     logger.error(str(type(err).__name__) + str(err))
     #     list_of_expression_dicts = []
 
-    logger.info("[TRACE] to_list_expressions end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/expression_list.html",
         query_time_dict=query_time_dict,
@@ -6328,7 +6351,7 @@ def to_list_derivations() -> str:
     >>> to_list_derivations()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_list_derivations start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     # query_time_dict = compute.convert_expr_sympy_pdg_symbols_to_neo4j_edge(
@@ -6345,7 +6368,7 @@ def to_list_derivations() -> str:
     #     # TODO: this derivation_id should come from request.form; I just don't know the field yet
     #     derivation_id = "5389624"
     #
-    #     logger.info("[TRACE] to_list_derivations end " + str(trace_id))
+    #     logger.info("[TRACE] end " + str(trace_id))
     #     return redirect(url_for(to_review_derivation, derivation_id))
 
     # https://neo4j.com/docs/python-manual/current/session-api/
@@ -6386,7 +6409,7 @@ def to_list_derivations() -> str:
 
     # TODO: convert derivation_dict['abstract_latex'] to HTML using pandoc
 
-    logger.info("[TRACE] to_list_derivations end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/derivation_list.html",
         query_time_dict=query_time_dict,
@@ -6401,7 +6424,7 @@ def to_list_inference_rules() -> str:
     >>> to_show_all_inference_rules()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_list_inference_rules start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_inference_rule_dicts = []
@@ -6424,7 +6447,7 @@ def to_list_inference_rules() -> str:
     for inference_rule_dict in list_of_inference_rule_dicts:
         logger.info("to_list_inference_rules " + str(inference_rule_dict))
 
-    logger.info("[TRACE] to_list_inference_rules end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/inference_rule_list.html",
         query_time_dict=query_time_dict,
@@ -6441,7 +6464,7 @@ def to_delete_graph_content() -> werkzeug.Response:
     https://neo4j.com/developer/kb/large-delete-transaction-best-practices-in-neo4j/
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_delete_graph_content start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     # https://neo4j.com/docs/python-manual/current/session-api/
@@ -6454,7 +6477,7 @@ def to_delete_graph_content() -> werkzeug.Response:
             "pdg_app/to_delete_graph_content: delete_all_nodes_and_relationships"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
-    logger.info("[TRACE] to_delete_graph_content end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return redirect(url_for("to_navigation"))
 
 
@@ -6471,7 +6494,7 @@ def to_export_json() -> werkzeug.Response:
 
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_export_json start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6485,7 +6508,7 @@ def to_export_json() -> werkzeug.Response:
     # <Record file='all.json' source='database: nodes(4), rels(0)' format='json' nodes=4 relationships=0 properties=16 time=123 rows=4 batchSize=-1 batches=0 done=True data=None>
 
     # "dumping_grounds" is a variable set in the docker-compose file using variable NEO4J_dbms_directories_import
-    logger.info("[TRACE] to_export_json end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return redirect(url_for("static", filename="dumping_grounds/pdg.jsonl"))
 
 
@@ -6493,7 +6516,7 @@ def to_export_json() -> werkzeug.Response:
 def to_export_csv() -> werkzeug.Response:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_export_csv start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6505,7 +6528,7 @@ def to_export_csv() -> werkzeug.Response:
 
     logger.info("res=" + str(res))
 
-    logger.info("[TRACE] to_export_csv end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return redirect(url_for("static", filename="dumping_grounds/pdg.csv"))
 
 
@@ -6513,7 +6536,7 @@ def to_export_csv() -> werkzeug.Response:
 def to_export_graphml() -> werkzeug.Response:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_export_graphml start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6525,7 +6548,7 @@ def to_export_graphml() -> werkzeug.Response:
 
     logger.info("res=" + str(res))
 
-    logger.info("[TRACE] to_export_graphml end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return redirect(url_for("static", filename="dumping_grounds/pdg.graphml"))
 
 
@@ -6543,7 +6566,7 @@ def to_export_cypher() -> werkzeug.Response:
     # https://stackoverflow.com/a/20894360/1164295
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] to_export_cypher start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6556,7 +6579,7 @@ def to_export_cypher() -> werkzeug.Response:
     logger.info("res=" + str(res))
     # <Record file='all.cypher' batches=1 source='database: nodes(4), rels(0)' format='cypher' nodes=4 relationships=0 properties=16 time=13 rows=4 batchSize=20000>
 
-    logger.info("[TRACE] to_export_cypher end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return redirect(url_for("static", filename="dumping_grounds/pdg.cypher"))
 
 
@@ -6655,7 +6678,7 @@ def search_redirect_to_google():
     This search only works via webform since the value is grabbed from form value "search"
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] search_redirect_to_google start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     logger.info(
         "request.url: " + str(request.url)
     )  # https://stackoverflow.com/a/46176337/1164295
@@ -6745,11 +6768,11 @@ def static_dir():
     >>> static_dir()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] static_dir start " + str(trace_id) + "]")
+    logger.info("[TRACE] start " + str(trace_id) + "]")
     # https://stackoverflow.com/a/3207973/1164295
     _, _, filenames = next(os.walk("static"))
     filenames.sort()
-    logger.info("[TRACE] static_dir end " + str(trace_id) + "]")
+    logger.info("[TRACE] end " + str(trace_id) + "]")
     return render_template(
         "jinja2_pages/static_dir.html",
         list_of_files=filenames,

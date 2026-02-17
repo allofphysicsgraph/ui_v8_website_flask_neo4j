@@ -83,7 +83,7 @@ def validate_step(
     >>> validate_step('4924823', '2500423', 'data.json')
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] validate_step start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # logger.debug(str(inference_rule_dict))
     # logger.debug(str(list_of_input_dicts))

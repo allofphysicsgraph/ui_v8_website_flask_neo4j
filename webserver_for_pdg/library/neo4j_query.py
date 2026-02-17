@@ -157,7 +157,7 @@ def constrain_unique_id(tx) -> None:
     >>> constrain_unique_id()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] constrain_unique_id start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     for node_type in list_of_valid.node_types:
         # try:
@@ -271,7 +271,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
 
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] symbols_in_feed start " + str(trace_id))
+#     logger.info("[TRACE] start " + str(trace_id))
 
 #     print("neo4j_query/symbols_in_feed: symbol_category=", symbol_category)
 
@@ -288,7 +288,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
 #         symbol_list.append(result.data()["s.id"])
 #     print("feed_id=", feed_id, "symbol_list=", symbol_list)
 
-#     logger.info("[TRACE] symbols_in_feed end " + str(trace_id))
+#     logger.info("[TRACE] end " + str(trace_id))
 #     return symbol_list
 
 
@@ -857,7 +857,7 @@ def edit_expression(
 #     >>> edit_feed()
 #     """
 #     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] edit_feed start " + str(trace_id))
+#     logger.info("[TRACE] start " + str(trace_id))
 
 #     result = tx.run(
 #         'MERGE (e:feed {id:"' + str(feed_id) + '"})'
@@ -869,7 +869,7 @@ def edit_expression(
 #         'latex: "' + str(feed_latex) + '"}'
 #     )
 
-#     logger.info("[TRACE] edit_feed end " + str(trace_id))
+#     logger.info("[TRACE] end " + str(trace_id))
 #     return
 
 
@@ -1240,7 +1240,7 @@ def connect_expressions_to_step(
     >>> connect_expressions_to_step()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] connect_expressions_to_step start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     assert (
         (len(list_of_input_expression_IDs) > 0)
@@ -1283,7 +1283,7 @@ def connect_expressions_to_step(
         )
         # print(result.data()) # this just shows "[]"
 
-    logger.info("[TRACE] connect_expressions_to_step end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1308,7 +1308,7 @@ def add_expression(
     >>> add_expression(tx,)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] add_expression start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # result = tx.run(
     #     "MERGE (:expression "
@@ -1361,7 +1361,7 @@ def add_expression(
     """
     tx.run(query, params)
 
-    logger.info("[TRACE] add_expression end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1380,7 +1380,7 @@ def add_feed(
     >>> add_feed(tx,)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] add_feed start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # result = tx.run(
     #     "merge (:feed "
@@ -1418,7 +1418,7 @@ def add_feed(
 
     result = tx.run(query, params)
 
-    logger.info("[TRACE] add_feed end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1439,7 +1439,7 @@ def add_quantum_operator_symbol(
     >>> add_symbol(tx,)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] add_quantum_operator_symbol start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # result = tx.run(
     #     "merge (:quantum_operator "
@@ -1485,7 +1485,7 @@ def add_quantum_operator_symbol(
     """
     tx.run(query, params)
 
-    logger.info("[TRACE] add_quantum_operator_symbol end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1506,7 +1506,7 @@ def add_constant_value_with_units(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] add_constant_value_with_units start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     str_to_add = ""
     for property_key, property_value in dict_of_units.items():
@@ -1572,7 +1572,7 @@ def add_constant_value_with_units(
         "MERGE (s)-[:HAS_VALUE]->(v)"
     )
 
-    logger.info("[TRACE] add_constant_value_with_units end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1600,7 +1600,7 @@ def add_scalar_symbol(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] add_scalar_symbol start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # corresponds to SpecifyNewSymbolDIRECTScalarForm
     assert len(symbol_latex) > 0
@@ -1687,7 +1687,7 @@ def add_scalar_symbol(
 
     tx.run(query, params)
 
-    logger.info("[TRACE] add_scalar_symbol end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1709,7 +1709,7 @@ def add_vector_symbol(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] add_vector_symbol start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # corresponds to SpecifyNewSymbolDIRECTVectorForm
     assert len(symbol_latex) > 0
@@ -1820,7 +1820,7 @@ def add_vector_symbol(
         """
         result = tx.run(query, params)
 
-    logger.info("[TRACE] add_vector_symbol end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1842,7 +1842,7 @@ def add_matrix_symbol(
     >>>
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] add_matrix_symbol start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # corresponds to SpecifyNewSymbolDIRECTMatrixForm
     assert len(symbol_latex) > 0
@@ -1949,7 +1949,7 @@ def add_matrix_symbol(
 
         result = tx.run(query, parameters)
 
-    logger.info("[TRACE] add_matrix_symbol end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1970,7 +1970,7 @@ def add_operation_symbol(
     >>> add_operation(tx,)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] add_operation_symbol start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # corresponds to SpecifyNewSymbolDIRECTOperationForm
     assert len(operation_name) > 0
@@ -2039,7 +2039,7 @@ def add_operation_symbol(
 
     result = tx.run(query, params)
 
-    logger.info("[TRACE] add_operation_symbol end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -2059,7 +2059,7 @@ def add_relation_symbol(
     >>> add_operation(tx,)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] add_relation_symbol start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # corresponds to SpecifyNewSymbolDIRECTOperationForm
     assert len(relation_name_latex) > 0
@@ -2095,7 +2095,7 @@ def add_relation_symbol(
 
     result = tx.run(query, params)
 
-    logger.info("[TRACE] add_relation_symbol end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -2120,11 +2120,11 @@ def delete_all_nodes_and_relationships(tx) -> None:
     >>> delete_all_nodes_and_relationships(tx)
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] delete_all_nodes_and_relationships start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     tx.run("MATCH (n) DETACH DELETE n")
 
-    logger.info("[TRACE] delete_all_nodes_and_relationships end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -2137,7 +2137,7 @@ def user_query(tx, query: str) -> list:
     >>> user_query(tx, "test")
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] user_query start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     list_of_results = []
     try:
@@ -2148,7 +2148,7 @@ def user_query(tx, query: str) -> list:
     except neo4j.exceptions.TransactionError:
         list_of_results = ["WRITE OPERATIONS NOT ALLOWED (2)"]
 
-    logger.info("[TRACE] user_query end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return list_of_results
 
 
