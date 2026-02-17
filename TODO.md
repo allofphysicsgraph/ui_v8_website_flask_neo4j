@@ -2,31 +2,24 @@ Enter a novel derivation: https://github.com/allofphysicsgraph/task-tracker/issu
 
 What's preventing me from doing so now?
 
-https://localhost/new_symbol_vector is missing dimensions (length, time, mass)
 
+- verified 2026-02-16 11:18 need for missing feature: https://localhost/new_symbol_vector is missing dimensions (length, time, mass)
+
+- BUG verified 2026-02-16 11:50: on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
+
+- no derivation has all steps valid. There are many errors in the step validation for most derivations
+
+- BUG verified 2026-02-16 16:47: `\r` doesn't render https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/87
+
+to verify:
 
 - https://localhost/list_expressions should show Latex-from-Sympy in the Sympy column
 
-- BUG: SymPy-to-be-edited not displayed in https://localhost/edit_expression/6709044
-
-- BUG: The missing expressions in step 17
-
-- BUG: on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
+- BUG: SymPy-to-be-edited not displayed in edit_expression
 
 
 New function in compute: List of all non-operation symbols
 Used by new feed when promoting existing symbol
-
----
-
-document the design decision to put all routes in a single Python script
-
-More design decision documentation:
-
-In the choices about data structures, note that there is actually a neo4j data structure and the intermediate list and dictionaries that get used by their web pages 
-It's not clear to me whether I could just be using neo4j and am that directly to the web UI 
-
-I've made a design decision to not hire someone as a designer for the web front end because that would be premature at this point. I'm still in the exploration prototyping phase to figure out what the front end will need to be able to do
 
 ---
 
@@ -45,6 +38,9 @@ Given the existing HTML page for expression entry, I bet Gemini could figure out
 
 ---
 
+validates lean capability using T, f
+https://github.com/allofphysicsgraph/task-tracker/issues/105
+
 In the lean repo, do I have examples of multiply both sides by and divide both sides by?
 
 A significant use case is supplemental material for any paper that includes equations. There are two sub cases 
@@ -52,7 +48,6 @@ A significant use case is supplemental material for any paper that includes equa
 - The second sub case is indicating the relation between the equations used in this paper and equations used in any other paper
 
 ---
-
 
 email alerts - https://github.com/allofphysicsgraph/task-tracker/issues/137
 
@@ -62,13 +57,7 @@ add column for status on other projects for categories like active, idle, unavai
 
 ---
 
-
 Move content out of "todo.md"
-
----
-
-validates lean capability using T, f
-https://github.com/allofphysicsgraph/task-tracker/issues/105
 
 ---
 
@@ -156,6 +145,7 @@ Document how each inference rule operates on ASTs
 
 ---
 
+[graph query]
 Are there tuples or triples of inference rules that imply a larger inference rule?
 
 ---
@@ -189,11 +179,13 @@ http://biarri.com/adventures-with-javascript-graphing-libraries/
 
 ---
 
-binomials
+to support: binomials
 
 <https://www.cs.cmu.edu/~adamchik/21-127/lectures/binomials_print.pdf>
 <https://en.wikipedia.org/wiki/Binomial_coefficient>
 <https://mathworld.wolfram.com/BinomialCoefficient.html>
+
+TODO: find a derivation that leverages binomials
 
 ---
 
