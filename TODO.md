@@ -1,25 +1,24 @@
-Enter a novel derivation: https://github.com/allofphysicsgraph/task-tracker/issues/162 (F=ma)
-
-What's preventing me from doing so now?
-
-
-- verified 2026-02-16 11:18 need for missing feature: https://localhost/new_symbol_vector is missing dimensions (length, time, mass)
-
-- BUG verified 2026-02-16 11:50: on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
-
-- no derivation has all steps valid. There are many errors in the step validation for most derivations
-
-- BUG verified 2026-02-16 16:47: `\r` doesn't render https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/87
 
 to verify:
-
-- https://localhost/list_expressions should show Latex-from-Sympy in the Sympy column
-
 - BUG: SymPy-to-be-edited not displayed in edit_expression
 
+---
 
-New function in compute: List of all non-operation symbols
-Used by new feed when promoting existing symbol
+Goal is to enter a novel derivation
+e.g., https://github.com/allofphysicsgraph/task-tracker/issues/162 (F=ma)
+
+What's preventing me from entering a derivation right now?
+
+bug categories:
+1) no page should trigger a gunicorn error (which prevent rendering HTML)
+2) pages that do render HTML should not have errors (including flash messages)
+   - BUG verified 2026-02-16 11:50: on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
+   - no derivation has all steps valid. There are many errors in the step validation for most derivations
+
+3) pages that claim a feature but do not enact that feature (e.g., editing a variable or expression or step or infrule or derivation)
+4) pages that lack a necessary feature for the workflow (e.g., editing)
+   - verified 2026-02-16 11:18 need for missing feature: https://localhost/new_symbol_vector is missing dimensions (length, time, mass)
+   - New function in compute: List of all non-operation symbols. Used by new feed when promoting existing symbol
 
 ---
 
