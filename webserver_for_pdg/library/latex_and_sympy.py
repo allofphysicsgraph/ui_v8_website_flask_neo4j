@@ -15,6 +15,7 @@ In the situation where another CAS like Sage is used, a separate "latex_and_sage
 
 import random
 import time
+import tokenize
 
 # move and copy files
 import shutil
@@ -130,7 +131,7 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     return list(list_of_sympy_symbols)
 
 
-def create_AST_png_for_latex(sympy_expr: str, output_filename: str):
+def create_AST_png_for_latex(sympy_expr: str, output_filename: str) -> str:
     """
     >>> create_AST_png_for_latex('Eq(Symbol('a'),Symbol('b'))','filename')
     """
@@ -139,7 +140,48 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str):
 
     logger.info("output_filename = " + output_filename)
 
-    expr = parse_expr(sympy_expr, evaluate=False)
+    try:
+        expr = parse_expr(sympy_expr, evaluate=False)
+    except NameError as err:
+        return (
+            str(type(err).__name__)
+            + ": unable to parse "
+            + sympy_expr
+            + " as SymPy; error="
+            + str(err)
+        )  # this shows up in the HTML table
+    except SyntaxError as err:
+        return (
+            str(type(err).__name__)
+            + ": unable to parse "
+            + sympy_expr
+            + " as SymPy; error="
+            + str(err)
+        )  # this shows up in the HTML table
+    except AttributeError as err:
+        return (
+            str(type(err).__name__)
+            + ": unable to parse "
+            + sympy_expr
+            + " as SymPy; error="
+            + str(err)
+        )
+    except TypeError as err:
+        return (
+            str(type(err).__name__)
+            + ": unable to parse "
+            + sympy_expr
+            + " as SymPy; error="
+            + str(err)
+        )
+    except tokenize.TokenError as err:
+        return (
+            str(type(err).__name__)
+            + ": unable to parse "
+            + sympy_expr
+            + " as SymPy; error="
+            + str(err)
+        )
 
     graphviz_of_AST_for_expr = sympy.printing.dot.dotprint(expr)
     dot_filename = "tmp.dot"
@@ -170,7 +212,7 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str):
     )
 
     logger.info("[TRACE] end " + trace_id)
-    return
+    return ""
 
 
 # For the difference between "free_symbols" and "atoms" see

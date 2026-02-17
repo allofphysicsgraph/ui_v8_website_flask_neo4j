@@ -2121,13 +2121,19 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     # 'latex_relation': '='}
 
     if "sympy_lhs" in expression_dict.keys():
-        latex_and_sympy.create_AST_png_for_latex(
+        error_msg = latex_and_sympy.create_AST_png_for_latex(
             expression_dict["sympy_lhs"], expression_dict["id"] + "_LHS"
         )
+        if len(error_msg) > 0:
+            flash("pdg_app/to_edit_expression: " + str(error_msg))
+            logger.error(str(error_msg))
     if "sympy_rhs" in expression_dict.keys():
-        latex_and_sympy.create_AST_png_for_latex(
+        error_msg = latex_and_sympy.create_AST_png_for_latex(
             expression_dict["sympy_rhs"], expression_dict["id"] + "_RHS"
         )
+        if len(error_msg) > 0:
+            flash("pdg_app/to_edit_expression: " + str(error_msg))
+            logger.error(str(error_msg))
 
     dict_of_nonoperation_symbol_dicts_in_expression, query_time_dict = (
         compute.get_dict_of_nonoperation_symbol_dicts_in_expression(
@@ -3381,16 +3387,18 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
         )
     logger.info("vector_dict:" + str(vector_dict))
 
-    if scalar_dict is None:
+    if vector_dict is None:
         return "<H1>Vector ID " + str(vector_id) + " does not exist in database</H1>."
 
     web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
+    web_form_no_options = NoOptionsForm(request.form)
 
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_vector_edit.html",
         query_time_dict=query_time_dict,
         form=web_form_vector_properties,
+        form_no_options=web_form_no_options,
         vector_dict=vector_dict,
     )
 
@@ -3427,12 +3435,14 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
         return "<H1>Matrix ID " + str(matrix_id) + " does not exist in database</H1>."
 
     web_form_matrix_properties = SpecifyNewSymbolMatrixForm(request.form)
+    web_form_no_options = NoOptionsForm(request.form)
 
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/symbol_matrix_edit.html",
         query_time_dict=query_time_dict,
         form=web_form_matrix_properties,
+        form_no_options=web_form_no_options,
         matrix_dict=matrix_dict,
     )
 
