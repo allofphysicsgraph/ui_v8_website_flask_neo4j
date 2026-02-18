@@ -20,33 +20,20 @@ can be constructed using md5hash(<derivation_id>_<expression_id>).
 # convention: every call to flash must be either a string or the content must be wrapped in str()
 # reason: when content is passed to flash() that cannot be serialized, the Flask error and the website crashes
 
-# convention:
-- DEBUG    = detailed technical data for diagnostics. Not normally be relevant to collect.
-- INFO     = routine, healthy operations. Usually don't care about under normal circumstances. Default level for log entries.
-- WARNING  = unexpected, potentially problematic events. Anything that can potentially cause application oddities, but for which there is automatic recovery.
-- ERROR    = failed operations affecting functionality. Errors force user intervention.
-- CRITICAL = unrecoverable system failure; data corruption or data loss occurred.
-
+See https://allofphysics.com/documentation/conventions
 
 # convention: every Python function starts with
 ```
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] main start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 ```
 and exits with
 ```
-    logger.info("[TRACE] main start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     return
 ```
 # reason: This enables creation of a flamegraph <https://www.brendangregg.com/flamegraphs.html>
-
-
-# convention: every debug/print of request.form includes the function name:
-```
-    logger.info("main: request.form = %s", request.form)
-```
-# reason: improved ability to understand which path the request was made by
 
 ****************************
 
@@ -6882,6 +6869,35 @@ def to_design_documentation():
     return render_template(
         "jinja2_pages/documentation_of_design_choices.html",
         title="Design Decisions Documentation",
+    )
+
+
+@web_app.route("/documentation/dimensionality", methods=["GET"])
+def to_document_dimensionality():
+    """ """
+    logger.info("[TRACE] ")
+    return render_template(
+        "jinja2_pages/documentation_dimensionality.html", title="Dimensionality"
+    )
+
+
+@web_app.route("/documentation/goals_roadmap", methods=["GET"])
+def to_document_goals_roadmap():
+    """ """
+    logger.info("[TRACE] ")
+    return render_template(
+        "jinja2_pages/documentation_goals_roadmap.html",
+        title="Goals and Roadmap for Physics Derivation Graph",
+    )
+
+
+@web_app.route("/documentation/hilberts_sixth_problem", methods=["GET"])
+def to_document_hilbert_sixth():
+    """ """
+    logger.info("[TRACE] ")
+    return render_template(
+        "jinja2_pages/documentation_hilberts_sixth_problem.html",
+        title="Hilbert's Sixth Problem and the Physics Derivation Graph",
     )
 
 
