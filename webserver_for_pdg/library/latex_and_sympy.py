@@ -182,6 +182,14 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str) -> str:
             + " as SymPy; error="
             + str(err)
         )
+    except IndexError as err:
+        return (
+            str(type(err).__name__)
+            + ": unable to parse "
+            + sympy_expr
+            + " as SymPy; error="
+            + str(err)
+        )
 
     graphviz_of_AST_for_expr = sympy.printing.dot.dotprint(expr)
     dot_filename = "tmp.dot"
