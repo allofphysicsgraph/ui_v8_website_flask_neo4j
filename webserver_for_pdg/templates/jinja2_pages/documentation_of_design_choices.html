@@ -158,9 +158,18 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 
 <H2 id="checkable by CAS"><i>Decision</i>: What does "checkable by CAS" mean?</H2>
 
-<P>The mathematical steps, identity, or solution can be verified as correct using symbolic mathematical software. (See <a href="#which cas">which CAS</a> for examples.)
+<P>In a derivation the mathematical steps can be verified as correct using symbolic mathematical software. (See <a href="#which cas">which CAS</a> for examples of applicable Computer Algebra Systems.)
 
-<p>Just writing down symbols and expressions is not meaningful.</p>
+<P>Once a CAS is introduced, there are multiple aspects that can be checked:
+  <UL>
+    <LI><a href="{{ url_for('to_document_dimensionality') }}">dimensional consistency</a> of expression</LI>
+    <LI>shape consistency of expression</LI>
+    <LI>step validation</LI>
+    <LI>that steps in the derivation are interlinked with other steps</LI>
+    <LI>that a step has an inference rule</LI>
+  </UL>
+
+<p>The relevance of checking the math is to distinguish from just writing down symbols and expressions.</p>
 
 <P>Why this matters: Reliability of machine-verified logic, Reproducibility, and Accessibility (no leaps of logic).
 

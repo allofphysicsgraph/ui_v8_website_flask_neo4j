@@ -1,0 +1,52 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
+<H1>Hilbert's Sixth Problem and the Physics Derivation Graph</H1>
+
+<P><a href="{{ url_for('to_navigation') }}?referrer=faq">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=faq">documentation overview</a> / 
+   Hilbert's Sixth Problem
+
+<P>
+  <a name="hilbert's sixth problem">
+    <em>How is the Physics Derivation Graph related to <a href="https://en.wikipedia.org/wiki/Hilbert%27s_sixth_problem">Hilbert's Sixth Problem</a>?</em>
+  </a>
+<P>Hilbert's Sixth Problem is
+  <blockquote>
+    "To treat in the same manner, by means of axioms, those physical sciences in which already today mathematics plays an important part; in the first rank are the theory of probabilities and mechanics."
+  </blockquote>
+<P>Solving, or even attempting to solve, that challenge is ambitious. Whether the inference rules would qualify as axioms is not clear to the developer of the Physics Derivation Graph. Writing down all of mathematical physics is the primary goal of the Physics Derivation Graph, and the fact that some of the steps can be proven in Lean is an accidental benefit. The use of a Computer Algebra System (CAS) like SymPy and a proof assistant like Lean are secondary in the Physics Derivation Graph because the author does not expect every inference rule to be amenable to rigorous validation.
+
+
+<H2>What's been done </H2>
+<P>Hilbert explicitly included probability theory in his request, as it was essential for the kinetic theory of gases.
+In 1933, the Russian mathematician Andrey Kolmogorov published Foundations of the Theory of Probability. He successfully axiomatized probability using measure theory.
+
+
+<h2>What is being worked on</h2>
+<P>Hilbert wanted a rigorous mathematical explanation of how the behavior of atoms (microscopic) leads to the laws of fluid dynamics (macroscopic). Specifically, he wanted to derive the Euler and Navier-Stokes equations directly from the Boltzmann equation. The challenge is proving that the chaotic motion of billions of particles mathematically converges to smooth fluid flows without logical gaps. Provide a complete, rigorous proof that the continuum mechanics of fluids emerges from atomistic dynamics under all conditions (including turbulence).
+<!-- 
+  see 
+
+  "Hilbert's sixth problem: derivation of fluid equations via Boltzmann's kinetic theory" https://arxiv.org/abs/2503.01800
+  comments: https://www.reddit.com/r/math/comments/1j3lkm5/solution_to_hilberts_sixth/
+
+  "Dynamics of dilute gases: a statistical approach" https://ems.press/books/standalone/274/5415
+-->
+
+<h2>What would need to be done</h2>
+<P>axiomatize Quantum Field Theory (QFT). Solve the Yang-Mills Existence and Mass Gap problem.
+This is one of the Clay Millennium Prize problems. Prove that the mathematical governing equations of particle physics exist and have a "mass gap" (meaning particles have mass) using strict axiomatic standards.
+
+<P>Hilbert wanted the axioms of all physics. Currently, physics is broken into two incompatible frameworks:
+  <UL>
+<LI>General Relativity: Describes gravity and the cosmos (smooth spacetime geometry).
+<LI>Quantum Mechanics: Describes atoms and forces (discrete, probabilistic).</LI>
+</UL>
+<P>Need a theory of Quantum Gravity.
+Candidates include String Theory and Loop Quantum Gravity, but neither has been experimentally verified or fully axiomatized.
+Once a unified physical theory is discovered, then formulate it as a set of axioms from which all physical phenomena can be derived as theorems.
+
+{% endblock %}

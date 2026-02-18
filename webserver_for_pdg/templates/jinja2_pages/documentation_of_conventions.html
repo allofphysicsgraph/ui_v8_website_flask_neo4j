@@ -14,6 +14,23 @@
 <UL>
   <LI>On webpages the HTML tag "Fieldset" is used to denote actions available to the user.</LI>
   <LI>Indices start from 1</LI>
+  <LI>Only ASCII<BR>
+  This manifests in both the HTML pages and checking in this file for each route that accepts input.</LI>
+  <LI>Logging categories</LI>
+  <UL>
+    <LI>DEBUG    = detailed technical data for diagnostics. Not normally be relevant to collect.
+    <LI>INFO     = routine, healthy operations. Usually don't care about under normal circumstances. Default level for log entries.
+    <LI>WARNING  = unexpected, potentially problematic events. Anything that can potentially cause application oddities, but for which there is automatic recovery.
+    <LI>ERROR    = failed operations affecting functionality. Errors force user intervention.
+    <LI>CRITICAL = unrecoverable system failure; data corruption or data loss occurred.
+  </UL>
+  <LI>Bug categories</LI>
+  <OL>
+    <LI>no page should trigger a gunicorn error (which prevent rendering HTML)
+    <LI>pages that do render HTML should not have errors (including flash messages)
+    <LI>pages that claim a feature but do not enact that feature (e.g., editing a variable or expression or step or infrule or derivation)
+    <LI>pages that lack a necessary feature for the workflow (e.g., editing)
+  </OL>
 </UL>
 
 <H2>Jargon, Definitions, Dictionary</H2>

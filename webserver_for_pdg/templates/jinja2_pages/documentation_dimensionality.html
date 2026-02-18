@@ -1,0 +1,144 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
+<H1>Dimensionality using SymPy in the Physics Derivation Graph</H1>
+
+<P><a href="{{ url_for('to_navigation') }}?referrer=faq">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=faq">documentation overview</a> / 
+   Dimensionality
+
+
+
+<P>The commands here can be reproduced using
+<PRE>
+docker run -it --rm -v `pwd`:/scratch --workdir /scratch sympyonubuntu python3
+</PRE>
+<P>using the Dockerfile <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/webserver_for_pdg/Dockerfile">https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/webserver_for_pdg/Dockerfile</a> which provides SymPy 1.14.0 and antlr4-python3-runtime==4.11 
+
+
+<P>How to convert Latex to SymPy with symbol IDs, then check dimensionality.
+
+
+<P>A Latex expression can serve as input for SymPy:
+<PRE>
+&gt;&gt;&gt; from sympy.parsing.latex import parse_latex
+&gt;&gt;&gt; my_expr = parse_latex("x = r")
+&gt;&gt;&gt; my_expr
+Eq(x, r)
+</PRE>
+
+<P>Also, SymPy can print to Latex. A round-trip example:
+<PRE>
+&gt;&gt;&gt; import sympy
+&gt;&gt;&gt; print(sympy.__version__)
+1.12
+&gt;&gt;&gt; from sympy.parsing.latex import parse_latex
+&gt;&gt;&gt; print(sympy.latex(parse_latex("x = y")))
+x = y
+</PRE>
+
+<P> _Goal_: replace symbols like `r` with something like `pdg123`. 
+Substituting in the Latex string doesn't work:
+<PRE>
+&gt;&gt;&gt; from sympy.parsing.latex import parse_latex
+&gt;&gt;&gt; parse_latex("x = pdg123")
+Eq(x, p*(dg*123))
+</PRE>
+<P>That's not what we were seeking. 
+
+<P>From the page
+<a href="https://docs.sympy.org/latest/tutorials/intro-tutorial/basic_operations.html#substitution"></a>
+substitution of variables is available in SymPy:
+<PRE>
+&gt;&gt;&gt; import sympy
+&gt;&gt;&gt; x, y, z = sympy.symbols("x y z")
+&gt;&gt;&gt; expr = sympy.cos(x) + 1
+&gt;&gt;&gt; expr.subs(x, y)
+cos(y) + 1
+</PRE>
+
+<P>Use SymPy's substitution, but with arbitrary strings for replacement.
+
+<P>First, observe that the symbols can be extracted:
+<PRE>
+&gt;&gt;&gt; from sympy.parsing.latex import parse_latex
+&gt;&gt;&gt; expr = parse_latex('x = y a')
+&gt;&gt;&gt; expr.atoms()
+{x, a, y}
+</PRE>
+
+<P>At this point `x, a, y` aren't SymPy symbols yet:
+<PRE>
+&gt;&gt;&gt; from sympy.parsing.latex import parse_latex
+&gt;&gt;&gt; expr = parse_latex('x = y a')
+&gt;&gt;&gt; expr.atoms()
+{x, a, y}
+&gt;&gt;&gt; a
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+NameError: name 'a' is not defined
+</PRE>
+<P>Declare the symbols using dynamic execution ([Pythons' `exec`](https://docs.python.org/3/library/functions.html#exec)):
+<PRE>
+&gt;&gt;&gt; import sympy
+&gt;&gt;&gt; from sympy.parsing.latex import parse_latex
+&gt;&gt;&gt; expr = parse_latex('x = y a')
+&gt;&gt;&gt; for this_symb in expr.atoms():
+    my_str = str(this_symb)+" = sympy.Symbol('"+str(this_symb)+"')"
+    exec(my_str)
+
+&gt;&gt;&gt; type(x)
+&lt;class 'sympy.core.symbol.Symbol'&gt;
+
+&gt;&gt;&gt; revised_expr = expr.subs(x, sympy.Symbol('pdg12')).subs(a, sympy.Symbol('pdg99')).subs(y, sympy.Symbol('pdg00'))
+&gt;&gt;&gt; revised_expr
+Eq(pdg12, pdg00*pdg99)
+</PRE>
+<P>That's what we wanted. We are now treating `pdg12` as a symbol registered with SymPy. 
+
+<P># _Goal_: consistent dimensionality of symbols in an expression
+
+<PRE>
+&gt;&gt;&gt; from sympy.parsing.latex import parse_latex
+&gt;&gt;&gt; from sympy.physics.units import mass, length, time, temperature, luminous_intensity, amount_of_substance, charge
+&gt;&gt;&gt; from sympy.physics.units.systems.si import dimsys_SI  # type: ignore
+
+&gt;&gt;&gt; expr = parse_latex('x = y a')
+&gt;&gt;&gt; for this_symb in expr.atoms():
+    my_str = str(this_symb)+" = sympy.Symbol('"+str(this_symb)+"')"
+    exec(my_str)
+
+&gt;&gt;&gt; revised_expr = expr.subs(x, sympy.Symbol('pdg12')).subs(a, sympy.Symbol('pdg99')).subs(y, sympy.Symbol('pdg00'))
+
+&gt;&gt;&gt; pdg12 = (mass**2)*(time**3)
+&gt;&gt;&gt; pdg00 = (mass**2)
+&gt;&gt;&gt; pdg99 = (time**3)
+</PRE>
+<P>Now that the variables have dimensions, we can check for consistency:
+<PRE>
+&gt;&gt;&gt; dimsys_SI.equivalent_dims(pdg12, pdg00*pdg99)
+True
+</PRE>
+<P>For reasons I don't understand, `equivalent_dims` doesn't seem to unpack `revised_expr`
+<PRE>
+&gt;&gt;&gt; dimsys_SI.equivalent_dims(revised_expr.lhs, revised_expr.rhs)
+False
+</PRE>
+<P>even though we can confirm they are comprised of these symbols
+<PRE>
+&gt;&gt;&gt; revised_expr.lhs
+pdg12
+&gt;&gt;&gt; revised_expr.rhs
+pdg00*pdg99
+</PRE>
+<P>Here's the ugly hack to check dimensions:
+<PRE>
+&gt;&gt;&gt; dimsys_SI.equivalent_dims(eval(str(revised_expr.lhs)), eval(str(revised_expr.rhs)))
+True
+</PRE>
+
+
+
+{% endblock %}

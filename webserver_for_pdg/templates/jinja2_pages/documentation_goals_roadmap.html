@@ -1,0 +1,40 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
+<H1>Goals and Roadmap for the Physics Derivation Graph</H1>
+
+<P><a href="{{ url_for('to_navigation') }}?referrer=faq">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=faq">documentation overview</a> / 
+   Goals and Roadmap
+
+
+<P>Content:
+<OL>
+<LI>enter a derivation 
+<LI>enter a derivation per major domain 
+<LI>enter derivations that span 2 domains 
+<LI>identify derivations that connect the above 
+</OL>
+
+<P>Validation: In a CAS, and then in Lean,
+<OL>
+<LI>Validate an expression 
+<LI>Validate a step 
+<LI>Validate the majority of steps and expressions in a derivation 
+<LI>Validate all steps and expressions in a derivation 
+<LI>Validate an expression and step from each derivation 
+<LI>Validate the majority of steps and expressions in every derivation 
+<LI>Validate all steps and expressions in all derivations 
+</OL>
+
+<P>Demonstrate <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/55">all the proposed queries</a>.
+
+<OL>
+<LI>Demonstrate use in an arxiv paper 
+<LI>Demonstrate the cross reference in 2 published papers 
+</OL>
+
+
+{% endblock %}
