@@ -219,6 +219,26 @@ def get_scalar_id_that_has_value_and_units_id(tx, value_and_units_id: str):
     return scalar_id
 
 
+def get_list_of_symbol_dicts_for_expression(tx, expression_id: str) -> List[dict]:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("expression_id =" + expression_id)
+    symbol_list = []  # type: List[dict]
+
+    query = """
+    MATCH (e:expression {id: $eid})-[:HAS_SYMBOL]->(s:symbol) 
+    RETURN properties(s) AS props
+    """
+    result = tx.run(query, eid=expression_id)
+
+    for res in result:
+        logger.info("res=" + str(res))
+        symbol_list.append(res)
+    logger.info("[TRACE] end " + str(trace_id))
+    return symbol_list
+
+
 def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     tx, expression_or_feed: str, expression_or_feed_id: str, symbol_category: str
 ) -> List[str]:
@@ -227,8 +247,6 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     This read query returns which symbol IDs are used for the provided expression ID
 
     this is the opposite query of `expressions_that_use_symbol`
-
-    >>> get_list_of_symbol_IDs_in_expression_or_feed()
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
