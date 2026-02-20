@@ -466,7 +466,7 @@ def get_dimensional_consistency_per_expression_id(
         list_of_expression_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "expression"
         )
-        query_time_dict["pdg_app/to_add_expression: list_nodes_of_type" + trace_id] = (
+        query_time_dict["pdg_app/get_dimensional_consistency_per_expression_id: get_list_node_dicts_of_type expression " + trace_id] = (
             round(time.time() - query_start_time, 3)
         )
 
@@ -543,7 +543,7 @@ def get_dict_of_node_type_for_every_id(
             neo4j_query.get_list_of_all_node_IDs_and_labels
         )
         query_time_dict[
-            "compute/to_edit_node: get_list_of_all_node_IDs_and_labels" + trace_id
+            "compute/to_edit_node: get_list_of_all_node_IDs_and_labels " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     # [{'n.id': '8379131', 'labels(n)': ['relation']},
@@ -920,7 +920,7 @@ def get_list_of_all_symbol_dicts(
             neo4j_query.get_list_node_dicts_of_type, "operation"
         )
         query_time_dict[
-            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type" + trace_id
+            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type " + trace_id
         ] = round(time.time() - query_start_time, 3)
     for this_symbol_dict in list_of_operation_symbol_dicts:
         this_symbol_dict["symbol_category"] = "operation"
@@ -932,7 +932,7 @@ def get_list_of_all_symbol_dicts(
             neo4j_query.get_list_node_dicts_of_type, "scalar"
         )
         query_time_dict[
-            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type" + trace_id
+            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type " + trace_id
         ] = round(time.time() - query_start_time, 3)
     for this_symbol_dict in list_of_scalar_symbol_dicts:
         this_symbol_dict["symbol_category"] = "scalar"
@@ -944,7 +944,7 @@ def get_list_of_all_symbol_dicts(
             neo4j_query.get_list_node_dicts_of_type, "vector"
         )
         query_time_dict[
-            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type" + trace_id
+            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type " + trace_id
         ] = round(time.time() - query_start_time, 3)
     for this_symbol_dict in list_of_vector_symbol_dicts:
         this_symbol_dict["symbol_category"] = "vector"
@@ -956,7 +956,7 @@ def get_list_of_all_symbol_dicts(
             neo4j_query.get_list_node_dicts_of_type, "matrix"
         )
         query_time_dict[
-            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type" + trace_id
+            "compute/get_list_of_all_symbol_dicts, list_nodes_of_type " + trace_id
         ] = round(time.time() - query_start_time, 3)
     for this_symbol_dict in list_of_matrix_symbol_dicts:
         this_symbol_dict["symbol_category"] = "matrix"
@@ -1284,7 +1284,7 @@ def get_dict_of_relation_dicts_not_in_expression(
             neo4j_query.get_node_properties, "expression", expression_id
         )
         query_time_dict[
-            "pdg_app/to_edit_expression: get_node_properties expression" + trace_id
+            "pdg_app/to_edit_expression: get_node_properties expression " + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info("pdg_app/to_edit_expression: expression_dict:" + str(expression_dict))
     logger.info("relation is " + str(expression_dict["latex_relation"]))
@@ -1319,7 +1319,7 @@ def get_dict_of_node_dicts(
             neo4j_query.get_list_node_dicts_of_type, node_type
         )
         query_time_dict[
-            "compute/get_dict_of_node_dicts, list_nodes_of_type " + trace_id
+            "compute/get_dict_of_node_dicts, get_list_node_dicts_of_type " + node_type + " " + trace_id
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_all_node_dicts=", list_of_all_node_dicts)
 
