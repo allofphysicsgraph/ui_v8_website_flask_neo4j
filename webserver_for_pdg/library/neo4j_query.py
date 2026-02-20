@@ -219,6 +219,40 @@ def get_scalar_id_that_has_value_and_units_id(tx, value_and_units_id: str):
     return scalar_id
 
 
+def get_list_of_symbol_dicts_for_every_expression(
+    tx, list_of_expression_ids: List[str]
+):
+    """
+    `get_list_of_symbol_dicts_for_expression` wasn't fast enough (25 seconds for 620 expressions)
+    so Gemini 3 Pro suggested this batching approach
+
+    Explanation:
+    - pass the list of IDs to Neo4j and use the aggregation function `collect()` to
+      group the symbols by expression.
+    - `collect()` aggregates the results (the `s` nodes) into a list for each
+      distinct `e` node, doing the grouping work on the database side rather than in Python.
+    - the dictionary should include keys for expressions that have empty lists of symbols,
+      hence the use of `OPTIONAL MATCH`
+
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
+    query = """
+    MATCH (e:expression)
+    WHERE e.id IN $eids
+    OPTIONAL MATCH (e)-[:HAS_SYMBOL]->(s:symbol)
+    RETURN e.id AS eid, collect(properties(s)) AS symbols
+    """
+
+    result = tx.run(query, eids=list_of_expression_ids)
+
+    symbol_map = {record["eid"]: record["symbols"] for record in result}
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return symbol_map
+
+
 def get_list_of_symbol_dicts_for_expression(tx, expression_id: str) -> List[dict]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
@@ -492,6 +526,22 @@ def get_list_of_value_dicts_for_constant_id(tx, scalar_id: str) -> list:
     return list_of_value_dicts
 
 
+def get_number_of_steps_per_derivation(tx) -> dict:
+    """
+    step count per derivation is used by
+    - <https://localhost/new_derivation>
+    - <https://localhost/list_derivations>
+    """
+    query = """
+    MATCH (d:derivation)-[:HAS_STEP]->(s:step)
+    RETURN d.id AS derivation_id, count(s) AS step_count
+    """
+    result = tx.run(query)
+
+    # Dictionary comprehension to build {id: count}
+    return {record["derivation_id"]: record["step_count"] for record in result}
+
+
 def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
     """
     For a given derivation, what are all the associated step IDs?
@@ -501,35 +551,14 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
 
-    list_of_step_dicts = []  # type: List[dict]
-    for result in tx.run(
-        'MATCH (d:derivation {id:"'
-        + derivation_id
-        + '"})-[r:HAS_STEP]->(s:step) RETURN r.sequence_index,s',
-    ):
-        res = result.data()
+    query = """
+    MATCH (d:derivation {id: $did})-[r:HAS_STEP]->(s:step)
+    RETURN s {.*, sequence_index: r.sequence_index} AS step_data
+    ORDER BY r.sequence_index
+    """
+    result = tx.run(query, did=derivation_id)
 
-        logger.info(
-            "neo4j_query/get_list_of_step_dicts_in_this_derivation: res=" + str(res)
-        )
-        # res= {'r.sequence_index': 0, 's': {'note_after_step_latex': '', 'author_name_latex': 'ben', 'id': '4022988', 'created_datetime': '2024-06-02_21-40-52-881678', 'note_before_step_latex': ''}}
-
-        this_step_dict = res["s"]
-        # print(
-        #     "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_dict=",
-        #     this_step_dict,
-        # )
-
-        this_step_index = res["r.sequence_index"]
-        logger.info(
-            "neo4j_query/get_list_of_step_dicts_in_this_derivation: this_step_index_dict="
-            + str(this_step_index)
-        )
-
-        # add sequence_index property value to dict
-        this_step_dict["sequence_index"] = this_step_index
-
-        list_of_step_dicts.append(this_step_dict)
+    list_of_step_dicts = [record["step_data"] for record in result]
 
     logger.info("[TRACE] end " + str(trace_id))
     return list_of_step_dicts
