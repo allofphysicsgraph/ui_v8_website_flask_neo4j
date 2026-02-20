@@ -466,14 +466,16 @@ def get_dimensional_consistency_per_expression_id(
         list_of_expression_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "expression"
         )
-        query_time_dict["pdg_app/get_dimensional_consistency_per_expression_id: get_list_node_dicts_of_type expression " + trace_id] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/get_dimensional_consistency_per_expression_id: get_list_node_dicts_of_type expression "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     dict_of_all_symbol_dicts, query_time_dict = get_dict_of_all_symbol_dicts(
         graphDB_Driver, query_time_dict
     )
 
+    # TODO: Neo4j inside loop causes high latency
     for this_expression_dict in list_of_expression_dicts:
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -603,85 +605,85 @@ def remove_file_debris(
     return
 
 
-def get_list_of_symbol_IDs_in_expression_or_feed(
-    graphDB_Driver,
-    query_time_dict: query_timing_result_type,
-    expression_or_feed: str,
-    expression_id: unique_numeric_id_as_str,
-) -> Tuple[List[str], query_timing_result_type]:
-    """
-    >>> get_list_of_symbol_IDs_in_expression_or_feed()
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] start " + trace_id)
+# def get_list_of_symbol_IDs_in_expression_or_feed(
+#     graphDB_Driver,
+#     query_time_dict: query_timing_result_type,
+#     expression_or_feed: str,
+#     expression_id: unique_numeric_id_as_str,
+# ) -> Tuple[List[str], query_timing_result_type]:
+#     """
+#     >>> get_list_of_symbol_IDs_in_expression_or_feed()
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     logger.info("[TRACE] start " + trace_id)
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_symbol_IDs_in_expression_or_feed = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-            expression_or_feed,
-            expression_id,
-            "operation",
-        )
-        query_time_dict[
-            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed operation"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
+# with graphDB_Driver.session() as session:
+#     query_start_time = time.time()
+#     list_of_symbol_IDs_in_expression_or_feed = session.read_transaction(
+#         neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+#         expression_or_feed,
+#         expression_id,
+#         "operation",
+#     )
+#     query_time_dict[
+#         "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed operation"
+#         + trace_id
+#     ] = round(time.time() - query_start_time, 3)
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-            expression_or_feed,
-            expression_id,
-            "relation",
-        )
-        query_time_dict[
-            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed relation"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
+# with graphDB_Driver.session() as session:
+#     query_start_time = time.time()
+#     list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+#         neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+#         expression_or_feed,
+#         expression_id,
+#         "relation",
+#     )
+#     query_time_dict[
+#         "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed relation"
+#         + trace_id
+#     ] = round(time.time() - query_start_time, 3)
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-            expression_or_feed,
-            expression_id,
-            "scalar",
-        )
-        query_time_dict[
-            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed scalar"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
+# with graphDB_Driver.session() as session:
+#     query_start_time = time.time()
+#     list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+#         neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+#         expression_or_feed,
+#         expression_id,
+#         "scalar",
+#     )
+#     query_time_dict[
+#         "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed scalar"
+#         + trace_id
+#     ] = round(time.time() - query_start_time, 3)
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-            expression_or_feed,
-            expression_id,
-            "vector",
-        )
-        query_time_dict[
-            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed vector"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
+# with graphDB_Driver.session() as session:
+#     query_start_time = time.time()
+#     list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+#         neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+#         expression_or_feed,
+#         expression_id,
+#         "vector",
+#     )
+#     query_time_dict[
+#         "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed vector"
+#         + trace_id
+#     ] = round(time.time() - query_start_time, 3)
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-            expression_or_feed,
-            expression_id,
-            "matrix",
-        )
-        query_time_dict[
-            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed matrix"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
+# with graphDB_Driver.session() as session:
+#     query_start_time = time.time()
+#     list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
+#         neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
+#         expression_or_feed,
+#         expression_id,
+#         "matrix",
+#     )
+#     query_time_dict[
+#         "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed matrix"
+#         + trace_id
+#     ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] end " + trace_id)
-    return list_of_symbol_IDs_in_expression_or_feed, query_time_dict
+# logger.info("[TRACE] end " + trace_id)
+# return list_of_symbol_IDs_in_expression_or_feed, query_time_dict
 
 
 def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
@@ -1319,7 +1321,10 @@ def get_dict_of_node_dicts(
             neo4j_query.get_list_node_dicts_of_type, node_type
         )
         query_time_dict[
-            "compute/get_dict_of_node_dicts, get_list_node_dicts_of_type " + node_type + " " + trace_id
+            "compute/get_dict_of_node_dicts, get_list_node_dicts_of_type "
+            + node_type
+            + " "
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_all_node_dicts=", list_of_all_node_dicts)
 
@@ -1342,6 +1347,7 @@ def get_dict_of_derivations_used_per_inference_rule(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id)
 
+    # TODO: Neo4j inside loop causes high latency
     dict_of_derivations_used_per_inference_rule = {}
     for this_inference_rule_dict in list_of_inference_rule_dicts:
         list_of_derivations_that_use_this_inference_rule_id = []
@@ -1476,6 +1482,7 @@ def get_dict_of_steps_in_derivation(
         "list of steps for" + str(derivation_id) + ":" + str(list_of_step_dicts)
     )
 
+    # TODO: Neo4j inside loop causes high latency
     all_steps = {}
     for this_step_dict in list_of_step_dicts:
         logger.info('this_step_dict["id"]:' + this_step_dict["id"])

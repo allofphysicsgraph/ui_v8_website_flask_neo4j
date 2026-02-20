@@ -2396,11 +2396,20 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         graphDB_Driver, query_time_dict
     )
 
-    list_of_symbol_IDs_in_feed, query_time_dict = (
-        compute.get_list_of_symbol_IDs_in_expression_or_feed(
-            graphDB_Driver, query_time_dict, "feed", feed_id
+    # list_of_symbol_IDs_in_feed, query_time_dict = (
+    #     compute.get_list_of_symbol_IDs_in_expression_or_feed(
+    #         graphDB_Driver, query_time_dict, "feed", feed_id
+    #     )
+    # )
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_symbol_IDs_in_feed = session.read_transaction(
+            neo4j_query.get_all_symbol_IDs_in_feed, feed_id
         )
-    )
+        query_time_dict[
+            "pdg_app/to_edit_feed get_all_symbol_IDs_in_feed " + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     logger.info("feed_id=" + str(feed_id))
     logger.info("list_of_symbol_IDs_in_feed=" + str(list_of_symbol_IDs_in_feed))
@@ -5823,8 +5832,6 @@ def to_list_feeds() -> werkzeug.Response:
         ] = round(time.time() - query_start_time, 3)
     logger.info("list_of_operation_dicts " + str(list_of_feed_dicts))
 
-    feed_ids = [f["id"] for f in list_of_feed_dicts]
-
     dict_of_derivation_dicts_that_use_feed = {}  # type: Dict[str,list]
     # for this_feed_dict in list_of_feed_dicts:
     #     with graphDB_Driver.session() as session:
@@ -5842,25 +5849,29 @@ def to_list_feeds() -> werkzeug.Response:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         dict_of_derivation_dicts_that_use_feed = session.read_transaction(
-            neo4j_query.get_derivation_dicts_for_feeds, feed_ids
+            neo4j_query.get_all_derivation_dicts_for_feeds
         )
         query_time_dict[
-            "pdg_app/to_list_feeds: get_derivation_dicts_for_feeds" + trace_id
+            "pdg_app/to_list_feeds: get_all_derivation_dicts_for_feeds" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    # If there are feeds that have no derivations, then backfill
-    for feed_id in feed_ids:
-        if feed_id not in dict_of_derivation_dicts_that_use_feed:
-            dict_of_derivation_dicts_that_use_feed[feed_id] = []
-
     # TODO: Neo4j inside loop causes high latency
-    symbol_IDs_per_feed_id = {}  # type: Dict[str,list] # _table_of_feeds.html
-    for this_feed_dict in list_of_feed_dicts:
-        symbol_IDs_per_feed_id[this_feed_dict["id"]], query_time_dict = (
-            compute.get_list_of_symbol_IDs_in_expression_or_feed(
-                graphDB_Driver, query_time_dict, "feed", this_feed_dict["id"]
-            )
+    # symbol_IDs_per_feed_id = {}  # type: Dict[str,list] # _table_of_feeds.html
+    # for this_feed_dict in list_of_feed_dicts:
+    #     symbol_IDs_per_feed_id[this_feed_dict["id"]], query_time_dict = (
+    #         compute.get_list_of_symbol_IDs_in_expression_or_feed(
+    #             graphDB_Driver, query_time_dict, "feed", this_feed_dict["id"]
+    #         )
+    #     )
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        symbol_IDs_per_feed_id = session.read_transaction(
+            neo4j_query.get_all_symbol_IDs_in_every_feed
         )
+        query_time_dict[
+            "pdg_app/to_list_feeds: get_all_symbol_IDs_in_every_feed" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     sympy_as_latex_per_feed_id = compute.get_sympy_as_latex_per_feed_id(
         list_of_feed_dicts

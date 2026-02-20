@@ -274,11 +274,59 @@ def get_list_of_symbol_dicts_for_expression(tx, expression_id: str) -> List[dict
     return symbol_list
 
 
+def get_all_symbol_IDs_in_expression(tx, expression_id: str) -> List[str]:
+    """match (s:symbol) because nodes are created with multiple labels (e.g. :symbol:scalar)"""
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+    query = (
+        "MATCH (e:expression)-[:HAS_SYMBOL]->(s:symbol) "
+        "WHERE e.id = $id "
+        "RETURN s.id"
+    )
+    result = tx.run(query, id=expression_id)
+    logger.info("[TRACE] end " + str(trace_id))
+    return [record["s.id"] for record in result]
+
+
+def get_all_symbol_IDs_in_every_feed(tx):
+    """
+    `MATCH (f:feed)` selects all nodes with the label feed, regardless of whether you passed an ID list or not.
+    `OPTIONAL MATCH ...` is like a "Left Outer Join" in SQL. It attempts to find the pattern (f)-[:HAS_SYMBOL]->(s:symbol).
+        - If the pattern exists, s will contain the symbol node.
+        - If the pattern does not exist (the feed has no symbols), f is still kept in the result, but s will be null.
+    `collect(s.id)` aggregation function automatically ignores null values. Therefore, if s is null (because of the OPTIONAL MATCH), the result is an empty list [] rather than [null].
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
+    query = """
+    MATCH (f:feed)
+    OPTIONAL MATCH (f)-[:HAS_SYMBOL]->(s:symbol)
+    RETURN f.id as feed_id, collect(s.id) as symbol_ids
+    """
+    result = tx.run(query)
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return result
+
+
+def get_all_symbol_IDs_in_feed(tx, feed_id: str) -> List[str]:
+    """match (s:symbol) because nodes are created with multiple labels (e.g. :symbol:scalar)"""
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+    query = (
+        "MATCH (f:feed)-[:HAS_SYMBOL]->(s:symbol) " "WHERE f.id = $id " "RETURN s.id"
+    )
+    result = tx.run(query, id=feed_id)
+    logger.info("[TRACE] end " + str(trace_id))
+    return [record["s.id"] for record in result]
+
+
 def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     tx, expression_or_feed: str, expression_or_feed_id: str, symbol_category: str
 ) -> List[str]:
     """
-    an expression has one or more sybmols
+    an expression has one or more symbols
     This read query returns which symbol IDs are used for the provided expression ID
 
     this is the opposite query of `expressions_that_use_symbol`
@@ -286,24 +334,39 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
 
-    logger.info("symbol_category=" + symbol_category)
-
     logger.info("expression_or_feed=" + expression_or_feed)
     assert expression_or_feed in ["expression", "feed"]
     logger.info("symbol_category=" + symbol_category)
     assert symbol_category in list_of_valid.symbol_categories
 
-    symbol_list = []  # type: List[str]
-    for result in tx.run(
-        "MATCH (e:"
-        + expression_or_feed
-        + ")-[:HAS_SYMBOL]->(s:"
-        + symbol_category
-        + ") WHERE e.id='"
-        + expression_or_feed_id
-        + "' RETURN s.id"
-    ):
-        symbol_list.append(result.data()["s.id"])
+    # symbol_list = []  # type: List[str]
+    # for result in tx.run(
+    #     "MATCH (e:"
+    #     + expression_or_feed
+    #     + ")-[:HAS_SYMBOL]->(s:"
+    #     + symbol_category
+    #     + ") WHERE e.id='"
+    #     + expression_or_feed_id
+    #     + "' RETURN s.id"
+    # ):
+    #     symbol_list.append(result.data()["s.id"])
+
+    # Sanitize dynamic labels to prevent injection and handle special characters
+    # Neo4j uses backticks to escape label names. Escape existing backticks by doubling them.
+    safe_source_label = f"`{expression_or_feed.replace('`', '``')}`"
+    safe_target_label = f"`{symbol_category.replace('`', '``')}`"
+
+    # Construct Query using f-strings and Parameters
+    # Labels cannot be parameterized, so we inject the sanitized strings.
+    # Values (like IDs) MUST be parameterized ($id).
+    query = (
+        f"MATCH (e:{safe_source_label})-[:HAS_SYMBOL]->(s:{safe_target_label}) "
+        "WHERE e.id = $id "
+        "RETURN s.id"
+    )
+
+    result = tx.run(query, id=expression_or_feed_id)
+
     logger.info(
         "expression_or_feed_id="
         + str(expression_or_feed_id)
@@ -312,7 +375,9 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     )
 
     logger.info("[TRACE] end " + str(trace_id))
-    return symbol_list
+
+    # Pythonic list comprehension (faster than .data())
+    return [record["s.id"] for record in result]
 
 
 # def symbols_in_feed(tx, feed_id: str, symbol_category: str) -> list:
@@ -392,27 +457,25 @@ def get_count_nodes_of_type(tx, node_type: str) -> int:
     return node_count
 
 
-def get_derivation_dicts_for_feeds(
-    tx, feed_ids: List[str]
-) -> Dict[str, List[Dict[str, Any]]]:
-    # match feeds found in the provided list
-    # Then collect the 'd' nodes into a list for every unique 'f'
+def get_all_derivation_dicts_for_feeds(tx) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    match feeds found in the provided list
+    Then collect the 'd' nodes into a list for every unique 'f'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
     query = """
     MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:USES_FEED]->(f:feed)
-    WHERE f.id IN $feed_ids
     RETURN f.id AS feed_id, collect(d) AS derivation_nodes
     """
+    result = tx.run(query)
 
-    result = tx.run(query, feed_ids=feed_ids)
-
-    # Build the dictionary from the single result set
-    results_dict = {}
-    for record in result:
-        # Convert the list of Neo4j Nodes into a list of Python dicts
-        derivations_list = [dict(node) for node in record["derivation_nodes"]]
-        results_dict[record["feed_id"]] = derivations_list
-
-    return results_dict
+    logger.info("[TRACE] end " + str(trace_id))
+    return {
+        record["feed_id"]: [dict(node) for node in record["derivation_nodes"]]
+        for record in result
+    }
 
 
 # def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> List[Dict[str, Any]]:
