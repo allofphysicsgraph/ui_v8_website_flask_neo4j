@@ -30,7 +30,8 @@ In Cypher queries
 
 import neo4j  # needed for exception handling
 import random  # for trace IDs
-from typing import Dict, List
+from typing import Dict, List, Any
+
 import time
 
 import list_of_valid
@@ -391,23 +392,57 @@ def get_count_nodes_of_type(tx, node_type: str) -> int:
     return node_count
 
 
-def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> list:
-    """ """
-    trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] start " + str(trace_id))
-    logger.info("neo4j_query/get_derivation_dicts_that_use_feed: feed_id=" + feed_id)
+def get_derivation_dicts_for_feeds(
+    tx, feed_ids: List[str]
+) -> Dict[str, List[Dict[str, Any]]]:
+    # match feeds found in the provided list
+    # Then collect the 'd' nodes into a list for every unique 'f'
+    query = """
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:USES_FEED]->(f:feed)
+    WHERE f.id IN $feed_ids
+    RETURN f.id AS feed_id, collect(d) AS derivation_nodes
+    """
 
-    # TODO: this should be derivation->step->feed
-    list_of_derivation_dicts = []  # type: List[dict]
-    for result in tx.run(
-        'MATCH (d:derivation)-[]->(s:step)-[]->(f:feed) WHERE f.id = "'
-        + str(feed_id)
-        + '" RETURN d'
-    ):
-        list_of_derivation_dicts.append(result.data()["d"])
+    result = tx.run(query, feed_ids=feed_ids)
 
-    logger.info("[TRACE] end " + str(trace_id))
-    return list_of_derivation_dicts
+    # Build the dictionary from the single result set
+    results_dict = {}
+    for record in result:
+        # Convert the list of Neo4j Nodes into a list of Python dicts
+        derivations_list = [dict(node) for node in record["derivation_nodes"]]
+        results_dict[record["feed_id"]] = derivations_list
+
+    return results_dict
+
+
+# def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> List[Dict[str, Any]]:
+#     """ """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     logger.info("[TRACE] start " + str(trace_id))
+#     logger.info("feed_id=" + feed_id)
+
+#     # # TODO: this should be derivation->step->feed
+#     # list_of_derivation_dicts = []  # type: List[dict]
+#     # for result in tx.run(
+#     #     'MATCH (d:derivation)-[]->(s:step)-[]->(f:feed) WHERE f.id = "'
+#     #     + str(feed_id)
+#     #     + '" RETURN d'
+#     # ):
+#     #     list_of_derivation_dicts.append(result.data()["d"])
+
+#     query = """
+#     MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:USES_FEED]->(f:feed)
+#     WHERE f.id = $feed_id
+#     RETURN d
+#     """
+
+#     # Use parameters, specify specific relationships if possible
+#     result = tx.run(query, feed_id=feed_id)
+
+#     logger.info("[TRACE] end " + str(trace_id))
+
+#     # list comprehension convert Node objects to dicts directly
+#     return [dict(record["d"]) for record in result]
 
 
 def get_derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
