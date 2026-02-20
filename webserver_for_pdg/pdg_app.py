@@ -2955,7 +2955,6 @@ def to_add_feed() -> werkzeug.Response:
 
         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
-        # TODO: Neo4j inside loop causes high latency
         for symbol_dict in list_of_nonoperation_symbol_dicts:
             if symbol_dict["id"] == request.form["symbol_select_id_to_add"]:
                 # https://neo4j.com/docs/python-manual/current/session-api/
@@ -5824,22 +5823,37 @@ def to_list_feeds() -> werkzeug.Response:
         ] = round(time.time() - query_start_time, 3)
     logger.info("list_of_operation_dicts " + str(list_of_feed_dicts))
 
-    # TODO: Neo4j inside loop causes high latency
-    dict_of_derivation_dicts_that_use_feed = {}  # type: Dict[str,list]
-    for this_feed_dict in list_of_feed_dicts:
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_derivation_dicts = session.read_transaction(
-                neo4j_query.get_derivation_dicts_that_use_feed, this_feed_dict["id"]
-            )
-            query_time_dict[
-                "pdg_app/get_dict_of_derivation_dicts_that_use_feed: derivation_dicts_that_use_feed"
-                + trace_id
-            ] = round(time.time() - query_start_time, 3)
-        dict_of_derivation_dicts_that_use_feed[this_feed_dict["id"]] = (
-            list_of_derivation_dicts
-        )
+    feed_ids = [f["id"] for f in list_of_feed_dicts]
 
+    dict_of_derivation_dicts_that_use_feed = {}  # type: Dict[str,list]
+    # for this_feed_dict in list_of_feed_dicts:
+    #     with graphDB_Driver.session() as session:
+    #         query_start_time = time.time()
+    #         list_of_derivation_dicts = session.read_transaction(
+    #             neo4j_query.get_derivation_dicts_that_use_feed, this_feed_dict["id"]
+    #         )
+    #         query_time_dict[
+    #             "pdg_app/get_dict_of_derivation_dicts_that_use_feed: derivation_dicts_that_use_feed"
+    #             + trace_id
+    #         ] = round(time.time() - query_start_time, 3)
+    #     dict_of_derivation_dicts_that_use_feed[this_feed_dict["id"]] = (
+    #         list_of_derivation_dicts
+    #     )
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        dict_of_derivation_dicts_that_use_feed = session.read_transaction(
+            neo4j_query.get_derivation_dicts_for_feeds, feed_ids
+        )
+        query_time_dict[
+            "pdg_app/to_list_feeds: get_derivation_dicts_for_feeds" + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    # If there are feeds that have no derivations, then backfill
+    for feed_id in feed_ids:
+        if feed_id not in dict_of_derivation_dicts_that_use_feed:
+            dict_of_derivation_dicts_that_use_feed[feed_id] = []
+
+    # TODO: Neo4j inside loop causes high latency
     symbol_IDs_per_feed_id = {}  # type: Dict[str,list] # _table_of_feeds.html
     for this_feed_dict in list_of_feed_dicts:
         symbol_IDs_per_feed_id[this_feed_dict["id"]], query_time_dict = (
@@ -6380,26 +6394,15 @@ def to_list_derivations() -> str:
     if len(list_of_derivation_dicts) == 0:
         return redirect(url_for("to_add_derivation"))
 
-    # TODO: Neo4j inside loop causes high latency
     number_of_steps_per_derivation = {}
-    for derivation_dict in list_of_derivation_dicts:
-        logger.info("derivation_dict" + str(derivation_dict))
-
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_steps = session.read_transaction(
-                neo4j_query.get_list_of_step_dicts_in_this_derivation,
-                derivation_dict["id"],
-            )
-            query_time_dict[
-                "pdg_app/to_list_derivations: get_list_of_step_dicts_in_this_derivation"
-                + trace_id
-            ] = round(time.time() - query_start_time, 3)
-        number_of_steps_per_derivation[derivation_dict["id"]] = len(list_of_steps)
-
-    logger.info(
-        "    number_of_steps_per_derivation = " + str(number_of_steps_per_derivation)
-    )
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        number_of_steps_per_derivation = session.read_transaction(
+            neo4j_query.get_number_of_steps_per_derivation
+        )
+        query_time_dict[
+            "pdg_app/to_add_derivation: get_number_of_steps_per_derivation" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     # TODO: convert derivation_dict['abstract_latex'] to HTML using pandoc
 
