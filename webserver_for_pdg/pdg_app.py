@@ -1291,24 +1291,24 @@ def to_navigation():
             neo4j_query.get_count_nodes_of_type, "scalar"
         )
 
-        query_time_dict["pdg_app/main: count_nodes_of_type, scalar " + trace_id] = round(
-            time.time() - query_start_time, 3
+        query_time_dict["pdg_app/main: count_nodes_of_type, scalar " + trace_id] = (
+            round(time.time() - query_start_time, 3)
         )
 
         query_start_time = time.time()
         number_of_vectors = session.read_transaction(
             neo4j_query.get_count_nodes_of_type, "vector"
         )
-        query_time_dict["pdg_app/main: count_nodes_of_type, vector " + trace_id] = round(
-            time.time() - query_start_time, 3
+        query_time_dict["pdg_app/main: count_nodes_of_type, vector " + trace_id] = (
+            round(time.time() - query_start_time, 3)
         )
 
         query_start_time = time.time()
         number_of_matrices = session.read_transaction(
             neo4j_query.get_count_nodes_of_type, "matrix"
         )
-        query_time_dict["pdg_app/main: count_nodes_of_type, matrix " + trace_id] = round(
-            time.time() - query_start_time, 3
+        query_time_dict["pdg_app/main: count_nodes_of_type, matrix " + trace_id] = (
+            round(time.time() - query_start_time, 3)
         )
 
         query_start_time = time.time()
@@ -1381,25 +1381,16 @@ def to_add_derivation() -> werkzeug.Response:
             "pdg_app/to_add_derivation: get_list_node_dicts_of_type derivation"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
+
     number_of_steps_per_derivation = {}
-    for derivation_dict in list_of_derivation_dicts:
-        logger.info("derivation_dict" + str(derivation_dict))
-
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_steps = session.read_transaction(
-                neo4j_query.get_list_of_step_dicts_in_this_derivation,
-                derivation_dict["id"],
-            )
-            query_time_dict[
-                "pdg_app/to_add_derivation: get_list_of_step_dicts_in_this_derivation"
-                + trace_id
-            ] = round(time.time() - query_start_time, 3)
-        number_of_steps_per_derivation[derivation_dict["id"]] = len(list_of_steps)
-
-    logger.info("derivations in the database:")
-    for deriv_dict in list_of_derivation_dicts:
-        logger.info("deriv_dict:" + str(deriv_dict))
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        number_of_steps_per_derivation = session.read_transaction(
+            neo4j_query.get_number_of_steps_per_derivation
+        )
+        query_time_dict[
+            "pdg_app/to_add_derivation: get_number_of_steps_per_derivation" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     # derivation_name_from_URL = None
     # derivation_abstract_from_URL = None
@@ -1683,6 +1674,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
 
             logger.info("list_of_step_dicts (to delete)=" + str(list_of_step_dicts))
 
+            # TODO: Neo4j inside loop causes high latency
             for this_step_dict in list_of_step_dicts:
                 with graphDB_Driver.session() as session:
                     query_start_time = time.time()
@@ -2390,9 +2382,9 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         feed_dict = session.read_transaction(
             neo4j_query.get_node_properties, "feed", feed_id
         )
-        query_time_dict["pdg_app/to_edit_feed: get_node_properties feed " + trace_id] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/to_edit_feed: get_node_properties feed " + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info("feed_dict:" + str(feed_dict))
 
     if feed_dict is None:
@@ -2541,8 +2533,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                     feed_id,
                     "feed",
                 )
-                query_time_dict["pdg_app/to_edit_feed: delete_node " + trace_id] = round(
-                    time.time() - query_start_time, 3
+                query_time_dict["pdg_app/to_edit_feed: delete_node " + trace_id] = (
+                    round(time.time() - query_start_time, 3)
                 )
 
         if "symbol_select_id_to_disconnect" in request.form.keys():
@@ -2625,9 +2617,9 @@ def to_add_expression() -> werkzeug.Response:
         list_of_expression_dicts = session.read_transaction(
             neo4j_query.get_list_node_dicts_of_type, "expression"
         )
-        query_time_dict["pdg_app/to_add_expression: get_list_node_dicts_of_type " + trace_id] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/to_add_expression: get_list_node_dicts_of_type " + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     # Used in _table_of_expressions.html which is referenced in expression_create.html
     symbol_IDs_per_expression_id = (
@@ -2963,6 +2955,7 @@ def to_add_feed() -> werkzeug.Response:
 
         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
+        # TODO: Neo4j inside loop causes high latency
         for symbol_dict in list_of_nonoperation_symbol_dicts:
             if symbol_dict["id"] == request.form["symbol_select_id_to_add"]:
                 # https://neo4j.com/docs/python-manual/current/session-api/
@@ -3243,9 +3236,9 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
         scalar_dict = session.read_transaction(
             neo4j_query.get_node_properties, "scalar", scalar_id
         )
-        query_time_dict["pdg_app/to_edit_scalar_symbol: node_properties " + trace_id] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/to_edit_scalar_symbol: node_properties " + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info("scalar_dict:" + str(scalar_dict))
 
     if scalar_dict is None:
@@ -3281,6 +3274,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
+        # TODO: Neo4j inside loop causes high latency
         # instead of changing every property,
         # only change the properties that are different from symbol_dict
         for symbol_property, symbol_property_value in scalar_dict.items():
@@ -3369,9 +3363,9 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
         vector_dict = session.read_transaction(
             neo4j_query.get_node_properties, "vector", vector_id
         )
-        query_time_dict["pdg_app/to_edit_vector_symbol: node_properties " + trace_id] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/to_edit_vector_symbol: node_properties " + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info("vector_dict:" + str(vector_dict))
 
     if vector_dict is None:
@@ -3413,9 +3407,9 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
         matrix_dict = session.read_transaction(
             neo4j_query.get_node_properties, "matrix", matrix_id
         )
-        query_time_dict["pdg_app/to_edit_matrix_symbol: node_properties " + trace_id] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/to_edit_matrix_symbol: node_properties " + trace_id
+        ] = round(time.time() - query_start_time, 3)
     logger.info("matrix_dict:" + str(matrix_dict))
 
     if matrix_dict is None:
@@ -4576,6 +4570,7 @@ def to_add_symbols_and_operations_for_expression(
         list_of_symbol_IDs_in_expression = []  # type: List[str]
         symbol_id_dict = {}  # type: Dict[str, str]
 
+        # TODO: Neo4j inside loop causes high latency
         # request.form =
         for ke, symbol_id_and_category in request.form.items():
             # logger.info("key=", ke)
@@ -4894,7 +4889,8 @@ def to_add_symbols_and_operations_for_feed(
             neo4j_query.get_node_properties, "feed", feed_id
         )
         query_time_dict[
-            "pdg_app/to_add_symbols_and_operations_for_feed, node_properties " + trace_id
+            "pdg_app/to_add_symbols_and_operations_for_feed, node_properties "
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info("symbols_and_operations_for_feed: feed_dict=" + str(feed_dict))
 
@@ -4999,6 +4995,7 @@ def to_add_symbols_and_operations_for_feed(
         list_of_symbol_IDs_in_expression = []  # type: List[str]
         symbol_id_dict = {}  # type: Dict[str, str]
 
+        # TODO: Neo4j inside loop causes high latency
         # request.form =
         for ke, symbol_id_and_category in request.form.items():
             # logger.info("key=", ke)
@@ -5827,6 +5824,7 @@ def to_list_feeds() -> werkzeug.Response:
         ] = round(time.time() - query_start_time, 3)
     logger.info("list_of_operation_dicts " + str(list_of_feed_dicts))
 
+    # TODO: Neo4j inside loop causes high latency
     dict_of_derivation_dicts_that_use_feed = {}  # type: Dict[str,list]
     for this_feed_dict in list_of_feed_dicts:
         with graphDB_Driver.session() as session:
@@ -6282,24 +6280,23 @@ def to_list_expressions() -> str:
     if len(list_of_expression_dicts) == 0:
         return redirect(url_for("to_add_expression"))
 
-    list_of_symbol_dicts_per_expression_id = (
-        {}
-    )  # type: Dict[str,list] # _table_of_expressions.html
+    list_of_expression_IDs = []  # type: List[str]
     for this_expression_dict in list_of_expression_dicts:
-        expression_id = this_expression_dict["id"]
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_symbol_dicts_per_expression_id[expression_id] = (
-                session.read_transaction(
-                    neo4j_query.get_list_of_symbol_dicts_for_expression,
-                    expression_id,
-                )
-            )
-            query_time_dict[
-                "pdg_app/to_list_expressions get_list_of_symbol_dicts_for_expression"
-                + expression_id
-                + trace_id
-            ] = round(time.time() - query_start_time, 3)
+        list_of_expression_IDs.append(this_expression_dict["id"])
+
+    # list_of_symbol_dicts_per_expression_id = (
+    #     {}
+    # )  # type: Dict[str,list] # _table_of_expressions.html
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        symbol_dicts_per_expression_id = session.read_transaction(
+            neo4j_query.get_list_of_symbol_dicts_for_every_expression,
+            list_of_expression_IDs,
+        )
+        query_time_dict[
+            "pdg_app/to_list_expressions get_list_of_symbol_dicts_for_every_expression "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     # try:
     dimensional_consistency_per_expression_id, query_time_dict = (
@@ -6331,7 +6328,7 @@ def to_list_expressions() -> str:
         "jinja2_pages/user_workflow/expression_list.html",
         query_time_dict=query_time_dict,
         list_of_expression_dicts=list_of_expression_dicts,
-        list_of_symbol_dicts_per_expression_id=list_of_symbol_dicts_per_expression_id,
+        list_of_symbol_dicts_per_expression_id=symbol_dicts_per_expression_id,
         dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,  # Used in _table_of_expressions.html which is referenced in expression_list.html
     )
 
@@ -6383,6 +6380,7 @@ def to_list_derivations() -> str:
     if len(list_of_derivation_dicts) == 0:
         return redirect(url_for("to_add_derivation"))
 
+    # TODO: Neo4j inside loop causes high latency
     number_of_steps_per_derivation = {}
     for derivation_dict in list_of_derivation_dicts:
         logger.info("derivation_dict" + str(derivation_dict))
@@ -6538,9 +6536,9 @@ def to_export_graphml() -> werkzeug.Response:
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         res = session.read_transaction(neo4j_query.apoc_export_graphml, "pdg.graphml")
-        query_time_dict["pdg_app/to_export_graphml: apoc_export_graphml " + trace_id] = (
-            round(time.time() - query_start_time, 3)
-        )
+        query_time_dict[
+            "pdg_app/to_export_graphml: apoc_export_graphml " + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     logger.info("res=" + str(res))
 
