@@ -203,6 +203,15 @@ MATCH (i:inference_rule), (s:step) WHERE s.id='{{step_id}}' RETURN i</a></td>
 MATCH (n:expression), (m:inference_rule) WHERE m.id='{{inference_rule_id}}' RETURN n</a></td>
     <td></td>
   </tr>
+
+<TR>
+  <td id="list symbol dicts connected to a specific expression">list symbol dicts connected to a specific expression
+    <a href="#list symbol dicts connected to a specific expression">#</a></td>
+  <TD><a href="{{ url_for('to_query') }}?cypher=MATCH (e:expression {id: '{{inference_rule_id}}'})-[:HAS_SYMBOL]->(s:symbol) RETURN properties(s) AS props">
+MATCH (e:expression {id: '{{inference_rule_id}}'})-[:HAS_SYMBOL]->(s:symbol) RETURN properties(s) AS props</a></td>
+    <td></td>
+  </tr>
+
   <tr>
     <td id="show properties for a specific derivation">show properties for a specific derivation
      <a href="#show properties for a specific derivation">#</a></td>
