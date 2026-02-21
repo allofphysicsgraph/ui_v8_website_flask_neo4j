@@ -91,11 +91,15 @@ from flask import (
     flash,
     jsonify,
     Response,
+    session,  # needed to return the user to original page after logging in
 )
 
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
 # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
 from flask_wtf import FlaskForm, CSRFProtect, Form  # type: ignore
+
+# needed to return the user to original page after logging in
+from urllib.parse import urlparse, urljoin
 
 # https://github.com/TypeError/secure
 import secure  # type: ignore
@@ -250,6 +254,18 @@ csrf.init_app(web_app)
 ################################## END what was in "initialize_flask.py" ###############################
 
 
+def is_safe_url(target):
+    """
+    Ensures that a redirect target will lead to the same server.
+    Prevents Open Redirect vulnerabilities.
+
+    Gemini 3.1 Pro says this has to be above the login functions
+    """
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
+
+
 ################################## BEGIN what was in "pdg_login.py" ###############################
 
 # in support of Google Sign-in
@@ -285,7 +301,7 @@ def get_google_provider_cfg():
     """
     https://realpython.com/flask-google-login/
     """
-    logger.info("[TRACE] pdg_login/get_google_provider_cfg")
+    logger.info("[TRACE] ")
     url_json = requests.get(GOOGLE_DISCOVERY_URL).json()
     logger.debug(url_json)
     return url_json
@@ -297,8 +313,10 @@ def unauthorized():
     https://flask-login.readthedocs.io/en/latest/
     >>>
     """
-    logger.info("[TRACE] pdg_login/unauthorized")
-    return redirect(url_for("to_login", referrer="unauthorized"))
+    logger.info("[TRACE]")
+    # return redirect(url_for("to_login", referrer="unauthorized"))
+    # Tell Flask-Login to append the originally requested page to the login URL as a next query parameter.
+    return redirect(url_for("to_login", next=request.url))
 
 
 @login_manager.user_loader
@@ -308,7 +326,7 @@ def load_user(user_id):
     also https://realpython.com/using-flask-login-for-user-management-with-flask/
     https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
     """
-    logger.info("[TRACE] pdg_login/load_user")
+    logger.info("[TRACE]")
     logger.debug(user_id)
     # return USERS.get(int(user_id))
 
@@ -321,7 +339,11 @@ def to_login():
     """
     https://realpython.com/flask-google-login/
     """
-    logger.info("[TRACE] pdg_login/to_login")
+    logger.info("[TRACE]")
+
+    next_url = request.args.get("next")
+    if next_url:
+        session["next_url"] = next_url
 
     if "db" not in g:
         logger.debug("db not in g")
@@ -349,7 +371,7 @@ def callback():
     https://realpython.com/flask-google-login/
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] start " + str(trace_id) + "]")
+    logger.info("[TRACE] start " + str(trace_id))
     # Get authorization code Google sent back to you
     code = request.args.get("code")
 
@@ -415,10 +437,19 @@ def callback():
     flash("logged in")
 
     # Send user back to homepage
-    logger.info("[TRACE] end " + str(trace_id) + "]")
-    return redirect(url_for("to_navigation", referrer="login"))
+    # return redirect(url_for("to_navigation", referrer="login"))
     # TODO: rather than return the user to navigation, put them back on the original page they came from
     # This seems tricky; https://www.reddit.com/r/flask/comments/67lu0m/flasklogin_why_do_you_have_to_validate_a_next_url/
+
+    # Retrieve 'next' URL from session and remove it
+    next_url = session.pop("next_url", None)
+
+    # Validate the url to prevent Open Redirects. If invalid or missing, fallback to navigation
+    if not next_url or not is_safe_url(next_url):
+        next_url = url_for("to_navigation", referrer="login")
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return redirect(next_url)
 
 
 @web_app.route("/logout", methods=["GET", "POST"])
@@ -6776,11 +6807,11 @@ def static_dir():
     >>> static_dir()
     """
     trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] start " + str(trace_id) + "]")
+    logger.info("[TRACE] start " + str(trace_id))
     # https://stackoverflow.com/a/3207973/1164295
     _, _, filenames = next(os.walk("static"))
     filenames.sort()
-    logger.info("[TRACE] end " + str(trace_id) + "]")
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/static_dir.html",
         list_of_files=filenames,
@@ -7371,16 +7402,16 @@ def to_class_notes_subpage(which_class: str):
 
     if which_class == "overview":
         logger.info("URL is overview")
-        logger.info("[TRACE] end " + str(trace_id) + "]")
+        logger.info("[TRACE] end " + str(trace_id))
         return render_template("class_notes/overview.html", title="overview")
     elif which_class == "math402_mathematical_physics_hale":
         logger.info("URL is 402")
-        logger.info("[TRACE] end " + str(trace_id) + "]")
+        logger.info("[TRACE] end " + str(trace_id))
         return render_template(
             "class_notes/math402_mathematical_physics_hale.html", title="Math 402"
         )
 
-    logger.info("[TRACE] end " + str(trace_id) + "]")
+    logger.info("[TRACE] end " + str(trace_id))
     return render_template("class_notes_overview.html", title="class notes overview")
 
 
