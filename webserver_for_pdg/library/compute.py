@@ -18,6 +18,7 @@ import list_of_valid
 import sympy_validate_expression
 import latex_and_sympy
 import re
+import hashlib
 import csv
 
 # https://docs.python.org/3/library/typing.html
@@ -70,12 +71,17 @@ def generate_random_id(
             found_new_ID = True
 
     logger.info("new_id=" + str(new_id))
-    logger.info("[TRACE] compute/generate_random_id end " + trace_id)
+    logger.info("[TRACE] end " + trace_id)
     return str(new_id), query_time_dict
 
 
 def generate_lookup_for_shorten_url(shorten_url_file: str) -> str:
-    """ """
+    """
+    TODO: if URL already exists in CSV, then just return existing lookup
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + trace_id)
+
     data_list = []  # contents of file as list of dicts
 
     # newline='' is a best practice when using the csv module to handle line endings correctly
@@ -97,26 +103,54 @@ def generate_lookup_for_shorten_url(shorten_url_file: str) -> str:
 
     logger.info("random_string=" + random_string)
 
+    logger.info("[TRACE] end " + trace_id)
     return random_string
 
 
 def add_url_to_shortened_list(now_str, current_user_email, user_url) -> str:
-    """ """
+    """
+    User's email is part of the database in case someone decides to put something naughty in the database
+
+    User's email is hashed because the database is exposed publicly on the website
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + trace_id)
+
     if not os.path.exists(shorten_url_file):
         with open(shorten_url_file, "a") as file_handle:
-            file_handle.write("timestamp|email|lookup|url\n")
+            file_handle.write("timestamp|email|count|lookup|url\n")
 
     lookup = generate_lookup_for_shorten_url(shorten_url_file)
 
+    stable_user_email_hash = hashlib.sha256(
+        current_user_email.encode("utf-8")
+    ).hexdigest()
+
     with open(shorten_url_file, "a") as file_handle:
         file_handle.write(
-            now_str + "|" + current_user_email + "|" + lookup + "|" + user_url + "\n"
+            now_str
+            + "|"
+            + stable_user_email_hash
+            + "|0|"
+            + lookup
+            + "|"
+            + user_url
+            + "\n"
         )
 
+    logger.info("[TRACE] end " + trace_id)
     return lookup
 
 
 def get_url_from_shortened_list(lookup) -> str:
+    """
+    Given the `lookup`, what is the URL?
+
+    TODO: increment the "count" column
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + trace_id)
+
     data_list = []  # contents of file as list of dicts
 
     # newline='' is a best practice when using the csv module to handle line endings correctly
@@ -130,6 +164,8 @@ def get_url_from_shortened_list(lookup) -> str:
             return "success", this_row_dict["url"]
 
     logger.error("lookup " + lookup + " not found")
+
+    logger.info("[TRACE] end " + trace_id)
     return "ERROR: lookup " + lookup + " not found", None
 
 
@@ -359,7 +395,8 @@ def send_email_with_msmtp(
     Returns:
         bool: True for success, False for failure.
     """
-    logger.info("[TRACE]")
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + trace_id)
 
     if isinstance(recipients, str):
         recipients_list = [recipients]
@@ -420,6 +457,7 @@ def send_email_with_msmtp(
         print(e.stderr.decode(), file=sys.stderr)
         return False
 
+    logger.info("[TRACE] end " + trace_id)
     return
 
 
@@ -427,6 +465,7 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+
     sympy_as_latex_per_feed_id = {}  # type: Dict[str, str]
     for this_feed_dict in list_of_feed_dicts:
         if "sympy" in this_feed_dict.keys():
@@ -452,7 +491,7 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
         else:
             sympy_as_latex_per_feed_id[this_feed_dict["id"]] = "no 'sympy' key"
 
-    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] end " + trace_id)
     return sympy_as_latex_per_feed_id
 
 
@@ -464,6 +503,7 @@ def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id)
+
     for index, this_expression_dict in enumerate(list_of_expression_dicts):
         if "sympy_lhs" in this_expression_dict.keys():
             try:
@@ -503,6 +543,7 @@ def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
                 list_of_expression_dicts[index]["latex_as_sympy_RHS"] = (
                     "tokenize.TokenError in get_sympy_as_latex_per_expr_id: " + str(err)
                 )
+
     logger.info("[TRACE] end " + trace_id)
     return list_of_expression_dicts
 
