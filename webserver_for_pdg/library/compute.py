@@ -10,6 +10,7 @@
 
 import os
 import random
+import string
 import time
 import tokenize
 import neo4j_query
@@ -17,6 +18,7 @@ import list_of_valid
 import sympy_validate_expression
 import latex_and_sympy
 import re
+import csv
 
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
@@ -27,6 +29,8 @@ unique_numeric_id_as_str = NewType("unique_numeric_id_as_str", str)
 query_timing_result_type = NewType("query_timing_result_type", Dict[str, float])
 
 import logging
+
+shorten_url_file = "static/url_shorten_expand.csv"
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +72,65 @@ def generate_random_id(
     logger.info("new_id=" + str(new_id))
     logger.info("[TRACE] compute/generate_random_id end " + trace_id)
     return str(new_id), query_time_dict
+
+
+def generate_lookup_for_shorten_url(shorten_url_file: str) -> str:
+    """ """
+    data_list = []  # contents of file as list of dicts
+
+    # newline='' is a best practice when using the csv module to handle line endings correctly
+    with open(shorten_url_file, mode="r", newline="") as file_handle:
+        reader = csv.DictReader(file_handle, delimiter="|")
+        for row in reader:
+            data_list.append(row)
+
+    characters = string.ascii_letters  # + string.digits
+
+    collision_found = True
+    while collision_found:
+        random_string = "".join(random.choices(characters, k=5))
+
+        collision_found = False
+        for this_row_dict in data_list:
+            if this_row_dict["lookup"] == random_string:
+                collision_found = True
+
+    logger.info("random_string=" + random_string)
+
+    return random_string
+
+
+def add_url_to_shortened_list(now_str, current_user_email, user_url) -> str:
+    """ """
+    if not os.path.exists(shorten_url_file):
+        with open(shorten_url_file, "a") as file_handle:
+            file_handle.write("timestamp|email|lookup|url\n")
+
+    lookup = generate_lookup_for_shorten_url(shorten_url_file)
+
+    with open(shorten_url_file, "a") as file_handle:
+        file_handle.write(
+            now_str + "|" + current_user_email + "|" + lookup + "|" + user_url + "\n"
+        )
+
+    return lookup
+
+
+def get_url_from_shortened_list(lookup) -> str:
+    data_list = []  # contents of file as list of dicts
+
+    # newline='' is a best practice when using the csv module to handle line endings correctly
+    with open(shorten_url_file, mode="r", newline="") as file_handle:
+        reader = csv.DictReader(file_handle, delimiter="|")
+        for row in reader:
+            data_list.append(row)
+
+    for this_row_dict in data_list:
+        if this_row_dict["lookup"] == lookup:
+            return "success", this_row_dict["url"]
+
+    logger.error("lookup " + lookup + " not found")
+    return "ERROR: lookup " + lookup + " not found", None
 
 
 # def convert_expr_sympy_pdg_symbols_to_neo4j_edge(

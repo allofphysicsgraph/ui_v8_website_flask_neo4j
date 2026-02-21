@@ -6940,6 +6940,60 @@ def to_other_projects():
     )
 
 
+@web_app.route("/shorten", methods=["GET", "POST"])
+@login_required
+def to_shorten():
+    """
+    user provides a URL to be shortened and gets back a lookup for the shortened URL
+    """
+    logger.info("[TRACE] ")
+
+    if not request.args:
+        return (
+            "<H1>Shorten a URL</H1>\n"
+            + '<P>For example, <a href="/shorten?url=https://google.com">allofphysics.com/shorten?url=https://google.com</a>\n'
+        )
+
+    user_url = request.args.get("url", "").lower()
+    logger.info("user_url: " + user_url)
+
+    # as per https://strftime.org/
+    # %f = Microsecond as a decimal number, zero-padded on the left.
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
+    lookup = compute.add_url_to_shortened_list(now_str, current_user.email, user_url)
+
+    return (
+        '<H1><a href="/expand/'
+        + lookup
+        + '">allofphysics.com/expand/'
+        + lookup
+        + "</a></H1>"
+    )
+
+
+@web_app.route("/expand/<lookup>", methods=["GET", "POST"])
+def to_expand(lookup: str):
+    """
+    take the shortened URL and redirects the user to the expanded URL
+    """
+    logger.info("[TRACE] ")
+
+    status, url = compute.get_url_from_shortened_list(lookup)
+
+    return redirect(url)
+
+
+@web_app.route("/expand/", methods=["GET", "POST"])
+@web_app.route("/expand", methods=["GET", "POST"])
+def to_expand_instructions():
+    logger.info("[TRACE] ")
+    return (
+        "<H1>Need a lookup to expand</H1>"
+        + '<P>For example, <a href="/shorten?url=https://google.com">allofphysics.com/shorten?url=https://google.com</a>\n'
+    )
+
+
 @web_app.route("/arxiv_scraper", methods=["GET", "POST"])
 def scrape_arxiv():
     """
