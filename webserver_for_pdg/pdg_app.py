@@ -60,7 +60,6 @@ See https://neo4j.com/developer/python/
 
 import os
 import sys
-
 import json
 import time
 import random
@@ -6549,6 +6548,40 @@ def to_export_json() -> werkzeug.Response:
     # "dumping_grounds" is a variable set in the docker-compose file using variable NEO4J_dbms_directories_import
     logger.info("[TRACE] end " + str(trace_id))
     return redirect(url_for("static", filename="dumping_grounds/pdg.jsonl"))
+
+
+@web_app.route("/export_metadata_schema")
+def to_export_metadata_schema():
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+    query_time_dict = {}  # type: query_timing_result_type
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        res = session.read_transaction(neo4j_query.apoc_metdata_schema)
+        query_time_dict[
+            "pdg_app/to_export_metadata_schema: apoc_metdata_schema " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+    # logger.info("res=" + str(res))
+
+    # for k, v in res.items():
+    #     logger.info(str(k) + ":" + str(v))
+
+    json_string = json.dumps(res["stats"], indent=2)
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return Response(json_string, mimetype="application/json")
+
+    # alternative:
+    # return f"<pre>{json_string}</pre>"
+
+    # alternative: return a file:
+    # return Response(
+    #     json_string,
+    #     mimetype='application/json',
+    #     headers={'Content-Disposition': 'attachment;filename=stats.json'}
+    # )
 
 
 @web_app.route("/export_to_csv")
