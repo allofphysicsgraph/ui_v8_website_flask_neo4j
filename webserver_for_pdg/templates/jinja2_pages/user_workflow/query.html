@@ -1,11 +1,9 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
-<P>
-  Return to <a href="{{ url_for('to_navigation') }}?referrer=query">navigation page</a>
-</P>
+<P>Return to <a href="{{ url_for('to_navigation') }}?referrer=query">navigation page</a></P>
 
-Three ways to submit a read-only query:
+<P>Three ways to submit a read-only query:
 <UL>
   <LI>provide a Cypher query string in <a href="#user_prompt">the prompt below</a>.</LI>
   <LI>click on one of the pre-defined Cypher queries in <a href="#example_queries">the table below</a>.</LI>
@@ -17,27 +15,26 @@ Three ways to submit a read-only query:
     <H2 id="user_prompt">Cypher query</H2>
   </legend>
 
-<form method="post" action="" onsubmit="return checkForm(this);">
-  {{ form.csrf_token }}
-  <P>
-    {{ form.query.label}}: {{ form.query(size=100, minlength=1) }}
-  <input type="submit" value="query graph">
-</form>
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form.csrf_token }}
+    <P>{{ form.query.label}}: {{ form.query(size=100, minlength=1) }}
+    <input type="submit" value="query graph">
+  </form>
 </fieldset>
 
 {% if submitted_query is defined %}
   {% if submitted_query|length > 0 %}
-For the query <BR>
-  {{ submitted_query.replace('\r','\\\\r') | safe }}<BR> <!-- https://stackoverflow.com/a/35215981/1164295 -->
-  the results are
+    For the query <BR>
+    {{ submitted_query.replace('\r','\\\\r') | safe }}<BR> <!-- https://stackoverflow.com/a/35215981/1164295 -->
+    the results are
+  {% endif %}
 {% endif %}
-{% endif %}
+
 <UL>
 {% for record in list_of_records %}
     <LI>{{ record.replace('\r','\\\\r') | safe }}</LI>
 {% endfor %}
 </UL>
-
 
 <div id="example_queries">Example queries:</div>
 <table border="1">
@@ -71,6 +68,20 @@ For the query <BR>
   </tr>
 
   <tr>
+    <td id="count all nodes">count all nodes
+      <a href="#count all nodes">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH () RETURN count(*) AS totalNodes">
+                                                  MATCH () RETURN count(*) AS totalNodes</a></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="count all edges">count all edges
+      <a href="#count all edges">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH ()-[r]->() RETURN count(r)">
+                                                  MATCH ()-[r]->() RETURN count(r)</a></td>
+    <td></td>
+  </tr>
+  <tr>
     <td id="list the node count for each label">list the node count for each label <!--(<a href="https://stackoverflow.com/a/24058571/1164295">citation</a>)-->
        <a href="#list the node count for each label">#</a>
     </td>
@@ -78,7 +89,6 @@ For the query <BR>
                                                   MATCH (n) RETURN DISTINCT labels(n), count(*)</a></td>
     <td>how many nodes of each type?</td>
   </tr>
-
   <tr>
     <td id="list all nodes">list all nodes
      <a href="#list all nodes">#</a></td>
@@ -100,7 +110,60 @@ For the query <BR>
                                                   MATCH (n)-[r]->(m) RETURN n,r,m</a></td>
     <td></td>
   </tr>
+  <tr>
+    <td id="step not connected to derivation">step not connected to derivation
+      <a href="#step not connected to derivation">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (s:step) WHERE NOT (:derivation)-[:HAS_STEP]->(s) RETURN s">
+MATCH (s:step) WHERE NOT (:derivation)-[:HAS_STEP]->(s) RETURN s</a></td>
+    <td>find all :step nodes that are not connected to a :derivation node via a HAS_STEP relationship</td>
+  </tr>
+  <tr>
+    <td id="step with no expression">step with no expression
+      <a href="#step with no expression">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (s:step) WHERE NOT (s)-[:HAS_INPUT|HAS_OUTPUT]->(:expression) RETURN s">
+MATCH (s:step) WHERE NOT (s)-[:HAS_INPUT|HAS_OUTPUT]->(:expression) RETURN s</a></td>
+    <td>find all step nodes that are not connected to an expression via HAS_INPUT or HAS_OUTPUT relationship</td>
+  </tr>
 
+  <tr>
+    <td id="step missing inference rule">step missing inference rule
+      <a href="#step missing inference rule">#</a></td>      
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (s:step) WHERE NOT (s)-[:HAS_INFERENCE_RULE]->(:inference_rule) RETURN s">
+MATCH (s:step) WHERE NOT (s)-[:HAS_INFERENCE_RULE]->(:inference_rule) RETURN s</a></td>
+    <td>find all step nodes that are not connected to an inference_rule via HAS_INFERENCE_RULE relationship</td>
+  </tr>
+  <tr>
+    <td id="step-to-step missing intermediate expression">step not connected to other steps via expression
+      <a href="#step-to-step missing intermediate expression">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (s:step) WHERE NOT EXISTS { MATCH (s)-[:HAS_INPUT|HAS_OUTPUT]->(e:expression)<-[:HAS_INPUT|HAS_OUTPUT]-(other:step)   WHERE s <> other } RETURN s">
+MATCH (s:step) WHERE NOT EXISTS { MATCH (s)-[:HAS_INPUT|HAS_OUTPUT]->(e:expression)<-[:HAS_INPUT|HAS_OUTPUT]-(other:step)   WHERE s &lt;&gt; other } RETURN s</a></td>
+    <td>find :step nodes that are not connected to any other :step nodes through an intermediate :expression.</td>
+  </tr>
+
+  <tr>
+    <td id="all distinct node labels and the unique property keys used within each label">
+            all distinct node labels and the unique property keys used within each label.
+            <a href="#all distinct node labels and the unique property keys used within each label">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n) UNWIND labels(n) AS label UNWIND keys(n) AS key RETURN DISTINCT label, collect(DISTINCT key) AS properties ORDER BY label">
+    MATCH (n) UNWIND labels(n) AS label UNWIND keys(n) AS key RETURN DISTINCT label, collect(DISTINCT key) AS properties ORDER BY label</a></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="all distinct relationship types and the unique property keys used for each type">
+all distinct relationship types and the unique property keys used for each type.
+            <a href="#all distinct relationship types and the unique property keys used for each type">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH ()-[r]-() WITH type(r) AS relationshipType, keys(r) AS keys UNWIND keys AS key RETURN DISTINCT relationshipType, collect(DISTINCT key) AS properties ORDER BY relationshipType">
+    MATCH ()-[r]-() WITH type(r) AS relationshipType, keys(r) AS keys UNWIND keys AS key RETURN DISTINCT relationshipType, collect(DISTINCT key) AS properties ORDER BY relationshipType</a></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td id="all distinct relationship types and the unique property keys used for each type, including empty properties">
+all distinct relationship types and the unique property keys used for each type, including empty properties.
+            <a href="#all distinct relationship types and the unique property keys used for each type, including empty properties">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH ()-[r]->() WITH type(r) AS relationshipType, keys(r) AS keys UNWIND (CASE WHEN size(keys) = 0 THEN [null] ELSE keys END) AS key RETURN relationshipType, collect(DISTINCT key) AS properties ORDER BY relationshipType">
+MATCH ()-[r]->() WITH type(r) AS relationshipType, keys(r) AS keys UNWIND (CASE WHEN size(keys) = 0 THEN [null] ELSE keys END) AS key RETURN relationshipType, collect(DISTINCT key) AS properties ORDER BY relationshipType</a></td>
+    <td></td>
+  </tr>
   <tr>
     <td id="list derivations">list derivations
      <a href="#list derivations">#</a></td>
@@ -185,10 +248,19 @@ For the query <BR>
 MATCH (s:step)-[r]->(e) WHERE s.id='{{step_id}}' RETURN e</a></td>
     <td>all input expressions, feeds, and output expressions</td>
   </tr>
+  <tr>
+    <td id="all named expressions">all named expressions
+      <a href="#all named expressions">#</a></td>
+    <TD><a href="{{ url_for('to_query') }}?cypher=MATCH (e:expression) WHERE e.name_latex <> '' RETURN e">
+MATCH (e:expression) WHERE e.name_latex &lt;&gt; "" RETURN e</a></td>
+    <td></td>
+  </TR>
+  <tr>
     <td id="list pairs of nodes with edge HAS_VALUE">list pairs of nodes with edge HAS_VALUE<a href="#list pairs of nodes with edge HAS_VALUE">#</a></td>
     <td><a href="{{ url_for('to_query') }}?cypher=MATCH%20(a)-[r]->(b)%20RETURN%20DISTINCT%20type(r)">
                                MATCH (a)-[:HAS_VALUE]->(b) RETURN a, b</a></td>
     <td>See also <a href="#list%20all%20distinct%20edge%20labels">list all distinct edge labels</a>.</td>
+  </tr>
   <tr>
     <td id="list inference rule used in a specific step">list inference rule used in a specific step
      <a href="#list inference rule used in a specific step">#</a></td>
@@ -203,15 +275,13 @@ MATCH (i:inference_rule), (s:step) WHERE s.id='{{step_id}}' RETURN i</a></td>
 MATCH (n:expression), (m:inference_rule) WHERE m.id='{{inference_rule_id}}' RETURN n</a></td>
     <td></td>
   </tr>
-
-<TR>
-  <td id="list symbol dicts connected to a specific expression">list symbol dicts connected to a specific expression
+  <TR>
+    <td id="list symbol dicts connected to a specific expression">list symbol dicts connected to a specific expression
     <a href="#list symbol dicts connected to a specific expression">#</a></td>
-  <TD><a href="{{ url_for('to_query') }}?cypher=MATCH (e:expression {id: '{{inference_rule_id}}'})-[:HAS_SYMBOL]->(s:symbol) RETURN properties(s) AS props">
+    <TD><a href="{{ url_for('to_query') }}?cypher=MATCH (e:expression {id: '{{inference_rule_id}}'})-[:HAS_SYMBOL]->(s:symbol) RETURN properties(s) AS props">
 MATCH (e:expression {id: '{{inference_rule_id}}'})-[:HAS_SYMBOL]->(s:symbol) RETURN properties(s) AS props</a></td>
     <td></td>
   </tr>
-
   <tr>
     <td id="show properties for a specific derivation">show properties for a specific derivation
      <a href="#show properties for a specific derivation">#</a></td>
@@ -230,15 +300,13 @@ MATCH (e:expression {id: '{{inference_rule_id}}'})-[:HAS_SYMBOL]->(s:symbol) RET
                                                   MATCH (n:expression) WHERE n.id='0203024440' RETURN n</a></td>
     <td></td>
   </tr>
-
   <tr>
-    <td id="list expressions that have a name">list expressions that have a name
+    <td id="list expressions that have a name">[ILL-POSED]<BR>list expressions that have a name
      <a href="#list expressions that have a name">#</a></td>
-    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n:expression) WHERE n.name_latex <> '' RETURN n">
+    <td>[ILL-POSED]<BR><a href="{{ url_for('to_query') }}?cypher=MATCH (n:expression) WHERE n.name_latex <> '' RETURN n">
                                                   MATCH (n:expression) WHERE n.name_latex &lt;&gt; '' RETURN n</a></td>
     <td>query assumes the  name_latex always exists on the nodes being considered. If the property might be missing, n.name_latex would be null, and null &lt;&gt; '' would evaluate to true. </td>
   </tr>
-
   <tr>
     <td id="list expressions that have a name">list expressions that have a name
      <a href="#list expressions that have a name">#</a></td>
@@ -246,7 +314,20 @@ MATCH (e:expression {id: '{{inference_rule_id}}'})-[:HAS_SYMBOL]->(s:symbol) RET
                                                   MATCH (n:expression) WHERE exists(n.name_latex) AND n.name_latex &lt;&gt; '' RETURN n</a></td>
     <td>check for existence of name_latex</td>
   </tr>
-
+  <TR>
+    <TD id="expression nodes connected to two or more derivations">expression nodes connected to two or more unique derivation nodes
+      <a href="#expression nodes connected to two or more derivations">#</a></TD>
+    <TD><a href="{{ url_for('to_query') }}?cypher=MATCH (d:derivation)-[:HAS_STEP]->(s:step)-[:HAS_INPUT|HAS_OUTPUT]->(e:expression) WITH e, count(DISTINCT d) AS derivationCount WHERE derivationCount >= 2 RETURN e">
+MATCH (d:derivation)-[:HAS_STEP]->(s:step)-[:HAS_INPUT|HAS_OUTPUT]->(e:expression) WITH e, count(DISTINCT d) AS derivationCount WHERE derivationCount >= 2 RETURN e</a></td>
+    <td></td>
+  </TR>
+  <tr>
+    <td id="named expressions connected to two or more derivations">named expressions connected to two or more derivations
+     <a href="#named expressions connected to two or more derivations">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (d:derivation)-[:HAS_STEP]->(s:step)-[:HAS_INPUT|HAS_OUTPUT]->(e:expression) WHERE e.name_latex IS NOT NULL AND e.name_latex <> '' WITH e, count(DISTINCT d) AS derivationCount WHERE derivationCount >= 2 RETURN e">
+MATCH (d:derivation)-[:HAS_STEP]->(s:step)-[:HAS_INPUT|HAS_OUTPUT]->(e:expression) WHERE e.name_latex IS NOT NULL AND e.name_latex &lt;&gt; "" WITH e, count(DISTINCT d) AS derivationCount WHERE derivationCount >= 2 RETURN e</a></td>
+    <td></td>
+  </TR>
   <tr>
     <td id="an inference rule is in which derivations?">an inference rule is in which derivations?
      <a href="#an inference rule is in which derivations?">#</a></td>
@@ -279,15 +360,19 @@ MATCH (e:expression {id: '{{inference_rule_id}}'})-[:HAS_SYMBOL]->(s:symbol) RET
     </a></td>
     <td>replace ID values with your desired nodes</td>
   </tr>
-
+  <TR>
+    <TD id="longest shortest path">longest shortest path, aka diameter
+      <a href="#longest shortest path">#</a></TD>
+    <TD><a href="{{ url_for('to_query') }}?cypher=MATCH (n), (m) WHERE id(n) < id(m) MATCH p = shortestPath((n)-[*]-(m)) RETURN p, length(p) AS distance ORDER BY distance DESC LIMIT 1">
+MATCH (n), (m) WHERE id(n) < id(m) MATCH p = shortestPath((n)-[*]-(m)) RETURN p, length(p) AS distance ORDER BY distance DESC LIMIT 1</a></TD>
+    <TD></TD>
+  </TR>
 </table>
-<P>
-  <a href="https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887">cheatsheet</a>
-</P>
+<P><a href="https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887">cheatsheet</a></P>
 
-<P>
-  The following fail because they try to write:
-</P>
+<P>Have a suggestion for a query that should be added to the above table? <a href="mailto:ben.is.located@gmail.com?subject=Physics Derivation Graph">Contact the maintainer</a> or submit <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/pulls">a merge request</a>.
+
+<P>The following fail because they try to write:</P>
 <table border="1">
   <tr>
     <th>purpose</th>
