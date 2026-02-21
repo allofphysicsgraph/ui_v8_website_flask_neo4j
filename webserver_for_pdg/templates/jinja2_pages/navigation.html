@@ -12,7 +12,8 @@
   <LI><a href="{{ url_for('to_export_cypher') }}?referrer=navigation">export as Cypher</a>
    or <a href="{{ url_for('to_export_json') }}?referrer=navigation">  export as JSON</a> or 
   or <a href="{{ url_for('to_export_csv') }}?referrer=navigation">  export as CSV</a> or 
-  or <a href="{{ url_for('to_export_graphml') }}?referrer=navigation">  export as GraphML</a>.</LI>
+  or <a href="{{ url_for('to_export_graphml') }}?referrer=navigation">  export as GraphML</a>. 
+<a href="{{ url_for('to_export_metadata_schema') }}?referrer=navigation">Export metadata</a>.</LI>
   <LI><a href="{{ url_for('to_list_derivations') }}?referrer=navigation">show {{ number_of_derivations }} derivations</a>, (which are comprised of steps); 
 {% if current_user.is_anonymous %}
 you have to <a href="{{ url_for('to_login') }}?referrer=navigation">sign in</a> to create new derivations
