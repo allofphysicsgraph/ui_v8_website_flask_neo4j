@@ -1,7 +1,63 @@
-The current schema is determined by searching for the string
+The schema-as-enacted is determined by searching for the string
+```
 CREATE (
+```
 in the file `neo4j_query.py`. 
 
+The output of <https://neo4j.com/docs/apoc/current/overview/apoc.meta/apoc.meta.stats/> is, as of 2026-02-21,
+```
+"propertyKeyCount": 53,
+"nodeCount": 2149,
+"relCount": 5691,
+"relTypeCount": 7,
+"labelCount": 12,
+"labels": {
+    "expression": 632,
+    "operation": 40,
+    "derivation": 44,
+    "symbol": 241,
+    "scalar": 227,
+    "inference_rule": 94,
+    "value_with_units": 20,
+    "vector": 14,
+    "relation": 10,
+    "feed": 356,
+    "step": 712,
+},
+"relTypes": {
+    "()-[:HAS_STEP]->()": 712,
+    "()-[:HAS_STEP]->(:step)": 712,
+    "(:derivation)-[:HAS_STEP]->()": 712,
+
+    "()-[:HAS_SYMBOL]->()": 2493,
+    "()-[:HAS_SYMBOL]->(:symbol)": 2493,
+    "()-[:HAS_SYMBOL]->(:scalar)": 2430,
+    "()-[:HAS_SYMBOL]->(:vector)": 63,
+    "(:feed)-[:HAS_SYMBOL]->()": 376,
+    "(:expression)-[:HAS_SYMBOL]->()": 2117,
+
+    "(:step)-[:HAS_INFERENCE_RULE]->()": 712,
+    "()-[:HAS_INFERENCE_RULE]->(:inference_rule)": 712,
+    "()-[:HAS_INFERENCE_RULE]->()": 712,
+
+    "(:step)-[:HAS_INPUT]->()": 732,
+    "()-[:HAS_INPUT]->()": 732,
+    "()-[:HAS_INPUT]->(:expression)": 732,
+
+    "()-[:HAS_VALUE]->(:value_with_units)": 20,
+    "(:scalar)-[:HAS_VALUE]->()": 20,
+    "(:symbol)-[:HAS_VALUE]->()": 20,
+    "()-[:HAS_VALUE]->()": 20,
+
+    "()-[:HAS_OUTPUT]->()": 667,
+    "(:step)-[:HAS_OUTPUT]->()": 667,
+    "()-[:HAS_OUTPUT]->(:expression)": 667,
+
+    "()-[:HAS_FEED]->()": 355,
+    "(:step)-[:HAS_FEED]->()": 355,
+    "()-[:HAS_FEED]->(:feed)": 355,
+}
+```
 
 https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Result
 keywords:
