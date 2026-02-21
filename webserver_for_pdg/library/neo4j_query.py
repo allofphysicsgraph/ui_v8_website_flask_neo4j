@@ -29,8 +29,10 @@ In Cypher queries
 """
 
 import neo4j  # needed for exception handling
+
+from neo4j import Record, Transaction
 import random  # for trace IDs
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 import time
 
@@ -41,7 +43,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_list_IDs(tx, node_type: str) -> List[str]:
+def get_list_IDs(tx: Transaction, node_type: str) -> List[str]:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a list of all PDG IDs for the nodes
@@ -62,7 +64,20 @@ def get_list_IDs(tx, node_type: str) -> List[str]:
     return list_of_IDs
 
 
-def apoc_export_csv(tx, output_filename: str):
+def apoc_metdata_schema(tx: Transaction):
+    """
+    https://neo4j.com/docs/apoc/current/overview/apoc.meta/apoc.meta.stats/
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
+    result = tx.run("CALL apoc.meta.stats()")
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return result.single()
+
+
+def apoc_export_csv(tx: Transaction, output_filename: str) -> dict:
     """
     https://neo4j.com/docs/apoc/current/overview/apoc.export/
     https://neo4j.com/docs/apoc/current/export/csv/
@@ -70,12 +85,22 @@ def apoc_export_csv(tx, output_filename: str):
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
-    for result in tx.run(
-        "CALL apoc.export.csv.all('" + output_filename + "',{useTypes:true})"
-    ):
-        pass
+    # for result in tx.run(
+    #     "CALL apoc.export.csv.all('" + output_filename + "',{useTypes:true})"
+    # ):
+    #     pass
+    # logger.info("[TRACE] end " + str(trace_id))
+    # return result
+    query = "CALL apoc.export.csv.all($file_name, {useTypes: true})"
+
+    result = tx.run(query, file_name=output_filename)
+
+    # APOC export procedures return exactly one record with statistics
+    record = result.single()
+
     logger.info("[TRACE] end " + str(trace_id))
-    return result
+    # Return as a standard Python dictionary (or an empty dict if no record)
+    return record.data() if record else {}
 
 
 def apoc_export_graphml(tx, output_filename: str):
