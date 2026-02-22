@@ -190,7 +190,7 @@ def get_url_from_shortened_list(lookup) -> str:
 #     with graphDB_Driver.session() as session:
 #         query_start_time = time.time()
 #         list_of_expression_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "expression"
+#             neo4j_query.get_nodes_of_type, "expression"
 #         )
 #         query_time_dict[
 #             "compute/convert_expr_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type expression"
@@ -201,7 +201,7 @@ def get_url_from_shortened_list(lookup) -> str:
 #     with graphDB_Driver.session() as session:
 #         query_start_time = time.time()
 #         list_of_symbol_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "symbol"
+#             neo4j_query.get_nodes_of_type, "symbol"
 #         )
 #         query_time_dict[
 #             "compute/convert_expr_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type symbol"
@@ -295,7 +295,7 @@ def get_url_from_shortened_list(lookup) -> str:
 #     with graphDB_Driver.session() as session:
 #         query_start_time = time.time()
 #         list_of_expression_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "feed"
+#             neo4j_query.get_nodes_of_type, "feed"
 #         )
 #         query_time_dict[
 #             "compute/convert_feed_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type feed"
@@ -306,7 +306,7 @@ def get_url_from_shortened_list(lookup) -> str:
 #     with graphDB_Driver.session() as session:
 #         query_start_time = time.time()
 #         list_of_symbol_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "symbol"
+#             neo4j_query.get_nodes_of_type, "symbol"
 #         )
 #         query_time_dict[
 #             "compute/convert_feed_sympy_pdg_symbols_to_neo4j_edge: list_nodes_of_type symbol"
@@ -570,10 +570,10 @@ def get_dimensional_consistency_per_expression_id(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_expression_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "expression"
+            neo4j_query.get_nodes_of_type, "expression"
         )
         query_time_dict[
-            "pdg_app/get_dimensional_consistency_per_expression_id: get_list_node_dicts_of_type expression "
+            "pdg_app/get_dimensional_consistency_per_expression_id: get_nodes_of_type expression "
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
@@ -881,7 +881,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
 #     with graphDB_Driver.session() as session:
 #         query_start_time = time.time()
 #         list_of_operation_symbol_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "operation"
+#             neo4j_query.get_nodes_of_type, "operation"
 #         )
 #         query_time_dict[
 #             "compute/get_list_of_all_symbol_dicts, list_nodes_of_type " + trace_id
@@ -893,7 +893,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
 #     with graphDB_Driver.session() as session:
 #         query_start_time = time.time()
 #         list_of_scalar_symbol_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "scalar"
+#             neo4j_query.get_nodes_of_type, "scalar"
 #         )
 #         query_time_dict[
 #             "compute/get_list_of_all_symbol_dicts, list_nodes_of_type " + trace_id
@@ -905,7 +905,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
 #     with graphDB_Driver.session() as session:
 #         query_start_time = time.time()
 #         list_of_vector_symbol_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "vector"
+#             neo4j_query.get_nodes_of_type, "vector"
 #         )
 #         query_time_dict[
 #             "compute/get_list_of_all_symbol_dicts, list_nodes_of_type " + trace_id
@@ -917,7 +917,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
 #     with graphDB_Driver.session() as session:
 #         query_start_time = time.time()
 #         list_of_matrix_symbol_dicts = session.read_transaction(
-#             neo4j_query.get_list_node_dicts_of_type, "matrix"
+#             neo4j_query.get_nodes_of_type, "matrix"
 #         )
 #         query_time_dict[
 #             "compute/get_list_of_all_symbol_dicts, list_nodes_of_type " + trace_id
@@ -954,7 +954,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_scalar_symbol_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "scalar"
+            neo4j_query.get_nodes_of_type, "scalar"
         )
         query_time_dict[
             "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
@@ -967,7 +967,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_vector_symbol_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "vector"
+            neo4j_query.get_nodes_of_type, "vector"
         )
         query_time_dict[
             "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
@@ -980,7 +980,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_matrix_symbol_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "matrix"
+            neo4j_query.get_nodes_of_type, "matrix"
         )
         query_time_dict[
             "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
@@ -1280,10 +1280,10 @@ def get_dict_of_node_dicts(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_all_node_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, node_type
+            neo4j_query.get_nodes_of_type, node_type
         )
         query_time_dict[
-            "compute/get_dict_of_node_dicts, get_list_node_dicts_of_type "
+            "compute/get_dict_of_node_dicts, get_nodes_of_type "
             + node_type
             + " "
             + trace_id
@@ -1506,46 +1506,46 @@ def input_feed_output_infrule_for_step(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         inference_rule_dict = session.read_transaction(
-            neo4j_query.get_step_has_inference_rule, step_id
+            neo4j_query.get_inference_rule_connected_to_step_ID, step_id
         )
         query_time_dict[
-            "compute/get_dict_of_steps_in_derivation: step_has_inference_rule"
+            "compute/get_dict_of_steps_in_derivation: get_inference_rule_connected_to_step_ID"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
     # print("inference_rule_dict=", inference_rule_dict)
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_input_dicts = session.read_transaction(
-            neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
+            neo4j_query.get_expressions_from_step_id_and_expr_type,
             step_id,
             "HAS_INPUT",
         )
         query_time_dict[
-            "compute/get_dict_of_steps_in_derivation: step_id_has_expressions, HAS_INPUT"
+            "compute/get_dict_of_steps_in_derivation: get_expressions_from_step_id_and_expr_type HAS_INPUT"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_input_dicts=", list_of_input_dicts)
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_feed_dicts = session.read_transaction(
-            neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
+            neo4j_query.get_expressions_from_step_id_and_expr_type,
             step_id,
             "HAS_FEED",
         )
         query_time_dict[
-            "compute/get_dict_of_steps_in_derivation: step_id_has_expressions, HAS_FEED"
+            "compute/get_dict_of_steps_in_derivation: get_expressions_from_step_id_and_expr_type, HAS_FEED"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_feed_dicts=", list_of_feed_dicts)
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_output_dicts = session.read_transaction(
-            neo4j_query.get_list_of_expression_dicts_from_step_id_and_expr_type,
+            neo4j_query.get_expressions_from_step_id_and_expr_type,
             step_id,
             "HAS_OUTPUT",
         )
         query_time_dict[
-            "compute/get_dict_of_steps_in_derivation: step_id_has_expressions, HAS_OUTPUT"
+            "compute/get_dict_of_steps_in_derivation: get_expressions_from_step_id_and_expr_type, HAS_OUTPUT"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
     # print("list_of_output_dicts=", list_of_output_dicts)

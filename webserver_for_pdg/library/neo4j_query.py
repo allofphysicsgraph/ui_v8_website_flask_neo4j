@@ -269,11 +269,9 @@ def get_scalar_id_that_has_value_and_units_id(tx: Transaction, value_and_units_i
     return scalar_id
 
 
-def get_list_of_symbol_dicts_for_every_expression(
-    tx, list_of_expression_ids: List[str]
-):
+def get_symbols_for_every_expression(tx, list_of_expression_ids: List[str]):
     """
-    `get_list_of_symbol_dicts_for_expression` wasn't fast enough (25 seconds for 620 expressions)
+    `get_symbols_for_expression` wasn't fast enough (25 seconds for 620 expressions)
     so Gemini 3 Pro suggested this batching approach
 
     Explanation:
@@ -303,9 +301,7 @@ def get_list_of_symbol_dicts_for_every_expression(
     return symbol_map
 
 
-def get_list_of_symbol_dicts_for_expression(
-    tx: Transaction, expression_id: str
-) -> List[dict]:
+def get_symbols_for_expression(tx: Transaction, expression_id: str) -> List[dict]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
@@ -325,7 +321,7 @@ def get_list_of_symbol_dicts_for_expression(
     return symbol_list
 
 
-def get_all_symbol_IDs_in_expression(tx: Transaction, expression_id: str) -> List[str]:
+def get_symbol_IDs_in_expression(tx: Transaction, expression_id: str) -> List[str]:
     """match (s:symbol) because nodes are created with multiple labels (e.g. :symbol:scalar)"""
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
@@ -339,7 +335,7 @@ def get_all_symbol_IDs_in_expression(tx: Transaction, expression_id: str) -> Lis
     return [record["s.id"] for record in result]
 
 
-def get_all_symbol_IDs_in_every_feed(tx):
+def get_symbol_IDs_in_every_feed(tx):
     """
     `MATCH (f:feed)` selects all nodes with the label feed, regardless of whether you passed an ID list or not.
     `OPTIONAL MATCH ...` is like a "Left Outer Join" in SQL. It attempts to find the pattern (f)-[:HAS_SYMBOL]->(s:symbol).
@@ -361,7 +357,7 @@ def get_all_symbol_IDs_in_every_feed(tx):
     return result
 
 
-def get_all_symbol_IDs_in_feed(tx: Transaction, feed_id: str) -> List[str]:
+def get_symbol_IDs_in_feed(tx: Transaction, feed_id: str) -> List[str]:
     """match (s:symbol) because nodes are created with multiple labels (e.g. :symbol:scalar)"""
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
@@ -461,7 +457,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
 #     return symbol_list
 
 
-def get_list_node_dicts_of_type(tx: Transaction, node_type: str) -> list:
+def get_nodes_of_type(tx: Transaction, node_type: str) -> list:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a list of all nodes
@@ -508,7 +504,7 @@ def get_count_nodes_of_type(tx: Transaction, node_type: str) -> int:
     return node_count
 
 
-def get_all_expressions_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_expressions_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     collect the 'e' nodes into a list for every unique 's'
     """
@@ -531,7 +527,7 @@ def get_all_expressions_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]
     return res_dict
 
 
-def get_all_expressions_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_expressions_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     collect the 'e' nodes into a list for every unique 's'
     """
@@ -554,7 +550,7 @@ def get_all_expressions_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]
     return res_dict
 
 
-def get_all_expressions_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_expressions_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     collect the 'e' nodes into a list for every unique 's'
     """
@@ -577,7 +573,7 @@ def get_all_expressions_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
     return res_dict
 
 
-def get_all_derivations_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_derivations_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 's'
 
@@ -607,7 +603,7 @@ def get_all_derivations_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]
     return res_dict
 
 
-def get_all_derivations_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_derivations_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 's'
 
@@ -637,7 +633,7 @@ def get_all_derivations_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]
     return res_dict
 
 
-def get_all_derivations_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_derivations_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 's'
 
@@ -665,7 +661,7 @@ def get_all_derivations_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
     return res_dict
 
 
-def get_all_derivations_for_every_feed(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_derivations_for_every_feed(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 'f'
     """
@@ -689,7 +685,7 @@ def get_all_derivations_for_every_feed(tx) -> Dict[str, List[Dict[str, Any]]]:
     return res_dict
 
 
-def get_all_derivations_for_every_expression(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_derivations_for_every_expression(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 'e'
 
@@ -783,7 +779,7 @@ def get_derivations_that_use_inference_rule(
     return list_of_derivation_dicts
 
 
-def get_all_expressions_that_use_symbol(tx, symbol_id: str) -> List[Dict[str, Any]]:
+def get_expressions_that_use_symbol(tx, symbol_id: str) -> List[Dict[str, Any]]:
     """
     which expressions contain this symbol?
 
@@ -826,7 +822,7 @@ def get_all_expressions_that_use_symbol(tx, symbol_id: str) -> List[Dict[str, An
     return list_of_expression_dicts
 
 
-def get_all_derivations_that_use_symbol(
+def get_derivations_that_use_symbol(
     tx,
     symbol_id: str,
 ) -> list:
@@ -854,7 +850,7 @@ def get_all_derivations_that_use_symbol(
     return list_of_derivation_dicts
 
 
-def get_list_of_value_dicts_for_constant_id(tx: Transaction, scalar_id: str) -> list:
+def get_values_for_constant(tx: Transaction, scalar_id: str) -> list:
     """
     >>>
     """
@@ -911,10 +907,10 @@ def get_list_of_step_dicts_in_this_derivation(
     return list_of_step_dicts
 
 
-def get_list_of_symbol_IDs_per_derivation(tx: Transaction, derivation_id: str):
-    """ """
-    # TODO
-    return list_of_symbol_IDs
+# def get_list_of_symbol_IDs_per_derivation(tx: Transaction, derivation_id: str):
+#     """ """
+#     # TODO
+#     return list_of_symbol_IDs
 
 
 def get_step_has_sequence_index(tx: Transaction, step_id: str) -> int:
@@ -937,7 +933,7 @@ def get_step_has_sequence_index(tx: Transaction, step_id: str) -> int:
     return sequence_index
 
 
-def get_step_has_inference_rule(tx: Transaction, step_id: str):
+def get_inference_rule_connected_to_step_ID(tx: Transaction, step_id: str):
     """
     use case: when displaying a derivation, user wants to see inference rule per step
 
@@ -992,7 +988,7 @@ def get_derivation_id_from_step_id(tx: Transaction, step_id: str) -> str:
     return derivation_id
 
 
-def get_list_of_expression_dicts_from_step_id_and_expr_type(
+def get_expressions_from_step_id_and_expr_type(
     tx, step_id: str, expression_type: str
 ) -> list:
     """
