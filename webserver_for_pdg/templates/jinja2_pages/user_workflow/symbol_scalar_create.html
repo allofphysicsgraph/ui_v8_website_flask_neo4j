@@ -124,7 +124,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+{% if list_of_scalar_dicts|length > 0 %}
 <P>{% include 'jinja2_pages/reusable_components/_table_of_symbols_scalar.html' %}
+{% endif %}
 
 <script>
 function select_symbol() {
