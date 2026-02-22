@@ -3121,6 +3121,18 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
             + " does not exist in database</H1>."
         )
 
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_expression_dicts = session.read_transaction(
+            neo4j_query.get_expressions_that_use_symbol, operation_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_operation: node_properties "
+            + operation_id
+            + " "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
     web_form = SpecifyNewSymbolOperationForm(request.form)
     web_form_no_options = NoOptionsForm(request.form)
     logger.info("request.method =" + str(request.method))
@@ -3197,6 +3209,15 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
         return (
             "<H1>Relation ID " + str(relation_id) + " does not exist in database</H1>."
         )
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_expression_dicts = session.read_transaction(
+            neo4j_query.get_expressions_that_use_symbol, relation_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_relation: node_properties " + relation_id + " " + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     web_form_no_options = NoOptionsForm(request.form)
     web_form_new_symbol = SpecifyNewSymbolRelationForm(request.form)
@@ -3288,7 +3309,10 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
             neo4j_query.get_expressions_that_use_symbol, scalar_id
         )
         query_time_dict[
-            "pdg_app/to_edit_scalar_symbol: node_properties " + trace_id
+            "pdg_app/to_edit_scalar_symbol: node_properties "
+            + scalar_id
+            + " "
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     web_form_symbol_properties = SpecifyNewSymbolScalarForm(request.form)
@@ -3420,6 +3444,18 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
     if vector_dict is None:
         return "<H1>Vector ID " + str(vector_id) + " does not exist in database</H1>."
 
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_expression_dicts = session.read_transaction(
+            neo4j_query.get_expressions_that_use_symbol, vector_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_scalar_symbol: node_properties "
+            + vector_id
+            + " "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
     web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
     web_form_no_options = NoOptionsForm(request.form)
 
@@ -3465,6 +3501,18 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     if matrix_dict is None:
         return "<H1>Matrix ID " + str(matrix_id) + " does not exist in database</H1>."
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_expression_dicts = session.read_transaction(
+            neo4j_query.get_expressions_that_use_symbol, matrix_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_scalar_symbol: node_properties "
+            + matrix_id
+            + " "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     web_form_matrix_properties = SpecifyNewSymbolMatrixForm(request.form)
     web_form_no_options = NoOptionsForm(request.form)
