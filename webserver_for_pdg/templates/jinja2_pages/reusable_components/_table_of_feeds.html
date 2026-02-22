@@ -39,7 +39,13 @@
           {{ feed_dict['latex']|e }}</td>
     <td>{{ feed_dict['name_latex'] }}</td>
     <td>{{ feed_dict['description_latex'] }}</td>
-    <td>TODO</td> <!-- derivation -->
+    <td><UL>{% for derivation_dict in dict_of_derivation_dicts_that_use_feed[feed_dict['id']] %}
+      
+        <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
+      
+        {% endfor %}
+        </UL>
+    </td> <!-- used in derivation -->
     <td><UL>{% for symbol_id in symbol_IDs_per_feed_id[feed_dict['id']] %}
       
         <LI><a href="{{ url_for('to_edit_node', node_id=symbol_id) }}" title="see more about this symbol">

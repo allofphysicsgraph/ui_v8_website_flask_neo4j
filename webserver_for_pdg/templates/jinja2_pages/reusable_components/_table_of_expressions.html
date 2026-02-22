@@ -50,7 +50,13 @@
           {{ expression_dict['latex_lhs']|e }}  {{ expression_dict['latex_relation']|e }} {{ expression_dict['latex_rhs']|e }}</td>
     <td>{{ expression_dict['name_latex'] }}</td>
     <td>{{ expression_dict['description_latex'] }}</td>
-    <td>TODO</td> <!-- derivation -->
+    <td><UL>{% for derivation_dict in dict_of_derivation_dicts_that_use_expression[expression_dict['id']] %}
+      
+        <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
+      
+        {% endfor %}
+        </UL>
+    </td> <!-- used in derivation -->
     <td><UL>{% for symbol_dict in list_of_symbol_dicts_per_expression_id[expression_dict['id']] %}
         <LI><a href="{{ url_for('to_edit_node', node_id=symbol_dict['id']) }}" title="see more about this symbol">
              {{ symbol_dict['id'] }}</a>:  {{ symbol_dict['latex']|e }}</LI>
