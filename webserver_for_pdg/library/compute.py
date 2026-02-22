@@ -31,6 +31,8 @@ query_timing_result_type = NewType("query_timing_result_type", Dict[str, float])
 
 import logging
 
+# TODO: file created in `static` isn't persistent across restarts of the Docker image
+# Perhaps this should be in "dumpinggrounds" instead since that is persistent?
 shorten_url_file = "static/url_shorten_expand.csv"
 
 logger = logging.getLogger(__name__)
@@ -858,136 +860,136 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
     return list_of_symbol_IDs_in_expression_or_feed, query_time_dict
 
 
-def get_list_of_expression_dicts_that_use_symbol_id(
-    graphDB_Driver, query_time_dict: query_timing_result_type, symbol_id: str
-) -> Tuple[List[dict], Dict[str, float]]:
-    """
-    This helper function returns all expressions for any category, unlike
-    neo4j_query.get_dict_of_derivations_that_use_symbol_id_by_category
-    which requires category as input
+# def get_list_of_expression_dicts_that_use_symbol_id(
+#     graphDB_Driver, query_time_dict: query_timing_result_type, symbol_id: str
+# ) -> Tuple[List[dict], Dict[str, float]]:
+#     """
+#     This helper function returns all expressions for any category, unlike
+#     neo4j_query.get_dict_of_derivations_that_use_symbol_id_by_category
+#     which requires category as input
 
-    This cannot be combined with
-    get_list_of_derivations_that_use_symbol_id
-    because the cypher query is different
+#     This cannot be combined with
+#     get_list_of_derivations_that_use_symbol_id
+#     because the cypher query is different
 
-    >>>
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] start " + trace_id)
+#     >>>
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     logger.info("[TRACE] start " + trace_id)
 
-    list_of_expression_dicts = []  # type: List[dict]
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_expression_dicts += session.read_transaction(
-            neo4j_query.get_list_of_expression_dicts_that_use_symbol_id_by_category,
-            symbol_id,
-            "operation",
-        )
-        query_time_dict[
-            "compute/get_dict_of_expression_dicts_that_use_symbol_id: get_dict_of_expression_dicts_that_use_symbol_id_by_category operation"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_expression_dicts += session.read_transaction(
-            neo4j_query.get_list_of_expression_dicts_that_use_symbol_id_by_category,
-            symbol_id,
-            "scalar",
-        )
-        query_time_dict[
-            "compute/get_dict_of_expression_dicts_that_use_symbol_id: get_dict_of_expression_dicts_that_use_symbol_id_by_category scalar"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_expression_dicts += session.read_transaction(
-            neo4j_query.get_list_of_expression_dicts_that_use_symbol_id_by_category,
-            symbol_id,
-            "vector",
-        )
-        query_time_dict[
-            "compute/get_dict_of_expression_dicts_that_use_symbol_id: get_dict_of_expression_dicts_that_use_symbol_id_by_category vector"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_expression_dicts += session.read_transaction(
-            neo4j_query.get_list_of_expression_dicts_that_use_symbol_id_by_category,
-            symbol_id,
-            "matrix",
-        )
-        query_time_dict[
-            "compute/get_dict_of_expression_dicts_that_use_symbol_id: get_dict_of_expression_dicts_that_use_symbol_id_by_category matrix"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
+#     list_of_expression_dicts = []  # type: List[dict]
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         list_of_expression_dicts = session.read_transaction(
+#             neo4j_query.get_list_of_expression_dicts_that_use_symbol_id_by_category,
+#             ,
+#             "operation",
+#         )
+#         query_time_dict[
+#             "pdg_app/: get_dict_of_expression_dicts_that_use_symbol_id_by_category operation"
+#             + trace_id
+#         ] = round(time.time() - query_start_time, 3)
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         list_of_expression_dicts = session.read_transaction(
+#             neo4j_query.get_list_of_expression_dicts_that_use_symbol_id_by_category,
+#             ,
+#             "scalar",
+#         )
+#         query_time_dict[
+#             "pdg_app/: get_dict_of_expression_dicts_that_use_symbol_id_by_category scalar"
+#             + trace_id
+#         ] = round(time.time() - query_start_time, 3)
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         list_of_expression_dicts = session.read_transaction(
+#             neo4j_query.get_list_of_expression_dicts_that_use_symbol_id_by_category,
+#             ,
+#             "vector",
+#         )
+#         query_time_dict[
+#             "pdg_app/: get_dict_of_expression_dicts_that_use_symbol_id_by_category vector"
+#             + trace_id
+#         ] = round(time.time() - query_start_time, 3)
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         list_of_expression_dicts = session.read_transaction(
+#             neo4j_query.get_list_of_expression_dicts_that_use_symbol_id_by_category,
+#             ,
+#             "matrix",
+#         )
+#         query_time_dict[
+#             "pdg_app/: get_dict_of_expression_dicts_that_use_symbol_id_by_category matrix"
+#             + trace_id
+#         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] end " + trace_id)
-    return list_of_expression_dicts, query_time_dict
+#     logger.info("[TRACE] end " + trace_id)
+#     return list_of_expression_dicts, query_time_dict
 
 
-def get_list_of_derivation_dicts_that_use_symbol_id(
-    graphDB_Driver, query_time_dict: query_timing_result_type, symbol_id: str
-):
-    """
-    >>>
-    """
-    trace_id = str(random.randint(1000000, 9999999))
-    logger.info("[TRACE] start " + trace_id)
+# def get_list_of_derivation_dicts_that_use_symbol_id(
+#     graphDB_Driver, query_time_dict: query_timing_result_type, symbol_id: str
+# ):
+#     """
+#     >>>
+#     """
+#     trace_id = str(random.randint(1000000, 9999999))
+#     logger.info("[TRACE] start " + trace_id)
 
-    list_of_derivation_dicts = []  # type: List[dict]
+#     list_of_derivation_dicts = []  # type: List[dict]
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_derivation_dicts += session.read_transaction(
-            neo4j_query.get_list_of_derivation_dicts_that_use_symbol_id_by_category,
-            symbol_id,
-            "operation",
-        )
-        query_time_dict[
-            "compute/get_dict_of_derivation_dicts_that_use_symbol: derivations_that_use_symbol operation"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_derivation_dicts += session.read_transaction(
-            neo4j_query.get_list_of_derivation_dicts_that_use_symbol_id_by_category,
-            symbol_id,
-            "scalar",
-        )
-        query_time_dict[
-            "compute/get_dict_of_derivation_dicts_that_use_symbol: derivations_that_use_symbol scalar"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_derivation_dicts += session.read_transaction(
-            neo4j_query.get_list_of_derivation_dicts_that_use_symbol_id_by_category,
-            symbol_id,
-            "vector",
-        )
-        query_time_dict[
-            "compute/get_dict_of_derivation_dicts_that_use_symbol: derivations_that_use_symbol vector"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_derivation_dicts += session.read_transaction(
-            neo4j_query.get_list_of_derivation_dicts_that_use_symbol_id_by_category,
-            symbol_id,
-            "matrix",
-        )
-        query_time_dict[
-            "compute/get_dict_of_derivation_dicts_that_use_symbol: derivation_dicts_that_use_symbol matrix"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         list_of_derivation_dicts += session.read_transaction(
+#             neo4j_query.get_list_of_derivation_dicts_that_use_symbol_id_by_category,
+#             symbol_id,
+#             "operation",
+#         )
+#         query_time_dict[
+#             "compute/get_dict_of_derivation_dicts_that_use_symbol: derivations_that_use_symbol operation"
+#             + trace_id
+#         ] = round(time.time() - query_start_time, 3)
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         list_of_derivation_dicts += session.read_transaction(
+#             neo4j_query.get_list_of_derivation_dicts_that_use_symbol_id_by_category,
+#             symbol_id,
+#             "scalar",
+#         )
+#         query_time_dict[
+#             "compute/get_dict_of_derivation_dicts_that_use_symbol: derivations_that_use_symbol scalar"
+#             + trace_id
+#         ] = round(time.time() - query_start_time, 3)
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         list_of_derivation_dicts += session.read_transaction(
+#             neo4j_query.get_list_of_derivation_dicts_that_use_symbol_id_by_category,
+#             symbol_id,
+#             "vector",
+#         )
+#         query_time_dict[
+#             "compute/get_dict_of_derivation_dicts_that_use_symbol: derivations_that_use_symbol vector"
+#             + trace_id
+#         ] = round(time.time() - query_start_time, 3)
+#     with graphDB_Driver.session() as session:
+#         query_start_time = time.time()
+#         list_of_derivation_dicts += session.read_transaction(
+#             neo4j_query.get_list_of_derivation_dicts_that_use_symbol_id_by_category,
+#             symbol_id,
+#             "matrix",
+#         )
+#         query_time_dict[
+#             "compute/get_dict_of_derivation_dicts_that_use_symbol: derivation_dicts_that_use_symbol matrix"
+#             + trace_id
+#         ] = round(time.time() - query_start_time, 3)
 
-    # This will keep the last dictionary encountered for each ID.
-    list_of_unique_derivations = list(
-        {v["id"]: v for v in list_of_derivation_dicts}.values()
-    )
+#     # This will keep the last dictionary encountered for each ID.
+#     list_of_unique_derivations = list(
+#         {v["id"]: v for v in list_of_derivation_dicts}.values()
+#     )
 
-    logger.info("[TRACE] end " + trace_id)
-    return list_of_unique_derivations, query_time_dict
+#     logger.info("[TRACE] end " + trace_id)
+#     return list_of_unique_derivations, query_time_dict
 
 
 # def get_list_of_derivation_dicts_that_use_feed_id(
