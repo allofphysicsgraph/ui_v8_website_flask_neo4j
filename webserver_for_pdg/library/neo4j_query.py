@@ -201,7 +201,7 @@ def constrain_unique_id(tx) -> None:
     return
 
 
-def get_derivation_dicts_that_use_expression(tx: Transaction, expression_id: str):
+def get_derivations_that_use_expression(tx: Transaction, expression_id: str):
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
@@ -367,9 +367,7 @@ def get_all_symbol_IDs_in_feed(tx: Transaction, feed_id: str) -> List[str]:
     logger.info("[TRACE] start " + str(trace_id))
     logger.info("feed_id=" + feed_id)
 
-    query = (
-        "MATCH (f:feed)-[:HAS_SYMBOL]->(s:symbol) " "WHERE f.id = $id " "RETURN s.id"
-    )
+    query = "MATCH (f:feed)-[:HAS_SYMBOL]->(s:symbol) WHERE f.id = $id RETURN s.id"
     result = tx.run(query, id=feed_id)
     logger.info("[TRACE] end " + str(trace_id))
     return [record["s.id"] for record in result]
@@ -510,7 +508,164 @@ def get_count_nodes_of_type(tx: Transaction, node_type: str) -> int:
     return node_count
 
 
-def get_all_derivation_dicts_for_feeds(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_all_expressions_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    collect the 'e' nodes into a list for every unique 's'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
+    query = """
+    MATCH (e:expression)-[:HAS_SYMBOL]->(s:operation)
+    RETURN s.id AS operation_id, collect(DISTINCT e) AS expression_nodes
+    """
+    result = tx.run(query)
+
+    res_dict = {
+        record["operation_id"]: [dict(node) for node in record["expression_nodes"]]
+        for record in result
+    }
+    logger.info("res_dict=" + str(res_dict))
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return res_dict
+
+
+def get_all_expressions_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    collect the 'e' nodes into a list for every unique 's'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
+    query = """
+    MATCH (e:expression)-[:HAS_SYMBOL]->(r:relation)
+    RETURN r.id AS relation_id, collect(DISTINCT e) AS expression_nodes
+    """
+    result = tx.run(query)
+
+    res_dict = {
+        record["relation_id"]: [dict(node) for node in record["expression_nodes"]]
+        for record in result
+    }
+    logger.info("res_dict=" + str(res_dict))
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return res_dict
+
+
+def get_all_expressions_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    collect the 'e' nodes into a list for every unique 's'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
+    query = """
+    MATCH (e:expression)-[:HAS_SYMBOL]->(s:symbol)
+    RETURN s.id AS symbol_id, collect(DISTINCT e) AS expression_nodes
+    """
+    result = tx.run(query)
+
+    res_dict = {
+        record["symbol_id"]: [dict(node) for node in record["expression_nodes"]]
+        for record in result
+    }
+    logger.info("res_dict=" + str(res_dict))
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return res_dict
+
+
+def get_all_derivations_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    Then collect the 'd' nodes into a list for every unique 's'
+
+    if one derivation has three different steps that all link to the same symbol,
+    the MATCH pattern finds three separate paths. `collect(d)` then grabs the derivation
+    node once for every path it finds, resulting in three instances of the same node in your list.
+    `collect(DISTINCT d)` collapses those into one.
+
+    TODO: replace `HAS_SYMBOL` with `HAS_RELATION`
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
+    query = """
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(e:expression)-[:HAS_SYMBOL]->(r:relation)
+    RETURN r.id AS relation_id, collect(DISTINCT d) AS derivation_nodes
+    """
+    result = tx.run(query)
+
+    res_dict = {
+        record["relation_id"]: [dict(node) for node in record["derivation_nodes"]]
+        for record in result
+    }
+    logger.info("res_dict=" + str(res_dict))
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return res_dict
+
+
+def get_all_derivations_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    Then collect the 'd' nodes into a list for every unique 's'
+
+    if one derivation has three different steps that all link to the same symbol,
+    the MATCH pattern finds three separate paths. `collect(d)` then grabs the derivation
+    node once for every path it finds, resulting in three instances of the same node in your list.
+    `collect(DISTINCT d)` collapses those into one.
+
+    TODO: replace `HAS_SYMBOL` with `HAS_OPERATION`
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
+    query = """
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(e:expression)-[:HAS_SYMBOL]->(s:operation)
+    RETURN s.id AS operation_id, collect(DISTINCT d) AS derivation_nodes
+    """
+    result = tx.run(query)
+
+    res_dict = {
+        record["operation_id"]: [dict(node) for node in record["derivation_nodes"]]
+        for record in result
+    }
+    logger.info("res_dict=" + str(res_dict))
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return res_dict
+
+
+def get_all_derivations_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    Then collect the 'd' nodes into a list for every unique 's'
+
+    if one derivation has three different steps that all link to the same symbol,
+    the MATCH pattern finds three separate paths. `collect(d)` then grabs the derivation
+    node once for every path it finds, resulting in three instances of the same node in your list.
+    `collect(DISTINCT d)` collapses those into one.
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
+    query = """
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(e:expression)-[:HAS_SYMBOL]->(s:symbol)
+    RETURN s.id AS symbol_id, collect(DISTINCT d) AS derivation_nodes
+    """
+    result = tx.run(query)
+
+    res_dict = {
+        record["symbol_id"]: [dict(node) for node in record["derivation_nodes"]]
+        for record in result
+    }
+    logger.info("res_dict=" + str(res_dict))
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return res_dict
+
+
+def get_all_derivations_for_every_feed(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 'f'
     """
@@ -518,7 +673,7 @@ def get_all_derivation_dicts_for_feeds(tx) -> Dict[str, List[Dict[str, Any]]]:
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
-    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:USES_FEED]->(f:feed)
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:HAS_FEED]->(f:feed)
     RETURN f.id AS feed_id, collect(d) AS derivation_nodes
     """
     result = tx.run(query)
@@ -534,54 +689,65 @@ def get_all_derivation_dicts_for_feeds(tx) -> Dict[str, List[Dict[str, Any]]]:
     return res_dict
 
 
-def get_all_derivation_dicts_for_expressions(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_all_derivations_for_every_expression(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 'e'
+
+    if one derivation has three different steps that all link to the same expression,
+    the MATCH pattern finds three separate paths. `collect(d)` then grabs the derivation
+    node once for every path it finds, resulting in three instances of the same node in your list.
+    `collect(DISTINCT d)` collapses those into one.
+
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
-    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:USES_FEED]->(e:expression)
-    RETURN e.id AS expression_id, collect(d) AS derivation_nodes
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(e:expression)
+    RETURN e.id AS expression_id, collect(DISTINCT d) AS derivation_nodes
     """
     result = tx.run(query)
 
-    logger.info("[TRACE] end " + str(trace_id))
-    return {
+    res_dict = {
         record["expression_id"]: [dict(node) for node in record["derivation_nodes"]]
         for record in result
     }
+    logger.info("res_dict=" + str(res_dict))
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return res_dict
 
 
-# def get_derivation_dicts_that_use_feed(tx: Transaction, feed_id: str) -> List[Dict[str, Any]]:
-#     """ """
-#     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] start " + str(trace_id))
-#     logger.info("feed_id=" + feed_id)
+def get_derivations_that_use_feed(
+    tx: Transaction, feed_id: str
+) -> List[Dict[str, Any]]:
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("feed_id=" + feed_id)
 
-#     # # TODO: this should be derivation->step->feed
-#     # list_of_derivation_dicts = []  # type: List[dict]
-#     # for result in tx.run(
-#     #     'MATCH (d:derivation)-[]->(s:step)-[]->(f:feed) WHERE f.id = "'
-#     #     + str(feed_id)
-#     #     + '" RETURN d'
-#     # ):
-#     #     list_of_derivation_dicts.append(result.data()["d"])
+    # # TODO: this should be derivation->step->feed
+    # list_of_derivation_dicts = []  # type: List[dict]
+    # for result in tx.run(
+    #     'MATCH (d:derivation)-[]->(s:step)-[]->(f:feed) WHERE f.id = "'
+    #     + str(feed_id)
+    #     + '" RETURN d'
+    # ):
+    #     list_of_derivation_dicts.append(result.data()["d"])
 
-#     query = """
-#     MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:USES_FEED]->(f:feed)
-#     WHERE f.id = $feed_id
-#     RETURN d
-#     """
+    query = """
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:HAS_FEED]->(f:feed)
+    WHERE f.id = $feed_id
+    RETURN d
+    """
 
-#     # Use parameters, specify specific relationships if possible
-#     result = tx.run(query, feed_id=feed_id)
+    # Use parameters, specify specific relationships if possible
+    result = tx.run(query, feed_id=feed_id)
 
-#     logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
 
-#     # list comprehension convert Node objects to dicts directly
-#     return [dict(record["d"]) for record in result]
+    # list comprehension convert Node objects to dicts directly
+    return [dict(record["d"]) for record in result]
 
 
 def get_derivations_that_use_inference_rule(
@@ -617,9 +783,7 @@ def get_derivations_that_use_inference_rule(
     return list_of_derivation_dicts
 
 
-def get_list_of_expression_dicts_that_use_symbol_id_by_category(
-    tx, symbol_id: str, symbol_category: str
-) -> List[Dict[str, Any]]:
+def get_all_expressions_that_use_symbol(tx, symbol_id: str) -> List[Dict[str, Any]]:
     """
     which expressions contain this symbol?
 
@@ -647,11 +811,11 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(
     # ):
     #     list_of_expression_dicts.append(result.data()["e"])
 
-    query = (
-        f"MATCH (e:expression)-[]->(s:{symbol_category}) "
-        "WHERE s.id = $sid "
-        "RETURN e"
-    )
+    query = """
+        MATCH (e:expression)-[]->(s:symbol) 
+        WHERE s.id = $sid 
+        RETURN e
+    """
 
     # Use parameters ($sid) for values to prevent Cypher Injection
     result = tx.run(query, sid=symbol_id)
@@ -662,46 +826,29 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(
     return list_of_expression_dicts
 
 
-def get_list_of_derivation_dicts_that_use_symbol_id_by_category(
-    tx, symbol_id: str, symbol_category: str
+def get_all_derivations_that_use_symbol(
+    tx,
+    symbol_id: str,
 ) -> list:
     """
     which derivations contain this symbol?
 
     Returns a list of derivation dictionaries that contain a specific symbol.
-
-    >>> derivations_that_use_symbol()
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
 
-    logger.info("symbol_category=" + symbol_category)
-    assert symbol_category in list_of_valid.symbol_categories
-
-    list_of_derivation_dicts = []  # type: List[dict]
-
-    # # TODO: should be derivation->step->expression->symbol
-    # for result in tx.run(
-    #     "MATCH (d:derivation)-[]->(:step)-[]->(:expression)-[]->(s:"
-    #     + symbol_category
-    #     + ") WHERE s.id = '"
-    #     + str(symbol_id)
-    #     + "' RETURN d"
-    # ):
-    #     list_of_derivation_dicts.append(result.data()["d"])
-
-    # Labels cannot be parameterized in Cypher, so we use an f-string
-    # for the label but parameters for the ID.
-    query = (
-        f"MATCH (d:derivation)-[]->(:step)-[]->(:expression)"
-        f"-[:HAS_SYMBOL]->(s:{symbol_category}) "
-        "WHERE s.id = $symbol_id "
-        "RETURN d"
-    )
+    query = """
+        MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(:expression)-[:HAS_SYMBOL]->(s:symbol) 
+        WHERE s.id = $symbol_id 
+        RETURN d
+    """
 
     result = tx.run(query, symbol_id=symbol_id)
 
     list_of_derivation_dicts = [record["d"] for record in result]
+
+    logger.info("list_of_derivation_dicts=" + str(list_of_derivation_dicts))
 
     logger.info("[TRACE] end " + str(trace_id))
     return list_of_derivation_dicts
@@ -2161,7 +2308,7 @@ def add_matrix_symbol(
         #     ' id:"' + str(symbol_id) + '"})'
         # )
         query = """
-            MERGE (m:matrix {id: $id})
+            MERGE (m:matrix:symbol {id: $id})
             ON CREATE SET
                 m.created_datetime = $created_datetime,
                 m.name_latex = $name_latex,
