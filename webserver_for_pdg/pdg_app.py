@@ -2432,12 +2432,6 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         graphDB_Driver, query_time_dict
     )
 
-    # list_of_symbol_IDs_in_feed, query_time_dict = (
-    #     compute.get_list_of_symbol_IDs_in_expression_or_feed(
-    #         graphDB_Driver, query_time_dict, "feed", feed_id
-    #     )
-    # )
-
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_symbol_IDs_in_feed = session.read_transaction(
@@ -2692,11 +2686,6 @@ def to_add_expression() -> werkzeug.Response:
             graphDB_Driver, query_time_dict
         )
     )
-
-    # logger.info(
-    #     "dimensional_consistency_per_expression_id="
-    #     + str(dimensional_consistency_per_expression_id)
-    # )
 
     # Used in _table_of_expressions.html which is referenced in expression_create.html
     sympy_as_latex_per_expr_id = compute.get_sympy_as_latex_per_expr_id(
@@ -3591,16 +3580,6 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
         dict_of_expression_dicts_that_use_scalar[this_scalar_dict["id"]] = (
             list_of_expression_dicts
         )
-    #     (
-    #         dict_of_expression_dicts_that_use_scalar[this_scalar_dict["id"]],
-    #         query_time_dict,
-    #     ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
-    #         graphDB_Driver, query_time_dict, this_scalar_dict["id"]
-    #     )
-    # logger.info(
-    #     "dict_of_expression_dicts_that_use_scalar="
-    #     + str(dict_of_expression_dicts_that_use_scalar)
-    # )
 
     dict_of_derivation_dicts_that_use_scalar = {}  # type: Dict[str,list]
     for this_scalar_dict in list_of_scalar_dicts:
@@ -3618,12 +3597,6 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
         dict_of_derivation_dicts_that_use_scalar[this_scalar_dict["id"]] = (
             list_of_derivation_dicts
         )
-        # (
-        #     dict_of_derivation_dicts_that_use_scalar[this_scalar_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_scalar_dict["id"]
-        # )
 
     dict_of_derivations_that_use_scalar = {}  # type: Dict[str,list]
     for (
@@ -3777,12 +3750,6 @@ def to_add_symbol_scalar() -> werkzeug.Response:
         dict_of_expression_dicts_that_use_scalar[this_scalar_dict["id"]] = (
             list_of_expression_dicts
         )
-        # (
-        #     dict_of_expression_dicts_that_use_scalar[this_scalar_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_scalar_dict["id"]
-        # )
 
     dict_of_derivation_dicts_that_use_scalar = {}  # type: Dict[str,list]
     for this_scalar_dict in list_of_scalar_dicts:
@@ -3800,12 +3767,6 @@ def to_add_symbol_scalar() -> werkzeug.Response:
         dict_of_derivation_dicts_that_use_scalar[this_scalar_dict["id"]] = (
             list_of_derivation_dicts
         )
-        # (
-        #     dict_of_derivation_dicts_that_use_scalar[this_scalar_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_scalar_dict["id"]
-        # )
 
     dict_of_derivations_that_use_scalar = {}  # type: Dict[str,list]
     for (
@@ -3870,12 +3831,6 @@ def to_add_symbol_vector() -> werkzeug.Response:
         dict_of_expression_dicts_that_use_vector[this_vector_dict["id"]] = (
             list_of_expression_dicts
         )
-        # (
-        #     dict_of_expression_dicts_that_use_vector[this_vector_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_vector_dict["id"]
-        # )
 
     dict_of_derivation_dicts_that_use_vector = {}  # type: Dict[str,list]
     for this_vector_dict in list_of_vector_dicts:
@@ -3893,12 +3848,6 @@ def to_add_symbol_vector() -> werkzeug.Response:
         dict_of_derivation_dicts_that_use_vector[this_vector_dict["id"]] = (
             list_of_derivation_dicts
         )
-        # (
-        #     dict_of_derivation_dicts_that_use_vector[this_vector_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_vector_dict["id"]
-        # )
 
     web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
 
@@ -4009,12 +3958,6 @@ def to_add_symbol_matrix() -> werkzeug.Response:
         dict_of_expression_dicts_that_use_matrix[this_matrix_dict["id"]] = (
             list_of_expression_dicts
         )
-        # (
-        #     dict_of_expression_dicts_that_use_matrix[this_matrix_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_matrix_dict["id"]
-        # )
 
     dict_of_derivation_dicts_that_use_matrix = {}  # type: Dict[str,list]
     for this_matrix_dict in list_of_matrix_dicts:
@@ -4032,12 +3975,6 @@ def to_add_symbol_matrix() -> werkzeug.Response:
         dict_of_derivation_dicts_that_use_matrix[this_matrix_dict["id"]] = (
             list_of_derivation_dicts
         )
-        # (
-        #     dict_of_derivation_dicts_that_use_matrix[this_matrix_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_matrix_dict["id"]
-        # )
 
     web_form_matrix_properties = SpecifyNewSymbolMatrixForm(request.form)
 
@@ -4160,13 +4097,6 @@ def to_add_operation() -> werkzeug.Response:
             list_of_expression_dicts
         )
 
-        # (
-        #     list_of_expression_dicts,
-        #     query_time_dict,
-        # ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_operation_dict["id"]
-        # )
-
     dict_of_derivation_dicts_that_use_operation = {}  # type: Dict[str,list]
     for this_operation_dict in list_of_operation_dicts:
         with graphDB_Driver.session() as session:
@@ -4183,12 +4113,6 @@ def to_add_operation() -> werkzeug.Response:
         dict_of_derivation_dicts_that_use_operation[this_operation_dict["id"]] = (
             list_of_derivation_dicts
         )
-        # (
-        #     dict_of_derivation_dicts_that_use_operation[this_operation_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_operation_dict["id"]
-        # )
 
     web_form = SpecifyNewSymbolOperationForm(request.form)
 
@@ -4283,12 +4207,6 @@ def to_add_relation() -> werkzeug.Response:
         dict_of_expression_dicts_that_use_relation[this_relation_dict["id"]] = (
             list_of_expression_dicts
         )
-        # (
-        #     list_of_expression_dicts,
-        #     query_time_dict,
-        # ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_relation_dict["id"]
-        # )
 
     dict_of_derivation_dicts_that_use_relation = {}  # type: Dict[str,list]
     for this_relation_dict in list_of_relation_dicts:
@@ -4306,12 +4224,6 @@ def to_add_relation() -> werkzeug.Response:
         dict_of_derivation_dicts_that_use_relation[this_relation_dict["id"]] = (
             list_of_derivation_dicts
         )
-        # (
-        #     dict_of_derivation_dicts_that_use_relation[this_relation_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_relation_dict["id"]
-        # )
 
     logger.info("before validate - request.form = " + str(request.form))
     web_form = SpecifyNewSymbolRelationForm(request.form)
@@ -4603,10 +4515,21 @@ def to_add_symbols_and_operations_for_expression(
         ] = round(time.time() - query_start_time, 3)
     logger.info("expression_dict=" + str(expression_dict))
 
-    list_of_symbol_dicts, query_time_dict = compute.get_list_of_all_symbol_dicts(
-        graphDB_Driver, query_time_dict
-    )
-    logger.info("list_of_symbols" + str(list_of_symbol_dicts))
+    # list_of_symbol_dicts, query_time_dict = compute.get_list_of_all_symbol_dicts(
+    #     graphDB_Driver, query_time_dict
+    # )
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_symbol_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "symbol"
+        )
+        query_time_dict[
+            "pdg_app/to_add_symbols_and_operations_for_expression, get_list_node_dicts_of_type symbol "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    # logger.info("list_of_symbols" + str(list_of_symbol_dicts))
 
     # The naive option would be to return to the user the complete list of
     # symbols and then ask the user to select relevant symbols.
@@ -5118,12 +5041,22 @@ def to_add_symbols_and_operations_for_feed(
         ] = round(time.time() - query_start_time, 3)
     logger.info("symbols_and_operations_for_feed: feed_dict=" + str(feed_dict))
 
-    list_of_symbol_dicts, query_time_dict = compute.get_list_of_all_symbol_dicts(
-        graphDB_Driver, query_time_dict
-    )
-    logger.info(
-        "symbols_and_operations_for_feed: list_of_symbols" + str(list_of_symbol_dicts)
-    )
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_symbol_dicts = session.read_transaction(
+            neo4j_query.get_list_node_dicts_of_type, "symbol"
+        )
+        query_time_dict[
+            "pdg_app/to_add_symbols_and_operations_for_feed, get_list_node_dicts_of_type symbol "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    # list_of_symbol_dicts, query_time_dict = compute.get_list_of_all_symbol_dicts(
+    #     graphDB_Driver, query_time_dict
+    # )
+    # logger.info(
+    #     "symbols_and_operations_for_feed: list_of_symbols" + str(list_of_symbol_dicts)
+    # )
 
     # The naive option would be to return to the user the complete list of
     # symbols and then ask the user to select relevant symbols.
@@ -6154,12 +6087,6 @@ def to_list_operations() -> werkzeug.Response:
         dict_of_expression_dicts_that_use_operation[this_operation_dict["id"]] = (
             list_of_expression_dicts
         )
-        # (
-        #     dict_of_expression_dicts_that_use_operation[this_operation_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_operation_dict["id"]
-        # )
 
     dict_of_derivation_dicts_that_use_operation = {}  # type: Dict[str,list]
     for this_operation_dict in list_of_operation_dicts:
@@ -6178,13 +6105,6 @@ def to_list_operations() -> werkzeug.Response:
         dict_of_derivation_dicts_that_use_operation[this_operation_dict["id"]] = (
             list_of_derivation_dicts
         )
-
-        # (
-        #     ,
-        #     query_time_dict,
-        # ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_operation_dict["id"]
-        # )
 
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
@@ -6237,12 +6157,6 @@ def to_list_relations() -> werkzeug.Response:
         dict_of_expression_dicts_that_use_relation[this_relation_dict["id"]] = (
             list_of_expression_dicts
         )
-        # (
-        #     dict_of_expression_dicts_that_use_relation[this_relation_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_relation_dict["id"]
-        # )
 
     dict_of_derivation_dicts_that_use_relation = {}  # type: Dict[str,list]
     for this_relation_dict in list_of_relation_dicts:
@@ -6260,12 +6174,6 @@ def to_list_relations() -> werkzeug.Response:
         dict_of_derivation_dicts_that_use_relation[this_relation_dict["id"]] = (
             list_of_derivation_dicts
         )
-        # (
-        #     dict_of_derivation_dicts_that_use_relation[this_relation_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_relation_dict["id"]
-        # )
 
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
@@ -6431,16 +6339,6 @@ def to_list_scalars() -> str:
         dict_of_expression_dicts_that_use_scalar[this_scalar_dict["id"]] = (
             list_of_expression_dicts
         )
-        # (
-        #     dict_of_expression_dicts_that_use_scalar[this_scalar_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_scalar_dict["id"]
-        # )
-    # logger.info(
-    #     "dict_of_expression_dicts_that_use_scalar="
-    #     + str(dict_of_expression_dicts_that_use_scalar)
-    # )
 
     dict_of_derivation_dicts_that_use_scalar = {}  # type: Dict[str,list]
     for this_scalar_dict in list_of_scalar_dicts:
@@ -6458,20 +6356,12 @@ def to_list_scalars() -> str:
 
         # This will keep the last dictionary encountered for each ID.
         list_of_derivation_dicts = list(
-            {
-                v["id"]: v for v in list_of_derivation_dicts
-            }.values()
+            {v["id"]: v for v in list_of_derivation_dicts}.values()
         )
 
         dict_of_derivation_dicts_that_use_scalar[this_scalar_dict["id"]] = (
             list_of_derivation_dicts
         )
-        # (
-        #     dict_of_derivation_dicts_that_use_scalar[this_scalar_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_scalar_dict["id"]
-        # )
 
     dict_of_derivations_that_use_scalar = {}  # type: Dict[str,list]
     for (
@@ -6538,12 +6428,6 @@ def to_list_vectors() -> str:
         dict_of_expression_dicts_that_use_vector[this_vector_dict["id"]] = (
             list_of_expression_dicts
         )
-        # (
-        #     dict_of_expression_dicts_that_use_vector[this_vector_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_vector_dict["id"]
-        # )
 
     dict_of_derivation_dicts_that_use_vector = {}  # type: Dict[str,list]
     for this_vector_dict in list_of_vector_dicts:
@@ -6562,21 +6446,12 @@ def to_list_vectors() -> str:
 
         # This will keep the last dictionary encountered for each ID.
         list_of_derivation_dicts = list(
-            {
-                v["id"]: v for v in list_of_derivation_dicts
-            }.values()
+            {v["id"]: v for v in list_of_derivation_dicts}.values()
         )
 
         dict_of_derivation_dicts_that_use_vector[this_vector_dict["id"]] = (
             list_of_derivation_dicts
         )
-
-        # (
-        #     dict_of_derivation_dicts_that_use_vector[this_vector_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_vector_dict["id"]
-        # )
 
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
@@ -6627,13 +6502,6 @@ def to_list_matrices() -> str:
             list_of_expression_dicts
         )
 
-        # (
-        #     dict_of_expression_dicts_that_use_matrix[this_matrix_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_expression_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_matrix_dict["id"]
-        # )
-
     dict_of_derivation_dicts_that_use_matrix = {}  # type: Dict[str,list]
     for this_matrix_dict in list_of_matrix_dicts:
         with graphDB_Driver.session() as session:
@@ -6650,12 +6518,6 @@ def to_list_matrices() -> str:
         dict_of_derivation_dicts_that_use_matrix[this_matrix_dict["id"]] = (
             list_of_derivation_dicts
         )
-        # (
-        #     dict_of_derivation_dicts_that_use_matrix[this_matrix_dict["id"]],
-        #     query_time_dict,
-        # ) = compute.get_list_of_derivation_dicts_that_use_symbol_id(
-        #     graphDB_Driver, query_time_dict, this_matrix_dict["id"]
-        # )
 
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
