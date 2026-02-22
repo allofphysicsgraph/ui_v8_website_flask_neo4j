@@ -103,7 +103,7 @@ def apoc_export_csv(tx: Transaction, output_filename: str) -> dict:
     return record.data() if record else {}
 
 
-def apoc_export_graphml(tx, output_filename: str):
+def apoc_export_graphml(tx: Transaction, output_filename: str):
     """
     https://neo4j.com/docs/apoc/current/overview/apoc.export/
     """
@@ -117,7 +117,7 @@ def apoc_export_graphml(tx, output_filename: str):
     return result
 
 
-def apoc_export_json(tx, output_filename: str):
+def apoc_export_json(tx: Transaction, output_filename: str):
     """
     https://neo4j.com/labs/apoc/4.4/overview/apoc.export/apoc.export.json.all/
 
@@ -141,7 +141,7 @@ def apoc_export_json(tx, output_filename: str):
     return result
 
 
-def apoc_export_cypher(tx, output_filename: str):
+def apoc_export_cypher(tx: Transaction, output_filename: str):
     """
     https://neo4j.com/labs/apoc/4.4/export/cypher/
 
@@ -201,7 +201,31 @@ def constrain_unique_id(tx) -> None:
     return
 
 
-def get_relation_latex(tx, relation_id: str):
+def get_derivation_dicts_that_use_expression(tx: Transaction, expression_id: str):
+    """ """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
+    logger.info("expression_id=" + expression_id)
+
+    result = tx.run(
+        """
+    MATCH (d:derivation)-[:HAS_STEP]->(s:step)-[:HAS_EXPRESSION]->(e:expression)
+    WHERE e.id = $expressionID
+    RETURN d
+    """,
+        expressionID=expression_id,
+    )
+
+    list_of_dicts = result.data()
+
+    logger.info("list_of_dicts=" + str(list_of_dicts))
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return list_of_dicts
+
+
+def get_relation_latex(tx: Transaction, relation_id: str):
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
@@ -226,7 +250,7 @@ def get_relation_latex(tx, relation_id: str):
     return relation_latex
 
 
-def get_scalar_id_that_has_value_and_units_id(tx, value_and_units_id: str):
+def get_scalar_id_that_has_value_and_units_id(tx: Transaction, value_and_units_id: str):
     """
     >>>
     """
@@ -279,7 +303,9 @@ def get_list_of_symbol_dicts_for_every_expression(
     return symbol_map
 
 
-def get_list_of_symbol_dicts_for_expression(tx, expression_id: str) -> List[dict]:
+def get_list_of_symbol_dicts_for_expression(
+    tx: Transaction, expression_id: str
+) -> List[dict]:
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
@@ -299,7 +325,7 @@ def get_list_of_symbol_dicts_for_expression(tx, expression_id: str) -> List[dict
     return symbol_list
 
 
-def get_all_symbol_IDs_in_expression(tx, expression_id: str) -> List[str]:
+def get_all_symbol_IDs_in_expression(tx: Transaction, expression_id: str) -> List[str]:
     """match (s:symbol) because nodes are created with multiple labels (e.g. :symbol:scalar)"""
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
@@ -335,10 +361,12 @@ def get_all_symbol_IDs_in_every_feed(tx):
     return result
 
 
-def get_all_symbol_IDs_in_feed(tx, feed_id: str) -> List[str]:
+def get_all_symbol_IDs_in_feed(tx: Transaction, feed_id: str) -> List[str]:
     """match (s:symbol) because nodes are created with multiple labels (e.g. :symbol:scalar)"""
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
+    logger.info("feed_id=" + feed_id)
+
     query = (
         "MATCH (f:feed)-[:HAS_SYMBOL]->(s:symbol) " "WHERE f.id = $id " "RETURN s.id"
     )
@@ -405,7 +433,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     return [record["s.id"] for record in result]
 
 
-# def symbols_in_feed(tx, feed_id: str, symbol_category: str) -> list:
+# def symbols_in_feed(tx: Transaction, feed_id: str, symbol_category: str) -> list:
 #     """
 #     a feed has one or more sybmols
 #     This read query returns which symbol IDs are used for the provided feed ID
@@ -435,7 +463,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
 #     return symbol_list
 
 
-def get_list_node_dicts_of_type(tx, node_type: str) -> list:
+def get_list_node_dicts_of_type(tx: Transaction, node_type: str) -> list:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a list of all nodes
@@ -459,7 +487,7 @@ def get_list_node_dicts_of_type(tx, node_type: str) -> list:
     return node_list
 
 
-def get_count_nodes_of_type(tx, node_type: str) -> int:
+def get_count_nodes_of_type(tx: Transaction, node_type: str) -> int:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a count of all nodes
@@ -484,7 +512,6 @@ def get_count_nodes_of_type(tx, node_type: str) -> int:
 
 def get_all_derivation_dicts_for_feeds(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
-    match feeds found in the provided list
     Then collect the 'd' nodes into a list for every unique 'f'
     """
     trace_id = str(random.randint(1000000, 9999999))
@@ -496,14 +523,38 @@ def get_all_derivation_dicts_for_feeds(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     result = tx.run(query)
 
-    logger.info("[TRACE] end " + str(trace_id))
-    return {
+    res_dict = {
         record["feed_id"]: [dict(node) for node in record["derivation_nodes"]]
         for record in result
     }
 
+    logger.info("res_dict=" + str(res_dict))
 
-# def get_derivation_dicts_that_use_feed(tx, feed_id: str) -> List[Dict[str, Any]]:
+    logger.info("[TRACE] end " + str(trace_id))
+    return res_dict
+
+
+def get_all_derivation_dicts_for_expressions(tx) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    Then collect the 'd' nodes into a list for every unique 'e'
+    """
+    trace_id = str(random.randint(1000000, 9999999))
+    logger.info("[TRACE] start " + str(trace_id))
+
+    query = """
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:USES_FEED]->(e:expression)
+    RETURN e.id AS expression_id, collect(d) AS derivation_nodes
+    """
+    result = tx.run(query)
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return {
+        record["expression_id"]: [dict(node) for node in record["derivation_nodes"]]
+        for record in result
+    }
+
+
+# def get_derivation_dicts_that_use_feed(tx: Transaction, feed_id: str) -> List[Dict[str, Any]]:
 #     """ """
 #     trace_id = str(random.randint(1000000, 9999999))
 #     logger.info("[TRACE] start " + str(trace_id))
@@ -533,7 +584,9 @@ def get_all_derivation_dicts_for_feeds(tx) -> Dict[str, List[Dict[str, Any]]]:
 #     return [dict(record["d"]) for record in result]
 
 
-def get_derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
+def get_derivations_that_use_inference_rule(
+    tx: Transaction, inference_rule_id: str
+) -> list:
     """
     which derivations contain this inference rule?
 
@@ -654,7 +707,7 @@ def get_list_of_derivation_dicts_that_use_symbol_id_by_category(
     return list_of_derivation_dicts
 
 
-def get_list_of_value_dicts_for_constant_id(tx, scalar_id: str) -> list:
+def get_list_of_value_dicts_for_constant_id(tx: Transaction, scalar_id: str) -> list:
     """
     >>>
     """
@@ -687,7 +740,9 @@ def get_number_of_steps_per_derivation(tx) -> dict:
     return {record["derivation_id"]: record["step_count"] for record in result}
 
 
-def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
+def get_list_of_step_dicts_in_this_derivation(
+    tx: Transaction, derivation_id: str
+) -> list:
     """
     For a given derivation, what are all the associated step IDs?
 
@@ -709,13 +764,13 @@ def get_list_of_step_dicts_in_this_derivation(tx, derivation_id: str) -> list:
     return list_of_step_dicts
 
 
-def get_list_of_symbol_IDs_per_derivation(tx, derivation_id: str):
+def get_list_of_symbol_IDs_per_derivation(tx: Transaction, derivation_id: str):
     """ """
     # TODO
     return list_of_symbol_IDs
 
 
-def get_step_has_sequence_index(tx, step_id: str) -> int:
+def get_step_has_sequence_index(tx: Transaction, step_id: str) -> int:
     """
     >>> step_has_sequence_index()
     """
@@ -735,7 +790,7 @@ def get_step_has_sequence_index(tx, step_id: str) -> int:
     return sequence_index
 
 
-def get_step_has_inference_rule(tx, step_id: str):
+def get_step_has_inference_rule(tx: Transaction, step_id: str):
     """
     use case: when displaying a derivation, user wants to see inference rule per step
 
@@ -764,7 +819,7 @@ def get_step_has_inference_rule(tx, step_id: str):
     return inf_rule_list_of_dicts[0]["m"]
 
 
-def get_derivation_id_from_step_id(tx, step_id: str) -> str:
+def get_derivation_id_from_step_id(tx: Transaction, step_id: str) -> str:
     """
     >>>
     """
@@ -857,7 +912,7 @@ def get_list_of_expression_dicts_from_step_id_and_expr_type(
     return list_of_expression_dicts
 
 
-def get_node_properties(tx, node_type: str, node_id: str) -> dict:
+def get_node_properties(tx: Transaction, node_type: str, node_id: str) -> dict:
     """
     metadata associated with the node_id
 
@@ -1137,7 +1192,7 @@ def edit_derivation_metadata(
     return
 
 
-def disconnect_step_from_inference_rule(tx, step_id: str) -> None:
+def disconnect_step_from_inference_rule(tx: Transaction, step_id: str) -> None:
     """
     called by "delete derivation"
 
@@ -1159,7 +1214,7 @@ def disconnect_step_from_inference_rule(tx, step_id: str) -> None:
     return
 
 
-def delete_node(tx, node_id: str, node_type) -> None:
+def delete_node(tx: Transaction, node_id: str, node_type) -> None:
     """
     called by "delete derivation"
 
@@ -1249,7 +1304,9 @@ def disconnect_symbol_from_feed(
     return
 
 
-def get_node_labels_from_property(tx, property_key: str, property_value: str):
+def get_node_labels_from_property(
+    tx: Transaction, property_key: str, property_value: str
+):
     """ """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE]  start " + str(trace_id))
@@ -1331,7 +1388,9 @@ def add_symbol_to_expression_or_feed(
     return
 
 
-def get_list_of_sequence_values_for_derivation_id(tx, derivation_id: str) -> list:
+def get_list_of_sequence_values_for_derivation_id(
+    tx: Transaction, derivation_id: str
+) -> list:
     """
     sequence value is a positive integer for ordering the steps of a derivation
     """
@@ -2320,13 +2379,13 @@ def delete_all_nodes_and_relationships(tx) -> None:
     return
 
 
-def user_query(tx, query: str) -> list:
+def user_query(tx: Transaction, query: str) -> list:
     """
     User-submitted Cypher query for Neo4j database
 
     Read-only for Neo4j database
 
-    >>> user_query(tx, "test")
+    >>> user_query(tx: Transaction, "test")
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
