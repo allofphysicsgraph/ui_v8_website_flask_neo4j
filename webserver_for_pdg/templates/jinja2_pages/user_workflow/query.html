@@ -367,6 +367,22 @@ MATCH (d:derivation)-[:HAS_STEP]->(s:step)-[:HAS_INPUT|HAS_OUTPUT]->(e:expressio
 MATCH (n), (m) WHERE id(n) < id(m) MATCH p = shortestPath((n)-[*]-(m)) RETURN p, length(p) AS distance ORDER BY distance DESC LIMIT 1</a></TD>
     <TD></TD>
   </TR>
+  <TR>
+    <TD id="everything connected to node with this ID">everything connected to node with this ID
+      <a href="#everything connected to node with this ID">#</a></TD>
+    <TD><a href="{{ url_for('to_query') }}?cypher=MATCH (n {id: '{{derivation_id}}'}) OPTIONAL MATCH (n)-[r]-(connected) RETURN n, r, connected">
+MATCH (n {id: '{{derivation_id}}'}) OPTIONAL MATCH (n)-[r]-(connected) RETURN n, r, connected</a>
+    </TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD id="everything within 2 hops of nodes with this ID">everything within 2 hops of nodes with this ID
+      <a href="#everything within 2 hops of nodes with this ID">#</a></TD>
+    <TD><a href="{{ url_for('to_query') }}?cypher=MATCH path = (n {id: '{{derivation_id}}'})-[*1..2]-(connected) RETURN path">
+MATCH path = (n {id: '{{derivation_id}}'})-[*1..2]-(connected) RETURN path</a>
+    </TD>
+    <TD></TD>
+  </TR>
 </table>
 <P><a href="https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887">cheatsheet</a></P>
 
