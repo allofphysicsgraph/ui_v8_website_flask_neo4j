@@ -409,7 +409,7 @@ def to_api_via_js() -&gt; str:
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id="data structure"><i>Decision</i>: Which data structure to use in the Physics Derivation Graph</a></H2>
+<H2 id="data structure"><i>Decision</i>: Which data structure to use in the Physics Derivation Graph</H2>
 
 <P><em>current status</em>: the Physics Derivation Graph is stored in a Neo4j Property Graph database.</P>
 
@@ -418,6 +418,33 @@ Not clear whether the site could just be using Neo4j directly by the web UI. </P
 
 <P>
   The many alternatives data storage options (e.g., SQLite, Redis, Python Pickle, CSV, GraphML) offer trade-offs, a few of which <a href="{{ url_for('to_comparison_of_design_options_database') }}?referrer=design_documentation">have been explored</a>.
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id="distinct nodes"><I>Decision</I>: Why are there different node type?</H2>
+
+<P>In neo4j_query.py there are many node types:
+<UL>
+  <LI>:operation</LI>
+  <LI>:relation</LI>
+  <LI>:scalar:symbol</LI>
+  <LI>:vector:symbol</LI>
+  <LI>:matrix:symbol</LI>
+  <LI>:quantum_operator</LI>
+  <LI>:value_with_units</LI>
+  <LI>:feed</LI>
+  <LI>:expression</LI>
+</UL>
+
+<P>The motive for having distinct node types is each has a specific set of property keys. The property keys of :scalar are different from the property keys relevant to :matrix.
+
+<P>The :scalar, :vector, :matrix nodes are grouped under :symbol. 
+  There's an argument to be made that another hierarchical layer would be :operation, :relation, :quantum_operator, :value_with_units, :symbol. 
+  Not clear what that grouping would be called. "Things that appear in expressions and feeds" is too long.
+
+<P>A counter-proposal would be that :operation, :relation, and :quantum_operator should be nested under :symbol. Currently those nodes are connected to :expression and :feed by :HAS_SYMBOL (rather than :HAS_RELATION and :HAS_OPERATION).
 
 <P>&nbsp;</P>
 <HR/>
