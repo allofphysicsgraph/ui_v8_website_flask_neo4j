@@ -392,12 +392,12 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
 
     result = tx.run(query, id=expression_or_feed_id)
 
-    logger.info(
-        "expression_or_feed_id="
-        + str(expression_or_feed_id)
-        + "symbol_list="
-        + str(symbol_list)
-    )
+    # logger.info(
+    #     "expression_or_feed_id="
+    #     + str(expression_or_feed_id)
+    #     + "symbol_list="
+    #     + str(symbol_list)
+    # )
 
     logger.info("[TRACE] end " + str(trace_id))
 
@@ -566,9 +566,12 @@ def get_derivations_that_use_inference_rule(tx, inference_rule_id: str) -> list:
 
 def get_list_of_expression_dicts_that_use_symbol_id_by_category(
     tx, symbol_id: str, symbol_category: str
-) -> list:
+) -> List[Dict[str, Any]]:
     """
     which expressions contain this symbol?
+
+    Returns a list of expression nodes that are connected to a symbol
+    of a specific category and ID.
 
     >>> expressions_that_use_symbol()
     """
@@ -576,22 +579,31 @@ def get_list_of_expression_dicts_that_use_symbol_id_by_category(
     logger.info("[TRACE] start " + str(trace_id))
 
     logger.info("symbol_category=" + str(symbol_category))
+    logger.info("symbol_id = " + symbol_id)
 
     assert symbol_category in list_of_valid.symbol_categories
 
     list_of_expression_dicts = []  # type: List[dict]
 
-    for result in tx.run(
-        "MATCH (e:expression)-[r]->(s:"
-        + symbol_category
-        + ") WHERE s.id = '"
-        + str(symbol_id)
-        + "' RETURN e"
-    ):
-        list_of_expression_dicts.append(result.data()["e"])
+    # for result in tx.run(
+    #     "MATCH (e:expression)-[:HAS_SYMBOL]->(s:"
+    #     + symbol_category
+    #     + ") WHERE s.id = '"
+    #     + str(symbol_id)
+    #     + "' RETURN e"
+    # ):
+    #     list_of_expression_dicts.append(result.data()["e"])
 
-    logger.info("symbol_id = " + symbol_id)
-    logger.info("list_of_expressions = " + str(list_of_expression_dicts))
+    query = (
+        f"MATCH (e:expression)-[]->(s:{symbol_category}) "
+        "WHERE s.id = $sid "
+        "RETURN e"
+    )
+
+    # Use parameters ($sid) for values to prevent Cypher Injection
+    result = tx.run(query, sid=symbol_id)
+
+    list_of_expression_dicts = [record.data()["e"] for record in result]
 
     logger.info("[TRACE] end " + str(trace_id))
     return list_of_expression_dicts
@@ -603,30 +615,40 @@ def get_list_of_derivation_dicts_that_use_symbol_id_by_category(
     """
     which derivations contain this symbol?
 
+    Returns a list of derivation dictionaries that contain a specific symbol.
+
     >>> derivations_that_use_symbol()
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
 
-    logger.info(
-        "neo4j_query/get_list_of_derivation_dicts_that_use_symbol_id_by_category: symbol_category="
-        + symbol_category
-    )
+    logger.info("symbol_category=" + symbol_category)
     assert symbol_category in list_of_valid.symbol_categories
 
     list_of_derivation_dicts = []  # type: List[dict]
 
-    # TODO: should be derivation->step->expression->symbol
-    for result in tx.run(
-        "MATCH (d:derivation)-[]->(:step)-[]->(:expression)-[]->(s:"
-        + symbol_category
-        + ") WHERE s.id = '"
-        + str(symbol_id)
-        + "' RETURN d"
-    ):
-        list_of_derivation_dicts.append(result.data()["d"])
+    # # TODO: should be derivation->step->expression->symbol
+    # for result in tx.run(
+    #     "MATCH (d:derivation)-[]->(:step)-[]->(:expression)-[]->(s:"
+    #     + symbol_category
+    #     + ") WHERE s.id = '"
+    #     + str(symbol_id)
+    #     + "' RETURN d"
+    # ):
+    #     list_of_derivation_dicts.append(result.data()["d"])
 
-    #    print("symbol_id=", symbol_id, "list_of_derivations=", list_of_derivation_dicts)
+    # Labels cannot be parameterized in Cypher, so we use an f-string
+    # for the label but parameters for the ID.
+    query = (
+        f"MATCH (d:derivation)-[]->(:step)-[]->(:expression)"
+        f"-[:HAS_SYMBOL]->(s:{symbol_category}) "
+        "WHERE s.id = $symbol_id "
+        "RETURN d"
+    )
+
+    result = tx.run(query, symbol_id=symbol_id)
+
+    list_of_derivation_dicts = [record["d"] for record in result]
 
     logger.info("[TRACE] end " + str(trace_id))
     return list_of_derivation_dicts
