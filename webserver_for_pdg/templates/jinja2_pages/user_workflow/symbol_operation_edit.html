@@ -56,5 +56,11 @@ TODO: edit dimension
 </form>
 </fieldset>
 
+{% if list_of_expression_dicts|length > 0 %}
+<P>Here are expressions in which \( {{ operation_dict['latex'] }} \) appears:
+{% include 'jinja2_pages/reusable_components/_table_of_expressions_mini.html' %}
+{% else %}
+<P>This Operation appears in no Expressions.</P>
+{% endif %}
 
 {% endblock %}
