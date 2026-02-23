@@ -10,7 +10,7 @@ e.g., https://github.com/allofphysicsgraph/task-tracker/issues/162 (F=ma)
 What's preventing me from entering a derivation right now?
 
 bug categories:
-1) no page should trigger a gunicorn error (which prevent rendering HTML)
+1) no page should trigger a gunicorn error (which prevents rendering HTML)
 2) pages that do render HTML should not have errors (including flash messages)
    - BUG verified 2026-02-16 11:50: on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
    - no derivation has all steps valid. There are many errors in the step validation for most derivations
