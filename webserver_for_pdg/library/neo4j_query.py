@@ -427,36 +427,6 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     return [record["s.id"] for record in result]
 
 
-# def symbols_in_feed(tx: Transaction, feed_id: str, symbol_category: str) -> list:
-#     """
-#     a feed has one or more sybmols
-#     This read query returns which symbol IDs are used for the provided feed ID
-
-#     this is the opposite query of `feeds_that_use_symbol`
-
-#     """
-#     trace_id = str(random.randint(1000000, 9999999))
-#     logger.info("[TRACE] start " + str(trace_id))
-
-#     print("neo4j_query/symbols_in_feed: symbol_category=", symbol_category)
-
-#     assert symbol_category in list_of_valid.symbol_categories
-
-#     symbol_list = []
-#     for result in tx.run(
-#         "MATCH (e:feed)-[:HAS_SYMBOL]->(s:'"
-#         + symbol_category
-#         + "') WHERE e.id='"
-#         + feed_id
-#         + "' RETURN s.id"
-#     ):
-#         symbol_list.append(result.data()["s.id"])
-#     print("feed_id=", feed_id, "symbol_list=", symbol_list)
-
-#     logger.info("[TRACE] end " + str(trace_id))
-#     return symbol_list
-
-
 def get_nodes_of_type(tx: Transaction, node_type: str) -> list:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
@@ -791,10 +761,9 @@ def get_expressions_that_use_symbol(tx, symbol_id: str) -> List[Dict[str, Any]]:
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
 
-    logger.info("symbol_category=" + str(symbol_category))
     logger.info("symbol_id = " + symbol_id)
 
-    assert symbol_category in list_of_valid.symbol_categories
+    # assert symbol_category in list_of_valid.symbol_categories
 
     list_of_expression_dicts = []  # type: List[dict]
 
