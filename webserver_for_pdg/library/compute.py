@@ -1245,10 +1245,11 @@ def get_dict_of_relation_dicts_not_in_expression(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         expression_dict = session.read_transaction(
-            neo4j_query.get_node_properties, "expression", expression_id
+            neo4j_query.get_node_properties_from_id, "expression", expression_id
         )
         query_time_dict[
-            "pdg_app/to_edit_expression: get_node_properties expression " + trace_id
+            "pdg_app/to_edit_expression: get_node_properties_from_id expression "
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info("pdg_app/to_edit_expression: expression_dict:" + str(expression_dict))
     logger.info("relation is " + str(expression_dict["latex_relation"]))

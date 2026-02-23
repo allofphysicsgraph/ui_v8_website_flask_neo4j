@@ -353,8 +353,16 @@ def get_symbol_IDs_in_every_feed(tx):
     """
     result = tx.run(query)
 
+    res = result.data()
+
+    # logger.info("res=" + str(res))
+
+    feed_has_symbols = {}
+    for this_dict in res:
+        feed_has_symbols[this_dict["feed_id"]] = this_dict["symbol_ids"]
+
     logger.info("[TRACE] end " + str(trace_id))
-    return result
+    return feed_has_symbols
 
 
 def get_symbol_IDs_in_feed(tx: Transaction, feed_id: str) -> List[str]:
@@ -1024,11 +1032,23 @@ def get_expressions_from_step_id_and_expr_type(
     return list_of_expression_dicts
 
 
-def get_node_properties(tx: Transaction, node_type: str, node_id: str) -> dict:
+def get_node_properties_from_id(
+    tx: Transaction, node_type: str, node_id: str
+) -> Optional[Dict[str, Any]]:
     """
     metadata associated with the node_id
 
-    >>> node_properties()
+    Although
+    ```
+    MATCH n WHERE n.id = "42" RETURN n
+    ```
+    would be easier to use than
+    ```
+    MATCH (n:person) WHERE n.id = "42" RETURN n
+    ```
+    the latency and memory usage of the first is higher.
+
+
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
@@ -1037,24 +1057,22 @@ def get_node_properties(tx: Transaction, node_type: str, node_id: str) -> dict:
     assert node_type in list_of_valid.node_types
     logger.info("node_id:" + node_id)
 
-    result = tx.run(
-        "MATCH (n: " + str(node_type) + ') WHERE n.id = "' + str(node_id) + '" RETURN n'
-    )
-    res_data = result.data()
+    query = f"MATCH (n:{node_type}) WHERE n.id = $node_id RETURN n"
 
-    # logger.info("result.data() =" + str(res_data))
+    result = tx.run(query, node_id=node_id)
 
-    if len(res_data) == 0:
-        logger.info("result.data() is an empty list")
+    record = result.single()
+
+    if not record:
+        logger.info("Node with id %s and type %s not found", node_id, node_type)
         return None
 
     # logger.info("result.data()[0] =" + str(res_data[0]))
 
-    node_data = res_data[0]["n"]
-    logger.info("node_data=" + str(node_data))
+    node = dict(record["n"])
 
     logger.info("[TRACE]  end " + str(trace_id))
-    return node_data
+    return node
 
 
 def add_derivation(
