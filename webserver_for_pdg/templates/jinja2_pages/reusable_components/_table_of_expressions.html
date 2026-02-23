@@ -46,7 +46,7 @@
          Now I'm using Jinja2 manual escape, as documented on
          https://jinja.palletsprojects.com/en/3.0.x/templates/#working-with-manual-escaping
       -->
-    <td>\( {{ expression_dict['latex_lhs']|e }} {{ expression_dict['latex_relation']|e }} {{ expression_dict['latex_rhs']|e }} \)<BR>
+    <td>\( {{ expression_dict['latex_lhs']|e }} {{ expression_dict['latex_relation']|e }} {{ expression_dict['latex_rhs']|e }} \)<BR><BR>
           {{ expression_dict['latex_lhs']|e }}  {{ expression_dict['latex_relation']|e }} {{ expression_dict['latex_rhs']|e }}</td>
     <td>{{ expression_dict['name_latex'] }}</td>
     <td>{{ expression_dict['description_latex'] }}</td>
@@ -59,7 +59,7 @@
     </td> <!-- used in derivation -->
     <td><UL>{% for symbol_dict in list_of_symbol_dicts_per_expression_id[expression_dict['id']] %}
         <LI><a href="{{ url_for('to_edit_node', node_id=symbol_dict['id']) }}" title="see more about this symbol">
-             {{ symbol_dict['id'] }}</a>:  {{ symbol_dict['latex']|e }}</LI>
+             {{ symbol_dict['id'] }}</a>:  \( {{ symbol_dict['latex']|e }} \)</LI>
       {% endfor %}
       </UL>
     </td> <!-- symbols -->
