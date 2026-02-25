@@ -179,14 +179,24 @@ def apoc_export_cypher(tx: Transaction, output_filename: str):
     YIELD file, batches, source, format, nodes, relationships, properties, time, rows, batchSize
     RETURN file, batches, source, format, nodes, relationships, properties, time, rows, batchSize
     """
-    
+
+    # config = {
+    #     "format": "plain",
+    #     "useOptimizations": {
+    #         "type": "UNWIND_BATCH",
+    #         "unwindBatchSize": 20
+    #     }
+    # }
+
     config = {
-        "format": "plain",
-        "useOptimizations": {
-            "type": "UNWIND_BATCH",
-            "unwindBatchSize": 20
-        }
+        "format": "cypher-shell",  # Better for line-by-line reading
+        "useOptimizations": {"type": "NONE"},  # Disables the huge UNWIND blocks
+        "separateFiles": False,
+        "cypherFormat": "merge",
     }
+    # for `cypherFormat`, `create` is faster but could create duplicates
+    # If that's a hallucination, see <https://neo4j.com/labs/apoc/4.4/overview/apoc.export/apoc.export.cypher.all/>
+    # and use `updateAll`
 
     # Use .single() to get the result row directly
     result = tx.run(query, file=output_filename, config=config)
