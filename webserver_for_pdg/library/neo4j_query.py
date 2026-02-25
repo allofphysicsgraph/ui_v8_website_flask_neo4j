@@ -161,19 +161,38 @@ def apoc_export_cypher(tx: Transaction, output_filename: str):
     # https://neo4j.com/labs/apoc/4.4/overview/apoc.export/apoc.export.cypher.query/
     # which produces separate files for relationships and nodes
 
-    for result in tx.run(
-        "CALL apoc.export.cypher.all('" + output_filename + "', {"
-        # "format: 'cypher-shell'," # the output produced when using 'cypher-shell' is readable by `bin/cypher-shell --file dumping_grounds/pdg.cypher` but not the Python driver
-        "format: 'plain',"
-        "useOptimizations: {type: 'UNWIND_BATCH', unwindBatchSize: 20}"
-        "}) "
-        "YIELD file, batches, source, format, nodes, relationships, properties, time, rows, batchSize "
-        "RETURN file, batches, source, format, nodes, relationships, properties, time, rows, batchSize;"
-    ):
-        pass
+    # for result in tx.run(
+    #     "CALL apoc.export.cypher.all('" + output_filename + "', {"
+    #     # "format: 'cypher-shell'," # the output produced when using 'cypher-shell' is readable by `bin/cypher-shell --file dumping_grounds/pdg.cypher` but not the Python driver
+    #     "format: 'plain',"
+    #     "useOptimizations: {type: 'UNWIND_BATCH', unwindBatchSize: 20}"
+    #     "}) "
+    #     "YIELD file, batches, source, format, nodes, relationships, properties, time, rows, batchSize "
+    #     "RETURN file, batches, source, format, nodes, relationships, properties, time, rows, batchSize;"
+    # ):
+    #     pass
+
+    # return result
+
+    query = """
+    CALL apoc.export.cypher.all($file, $config)
+    YIELD file, batches, source, format, nodes, relationships, properties, time, rows, batchSize
+    RETURN file, batches, source, format, nodes, relationships, properties, time, rows, batchSize
+    """
+    
+    config = {
+        "format": "plain",
+        "useOptimizations": {
+            "type": "UNWIND_BATCH",
+            "unwindBatchSize": 20
+        }
+    }
+
+    # Use .single() to get the result row directly
+    result = tx.run(query, file=output_filename, config=config)
 
     logger.info("[TRACE] end " + str(trace_id))
-    return result
+    return result.single()
 
 
 def constrain_unique_id(tx) -> None:
