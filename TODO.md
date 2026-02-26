@@ -1,13 +1,3 @@
-HAS_SYMBOL is bad as an edge because it implies a category of node
-IS_COMPRISED_OF
-would be better 
-
-Could every edge be IS_COMPRISED_OF?
-No. For example, HAS_STEP is separate because of the property key sequence index
-Similarly, HAS_INPUT, HAS_OUTPUT, HAS_FEED are right and each also should have an index 
-
----
-
 
 to verify:
 - BUG: SymPy-to-be-edited not displayed in edit_expression
