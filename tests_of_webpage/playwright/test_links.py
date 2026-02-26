@@ -27,21 +27,248 @@ def test_get_started_link(page: Page):
     expect(page.get_by_role("heading", name="Navigating")).to_be_visible()
 
 
-def test_nav_page(page: Page):
+def test_get_nav_page(page: Page):
     page.goto(URL+"/navigation")
 
     expect(page).to_have_title(re.compile("site map"))
 
-def test_nav_page_to_derivations(page: Page):
+def test_link_nav_page_to_derivations(page: Page):
     page.goto(URL+"/navigation")
 
     page.get_by_role("link", name="derivations").click()
 
     expect(page).to_have_title(re.compile("Derivation"))
 
-def test_derivations_list_to_curl_curl(page: Page):
+
+
+def test_get_login_page(page: Page):
+    page.goto(URL+"/login")
+
+def test_get_index_page(page: Page):
+    page.goto(URL+"/index")
+
+def test_get_choose_new_symbol_page(page: Page):
+    page.goto(URL+"/new_symbol")
+
+
+def test_get_query_page(page: Page):
+    page.goto(URL+"/query")
+
+    expect(page).to_have_title(re.compile("Query"))
+
+def test_get_list_feeds_page(page: Page):
+    page.goto(URL+"/list_feeds")
+
+def test_get_list_operations_page(page: Page):
+    page.goto(URL+"/list_operations")
+
+def test_get_list_relations_page(page: Page):
+    page.goto(URL+"/list_relations")
+
+def test_get_list_scalars_page(page: Page):
+    page.goto(URL+"/list_scalars")
+
+def test_get_list_vectors_page(page: Page):
+    page.goto(URL+"/list_vectors")
+
+def test_get_list_matrices_page(page: Page):
+    page.goto(URL+"/list_matrices")
+
+def test_get_list_expressions_page(page: Page):
+    page.goto(URL+"/list_expressions")
+
+    expect(page).to_have_title(re.compile("Expression"))
+
+def test_get_list_derivations_page(page: Page):
+    page.goto(URL+"/list_derivations")
+
+    expect(page).to_have_title(re.compile("Derivation list"))
+
+def test_link_list_derivations_to_curl_curl(page: Page):
     page.goto(URL+"/list_derivations")
 
     page.get_by_role("link", name="curl curl identity").click()
 
     expect(page.get_by_role("heading", name="Review curl curl identity")).to_be_visible()
+
+def test_get_list_inference_rules_page(page: Page):
+    page.goto(URL+"/list_inference_rules")
+
+    expect(page).to_have_title(re.compile("Inference"))
+    
+
+def test_get_export_json_page(page: Page):
+    page.goto(URL+"/export_to_json")
+
+def test_get_export_metadata_page(page: Page):
+    page.goto(URL+"/export_metadata_schema")
+
+def test_get_export_csv_page(page: Page):
+    page.goto(URL+"/export_to_csv")
+
+def test_get_export_graphml_page(page: Page):
+    page.goto(URL+"/export_to_graphml")
+
+def test_get_export_cypher_page(page: Page):
+    page.goto(URL+"/export_to_cypher")
+
+def test_get_api_js_page(page: Page):
+    page.goto(URL+"/api_via_js")
+
+def test_get_api_page(page: Page):
+    page.goto(URL+"/documentation/api")
+
+    expect(page).to_have_title(re.compile("API Documentation"))
+
+    expect(page.get_by_role("heading", name="API Documentation")).to_be_visible()
+    
+
+def test_get_workflow_page(page: Page):
+    page.goto(URL+"/workflow_documentation")
+
+    expect(page).to_have_title(re.compile("Workflow"))
+
+    expect(page.get_by_role("heading", name="Workflow")).to_be_visible()
+    
+
+def test_get_profile_page(page: Page):
+    page.goto(URL+"/profile")
+
+def test_get_search_page(page: Page):
+    page.goto(URL+"/search")
+
+def test_get_favicon_page(page: Page):
+    page.goto(URL+"/favicon.ico")
+
+def test_get_robots_page(page: Page):
+    page.goto(URL+"/robots.txt")
+
+def test_get_sitemap_page(page: Page):
+    page.goto(URL+"/sitemap.txt")
+
+def test_get_static_dir_page(page: Page):
+    page.goto(URL+"/static_dir/")
+
+    expect(page.get_by_role("heading", name="File listing of static")).to_be_visible()
+
+def test_get_eval_LLM_page(page: Page):
+    page.goto(URL+"/documentation/evaluation_of_LLM_prompts")
+
+    expect(page.get_by_role("heading", name="Evaluation of LLM prompts")).to_be_visible()
+
+def test_get_overview_page(page: Page):
+    page.goto(URL+"/documentation/overview")
+
+    expect(page.get_by_role("heading", name="Documentation")).to_be_visible()
+
+def test_get_user_page(page: Page):
+    page.goto(URL+"/documentation/user")
+
+    expect(page).to_have_title(re.compile("User Documentation"))
+    
+
+def test_get_developer_page(page: Page):
+    page.goto(URL+"/documentation/developer")
+
+    expect(page).to_have_title(re.compile("Developer Documentation"))
+    
+
+def test_get_conventions_page(page: Page):
+    page.goto(URL+"/documentation/conventions")
+
+    expect(page.get_by_role("heading", name="Conventions and Definitions")).to_be_visible()
+    
+
+def test_get_design_choices_page(page: Page):
+    page.goto(URL+"/documentation/design_choices")
+
+    expect(page.get_by_role("heading", name="Design")).to_be_visible()
+    
+
+def test_get_dimensionality_page(page: Page):
+    page.goto(URL+"/documentation/dimensionality")
+
+    expect(page.get_by_role("heading", name="Dimensionality")).to_be_visible()
+    
+
+def test_get_roadmap_page(page: Page):
+    page.goto(URL+"/documentation/goals_roadmap")
+
+    expect(page.get_by_role("heading", name="Goals and Roadmap")).to_be_visible()
+    
+
+def test_get_hilbert_sixth_page(page: Page):
+    page.goto(URL+"/documentation/hilberts_sixth_problem")
+
+    expect(page.get_by_role("heading", name="Hilbert")).to_be_visible()
+    
+
+def test_get_faq_page(page: Page):
+    page.goto(URL+"/documentation/faq")
+
+    expect(page.get_by_role("heading", name="Frequently Asked Questions")).to_be_visible()
+    
+
+def test_get_other_projects_page(page: Page):
+    page.goto(URL+"/documentation/other_projects")
+
+    expect(page.get_by_role("heading", name="Other Projects")).to_be_visible()
+
+
+def test_get_expand_page(page: Page):
+    page.goto(URL+"/expand")
+
+def test_get_arxiv_page(page: Page):
+    page.goto(URL+"/arxiv_scraper")
+
+def test_get_common_errors_page(page: Page):
+    page.goto(URL+"/documentation/common_errors_in_college_math")
+
+def test_get_lit_review_page(page: Page):
+    page.goto(URL+"/documentation/literature_review")
+
+
+    expect(page.get_by_role("heading", name="Literature Review")).to_be_visible()
+    
+
+def test_get_compare_cas_page(page: Page):
+    page.goto(URL+"/documentation/comparison_of_design_options/cas")
+
+def test_get_compare_graph_page(page: Page):
+    page.goto(URL+"/documentation/comparison_of_design_options/graph_drawing")
+
+    expect(page.get_by_role("heading", name="Comparison of Graph Drawing")).to_be_visible()
+    
+
+def test_get_compare_proofs_page(page: Page):
+    page.goto(URL+"/documentation/comparison_of_design_options/proofs")
+
+def test_get_compare_syntax_page(page: Page):
+    page.goto(URL+"/documentation/comparison_of_design_options/syntax")
+
+    expect(page.get_by_role("heading", name="Comparison of Syntax")).to_be_visible()
+    
+
+def test_get_compare_db_page(page: Page):
+    page.goto(URL+"/documentation/comparison_of_design_options/database")
+
+    expect(page.get_by_role("heading", name="Comparison of Database")).to_be_visible()
+
+def test_get_list_named_expressions_page(page: Page):
+    page.goto(URL+"/list_named_expressions")
+
+def test_get_survey_named_expressions_page(page: Page):
+    page.goto(URL+"/survey_of_named_expressions")
+
+def test_get_blog_page(page: Page):
+    page.goto(URL+"/blog/")
+
+def test_get_clickable_layers_page(page: Page):
+    page.goto(URL+"/clickable_layers")
+
+def test_get_class_notes_page(page: Page):
+    page.goto(URL+"/class_notes")
+
+def test_get_spectrum_precision_overview_page(page: Page):
+    page.goto(URL+"/spectrum_of_precision/overview")
+
