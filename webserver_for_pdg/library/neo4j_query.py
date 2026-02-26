@@ -318,7 +318,7 @@ def get_symbols_for_every_expression(tx, list_of_expression_ids: List[str]):
     query = """
     MATCH (e:expression)
     WHERE e.id IN $eids
-    OPTIONAL MATCH (e)-[:HAS_SYMBOL]->(s:symbol)
+    OPTIONAL MATCH (e)-[:IS_COMPRISED_OF]->(s:symbol)
     RETURN e.id AS eid, collect(properties(s)) AS symbols
     """
 
@@ -338,7 +338,7 @@ def get_symbols_for_expression(tx: Transaction, expression_id: str) -> List[dict
     symbol_list = []  # type: List[dict]
 
     query = """
-    MATCH (e:expression {id: $eid})-[:HAS_SYMBOL]->(s:symbol) 
+    MATCH (e:expression {id: $eid})-[:IS_COMPRISED_OF]->(s:symbol) 
     RETURN properties(s) AS props
     """
     result = tx.run(query, eid=expression_id)
@@ -355,7 +355,7 @@ def get_symbol_IDs_in_expression(tx: Transaction, expression_id: str) -> List[st
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
     query = (
-        "MATCH (e:expression)-[:HAS_SYMBOL]->(s:symbol) "
+        "MATCH (e:expression)-[:IS_COMPRISED_OF]->(s:symbol) "
         "WHERE e.id = $id "
         "RETURN s.id"
     )
@@ -367,7 +367,7 @@ def get_symbol_IDs_in_expression(tx: Transaction, expression_id: str) -> List[st
 def get_symbol_IDs_in_every_feed(tx):
     """
     `MATCH (f:feed)` selects all nodes with the label feed, regardless of whether you passed an ID list or not.
-    `OPTIONAL MATCH ...` is like a "Left Outer Join" in SQL. It attempts to find the pattern (f)-[:HAS_SYMBOL]->(s:symbol).
+    `OPTIONAL MATCH ...` is like a "Left Outer Join" in SQL. It attempts to find the pattern (f)-[:IS_COMPRISED_OF]->(s:symbol).
         - If the pattern exists, s will contain the symbol node.
         - If the pattern does not exist (the feed has no symbols), f is still kept in the result, but s will be null.
     `collect(s.id)` aggregation function automatically ignores null values. Therefore, if s is null (because of the OPTIONAL MATCH), the result is an empty list [] rather than [null].
@@ -377,7 +377,7 @@ def get_symbol_IDs_in_every_feed(tx):
 
     query = """
     MATCH (f:feed)
-    OPTIONAL MATCH (f)-[:HAS_SYMBOL]->(s:symbol)
+    OPTIONAL MATCH (f)-[:IS_COMPRISED_OF]->(s:symbol)
     RETURN f.id as feed_id, collect(s.id) as symbol_ids
     """
     result = tx.run(query)
@@ -400,7 +400,7 @@ def get_symbol_IDs_in_feed(tx: Transaction, feed_id: str) -> List[str]:
     logger.info("[TRACE] start " + str(trace_id))
     logger.info("feed_id=" + feed_id)
 
-    query = "MATCH (f:feed)-[:HAS_SYMBOL]->(s:symbol) WHERE f.id = $id RETURN s.id"
+    query = "MATCH (f:feed)-[:IS_COMPRISED_OF]->(s:symbol) WHERE f.id = $id RETURN s.id"
     result = tx.run(query, id=feed_id)
     logger.info("[TRACE] end " + str(trace_id))
     return [record["s.id"] for record in result]
@@ -427,7 +427,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     # for result in tx.run(
     #     "MATCH (e:"
     #     + expression_or_feed
-    #     + ")-[:HAS_SYMBOL]->(s:"
+    #     + ")-[:IS_COMPRISED_OF]->(s:"
     #     + symbol_category
     #     + ") WHERE e.id='"
     #     + expression_or_feed_id
@@ -444,7 +444,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
     # Labels cannot be parameterized, so we inject the sanitized strings.
     # Values (like IDs) MUST be parameterized ($id).
     query = (
-        f"MATCH (e:{safe_source_label})-[:HAS_SYMBOL]->(s:{safe_target_label}) "
+        f"MATCH (e:{safe_source_label})-[:IS_COMPRISED_OF]->(s:{safe_target_label}) "
         "WHERE e.id = $id "
         "RETURN s.id"
     )
@@ -519,7 +519,7 @@ def get_expressions_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
-    MATCH (e:expression)-[:HAS_SYMBOL]->(s:operation)
+    MATCH (e:expression)-[:IS_COMPRISED_OF]->(s:operation)
     RETURN s.id AS operation_id, collect(DISTINCT e) AS expression_nodes
     """
     result = tx.run(query)
@@ -542,7 +542,7 @@ def get_expressions_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
-    MATCH (e:expression)-[:HAS_SYMBOL]->(r:relation)
+    MATCH (e:expression)-[:IS_COMPRISED_OF]->(r:relation)
     RETURN r.id AS relation_id, collect(DISTINCT e) AS expression_nodes
     """
     result = tx.run(query)
@@ -565,7 +565,7 @@ def get_expressions_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
-    MATCH (e:expression)-[:HAS_SYMBOL]->(s:symbol)
+    MATCH (e:expression)-[:IS_COMPRISED_OF]->(s:symbol)
     RETURN s.id AS symbol_id, collect(DISTINCT e) AS expression_nodes
     """
     result = tx.run(query)
@@ -589,13 +589,13 @@ def get_derivations_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
     node once for every path it finds, resulting in three instances of the same node in your list.
     `collect(DISTINCT d)` collapses those into one.
 
-    TODO: replace `HAS_SYMBOL` with `HAS_RELATION`
+    TODO: replace `IS_COMPRISED_OF` with `HAS_RELATION`
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
-    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(e:expression)-[:HAS_SYMBOL]->(r:relation)
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(e:expression)-[:IS_COMPRISED_OF]->(r:relation)
     RETURN r.id AS relation_id, collect(DISTINCT d) AS derivation_nodes
     """
     result = tx.run(query)
@@ -619,13 +619,13 @@ def get_derivations_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
     node once for every path it finds, resulting in three instances of the same node in your list.
     `collect(DISTINCT d)` collapses those into one.
 
-    TODO: replace `HAS_SYMBOL` with `HAS_OPERATION`
+    TODO: replace `IS_COMPRISED_OF` with `HAS_OPERATION`
     """
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
-    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(e:expression)-[:HAS_SYMBOL]->(s:operation)
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(e:expression)-[:IS_COMPRISED_OF]->(s:operation)
     RETURN s.id AS operation_id, collect(DISTINCT d) AS derivation_nodes
     """
     result = tx.run(query)
@@ -653,7 +653,7 @@ def get_derivations_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
-    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(e:expression)-[:HAS_SYMBOL]->(s:symbol)
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(e:expression)-[:IS_COMPRISED_OF]->(s:symbol)
     RETURN s.id AS symbol_id, collect(DISTINCT d) AS derivation_nodes
     """
     result = tx.run(query)
@@ -805,7 +805,7 @@ def get_expressions_that_use_symbol(tx, symbol_id: str) -> List[Dict[str, Any]]:
     list_of_expression_dicts = []  # type: List[dict]
 
     # for result in tx.run(
-    #     "MATCH (e:expression)-[:HAS_SYMBOL]->(s:"
+    #     "MATCH (e:expression)-[:IS_COMPRISED_OF]->(s:"
     #     + symbol_category
     #     + ") WHERE s.id = '"
     #     + str(symbol_id)
@@ -841,7 +841,7 @@ def get_derivations_that_use_symbol(
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
-        MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(:expression)-[:HAS_SYMBOL]->(s:symbol) 
+        MATCH (d:derivation)-[:HAS_STEP]->(:step)-[]->(:expression)-[:IS_COMPRISED_OF]->(s:symbol) 
         WHERE s.id = $symbol_id 
         RETURN d
     """
@@ -1418,7 +1418,7 @@ def disconnect_symbol_from_expression(
     assert symbol_category in list_of_valid.symbol_categories
 
     result = tx.run(
-        "MATCH (e:expression)-[r:HAS_SYMBOL]->(s:"
+        "MATCH (e:expression)-[r:IS_COMPRISED_OF]->(s:"
         + symbol_category
         + ")"
         + 'WHERE e.id="'
@@ -1448,7 +1448,7 @@ def disconnect_symbol_from_feed(
     assert symbol_category in list_of_valid.symbol_categories
 
     result = tx.run(
-        "MATCH (e:feed)-[r:HAS_SYMBOL]->(s:"
+        "MATCH (e:feed)-[r:IS_COMPRISED_OF]->(s:"
         + symbol_category
         + ")"
         + 'WHERE e.id="'
@@ -1533,14 +1533,14 @@ def add_symbol_to_expression_or_feed(
     #     + '" AND s.id="'
     #     + str(symbol_id)
     #     + '" '
-    #     + "MERGE (e)-[r:HAS_SYMBOL]->(s)"
+    #     + "MERGE (e)-[r:IS_COMPRISED_OF]->(s)"
     # )
 
     # To avoid triggering a Cartesian product, use
     result = tx.run(
         "MATCH (e:" + expression_or_feed + " {id: '" + expression_or_feed_id + "'})"
         "MATCH (s:" + symbol_category + " {id: '" + symbol_id + "'})"
-        "MERGE (e)-[r:HAS_SYMBOL]->(s)"
+        "MERGE (e)-[r:IS_COMPRISED_OF]->(s)"
     )
 
     logger.info("[TRACE]  end " + str(trace_id))

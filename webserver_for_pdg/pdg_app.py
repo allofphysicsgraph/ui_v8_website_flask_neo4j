@@ -5613,9 +5613,6 @@ def to_query() -> werkzeug.Response:
         except neo4j.exceptions.TransactionError:
             list_of_records = ["probably tried a write Cypher query (TransactionError)"]
 
-        # logger.info("list_of_records=", list_of_records)
-        # list_of_records= ["<Record type(r)='HAS_VALUE'>", "<Record type(r)='HAS_SYMBOL'>"]
-
         # convert list of strings to strings-with-html
         # We can't use jinja2 to process the content (because then links would not work)
         # so we have to "safe" the strings before adding links
