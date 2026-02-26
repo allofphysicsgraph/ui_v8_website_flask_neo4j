@@ -278,8 +278,8 @@ MATCH (n:expression), (m:inference_rule) WHERE m.id='{{inference_rule_id}}' RETU
   <TR>
     <td id="list symbol dicts connected to a specific expression">list symbol dicts connected to a specific expression
     <a href="#list symbol dicts connected to a specific expression">#</a></td>
-    <TD><a href="{{ url_for('to_query') }}?cypher=MATCH (e:expression {id: '{{inference_rule_id}}'})-[:HAS_SYMBOL]->(s:symbol) RETURN properties(s) AS props">
-MATCH (e:expression {id: '{{inference_rule_id}}'})-[:HAS_SYMBOL]->(s:symbol) RETURN properties(s) AS props</a></td>
+    <TD><a href="{{ url_for('to_query') }}?cypher=MATCH (e:expression {id: '{{inference_rule_id}}'})-[:IS_COMPRISED_OF]->(s:symbol) RETURN properties(s) AS props">
+MATCH (e:expression {id: '{{inference_rule_id}}'})-[:IS_COMPRISED_OF]->(s:symbol) RETURN properties(s) AS props</a></td>
     <td></td>
   </tr>
   <tr>
