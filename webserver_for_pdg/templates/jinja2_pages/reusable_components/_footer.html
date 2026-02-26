@@ -6,18 +6,18 @@
 <div align="center">
     <hr width="50%" align="center">
     <P>
-       <a href="{{ url_for('to_index', referrer='_footer.html') }}">Physics Derivation Graph homepage</a> |
-       <a href="{{ url_for('to_navigation', referrer='_footer.html') }}">navigation</a> |
-       <a href="{{ url_for('to_faq', referrer='_footer.html') }}">FAQ</a> |
-       <a href="{{ url_for('to_documentation_overview', referrer='_footer.html') }}">documentation</a> 
+       <a href="{{ url_for('to_index', referrer='_footer.html') }}" data-testid="footer-homepage">Physics Derivation Graph homepage</a> |
+       <a href="{{ url_for('to_navigation', referrer='_footer.html') }}" data-testid="footer-nav">navigation</a> |
+       <a href="{{ url_for('to_faq', referrer='_footer.html') }}" data-testid="footer-faq">FAQ</a> |
+       <a href="{{ url_for('to_documentation_overview', referrer='_footer.html') }}" data-testid="footer-doc">documentation</a> 
 
     <P>
-      <a href="https://physicsderivationgraph.blogspot.com/">blog</a> |
+      <a href="https://physicsderivationgraph.blogspot.com/" data-testid="footer-blog">blog</a> |
       <a href="{{ url_for('to_index', referrer='_footer.html') }}">website</a> |
       <!--<a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/wiki">wiki</a> | --> <!-- not in use -->
       <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues">issues</a> |
       <a href="https://app.gitter.im/#/room/#allofphysicsgraph_Lobby:gitter.im">discuss on Gitter</a> or
-      <a href="https://groups.google.com/g/physics-derivation-graph">Google Groups</a> |
+      <a href="https://groups.google.com/g/physics-derivation-graph" data-testid="footer-google-groups">Google Groups</a> |
     <!--
       <a href="https://creativecommons.org/licenses/by/4.0/">License</a> |
     -->
@@ -27,12 +27,12 @@
       <table>
         <tr>
          <td valign="middle" width="100">
-           <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j">
+           <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j" data-testid="footer-github">
              <img src="{{ url_for('static', filename='GitHub-icon.png')}}" align="left" alt="source code on GitHub">
            </a>
          </td>
          <td valign="middle" width="100">
-           <a href="https://www.facebook.com/physicsderivationgraph/">
+           <a href="https://www.facebook.com/physicsderivationgraph/" data-testid="footer-facebook">
              <img src="{{ url_for('static', filename='facebook_icon.svg')}}" width="40" align="left" alt="Facebook"/>
            </a>
          </td>
@@ -52,12 +52,12 @@
            &nbsp;
          </td>
          <td valign="middle" width="100">
-           <a href="https://www.youtube.com/channel/UCBSInUAbtBkYDYKNc_iauVQ/">
+           <a href="https://www.youtube.com/channel/UCBSInUAbtBkYDYKNc_iauVQ/" data-testid="footer-youtube">
              <img src="{{ url_for('static', filename='Youtube_icon.png')}}" width="40" align="left" alt="YouTube Channel"/>
            </a>
          </td>
          <td valign="middle" width="100">
-           <a href="https://www.reddit.com/r/Physics/">
+           <a href="https://www.reddit.com/r/Physics/" data-testid="footer-reddit">
              <img src="{{ url_for('static', filename='reddit_icon.png')}}" align="left" alt="Reddit"/>
            </a>
          </td>
@@ -75,10 +75,10 @@
 
     <P>
       <small>
-        Site content, the project software, and data are covered by the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+        Site content, the project software, and data are covered by the <a href="https://creativecommons.org/licenses/by/4.0/" data-testid="footer-creative-commons">Creative Commons Attribution 4.0 International License</a>
       </small>
     </P>
     </div>
 
-    Rendered in {{ g.request_time() }} seconds using <a href="https://flask.palletsprojects.com/">Flask</a>
+    Rendered in {{ g.request_time() }} seconds using <a href="https://flask.palletsprojects.com/" data-testid="footer-flask">Flask</a>
     </footer>
