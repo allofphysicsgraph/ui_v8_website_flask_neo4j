@@ -100,6 +100,10 @@ RUN npm install -g pyright
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt --no-cache-dir -vvv --ignore-installed blinker
 
+
+RUN playwright install
+RUN playwright install-deps
+
 # TODO: don't be root!
 
 
