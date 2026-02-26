@@ -171,8 +171,6 @@ def get_url_from_shortened_list(lookup) -> str:
     return "ERROR: lookup " + lookup + " not found", None
 
 
-
-
 def send_email_with_msmtp(
     recipients: Union[str, List[str]], subject: str, body: str, from_address: str = None
 ):
@@ -503,8 +501,6 @@ def remove_file_debris(
     return
 
 
-
-
 def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
     graphDB_Driver,
     query_time_dict: query_timing_result_type,
@@ -571,8 +567,6 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
 
     logger.info("[TRACE] end " + trace_id)
     return list_of_symbol_IDs_in_expression_or_feed, query_time_dict
-
-
 
 
 def get_list_of_all_nonoperation_symbol_dicts(
