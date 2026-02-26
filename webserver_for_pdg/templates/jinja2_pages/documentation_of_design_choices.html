@@ -445,7 +445,7 @@ Not clear whether the site could just be using Neo4j directly by the web UI. </P
   There's an argument to be made that another hierarchical layer would be :operation, :relation, :quantum_operator, :value_with_units, :symbol. 
   Not clear what that grouping would be called. "Things that appear in expressions and feeds" is too long.
 
-<P>A counter-proposal would be that :operation, :relation, and :quantum_operator should be nested under :symbol. Currently those nodes are connected to :expression and :feed by :HAS_SYMBOL (rather than :HAS_RELATION and :HAS_OPERATION).
+<P>A counter-proposal would be that :operation, :relation, and :quantum_operator should be nested under :symbol. Currently those nodes are connected to :expression and :feed by :IS_COMPRISED_OF (rather than :HAS_RELATION and :HAS_OPERATION).
 
 <P>&nbsp;</P>
 <HR/>
@@ -454,11 +454,21 @@ Not clear whether the site could just be using Neo4j directly by the web UI. </P
 <H2 id="latex for expressions">\(\rm\LaTeX\) representation of expressions</a></H2>
 <P>
   There are multiple choices of how to represent a mathematical expression.
-  The choices feature trade-offs between conciseness, ability to express the range of notations necessary for Physics, symantic meaning, and ability to use the expression in a computer algebra system (CAS).
+  The choices feature trade-offs between conciseness, ability to express the range of notations necessary for Physics, semantic meaning, and ability to use the expression in a computer algebra system (CAS).
   See the <a href="{{ url_for('to_comparison_of_design_options_syntax') }}?referrer=design_documentation">comparison of syntax</a>.
   \(\rm\LaTeX\) was selected primarily because of the common use in Physics, display of complex math, conciseness, and expressiveness.
   The use of \(\rm\LaTeX\) means other tasks like parsing symbols and resolving ambiguity are harder.
 </p>
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id="primary representation">\(\rm\LaTeX\) or SymPy as the primary representation of expressions?</H2>
+
+<P>Is the latex representation primary, or SymPy primary, or is one canonical? 
+
+<P>They are co-equals and intended to be equivalent.
 
 <P>&nbsp;</P>
 <HR/>
@@ -473,9 +483,9 @@ Not clear whether the site could just be using Neo4j directly by the web UI. </P
 <P>Beyond those there are objects that could be a either node in the graph or a property of a node. For example, should (LHS, relation, RHS) be separate nodes or properties of an expression? A framing that motivates the choice is whether a user may want to query LHS separately from the expression. The trade-off is that additional nodes better support custom queries but then incur more queries to extract information relevant for typical workflows. 
 
   <P>Another framing to motivate the node-or-property decision is the nodes can have properties but properties cannot have edges. For example, if LHS is a property of expression, then a symbol-as-node has to be related to the expression rather than LHS.
-    <pre>:expression (LHS) -> HAS_SYMBOL -> :symbol (x)</pre>
+    <pre>:expression (LHS) -> IS_COMPRISED_OF -> :symbol (x)</pre>
     <P>versus
-    <pre>:expression -> HAS_SIDE -> LHS -> HAS_SYMBOL -> :symbol (x)</pre>
+    <pre>:expression -> HAS_SIDE -> LHS -> IS_COMPRISED_OF -> :symbol (x)</pre>
 
 <P>If "symbol" is a node, then is a relation is a symbol? Should the relation be a property of the expression-as-node, or should the schema be
   <pre>:expression -> HAS_RELATION -> :relation (=)</pre>
