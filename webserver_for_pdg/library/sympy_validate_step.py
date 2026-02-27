@@ -1705,6 +1705,10 @@ def substitute_RHS_of_expr_1_into_expr_2(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id)
 
+    logger.info(str(list_of_input_dicts))
+    logger.info(str(list_of_feed_dicts))
+    logger.info(str(list_of_output_dicts))
+
     input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
     input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
     input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
@@ -2144,6 +2148,10 @@ def simplify(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id)
 
+    logger.info(str(list_of_input_dicts))
+    logger.info(str(list_of_feed_dicts))
+    logger.info(str(list_of_output_dicts))
+
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
     input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
     output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
@@ -2359,15 +2367,16 @@ def change_two_variables_in_expr(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id)
 
+    # logger.info(str(list_of_input_dicts))
+    # logger.info(str(list_of_feed_dicts))
+    # logger.info(str(list_of_output_dicts))
+
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
     input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
     feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
     feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
     feed_sympy_2 = eval(list_of_feed_dicts[2]["sympy"])
     feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
-    feed_sympy_4 = eval(list_of_feed_dicts[4]["sympy"])
-    feed_sympy_5 = eval(list_of_feed_dicts[5]["sympy"])
-    feed_sympy_6 = eval(list_of_feed_dicts[6]["sympy"])
     output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
     output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
 
@@ -2419,6 +2428,10 @@ def change_three_variables_in_expr(
     trace_id = str(random.randint(1000000, 9999999))
     logger.info("[TRACE] start " + trace_id)
 
+    logger.info(str(list_of_input_dicts))
+    logger.info(str(list_of_feed_dicts))
+    logger.info(str(list_of_output_dicts))
+
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
     input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
     feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
@@ -2427,7 +2440,6 @@ def change_three_variables_in_expr(
     feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
     feed_sympy_4 = eval(list_of_feed_dicts[4]["sympy"])
     feed_sympy_5 = eval(list_of_feed_dicts[5]["sympy"])
-    feed_sympy_6 = eval(list_of_feed_dicts[6]["sympy"])
     output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
     output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
 
