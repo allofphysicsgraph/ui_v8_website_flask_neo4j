@@ -70,7 +70,7 @@ def generate_random_id(
 
     found_new_ID = False
     while not found_new_ID:
-        new_id = str(random.randint(1000000, 9999999))
+        new_id = str(random.randint(1000000000, 9999999999))
         if new_id not in list_of_existing_IDs:
             found_new_ID = True
 
