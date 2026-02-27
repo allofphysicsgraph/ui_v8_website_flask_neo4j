@@ -4527,7 +4527,8 @@ def to_add_symbols_and_operations_for_expression(
                 url_for(
                     "to_add_sympy_and_lean_for_expression",
                     expression_id=expression_id,
-                    symbol_id_dict=symbol_id_dict,
+                    **symbol_id_dict,  # Unpack the dictionary into keyword arguments
+                    # symbol_id_dict=json.dumps(symbol_id_dict),
                 )
             )
         elif (
@@ -4589,7 +4590,8 @@ def to_add_symbols_and_operations_for_expression(
                 url_for(
                     "to_add_sympy_and_lean_for_expression",
                     expression_id=expression_id,
-                    symbol_id_dict=symbol_id_dict,
+                    **symbol_id_dict,  # Unpack the dictionary into keyword arguments
+                    # symbol_id_dict=json.dumps(symbol_id_dict),
                 )
             )
         else:
@@ -4633,7 +4635,16 @@ def to_add_sympy_and_lean_for_expression(
     logger.info("type(symbol_id_dict)=" + str(type(symbol_id_dict)))
     # TODO this is a security risk - evaluating user-provided string from URL
     # To fix this, pass the arguments as key-value pairs ?a=5638458&b=7152159
-    symbol_id_dict = eval(symbol_id_dict)
+    # symbol_id_dict = eval(symbol_id_dict)
+
+    # try:
+    #     # Safely parse the JSON string back into a dictionary
+    #     symbol_id_dict = json.loads(symbol_id_dict)
+    # except json.JSONDecodeError:
+    #     return "Invalid dictionary format", 400
+
+    symbol_id_dict = request.args.to_dict()
+
     logger.info("symbol_id_dict=" + str(symbol_id_dict))
 
     with graphDB_Driver.session() as session:
@@ -5026,7 +5037,8 @@ def to_add_symbols_and_operations_for_feed(
             url_for(
                 "to_add_sympy_and_lean_for_feed",
                 feed_id=feed_id,
-                symbol_id_dict=symbol_id_dict,
+                **symbol_id_dict,  # Unpack the dictionary into keyword arguments
+                # symbol_id_dict=json.dumps(symbol_id_dict),
             )
         )
 
@@ -5058,12 +5070,16 @@ def to_add_sympy_and_lean_for_feed(
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    logger.info(
-        "to_add_sympy_and_lean_for_feed: type(symbol_id_dict)="
-        + str(type(symbol_id_dict))
-    )
-    symbol_id_dict = eval(symbol_id_dict)
-    logger.info("to_add_sympy_and_lean_for_feed: symbol_id_dict=" + str(symbol_id_dict))
+    # symbol_id_dict = eval(symbol_id_dict)
+
+    # try:
+    #     # Safely parse the JSON string back into a dictionary
+    #     symbol_id_dict = json.loads(symbol_id_dict)
+    # except json.JSONDecodeError:
+    #     return "Invalid dictionary format", 400
+
+    symbol_id_dict = request.args.to_dict()
+    logger.info("symbol_id_dict=" + str(symbol_id_dict))
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -5073,21 +5089,19 @@ def to_add_sympy_and_lean_for_feed(
         query_time_dict[
             "pdg_app/to_add_sympy_and_lean_for_feed, node_properties " + trace_id
         ] = round(time.time() - query_start_time, 3)
-    logger.info("to_add_sympy_and_lean_for_feed: feed_dict=" + str(feed_dict))
+    logger.info("feed_dict=" + str(feed_dict))
 
-    logger.info("to_add_sympy_and_lean_for_feed: symbol_id_dict=" + str(symbol_id_dict))
+    logger.info("symbol_id_dict=" + str(symbol_id_dict))
     # symbol_id_dict= {'a': '5638458', 'b': '7152159'}
 
     # provide a guess for the SymPy based on the Latex provided
 
     cleaned_latex_str = compute.remove_latex_presention_markings(feed_dict["latex"])
-    logger.info(
-        "to_add_sympy_and_lean_for_feed: cleaned_latex_str=" + str(cleaned_latex_str)
-    )
+    logger.info("cleaned_latex_str=" + str(cleaned_latex_str))
     sympy_expr = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
         cleaned_latex_str
     )
-    logger.info("to_add_sympy_and_lean_for_feed: sympy_expr=" + str(sympy_expr))
+    logger.info("sympy_expr=" + str(sympy_expr))
     # list_of_sympy_symbols = latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr)
     # logger.info("list_of_sympy_symbols=",list_of_sympy_symbols)
 
@@ -5097,7 +5111,7 @@ def to_add_sympy_and_lean_for_feed(
         sympy_expr, symbol_id_dict
     )
 
-    logger.info("to_add_sympy_and_lean_for_feed revised_expr=" + str(revised_expr))
+    logger.info("revised_expr=" + str(revised_expr))
 
     revised_feed_with_str = re.sub(
         r"(pdg\d\d\d\d\d\d\d)", r"Symbol('\1')", str(revised_expr)
@@ -5105,23 +5119,16 @@ def to_add_sympy_and_lean_for_feed(
 
     # revised_feed_with_str = re.sub(r"^Eq", "sympy.Eq", revised_feed_with_str)
 
-    logger.info(
-        "to_add_sympy_and_lean_for_feed revised_feed_with_str="
-        + str(revised_feed_with_str)
-    )
+    logger.info("revised_feed_with_str=" + str(revised_feed_with_str))
 
     web_form = SpecifyNewFeedSympyLeanForm(request.form)
     if request.method == "POST":
-        logger.info(
-            "to_add_sympy_and_lean_for_feed request.form = " + str(request.form)
-        )
+        logger.info("request.form = " + str(request.form))
 
         sympy_str = str(web_form.sympy_str.data).strip()
         lean_str = str(web_form.lean_str.data).strip()
 
-        logger.info(
-            "to_add_sympy_and_lean_for_feed submitted sympy_str=" + str(sympy_str)
-        )
+        logger.info("submitted sympy_str=" + str(sympy_str))
 
         try:
             # CAVEAT: sympy_str must use single quotes (') since neo4j query uses (")
