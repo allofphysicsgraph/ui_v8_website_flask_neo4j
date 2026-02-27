@@ -2539,7 +2539,7 @@ def to_add_expression() -> werkzeug.Response:
     )  # type: Dict[str,list] # _table_of_expressions.html
     for this_expression_dict in list_of_expression_dicts:
         symbol_IDs_per_expression_id[this_expression_dict["id"]], query_time_dict = (
-            compute.get_list_of_symbol_IDs_in_expression_or_feed(
+            compute.get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
                 graphDB_Driver,
                 query_time_dict,
                 "expression",
@@ -2780,7 +2780,7 @@ def to_add_feed() -> werkzeug.Response:
     symbol_IDs_per_feed_id = {}  # type: Dict[str,list]  # _table_of_feeds.html
     for this_feed_dict in list_of_feed_dicts:
         symbol_IDs_per_feed_id[this_feed_dict["id"]], query_time_dict = (
-            compute.get_list_of_symbol_IDs_in_expression_or_feed(
+            compute.get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
                 graphDB_Driver, query_time_dict, "feed", this_feed_dict["id"]
             )
         )
