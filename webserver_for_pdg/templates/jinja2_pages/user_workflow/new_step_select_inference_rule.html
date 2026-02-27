@@ -30,23 +30,41 @@ Case-insensitive dynamic search of latex as plain text: <input type="text" id="i
 function latex_filter() {
   // Declare variables
   var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("select_infrule");
+  input = document.getElementById("inf_rule_input");
   filter = input.value.toUpperCase();
   table = document.getElementById("inference_rule_table");
   tr = table.getElementsByTagName("tr");
 
-  // Loop through all table rows, and hide those who don't match the search query
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[1];
-    console.log(td)
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+  // Loop through all table rows (except header); then hide those who don't match the search query
+  for (i = 1; i < tr.length; i++) {
+    // td = tr[i].getElementsByTagName("td")[1]; // just "latex" column
+    // console.log(td)
+    // if (td) {
+    //   txtValue = td.textContent || td.innerText;
+    //   if (txtValue.toUpperCase().indexOf(filter) > -1) {
+    //     tr[i].style.display = "";
+    //   } else {
+    //     tr[i].style.display = "none";
+    //   }
+    // }
+
+    var tdName = tr[i].getElementsByTagName("td")[0];
+    var tdLatex = tr[i].getElementsByTagName("td")[1];
+    
+    if (tdName || tdLatex) {
+      // Get text from both cells (using empty string if cell is missing)
+      var nameValue = tdName ? (tdName.textContent || tdName.innerText) : "";
+      var latexValue = tdLatex ? (tdLatex.textContent || tdLatex.innerText) : "";
+      
+      // Check if the filter matches either the name OR the latex
+      if (nameValue.toUpperCase().indexOf(filter) > -1 || 
+          latexValue.toUpperCase().indexOf(filter) > -1) {
         tr[i].style.display = "";
       } else {
         tr[i].style.display = "none";
       }
     }
+
   }
 }
 </script>
