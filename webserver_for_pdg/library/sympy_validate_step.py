@@ -20,7 +20,7 @@ Observations:
 TODO: although some functions have doctests, these doctests rely on the previous argument structures
 rather than the current "list of dicts"x3.
         # Implementation expects:
-        input_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
+        input_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
 
         # Doctest provides:
         input_expr = parse_latex("a = b") # Returns an Equality object
@@ -520,6 +520,23 @@ def validate_step(
     return "This message should not be seen"
 
 
+def parse_to_sympy(expr_str: str):
+    """
+    Helper function to replace eval() and handle empty strings
+    """
+    if not expr_str:  # gracefully handle empty strings like ''
+        logger.error("Empty string instead of SymPy")
+        raise Exception("Empty string instead of SymPy")
+
+    # try:
+    res = sympy.sympify(expr_str)
+    # except Exception as err:
+    #     logger.error(str(type(err).__name__) + ": " + str(err) + " : " + str(expr_str))
+    #     return None
+
+    return res
+
+
 def add_X_to_both_sides(
     list_of_input_dicts: List[dict],
     list_of_feed_dicts: List[dict],
@@ -551,13 +568,31 @@ def add_X_to_both_sides(
         == list_of_output_dicts[0]["latex_relation"]
     )
 
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_feed_dicts[0]["sympy"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
     # since this inference rule is valid for equality and inequality, no need to check the relation
 
-    input_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed = eval(list_of_feed_dicts[0]["sympy"])
-    output_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     delta_lhs = sympy.simplify(sympy.Add(input_lhs, feed) - output_lhs)
 
@@ -621,13 +656,31 @@ def subtract_X_from_both_sides(
         == list_of_output_dicts[0]["latex_relation"]
     )
 
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_feed_dicts[0]["sympy"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
     # since this inference rule is valid for equality and inequality, no need to check the relation
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     delta_lhs = sympy.simplify(
         sympy.Add(input_expr_sympy_lhs, sympy.Mul(-1, feed_sympy))
@@ -736,13 +789,31 @@ def multiply_both_sides_by(
     #     logger.info("[TRACE] end " + trace_id)
     #     return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
 
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_feed_dicts[0]["sympy"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
     # Gemini 3 Pro says `sympy.parse_expr` or specific context handling is safer than `eval()`.
     # Gemini 3 Pro also says using sympify is safer and more robust than eval() for math expressions
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     input_rel_latex = list_of_input_dicts[0].get("latex_relation", "=").strip()
     output_rel_latex = list_of_output_dicts[0].get("latex_relation", "=").strip()
@@ -927,11 +998,29 @@ def divide_both_sides_by(
         == list_of_output_dicts[0]["latex_relation"]
     )
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_feed_dicts[0]["sympy"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     # BHP's original (inadequate) attempt:
     # delta_lhs = sympy.simplify(
@@ -1051,12 +1140,33 @@ def change_variable_X_to_Y(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
-    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_feed_dicts[0]["sympy"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_feed_dicts[1]["sympy"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = parse_to_sympy(list_of_feed_dicts[1]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
         input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1) - output_expr_sympy_lhs
@@ -1103,11 +1213,29 @@ def multiply_LHS_by_unity(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_feed_dicts[0]["sympy"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(feed_sympy - 1)
     d2 = sympy.simplify(
@@ -1156,11 +1284,29 @@ def multiply_RHS_by_unity(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_feed_dicts[0]["sympy"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(feed_sympy - 1)
     d2 = sympy.simplify(
@@ -1211,11 +1357,29 @@ def add_zero_to_LHS(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_feed_dicts[0]["sympy"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(feed_sympy)
     d2 = sympy.simplify(
@@ -1264,11 +1428,29 @@ def add_zero_to_RHS(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_feed_dicts[0]["sympy"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(feed_sympy)
     d2 = sympy.simplify(
@@ -1484,11 +1666,37 @@ def make_expr_power(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_feed_dicts[0]["sympy"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+
+    logger.info("input_expr_sympy_lhs " + str(input_expr_sympy_lhs))
+    logger.info("input_expr_sympy_rhs " + str(input_expr_sympy_rhs))
+
+    logger.info("feed_sympy " + str(feed_sympy))
+
+    logger.info("output_expr_sympy_lhs " + str(output_expr_sympy_lhs))
+    logger.info("output_expr_sympy_rhs " + str(output_expr_sympy_rhs))
 
     d1 = sympy.simplify(
         output_expr_sympy_lhs - sympy.Pow(feed_sympy, input_expr_sympy_lhs)
@@ -1521,10 +1729,29 @@ def select_real_parts(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+
+    logger.info("input_expr_sympy_lhs " + str(input_expr_sympy_lhs))
+    logger.info("input_expr_sympy_rhs " + str(input_expr_sympy_rhs))
+
+    logger.info("output_expr_sympy_lhs " + str(output_expr_sympy_lhs))
+    logger.info("output_expr_sympy_rhs " + str(output_expr_sympy_rhs))
 
     d1 = sympy.simplify(sympy.re(input_expr_sympy_lhs) - output_expr_sympy_lhs)
     d2 = sympy.simplify(sympy.re(input_expr_sympy_rhs) - output_expr_sympy_rhs)
@@ -1554,10 +1781,29 @@ def select_imag_parts(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+
+    logger.info("input_expr_sympy_lhs " + str(input_expr_sympy_lhs))
+    logger.info("input_expr_sympy_rhs " + str(input_expr_sympy_rhs))
+
+    logger.info("output_expr_sympy_lhs " + str(output_expr_sympy_lhs))
+    logger.info("output_expr_sympy_rhs " + str(output_expr_sympy_rhs))
 
     d1 = sympy.simplify(sympy.im(input_expr_sympy_lhs) - output_expr_sympy_lhs)
     d2 = sympy.simplify(sympy.im(input_expr_sympy_rhs) - output_expr_sympy_rhs)
@@ -1587,10 +1833,29 @@ def swap_LHS_with_RHS(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+
+    logger.info("input_expr_sympy_lhs " + str(input_expr_sympy_lhs))
+    logger.info("input_expr_sympy_rhs " + str(input_expr_sympy_rhs))
+
+    logger.info("output_expr_sympy_lhs " + str(output_expr_sympy_lhs))
+    logger.info("output_expr_sympy_rhs " + str(output_expr_sympy_rhs))
 
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_rhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_lhs)
@@ -1666,12 +1931,40 @@ def add_expr_1_to_expr_2(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
-    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
-    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
-    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    input_expr_sympy_lhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+
+    logger.info("input_expr_sympy_lhs_0 " + str(input_expr_sympy_lhs_0))
+    logger.info("input_expr_sympy_rhs_0 " + str(input_expr_sympy_rhs_0))
+
+    logger.info("input_expr_sympy_lhs_1 " + str(input_expr_sympy_lhs_1))
+    logger.info("input_expr_sympy_rhs_1 " + str(input_expr_sympy_rhs_1))
+
+    logger.info("output_expr_sympy_lhs_0 " + str(output_expr_sympy_lhs_0))
+    logger.info("output_expr_sympy_rhs_0 " + str(output_expr_sympy_rhs_0))
 
     d1 = sympy.simplify(
         sympy.Add(input_expr_sympy_lhs_0, input_expr_sympy_lhs_1)
@@ -1710,21 +2003,68 @@ def substitute_RHS_of_expr_1_into_expr_2(
     logger.info(str(list_of_feed_dicts))
     logger.info(str(list_of_output_dicts))
 
-    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
-    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
-    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
-    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+    # input_expr_sympy_lhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    # input_expr_sympy_rhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    # input_expr_sympy_lhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_lhs"])
+    # input_expr_sympy_rhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_rhs"])
+    # output_expr_sympy_lhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    # output_expr_sympy_rhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
-    d1 = sympy.simplify(
-        input_expr_sympy_lhs_1.subs(input_expr_sympy_rhs_0, input_expr_sympy_lhs_0)
-        - output_expr_sympy_lhs_0
-    )  # subs(old,new)
-    d2 = sympy.simplify(
-        input_expr_sympy_rhs_1.subs(input_expr_sympy_rhs_0, input_expr_sympy_lhs_0)
-        - output_expr_sympy_rhs_0
-    )  # subs(old,new)
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+
+    try:
+        input_expr_sympy_lhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+        input_expr_sympy_rhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+
+        input_expr_sympy_lhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_lhs"])
+        input_expr_sympy_rhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_rhs"])
+
+        output_expr_sympy_lhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+        output_expr_sympy_rhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    except Exception as err:
+        logger.error(
+            str(type(err).__name__) + ": " + str(err) + " : loading parameters"
+        )
+        return str(type(err).__name__) + ": " + str(err) + " : loading parameters"
+
+    logger.info("input_expr_sympy_lhs_0 " + str(input_expr_sympy_lhs_0))
+    logger.info("input_expr_sympy_rhs_0 " + str(input_expr_sympy_rhs_0))
+
+    logger.info("input_expr_sympy_lhs_1 " + str(input_expr_sympy_lhs_1))
+    logger.info("input_expr_sympy_rhs_1 " + str(input_expr_sympy_rhs_1))
+
+    logger.info("output_expr_sympy_lhs_0 " + str(output_expr_sympy_lhs_0))
+    logger.info("output_expr_sympy_rhs_0 " + str(output_expr_sympy_rhs_0))
+
+    try:
+        d1 = sympy.simplify(
+            input_expr_sympy_lhs_1.subs(input_expr_sympy_rhs_0, input_expr_sympy_lhs_0)
+            - output_expr_sympy_lhs_0
+        )  # subs(old,new)
+        d2 = sympy.simplify(
+            input_expr_sympy_rhs_1.subs(input_expr_sympy_rhs_0, input_expr_sympy_lhs_0)
+            - output_expr_sympy_rhs_0
+        )  # subs(old,new)
+    except Exception as err:
+        logger.error(str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy")
+        return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
 
     if (d1 == 0) and (d2 == 0):
         logger.info("[TRACE] end " + trace_id)
@@ -1751,21 +2091,53 @@ def substitute_LHS_of_expr_1_into_expr_2(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
-    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
-    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
-    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
 
-    d1 = sympy.simplify(
-        input_expr_sympy_lhs_1.subs(input_expr_sympy_lhs_0, input_expr_sympy_rhs_0)
-        - output_expr_sympy_lhs_0
-    )  # subs(old,new)
-    d2 = sympy.simplify(
-        input_expr_sympy_rhs_1.subs(input_expr_sympy_lhs_0, input_expr_sympy_rhs_0)
-        - output_expr_sympy_rhs_0
-    )  # subs(old,new)
+    input_expr_sympy_lhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+
+    logger.info("input_expr_sympy_lhs_0 " + str(input_expr_sympy_lhs_0))
+    logger.info("input_expr_sympy_rhs_0 " + str(input_expr_sympy_rhs_0))
+
+    logger.info("input_expr_sympy_lhs_1 " + str(input_expr_sympy_lhs_1))
+    logger.info("input_expr_sympy_rhs_1 " + str(input_expr_sympy_rhs_1))
+
+    logger.info("output_expr_sympy_lhs_0 " + str(output_expr_sympy_lhs_0))
+    logger.info("output_expr_sympy_rhs_0 " + str(output_expr_sympy_rhs_0))
+
+    try:
+        d1 = sympy.simplify(
+            input_expr_sympy_lhs_1.subs(input_expr_sympy_lhs_0, input_expr_sympy_rhs_0)
+            - output_expr_sympy_lhs_0
+        )  # subs(old,new)
+        d2 = sympy.simplify(
+            input_expr_sympy_rhs_1.subs(input_expr_sympy_lhs_0, input_expr_sympy_rhs_0)
+            - output_expr_sympy_rhs_0
+        )  # subs(old,new)
+    except Exception as err:
+        logger.error(str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy")
+        return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
 
     if (d1 == 0) and (d2 == 0):
         logger.info("[TRACE] end " + trace_id)
@@ -1793,21 +2165,55 @@ def mult_expr_1_by_expr_2(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
-    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
-    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
-    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
 
-    d1 = sympy.simplify(
-        sympy.Mul(input_expr_sympy_lhs_0, input_expr_sympy_lhs_1)
-        - output_expr_sympy_lhs_0
-    )
-    d2 = sympy.simplify(
-        sympy.Mul(input_expr_sympy_rhs_0, input_expr_sympy_rhs_1)
-        - output_expr_sympy_rhs_0
-    )
+    input_expr_sympy_lhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+
+    logger.info("input_expr_sympy_lhs_0 " + str(input_expr_sympy_lhs_0))
+    logger.info("input_expr_sympy_rhs_0 " + str(input_expr_sympy_rhs_0))
+
+    logger.info("input_expr_sympy_lhs_1 " + str(input_expr_sympy_lhs_1))
+    logger.info("input_expr_sympy_rhs_1 " + str(input_expr_sympy_rhs_1))
+
+    logger.info("output_expr_sympy_lhs_0 " + str(output_expr_sympy_lhs_0))
+    logger.info("output_expr_sympy_rhs_0 " + str(output_expr_sympy_rhs_0))
+
+    try:
+        d1 = sympy.simplify(
+            sympy.Mul(input_expr_sympy_lhs_0, input_expr_sympy_lhs_1)
+            - output_expr_sympy_lhs_0
+        )
+        d2 = sympy.simplify(
+            sympy.Mul(input_expr_sympy_rhs_0, input_expr_sympy_rhs_1)
+            - output_expr_sympy_rhs_0
+        )
+
+    except Exception as err:
+        logger.error(str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy")
+        return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
+
     if (d1 == 0) and (d2 == 0):
         logger.info("[TRACE] end " + trace_id)
         return "valid"
@@ -1844,16 +2250,54 @@ def LHS_of_expr_1_eq_LHS_of_expr_2(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
-    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
-    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
-    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
 
-    d1 = sympy.simplify(input_expr_sympy_lhs_0 - input_expr_sympy_lhs_1)  #  0 = a - a
-    d2 = sympy.simplify(input_expr_sympy_rhs_0 - output_expr_sympy_lhs_0)  #  0 = b - b
-    d3 = sympy.simplify(input_expr_sympy_rhs_1 - output_expr_sympy_rhs_0)  #  0 = d - d
+    input_expr_sympy_lhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+
+    logger.info("input_expr_sympy_lhs_0 " + str(input_expr_sympy_lhs_0))
+    logger.info("input_expr_sympy_rhs_0 " + str(input_expr_sympy_rhs_0))
+
+    logger.info("input_expr_sympy_lhs_1 " + str(input_expr_sympy_lhs_1))
+    logger.info("input_expr_sympy_rhs_1 " + str(input_expr_sympy_rhs_1))
+
+    logger.info("output_expr_sympy_lhs_0 " + str(output_expr_sympy_lhs_0))
+    logger.info("output_expr_sympy_rhs_0 " + str(output_expr_sympy_rhs_0))
+
+    try:
+        d1 = sympy.simplify(
+            input_expr_sympy_lhs_0 - input_expr_sympy_lhs_1
+        )  #  0 = a - a
+        d2 = sympy.simplify(
+            input_expr_sympy_rhs_0 - output_expr_sympy_lhs_0
+        )  #  0 = b - b
+        d3 = sympy.simplify(
+            input_expr_sympy_rhs_1 - output_expr_sympy_rhs_0
+        )  #  0 = d - d
+    except Exception as err:
+        logger.error(str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy")
+        return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
 
     if (d1 == 0) and (d2 == 0) and (d3 == 0):
         logger.info("[TRACE] end " + trace_id)
@@ -1890,16 +2334,49 @@ def RHS_of_expr_1_eq_RHS_of_expr_2(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
-    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
-    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
-    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[1]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
 
-    d1 = sympy.simplify(input_expr_sympy_rhs_0 - input_expr_sympy_rhs_1)
-    d2 = sympy.simplify(output_expr_sympy_lhs_0 - input_expr_sympy_lhs_0)
-    d3 = sympy.simplify(output_expr_sympy_rhs_0 - input_expr_sympy_lhs_1)
+    input_expr_sympy_lhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+
+    logger.info("input_expr_sympy_lhs_0 " + str(input_expr_sympy_lhs_0))
+    logger.info("input_expr_sympy_rhs_0 " + str(input_expr_sympy_rhs_0))
+
+    logger.info("input_expr_sympy_lhs_1 " + str(input_expr_sympy_lhs_1))
+    logger.info("input_expr_sympy_rhs_1 " + str(input_expr_sympy_rhs_1))
+
+    logger.info("output_expr_sympy_lhs_0 " + str(output_expr_sympy_lhs_0))
+    logger.info("output_expr_sympy_rhs_0 " + str(output_expr_sympy_rhs_0))
+
+    try:
+        d1 = sympy.simplify(input_expr_sympy_rhs_0 - input_expr_sympy_rhs_1)
+        d2 = sympy.simplify(output_expr_sympy_lhs_0 - input_expr_sympy_lhs_0)
+        d3 = sympy.simplify(output_expr_sympy_rhs_0 - input_expr_sympy_lhs_1)
+    except Exception as err:
+        logger.error(str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy")
+        return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
+
     if (d1 == 0) and (d2 == 0) and (d3 == 0):
         logger.info("[TRACE] end " + trace_id)
         return "valid"
@@ -1957,13 +2434,37 @@ def claim_expr_1_equals_expr_2(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
 
-    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
-    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+
+    logger.info("input_expr_sympy_lhs " + str(input_expr_sympy_lhs))
+    logger.info("input_expr_sympy_rhs " + str(input_expr_sympy_rhs))
+
+    logger.info("output_expr_sympy_lhs " + str(output_expr_sympy_lhs))
+    logger.info("output_expr_sympy_rhs " + str(output_expr_sympy_rhs))
+
+    try:
+        d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+        d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+    except Exception as err:
+        logger.error(str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy")
+        return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
+
     if (d1 == 0) and (d2 == 0):
         logger.info("[TRACE] end " + trace_id)
         return "valid"
@@ -1993,12 +2494,35 @@ def claim_LHS_equals_RHS(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    if not list_of_input_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_input_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_lhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
+    if not list_of_output_dicts[0]["sympy_rhs"]:
+        logger.info("Not evaluated due to missing term in SymPy")
+        return "Not evaluated due to missing term in SymPy"
 
-    d1 = sympy.simplify(input_expr_sympy_rhs - input_expr_sympy_lhs)
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+
+    logger.info("input_expr_sympy_lhs " + str(input_expr_sympy_lhs))
+    logger.info("input_expr_sympy_rhs " + str(input_expr_sympy_rhs))
+
+    logger.info("output_expr_sympy_lhs " + str(output_expr_sympy_lhs))
+    logger.info("output_expr_sympy_rhs " + str(output_expr_sympy_rhs))
+
+    try:
+        d1 = sympy.simplify(input_expr_sympy_rhs - input_expr_sympy_lhs)
+    except Exception as err:
+        logger.error(str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy")
+        return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
 
     if d1 == 0:
         logger.info("[TRACE] end " + trace_id)
@@ -2153,10 +2677,10 @@ def simplify(
     logger.info(str(list_of_feed_dicts))
     logger.info(str(list_of_output_dicts))
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
@@ -2185,12 +2709,12 @@ def subtract_expr_1_from_expr_2(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs_0 = eval(list_of_input_dicts[0]["sympy_rhs"])
-    input_expr_sympy_lhs_1 = eval(list_of_input_dicts[1]["sympy_lhs"])
-    input_expr_sympy_rhs_1 = eval(list_of_input_dicts[1]["sympy_rhs"])
-    output_expr_sympy_lhs_0 = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs_0 = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
         (input_expr_sympy_lhs_1 - input_expr_sympy_lhs_0) - output_expr_sympy_lhs_0
@@ -2220,11 +2744,11 @@ def factor_out_x(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
@@ -2255,11 +2779,11 @@ def factor_out_x_from_lhs(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
@@ -2291,11 +2815,11 @@ def factor_out_x_from_rhs(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
@@ -2372,14 +2896,14 @@ def change_two_variables_in_expr(
     # logger.info(str(list_of_feed_dicts))
     # logger.info(str(list_of_output_dicts))
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
-    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
-    feed_sympy_2 = eval(list_of_feed_dicts[2]["sympy"])
-    feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = parse_to_sympy(list_of_feed_dicts[1]["sympy"])
+    feed_sympy_2 = parse_to_sympy(list_of_feed_dicts[2]["sympy"])
+    feed_sympy_3 = parse_to_sympy(list_of_feed_dicts[3]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
         input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1).subs(
@@ -2433,16 +2957,16 @@ def change_three_variables_in_expr(
     logger.info(str(list_of_feed_dicts))
     logger.info(str(list_of_output_dicts))
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
-    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
-    feed_sympy_2 = eval(list_of_feed_dicts[2]["sympy"])
-    feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
-    feed_sympy_4 = eval(list_of_feed_dicts[4]["sympy"])
-    feed_sympy_5 = eval(list_of_feed_dicts[5]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = parse_to_sympy(list_of_feed_dicts[1]["sympy"])
+    feed_sympy_2 = parse_to_sympy(list_of_feed_dicts[2]["sympy"])
+    feed_sympy_3 = parse_to_sympy(list_of_feed_dicts[3]["sympy"])
+    feed_sympy_4 = parse_to_sympy(list_of_feed_dicts[4]["sympy"])
+    feed_sympy_5 = parse_to_sympy(list_of_feed_dicts[5]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
         input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1)
@@ -2474,18 +2998,18 @@ def change_four_variables_in_expr(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
-    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
-    feed_sympy_2 = eval(list_of_feed_dicts[2]["sympy"])
-    feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
-    feed_sympy_4 = eval(list_of_feed_dicts[4]["sympy"])
-    feed_sympy_5 = eval(list_of_feed_dicts[5]["sympy"])
-    feed_sympy_6 = eval(list_of_feed_dicts[6]["sympy"])
-    feed_sympy_7 = eval(list_of_feed_dicts[7]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = parse_to_sympy(list_of_feed_dicts[1]["sympy"])
+    feed_sympy_2 = parse_to_sympy(list_of_feed_dicts[2]["sympy"])
+    feed_sympy_3 = parse_to_sympy(list_of_feed_dicts[3]["sympy"])
+    feed_sympy_4 = parse_to_sympy(list_of_feed_dicts[4]["sympy"])
+    feed_sympy_5 = parse_to_sympy(list_of_feed_dicts[5]["sympy"])
+    feed_sympy_6 = parse_to_sympy(list_of_feed_dicts[6]["sympy"])
+    feed_sympy_7 = parse_to_sympy(list_of_feed_dicts[7]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
         input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1)
@@ -2519,20 +3043,20 @@ def change_five_variables_in_expr(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
-    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
-    feed_sympy_2 = eval(list_of_feed_dicts[2]["sympy"])
-    feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
-    feed_sympy_4 = eval(list_of_feed_dicts[4]["sympy"])
-    feed_sympy_5 = eval(list_of_feed_dicts[5]["sympy"])
-    feed_sympy_6 = eval(list_of_feed_dicts[6]["sympy"])
-    feed_sympy_7 = eval(list_of_feed_dicts[7]["sympy"])
-    feed_sympy_8 = eval(list_of_feed_dicts[8]["sympy"])
-    feed_sympy_9 = eval(list_of_feed_dicts[9]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = parse_to_sympy(list_of_feed_dicts[1]["sympy"])
+    feed_sympy_2 = parse_to_sympy(list_of_feed_dicts[2]["sympy"])
+    feed_sympy_3 = parse_to_sympy(list_of_feed_dicts[3]["sympy"])
+    feed_sympy_4 = parse_to_sympy(list_of_feed_dicts[4]["sympy"])
+    feed_sympy_5 = parse_to_sympy(list_of_feed_dicts[5]["sympy"])
+    feed_sympy_6 = parse_to_sympy(list_of_feed_dicts[6]["sympy"])
+    feed_sympy_7 = parse_to_sympy(list_of_feed_dicts[7]["sympy"])
+    feed_sympy_8 = parse_to_sympy(list_of_feed_dicts[8]["sympy"])
+    feed_sympy_9 = parse_to_sympy(list_of_feed_dicts[9]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
         input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1)
@@ -2568,22 +3092,22 @@ def change_six_variables_in_expr(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    feed_sympy_0 = eval(list_of_feed_dicts[0]["sympy"])
-    feed_sympy_1 = eval(list_of_feed_dicts[1]["sympy"])
-    feed_sympy_2 = eval(list_of_feed_dicts[2]["sympy"])
-    feed_sympy_3 = eval(list_of_feed_dicts[3]["sympy"])
-    feed_sympy_4 = eval(list_of_feed_dicts[4]["sympy"])
-    feed_sympy_5 = eval(list_of_feed_dicts[5]["sympy"])
-    feed_sympy_6 = eval(list_of_feed_dicts[6]["sympy"])
-    feed_sympy_7 = eval(list_of_feed_dicts[7]["sympy"])
-    feed_sympy_8 = eval(list_of_feed_dicts[8]["sympy"])
-    feed_sympy_9 = eval(list_of_feed_dicts[9]["sympy"])
-    feed_sympy_10 = eval(list_of_feed_dicts[10]["sympy"])
-    feed_sympy_11 = eval(list_of_feed_dicts[11]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = parse_to_sympy(list_of_feed_dicts[1]["sympy"])
+    feed_sympy_2 = parse_to_sympy(list_of_feed_dicts[2]["sympy"])
+    feed_sympy_3 = parse_to_sympy(list_of_feed_dicts[3]["sympy"])
+    feed_sympy_4 = parse_to_sympy(list_of_feed_dicts[4]["sympy"])
+    feed_sympy_5 = parse_to_sympy(list_of_feed_dicts[5]["sympy"])
+    feed_sympy_6 = parse_to_sympy(list_of_feed_dicts[6]["sympy"])
+    feed_sympy_7 = parse_to_sympy(list_of_feed_dicts[7]["sympy"])
+    feed_sympy_8 = parse_to_sympy(list_of_feed_dicts[8]["sympy"])
+    feed_sympy_9 = parse_to_sympy(list_of_feed_dicts[9]["sympy"])
+    feed_sympy_10 = parse_to_sympy(list_of_feed_dicts[10]["sympy"])
+    feed_sympy_11 = parse_to_sympy(list_of_feed_dicts[11]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
         input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1)
@@ -2701,11 +3225,11 @@ def evaluate_definite_integral(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    # feed_sympy = eval(list_of_feed_dicts[0]["sympy"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    # feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
@@ -2727,10 +3251,10 @@ def expand_LHS(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
@@ -2753,10 +3277,10 @@ def expand_RHS(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
-    input_expr_sympy_rhs = eval(list_of_input_dicts[0]["sympy_rhs"])
-    output_expr_sympy_lhs = eval(list_of_output_dicts[0]["sympy_lhs"])
-    output_expr_sympy_rhs = eval(list_of_output_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
