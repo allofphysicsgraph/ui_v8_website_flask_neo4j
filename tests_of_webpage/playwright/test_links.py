@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
 
+# Ben Payne
+# Physics Derivation Graph
+# https://allofphysics.com
+# Creative Commons Attribution 4.0 International License
+# https://creativecommons.org/licenses/by/4.0/
+
 import re
+import json
+import os
 from playwright.sync_api import Page, expect
+
 
 # this is what is exposed inside the Docker container
 URL="http://localhost:5000"
@@ -98,19 +107,141 @@ def test_get_list_inference_rules_page(page: Page):
     
 
 def test_get_export_json_page(page: Page):
-    page.goto(URL+"/export_to_json")
+    # page.goto(URL+"/export_to_json")
+
+    page.goto(f"{URL}/navigation")
+
+    with page.expect_download() as download_info:
+        # It is better practice to click the actual link to test the UI,
+        # but you can also use page.goto(f"{URL}/export_to_cypher")
+        page.get_by_role("link", name="export as JSON").click()
+
+        # another option is
+        #page.get_by_text("export", exact=True).click()
+
+    download = download_info.value
+
+    # Define the path where you want to save the file. Use the suggested filename for uniqueness
+    save_path = os.path.join(os.getcwd(), download.suggested_filename)
+    download.save_as(save_path)
+
+    print(f"Downloaded file saved to: {save_path}")
+    assert os.path.exists(save_path)
+    assert download.suggested_filename == "pdg.jsonl" # Verify the filename matches
+
+    # Clean up (Optional but recommended so future tests don't get false positives)
+    if os.path.exists(save_path):
+        os.remove(save_path)
 
 def test_get_export_metadata_page(page: Page):
-    page.goto(URL+"/export_metadata_schema")
+    """
+    Unlike other exports that produce a file, this route puts the JSON inline and the browser renders the JSON
+    """
+    # page.goto(URL+"/export_metadata_schema")
+
+    page.goto(f"{URL}/navigation")
+
+    # clicking the link navigates the current page to the JSON view:
+    page.get_by_role("link", name="Export Metadata").click()
+    
+    # Wait for the URL to change or the content to be visible
+    # page.wait_for_url("**/export_metadata_schema")
+    print(f"Current URL: {page.url}")
+
+    page.wait_for_url(re.compile(r"export_metadata_schema"))
+
+
+    # Browsers often wrap raw JSON in a <pre> tag
+    content = page.locator("pre").inner_text()
+    
+    # Parse and verify
+    data = json.loads(content)
+    assert "labelCount" in data.keys()
+
 
 def test_get_export_csv_page(page: Page):
-    page.goto(URL+"/export_to_csv")
+    # page.goto(URL+"/export_to_csv")
+
+    page.goto(f"{URL}/navigation")
+
+    with page.expect_download() as download_info:
+        # It is better practice to click the actual link to test the UI,
+        # but you can also use page.goto(f"{URL}/export_to_cypher")
+        page.get_by_role("link", name="export as CSV").click()
+
+        # another option is
+        #page.get_by_text("export", exact=True).click()
+
+    download = download_info.value
+
+    # Define the path where you want to save the file. Use the suggested filename for uniqueness
+    save_path = os.path.join(os.getcwd(), download.suggested_filename)
+    download.save_as(save_path)
+
+    print(f"Downloaded file saved to: {save_path}")
+    assert os.path.exists(save_path)
+    assert download.suggested_filename == "pdg.csv" # Verify the filename matches
+
+    # Clean up (Optional but recommended so future tests don't get false positives)
+    if os.path.exists(save_path):
+        os.remove(save_path)
+
 
 def test_get_export_graphml_page(page: Page):
-    page.goto(URL+"/export_to_graphml")
+    # page.goto(URL+"/export_to_graphml")
+
+    page.goto(f"{URL}/navigation")
+
+    with page.expect_download() as download_info:
+        # It is better practice to click the actual link to test the UI,
+        # but you can also use page.goto(f"{URL}/export_to_cypher")
+        page.get_by_role("link", name="export as GraphML").click()
+
+        # another option is
+        #page.get_by_text("export", exact=True).click()
+
+    download = download_info.value
+
+    # Define the path where you want to save the file. Use the suggested filename for uniqueness
+    save_path = os.path.join(os.getcwd(), download.suggested_filename)
+    download.save_as(save_path)
+
+    print(f"Downloaded file saved to: {save_path}")
+    assert os.path.exists(save_path)
+    assert download.suggested_filename == "pdg.graphml" # Verify the filename matches
+
+    # Clean up (Optional but recommended so future tests don't get false positives)
+    if os.path.exists(save_path):
+        os.remove(save_path)
+
 
 def test_get_export_cypher_page(page: Page):
-    page.goto(URL+"/export_to_cypher")
+    # page.goto(URL+"/export_to_cypher")
+
+    page.goto(f"{URL}/navigation")
+
+    with page.expect_download() as download_info:
+        # It is better practice to click the actual link to test the UI,
+        # but you can also use page.goto(f"{URL}/export_to_cypher")
+        page.get_by_role("link", name="export as Cypher").click()
+
+        # another option is
+        #page.get_by_text("export", exact=True).click()
+
+    download = download_info.value
+
+    # Define the path where you want to save the file. Use the suggested filename for uniqueness
+    save_path = os.path.join(os.getcwd(), download.suggested_filename)
+    download.save_as(save_path)
+
+    print(f"Downloaded file saved to: {save_path}")
+    assert os.path.exists(save_path)
+    assert download.suggested_filename == "pdg.cypher" # Verify the filename matches
+
+    # Clean up (Optional but recommended so future tests don't get false positives)
+    if os.path.exists(save_path):
+        os.remove(save_path)
+
 
 def test_get_api_js_page(page: Page):
     page.goto(URL+"/api_via_js")
@@ -128,7 +259,9 @@ def test_get_workflow_page(page: Page):
 
     expect(page).to_have_title(re.compile("Workflow"))
 
-    expect(page.get_by_role("heading", name="Workflow")).to_be_visible()
+    #expect(page.get_by_role("heading", name="Workflow")).to_be_visible()
+    expect(page.get_by_role("heading", name=re.compile("Workflow Interface Documentation"))).to_be_visible()
+
     
 
 def test_get_profile_page(page: Page):
@@ -182,7 +315,8 @@ def test_get_conventions_page(page: Page):
 def test_get_design_choices_page(page: Page):
     page.goto(URL+"/documentation/design_choices")
 
-    expect(page.get_by_role("heading", name="Design")).to_be_visible()
+    #expect(page.get_by_role("heading", name="Design")).to_be_visible()
+    expect(page.get_by_role("heading", name=re.compile("Design Principles Documentation"))).to_be_visible()
     
 
 def test_get_dimensionality_page(page: Page):
