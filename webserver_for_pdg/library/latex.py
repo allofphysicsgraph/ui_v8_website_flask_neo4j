@@ -253,7 +253,7 @@ def create_d3js_json(
             + '"img": "/static/'
             + png_name
             + '.png", '
-            + '"url": "https://allofphysiscs.com/list_all_inference_rules?referrer=d3js#'
+            + '"url": "https://allofphysics.com/list_all_inference_rules?referrer=d3js#'
             + step_dict["inference rule dict"]["name_latex"]
             + '", "width": '
             + str(image.shape[1])
