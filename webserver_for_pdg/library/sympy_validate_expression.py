@@ -106,7 +106,6 @@ def dimensional_consistency(
         return "sympy_rhs not provided for expression"
 
     try:
-        # sympy_expr = eval(expression_dict["sympy"])
         LHS = parse_expr(expression_dict["sympy_lhs"])
     except NameError as err:
         return (
@@ -153,7 +152,6 @@ def dimensional_consistency(
     # sympy_expr = Eq(pdg4223281, pdg3715170*pdg6035023)
 
     try:
-        # sympy_expr = eval(expression_dict["sympy"])
         RHS = parse_expr(expression_dict["sympy_rhs"])
     except NameError as err:
         return (

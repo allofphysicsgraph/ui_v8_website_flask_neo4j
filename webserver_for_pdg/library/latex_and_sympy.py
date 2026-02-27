@@ -54,7 +54,6 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
 
     expr = parse_expr(sympy_expr)
 
-    # latex_str = sympy.latex(eval(sympy_expr))
     latex_str = sympy.latex(expr)
 
     # TODO: sometimes the above files, like on a string with no SymPy formatting:
