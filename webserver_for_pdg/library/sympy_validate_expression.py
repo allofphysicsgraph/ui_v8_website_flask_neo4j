@@ -255,6 +255,9 @@ def dimensional_consistency(
     # now that the symbol dimensions have been set,
     # evaluate the dimensionality of the expression
 
+    logger.info(type(LHS))
+    logger.info(type(RHS))
+
     logger.info("LHS = " + str(LHS))
     logger.info("RHS = " + str(RHS))
 
