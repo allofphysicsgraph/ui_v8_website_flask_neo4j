@@ -20,6 +20,7 @@ import latex_and_sympy
 import re
 import hashlib
 import csv
+import uuid
 
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
@@ -47,7 +48,7 @@ def generate_random_id(
     The node IDs that Neo4j assigns internally are not static,
     so they can't be used for the Physics Derivation Graph
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     # print("node_type=", node_type)
 
@@ -81,7 +82,7 @@ def generate_lookup_for_shorten_url(shorten_url_file: str) -> str:
     """
     TODO: if URL already exists in CSV, then just return existing lookup
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     data_list = []  # contents of file as list of dicts
@@ -115,7 +116,7 @@ def add_url_to_shortened_list(now_str, current_user_email, user_url) -> str:
 
     User's email is hashed because the database is exposed publicly on the website
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     if not os.path.exists(shorten_url_file):
@@ -150,7 +151,7 @@ def get_url_from_shortened_list(lookup) -> str:
 
     TODO: increment the "count" column
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     data_list = []  # contents of file as list of dicts
@@ -187,7 +188,7 @@ def send_email_with_msmtp(
     Returns:
         bool: True for success, False for failure.
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     if isinstance(recipients, str):
@@ -255,7 +256,7 @@ def send_email_with_msmtp(
 
 def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     sympy_as_latex_per_feed_id = {}  # type: Dict[str, str]
@@ -293,7 +294,7 @@ def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
 
     The error handling here is similar to `sympy_validate_expression/dimensional_consistency`
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     for index, this_expression_dict in enumerate(list_of_expression_dicts):
@@ -351,7 +352,7 @@ def get_dimensional_consistency_per_expression_id(
     - all expressions for a specific derivation
     - editing one expression
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
@@ -432,7 +433,7 @@ def get_dict_of_node_type_for_every_id(
     """
     >>> get_node_type_from_id()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     with graphDB_Driver.session() as session:
@@ -489,7 +490,7 @@ def remove_file_debris(
 
     >>> remove_file_debris(['/path/to/file/'],['filename_without_extension'], ['ext1', 'ext2'])
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     for path_to_file in list_of_paths_to_files:
@@ -510,7 +511,7 @@ def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
     """
     TODO: eliminate this function
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     with graphDB_Driver.session() as session:
@@ -587,7 +588,7 @@ def get_list_of_all_nonoperation_symbol_dicts(
 
     >>> get_list_of_all_nonoperation_symbol_dicts
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     list_of_nonoperation_symbol_dicts = []  # type: List[dict]
@@ -649,7 +650,7 @@ def get_dict_of_all_symbol_dicts(
 
     >>>
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     dict_of_all_symbol_dicts = {}  # type: Dict[str,dict]
@@ -696,7 +697,7 @@ def get_dict_of_all_nonoperation_symbol_dicts(
 
     >>>
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     dict_of_all_nonoperation_symbol_dicts = {}  # type: Dict[str,dict]
@@ -727,7 +728,7 @@ def get_dict_of_nonoperation_symbol_dicts_in_expression(
     expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     dict_of_all_nonoperation_symbol_dicts, query_time_dict = (
         get_dict_of_all_nonoperation_symbol_dicts(graphDB_Driver, query_time_dict)
@@ -757,7 +758,7 @@ def get_dict_of_nonoperation_symbol_dicts_not_in_expression(
     expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     dict_of_all_nonoperation_symbol_dicts, query_time_dict = (
         get_dict_of_all_nonoperation_symbol_dicts(graphDB_Driver, query_time_dict)
@@ -790,7 +791,7 @@ def get_dict_of_operation_dicts_in_expression(
     expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
@@ -831,7 +832,7 @@ def get_dict_of_operation_dicts_not_in_expression(
     expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
@@ -872,7 +873,7 @@ def get_dict_of_relation_dicts_not_in_expression(
     expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     dict_of_all_relation_dicts, query_time_dict = get_dict_of_node_dicts(
@@ -912,7 +913,7 @@ def get_dict_of_node_dicts(
     """
     >>> get_dict_of_node_dicts()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     assert node_type in list_of_valid.node_types
@@ -948,7 +949,7 @@ def get_dict_of_derivations_used_per_inference_rule(
     list_of_inference_rule_dicts: list,
 ) -> Tuple[dict, query_timing_result_type]:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     # TODO: Neo4j inside loop causes high latency
@@ -997,7 +998,7 @@ def get_dict_of_steps_in_derivation(
     """
     >>> get_dict_of_steps_in_derivation()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     # list all steps in this derivation
@@ -1065,7 +1066,7 @@ def input_feed_output_infrule_for_step(
     """
     >>> input_feed_output_infrule_for_step()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     inference_rule_dict = {}
@@ -1142,7 +1143,7 @@ def remove_latex_presention_markings(latex_str: str) -> str:
     >>> remove_latex_presention_markings('a\\ b = c')
     'a b = c'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     logger.info("latex to be cleaned: " + latex_str)

@@ -14,6 +14,7 @@ import re
 import os
 import glob
 import time
+import uuid
 
 # move and copy files
 import shutil
@@ -60,7 +61,7 @@ def hash_of_file(filename_with_full_path: str) -> str:
     >>> hash_of_file('/code/static/name_of_file')
     d41d8cd98f00b204e9800998ecf8427e
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] latex/hash_of_file start " + trace_id)
 
     # TODO: exception handling
@@ -86,7 +87,7 @@ def hash_of_string(str_to_hash: str) -> str:
 
     >>> hash_of_string('a_string')
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info(
         "[TRACE] latex/hash_of_string start " + trace_id + " " + str(time.time())
     )
@@ -116,7 +117,7 @@ def make_string_safe_for_latex(unsafe_str: str) -> str:
     >>> make_string_safe_for_latex("hello_world")
     "hello\_world"
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     print(
         "[TRACE] latex/make_string_safe_for_latex start "
         + trace_id
@@ -194,7 +195,7 @@ def create_d3js_json(
     >>> create_d3js_json("000001", "pdg.db")
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] latex/create_d3js_json start " + trace_id)
 
     d3js_json_filename = derivation_id + ".json"
@@ -381,7 +382,7 @@ def edges_in_derivation_for_d3js(all_steps) -> List[Tuple[str, str]]:
 
     >>> edges_in_derivation_for_d3js()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] latex/edges_in_derivation_for_d3js start " + trace_id)
 
     # print("latex/edges_in_derivation_for_d3js all_steps", all_steps)
@@ -429,7 +430,7 @@ def create_tex_file_for_derivation(
     >>> path_to_tex_file = "/code/static/"  # must end with /
     >>> generate_tex_for_derivation("000001", path_to_tex_file)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] latex/create_tex_file_for_derivation start " + trace_id)
 
     tex_filename = derivation_id
@@ -692,7 +693,7 @@ def create_pdf_for_derivation(
     >>> create_pdf_for_derivation("000001", "myemail@address.com","pdg.db")
     """
     # logger.info("[trace start " + trace_id + "]")
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] latex/create_pdf_for_derivation start " + trace_id)
 
     # to isolate the build process, create a temporary folder
@@ -856,7 +857,7 @@ def create_png_from_latex(
     >>> destination_folder = "/code/static/"
     >>> create_png_from_latex('a \dot b \\nabla', 'a_filename')
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
     # logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
 
@@ -1013,7 +1014,7 @@ def create_tex_file_for_latex_string(
 
     >>> create_tex_file_for_latex_string('/code/static/filename_without_extension', 'a \dot b \\nabla')
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     # logger.info("[trace start " + trace_id + "]")
     logger.info(
         "[TRACE] latex/create_tex_file_for_latex_string start " + trace_id + "]"
@@ -1083,7 +1084,7 @@ def create_derivation_png(
 
     >>> create_derivation_png("000001", "pdg.db")
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     # logger.info("[trace start " + trace_id + "]")
     logger.info("[TRACE] latex/create_derivation_png start " + trace_id + "]")
 
@@ -1224,7 +1225,7 @@ def create_step_graphviz_png(
     >>> create_step_graphviz_png("000001", "1029890", "pdg.db")
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     # logger.info("[trace start " + trace_id + "]")
     logger.info("[TRACE] latex/create_step_graphviz_png start " + trace_id + "]")
 
@@ -1316,7 +1317,7 @@ def write_step_to_graphviz_file(
     >>> fil = open('a_file','r')
     >>> write_step_to_graphviz_file("000001", "1029890", file_handle, "pdg.db")
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     # logger.info("[trace start " + trace_id + "]")
     logger.info("[TRACE] latex/write_step_to_graphviz_file start " + trace_id + "]")
 

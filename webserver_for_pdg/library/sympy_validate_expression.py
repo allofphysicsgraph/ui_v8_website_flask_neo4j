@@ -7,6 +7,7 @@
 
 import random
 import tokenize
+import uuid
 
 # import time  # this creates a conflict with sympy's `time`
 
@@ -44,7 +45,7 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
     >>> convert_sympy_expr_to_pdg_symbols(sympy_expr, {'r': '99', 'x': 00})
     Eq(sympy.Symbol('pdg99'), sympy.Symbol('pdg00'))
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     logger.info("sympy_expr=" + str(sympy_expr))
     logger.info("symbol_id_dict=" + str(symbol_id_dict))
@@ -92,7 +93,7 @@ def dimensional_consistency(
                                 dict_of_all_symbol_dicts)
     unknown
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     # logger.info("expression_dict = " + str(expression_dict))
     # logger.info(

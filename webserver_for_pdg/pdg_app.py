@@ -24,7 +24,7 @@ See https://allofphysics.com/documentation/conventions
 
 # convention: every Python function starts with
 ```
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 ```
@@ -90,10 +90,12 @@ from flask import (
     send_from_directory,
     flash,
     jsonify,
-    escape,
     Response,
     session,  # needed to return the user to original page after logging in
 )
+
+# since `from flask import escape` wasn't available, use
+from markupsafe import escape
 
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
 # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
@@ -371,7 +373,7 @@ def callback():
     """
     https://realpython.com/flask-google-login/
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     # Get authorization code Google sent back to you
     code = request.args.get("code")
@@ -992,7 +994,7 @@ def to_index():
     """
     placeholder for landing page that provides context before user goes to_navigation
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query_time_dict = {}  # type: query_timing_result_type
@@ -1032,7 +1034,7 @@ def to_navigation():
 
     >>> to_navigation()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] main start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1261,7 +1263,7 @@ def to_add_derivation() -> werkzeug.Response:
     WIP:
     http://localhost:5000/new_derivation?derivation_name=asdf123&derivation_abstract=4924858miminginasf
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1430,7 +1432,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
 
     >>> to_review_derivation()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1703,7 +1705,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
     """
     User wants to delete step or edit step
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1760,7 +1762,7 @@ def to_edit_derivation_metadata(
     derivation_id: unique_numeric_id_as_str,
 ) -> werkzeug.Response:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1868,7 +1870,7 @@ def to_add_step_select_inference_rule(
 
     What inference rule should be used for this step?
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1960,7 +1962,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     - alter the label
     - delete the expression
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2277,7 +2279,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     """
     edit feed
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2516,7 +2518,7 @@ def to_add_expression() -> werkzeug.Response:
     """
     novel expression
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2761,7 +2763,7 @@ def to_add_feed() -> werkzeug.Response:
     """
     novel feed
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2901,7 +2903,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     >>> to_edit_node()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2973,7 +2975,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
     """
     edit operation
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -3064,7 +3066,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
     """
     edit relation
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -3156,7 +3158,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     >>> to_edit_scalar()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -3290,7 +3292,7 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     >>> to_edit_vector()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -3345,7 +3347,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     >>> to_edit_matrix()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -3396,7 +3398,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
     "/new_symbol_scalar_constant_value_and_units/<scalar_id>/", methods=["GET", "POST"]
 )
 def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -3548,7 +3550,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
     """
     novel scalar symbol
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -3695,7 +3697,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
     """
     novel vector
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -3807,7 +3809,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
     """
     novel matrix
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -3935,7 +3937,7 @@ def to_add_operation() -> werkzeug.Response:
     """
     novel operation
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -4032,7 +4034,7 @@ def to_add_relation() -> werkzeug.Response:
     """
     novel relation
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -4136,7 +4138,7 @@ def to_add_step_select_expressions(
 
     here we assume all expressions already exist
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -4336,7 +4338,7 @@ def to_add_symbols_and_operations_for_expression(
     For example,
     r_{\rm Earth} = 6
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -4624,7 +4626,7 @@ def to_add_sympy_and_lean_for_expression(
         {'m': '3973021', '\\vec{a}': '3506734', '\\vec{F}': '3235432'}
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -4862,7 +4864,7 @@ def to_add_symbols_and_operations_for_feed(
     For example,
     r_{\rm Earth} = 6
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5052,7 +5054,7 @@ def to_add_sympy_and_lean_for_feed(
     """
     derivation_id is the numeric ID of the derivation being edited
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5186,7 +5188,7 @@ def to_add_inference_rule() -> werkzeug.Response:
     create inference rule
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5326,7 +5328,7 @@ def to_edit_step(
     derivation_id: unique_numeric_id_as_str, step_id: unique_numeric_id_as_str
 ) -> werkzeug.Response:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5394,7 +5396,7 @@ def to_edit_inference_rule(
     inference_rule_id: unique_numeric_id_as_str,
 ) -> werkzeug.Response:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5572,7 +5574,7 @@ def to_query() -> werkzeug.Response:
     The pipe safe situation means the string is interpreted as is with no alterations,
     When there is no pipe then the string is converted to HTML safe text
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5806,7 +5808,7 @@ def to_list_feeds() -> werkzeug.Response:
     """
     >>> to_list_feeds()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5870,7 +5872,7 @@ def to_list_operations() -> werkzeug.Response:
     """
     >>> to_list_operations()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5923,7 +5925,7 @@ def to_list_relations() -> werkzeug.Response:
     """
     >>> to_list_relations()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -5978,7 +5980,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
     """
     >>> to_list_constant_values()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6021,7 +6023,7 @@ def to_edit_constant_value_and_units(
 
     >>> to_edit_constant_value_and_units()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6093,7 +6095,7 @@ def to_list_scalars() -> str:
 
     >>> to_list_scalars()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6181,7 +6183,7 @@ def to_list_vectors() -> str:
     """
     >>> to_list_vectors()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6233,7 +6235,7 @@ def to_list_matrices() -> str:
     """
     >>> to_list_matrices()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6286,7 +6288,7 @@ def to_list_expressions() -> str:
     """
     >>> to_list_expressions()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query_time_dict = {}  # type: query_timing_result_type
@@ -6378,7 +6380,7 @@ def to_list_derivations() -> str:
 
     >>> to_list_derivations()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6441,7 +6443,7 @@ def to_list_inference_rules() -> str:
     """
     >>> to_show_all_inference_rules()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6482,7 +6484,7 @@ def to_delete_graph_content() -> werkzeug.Response:
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
     https://neo4j.com/developer/kb/large-delete-transaction-best-practices-in-neo4j/
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6512,7 +6514,7 @@ def to_export_json() -> werkzeug.Response:
     https://neo4j.com/labs/apoc/4.1/installation/
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6534,7 +6536,7 @@ def to_export_json() -> werkzeug.Response:
 @web_app.route("/export_metadata_schema")
 def to_export_metadata_schema():
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6568,7 +6570,7 @@ def to_export_metadata_schema():
 @web_app.route("/export_to_csv")
 def to_export_csv() -> werkzeug.Response:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6588,7 +6590,7 @@ def to_export_csv() -> werkzeug.Response:
 @web_app.route("/export_to_graphml")
 def to_export_graphml() -> werkzeug.Response:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6618,7 +6620,7 @@ def to_export_cypher() -> werkzeug.Response:
     # queries:
     # https://stackoverflow.com/a/20894360/1164295
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6735,7 +6737,7 @@ def search_redirect_to_google():
 
     This search only works via webform since the value is grabbed from form value "search"
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     logger.info(
         "request.url: " + str(request.url)
@@ -6801,7 +6803,7 @@ def static_dir():
     This route is not intended to be linked to
     >>> static_dir()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     # https://stackoverflow.com/a/3207973/1164295
     _, _, filenames = next(os.walk("static"))
@@ -7380,7 +7382,7 @@ def to_class_notes_subpage(which_class: str):
     """
     class notes from school
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id) + "] ")
 
     if which_class == "overview":

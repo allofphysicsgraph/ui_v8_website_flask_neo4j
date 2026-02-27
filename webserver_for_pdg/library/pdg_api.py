@@ -52,6 +52,7 @@ Instead of the `@require_api_key` decorator you would use Flask-Login's `@login_
 import time
 import random
 import datetime
+import uuid
 
 from flask import (
     Blueprint,
@@ -111,7 +112,7 @@ api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 
 
 #     """
-#     trace_id = str(random.randint(1000000, 9999999))
+#     trace_id = str(uuid.uuid4())
 #     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 #     return
 
@@ -133,7 +134,7 @@ api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 #     curl --silent --insecure https://localhost/api/v1/resources/register | python3 -m json.tool
 
 #     """
-#     trace_id = str(random.randint(1000000, 9999999))
+#     trace_id = str(uuid.uuid4())
 #     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 #     # csrf_token = csrf.generate_csrf() # AttributeError: 'CSRFProtect' object has no attribute 'generate_csrf'
 
@@ -265,7 +266,7 @@ def api_list_derivations():
 
     >>>
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -371,7 +372,7 @@ def api_list_inference_rules():
     ]
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -457,7 +458,7 @@ def api_list_expressions():
         },
     ]
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -552,7 +553,7 @@ def api_list_operation_symbols():
     ]
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -638,7 +639,7 @@ def api_list_relation_symbols():
     curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/list | python3 -m json.tool
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -735,7 +736,7 @@ def api_list_scalar_symbols():
     ]
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -828,7 +829,7 @@ def api_list_vector_symbols():
     ]
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -921,7 +922,7 @@ def api_list_matrix_symbols():
     ]
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1024,7 +1025,7 @@ def api_create_derivation():
 
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1138,7 +1139,7 @@ def api_create_inference_rule():
 
     >>>
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1190,7 +1191,7 @@ def api_create_expression():
     see `to_add_expression`
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1379,7 +1380,7 @@ def api_create_scalar_symbol():
     see `to_add_symbol_scalar`
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1672,7 +1673,7 @@ def api_create_vector_symbol():
     curl --silent --insecure https://localhost/api/v1/resources/symbol/vector/create
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1688,7 +1689,7 @@ def api_create_matrix_symbol():
     curl --silent --insecure https://localhost/api/v1/resources/symbol/matrix/create
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1706,7 +1707,7 @@ def api_create_operation_symbol():
     see `to_add_operation`
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1821,7 +1822,7 @@ def api_create_relation_symbol():
 
     see `to_add_relation`
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -1969,7 +1970,7 @@ def api_derivation_metadata(derivation_id: str):
     }
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2057,7 +2058,7 @@ def api_derivation_steps(derivation_id: str):
     ]
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2090,7 +2091,7 @@ def api_delete_derivation(derivation_id: str):
 
     curl --silent --insecure https://localhost/api/v1/resources/derivation/<string:derivation_id>/delete
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -2236,7 +2237,7 @@ def api_cypher_query():
     """
     curl --silent --insecure https://localhost/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 

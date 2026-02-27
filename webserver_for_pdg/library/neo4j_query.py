@@ -35,6 +35,7 @@ import random  # for trace IDs
 from typing import Dict, List, Any, Optional
 
 import time
+import uuid
 
 import list_of_valid
 
@@ -49,7 +50,7 @@ def get_list_IDs(tx: Transaction, node_type: str) -> List[str]:
     return a list of all PDG IDs for the nodes
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     logger.info("node_type=" + str(node_type))
@@ -68,7 +69,7 @@ def apoc_metdata_schema(tx: Transaction):
     """
     https://neo4j.com/docs/apoc/current/overview/apoc.meta/apoc.meta.stats/
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     result = tx.run("CALL apoc.meta.stats()")
@@ -83,7 +84,7 @@ def apoc_export_csv(tx: Transaction, output_filename: str) -> dict:
     https://neo4j.com/docs/apoc/current/export/csv/
     https://neo4j.com/docs/apoc/current/overview/apoc.export/apoc.export.csv.all/
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     # for result in tx.run(
     #     "CALL apoc.export.csv.all('" + output_filename + "',{useTypes:true})"
@@ -107,7 +108,7 @@ def apoc_export_graphml(tx: Transaction, output_filename: str):
     """
     https://neo4j.com/docs/apoc/current/overview/apoc.export/
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     for result in tx.run(
         "CALL apoc.export.graphml.all('" + output_filename + "',{useTypes:true})"
@@ -129,7 +130,7 @@ def apoc_export_json(tx: Transaction, output_filename: str):
 
     >>> apoc_export_json(tx)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     for result in tx.run(
@@ -152,7 +153,7 @@ def apoc_export_cypher(tx: Transaction, output_filename: str):
 
     >>> apoc_export_cypher(tx)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # "cypher.all" produces 1 file with constraints
@@ -211,7 +212,7 @@ def constrain_unique_id(tx) -> None:
 
     >>> constrain_unique_id()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     for node_type in list_of_valid.node_types:
@@ -232,7 +233,7 @@ def constrain_unique_id(tx) -> None:
 
 def get_derivations_that_use_expression(tx: Transaction, expression_id: str):
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     logger.info("expression_id=" + expression_id)
@@ -256,7 +257,7 @@ def get_derivations_that_use_expression(tx: Transaction, expression_id: str):
 
 def get_relation_latex(tx: Transaction, relation_id: str):
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # string concatenation is a security risk (Cypher injection)
@@ -283,7 +284,7 @@ def get_scalar_id_that_has_value_and_units_id(tx: Transaction, value_and_units_i
     """
     >>>
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     result = tx.run(
         "MATCH (s:scalar)-[]->(v:value_with_units) WHERE v.id='"
@@ -312,7 +313,7 @@ def get_symbols_for_every_expression(tx, list_of_expression_ids: List[str]):
       hence the use of `OPTIONAL MATCH`
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -332,7 +333,7 @@ def get_symbols_for_every_expression(tx, list_of_expression_ids: List[str]):
 
 def get_symbols_for_expression(tx: Transaction, expression_id: str) -> List[dict]:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     logger.info("expression_id =" + expression_id)
     symbol_list = []  # type: List[dict]
@@ -352,7 +353,7 @@ def get_symbols_for_expression(tx: Transaction, expression_id: str) -> List[dict
 
 def get_symbol_IDs_in_expression(tx: Transaction, expression_id: str) -> List[str]:
     """match (s:symbol) because nodes are created with multiple labels (e.g. :symbol:scalar)"""
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query = (
         "MATCH (e:expression)-[:IS_COMPRISED_OF]->(s:symbol) "
@@ -372,7 +373,7 @@ def get_symbol_IDs_in_every_feed(tx):
         - If the pattern does not exist (the feed has no symbols), f is still kept in the result, but s will be null.
     `collect(s.id)` aggregation function automatically ignores null values. Therefore, if s is null (because of the OPTIONAL MATCH), the result is an empty list [] rather than [null].
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -396,7 +397,7 @@ def get_symbol_IDs_in_every_feed(tx):
 
 def get_symbol_IDs_in_feed(tx: Transaction, feed_id: str) -> List[str]:
     """match (s:symbol) because nodes are created with multiple labels (e.g. :symbol:scalar)"""
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     logger.info("feed_id=" + feed_id)
 
@@ -415,7 +416,7 @@ def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
 
     this is the opposite query of `expressions_that_use_symbol`
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     logger.info("expression_or_feed=" + expression_or_feed)
@@ -471,7 +472,7 @@ def get_nodes_of_type(tx: Transaction, node_type: str) -> list:
 
     >>> list_nodes_of_type(tx)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # must be one of these node types. See also 'schema.log' file
@@ -495,7 +496,7 @@ def get_count_nodes_of_type(tx: Transaction, node_type: str) -> int:
 
     >>> count_nodes_of_type(tx)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # must be one of these node types. See also 'schema.log' file
@@ -515,7 +516,7 @@ def get_expressions_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     collect the 'e' nodes into a list for every unique 's'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -538,7 +539,7 @@ def get_expressions_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     collect the 'e' nodes into a list for every unique 's'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -561,7 +562,7 @@ def get_expressions_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     collect the 'e' nodes into a list for every unique 's'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -591,7 +592,7 @@ def get_derivations_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
 
     TODO: replace `IS_COMPRISED_OF` with `HAS_RELATION`
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -621,7 +622,7 @@ def get_derivations_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
 
     TODO: replace `IS_COMPRISED_OF` with `HAS_OPERATION`
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -649,7 +650,7 @@ def get_derivations_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
     node once for every path it finds, resulting in three instances of the same node in your list.
     `collect(DISTINCT d)` collapses those into one.
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -672,7 +673,7 @@ def get_derivations_for_every_feed(tx) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 'f'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -702,7 +703,7 @@ def get_derivations_for_every_expression(tx) -> Dict[str, List[Dict[str, Any]]]:
     `collect(DISTINCT d)` collapses those into one.
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -725,7 +726,7 @@ def get_derivations_that_use_feed(
     tx: Transaction, feed_id: str
 ) -> List[Dict[str, Any]]:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     logger.info("feed_id=" + feed_id)
 
@@ -761,7 +762,7 @@ def get_derivations_that_use_inference_rule(
 
     >>> derivations_that_use_inference_rule()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     logger.info("inference_rule_id=" + inference_rule_id)
@@ -795,7 +796,7 @@ def get_expressions_that_use_symbol(tx, symbol_id: str) -> List[Dict[str, Any]]:
 
     >>> expressions_that_use_symbol()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     logger.info("symbol_id = " + symbol_id)
@@ -837,7 +838,7 @@ def get_derivations_that_use_symbol(
 
     Returns a list of derivation dictionaries that contain a specific symbol.
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -860,7 +861,7 @@ def get_values_for_constant(tx: Transaction, scalar_id: str) -> list:
     """
     >>>
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     logger.info("scalar_id=" + scalar_id)
 
@@ -897,7 +898,7 @@ def get_list_of_step_dicts_in_this_derivation(
 
     >>> get_list_of_step_dicts_in_this_derivation(tx)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     query = """
@@ -923,7 +924,7 @@ def get_step_has_sequence_index(tx: Transaction, step_id: str) -> int:
     """
     >>> step_has_sequence_index()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     sequence_index = 0
     result = tx.run(
@@ -945,7 +946,7 @@ def get_inference_rule_connected_to_step_ID(tx: Transaction, step_id: str):
 
     >>> step_has_inference_rule()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
     result = tx.run(
@@ -972,7 +973,7 @@ def get_derivation_id_from_step_id(tx: Transaction, step_id: str) -> str:
     """
     >>>
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     logger.info("neo4j_query/get_derivation_id_from_step_id: step_id=" + str(step_id))
@@ -1002,7 +1003,7 @@ def get_expressions_from_step_id_and_expr_type(
     for each step the user wants to know the inputs, feeds, and outputs.
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     logger.info(
@@ -1079,7 +1080,7 @@ def get_node_properties_from_id(
 
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     logger.info("node_type=" + node_type)
@@ -1118,7 +1119,7 @@ def add_derivation(
 
     >>> add_derivation(tx)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # print(
@@ -1162,7 +1163,7 @@ def add_inference_rule(
 
     >>> add_inference_rule(tx,)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     assert (
@@ -1199,7 +1200,7 @@ def edit_step_notes(
 
     >>> edit_step_notes()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
     result = tx.run(
@@ -1230,7 +1231,7 @@ def edit_expression(
 
     >>> edit_expression()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
     result = tx.run(
@@ -1262,7 +1263,7 @@ def edit_expression(
 #     """
 #     >>> edit_feed()
 #     """
-#     trace_id = str(random.randint(1000000, 9999999))
+#     trace_id = str(uuid.uuid4())
 #     logger.info("[TRACE] start " + str(trace_id))
 
 #     result = tx.run(
@@ -1287,7 +1288,7 @@ def edit_node_property(
 
     see https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887#update-node-properties-add-new-or-modify
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
     # print(
@@ -1333,7 +1334,7 @@ def edit_derivation_metadata(
 
     >>> edit_derivation_metadata()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
     result = tx.run(
@@ -1365,7 +1366,7 @@ def disconnect_step_from_inference_rule(tx: Transaction, step_id: str) -> None:
            * delete step node
      2) delete derivation node
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
     # TODO
     logger.info("not doing anything yet")
@@ -1384,7 +1385,7 @@ def delete_node(tx: Transaction, node_id: str, node_type) -> None:
      2) delete derivation node
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
     # must be one of these node types. See also 'schema.log' file
@@ -1408,7 +1409,7 @@ def disconnect_symbol_from_expression(
 
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
     logger.info(
@@ -1441,7 +1442,7 @@ def disconnect_symbol_from_feed(
 
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
     logger.info("symbol_category=" + symbol_category)
@@ -1467,7 +1468,7 @@ def get_node_labels_from_property(
     tx: Transaction, property_key: str, property_value: str
 ):
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
     # UNSAFE:
@@ -1501,7 +1502,7 @@ def add_symbol_to_expression_or_feed(
     symbol_category: str,
 ) -> None:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     logger.info(
         "symbol_id="
@@ -1553,7 +1554,7 @@ def get_list_of_sequence_values_for_derivation_id(
     """
     sequence value is a positive integer for ordering the steps of a derivation
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
     list_of_sequence_values = []  # type: List[int]
@@ -1598,7 +1599,7 @@ def add_step_to_derivation(
 
     >>> add_step_to_derivation()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
     # # https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Result
@@ -1649,7 +1650,7 @@ def connect_expressions_to_step(
 
     >>> connect_expressions_to_step()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     assert (
@@ -1717,7 +1718,7 @@ def add_expression(
 
     >>> add_expression(tx,)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # result = tx.run(
@@ -1789,7 +1790,7 @@ def add_feed(
 
     >>> add_feed(tx,)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # result = tx.run(
@@ -1848,7 +1849,7 @@ def add_quantum_operator_symbol(
 
     >>> add_symbol(tx,)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # result = tx.run(
@@ -1915,7 +1916,7 @@ def add_constant_value_with_units(
 
     >>>
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     str_to_add = ""
@@ -2009,7 +2010,7 @@ def add_scalar_symbol(
     """
     >>>
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # corresponds to SpecifyNewSymbolDIRECTScalarForm
@@ -2118,7 +2119,7 @@ def add_vector_symbol(
     """
     >>>
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # corresponds to SpecifyNewSymbolDIRECTVectorForm
@@ -2251,7 +2252,7 @@ def add_matrix_symbol(
     """
     >>>
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # corresponds to SpecifyNewSymbolDIRECTMatrixForm
@@ -2379,7 +2380,7 @@ def add_operation_symbol(
 
     >>> add_operation(tx,)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # corresponds to SpecifyNewSymbolDIRECTOperationForm
@@ -2468,7 +2469,7 @@ def add_relation_symbol(
 
     >>> add_operation(tx,)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     # corresponds to SpecifyNewSymbolDIRECTOperationForm
@@ -2529,7 +2530,7 @@ def delete_all_nodes_and_relationships(tx) -> None:
 
     >>> delete_all_nodes_and_relationships(tx)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     tx.run("MATCH (n) DETACH DELETE n")
@@ -2546,7 +2547,7 @@ def user_query(tx: Transaction, query: str) -> list:
 
     >>> user_query(tx: Transaction, "test")
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
     list_of_results = []

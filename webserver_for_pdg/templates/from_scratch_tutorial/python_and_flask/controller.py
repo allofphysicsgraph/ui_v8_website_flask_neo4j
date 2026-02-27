@@ -5,6 +5,8 @@
 # https://creativecommons.org/licenses/by/4.0/
 # Attribution 4.0 International (CC BY 4.0)
 
+import uuid
+
 # https://hplgit.github.io/web4sciapps/doc/pub/._web4sa_flask004.html
 from flask import (
     Flask,
@@ -27,7 +29,7 @@ def index():
     the index is a static page intended to be the landing page for new users
     >>> index()
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[trace page start " + trace_id + "]")
 
     try:

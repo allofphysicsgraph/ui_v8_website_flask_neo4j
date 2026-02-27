@@ -16,6 +16,7 @@ In the situation where another CAS like Sage is used, a separate "latex_and_sage
 import random
 import time
 import tokenize
+import uuid
 
 # move and copy files
 import shutil
@@ -44,7 +45,7 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
     sympy_to_latex_str: latex_str= \mathtt{\text{sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))}}
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     if sympy_expr == "":
@@ -77,7 +78,7 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
     >>> cleaned_latex_str_to_sympy_expression('a = b')
     Eq(a, b)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     logger.info("latex to be converted to SymPy: " + expr_latex)
@@ -108,7 +109,7 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
     >>> sympy_expr = parse_latex('a = b')
     >>> list_of_sympy_symbols_in_sympy_expression(sympy_expr)
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     # list_of_symbols = []
     # for symb in sympy_expr.atoms(sympy.Symbol):
@@ -134,7 +135,7 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str) -> str:
     """
     >>> create_AST_png_for_latex('Eq(Symbol('a'),Symbol('b'))','filename')
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     logger.info("output_filename = " + output_filename)
@@ -239,7 +240,7 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str) -> str:
 #     #>>> parse_latex(r'\nabla \vec{x} = f(y)').free_symbols
 #     {x, nabla, y, vec}
 #     """
-#     trace_id = str(random.randint(1000000, 9999999))
+#     trace_id = str(uuid.uuid4())
 #     logger.info("[TRACE] list_of_str_symbols_from_cleaned_latex_str start " + trace_id)
 #
 #     my_sym = list(sympy_expr.free_symbols)

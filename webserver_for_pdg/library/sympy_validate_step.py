@@ -44,6 +44,7 @@ testmod(name ='split_expr_into_lhs_rhs', verbose = True)
 
 import random
 import time
+import uuid
 
 import sympy  # type: ignore
 
@@ -82,7 +83,7 @@ def validate_step(
 
     >>> validate_step('4924823', '2500423', 'data.json')
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # logger.debug(str(inference_rule_dict))
@@ -541,7 +542,7 @@ def add_X_to_both_sides(
     >>> add_X_to_both_sides(input_expr, feed, output_expr)
     'valid'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # input and output should have same relation
@@ -611,7 +612,7 @@ def subtract_X_from_both_sides(
     >>> subtract_X_from_both_sides(input_expr, feed, output_expr)
     'valid'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # input and output should have same relation
@@ -718,7 +719,7 @@ def multiply_both_sides_by(
     >>> multiply_both_sides_by([input_expr], [feed], [output_expr])
     'valid'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     # BHP's original (inadequate) attempt:
@@ -917,7 +918,7 @@ def divide_both_sides_by(
     >>> divide_both_sides_by(input_expr, feed, output_expr)
     'valid'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     # input and output should have same relation
@@ -1047,7 +1048,7 @@ def change_variable_X_to_Y(
     >>> change_variable_X_to_Y(latex_dict)
     'valid'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1099,7 +1100,7 @@ def multiply_LHS_by_unity(
     >>> multiply_LHS_by_unity(latex_dict)
     'valid'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1152,7 +1153,7 @@ def multiply_RHS_by_unity(
     >>> multiply_RHS_by_unity(latex_dict)
     'valid'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1207,7 +1208,7 @@ def add_zero_to_LHS(
     >>> add_zero_to_LHS(latex_dict)
     'valid'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1260,7 +1261,7 @@ def add_zero_to_RHS(
     >>> add_zero_to_RHS(latex_dict)
     'valid'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1480,7 +1481,7 @@ def make_expr_power(
 
     ((out_lhs0 == (feed0)**(in_lhs0)) and (out_rhs0 == (feed0)**(in_rhs0)))
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1517,7 +1518,7 @@ def select_real_parts(
     Given a+i*b = c+i*d
     get a = c
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1550,7 +1551,7 @@ def select_imag_parts(
     Given a+i*b = c+i*d
     get b = d
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1583,7 +1584,7 @@ def swap_LHS_with_RHS(
     given 'a + b = c'
     get   'c = a + b'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1662,7 +1663,7 @@ def add_expr_1_to_expr_2(
         Add Eq.~\ref{eq:#1} to Eq.~\ref{eq:#2}.
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1702,7 +1703,7 @@ def substitute_RHS_of_expr_1_into_expr_2(
         given "A*x=B" and "C*y=A*x", subRHSofEqXintoEqY yields "C*y=B"
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     logger.info(str(list_of_input_dicts))
@@ -1747,7 +1748,7 @@ def substitute_LHS_of_expr_1_into_expr_2(
         given "A*x=B" and "C*y=B", subLHSofEqXintoEqY yields "C*y=A*x"
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1789,7 +1790,7 @@ def mult_expr_1_by_expr_2(
 
     ((in_lhs0*in_lhs1 == out_lhs0) and (in_rhs0*in_rhs1 == out_rhs0))
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1840,7 +1841,7 @@ def LHS_of_expr_1_eq_LHS_of_expr_2(
     'valid'
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1886,7 +1887,7 @@ def RHS_of_expr_1_eq_RHS_of_expr_2(
         given "A*x=B" and "C=B", RHSofEqXeqRHSofEqY yields "A*x=C"
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1953,7 +1954,7 @@ def claim_expr_1_equals_expr_2(
 
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -1989,7 +1990,7 @@ def claim_LHS_equals_RHS(
     If a user inputs a valid tautology (e.g., x = x) but asserts a completely unrelated output (e.g., y = z), the function will return 'valid', creating a break in the derivation chain.
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -2145,7 +2146,7 @@ def simplify(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     logger.info(str(list_of_input_dicts))
@@ -2181,7 +2182,7 @@ def subtract_expr_1_from_expr_2(
     and    c = d
     get    a - c = b - d
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs_0 = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -2216,7 +2217,7 @@ def factor_out_x(
     factor out x
     Get x*(a + b) = (c + d)*x
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -2251,7 +2252,7 @@ def factor_out_x_from_lhs(
     Inconsistency: If the input is ax + bx = y and the user provides an output ax + bx = y (no change) or (a+b)x = y (factored), both will return "valid". The function ignores the inference rule's intent (to factor out feed_sympy). It effectively degrades to a generic simplify check.
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -2287,7 +2288,7 @@ def factor_out_x_from_rhs(
     Inconsistency: If the input is ax + bx = y and the user provides an output ax + bx = y (no change) or (a+b)x = y (factored), both will return "valid". The function ignores the inference rule's intent (to factor out feed_sympy). It effectively degrades to a generic simplify check.
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -2364,7 +2365,7 @@ def change_two_variables_in_expr(
     >>> change_two_variables_in_expr(latex_dict)
     'valid'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     # logger.info(str(list_of_input_dicts))
@@ -2425,7 +2426,7 @@ def change_three_variables_in_expr(
     >>> change_three_variables_in_expr(latex_dict)
     'valid'
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     logger.info(str(list_of_input_dicts))
@@ -2470,7 +2471,7 @@ def change_four_variables_in_expr(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -2515,7 +2516,7 @@ def change_five_variables_in_expr(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -2564,7 +2565,7 @@ def change_six_variables_in_expr(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -2697,7 +2698,7 @@ def evaluate_definite_integral(
 
 
     """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -2723,7 +2724,7 @@ def expand_LHS(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
@@ -2749,7 +2750,7 @@ def expand_RHS(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(random.randint(1000000, 9999999))
+    trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     input_expr_sympy_lhs = eval(list_of_input_dicts[0]["sympy_lhs"])
