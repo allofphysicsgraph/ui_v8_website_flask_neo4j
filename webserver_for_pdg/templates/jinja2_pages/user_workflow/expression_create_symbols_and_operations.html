@@ -45,7 +45,7 @@ Or maybe symbol detection is having a bad day.
 
 {% for symbol_dict in potential_symbols_found_in_Latex_expression %}
 <UL>
-  <LI><input type="checkbox" name="symbol_id_to_connect_to_expression-{{ loop.index }}" value="{{ symbol_dict['id'] }}_{{ symbol_dict['symbol_category'] }}">\({{ symbol_dict['latex'] }}\), aka {{ symbol_dict['latex'] }}<BR>{{ symbol_dict }}<BR>
+  <LI><input type="checkbox" name="symbol_id_to_connect_to_expression-{{ loop.index }}" value="{{ symbol_dict['id'] }}">\({{ symbol_dict['latex'] }}\), aka {{ symbol_dict['latex'] }}<BR>{{ symbol_dict }}<BR>
   TODO: used in which derivations?</LI>
 </UL>
 {% endfor %}

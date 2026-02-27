@@ -2231,23 +2231,21 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
             logger.info("to_edit_expression: symbol_id_to_add=" + str(symbol_id_to_add))
 
-            dict_of_symbol_id_and_type, query_time_dict = (
-                compute.get_dict_of_node_type_for_every_id(
-                    graphDB_Driver, query_time_dict
-                )
-            )
-            symbol_category = dict_of_symbol_id_and_type[symbol_id_to_add]
-            logger.info(symbol_category)
+            # dict_of_symbol_id_and_type, query_time_dict = (
+            #     compute.get_dict_of_node_type_for_every_id(
+            #         graphDB_Driver, query_time_dict
+            #     )
+            # )
+            # symbol_category = dict_of_symbol_id_and_type[symbol_id_to_add]
+            # logger.info(symbol_category)
 
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 session.write_transaction(
-                    neo4j_query.add_symbol_to_expression_or_feed,
-                    "expression",
+                    neo4j_query.add_symbol_to_expression,
                     symbol_id_to_add,
                     expression_id,
-                    symbol_category,
                 )
                 query_time_dict["to_edit_expression: add_symbol_to_expression"] = round(
                     time.time() - query_start_time, 3
@@ -2465,7 +2463,6 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                     neo4j_query.disconnect_symbol_from_feed,
                     symbol_id_to_disconnect,
                     feed_id,
-                    "scalar",
                 )
                 query_time_dict[
                     "pdg_app/to_edit_feed: disconnect_symbol_from_feed " + trace_id
@@ -2482,11 +2479,9 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 session.write_transaction(
-                    neo4j_query.add_symbol_to_expression_or_feed,
-                    "feed",
+                    neo4j_query.add_symbol_to_feed,
                     symbol_id_to_add,
                     feed_id,
-                    "scalar",
                 )
                 query_time_dict[
                     "pdg_app/to_edit_feed: add_symbol_to_feed " + trace_id
@@ -4609,21 +4604,15 @@ def to_add_symbols_and_operations_for_expression(
 
         # TODO: Neo4j inside loop causes high latency
         # request.form =
-        for ke, symbol_id_and_category in request.form.items():
+        for ke, symbol_id in request.form.items():
             # logger.info("key=", ke)
             # logger.info("value=", val)
             if "symbol_id_to_connect_to_expression" in ke:
-                symbol_id = symbol_id_and_category.split("_")[0]
-                symbol_category = symbol_id_and_category.split("_")[1]
 
                 with graphDB_Driver.session() as session:
                     query_start_time = time.time()
                     list_of_inference_rule_dicts = session.write_transaction(
-                        neo4j_query.add_symbol_to_expression_or_feed,
-                        "expression",
-                        symbol_id,
-                        expression_id,
-                        symbol_category,
+                        neo4j_query.add_symbol_to_expression, symbol_id, expression_id
                     )
                     query_time_dict[
                         "pdg_app/to_add_symbols_and_operations_for_expression: add_symbol_to_expression"
@@ -5056,21 +5045,17 @@ def to_add_symbols_and_operations_for_feed(
 
         # TODO: Neo4j inside loop causes high latency
         # request.form =
-        for ke, symbol_id_and_category in request.form.items():
+        for ke, symbol_id in request.form.items():
             # logger.info("key=", ke)
             # logger.info("value=", val)
             if "symbol_id_to_connect_to_expression" in ke:
-                symbol_id = symbol_id_and_category.split("_")[0]
-                symbol_category = symbol_id_and_category.split("_")[1]
 
                 with graphDB_Driver.session() as session:
                     query_start_time = time.time()
                     list_of_inference_rule_dicts = session.write_transaction(
-                        neo4j_query.add_symbol_to_expression_or_feed,
-                        "feed",
+                        neo4j_query.add_symbol_to_feed,
                         symbol_id,
                         feed_id,
-                        symbol_category,
                     )
                     query_time_dict[
                         "pdg_app/to_add_symbols_and_operations_for_feed: add_symbol_to_expression"

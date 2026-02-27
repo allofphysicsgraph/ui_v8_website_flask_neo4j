@@ -1414,42 +1414,40 @@ def delete_node(tx: Transaction, node_id: str, node_type) -> None:
     return
 
 
-def disconnect_symbol_from_expression(
-    tx, symbol_id: str, expression_id: str, symbol_category: str
-) -> None:
-    """
-    called by "edit expression"
+# def disconnect_symbol_from_expression(
+#     tx, symbol_id: str, expression_id: str, symbol_category: str
+# ) -> None:
+#     """
+#     called by "edit expression"
 
-    https://neo4j.com/docs/cypher-manual/current/clauses/delete/
-    """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+#     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
+#     """
+#     trace_id = str(uuid.uuid4())
+#     logger.info("[TRACE]  start " + str(trace_id))
 
-    logger.info(
-        "neo4j_query/disconnect_symbol_from_expression: symbol_category="
-        + symbol_category
-    )
-    assert symbol_category in list_of_valid.symbol_categories
+#     logger.info(
+#         "symbol_category="
+#         + symbol_category
+#     )
+#     assert symbol_category in list_of_valid.symbol_categories
 
-    result = tx.run(
-        "MATCH (e:expression)-[r:IS_COMPRISED_OF]->(s:"
-        + symbol_category
-        + ")"
-        + 'WHERE e.id="'
-        + str(expression_id)
-        + '" AND s.id="'
-        + str(symbol_id)
-        + '"  DELETE r'
-    )
-    logger.info("result.data=" + str(result.data()))
+#     result = tx.run(
+#         "MATCH (e:expression)-[r:IS_COMPRISED_OF]->(s:"
+#         + symbol_category
+#         + ")"
+#         + 'WHERE e.id="'
+#         + str(expression_id)
+#         + '" AND s.id="'
+#         + str(symbol_id)
+#         + '"  DELETE r'
+#     )
+#     logger.info("result.data=" + str(result.data()))
 
-    logger.info("[TRACE]  end " + str(trace_id))
-    return
+#     logger.info("[TRACE]  end " + str(trace_id))
+#     return
 
 
-def disconnect_symbol_from_feed(
-    tx, symbol_id: str, feed_id: str, symbol_category: str
-) -> None:
+def disconnect_symbol_from_feed(tx, symbol_id: str, feed_id: str) -> None:
     """
     called by "edit feed"
 
@@ -1458,13 +1456,8 @@ def disconnect_symbol_from_feed(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + str(trace_id))
 
-    logger.info("symbol_category=" + symbol_category)
-    assert symbol_category in list_of_valid.symbol_categories
-
     result = tx.run(
-        "MATCH (e:feed)-[r:IS_COMPRISED_OF]->(s:"
-        + symbol_category
-        + ")"
+        "MATCH (e:feed)-[r:IS_COMPRISED_OF]->(s)"
         + 'WHERE e.id="'
         + str(feed_id)
         + '" AND s.id="'
@@ -1507,27 +1500,11 @@ def get_node_labels_from_property(
     return result.data()
 
 
-def add_symbol_to_expression_or_feed(
-    tx,
-    expression_or_feed: str,
-    symbol_id: str,
-    expression_or_feed_id: str,
-    symbol_category: str,
-) -> None:
+def add_symbol_to_feed(tx, symbol_id: str, expression_or_feed_id: str) -> None:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
-    logger.info(
-        "symbol_id="
-        + symbol_id
-        + "; expression_or_feed_id="
-        + expression_or_feed_id
-        + "; symbol_category="
-        + symbol_category
-    )
-
-    assert expression_or_feed in ["expression", "feed"]
-    assert symbol_category in list_of_valid.symbol_categories
+    logger.info("symbol_id=" + symbol_id + "; feed_id=" + feed_id)
 
     # the following Cypher structure produces this warning:
     #    If a part of a query contains multiple disconnected patterns, this will build a cartesian product between all those parts. This may produce a large amount of data and slow down query processing. While occasionally intended, it may often be possible to reformulate the query that avoids the use of this cross product, perhaps by adding a relationship between the different parts or by using OPTIONAL MATCH (identifier is: (s))'
@@ -1552,9 +1529,47 @@ def add_symbol_to_expression_or_feed(
 
     # To avoid triggering a Cartesian product, use
     result = tx.run(
-        "MATCH (e:" + expression_or_feed + " {id: '" + expression_or_feed_id + "'})"
-        "MATCH (s:" + symbol_category + " {id: '" + symbol_id + "'})"
-        "MERGE (e)-[r:IS_COMPRISED_OF]->(s)"
+        "MATCH (f:feed {id: '" + feed_id + "'})"
+        "MATCH (n {id: '" + symbol_id + "'})"
+        "MERGE (f)-[r:IS_COMPRISED_OF]->(s)"
+    )
+
+    logger.info("[TRACE]  end " + str(trace_id))
+    return
+
+
+def add_symbol_to_expression(tx, symbol_id: str, expression_id: str) -> None:
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("symbol_id=" + symbol_id + "; expression_id=" + expression_id)
+
+    # the following Cypher structure produces this warning:
+    #    If a part of a query contains multiple disconnected patterns, this will build a cartesian product between all those parts. This may produce a large amount of data and slow down query processing. While occasionally intended, it may often be possible to reformulate the query that avoids the use of this cross product, perhaps by adding a relationship between the different parts or by using OPTIONAL MATCH (identifier is: (s))'
+    # Gemini 3 Pro's explanation of the warning:
+    #    In Cypher, when you separate nodes with a comma in a single MATCH statement like this:
+    #    `MATCH (e:expression), (s:scalar)`
+    #    you are telling the database to find every possible combination of expressions and scalars. This is called a Cartesian Product
+    #
+    # result = tx.run(
+    #     "MATCH (e:"
+    #     + expression_or_feed
+    #     + "),(s:"
+    #     + symbol_category
+    #     + ") "
+    #     + 'WHERE e.id="'
+    #     + str(expression_or_feed_id)
+    #     + '" AND s.id="'
+    #     + str(symbol_id)
+    #     + '" '
+    #     + "MERGE (e)-[r:IS_COMPRISED_OF]->(s)"
+    # )
+
+    # To avoid triggering a Cartesian product, use
+    result = tx.run(
+        "MATCH (e:expression {id: '" + expression_id + "'})"
+        "MATCH (n {id: '" + symbol_id + "'})"
+        "MERGE (e)-[r:IS_COMPRISED_OF]->(n)"
     )
 
     logger.info("[TRACE]  end " + str(trace_id))
