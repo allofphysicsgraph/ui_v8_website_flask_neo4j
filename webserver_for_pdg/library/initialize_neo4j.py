@@ -7,13 +7,12 @@
 # https://creativecommons.org/licenses/by/4.0/
 
 import time
+import logging
 
 import neo4j  # for the exceptions
 from neo4j import GraphDatabase
 
-import neo4j_query
-
-import logging
+from . import neo4j_query
 
 logger = logging.getLogger(__name__)
 

@@ -149,18 +149,18 @@ from flask_login import (
 # `from ..library import list_of_valid`
 # but that results in
 # `ValueError: attempted relative import beyond top-level package`
-sys.path.append("library")
+# sys.path.append("library")
 
-import neo4j_query
-import compute
-import latex_and_sympy
-import latex
-import sympy_validate_step
-import sympy_validate_expression
-import list_of_valid
+from library import neo4j_query
+from library import compute
+from library import latex_and_sympy
+from library import latex
+from library import sympy_validate_step
+from library import sympy_validate_expression
+from library import list_of_valid
 
 # ORDERING: this has to come before the functions that use this type
-from compute import unique_numeric_id_as_str, query_timing_result_type
+from library.compute import unique_numeric_id_as_str, query_timing_result_type
 
 # https://docs.python.org/3/howto/logging.html
 import logging
@@ -212,11 +212,11 @@ logger = logging.getLogger(__name__)
 
 # When a Python file (a module) is imported, the Python interpreter executes every line of code in that file, from top to bottom.
 # graphDB_Driver isn't a function
-from initialize_neo4j import graphDB_Driver
+from library.initialize_neo4j import graphDB_Driver
 
 # look at `flask_critical_and_error_and_warning_and_info.log` and you'll see the initialize_neo4j is the first entry
 
-import initialize_version_log
+from library import initialize_version_log
 
 
 ################################## BEGIN what was in "initialize_flask.py" ###############################
@@ -273,8 +273,8 @@ def is_safe_url(target):
 
 # in support of Google Sign-in
 # from https://realpython.com/flask-google-login/
-from google_auth_sql_db import init_db
-from google_auth_user_account import User
+from library.google_auth_sql_db import init_db
+from library.google_auth_user_account import User
 
 # https://github.com/googleapis/google-auth-library-python/issues/1069
 # https://stackoverflow.com/questions/51006382/no-module-named-requests-when-trying-to-use-google-oauth2-with-docker
@@ -478,7 +478,7 @@ def to_logout():
 
 
 # the following import has to happen after web_app is configured because pdg_app uses graphDB_Driver
-from pdg_api import api_bp
+from library.pdg_api import api_bp
 
 web_app.register_blueprint(api_bp)
 

@@ -28,7 +28,6 @@ from sympy.parsing.sympy_parser import parse_expr  # type: ignore
 from subprocess import PIPE  # https://docs.python.org/3/library/subprocess.html
 import subprocess  # https://stackoverflow.com/questions/39187886/what-is-the-difference-between-subprocess-popen-and-subprocess-run/39187984
 
-
 import logging
 
 logger = logging.getLogger(__name__)

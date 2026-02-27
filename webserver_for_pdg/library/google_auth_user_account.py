@@ -12,8 +12,8 @@ This module contains a set of SQL read/write functions needed for the Google Log
 # from https://realpython.com/flask-google-login/
 
 from flask_login import UserMixin  # type: ignore
-from google_auth_sql_db import get_db
-from google_auth_sql_db import init_db
+from .google_auth_sql_db import get_db
+from .google_auth_sql_db import init_db
 import sqlite3
 import logging
 

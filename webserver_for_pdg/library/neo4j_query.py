@@ -36,10 +36,9 @@ from typing import Dict, List, Any, Optional
 
 import time
 import uuid
-
-import list_of_valid
-
 import logging
+
+from . import list_of_valid
 
 logger = logging.getLogger(__name__)
 

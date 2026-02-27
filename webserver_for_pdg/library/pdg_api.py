@@ -77,14 +77,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-import neo4j_query
-import compute
-import list_of_valid
+from . import neo4j_query
+from . import compute
+from . import list_of_valid
 
 
-from compute import query_timing_result_type
+from .compute import query_timing_result_type
 
-from initialize_neo4j import graphDB_Driver
+from .initialize_neo4j import graphDB_Driver
 
 # this works because app.py loads this file first
 

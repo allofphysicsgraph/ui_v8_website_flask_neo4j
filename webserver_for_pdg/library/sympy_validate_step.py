@@ -62,8 +62,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-import compute
-from compute import query_timing_result_type
+from . import compute
+from .compute import query_timing_result_type
 
 import time
 

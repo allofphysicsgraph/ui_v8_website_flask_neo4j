@@ -31,11 +31,11 @@ from typing import TextIO, Tuple, List
 # image dimensions in pixels
 import cv2  # type: ignore
 
-import compute
+from . import compute
 
 # ORDERING: this has to come before the functions that use this type
-from compute import unique_numeric_id_as_str, query_timing_result_type
-import neo4j_query
+from .compute import unique_numeric_id_as_str, query_timing_result_type
+from . import neo4j_query
 
 import logging
 

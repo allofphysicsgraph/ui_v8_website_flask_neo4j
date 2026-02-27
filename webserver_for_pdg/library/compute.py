@@ -13,10 +13,6 @@ import random
 import string
 import time
 import tokenize
-import neo4j_query
-import list_of_valid
-import sympy_validate_expression
-import latex_and_sympy
 import re
 import hashlib
 import csv
@@ -25,6 +21,11 @@ import uuid
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
 from typing import NewType, Dict, List, Tuple, Any, Union  # for type hinting
+
+from . import neo4j_query
+from . import list_of_valid
+from . import sympy_validate_expression
+from . import latex_and_sympy
 
 # ORDERING: this has to come before the functions that use this type
 unique_numeric_id_as_str = NewType("unique_numeric_id_as_str", str)

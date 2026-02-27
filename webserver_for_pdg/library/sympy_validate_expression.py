@@ -8,6 +8,7 @@
 import random
 import tokenize
 import uuid
+import logging
 
 # import time  # this creates a conflict with sympy's `time`
 
@@ -23,8 +24,6 @@ from sympy.physics.units import (
 )  # type: ignore
 from sympy.physics.units.systems.si import dimsys_SI  # type: ignore
 from sympy.parsing.sympy_parser import parse_expr
-
-import logging
 
 logger = logging.getLogger(__name__)
 
