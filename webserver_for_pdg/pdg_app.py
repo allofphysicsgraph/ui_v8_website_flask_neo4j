@@ -64,6 +64,7 @@ import json
 import time
 import random
 import datetime
+import uuid
 
 import xmltodict
 
@@ -89,6 +90,7 @@ from flask import (
     send_from_directory,
     flash,
     jsonify,
+    escape,
     Response,
     session,  # needed to return the user to original page after logging in
 )
@@ -1317,7 +1319,7 @@ def to_add_derivation() -> werkzeug.Response:
             logger.error(
                 "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
             )
-            return "<H1>Input must be ASCII only</H1>\n" + str(derivation_name_latex)
+            return f"<h1>Input must be ASCII only</h1>\n{escape(derivation_name_latex)}"
 
         # this preserves the LaTeX backslashes exactly as the user typed them.
         derivation_reference_latex = str(
@@ -1340,7 +1342,7 @@ def to_add_derivation() -> werkzeug.Response:
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not abstract_latex.isascii():
             logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
-            return "<H1>Input must be ASCII only</H1>\n" + str(abstract_latex)
+            return f"<h1>Input must be ASCII only</h1>\n{escape(abstract_latex)}"
 
         # 2025-01-04, BHP: the following has been commented out
         # because the safety of string should be applied on writing, not reading
@@ -1671,9 +1673,13 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             flash(
                 "pdg_app/to_review_derivation sympy_validate_step.validate_step: "
                 + str(type(err).__name__)
+                + " "
                 + str(err)
+                + " "
+                + str(step_id)
             )
             logger.error(str(type(err).__name__) + str(err))
+            logger.info(str(step_id))
             derivation_step_validity_dict[step_id] = err
 
     logger.info("[TRACE] end " + str(trace_id))
@@ -1795,7 +1801,7 @@ def to_edit_derivation_metadata(
             logger.error(
                 "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
             )
-            return "<H1>Input must be ASCII only</H1>\n" + str(derivation_name_latex)
+            return f"<h1>Input must be ASCII only</h1>\n{escape(derivation_name_latex)}"
 
         derivation_reference_latex = latex.make_string_safe_for_latex(
             str(web_form.derivation_reference_latex.data).strip()
@@ -1816,7 +1822,7 @@ def to_edit_derivation_metadata(
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not abstract_latex.isascii():
             logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
-            return "<H1>Input must be ASCII only</H1>\n" + str(abstract_latex)
+            return f"<h1>Input must be ASCII only</h1>\n{escape(abstract_latex)}"
 
         # as per https://strftime.org/
         # %f = Microsecond as a decimal number, zero-padded on the left.
@@ -2613,7 +2619,7 @@ def to_add_expression() -> werkzeug.Response:
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not expression_latex_lhs.isascii():
             logger.error("Non-ascii expression_latex_lhs: " + str(expression_latex_lhs))
-            return "<H1>Input must be ASCII only</H1>\n" + str(expression_latex_lhs)
+            return f"<h1>Input must be ASCII only</h1>\n{escape(expression_latex_lhs)}"
 
         # the web UI dropdown returns the symbol ID (and not Latex string)
         #'symbol_relation_id_to_add', '2222545'
@@ -2644,7 +2650,7 @@ def to_add_expression() -> werkzeug.Response:
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not expression_latex_rhs.isascii():
             logger.error("Non-ascii expression_latex_rhs: " + str(expression_latex_rhs))
-            return "<H1>Input must be ASCII only</H1>\n" + str(expression_latex_rhs)
+            return f"<h1>Input must be ASCII only</h1>\n{escape(expression_latex_rhs)}"
 
         expression_latex_condition = str(
             web_form.expression_latex_condition.data
@@ -2663,7 +2669,7 @@ def to_add_expression() -> werkzeug.Response:
             logger.error(
                 "Non-ascii expression_name_latex: " + str(expression_name_latex)
             )
-            return "<H1>Input must be ASCII only</H1>\n" + str(expression_name_latex)
+            return f"<h1>Input must be ASCII only</h1>\n{escape(expression_name_latex)}"
 
         expression_reference_latex = str(
             web_form.expression_reference_latex.data
