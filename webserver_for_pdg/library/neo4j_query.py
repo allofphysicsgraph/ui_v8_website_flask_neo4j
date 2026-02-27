@@ -127,7 +127,7 @@ def apoc_export_json(tx: Transaction, output_filename: str):
 
     Default export data structure is 'JSON_LINES' (not JSON)
 
-    >>> apoc_export_json(tx)
+    >>> apoc_export_json(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -150,7 +150,7 @@ def apoc_export_cypher(tx: Transaction, output_filename: str):
     For the PDG, docker-compose has a shared folder on the host accessible both Neo4j and Flask.
     The file from neo4j can then be accessed by Flask for providing to the user via the web interface.
 
-    >>> apoc_export_cypher(tx)
+    >>> apoc_export_cypher(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -205,7 +205,7 @@ def apoc_export_cypher(tx: Transaction, output_filename: str):
     return result.single()
 
 
-def constrain_unique_id(tx) -> None:
+def constrain_unique_id(tx: Transaction) -> None:
     """
     https://neo4j.com/docs/getting-started/current/cypher-intro/schema/#cypher-intro-constraints
 
@@ -364,7 +364,7 @@ def get_symbol_IDs_in_expression(tx: Transaction, expression_id: str) -> List[st
     return [record["s.id"] for record in result]
 
 
-def get_symbol_IDs_in_every_feed(tx):
+def get_symbol_IDs_in_every_feed(tx: Transaction):
     """
     `MATCH (f:feed)` selects all nodes with the label feed, regardless of whether you passed an ID list or not.
     `OPTIONAL MATCH ...` is like a "Left Outer Join" in SQL. It attempts to find the pattern (f)-[:IS_COMPRISED_OF]->(s:symbol).
@@ -469,7 +469,7 @@ def get_nodes_of_type(tx: Transaction, node_type: str) -> list:
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a list of all nodes
 
-    >>> list_nodes_of_type(tx)
+    >>> list_nodes_of_type(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -493,7 +493,7 @@ def get_count_nodes_of_type(tx: Transaction, node_type: str) -> int:
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a count of all nodes
 
-    >>> count_nodes_of_type(tx)
+    >>> count_nodes_of_type(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -511,7 +511,9 @@ def get_count_nodes_of_type(tx: Transaction, node_type: str) -> int:
     return node_count
 
 
-def get_expressions_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_expressions_for_every_operation(
+    tx: Transaction,
+) -> Dict[str, List[Dict[str, Any]]]:
     """
     collect the 'e' nodes into a list for every unique 's'
     """
@@ -534,7 +536,9 @@ def get_expressions_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
     return res_dict
 
 
-def get_expressions_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_expressions_for_every_relation(
+    tx: Transaction,
+) -> Dict[str, List[Dict[str, Any]]]:
     """
     collect the 'e' nodes into a list for every unique 's'
     """
@@ -557,7 +561,9 @@ def get_expressions_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
     return res_dict
 
 
-def get_expressions_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_expressions_for_every_symbol(
+    tx: Transaction,
+) -> Dict[str, List[Dict[str, Any]]]:
     """
     collect the 'e' nodes into a list for every unique 's'
     """
@@ -580,7 +586,9 @@ def get_expressions_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
     return res_dict
 
 
-def get_derivations_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_derivations_for_every_relation(
+    tx: Transaction,
+) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 's'
 
@@ -610,7 +618,9 @@ def get_derivations_for_every_relation(tx) -> Dict[str, List[Dict[str, Any]]]:
     return res_dict
 
 
-def get_derivations_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_derivations_for_every_operation(
+    tx: Transaction,
+) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 's'
 
@@ -640,7 +650,9 @@ def get_derivations_for_every_operation(tx) -> Dict[str, List[Dict[str, Any]]]:
     return res_dict
 
 
-def get_derivations_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_derivations_for_every_symbol(
+    tx: Transaction,
+) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 's'
 
@@ -668,7 +680,7 @@ def get_derivations_for_every_symbol(tx) -> Dict[str, List[Dict[str, Any]]]:
     return res_dict
 
 
-def get_derivations_for_every_feed(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_derivations_for_every_feed(tx: Transaction) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 'f'
     """
@@ -692,7 +704,9 @@ def get_derivations_for_every_feed(tx) -> Dict[str, List[Dict[str, Any]]]:
     return res_dict
 
 
-def get_derivations_for_every_expression(tx) -> Dict[str, List[Dict[str, Any]]]:
+def get_derivations_for_every_expression(
+    tx: Transaction,
+) -> Dict[str, List[Dict[str, Any]]]:
     """
     Then collect the 'd' nodes into a list for every unique 'e'
 
@@ -873,7 +887,7 @@ def get_values_for_constant(tx: Transaction, scalar_id: str) -> list:
     return list_of_value_dicts
 
 
-def get_number_of_steps_per_derivation(tx) -> dict:
+def get_number_of_steps_per_derivation(tx: Transaction) -> dict:
     """
     step count per derivation is used by
     - <https://localhost/new_derivation>
@@ -895,7 +909,7 @@ def get_list_of_step_dicts_in_this_derivation(
     """
     For a given derivation, what are all the associated step IDs?
 
-    >>> get_list_of_step_dicts_in_this_derivation(tx)
+    >>> get_list_of_step_dicts_in_this_derivation(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -1116,7 +1130,7 @@ def add_derivation(
     """
     Create a new derivation node
 
-    >>> add_derivation(tx)
+    >>> add_derivation(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -2509,7 +2523,7 @@ def add_relation_symbol(
     return
 
 
-def get_list_of_all_node_IDs_and_labels(tx) -> list:
+def get_list_of_all_node_IDs_and_labels(tx: Transaction) -> list:
     """
     >>> list_of_all_nodes()
     """
@@ -2519,7 +2533,7 @@ def get_list_of_all_node_IDs_and_labels(tx) -> list:
     return record
 
 
-def delete_all_nodes_and_relationships(tx) -> None:
+def delete_all_nodes_and_relationships(tx: Transaction) -> None:
     """
     Delete all nodes and relationships from Neo4j database
 
@@ -2527,7 +2541,7 @@ def delete_all_nodes_and_relationships(tx) -> None:
 
     nothing returned by function because action is to write change to Neo4j database
 
-    >>> delete_all_nodes_and_relationships(tx)
+    >>> delete_all_nodes_and_relationships(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
