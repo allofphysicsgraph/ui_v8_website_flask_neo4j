@@ -88,15 +88,11 @@ def hash_of_string(str_to_hash: str) -> str:
     >>> hash_of_string('a_string')
     """
     trace_id = str(uuid.uuid4())
-    logger.info(
-        "[TRACE] start " + trace_id + " " + str(time.time())
-    )
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     hashed_str = hashlib.md5(str_to_hash.encode("utf-8")).hexdigest()
 
-    logger.info(
-        "[TRACE] start " + trace_id + " " + str(time.time())
-    )
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
     return hashed_str
 
 
@@ -174,9 +170,9 @@ def create_d3js_json(
     }
 
     for inspiration based on the last time I implemented this, see
-    v3_CSV/bin/create_json_per_derivation_from_connectionsDB.py
-    and then
-    v7/compute.py create_d3js_json
+    `v3_CSV/bin/create_json_per_derivation_from_connectionsDB.py`
+    and
+    `create_d3js_json` in `v7/compute.py`
 
     Args:
         derivation_id: numeric identifier of the derivation
@@ -224,17 +220,19 @@ def create_d3js_json(
                 png_name,
             )
             logger.info("created PNG " + png_name)
-            # addxtobothsides
 
         # purpose of reading image is to determine width and height; both are needed for d3js JSON
         image = cv2.imread(destination_folder + png_name + ".png")
-        # logger.debug("type for cv2 image is " + str(type(image)))
         logger.info("type for cv2 image is " + str(type(image)))
+
+        # the relevance of "group" is to set node color
 
         # construct the node JSON content
         list_of_nodes.append(
             '    {"id": "'
             + step_dict["inference rule dict"]["id"]
+            + "_"
+            + str(step_dict["sequence index"])
             + '", "group": '
             + str(step_dict["sequence index"])
             + ", "
@@ -293,8 +291,7 @@ def create_d3js_json(
                     + hash_of_string(expression_latex)
                 )
 
-            logger.info(" png_name" + str(png_name))
-            # logger.debug("PNG name = " + png_name)
+            logger.info("png_name" + str(png_name))
 
             if not os.path.isfile(destination_folder + png_name + ".png"):
                 create_png_from_latex(
@@ -302,10 +299,8 @@ def create_d3js_json(
                     destination_folder,
                     png_name,
                 )
-                # logger.debug("created PNG " + png_name)
 
             image = cv2.imread(destination_folder + png_name + ".png")
-            # logger.debug("type for cv2 image is " + str(type(image)))
 
             # construct the node JSON content
             list_of_nodes.append(
@@ -361,7 +356,7 @@ def create_d3js_json(
     return
 
 
-def edges_in_derivation_for_d3js(all_steps) -> List[Tuple[str, str]]:
+def edges_in_derivation_for_d3js(all_steps: dict) -> List[Tuple[str, str]]:
     """
 
     str in the Tuples:
@@ -377,15 +372,19 @@ def edges_in_derivation_for_d3js(all_steps) -> List[Tuple[str, str]]:
 
     list_of_edge_tuples = []  # type: List[Tuple[str,str]]
     for step_id, step_dict in all_steps.items():
-
+        step_uniq_ID = (
+            step_dict["inference rule dict"]["id"]
+            + "_"
+            + str(step_dict["sequence index"])
+        )
         for input_dict in step_dict["list of input dicts"]:
-            edge_tuple = (input_dict["id"], step_dict["inference rule dict"]["id"])
+            edge_tuple = (input_dict["id"], step_uniq_ID)
             list_of_edge_tuples.append(edge_tuple)
         for feed_dict in step_dict["list of feed dicts"]:
-            edge_tuple = (feed_dict["id"], step_dict["inference rule dict"]["id"])
+            edge_tuple = (feed_dict["id"], step_uniq_ID)
             list_of_edge_tuples.append(edge_tuple)
         for output_dict in step_dict["list of output dicts"]:
-            edge_tuple = (step_dict["inference rule dict"]["id"], output_dict["id"])
+            edge_tuple = (step_uniq_ID, output_dict["id"])
             list_of_edge_tuples.append(edge_tuple)
 
     logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
@@ -990,8 +989,7 @@ def create_tex_file_for_latex_string(
     >>> create_tex_file_for_latex_string('/code/static/filename_without_extension', 'a \dot b \\nabla')
     """
     trace_id = str(uuid.uuid4())
-    logger.info(
-        "[TRACE] start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     logger.info("tmp_file_no_extension_full_path:" + tmp_file_no_extension_full_path)
     logger.info("input_latex_str:" + input_latex_str)
