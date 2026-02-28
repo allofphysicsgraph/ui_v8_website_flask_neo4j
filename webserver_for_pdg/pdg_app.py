@@ -999,7 +999,7 @@ def to_index():
     logger.info("[TRACE] start " + str(trace_id))
 
     query_time_dict = {}  # type: query_timing_result_type
-    T_and_f_derivation_ID = "884319"
+    T_and_f_derivation_ID = "0000884319"
     all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
         graphDB_Driver, T_and_f_derivation_ID, query_time_dict
     )
@@ -1380,7 +1380,7 @@ def to_add_derivation() -> werkzeug.Response:
         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         derivation_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "derivation"
+            graphDB_Driver, query_time_dict
         )
         logger.info("to_add_derivation: derivation_id=" + str(derivation_id))
 
@@ -2757,7 +2757,7 @@ def to_add_expression() -> werkzeug.Response:
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
         expression_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "expression"
+            graphDB_Driver, query_time_dict
         )
 
         # https://neo4j.com/docs/python-manual/current/session-api/
@@ -2870,7 +2870,7 @@ def to_add_feed() -> werkzeug.Response:
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
         feed_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "feed"
+            graphDB_Driver, query_time_dict
         )
 
         # https://neo4j.com/docs/python-manual/current/session-api/
@@ -2903,7 +2903,7 @@ def to_add_feed() -> werkzeug.Response:
         # request.form =  ImmutableMultiDict([('symbol_select_id_to_add', '3819395')])
 
         feed_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "feed"
+            graphDB_Driver, query_time_dict
         )
 
         # as per https://strftime.org/
@@ -3501,7 +3501,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
             ]
 
         value_with_units_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "value_with_units"
+            graphDB_Driver, query_time_dict
         )
 
         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
@@ -3638,7 +3638,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
         scalar_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "scalar"
+            graphDB_Driver, query_time_dict
         )
 
         # https://neo4j.com/docs/python-manual/current/session-api/
@@ -3805,7 +3805,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
         vector_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "vector"
+            graphDB_Driver, query_time_dict
         )
 
         # https://neo4j.com/docs/python-manual/current/session-api/
@@ -3924,7 +3924,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
         matrix_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "matrix"
+            graphDB_Driver, query_time_dict
         )
 
         # https://neo4j.com/docs/python-manual/current/session-api/
@@ -4038,7 +4038,7 @@ def to_add_operation() -> werkzeug.Response:
         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         operation_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "operation"
+            graphDB_Driver, query_time_dict
         )
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
@@ -4147,7 +4147,7 @@ def to_add_relation() -> werkzeug.Response:
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
         relation_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "relation"
+            graphDB_Driver, query_time_dict
         )
 
         # https://neo4j.com/docs/python-manual/current/session-api/
@@ -4302,7 +4302,7 @@ def to_add_step_select_expressions(
         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
         step_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "step"
+            graphDB_Driver, query_time_dict
         )
         logger.info("generated step_id=" + str(step_id))
 
@@ -5261,7 +5261,6 @@ def to_add_sympy_and_lean_for_feed(
 def to_add_inference_rule() -> werkzeug.Response:
     """
     create inference rule
-
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -5286,117 +5285,91 @@ def to_add_inference_rule() -> werkzeug.Response:
         )
     )
 
-    if request.method == "POST" and not web_form_new_infrule.validate():
-        flash("pdg_app/to_add_inference_rule" + str(web_form_new_infrule.errors))
-        logger.error(str(web_form_new_infrule.errors))
-    if request.method == "POST" and web_form_new_infrule.validate():
-        logger.info("request.form = " + str(request.form))
+    if request.method == "POST" and "new infrule" in request.form:
+        logger.info("request.form=" + str(request.form))
 
-        # request.form =  ImmutableMultiDict([('inference_rule_name', 'add x to both sides'),
-        # ('inference_rule_latex', 'add _ to both sides'),
-        # ('inference_rule_number_of_inputs', '1'), ('inference_rule_number_of_feeds', '1'), ('inference_rule_number_of_outputs', '1')])
+        if web_form_new_infrule.validate():
+            logger.info("request.form = " + str(request.form))
 
-        inference_rule_name = str(web_form_new_infrule.inference_rule_name.data).strip()
-        inference_rule_latex = str(
-            web_form_new_infrule.inference_rule_latex.data
-        ).strip()
-        number_of_inputs = int(
-            str(web_form_new_infrule.inference_rule_number_of_inputs.data).strip()
-        )
-        number_of_feeds = int(
-            str(web_form_new_infrule.inference_rule_number_of_feeds.data).strip()
-        )
-        number_of_outputs = int(
-            str(web_form_new_infrule.inference_rule_number_of_outputs.data).strip()
-        )
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+            inference_rule_name = str(
+                web_form_new_infrule.inference_rule_name.data
+            ).strip()
+            logger.info("inference_rule_name: " + str(inference_rule_name))
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        list_of_inference_rule_dicts = []
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_inference_rule_dicts = session.read_transaction(
-                neo4j_query.get_nodes_of_type, "inference_rule"
+            inference_rule_latex = str(
+                web_form_new_infrule.inference_rule_latex.data
+            ).strip()
+            number_of_inputs = int(
+                str(web_form_new_infrule.inference_rule_number_of_inputs.data).strip()
             )
-            query_time_dict[
-                "pdg_app/to_add_inference_rule: get_nodes_of_type inference_rule "
-                + trace_id
-            ] = round(time.time() - query_start_time, 3)
-
-        logger.info("inference_rule_name " + str(inference_rule_name))
-        for inference_rule_dict in list_of_inference_rule_dicts:
-            logger.info("inference_rule_dict is " + str(inference_rule_dict))
-            logger.info(
-                "inference_rule_dict['name_latex'] "
-                + str(inference_rule_dict["name_latex"])
+            number_of_feeds = int(
+                str(web_form_new_infrule.inference_rule_number_of_feeds.data).strip()
             )
-            if inference_rule_name == inference_rule_dict["name_latex"]:
-                logger.error(
-                    "INVALID INPUT: inference rule with that name already exists"
-                )
-                # TODO: a notice should be provided to the user
-                flash(
-                    "pdg_app/to_add_inference_rule INVALID INPUT: inference rule with that name already exists"
-                )
+            number_of_outputs = int(
+                str(web_form_new_infrule.inference_rule_number_of_outputs.data).strip()
+            )
+            author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
-                logger.info("[TRACE] end " + str(trace_id))
-                return redirect(url_for("to_add_inference_rule"))
-            if inference_rule_latex == inference_rule_dict["latex"]:
-                logger.error(
-                    "INVALID INPUT: inference rule with that latex already exists"
+            infrule_exists, message, query_time_dict = (
+                compute.check_whether_inference_rule_exists(
+                    graphDB_Driver,
+                    query_time_dict,
+                    inference_rule_name,
+                    inference_rule_latex,
                 )
-                # TODO: a notice should be provided to the user
-                flash(
-                    "pdg_app/to_add_inference_rule INVALID INPUT: inference rule with that latex already exists"
-                )
-
-                logger.info("[TRACE] end " + str(trace_id))
+            )
+            if infrule_exists:
+                flash("pdg_app/to_add_inference_rule: " + message)
                 return redirect(url_for("to_add_inference_rule"))
 
-        logger.info("status: No conflicting name or latex detected")
+            logger.info("status: No conflicting name or latex detected")
 
-        inference_rule_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict, "inference_rule"
-        )
-        logger.info("new inference_rule_id: " + str(inference_rule_id))
-
-        try:
-            assert (
-                (int(number_of_inputs) > 0)
-                or (int(number_of_feeds) > 0)
-                or (int(number_of_outputs) > 0)
+            inference_rule_id, query_time_dict = compute.generate_random_id(
+                graphDB_Driver, query_time_dict
             )
-            assert int(number_of_inputs) >= 0
-            assert int(number_of_feeds) >= 0
-            assert int(number_of_outputs) >= 0
-        except AssertionError as err:
-            # TODO: getting assertion error wipes whatever the user provided. That's bad.
-            flash(
-                "pdg_app/to_add_inference_rule Assertion error; try again. " + str(err)
-            )
-            logger.error(str(err))
-            return redirect(url_for("to_add_inference_rule"))
+            logger.info("new inference_rule_id: " + str(inference_rule_id))
 
-        # as per https://strftime.org/
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+            try:
+                assert (
+                    (int(number_of_inputs) > 0)
+                    or (int(number_of_feeds) > 0)
+                    or (int(number_of_outputs) > 0)
+                )
+                assert int(number_of_inputs) >= 0
+                assert int(number_of_feeds) >= 0
+                assert int(number_of_outputs) >= 0
+            except AssertionError as err:
+                # TODO: getting assertion error wipes whatever the user provided. That's bad.
+                flash(
+                    "pdg_app/to_add_inference_rule Assertion error; try again. "
+                    + str(err)
+                )
+                logger.error(str(err))
+                return redirect(url_for("to_add_inference_rule"))
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_inference_rule,
-                inference_rule_id=inference_rule_id,
-                inference_rule_name=inference_rule_name,
-                inference_rule_latex=inference_rule_latex,
-                number_of_inputs=number_of_inputs,
-                number_of_feeds=number_of_feeds,
-                number_of_outputs=number_of_outputs,
-                now_str=now_str,
-                author_name_latex=author_name_latex,
-            )
-        logger.info("[TRACE] end " + str(trace_id))
-        return redirect(url_for("to_list_inference_rules"))
+            # as per https://strftime.org/
+            # %f = Microsecond as a decimal number, zero-padded on the left.
+            now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
+            # https://neo4j.com/docs/python-manual/current/session-api/
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.add_inference_rule,
+                    inference_rule_id=inference_rule_id,
+                    inference_rule_name=inference_rule_name,
+                    inference_rule_latex=inference_rule_latex,
+                    number_of_inputs=number_of_inputs,
+                    number_of_feeds=number_of_feeds,
+                    number_of_outputs=number_of_outputs,
+                    now_str=now_str,
+                    author_name_latex=author_name_latex,
+                )
+            logger.info("[TRACE] end " + str(trace_id))
+            return redirect(url_for("to_list_inference_rules"))
+        else:
+            flash("pdg_app/to_add_inference_rule: " + str(web_form_new_infrule.errors))
+            logger.error(str(web_form_new_infrule.errors))
 
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
