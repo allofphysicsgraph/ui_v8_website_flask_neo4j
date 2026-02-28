@@ -496,7 +496,7 @@ def get_derivations(tx: Transaction) -> list:
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
-    query = f"MATCH (n:derivation) RETURN n ORDER BY n.name_latex"
+    query = f"MATCH (n:derivation) RETURN n ORDER BY toLower(n.name_latex)"
 
     node_list = []  # type: List[dict]
     for result in tx.run(query):
