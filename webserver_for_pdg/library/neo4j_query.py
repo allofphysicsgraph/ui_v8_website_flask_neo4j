@@ -127,7 +127,6 @@ def apoc_export_json(tx: Transaction, output_filename: str):
 
     Default export data structure is 'JSON_LINES' (not JSON)
 
-    >>> apoc_export_json(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -208,8 +207,6 @@ def apoc_export_cypher(tx: Transaction, output_filename: str):
 def constrain_unique_id(tx: Transaction) -> None:
     """
     https://neo4j.com/docs/getting-started/current/cypher-intro/schema/#cypher-intro-constraints
-
-    >>> constrain_unique_id()
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -280,9 +277,7 @@ def get_relation_latex(tx: Transaction, relation_id: str):
 
 
 def get_scalar_id_that_has_value_and_units_id(tx: Transaction, value_and_units_id: str):
-    """
-    >>>
-    """
+    """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     result = tx.run(
@@ -468,8 +463,6 @@ def get_nodes_of_type(tx: Transaction, node_type: str) -> list:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a list of all nodes
-
-    >>> list_nodes_of_type(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -621,8 +614,6 @@ def get_derivations_for_every_relation(
     the MATCH pattern finds three separate paths. `collect(d)` then grabs the derivation
     node once for every path it finds, resulting in three instances of the same node in your list.
     `collect(DISTINCT d)` collapses those into one.
-
-    TODO: replace `IS_COMPRISED_OF` with `HAS_RELATION`
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -653,8 +644,6 @@ def get_derivations_for_every_operation(
     the MATCH pattern finds three separate paths. `collect(d)` then grabs the derivation
     node once for every path it finds, resulting in three instances of the same node in your list.
     `collect(DISTINCT d)` collapses those into one.
-
-    TODO: replace `IS_COMPRISED_OF` with `HAS_OPERATION`
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -896,9 +885,7 @@ def get_derivations_that_use_symbol(
 
 
 def get_values_for_constant(tx: Transaction, scalar_id: str) -> list:
-    """
-    >>>
-    """
+    """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     logger.info("scalar_id=" + scalar_id)
@@ -985,7 +972,7 @@ def get_inference_rule_connected_to_step_ID(tx: Transaction, step_id: str):
     >>> step_has_inference_rule()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     result = tx.run(
         'MATCH (n:step {id:"'
@@ -1008,9 +995,7 @@ def get_inference_rule_connected_to_step_ID(tx: Transaction, step_id: str):
 
 
 def get_derivation_id_from_step_id(tx: Transaction, step_id: str) -> str:
-    """
-    >>>
-    """
+    """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
@@ -1139,7 +1124,7 @@ def get_node_properties_from_id(
 
     node = dict(record["n"])
 
-    logger.info("[TRACE]  end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return node
 
 
@@ -1154,8 +1139,6 @@ def add_derivation(
 ) -> None:
     """
     Create a new derivation node
-
-    >>> add_derivation(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -1198,8 +1181,6 @@ def add_inference_rule(
     but when writing the query string they are
     cast to integers to enable concatenation, but
     Neo4j sees the query as containing integers.
-
-    >>> add_inference_rule(tx,)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -1235,11 +1216,9 @@ def edit_step_notes(
     """
     TODO: deprecate this in favor of edit_node_properties
     see https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887#update-node-properties-add-new-or-modify
-
-    >>> edit_step_notes()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     result = tx.run(
         'MERGE (s:step {id:"' + str(step_id) + '", '
@@ -1248,7 +1227,7 @@ def edit_step_notes(
         'note_before_step_latex: "' + str(note_after_step_latex) + '"}'
     )
 
-    logger.info("[TRACE]  end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1266,8 +1245,6 @@ def edit_expression(
 ) -> None:
     """
     see https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887#update-node-properties-add-new-or-modify
-
-    >>> edit_expression()
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -1289,35 +1266,6 @@ def edit_expression(
     return
 
 
-# def edit_feed(
-#     tx,
-#     feed_id: str,
-#     feed_latex: str,
-#     feed_name: str,
-#     feed_description: str,
-#     now_str: str,
-#     author_name_latex: str,
-# ) -> None:
-#     """
-#     >>> edit_feed()
-#     """
-#     trace_id = str(uuid.uuid4())
-#     logger.info("[TRACE] start " + str(trace_id))
-
-#     result = tx.run(
-#         'MERGE (e:feed {id:"' + str(feed_id) + '"})'
-#         'SET e = {id: "' + str(feed_id) + '",'
-#         'name_latex: "' + str(feed_name) + '",'
-#         'description_latex: "' + str(feed_description) + '",'
-#         'created_datetime:"' + now_str + '",'
-#         'author_name_latex:"' + author_name_latex + '",'
-#         'latex: "' + str(feed_latex) + '"}'
-#     )
-
-#     logger.info("[TRACE] end " + str(trace_id))
-#     return
-
-
 def edit_node_property(
     tx, node_type: str, node_id: str, property_key: str, property_value
 ) -> None:
@@ -1327,7 +1275,7 @@ def edit_node_property(
     see https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887#update-node-properties-add-new-or-modify
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # print(
     #     "node_type=",
@@ -1355,7 +1303,7 @@ def edit_node_property(
             "SET n." + str(property_key) + ' = "' + str(property_value) + '"'
         )
 
-    logger.info("[TRACE]  end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1373,7 +1321,7 @@ def edit_derivation_metadata(
     >>> edit_derivation_metadata()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     result = tx.run(
         'MERGE (d:derivation {id:"' + str(derivation_id) + '"})'
@@ -1424,7 +1372,7 @@ def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
 
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # must be one of these node types. See also 'schema.log' file
     logger.info("node_type= " + node_type)
@@ -1435,7 +1383,7 @@ def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
     )
     logger.info("result.data=" + str(result.data()))
 
-    logger.info("[TRACE]  end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1448,7 +1396,7 @@ def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
 #     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
 #     """
 #     trace_id = str(uuid.uuid4())
-#     logger.info("[TRACE]  start " + str(trace_id))
+#     logger.info("[TRACE] start " + str(trace_id))
 
 #     logger.info(
 #         "symbol_category="
@@ -1468,7 +1416,7 @@ def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
 #     )
 #     logger.info("result.data=" + str(result.data()))
 
-#     logger.info("[TRACE]  end " + str(trace_id))
+#     logger.info("[TRACE] end " + str(trace_id))
 #     return
 
 
@@ -1479,7 +1427,7 @@ def disconnect_symbol_from_feed(tx, symbol_id: str, feed_id: str) -> None:
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     result = tx.run(
         "MATCH (e:feed)-[r:IS_COMPRISED_OF]->(s)"
@@ -1491,7 +1439,7 @@ def disconnect_symbol_from_feed(tx, symbol_id: str, feed_id: str) -> None:
     )
     logger.info("result.data=" + str(result.data()))
 
-    logger.info("[TRACE]  end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1500,7 +1448,7 @@ def get_node_labels_from_property(
 ):
     """ """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # UNSAFE:
     # result = tx.run(
@@ -1521,11 +1469,11 @@ def get_node_labels_from_property(
     # Pass both variables as parameters in the dictionary
     result = tx.run(query, key=property_key, value=property_value)
 
-    logger.info("[TRACE]  end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return result.data()
 
 
-def add_symbol_to_feed(tx, symbol_id: str, feed_id: str) -> None:
+def connect_symbol_to_feed(tx, symbol_id: str, feed_id: str) -> None:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -1559,11 +1507,11 @@ def add_symbol_to_feed(tx, symbol_id: str, feed_id: str) -> None:
         "MERGE (f)-[r:IS_COMPRISED_OF]->(s)"
     )
 
-    logger.info("[TRACE]  end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
-def add_symbol_to_expression(tx, symbol_id: str, expression_id: str) -> None:
+def connect_symbol_to_expression(tx, symbol_id: str, expression_id: str) -> None:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -1597,7 +1545,7 @@ def add_symbol_to_expression(tx, symbol_id: str, expression_id: str) -> None:
         "MERGE (e)-[r:IS_COMPRISED_OF]->(n)"
     )
 
-    logger.info("[TRACE]  end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1608,7 +1556,7 @@ def get_list_of_sequence_values_for_derivation_id(
     sequence value is a positive integer for ordering the steps of a derivation
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     list_of_sequence_values = []  # type: List[int]
 
@@ -1632,11 +1580,11 @@ def get_list_of_sequence_values_for_derivation_id(
     list_of_sequence_values.sort()
     logger.info("list_of_sequence_values=" + str(list_of_sequence_values))
 
-    logger.info("[TRACE]  end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return list_of_sequence_values
 
 
-def add_step_to_derivation(
+def connect_step_to_derivation(
     tx,
     step_id: str,
     derivation_id: str,
@@ -1649,16 +1597,14 @@ def add_step_to_derivation(
 ) -> None:
     """
     can't add inference rules in same query because step needs to exist first
-
-    >>> add_step_to_derivation()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     # # https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Result
     # print("result=",result.single())
 
-    logger.info("insert step with id; this works")
+    # logger.info("insert step with id; this works")
     result = tx.run(
         'MERGE (:step {id:"' + step_id + '", '
         'author_name_latex:"' + author_name_latex + '", '
@@ -1668,7 +1614,7 @@ def add_step_to_derivation(
     )
     # print(result.data()) # this just shows "[]"
 
-    logger.info("step with edge" + derivation_id)
+    logger.info("step with edge " + derivation_id)
     result = tx.run(
         "MATCH (a:derivation),(b:step) "
         'WHERE a.id="' + str(derivation_id) + '" AND b.id="' + str(step_id) + '" '
@@ -1677,7 +1623,7 @@ def add_step_to_derivation(
         + "}]->(b) RETURN r"
     )
 
-    logger.info("inference_rule_id" + inference_rule_id)
+    logger.info("inference_rule_id " + inference_rule_id)
     result = tx.run(
         "MATCH (a:step),(b:inference_rule) "
         'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(inference_rule_id) + '"'
@@ -1685,7 +1631,7 @@ def add_step_to_derivation(
     )
     # print(result.data()) # this just shows "[]"
 
-    logger.info("[TRACE]  end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
@@ -1700,8 +1646,6 @@ def connect_expressions_to_step(
 ) -> None:
     """
     adding expressions to step can only be done once step exists
-
-    >>> connect_expressions_to_step()
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -1752,7 +1696,7 @@ def connect_expressions_to_step(
 
 
 def add_expression(
-    tx,
+    tx: Transaction,
     expression_id: str,
     expression_name_latex: str,
     expression_latex_lhs: str,
@@ -1769,7 +1713,6 @@ def add_expression(
 
     `add_expression` doesn't have `sympy_lhs`, `sympy_rhs`, `lean` because those are added in a separate action
 
-    >>> add_expression(tx,)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -1830,7 +1773,7 @@ def add_expression(
 
 
 def add_feed(
-    tx,
+    tx: Transaction,
     feed_id: str,
     feed_latex: str,
     feed_sympy: str,
@@ -1840,8 +1783,6 @@ def add_feed(
 ) -> None:
     """
     nothing returned by function because action is to write change to Neo4j database
-
-    >>> add_feed(tx,)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -1887,7 +1828,7 @@ def add_feed(
 
 
 def add_quantum_operator_symbol(
-    tx,
+    tx: Transaction,
     symbol_id: str,
     symbol_name: str,
     symbol_latex: str,
@@ -1900,7 +1841,6 @@ def add_quantum_operator_symbol(
     """
     nothing returned by function because action is to write change to Neo4j database
 
-    >>> add_symbol(tx,)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -1954,7 +1894,7 @@ def add_quantum_operator_symbol(
 
 
 def add_constant_value_with_units(
-    tx,
+    tx: Transaction,
     scalar_id: str,
     value_with_units_id: str,
     number_decimal: float,
@@ -1966,8 +1906,6 @@ def add_constant_value_with_units(
     """
     This function may suffice for creating new constants
     but is not expected to work for editing constants. See Gemini 3 Pro's observation inline below.
-
-    >>>
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -2041,7 +1979,7 @@ def add_constant_value_with_units(
 
 
 def add_scalar_symbol(
-    tx,
+    tx: Transaction,
     symbol_id: str,
     symbol_name: str,
     symbol_latex: str,
@@ -2060,9 +1998,7 @@ def add_scalar_symbol(
     now_str: str,
     author_name_latex: str,
 ):
-    """
-    >>>
-    """
+    """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
@@ -2156,7 +2092,7 @@ def add_scalar_symbol(
 
 
 def add_vector_symbol(
-    tx,
+    tx: Transaction,
     symbol_id: str,
     symbol_name: str,
     symbol_latex: str,
@@ -2169,9 +2105,7 @@ def add_vector_symbol(
     now_str: str,
     author_name_latex: str,
 ):
-    """
-    >>>
-    """
+    """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
@@ -2289,7 +2223,7 @@ def add_vector_symbol(
 
 
 def add_matrix_symbol(
-    tx,
+    tx: Transaction,
     symbol_id: str,
     symbol_name: str,
     symbol_latex: str,
@@ -2302,9 +2236,7 @@ def add_matrix_symbol(
     now_str: str,
     author_name_latex: str,
 ):
-    """
-    >>>
-    """
+    """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
@@ -2418,7 +2350,7 @@ def add_matrix_symbol(
 
 
 def add_operation_symbol(
-    tx,
+    tx: Transaction,
     operation_id: str,
     operation_name: str,
     operation_latex: str,
@@ -2431,7 +2363,6 @@ def add_operation_symbol(
     """
     nothing returned by function because action is to write change to Neo4j database
 
-    >>> add_operation(tx,)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -2508,7 +2439,7 @@ def add_operation_symbol(
 
 
 def add_relation_symbol(
-    tx,
+    tx: Transaction,
     relation_id: str,
     relation_name_latex: str,
     relation_latex: str,
@@ -2519,8 +2450,6 @@ def add_relation_symbol(
 ) -> None:
     """
     nothing returned by function because action is to write change to Neo4j database
-
-    >>> add_operation(tx,)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -2564,9 +2493,7 @@ def add_relation_symbol(
 
 
 def get_list_of_all_node_IDs_and_labels(tx: Transaction) -> list:
-    """
-    >>> list_of_all_nodes()
-    """
+    """ """
     result = tx.run("MATCH (n) RETURN n.id, labels(n)")
     record = result.data()
     # print("neo4j_query/list_of_all_nodes: record=", record)
@@ -2581,7 +2508,6 @@ def delete_all_nodes_and_relationships(tx: Transaction) -> None:
 
     nothing returned by function because action is to write change to Neo4j database
 
-    >>> delete_all_nodes_and_relationships(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
@@ -2597,8 +2523,6 @@ def user_query(tx: Transaction, query: str) -> list:
     User-submitted Cypher query for Neo4j database
 
     Read-only for Neo4j database
-
-    >>> user_query(tx: Transaction, "test")
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
