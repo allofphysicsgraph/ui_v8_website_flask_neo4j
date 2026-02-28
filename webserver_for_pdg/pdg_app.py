@@ -2218,7 +2218,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             session.write_transaction(
-                neo4j_query.delete_node, "expression", expression_id
+                neo4j_query.delete_node, expression_id, "expression"
             )
             query_time_dict["to_edit_expression: delete_node"] = round(
                 time.time() - query_start_time, 3
