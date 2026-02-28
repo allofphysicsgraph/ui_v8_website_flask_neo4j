@@ -28,23 +28,54 @@ function select_derivation() {
   var input, filter, table, tr, td, i, txtValue;
   input = document.getElementById('derivation_input');
   filter = input.value.toUpperCase();
-  // 2023-12-17: below was previously for UL/LI but I switched to TR/TD since the derivations are a table.
   table = document.getElementById("derivation_table");
 
   tr = table.getElementsByTagName("tr");
 
   // Loop through all table rows; hide those who don't match the search query
   for (i = 1; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0]; // name column
-    console.log(td)
-    if (td) {
-      txtValue = td.textContent || td.innerText;
+    // search a single column:
+    // td = tr[i].getElementsByTagName("td")[0]; // name column
+    // console.log(td)
+    // if (td) {
+    //   txtValue = td.textContent || td.innerText;
+    //   if (txtValue.toUpperCase().indexOf(filter) > -1) {
+    //     tr[i].style.display = "";
+    //   } else {
+    //     tr[i].style.display = "none";
+    //   }
+    // }
+
+    // Get the cells for column 0 and column 1
+    var td0 = tr[i].getElementsByTagName("td")[0];
+    var td1 = tr[i].getElementsByTagName("td")[1];
+
+    // Initialize flags to track if a match is found in either column
+    var matchFound = false;
+
+    // Check column 0
+    if (td0) {
+      txtValue = td0.textContent || td0.innerText;
       if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
+        matchFound = true;
       }
     }
+
+    // If no match found in column 0, check column 1
+    if (!matchFound && td1) {
+      txtValue = td1.textContent || td1.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        matchFound = true;
+      }
+    }
+
+    // If a match was found in either column, display the row, otherwise hide it
+    if (matchFound) {
+      tr[i].style.display = "";
+    } else {
+      tr[i].style.display = "none";
+    }
+
   }
 }
 </script>
