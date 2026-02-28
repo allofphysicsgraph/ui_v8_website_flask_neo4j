@@ -87,7 +87,12 @@ dict_of_nonoperation_symbol_dicts_in_expression: <BR>
   </legend>
 
 dict_of_nonoperation_symbol_dicts_not_in_expression:<BR>
-{{ dict_of_nonoperation_symbol_dicts_not_in_expression }}
+
+{% for symbol_id, symbol_dict in dict_of_nonoperation_symbol_dicts_not_in_expression.items() %}
+<UL>
+    <LI>{{ symbol_id }}: {{ symbol_dict }}</LI>
+</UL>
+{% endfor %}
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
@@ -165,7 +170,11 @@ dict_of_operation_dicts_in_expression:<BR>
   </legend>
 
 dict_of_operation_dicts_not_in_expression<BR>
-{{ dict_of_operation_dicts_not_in_expression }}
+{% for operation_id, operation_dict in dict_of_operation_dicts_not_in_expression.items() %}
+<UL>
+    <LI>{{ operation_id }}: {{ operation_dict }}
+</UL>
+{% endfor %}
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
@@ -306,16 +315,16 @@ dict_of_relation_dicts_not_in_expression<BR>
       <H1>Edit Expression SymPy and Lean</h1>
     </legend>
 
-<P>expression_dict['sympy_lhs']: <BR>{{expression_dict['sympy_lhs']}}
-<P>expression_dict['sympy_rhs']: <BR>{{expression_dict['sympy_rhs']}}
+<!--<P>expression_dict['sympy_lhs']: <BR>{ {expression_dict['sympy_lhs']}} -->
+<!--<P>expression_dict['sympy_rhs']: <BR>{ {expression_dict['sympy_rhs']}} -->
 
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_expression_sympy.csrf_token }}
 
-    <P>{{form_expression_sympy.sympy_str_lhs.label}}: {{ form_expression_sympy.sympy_str_lhs(size=50, maxlength=1000, value=expression_dict['sympy_lhs']) }}
-    <P>{{form_expression_sympy.sympy_str_rhs.label}}: {{ form_expression_sympy.sympy_str_rhs(size=50, maxlength=1000, value=expression_dict['sympy_rhs']) }}
-    <P>{{form_expression_sympy.lean_str.label}}:      {{ form_expression_sympy.lean_str(size=50, maxlength=1000, value=expression_dict['lean']) }}
+    <P>{{form_expression_sympy.sympy_str_lhs.label}}: {{ form_expression_sympy.sympy_str_lhs(cols=150, rows=3, maxlength=1000, value=expression_dict['sympy_lhs']) }}
+    <P>{{form_expression_sympy.sympy_str_rhs.label}}: {{ form_expression_sympy.sympy_str_rhs(cols=150, rows=3, maxlength=1000, value=expression_dict['sympy_rhs']) }}
+    <P>{{form_expression_sympy.lean_str.label}}:      {{ form_expression_sympy.lean_str(size=150, maxlength=1000, value=expression_dict['lean']) }}
   
   <P><input type="submit" name="edit expression sympy" value="Edit expression SymPy and Lean">
   </form>
