@@ -273,7 +273,7 @@ def api_list_derivations():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "derivation"
+            neo4j_query.get_nodes_of_type, "derivation"
         )
         query_time_dict[
             "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
@@ -379,11 +379,11 @@ def api_list_inference_rules():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "inference_rule"
+            neo4j_query.get_nodes_of_type, "inference_rule"
         )
-        query_time_dict[
-            "pdg_api/api_list_inference_rules: get_list_node_dicts_of_type"
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/api_list_inference_rules: get_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -465,9 +465,9 @@ def api_list_expressions():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "expression"
+            neo4j_query.get_nodes_of_type, "expression"
         )
-        query_time_dict["pdg_api/api_list_expressions: get_list_node_dicts_of_type"] = (
+        query_time_dict["pdg_api/api_list_expressions: get_nodes_of_type"] = (
             time.time() - query_start_time
         )
 
@@ -560,11 +560,11 @@ def api_list_operation_symbols():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "operation"
+            neo4j_query.get_nodes_of_type, "operation"
         )
-        query_time_dict[
-            "pdg_api/api_list_operation_symbols: get_list_node_dicts_of_type"
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/api_list_operation_symbols: get_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -646,7 +646,7 @@ def api_list_relation_symbols():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "relation"
+            neo4j_query.get_nodes_of_type, "relation"
         )
         query_time_dict[
             "pdg_api/api_list_relation_symbols: api_list_relation_symbols"
@@ -743,11 +743,11 @@ def api_list_scalar_symbols():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "scalar"
+            neo4j_query.get_nodes_of_type, "scalar"
         )
-        query_time_dict[
-            "pdg_api/api_list_scalar_symbols: get_list_node_dicts_of_type"
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/api_list_scalar_symbols: get_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -836,11 +836,11 @@ def api_list_vector_symbols():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "vector"
+            neo4j_query.get_nodes_of_type, "vector"
         )
-        query_time_dict[
-            "pdg_api/api_list_vector_symbols: get_list_node_dicts_of_type"
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/api_list_vector_symbols: get_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -929,11 +929,11 @@ def api_list_matrix_symbols():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "matrix"
+            neo4j_query.get_nodes_of_type, "matrix"
         )
-        query_time_dict[
-            "pdg_api/api_list_matrix_symbols: get_list_node_dicts_of_type"
-        ] = (time.time() - query_start_time)
+        query_time_dict["pdg_api/api_list_matrix_symbols: get_nodes_of_type"] = (
+            time.time() - query_start_time
+        )
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -1076,10 +1076,10 @@ def api_create_derivation():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_derivation_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "derivation"
+            neo4j_query.get_nodes_of_type, "derivation"
         )
         query_time_dict[
-            "pdg_api/api_create_derivation: get_list_node_dicts_of_type derivation"
+            "pdg_api/api_create_derivation: get_nodes_of_type derivation"
         ] = round(time.time() - query_start_time, 3)
 
     # print("list_of_derivation_dicts=", list_of_derivation_dicts)
@@ -1299,7 +1299,7 @@ def api_create_expression():
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_expression_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "expression"
+            neo4j_query.get_nodes_of_type, "expression"
         )
         query_time_dict["to_add_expression: list_nodes_of_type"] = round(
             time.time() - query_start_time, 3
@@ -1985,7 +1985,7 @@ def api_derivation_metadata(derivation_id: str):
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         derivation_dict = session.read_transaction(
-            neo4j_query.get_node_properties, "derivation", derivation_id
+            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
         )
         query_time_dict["pdg_api/: "] = time.time() - query_start_time
     logger.info("derivation_dict=" + str(derivation_dict))
@@ -2119,7 +2119,7 @@ def api_delete_derivation(derivation_id: str):
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_dicts = session.read_transaction(
-            neo4j_query.get_list_node_dicts_of_type, "derivation"
+            neo4j_query.get_nodes_of_type, "derivation"
         )
         query_time_dict[
             "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
@@ -2159,7 +2159,7 @@ def api_delete_derivation(derivation_id: str):
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         derivation_dict = session.read_transaction(
-            neo4j_query.get_node_properties, "derivation", derivation_id
+            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
         )
         query_time_dict["to_review_derivation: node_properties, derivation"] = round(
             time.time() - query_start_time, 3
@@ -2243,7 +2243,7 @@ def api_cypher_query():
 
     user_query = request.args.get("query")
 
-    logger.info("user_query:" + user_query)
+    logger.info("user_query: " + str(user_query))
 
     list_of_records = []  # type: List[str]
     if user_query:
