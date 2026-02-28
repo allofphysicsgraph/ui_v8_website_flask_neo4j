@@ -2148,6 +2148,13 @@ CREATE (:feed {author_name_latex:"ben.is.located@gmail.com", id:"9903988330", la
 CREATE (:feed {author_name_latex:"ben.is.located@gmail.com", id:"9906920183", latex:"x", lean:"", sympy:"Symbol('pdg0001464')"});
 CREATE (:feed {author_name_latex:"ben.is.located@gmail.com", id:"9933742680", latex:"r_{\\rm Schwarzschild}", lean:"", sympy:"Symbol('pdg0004518')"});
 CREATE (:feed {author_name_latex:"ben.is.located@gmail.com", id:"9956609318", latex:"6.67430*10^{-11}", lean:"", sympy:"Mul(Float('6.6742999999999997', precision=53), Pow(Integer(10), Mul(Integer(-1), Integer(11))))"});
+CREATE (:expression {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-27_22-25-57-571724", description_latex:"vector form relating force to mass and acceleration", id:"7455074", latex_condition:"", latex_lhs:"\\vec{F}", latex_relation:"=", latex_rhs:"m\\ \\vec{a}", lean:"", name_latex:"Newton's second law", reference_latex:"https://en.wikipedia.org/wiki/Newton%27s_laws_of_motion#Second_law", sympy_lhs:"", sympy_rhs:"Symbol('pdg0002423')"});
+CREATE (:derivation {abstract_latex:"convert vector representation to scalar", author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-27_21-32-14-900164", id:"8996667", name_latex:"Newton's Second Law of Motion: vector to scalar", reference_latex:""});
+CREATE (:step {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-27_23-19-05-499790", id:"1916083", note_after_step_latex:"", note_before_step_latex:""});
+CREATE (:expression {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_12-20-11-381958", description_latex:"", id:"1075552184", latex_condition:"", latex_lhs:"|\\vec{a}|", latex_relation:"=", latex_rhs:"a", name_latex:"", reference_latex:""});
+CREATE (:expression {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_13-00-31-662004", description_latex:"", id:"1219718533", latex_condition:"", latex_lhs:"|\\vec{F}|", latex_relation:"=", latex_rhs:"F", lean:"", name_latex:"", reference_latex:"", sympy:"Eq(Abs(Symbol('pdg0004202')),Symbol('pdg0004202'))", sympy_lhs:"Abs(Symbol('pdg0004202'))", sympy_rhs:"Symbol('pdg0004202')"});
+CREATE (:step {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_13-01-58-465558", id:"3536094510", note_after_step_latex:"", note_before_step_latex:""});
+CREATE (:step {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_13-02-39-741214", id:"1526680035", note_after_step_latex:"", note_before_step_latex:""});
 :commit
 :begin
 CREATE CONSTRAINT ON (node:derivation) ASSERT (node.id) IS UNIQUE;
@@ -7857,6 +7864,24 @@ MATCH (n1:derivation{id:"527822"}), (n2:step{id:"3858247"}) CREATE (n1)-[r:HAS_S
 MATCH (n1:derivation{id:"527822"}), (n2:step{id:"5760226"}) CREATE (n1)-[r:HAS_STEP {sequence_index:7}]->(n2);
 MATCH (n1:derivation{id:"527822"}), (n2:step{id:"6200455"}) CREATE (n1)-[r:HAS_STEP {sequence_index:0.5}]->(n2);
 MATCH (n1:expression{id:"3829492824"}), (n2:operation{id:"2222764"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:derivation{id:"8996667"}), (n2:step{id:"1916083"}) CREATE (n1)-[r:HAS_STEP {sequence_index:0}]->(n2);
+MATCH (n1:step{id:"1916083"}), (n2:inference_rule{id:"111981"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
+MATCH (n1:step{id:"1916083"}), (n2:expression{id:"7455074"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:expression{id:"1075552184"}), (n2:scalar{id:"0002423"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"1075552184"}), (n2:scalar{id:"0009140"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"7455074"}), (n2:scalar{id:"0006777"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"7455074"}), (n2:scalar{id:"0002423"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"7455074"}), (n2:scalar{id:"0005156"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"1219718533"}), (n2:scalar{id:"0004202"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"1219718533"}), (n2:vector{id:"0006777"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:derivation{id:"8996667"}), (n2:step{id:"3536094510"}) CREATE (n1)-[r:HAS_STEP {sequence_index:1}]->(n2);
+MATCH (n1:step{id:"3536094510"}), (n2:inference_rule{id:"111981"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
+MATCH (n1:step{id:"3536094510"}), (n2:expression{id:"1075552184"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:derivation{id:"8996667"}), (n2:step{id:"1526680035"}) CREATE (n1)-[r:HAS_STEP {sequence_index:2}]->(n2);
+MATCH (n1:step{id:"1526680035"}), (n2:inference_rule{id:"111981"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
+MATCH (n1:step{id:"1526680035"}), (n2:expression{id:"1219718533"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:expression{id:"6831694380"}), (n2:scalar{id:"0009140"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"7575859312"}), (n2:scalar{id:"0004326"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 :commit
 :begin
 MATCH (n:`UNIQUE IMPORT LABEL`)  WITH n LIMIT 20000 REMOVE n:`UNIQUE IMPORT LABEL` REMOVE n.`UNIQUE IMPORT ID`;
