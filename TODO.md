@@ -1,4 +1,28 @@
 
+---
+
+Delete the manual `trace_id` and `query_time_dict`; replace it with Flask's `@app.before_request` and `g` object.
+
+---
+
+MyPy type hints:
+
+Some functions have `-> werkzeug.Response:`, some have `-> str:`, and over half have no return type hint at all. You import `Union, Tuple` but rarely use them in function signatures. 
+
+---
+
+in `def to_add_sympy_and_lean_for_expression` 
+there's an `eval` to eliminate
+
+in `sympy_validate_expression/dimensional_consistency`
+there's an `eval` to eliminate
+
+---
+
+Playwright tests: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/107
+
+---
+
 to verify:
 - BUG: SymPy-to-be-edited not displayed in edit_expression
 
@@ -30,6 +54,9 @@ https://en.wikipedia.org/wiki/List_of_common_physics_notations
 Submit neo4j query Python file to Gemini for a code review of suggestions and criticism
 
 Same for the API file
+
+Prompt:
+What inconsistencies are there? Bad coding implementation, or naming conventions, or design flaws for example.
 
 ---
 
