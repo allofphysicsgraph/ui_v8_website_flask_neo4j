@@ -1405,14 +1405,14 @@ def disconnect_step_from_inference_rule(tx: Transaction, step_id: str) -> None:
      2) delete derivation node
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
     # TODO
     logger.info("not doing anything yet")
-    logger.info("[TRACE]  end " + str(trace_id))
+    logger.info("[TRACE] end " + str(trace_id))
     return
 
 
-def delete_node(tx: Transaction, node_id: str, node_type) -> None:
+def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
     """
     called by "delete derivation"
 
@@ -1427,7 +1427,7 @@ def delete_node(tx: Transaction, node_id: str, node_type) -> None:
     logger.info("[TRACE]  start " + str(trace_id))
 
     # must be one of these node types. See also 'schema.log' file
-    logger.info("neo4j_query/delete_node: node_type=" + node_type)
+    logger.info("node_type= " + node_type)
     assert node_type in list_of_valid.node_types
 
     result = tx.run(
