@@ -118,8 +118,8 @@ def make_string_safe_for_latex(unsafe_str: str) -> str:
     "hello\_world"
     """
     trace_id = str(uuid.uuid4())
-    print(
-        "[TRACE] latex/make_string_safe_for_latex start "
+    logger.info(
+        "[TRACE] start "
         + trace_id
         + " "
         + str(time.time())
@@ -227,7 +227,7 @@ def create_d3js_json(
         png_name = "".join(
             filter(str.isalnum, step_dict["inference rule dict"]["name_latex"])
         )
-        print("latex/create_d3js_json PNG name = " + png_name)
+        logger.info("PNG name = " + png_name)
 
         if not os.path.isfile(destination_folder + png_name + ".png"):
             create_png_from_latex(
@@ -235,13 +235,13 @@ def create_d3js_json(
                 destination_folder,
                 png_name,
             )
-            print("latex/create_d3js_json created PNG " + png_name)
+            logger.info("created PNG " + png_name)
             # addxtobothsides
 
         # purpose of reading image is to determine width and height; both are needed for d3js JSON
         image = cv2.imread(destination_folder + png_name + ".png")
         # logger.debug("type for cv2 image is " + str(type(image)))
-        print("type for cv2 image is " + str(type(image)))
+        logger.info("type for cv2 image is " + str(type(image)))
 
         # construct the node JSON content
         list_of_nodes.append(
@@ -281,7 +281,7 @@ def create_d3js_json(
             list_of_expressions.append(temp_dict)
 
         for this_expression_dict in list_of_expressions:
-            print("latex/create_d3js_json this_expression_dict", this_expression_dict)
+            logger.info("this_expression_dict"+ str(this_expression_dict))
 
             if this_expression_dict["type of math"] == "expression":
                 # TODO: account for input_dict['latex_condition']
@@ -305,7 +305,7 @@ def create_d3js_json(
                     + hash_of_string(expression_latex)
                 )
 
-            print("latex/create_d3js_json png_name", png_name)
+            logger.info(" png_name"+ str(png_name))
             # logger.debug("PNG name = " + png_name)
 
             if not os.path.isfile(destination_folder + png_name + ".png"):
@@ -431,7 +431,7 @@ def create_tex_file_for_derivation(
     >>> generate_tex_for_derivation("000001", path_to_tex_file)
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] latex/create_tex_file_for_derivation start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
 
     tex_filename = derivation_id
 
@@ -439,7 +439,7 @@ def create_tex_file_for_derivation(
         [path_to_tex_file], [tex_filename], ["tex", "log", "pdf", "aux"]
     )
 
-    print("latex/create_tex_file_for_derivation: derivation_dict=", derivation_dict)
+    logger.info("derivation_dict="+ str(derivation_dict))
 
     with open(tex_filename + ".tex", "w") as latex_file_handle:
         latex_file_handle.write(
@@ -861,9 +861,9 @@ def create_png_from_latex(
     logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
     # logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
 
-    print(
-        "latex/create_png_from_latex png_filename_no_extension",
-        png_filename_no_extension,
+    logger.info(
+        "png_filename_no_extension"+
+        str(png_filename_no_extension)
     )
 
     #    logger.debug("png_filename_no_extension = %s", png_filename_no_extension)
@@ -880,11 +880,11 @@ def create_png_from_latex(
     tmp_file_no_extension_full_path = "lat"
 
     # logger.debug("latex = " + str(input_latex_str))
-    print("latex/create_png_from_latex latex = " + str(input_latex_str))
+    logger.info("latex = " + str(input_latex_str))
     create_tex_file_for_latex_string(tmp_file_no_extension_full_path, input_latex_str)
 
     tex_filename_with_hash = png_filename_no_extension + ".tex"
-    print("latex/create_png_from_latex tex_filename_with_hash:", tex_filename_with_hash)
+    logger.info("tex_filename_with_hash:"+ tex_filename_with_hash)
 
     # shutil.move(tmp_file_no_extension_full_path + ".tex", tex_filename_with_hash)
     # logger.debug(str(os.listdir()))
@@ -910,12 +910,12 @@ def create_png_from_latex(
 
         # logger.debug("latex std out:" + str(latex_stdout))
         # logger.debug("latex std err:" + str(latex_stderr))
-        print("latex/create_png_from_latex latex std out:" + str(latex_stdout))
-        print("latex std err:" + str(latex_stderr))
+        logger.info("latex std out:" + str(latex_stdout))
+        logger.info("latex std err:" + str(latex_stderr))
 
         if "Text line contains an invalid character" in latex_stdout:
             # logging.error("tex input contains invalid charcter")
-            print("tex input contains invalid charcter")
+            logger.error("tex input contains invalid charcter")
             shutil.copy(
                 destination_folder + "error.png",
                 destination_folder + png_filename_no_extension,
@@ -944,17 +944,17 @@ def create_png_from_latex(
         if len(png_stdout) > 0:
             if "This is dvipng" not in png_stdout:
                 # logger.debug("png std out %s", png_stdout)
-                print("png std out %s", png_stdout)
+                logger.info("png std out "+ png_stdout)
         if len(png_stderr) > 0:
             # logger.debug("png std err %s", png_stderr)
-            print("png std err %s", png_stderr)
+            logger.info("png std err "+ png_stderr)
 
         # logger.debug(str(os.listdir()))
 
         if "No such file or directory" in png_stderr:
             # logging.error("PNG creation failed for %s", png_filename_no_extension)
-            print(
-                "latex/create_png_from_latex PNG creation failed for %s",
+            logger.info(
+                "PNG creation failed for "+
                 png_filename_no_extension,
             )
             shutil.copy(
@@ -970,7 +970,7 @@ def create_png_from_latex(
 
         if not (os.path.isfile(tmp_file_no_extension_full_path + ".png")):
             # logging.error("PNG creation failed for %s", png_filename_no_extension)
-            print("PNG creation failed for %s", png_filename_no_extension)
+            logger.info("PNG creation failed for "+ png_filename_no_extension)
 
         shutil.move(
             tmp_file_no_extension_full_path + ".png",
@@ -978,8 +978,8 @@ def create_png_from_latex(
         )
 
     # logger.debug(destination_folder + png_filename_no_extension + ".png")
-    print(
-        "latex/create_png_from_latex: dest:"
+    logger.info(
+        "dest:"
         + destination_folder
         + png_filename_no_extension
         + ".png"
@@ -1020,11 +1020,11 @@ def create_tex_file_for_latex_string(
         "[TRACE] latex/create_tex_file_for_latex_string start " + trace_id + "]"
     )
 
-    print(
-        "latex/create_tex_file_for_latex_string tmp_file_no_extension_full_path:",
-        tmp_file_no_extension_full_path,
+    logger.info(
+        "tmp_file_no_extension_full_path:"+
+        tmp_file_no_extension_full_path
     )
-    print("latex/create_tex_file_for_latex_string input_latex_str:", input_latex_str)
+    logger.info("input_latex_str:"+ input_latex_str)
 
     # compute.remove_file_debris(["./"], [tmp_file_no_extension_full_path], ["tex"])
 
@@ -1103,7 +1103,7 @@ def create_derivation_png(
         file_handle.write("fontsize=12;\n")
 
         for this_step_dict in list_of_step_dicts_in_this_derivation:
-            print("latex/create_derivation_png step_dict=", this_step_dict)
+            logger.info("step_dict="+ str(this_step_dict))
 
             (
                 inference_rule_dict,
@@ -1150,15 +1150,15 @@ def create_derivation_png(
         neato_stdout = process.stdout.decode("utf-8")
         if len(neato_stdout) > 0:
             # logger.debug(neato_stdout)
-            print(neato_stdout)
+            logger.info(neato_stdout)
         neato_stderr = process.stderr.decode("utf-8")
         if len(neato_stderr) > 0:
             # logger.debug(neato_stderr)
-            print(neato_stderr)
+            logger.info(neato_stderr)
 
-        print("output_filename_png, ", output_filename_png)
-        print(
-            "path_to_output_png + output_filename_png",
+        logger.info("output_filename_png "+ output_filename_png)
+        logger.info(
+            "path_to_output_png + output_filename_png: "+
             path_to_output_png + output_filename_png,
         )
         shutil.move(output_filename_png, path_to_output_png + output_filename_png)
@@ -1261,7 +1261,7 @@ def create_step_graphviz_png(
 
     output_filename = step_dict["id"] + ".png"
     # logger.debug("output_filename = %s", output_filename)
-    print("output_filename = %s", output_filename)
+    logger.info("output_filename = "+ output_filename)
     compute.remove_file_debris([destination_folder], ["graphviz"], ["png"])
 
     # neato -Tpng graphviz.dot > /code/static/graphviz.png
@@ -1276,11 +1276,11 @@ def create_step_graphviz_png(
         neato_stdout = process.stdout.decode("utf-8")
         if len(neato_stdout) > 0:
             # logger.debug(neato_stdout)
-            print(neato_stdout)
+            logger.info(neato_stdout)
         neato_stderr = process.stderr.decode("utf-8")
         if len(neato_stderr) > 0:
             # logger.debug(neato_stderr)
-            print(neato_stdout)
+            logger.info(neato_stdout)
 
         shutil.move(output_filename, destination_folder + output_filename)
     # return True, "no invalid latex", output_filename
@@ -1319,16 +1319,16 @@ def write_step_to_graphviz_file(
     """
     trace_id = str(uuid.uuid4())
     # logger.info("[trace start " + trace_id + "]")
-    logger.info("[TRACE] latex/write_step_to_graphviz_file start " + trace_id + "]")
+    logger.info("[TRACE] start " + trace_id + "]")
 
-    print("step_id =", step_id)
+    logger.info("step_id =", step_id)
     # logger.debug("step_id = %s", step_id)
 
-    print("latex/write_step_to_graphviz_file inference_rule_dict", inference_rule_dict)
-    print("latex/write_step_to_graphviz_file list_of_input_dicts", list_of_input_dicts)
-    print("latex/write_step_to_graphviz_file list_of_feed_dicts", list_of_feed_dicts)
-    print(
-        "latex/write_step_to_graphviz_file list_of_output_dicts", list_of_output_dicts
+    logger.info("inference_rule_dict", inference_rule_dict)
+    logger.info("list_of_input_dicts", list_of_input_dicts)
+    logger.info("list_of_feed_dicts", list_of_feed_dicts)
+    logger.info(
+        "list_of_output_dicts", list_of_output_dicts
     )
 
     # inference rule
