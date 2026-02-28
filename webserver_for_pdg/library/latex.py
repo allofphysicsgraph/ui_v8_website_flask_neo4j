@@ -62,7 +62,7 @@ def hash_of_file(filename_with_full_path: str) -> str:
     d41d8cd98f00b204e9800998ecf8427e
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] latex/hash_of_file start " + trace_id)
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # TODO: exception handling
     with open(filename_with_full_path, "rb") as file_handle:
@@ -70,7 +70,7 @@ def hash_of_file(filename_with_full_path: str) -> str:
 
     hashed_file = hashlib.md5(file_content).hexdigest()
 
-    logger.info("[TRACE] latex/hash_of_file end " + trace_id)
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return hashed_file
 
 
@@ -89,13 +89,13 @@ def hash_of_string(str_to_hash: str) -> str:
     """
     trace_id = str(uuid.uuid4())
     logger.info(
-        "[TRACE] latex/hash_of_string start " + trace_id + " " + str(time.time())
+        "[TRACE] start " + trace_id + " " + str(time.time())
     )
 
     hashed_str = hashlib.md5(str_to_hash.encode("utf-8")).hexdigest()
 
     logger.info(
-        "[TRACE] latex/hash_of_string start " + trace_id + " " + str(time.time())
+        "[TRACE] start " + trace_id + " " + str(time.time())
     )
     return hashed_str
 
@@ -118,12 +118,7 @@ def make_string_safe_for_latex(unsafe_str: str) -> str:
     "hello\_world"
     """
     trace_id = str(uuid.uuid4())
-    logger.info(
-        "[TRACE] start "
-        + trace_id
-        + " "
-        + str(time.time())
-    )
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # some derivation notes have valid underscores, like
     # \cite{yyyy_author}
@@ -156,7 +151,7 @@ def make_string_safe_for_latex(unsafe_str: str) -> str:
         fixed_underscore_str.replace("#", "\#").replace("$", "\$").replace("%", "\%")
     )
 
-    logger.info("[TRACE] latex/make_string_safe_for_latex end " + trace_id)
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return no_hashtag_str
 
 
@@ -184,19 +179,12 @@ def create_d3js_json(
     v7/compute.py create_d3js_json
 
     Args:
-        deriv_id: numeric identifier of the derivation
-        path_to_db: filename of the SQL database containing
-                    a JSON entry that returns a nested dictionary
+        derivation_id: numeric identifier of the derivation
     Returns:
-        d3js_json_filename: name of JSON file to be read by d3js
     Raises:
-
-    >>> destination_folder = "/code/static/"
-    >>> create_d3js_json("000001", "pdg.db")
-
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] latex/create_d3js_json start " + trace_id)
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     d3js_json_filename = derivation_id + ".json"
 
@@ -281,7 +269,7 @@ def create_d3js_json(
             list_of_expressions.append(temp_dict)
 
         for this_expression_dict in list_of_expressions:
-            logger.info("this_expression_dict"+ str(this_expression_dict))
+            logger.info("this_expression_dict" + str(this_expression_dict))
 
             if this_expression_dict["type of math"] == "expression":
                 # TODO: account for input_dict['latex_condition']
@@ -305,7 +293,7 @@ def create_d3js_json(
                     + hash_of_string(expression_latex)
                 )
 
-            logger.info(" png_name"+ str(png_name))
+            logger.info(" png_name" + str(png_name))
             # logger.debug("PNG name = " + png_name)
 
             if not os.path.isfile(destination_folder + png_name + ".png"):
@@ -383,7 +371,7 @@ def edges_in_derivation_for_d3js(all_steps) -> List[Tuple[str, str]]:
     >>> edges_in_derivation_for_d3js()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] latex/edges_in_derivation_for_d3js start " + trace_id)
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # print("latex/edges_in_derivation_for_d3js all_steps", all_steps)
 
@@ -400,7 +388,7 @@ def edges_in_derivation_for_d3js(all_steps) -> List[Tuple[str, str]]:
             edge_tuple = (step_dict["inference rule dict"]["id"], output_dict["id"])
             list_of_edge_tuples.append(edge_tuple)
 
-    logger.info("[TRACE] latex/edges_in_derivation_for_d3js end " + trace_id)
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return list_of_edge_tuples
 
 
@@ -431,7 +419,7 @@ def create_tex_file_for_derivation(
     >>> generate_tex_for_derivation("000001", path_to_tex_file)
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     tex_filename = derivation_id
 
@@ -439,7 +427,7 @@ def create_tex_file_for_derivation(
         [path_to_tex_file], [tex_filename], ["tex", "log", "pdf", "aux"]
     )
 
-    logger.info("derivation_dict="+ str(derivation_dict))
+    logger.info("derivation_dict=" + str(derivation_dict))
 
     with open(tex_filename + ".tex", "w") as latex_file_handle:
         latex_file_handle.write(
@@ -666,9 +654,9 @@ def create_tex_file_for_derivation(
         latex_file_handle.write("% EOF\n")
 
     shutil.copy(tex_filename + ".tex", path_to_tex_file + tex_filename + ".tex")
-    # logger.info("[trace end " + trace_id + "]")
+    # logger.info("[trace end " + trace_id + " " + str(time.time()))
 
-    logger.info("[TRACE] latex/create_tex_file_for_derivation " + trace_id)
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return
 
 
@@ -692,9 +680,8 @@ def create_pdf_for_derivation(
 
     >>> create_pdf_for_derivation("000001", "myemail@address.com","pdg.db")
     """
-    # logger.info("[trace start " + trace_id + "]")
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] latex/create_pdf_for_derivation start " + trace_id)
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # to isolate the build process, create a temporary folder
     tmp_latex_folder = "tmp_latex_folder_" + str(random.randint(1000000, 9999999))
@@ -826,9 +813,8 @@ def create_pdf_for_derivation(
     )
     shutil.rmtree(tmp_latex_folder_full_path)
     # return True, pdf_filename + ".pdf"
-    # logger.info("[trace end " + trace_id + "]")
 
-    logger.info("[TRACE] latex/create_pdf_for_derivation start " + trace_id)
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return pdf_filename + ".pdf"
 
 
@@ -858,13 +844,9 @@ def create_png_from_latex(
     >>> create_png_from_latex('a \dot b \\nabla', 'a_filename')
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
-    # logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
-    logger.info(
-        "png_filename_no_extension"+
-        str(png_filename_no_extension)
-    )
+    logger.info("png_filename_no_extension" + str(png_filename_no_extension))
 
     #    logger.debug("png_filename_no_extension = %s", png_filename_no_extension)
     #    logger.debug("input latex str = %s", input_latex_str)
@@ -884,7 +866,7 @@ def create_png_from_latex(
     create_tex_file_for_latex_string(tmp_file_no_extension_full_path, input_latex_str)
 
     tex_filename_with_hash = png_filename_no_extension + ".tex"
-    logger.info("tex_filename_with_hash:"+ tex_filename_with_hash)
+    logger.info("tex_filename_with_hash:" + tex_filename_with_hash)
 
     # shutil.move(tmp_file_no_extension_full_path + ".tex", tex_filename_with_hash)
     # logger.debug(str(os.listdir()))
@@ -944,18 +926,17 @@ def create_png_from_latex(
         if len(png_stdout) > 0:
             if "This is dvipng" not in png_stdout:
                 # logger.debug("png std out %s", png_stdout)
-                logger.info("png std out "+ png_stdout)
+                logger.info("png std out " + png_stdout)
         if len(png_stderr) > 0:
             # logger.debug("png std err %s", png_stderr)
-            logger.info("png std err "+ png_stderr)
+            logger.info("png std err " + png_stderr)
 
         # logger.debug(str(os.listdir()))
 
         if "No such file or directory" in png_stderr:
             # logging.error("PNG creation failed for %s", png_filename_no_extension)
             logger.info(
-                "PNG creation failed for "+
-                png_filename_no_extension,
+                "PNG creation failed for " + png_filename_no_extension,
             )
             shutil.copy(
                 destination_folder + "error.png",
@@ -970,7 +951,7 @@ def create_png_from_latex(
 
         if not (os.path.isfile(tmp_file_no_extension_full_path + ".png")):
             # logging.error("PNG creation failed for %s", png_filename_no_extension)
-            logger.info("PNG creation failed for "+ png_filename_no_extension)
+            logger.info("PNG creation failed for " + png_filename_no_extension)
 
         shutil.move(
             tmp_file_no_extension_full_path + ".png",
@@ -978,12 +959,7 @@ def create_png_from_latex(
         )
 
     # logger.debug(destination_folder + png_filename_no_extension + ".png")
-    logger.info(
-        "dest:"
-        + destination_folder
-        + png_filename_no_extension
-        + ".png"
-    )
+    logger.info("dest:" + destination_folder + png_filename_no_extension + ".png")
     # /code/static/addxtobothsides.png
 
     os.chdir(original_dir)
@@ -994,8 +970,7 @@ def create_png_from_latex(
     #        logger.error("png already exists!")
 
     # return True, "success"
-    # logger.info("[trace end " + trace_id + "]")
-    logger.info("[TRACE] latex/create_png_from_latex start " + trace_id + "]")
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return
 
 
@@ -1015,16 +990,11 @@ def create_tex_file_for_latex_string(
     >>> create_tex_file_for_latex_string('/code/static/filename_without_extension', 'a \dot b \\nabla')
     """
     trace_id = str(uuid.uuid4())
-    # logger.info("[trace start " + trace_id + "]")
     logger.info(
-        "[TRACE] latex/create_tex_file_for_latex_string start " + trace_id + "]"
-    )
+        "[TRACE] start " + trace_id + " " + str(time.time()))
 
-    logger.info(
-        "tmp_file_no_extension_full_path:"+
-        tmp_file_no_extension_full_path
-    )
-    logger.info("input_latex_str:"+ input_latex_str)
+    logger.info("tmp_file_no_extension_full_path:" + tmp_file_no_extension_full_path)
+    logger.info("input_latex_str:" + input_latex_str)
 
     # compute.remove_file_debris(["./"], [tmp_file_no_extension_full_path], ["tex"])
 
@@ -1056,8 +1026,8 @@ def create_tex_file_for_latex_string(
         latex_file_handle.write("}\n")
         latex_file_handle.write("\\end{document}\n")
     # logger.debug("wrote tex file")
-    # logger.info("[trace end " + trace_id + "]")
-    logger.info("[TRACE] latex/create_tex_file_for_latex_string end " + trace_id + "]")
+    # logger.info("[trace end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return
 
 
@@ -1085,8 +1055,8 @@ def create_derivation_png(
     >>> create_derivation_png("000001", "pdg.db")
     """
     trace_id = str(uuid.uuid4())
-    # logger.info("[trace start " + trace_id + "]")
-    logger.info("[TRACE] latex/create_derivation_png start " + trace_id + "]")
+    # logger.info("[trace start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # print("latex/create_derivation_png: list_of_step_dicts_in_this_derivation=",
     #     list_of_step_dicts_in_this_derivation)
@@ -1103,7 +1073,7 @@ def create_derivation_png(
         file_handle.write("fontsize=12;\n")
 
         for this_step_dict in list_of_step_dicts_in_this_derivation:
-            logger.info("step_dict="+ str(this_step_dict))
+            logger.info("step_dict=" + str(this_step_dict))
 
             (
                 inference_rule_dict,
@@ -1156,10 +1126,11 @@ def create_derivation_png(
             # logger.debug(neato_stderr)
             logger.info(neato_stderr)
 
-        logger.info("output_filename_png "+ output_filename_png)
+        logger.info("output_filename_png " + output_filename_png)
         logger.info(
-            "path_to_output_png + output_filename_png: "+
-            path_to_output_png + output_filename_png,
+            "path_to_output_png + output_filename_png: "
+            + path_to_output_png
+            + output_filename_png,
         )
         shutil.move(output_filename_png, path_to_output_png + output_filename_png)
 
@@ -1189,8 +1160,7 @@ def create_derivation_png(
     #     shutil.move(output_filename_svg, path_to_output_png + output_filename_svg)
 
     # return True, "no invalid latex", output_filename
-    # logger.info("[trace end " + trace_id + "]")
-    logger.info("[TRACE] latex/create_derivation_png end " + trace_id + "]")
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     # return output_filename_png, output_filename_svg, query_time_dict
     return output_filename_png, query_time_dict
 
@@ -1226,8 +1196,7 @@ def create_step_graphviz_png(
 
     """
     trace_id = str(uuid.uuid4())
-    # logger.info("[trace start " + trace_id + "]")
-    logger.info("[TRACE] latex/create_step_graphviz_png start " + trace_id + "]")
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     dot_filename = destination_folder + "graphviz.dot"
     compute.remove_file_debris([destination_folder], ["graphviz"], ["dot"])
@@ -1261,7 +1230,7 @@ def create_step_graphviz_png(
 
     output_filename = step_dict["id"] + ".png"
     # logger.debug("output_filename = %s", output_filename)
-    logger.info("output_filename = "+ output_filename)
+    logger.info("output_filename = " + output_filename)
     compute.remove_file_debris([destination_folder], ["graphviz"], ["png"])
 
     # neato -Tpng graphviz.dot > /code/static/graphviz.png
@@ -1284,8 +1253,7 @@ def create_step_graphviz_png(
 
         shutil.move(output_filename, destination_folder + output_filename)
     # return True, "no invalid latex", output_filename
-    # logger.info("[trace end " + trace_id + "]")
-    logger.info("[TRACE] latex/create_step_graphviz_png end " + trace_id + "]")
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return output_filename
 
 
@@ -1318,18 +1286,14 @@ def write_step_to_graphviz_file(
     >>> write_step_to_graphviz_file("000001", "1029890", file_handle, "pdg.db")
     """
     trace_id = str(uuid.uuid4())
-    # logger.info("[trace start " + trace_id + "]")
-    logger.info("[TRACE] start " + trace_id + "]")
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     logger.info("step_id =", step_id)
-    # logger.debug("step_id = %s", step_id)
 
     logger.info("inference_rule_dict", inference_rule_dict)
     logger.info("list_of_input_dicts", list_of_input_dicts)
     logger.info("list_of_feed_dicts", list_of_feed_dicts)
-    logger.info(
-        "list_of_output_dicts", list_of_output_dicts
-    )
+    logger.info("list_of_output_dicts", list_of_output_dicts)
 
     # inference rule
     png_filename_no_extension = "".join(
@@ -1420,8 +1384,7 @@ def write_step_to_graphviz_file(
             + '",labelloc=b];\n'
         )
 
-    # logger.info("[trace end " + trace_id + "]")
-    logger.info("[TRACE] latex/write_step_to_graphviz_file end " + trace_id + "]")
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return
 
 
