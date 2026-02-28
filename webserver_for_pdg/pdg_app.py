@@ -2526,36 +2526,36 @@ def to_add_expression() -> werkzeug.Response:
             round(time.time() - query_start_time, 3)
         )
 
-    # Used in _table_of_expressions.html which is referenced in expression_create.html
-    symbol_IDs_per_expression_id = (
-        {}
-    )  # type: Dict[str,list] # _table_of_expressions.html
-    for this_expression_dict in list_of_expression_dicts:
-        symbol_IDs_per_expression_id[this_expression_dict["id"]], query_time_dict = (
-            compute.get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
-                graphDB_Driver,
-                query_time_dict,
-                "expression",
-                this_expression_dict["id"],
-            )
-        )
+    # # Used in _table_of_expressions.html which is referenced in expression_create.html
+    # symbol_IDs_per_expression_id = (
+    #     {}
+    # )  # type: Dict[str,list] # _table_of_expressions.html
+    # for this_expression_dict in list_of_expression_dicts:
+    #     symbol_IDs_per_expression_id[this_expression_dict["id"]], query_time_dict = (
+    #         compute.get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
+    #             graphDB_Driver,
+    #             query_time_dict,
+    #             "expression",
+    #             this_expression_dict["id"],
+    #         )
+    #     )
 
-    # Used in _table_of_expressions.html which is referenced in expression_create.html
-    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
-        graphDB_Driver, query_time_dict
-    )
+    # # Used in _table_of_expressions.html which is referenced in expression_create.html
+    # dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
+    #     graphDB_Driver, query_time_dict
+    # )
 
-    # Used in _table_of_expressions.html which is referenced in expression_create.html
-    dimensional_consistency_per_expression_id, query_time_dict = (
-        compute.get_dimensional_consistency_per_expression_id(
-            graphDB_Driver, query_time_dict
-        )
-    )
+    # # Used in _table_of_expressions.html which is referenced in expression_create.html
+    # dimensional_consistency_per_expression_id, query_time_dict = (
+    #     compute.get_dimensional_consistency_per_expression_id(
+    #         graphDB_Driver, query_time_dict
+    #     )
+    # )
 
-    # Used in _table_of_expressions.html which is referenced in expression_create.html
-    sympy_as_latex_per_expr_id = compute.get_sympy_as_latex_per_expr_id(
-        list_of_expression_dicts
-    )
+    # # Used in _table_of_expressions.html which is referenced in expression_create.html
+    # sympy_as_latex_per_expr_id = compute.get_sympy_as_latex_per_expr_id(
+    #     list_of_expression_dicts
+    # )
 
     # dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
     #     graphDB_Driver, query_time_dict
@@ -2593,29 +2593,29 @@ def to_add_expression() -> werkzeug.Response:
             sorted_list_of_relation_dicts.append(this_relation_dict)
     list_of_relation_dicts = sorted_list_of_relation_dicts
 
-    list_of_expression_IDs = []  # type: List[str]
-    for this_expression_dict in list_of_expression_dicts:
-        list_of_expression_IDs.append(this_expression_dict["id"])
+    # list_of_expression_IDs = []  # type: List[str]
+    # for this_expression_dict in list_of_expression_dicts:
+    #     list_of_expression_IDs.append(this_expression_dict["id"])
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        dict_of_derivation_dicts_that_use_expression = session.read_transaction(
-            neo4j_query.get_derivations_for_every_expression
-        )
-        query_time_dict[
-            "pdg_app/to_add_expression: get_all_derivations_for_every_expression"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
+    # with graphDB_Driver.session() as session:
+    #     query_start_time = time.time()
+    #     dict_of_derivation_dicts_that_use_expression = session.read_transaction(
+    #         neo4j_query.get_derivations_for_every_expression
+    #     )
+    #     query_time_dict[
+    #         "pdg_app/to_add_expression: get_all_derivations_for_every_expression"
+    #         + trace_id
+    #     ] = round(time.time() - query_start_time, 3)
 
-        # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        symbol_dicts_per_expression_id = session.read_transaction(
-            neo4j_query.get_symbols_for_every_expression,
-            list_of_expression_IDs,
-        )
-        query_time_dict[
-            "pdg_app/to_add_expression: get_symbols_for_every_expression " + trace_id
-        ] = round(time.time() - query_start_time, 3)
+    #     # with graphDB_Driver.session() as session:
+    #     query_start_time = time.time()
+    #     symbol_dicts_per_expression_id = session.read_transaction(
+    #         neo4j_query.get_symbols_for_every_expression,
+    #         list_of_expression_IDs,
+    #     )
+    #     query_time_dict[
+    #         "pdg_app/to_add_expression: get_symbols_for_every_expression " + trace_id
+    #     ] = round(time.time() - query_start_time, 3)
 
     # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
     web_form = SpecifyNewExpressionForm(request.form)
@@ -2768,7 +2768,7 @@ def to_add_expression() -> werkzeug.Response:
         # dict_of_derivation_dicts_that_use_expression=dict_of_derivation_dicts_that_use_expression,  # Used in _table_of_expressions.html
         # list_of_symbol_dicts_per_expression_id=symbol_dicts_per_expression_id,  # Used in _table_of_expressions.html
         # dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,  # Used in _table_of_expressions.html which is referenced in expression_create.html
-        # list_of_relation_dicts=list_of_relation_dicts,  # Used in expression_create.html
+        list_of_relation_dicts=list_of_relation_dicts,  # Used in expression_create.html
         # symbol_IDs_per_expression_id=symbol_IDs_per_expression_id,  # Used in _table_of_expressions.html which is referenced in expression_create.html
         list_of_expression_dicts=list_of_expression_dicts,  # Used in _table_of_expressions_mini.html which is referenced in expression_create.html
         # sympy_as_latex_per_expr_id=sympy_as_latex_per_expr_id,  # Used in _table_of_expressions.html which is referenced in expression_create.html
@@ -4321,7 +4321,7 @@ def to_add_step_select_expressions(
 
         # https://neo4j.com/docs/python-manual/current/session-api/
         with graphDB_Driver.session() as session:
-            query_start_time = time.time()
+            # query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.add_step_to_derivation,
                 step_id,
@@ -4621,7 +4621,7 @@ def to_add_symbols_and_operations_for_expression(
 
                 symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
 
-        logger.info(" symbol_id_dict=" + str(symbol_id_dict))
+        logger.info("symbol_id_dict=" + str(symbol_id_dict))
         # example output: {'a': '5638458', 'b': '7152159'}
         #         or      {'m': '3973021', '\\vec{a}': '3506734', '\\vec{F}': '3235432'}
 
@@ -4653,12 +4653,11 @@ def to_add_symbols_and_operations_for_expression(
 
 
 @web_app.route(
-    "/sympy_and_lean_for_expression/<expression_id>/<symbol_id_dict>",
+    "/sympy_and_lean_for_expression/<expression_id>",
     methods=["GET", "POST"],
 )
 def to_add_sympy_and_lean_for_expression(
     expression_id: unique_numeric_id_as_str,
-    symbol_id_dict: dict,
 ) -> werkzeug.Response:
     """
     add sympy and lean for expression_id
@@ -4673,7 +4672,7 @@ def to_add_sympy_and_lean_for_expression(
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    logger.info("type(symbol_id_dict)=" + str(type(symbol_id_dict)))
+    # logger.info("type(symbol_id_dict)=" + str(type(symbol_id_dict)))
     # TODO this is a security risk - evaluating user-provided string from URL
     # To fix this, pass the arguments as key-value pairs ?a=5638458&b=7152159
     # symbol_id_dict = eval(symbol_id_dict)
@@ -5093,12 +5092,11 @@ def to_add_symbols_and_operations_for_feed(
 
 
 @web_app.route(
-    "/sympy_and_latex_for_feed/<feed_id>/<symbol_id_dict>",
+    "/sympy_and_latex_for_feed/<feed_id>",
     methods=["GET", "POST"],
 )
 def to_add_sympy_and_lean_for_feed(
     feed_id: unique_numeric_id_as_str,
-    symbol_id_dict: dict,
 ) -> werkzeug.Response:
     """
     derivation_id is the numeric ID of the derivation being edited
@@ -6463,13 +6461,11 @@ def to_list_derivations() -> str:
     list_of_derivation_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_derivation_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "derivation"
+        list_of_derivation_dicts = session.read_transaction(neo4j_query.get_derivations)
+        query_time_dict["pdg_app/to_list_derivations: get_derivations " + trace_id] = (
+            round(time.time() - query_start_time, 3)
         )
-        query_time_dict[
-            "pdg_app/to_list_derivations: get_nodes_of_type derivation" + trace_id
-        ] = round(time.time() - query_start_time, 3)
-        logger.info("    list_of_derivation_dicts = " + str(list_of_derivation_dicts))
+        # logger.info("    list_of_derivation_dicts = " + str(list_of_derivation_dicts))
 
         if len(list_of_derivation_dicts) == 0:
             return redirect(url_for("to_add_derivation"))
