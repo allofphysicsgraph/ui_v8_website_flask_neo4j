@@ -1267,6 +1267,9 @@ def to_add_derivation() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form = SpecifyNewDerivationForm()
+
+
     # TODO: check that the name of the derivation doesn't
     #       conflict with existing derivation names
 
@@ -1303,7 +1306,6 @@ def to_add_derivation() -> werkzeug.Response:
     # request.form= ('derivation_name_latex', 'this is a new derivation'),
     #               ('derivation_reference_latex', ''), ('abstract_latex', 'my summary')])
 
-    web_form = SpecifyNewDerivationForm(request.form)
 
     logger.info("request.method=" + str(request.method))  # POST
 
@@ -1436,6 +1438,10 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form_delete = NoOptionsForm()
+    web_form_tex_pdf = NoOptionsForm()
+
+
     derivation_dict = {}
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -1485,9 +1491,6 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             "pdg_app/to_review_derivation: get_nodes_of_type inference_rule" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    web_form_delete = NoOptionsForm(request.form)
-    web_form_tex_pdf = NoOptionsForm(request.form)
-    # web_form = DeleteButtonForm(request.form)
     if request.method == "POST":
         logger.info("to_review_derivation: request.form = " + str(request.form))
 
@@ -1764,6 +1767,9 @@ def to_edit_derivation_metadata(
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form = SpecifyNewDerivationForm()
+
+
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         derivation_dict = session.read_transaction(
@@ -1781,7 +1787,6 @@ def to_edit_derivation_metadata(
             + " does not exist in database</H1>."
         )
 
-    web_form = SpecifyNewDerivationForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
         flash("pdg_app/to_edit_derivation_metadata: " + str(web_form.errors))
@@ -1876,23 +1881,6 @@ def to_add_step_select_inference_rule(
         "to_add_step_select_inference_rule: derivation_id: " + str(derivation_id)
     )
 
-    # # web_form = SpecifyNewStepForm(request.form)
-    # if request.method == "POST": #and web_form.validate():
-    #     logger.info("request.form = " + str(request.form))
-
-    #     # TODO: get the inference_rule_id from the webform
-    #     # inference_rule_id =
-    #     logger.info(str(inference_rule_id))
-
-    #     logger.info("[TRACE] end " + str(trace_id))
-    #     redirect(
-    #         url_for(
-    #             "to_add_step_select_expressions",
-    #             derivation_id=derivation_id,
-    #             inference_rule_id=inference_rule_id,
-    #         )
-    #     )
-
     list_of_inference_rule_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -1966,278 +1954,129 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
     logger.info("expression_id: " + str(expression_id))
 
-    expression_dict = {}
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        expression_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "expression", expression_id
-        )
-        query_time_dict[
-            "pdg_app/to_edit_expression: get_node_properties_from_id expression "
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    logger.info("expression_dict:" + str(expression_dict))
+    web_form_new_expression = SpecifyNewExpressionForm()
+    web_form_expression_sympy = SpecifyNewExpressionSympyLeanForm()
+    web_form_no_options = NoOptionsForm()
 
-    if expression_dict is None:
-        return (
-            "<H1>Expression ID "
-            + str(expression_id)
-            + " does not exist in database</H1>."
-        )
-
-    if request.method == "POST" and "delete_expression" in request.form:
-        logger.info("Deleting expression: " + str(expression_id))
+    if request.method == "GET":
+        expression_dict = {}
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.delete_node, "expression", expression_id
-            )
-            query_time_dict["to_edit_expression: delete_node"] = round(
-                time.time() - query_start_time, 3
-            )
-        return redirect(url_for("to_list_expressions"))
-
-    # {'sympy_lhs': "Symbol('pdg5401487')", 'reference_latex': '', 'latex_condition': '',
-    #  'sympy_rhs': "Mul(Symbol('pdg3031455'),Symbol('pdg5028085'))", 'description_latex': '',
-    #  'created_datetime': '2026-02-08_01-59-31-990045', 'latex_lhs': '\\vec{F}', 'name_latex': '',
-    #  'lean': '', 'latex_rhs': 'm \\vec{a}', 'author_name_latex': 'ben.is.located@gmail.com',
-    # 'id': '6709044', 'sympy': "sympy.Eq(Symbol('pdg5401487'),Mul(Symbol('pdg3031455'),Symbol('pdg5028085')))",
-    # 'latex_relation': '='}
-
-    if "sympy_lhs" in expression_dict.keys():
-        error_msg = latex_and_sympy.create_AST_png_for_latex(
-            expression_dict["sympy_lhs"], expression_dict["id"] + "_LHS"
-        )
-        if len(error_msg) > 0:
-            flash("pdg_app/to_edit_expression: " + str(error_msg))
-            logger.error(str(error_msg))
-    if "sympy_rhs" in expression_dict.keys():
-        error_msg = latex_and_sympy.create_AST_png_for_latex(
-            expression_dict["sympy_rhs"], expression_dict["id"] + "_RHS"
-        )
-        if len(error_msg) > 0:
-            flash("pdg_app/to_edit_expression: " + str(error_msg))
-            logger.error(str(error_msg))
-
-    dict_of_nonoperation_symbol_dicts_in_expression, query_time_dict = (
-        compute.get_dict_of_nonoperation_symbol_dicts_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
-        )
-    )
-
-    logger.info(
-        "dict_of_nonoperation_symbol_dicts_in_expression: "
-        + str(dict_of_nonoperation_symbol_dicts_in_expression)
-    )
-
-    dict_of_nonoperation_symbol_dicts_not_in_expression, query_time_dict = (
-        compute.get_dict_of_nonoperation_symbol_dicts_not_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
-        )
-    )
-
-    logger.info(
-        "dict_of_nonoperation_symbol_dicts_not_in_expression: "
-        + str(dict_of_nonoperation_symbol_dicts_not_in_expression)
-    )
-
-    dict_of_operation_dicts_in_expression, query_time_dict = (
-        compute.get_dict_of_operation_dicts_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
-        )
-    )
-
-    logger.info(
-        "dict_of_operation_dicts_in_expression: "
-        + str(dict_of_operation_dicts_in_expression)
-    )
-
-    dict_of_operation_dicts_not_in_expression, query_time_dict = (
-        compute.get_dict_of_operation_dicts_not_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
-        )
-    )
-
-    logger.info(
-        "dict_of_operation_dicts_not_in_expression: "
-        + str(dict_of_operation_dicts_not_in_expression)
-    )
-
-    dict_of_relation_dicts_not_in_expression, query_time_dict = (
-        compute.get_dict_of_relation_dicts_not_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
-        )
-    )
-
-    logger.info(
-        "dict_of_relation_dicts_not_in_expression: "
-        + str(dict_of_relation_dicts_not_in_expression)
-    )
-
-    # when the expression is edited, the altered content is equivalent to
-    # deleting the old expression and creating a new expression
-    # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
-    web_form_new_expression = SpecifyNewExpressionForm(request.form)
-
-    web_form_expression_sympy = SpecifyNewExpressionSympyLeanForm(request.form)
-
-    if request.method == "POST" and not web_form_new_expression.validate():
-        flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
-        logger.error(
-            "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
-        )
-
-    if request.method == "POST" and web_form_new_expression.validate():
-        logger.info("with web_form_new_expression, request.form = " + str(request.form))
-
-        # sanitize latex
-        # TODO: notify user if text was edited
-        # expression_latex_lhs = latex.make_string_safe_for_latex(
-        #     str(web_form_new_expression.expression_latex_lhs.data)
-        #     .strip()
-        #     .replace("\\", "\\\\")  # due to Neo4j
-        # )
-        expression_latex_lhs = latex.make_string_safe_for_latex(
-            str(web_form_new_expression.expression_latex_lhs.data).strip()
-        )
-
-        # the web UI dropdown returns the symbol ID (and not Latex string)
-        #'symbol_relation_id_to_add', '2222545'
-        expression_relation_id = request.form["symbol_relation_id_to_add"]
-
-        # look up the Latex string. (The other option is to change the schema to expr -> HAS_RELATION -> symbol)
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            expression_relation = session.read_transaction(
-                neo4j_query.get_relation_latex, expression_relation_id
+            expression_dict = session.read_transaction(
+                neo4j_query.get_node_properties_from_id, "expression", expression_id
             )
             query_time_dict[
-                "pdg_app/to_edit_expression: get_relation_latex " + trace_id
+                "pdg_app/to_edit_expression: get_node_properties_from_id expression "
+                + trace_id
             ] = round(time.time() - query_start_time, 3)
+        logger.info("expression_dict:" + str(expression_dict))
 
-        # expression_latex_rhs = latex.make_string_safe_for_latex(
-        #     str(web_form_new_expression.expression_latex_rhs.data)
-        #     .strip()
-        #     .replace("\\", "\\\\")  # due to Neo4j
-        # )
-        expression_latex_rhs = latex.make_string_safe_for_latex(
-            str(web_form_new_expression.expression_latex_rhs.data).strip()
-        )
-        # expression_latex_condition = latex.make_string_safe_for_latex(
-        #     str(web_form_new_expression.expression_latex_condition.data)
-        #     .strip()
-        #     .replace("\\", "\\\\")  # due to Neo4j
-        # )
-        expression_latex_condition = latex.make_string_safe_for_latex(
-            str(web_form_new_expression.expression_latex_condition.data).strip()
-            # .replace("\\", "\\\\")  # due to Neo4j
-        )
-        expression_name_latex = latex.make_string_safe_for_latex(
-            str(web_form_new_expression.expression_name_latex.data).strip()
-        )
-        expression_reference_latex = latex.make_string_safe_for_latex(
-            str(web_form_new_expression.expression_name_latex.data).strip()
-        )
-        expression_description_latex = latex.make_string_safe_for_latex(
-            str(web_form_new_expression.expression_description_latex.data).strip()
-        )
-
-        logger.info(
-            "to_edit_expression: expression_latex_lhs=" + str(expression_latex_lhs)
-        )
-        logger.info(
-            "to_edit_expression: expression_latex_rhs=" + str(expression_latex_rhs)
-        )
-        logger.info(
-            "to_edit_expression: expression_latex_condition="
-            + str(expression_latex_condition)
-        )
-
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
-
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_expression,
-                expression_id,
-                expression_latex_lhs,
-                expression_relation,
-                expression_latex_rhs,
-                expression_latex_condition,
-                expression_name_latex,
-                expression_description_latex,
-                expression_reference_latex,
-                author_name_latex,
+        if expression_dict is None:
+            return (
+                "<H1>Expression ID "
+                + str(expression_id)
+                + " does not exist in database</H1>."
             )
-            query_time_dict[
-                "pdg_app/to_edit_expression: edit_expression " + trace_id
-            ] = round(time.time() - query_start_time, 3)
 
-    web_form_no_options = NoOptionsForm(request.form)
-    # web_form_no_options = DeleteButtonForm(request.form)
-    if request.method == "POST":
-        logger.info(
-            "to_edit_expression: no web_form; request.form = " + str(request.form)
+        web_form_new_expression.expression_latex_lhs.data = expression_dict["latex_lhs"]
+        web_form_new_expression.expression_latex_rhs.data = expression_dict["latex_rhs"]
+        web_form_new_expression.expression_name_latex.data = expression_dict[
+            "name_latex"
+        ]
+        web_form_new_expression.expression_reference_latex.data = expression_dict[
+            "reference_latex"
+        ]
+        web_form_new_expression.expression_description_latex.data = expression_dict[
+            "description_latex"
+        ]
+
+        web_form_expression_sympy.sympy_str_lhs.data = expression_dict.get(
+            "sympy_lhs", ""
+        )
+        web_form_expression_sympy.sympy_str_rhs.data = expression_dict.get(
+            "sympy_rhs", ""
+        )
+        web_form_expression_sympy.lean_str.data = expression_dict.get("lean_str", "")
+
+        if "sympy_lhs" in expression_dict.keys():
+            error_msg = latex_and_sympy.create_AST_png_for_latex(
+                expression_dict["sympy_lhs"], expression_dict["id"] + "_LHS"
+            )
+            if len(error_msg) > 0:
+                flash("pdg_app/to_edit_expression: " + str(error_msg))
+                logger.error(str(error_msg))
+        if "sympy_rhs" in expression_dict.keys():
+            error_msg = latex_and_sympy.create_AST_png_for_latex(
+                expression_dict["sympy_rhs"], expression_dict["id"] + "_RHS"
+            )
+            if len(error_msg) > 0:
+                flash("pdg_app/to_edit_expression: " + str(error_msg))
+                logger.error(str(error_msg))
+
+        dict_of_nonoperation_symbol_dicts_in_expression, query_time_dict = (
+            compute.get_dict_of_nonoperation_symbol_dicts_in_expression(
+                expression_id, graphDB_Driver, query_time_dict
+            )
         )
 
         logger.info(
-            "to_edit_expression: no web_form; request.form.keys()"
-            + str(request.form.keys())
+            "dict_of_nonoperation_symbol_dicts_in_expression: "
+            + str(dict_of_nonoperation_symbol_dicts_in_expression)
+        )
+
+        dict_of_nonoperation_symbol_dicts_not_in_expression, query_time_dict = (
+            compute.get_dict_of_nonoperation_symbol_dicts_not_in_expression(
+                expression_id, graphDB_Driver, query_time_dict
+            )
         )
 
         logger.info(
-            "to_edit_expression: no web_form; len(request.form.keys())"
-            + str(len(request.form.keys()))
+            "dict_of_nonoperation_symbol_dicts_not_in_expression: "
+            + str(dict_of_nonoperation_symbol_dicts_not_in_expression)
         )
 
-        # # user was provided all the symbols as an optional disconnect
-        # # but the function only handles disconnects of specific types (e.g., scalar, vector)
-        # dict_of_symbol_id_and_type, query_time_dict = (
-        #     compute.get_dict_of_node_type_for_every_id(graphDB_Driver, query_time_dict)
-        # )
+        dict_of_operation_dicts_in_expression, query_time_dict = (
+            compute.get_dict_of_operation_dicts_in_expression(
+                expression_id, graphDB_Driver, query_time_dict
+            )
+        )
 
-        # if "symbol_select_id_to_disconnect" in request.form.keys():
-        #     symbol_id_to_disconnect = str(
-        #         request.form["symbol_select_id_to_disconnect"]
-        #     )
-        #     logger.info(
-        #         "to_edit_expression: symbol_id_to_disconnect="
-        #         + str(symbol_id_to_disconnect)
-        #     )
+        logger.info(
+            "dict_of_operation_dicts_in_expression: "
+            + str(dict_of_operation_dicts_in_expression)
+        )
 
-        #     # https://neo4j.com/docs/python-manual/current/session-api/
-        #     with graphDB_Driver.session() as session:
-        #         query_start_time = time.time()
-        #         session.write_transaction(
-        #             neo4j_query.disconnect_symbol_from_expression,
-        #             symbol_id_to_disconnect,
-        #             expression_id,
-        #             dict_of_symbol_id_and_type[symbol_id_to_disconnect],
-        #         )
-        #         query_time_dict[
-        #             "to_edit_expression: disconnect_symbol_from_expression"
-        #         ] = round(time.time() - query_start_time, 3)
+        dict_of_operation_dicts_not_in_expression, query_time_dict = (
+            compute.get_dict_of_operation_dicts_not_in_expression(
+                expression_id, graphDB_Driver, query_time_dict
+            )
+        )
 
-        if "relation_select_id_to_update" in request.form.keys():
-            relation_id_to_add = str(request.form["symbol_select_id_to_add"])
+        logger.info(
+            "dict_of_operation_dicts_not_in_expression: "
+            + str(dict_of_operation_dicts_not_in_expression)
+        )
+
+        dict_of_relation_dicts_not_in_expression, query_time_dict = (
+            compute.get_dict_of_relation_dicts_not_in_expression(
+                expression_id, graphDB_Driver, query_time_dict
+            )
+        )
+
+        logger.info(
+            "dict_of_relation_dicts_not_in_expression: "
+            + str(dict_of_relation_dicts_not_in_expression)
+        )
+
+    if request.method == "POST" and "add symbol to expr" in request.form:
+        if web_form_new_expression.validate():
             logger.info(
-                "to_edit_expression: relation_id_to_add=" + str(relation_id_to_add)
+                "with web_form_new_expression, request.form = " + str(request.form)
             )
 
-            # TODO: enact change
-
-        if "symbol_select_id_to_add" in request.form.keys():
             symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
-            logger.info("to_edit_expression: symbol_id_to_add=" + str(symbol_id_to_add))
 
-            # dict_of_symbol_id_and_type, query_time_dict = (
-            #     compute.get_dict_of_node_type_for_every_id(
-            #         graphDB_Driver, query_time_dict
-            #     )
-            # )
-            # symbol_category = dict_of_symbol_id_and_type[symbol_id_to_add]
-            # logger.info(symbol_category)
+            logger.info("symbol_id_to_add: " + symbol_id_to_add)
 
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
@@ -2250,6 +2089,183 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
                 query_time_dict["to_edit_expression: add_symbol_to_expression"] = round(
                     time.time() - query_start_time, 3
                 )
+            return redirect(url_for("to_edit_expression", expression_id=expression_id))
+
+        else:  # invalid form submitted
+            flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
+            logger.error(
+                "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
+            )
+    if request.method == "POST" and "remove symbol from expr" in request.form:
+        if web_form_new_expression.validate():
+            logger.info(
+                "with web_form_new_expression, request.form = " + str(request.form)
+            )
+        else:  # invalid form submitted
+            flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
+            logger.error(
+                "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
+            )
+    if request.method == "POST" and "add operation to expr" in request.form:
+        if web_form_new_expression.validate():
+            logger.info(
+                "with web_form_new_expression, request.form = " + str(request.form)
+            )
+        else:  # invalid form submitted
+            flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
+            logger.error(
+                "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
+            )
+    if request.method == "POST" and "remove operation from expr" in request.form:
+        if web_form_new_expression.validate():
+            logger.info(
+                "with web_form_new_expression, request.form = " + str(request.form)
+            )
+        else:  # invalid form submitted
+            flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
+            logger.error(
+                "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
+            )
+    if request.method == "POST" and "update relation in expr" in request.form:
+        if web_form_new_expression.validate():
+            logger.info(
+                "with web_form_new_expression, request.form = " + str(request.form)
+            )
+        else:  # invalid form submitted
+            flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
+            logger.error(
+                "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
+            )
+    if request.method == "POST" and "edit expression latex" in request.form:
+        if web_form_new_expression.validate():
+            logger.info(
+                "with web_form_new_expression, request.form = " + str(request.form)
+            )
+
+            # sanitize latex
+            # TODO: notify user if text was edited
+            # expression_latex_lhs = latex.make_string_safe_for_latex(
+            #     str(web_form_new_expression.expression_latex_lhs.data)
+            #     .strip()
+            #     .replace("\\", "\\\\")  # due to Neo4j
+            # )
+            expression_latex_lhs = latex.make_string_safe_for_latex(
+                str(web_form_new_expression.expression_latex_lhs.data).strip()
+            )
+
+            # the web UI dropdown returns the symbol ID (and not Latex string)
+            #'symbol_relation_id_to_add', '2222545'
+            expression_relation_id = request.form["symbol_relation_id_to_add"]
+
+            # look up the Latex string. (The other option is to change the schema to expr -> HAS_RELATION -> symbol)
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                expression_relation = session.read_transaction(
+                    neo4j_query.get_relation_latex, expression_relation_id
+                )
+                query_time_dict[
+                    "pdg_app/to_edit_expression: get_relation_latex " + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+            # expression_latex_rhs = latex.make_string_safe_for_latex(
+            #     str(web_form_new_expression.expression_latex_rhs.data)
+            #     .strip()
+            #     .replace("\\", "\\\\")  # due to Neo4j
+            # )
+            expression_latex_rhs = latex.make_string_safe_for_latex(
+                str(web_form_new_expression.expression_latex_rhs.data).strip()
+            )
+            # expression_latex_condition = latex.make_string_safe_for_latex(
+            #     str(web_form_new_expression.expression_latex_condition.data)
+            #     .strip()
+            #     .replace("\\", "\\\\")  # due to Neo4j
+            # )
+            expression_latex_condition = latex.make_string_safe_for_latex(
+                str(web_form_new_expression.expression_latex_condition.data).strip()
+                # .replace("\\", "\\\\")  # due to Neo4j
+            )
+            expression_name_latex = latex.make_string_safe_for_latex(
+                str(web_form_new_expression.expression_name_latex.data).strip()
+            )
+            expression_reference_latex = latex.make_string_safe_for_latex(
+                str(web_form_new_expression.expression_name_latex.data).strip()
+            )
+            expression_description_latex = latex.make_string_safe_for_latex(
+                str(web_form_new_expression.expression_description_latex.data).strip()
+            )
+
+            logger.info(
+                "to_edit_expression: expression_latex_lhs=" + str(expression_latex_lhs)
+            )
+            logger.info(
+                "to_edit_expression: expression_latex_rhs=" + str(expression_latex_rhs)
+            )
+            logger.info(
+                "to_edit_expression: expression_latex_condition="
+                + str(expression_latex_condition)
+            )
+
+            author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+
+            # https://neo4j.com/docs/python-manual/current/session-api/
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.edit_expression,
+                    expression_id,
+                    expression_latex_lhs,
+                    expression_relation,
+                    expression_latex_rhs,
+                    expression_latex_condition,
+                    expression_name_latex,
+                    expression_description_latex,
+                    expression_reference_latex,
+                    author_name_latex,
+                )
+                query_time_dict[
+                    "pdg_app/to_edit_expression: edit_expression " + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+            return redirect(url_for("to_edit_expression", expression_id=expression_id))
+
+        else:  # invalid form submitted
+            flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
+            logger.error(
+                "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
+            )
+    if request.method == "POST" and "edit expression sympy" in request.form:
+        if web_form_new_expression.validate():
+            logger.info(
+                "with web_form_new_expression, request.form = " + str(request.form)
+            )
+        else:  # invalid form submitted
+            flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
+            logger.error(
+                "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
+            )
+    if request.method == "POST" and "delete expression" in request.form:
+        if web_form_new_expression.validate():
+            logger.info(
+                "with web_form_new_expression, request.form = " + str(request.form)
+            )
+            logger.info("request.form.keys()" + str(request.form.keys()))
+
+            logger.info("Deleting expression: " + str(expression_id))
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.delete_node, "expression", expression_id
+                )
+                query_time_dict["to_edit_expression: delete_node"] = round(
+                    time.time() - query_start_time, 3
+                )
+            return redirect(url_for("to_list_expressions"))
+
+        else:  # invalid form submitted
+            flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
+            logger.error(
+                "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
+            )
 
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
@@ -2266,7 +2282,6 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         dict_of_operation_dicts_not_in_expression=dict_of_operation_dicts_not_in_expression,
         dict_of_relation_dicts_not_in_expression=dict_of_relation_dicts_not_in_expression,
     )
-    # return redirect(url_for("to_list_expressions"))
 
 
 @web_app.route("/edit_feed/<feed_id>", methods=["GET", "POST"])
@@ -2279,7 +2294,11 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    logger.info("to_edit_feed: feed_id: " + str(feed_id))
+    logger.info("feed_id: " + str(feed_id))
+
+    web_form_no_options = NoOptionsForm()
+    web_form_new_feed = SpecifyEditFeedForm()
+
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -2357,7 +2376,6 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     #             dict_of_all_operation_dicts[this_operation_id]
     #         )
 
-    web_form_new_feed = SpecifyEditFeedForm(request.form)
 
     if request.method == "POST" and not web_form_new_feed.validate():
         flash("pdg_app/to_edit_feed: " + str(web_form_new_feed.errors))
@@ -2393,6 +2411,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 query_time_dict[
                     "pdg_app/to_edit_feed: edit_node_property feed latex " + trace_id
                 ] = round(time.time() - query_start_time, 3)
+
         if feed_dict["sympy"] != feed_sympy:
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
@@ -2403,6 +2422,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 query_time_dict[
                     "pdg_app/to_edit_feed: edit_node_property feed sympy " + trace_id
                 ] = round(time.time() - query_start_time, 3)
+
         if feed_dict["lean"] != feed_lean:
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
@@ -2416,8 +2436,6 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_list_feeds"))
 
-    web_form_no_options = NoOptionsForm(request.form)
-    # web_form_no_options = DeleteButtonForm(request.form)
     if request.method == "POST":
         logger.info("to_edit_feed: no web_form; request.form = " + str(request.form))
 
@@ -2443,6 +2461,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 query_time_dict["pdg_app/to_edit_feed: delete_node " + trace_id] = (
                     round(time.time() - query_start_time, 3)
                 )
+            return redirect(url_for("to_edit_feed", feed_id=feed_id))
 
         if "symbol_select_id_to_disconnect" in request.form.keys():
             symbol_id_to_disconnect = str(
@@ -2467,6 +2486,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 query_time_dict[
                     "pdg_app/to_edit_feed: disconnect_symbol_from_feed " + trace_id
                 ] = round(time.time() - query_start_time, 3)
+            return redirect(url_for("to_edit_feed", feed_id=feed_id))
 
         if "symbol_select_id_to_add" in request.form.keys():
             symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
@@ -2486,6 +2506,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 query_time_dict[
                     "pdg_app/to_edit_feed: add_symbol_to_feed " + trace_id
                 ] = round(time.time() - query_start_time, 3)
+            return redirect(url_for("to_edit_feed", feed_id=feed_id))
+
         logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_list_feeds"))
 
@@ -2514,6 +2536,9 @@ def to_add_expression() -> werkzeug.Response:
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
+
+    web_form = SpecifyNewExpressionForm()
+
 
     # Used in _table_of_expressions.html which is referenced in expression_create.html
     list_of_expression_dicts = []
@@ -2618,7 +2643,6 @@ def to_add_expression() -> werkzeug.Response:
     #     ] = round(time.time() - query_start_time, 3)
 
     # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
-    web_form = SpecifyNewExpressionForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
         flash("pdg_app/to_add_expression: " + str(web_form.errors))
@@ -2751,7 +2775,7 @@ def to_add_expression() -> werkzeug.Response:
             )
 
         # after user provides latex for expression have them provide symbol count
-        logger.info("[TRACE]  end " + str(trace_id))
+        logger.info("[TRACE] end " + str(trace_id))
         return redirect(
             url_for(
                 "to_add_symbols_and_operations_for_expression",
@@ -2786,6 +2810,8 @@ def to_add_feed() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form = SpecifyNewFeedForm()
+
     list_of_feed_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -2818,7 +2844,6 @@ def to_add_feed() -> werkzeug.Response:
         )
     )
 
-    web_form = SpecifyNewFeedForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
         flash("pdg_app/to_add_feed: " + str(web_form.errors))
@@ -2899,6 +2924,7 @@ def to_add_feed() -> werkzeug.Response:
                     query_time_dict[
                         "pdg_app/to_add_feed: add_feed promoted symbol " + trace_id
                     ] = round(time.time() - query_start_time, 3)
+            return redirect(url_for("to_add_feed"))
 
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
@@ -2997,8 +3023,11 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
-
     logger.info("operation_id: " + str(operation_id))
+
+    web_form = SpecifyNewSymbolOperationForm()
+    web_form_no_options = NoOptionsForm()
+
 
     # get properties of this operation
     with graphDB_Driver.session() as session:
@@ -3026,8 +3055,6 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    web_form = SpecifyNewSymbolOperationForm(request.form)
-    web_form_no_options = NoOptionsForm(request.form)
     logger.info("request.method =" + str(request.method))
 
     if request.method == "POST" and not web_form.validate():
@@ -3088,8 +3115,11 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
-
     logger.info("relation_id: " + str(relation_id))
+
+    web_form_no_options = NoOptionsForm()
+    web_form_new_symbol = SpecifyNewSymbolRelationForm()
+
 
     # get properties of this relation
     with graphDB_Driver.session() as session:
@@ -3114,8 +3144,6 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
             "pdg_app/to_edit_relation: node_properties " + relation_id + " " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    web_form_no_options = NoOptionsForm(request.form)
-    web_form_new_symbol = SpecifyNewSymbolRelationForm(request.form)
     logger.info("request.method =" + str(request.method))
     logger.info("request.form = " + str(request.form))
 
@@ -3182,8 +3210,11 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
-
     logger.info("scalar_id: " + str(scalar_id))
+
+    web_form_symbol_properties = SpecifyNewSymbolScalarForm()
+    web_form_no_options = NoOptionsForm()
+
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -3209,8 +3240,6 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
             "pdg_app/to_edit_scalar: node_properties " + scalar_id + " " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    web_form_symbol_properties = SpecifyNewSymbolScalarForm(request.form)
-    web_form_no_options = NoOptionsForm(request.form)
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -3264,24 +3293,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
                     + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
-        # # https://neo4j.com/docs/python-manual/current/session-api/
-        # with graphDB_Driver.session() as session:
-        #     query_start_time = time.time()
-        #     session.write_transaction(
-        #         neo4j_query.add_scalar_symbol,
-        #         scalar_id,
-        #         symbol_name,
-        #         symbol_latex,
-        #         symbol_description,
-        #         symbol_requires_arguments,
-        #         symbol_reference,
-        #         author_name_latex,
-        #     )
-    # elif request.method == "POST" and web_form_symbol_properties_vector.validate():
-    #     logger.info("request.form = ", request.form)
-
-    #     logger.info("[TRACE] end " + str(trace_id))
-    #     return redirect(url_for("to_list_symbols"))
+        return redirect(url_for("to_edit_scalar", scalar_id=scalar_id))
 
     elif request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -3318,8 +3330,11 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
-
     logger.info("vector_id: " + str(vector_id))
+
+    web_form_vector_properties = SpecifyNewSymbolVectorForm()
+    web_form_no_options = NoOptionsForm()
+
 
     flash("pdg_app/to_edit_vector: NOT ENACTED YET 13942942392")
     logger.error("NOT ENACTED YET 13942942392")
@@ -3349,8 +3364,6 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
             "pdg_app/to_edit_vector: node_properties " + vector_id + " " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
-    web_form_no_options = NoOptionsForm(request.form)
 
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
@@ -3377,6 +3390,9 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("matrix_id: " + str(matrix_id))
+
+    web_form_matrix_properties = SpecifyNewSymbolMatrixForm()
+    web_form_no_options = NoOptionsForm()
 
     flash("pdg_app/to_edit_matrix: NOT ENACTED YET 94294111111")
     logger.error("NOT ENACTED YET 94294111111")
@@ -3406,8 +3422,6 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
             "pdg_app/to_edit_matrix: node_properties " + matrix_id + " " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    web_form_matrix_properties = SpecifyNewSymbolMatrixForm(request.form)
-    web_form_no_options = NoOptionsForm(request.form)
 
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
@@ -3429,6 +3443,8 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form_constant_properties = SpecifyNewConstantNumberForm()
+
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_scalar_dicts = session.read_transaction(
@@ -3439,7 +3455,6 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
         ] = round(time.time() - query_start_time, 3)
 
     logger.info("request.form = " + str(request.form))
-    web_form_constant_properties = SpecifyNewConstantNumberForm(request.form)
 
     if request.method == "POST" and not web_form_constant_properties.validate():
         flash(
@@ -3581,7 +3596,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    web_form_scalar_properties = SpecifyNewSymbolScalarForm(request.form)
+    web_form_scalar_properties = SpecifyNewSymbolScalarForm()
 
     if request.method == "POST" and not web_form_scalar_properties.validate():
         flash("pdg_app/to_add_symbol_scalar: " + str(web_form_scalar_properties.errors))
@@ -3728,6 +3743,9 @@ def to_add_symbol_vector() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form_vector_properties = SpecifyNewSymbolVectorForm()
+
+
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_vector_dicts = session.read_transaction(
@@ -3757,7 +3775,6 @@ def to_add_symbol_vector() -> werkzeug.Response:
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    web_form_vector_properties = SpecifyNewSymbolVectorForm(request.form)
 
     if request.method == "POST" and not web_form_vector_properties.validate():
         flash("pdg_app/to_add_symbol_vector: " + str(web_form_vector_properties.errors))
@@ -3840,6 +3857,9 @@ def to_add_symbol_matrix() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form_matrix_properties = SpecifyNewSymbolMatrixForm()
+
+
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_matrix_dicts = session.read_transaction(
@@ -3870,7 +3890,6 @@ def to_add_symbol_matrix() -> werkzeug.Response:
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    web_form_matrix_properties = SpecifyNewSymbolMatrixForm(request.form)
 
     if request.method == "POST" and not web_form_matrix_properties.validate():
         flash("pdg_app/to_add_symbol_matrix: " + str(web_form_matrix_properties.errors))
@@ -3968,6 +3987,9 @@ def to_add_operation() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form = SpecifyNewSymbolOperationForm()
+
+
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_operation_dicts = session.read_transaction(
@@ -3997,7 +4019,6 @@ def to_add_operation() -> werkzeug.Response:
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    web_form = SpecifyNewSymbolOperationForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
         flash("pdg_app/to_add_operation: " + str(web_form.errors))
@@ -4068,6 +4089,9 @@ def to_add_relation() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form = SpecifyNewSymbolRelationForm()
+
+
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_relation_dicts = session.read_transaction(
@@ -4098,7 +4122,6 @@ def to_add_relation() -> werkzeug.Response:
         ] = round(time.time() - query_start_time, 3)
 
     logger.info("before validate - request.form = " + str(request.form))
-    web_form = SpecifyNewSymbolRelationForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
         flash("pdg_app/to_add_relation: " + str(web_form.errors))
@@ -4178,6 +4201,9 @@ def to_add_step_select_expressions(
     logger.info("derivation_id:" + str(derivation_id))
     logger.info("inference_rule_id:" + str(inference_rule_id))
 
+    web_form = SpecifyNewStepForm()
+
+
     # get list of expressions
     list_of_expression_dicts = []
     with graphDB_Driver.session() as session:
@@ -4246,7 +4272,6 @@ def to_add_step_select_expressions(
 
     logger.info("inference_rule_dict is " + str(inference_rule_dict))
 
-    web_form = SpecifyNewStepForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
         flash("pdg_app/to_add_step_select_expressions: " + str(web_form.errors))
@@ -4388,6 +4413,9 @@ def to_add_symbols_and_operations_for_expression(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
+
+    web_form_no_options = NoOptionsForm()
+
 
     # get the Latex for this expression_id
     with graphDB_Driver.session() as session:
@@ -4555,7 +4583,6 @@ def to_add_symbols_and_operations_for_expression(
 
     # The checkboxes are determined dynamically,
     # so I don't see how a class-based form could be used.
-    web_form_no_options = NoOptionsForm(request.form)
     if request.method == "POST":
         logger.info(
             "to_add_symbols_and_operations_for_expression request.form = "
@@ -4684,8 +4711,10 @@ def to_add_sympy_and_lean_for_expression(
     #     return "Invalid dictionary format", 400
 
     symbol_id_dict = request.args.to_dict()
-
     logger.info("symbol_id_dict=" + str(symbol_id_dict))
+
+    web_form = SpecifyNewExpressionSympyLeanForm()
+
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -4792,7 +4821,6 @@ def to_add_sympy_and_lean_for_expression(
     #     + str(revised_expr_with_str)
     # )
 
-    web_form = SpecifyNewExpressionSympyLeanForm(request.form)
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
@@ -4919,6 +4947,8 @@ def to_add_symbols_and_operations_for_feed(
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form_no_options = NoOptionsForm()
+
     # get the Latex for this expression_id
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -5033,7 +5063,6 @@ def to_add_symbols_and_operations_for_feed(
 
     # The checkboxes are determined dynamically,
     # so I don't see how a class-based form could be used.
-    web_form_no_options = NoOptionsForm(request.form)
     if request.method == "POST":
         logger.info(
             "symbols_and_operations_for_feed request.form = " + str(request.form)
@@ -5116,6 +5145,9 @@ def to_add_sympy_and_lean_for_feed(
     symbol_id_dict = request.args.to_dict()
     logger.info("symbol_id_dict=" + str(symbol_id_dict))
 
+    web_form = SpecifyNewFeedSympyLeanForm()
+
+
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         feed_dict = session.read_transaction(
@@ -5156,7 +5188,6 @@ def to_add_sympy_and_lean_for_feed(
 
     logger.info("revised_feed_with_str=" + str(revised_feed_with_str))
 
-    web_form = SpecifyNewFeedSympyLeanForm(request.form)
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
@@ -5234,6 +5265,9 @@ def to_add_inference_rule() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form = SpecifyNewInferenceRuleForm()
+
+
     list_of_inference_rule_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -5251,7 +5285,6 @@ def to_add_inference_rule() -> werkzeug.Response:
         )
     )
 
-    web_form = SpecifyNewInferenceRuleForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
         flash("pdg_app/to_add_inference_rule" + str(web_form.errors))
@@ -5382,6 +5415,9 @@ def to_edit_step(
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
+    web_form = SpecifyNewStepForm()
+
+
     # TODO: Verify that derivation_id exists
     # TODO: verify that step_id exists
     # TODO: verify that step_id is associated with Derivation_id
@@ -5404,7 +5440,6 @@ def to_edit_step(
             break
     logger.info("to_edit_step: this_step_dict=" + str(this_step_dict))
 
-    web_form = SpecifyNewStepForm(request.form)
 
     if request.method == "POST" and not web_form.validate():
         flash("pdg_app/to_edit_step: " + str(web_form.errors))
@@ -5456,8 +5491,9 @@ def to_edit_inference_rule(
 
     # TODO: verify that inference_rule_id exists before editing
 
-    web_form_edit = SpecifyNewInferenceRuleForm(request.form)
-    web_form_delete = NoOptionsForm(request.form)
+    web_form_edit = SpecifyNewInferenceRuleForm()
+    web_form_delete = NoOptionsForm()
+
     if request.method == "POST":
         logger.info(" request.form no validate = " + str(request.form))
 
@@ -5640,7 +5676,7 @@ def to_query() -> werkzeug.Response:
     # When the form button is clicked the method is POST
     logger.info("to_query: request.method=" + str(request.method))
 
-    web_form = CypherQueryForm(request.form)
+    web_form = CypherQueryForm()
 
     if request.method == "POST" and not web_form.validate():
         flash("pdg_app/to_query: " + str(web_form.errors))
