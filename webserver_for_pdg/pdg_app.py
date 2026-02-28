@@ -2388,13 +2388,21 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     if request.method == "POST" and web_form_new_feed.validate():
         logger.info("request.form = " + str(request.form))
 
+        # feed_latex = (
+        #     str(web_form_new_feed.feed_latex.data).strip().replace("\\", "\\\\")
+        # )
+        # feed_sympy = (
+        #     str(web_form_new_feed.feed_sympy.data).strip().replace("\\", "\\\\")
+        # )
+        # feed_lean = str(web_form_new_feed.feed_lean.data).strip().replace("\\", "\\\\")
+
         feed_latex = (
-            str(web_form_new_feed.feed_latex.data).strip().replace("\\", "\\\\")
+            str(web_form_new_feed.feed_latex.data).strip()
         )
         feed_sympy = (
-            str(web_form_new_feed.feed_sympy.data).strip().replace("\\", "\\\\")
+            str(web_form_new_feed.feed_sympy.data).strip()
         )
-        feed_lean = str(web_form_new_feed.feed_lean.data).strip().replace("\\", "\\\\")
+        feed_lean = str(web_form_new_feed.feed_lean.data).strip()
 
         logger.info("feed_latex=" + str(feed_latex))
         logger.info("feed_sympy=" + str(feed_sympy))
@@ -2854,7 +2862,8 @@ def to_add_feed() -> werkzeug.Response:
     if request.method == "POST" and web_form.validate():
         logger.info("request.form = " + str(request.form))
 
-        feed_latex = str(web_form.feed_latex.data).strip().replace("\\", "\\\\")
+        # feed_latex = str(web_form.feed_latex.data).strip().replace("\\", "\\\\")
+        feed_latex = str(web_form.feed_latex.data).strip()
 
         logger.info("feed_latex:" + str(feed_latex))
         # TODO: validate that this string is actually Latex before adding to database
@@ -6488,7 +6497,7 @@ def to_list_derivations() -> str:
             neo4j_query.get_number_of_steps_per_derivation
         )
         query_time_dict[
-            "pdg_app/to_add_derivation: get_number_of_steps_per_derivation" + trace_id
+            "pdg_app/to_list_derivations: get_number_of_steps_per_derivation" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     # TODO: convert derivation_dict['abstract_latex'] to HTML using pandoc
