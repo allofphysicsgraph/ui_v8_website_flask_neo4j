@@ -16,6 +16,7 @@
     {{ form.csrf_token }}
 
 
+
 Latex:
 <table border="1">
   <tr>
@@ -24,6 +25,7 @@ Latex:
                                 id="input_latex_lhs", 
                                 type="text",
                                 pattern="^[\x20-\x7F]+$", 
+                                onkeyup="latex_filter()", 
                                 oninput="validateASCII(this)", 
                                 onchange="onChangeFunction();") }}</td>
 <!-- https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84 -->
@@ -154,6 +156,37 @@ Latex:
     </P>
   </form>
 
+
+
+
+<script>
+function latex_filter() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("input_latex_lhs");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("expression_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows (except header); then hide those who don't match the search query
+  for (i = 1; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1]; // just "latex" column
+    console.log(td)
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
+
+
+
 <fieldset>
   <legend>Actions</legend>
 <ul>
@@ -168,11 +201,7 @@ Latex:
 </fieldset>
 
 {% if list_of_expression_dicts|length > 0 %}
-
-TODO: as user is entering expression, filter the list of existing expressions
-
 {% include 'jinja2_pages/reusable_components/_table_of_expressions_mini.html' %}
-
 {% endif %}
 
 <script>
