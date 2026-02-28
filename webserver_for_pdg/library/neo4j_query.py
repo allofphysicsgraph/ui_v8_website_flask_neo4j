@@ -1270,7 +1270,7 @@ def edit_expression(
     >>> edit_expression()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + str(trace_id))
+    logger.info("[TRACE] start " + str(trace_id))
 
     result = tx.run(
         'MERGE (e:expression {id:"' + str(expression_id) + '"})'
@@ -1767,7 +1767,7 @@ def add_expression(
     """
     nothing returned by function because action is to write change to Neo4j database
 
-    TODO: add Lean and SymPy.LHS and SymPy.RHS
+    `add_expression` doesn't have `sympy_lhs`, `sympy_rhs`, `lean` because those are added in a separate action
 
     >>> add_expression(tx,)
     """
