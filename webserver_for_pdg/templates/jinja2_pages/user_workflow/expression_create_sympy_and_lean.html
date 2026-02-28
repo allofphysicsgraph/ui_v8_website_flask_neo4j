@@ -35,20 +35,20 @@
 
 <H3>SymPy</H3>
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form.csrf_token }}
+    {{ form_new_expression_sympy.csrf_token }}
 
 <table border="0">
   <tr>
-    <td>{{ form.sympy_str_lhs(cols=50, rows=5, 
+    <td>{{ form_new_expression_sympy.sympy_str_lhs(cols=50, rows=5, 
                          maxlength=1000) }}</td> <!-- LHS -->
     <td>{{ expression_dict['latex_relation'] }}</td> <!-- relation -->
-    <td>{{ form.sympy_str_rhs(cols=50, rows=5, 
+    <td>{{ form_new_expression_sympy.sympy_str_rhs(cols=50, rows=5, 
                          maxlength=1000) }}</td> <!-- RHS -->
   </tr>
   <tr>
-    <td>{{ form.sympy_str_lhs.label}}</td> <!-- LHS -->
+    <td>{{ form_new_expression_sympy.sympy_str_lhs.label}}</td> <!-- LHS -->
     <td></td> <!-- relation -->
-    <td>{{ form.sympy_str_rhs.label}}</td> <!-- RHS -->
+    <td>{{ form_new_expression_sympy.sympy_str_rhs.label}}</td> <!-- RHS -->
   </tr>
 </table>
 
@@ -56,8 +56,8 @@
                           "TextArea doesn't have a value attribute,"
                          value=revised_expr_with_str) }}</P>
                          -->
-    <P>{{ form.lean_str.label}}: 
-       {{ form.lean_str(size=100, 
+    <P>{{ form_new_expression_sympy.lean_str.label}}: 
+       {{ form_new_expression_sympy.lean_str(size=100, 
                         maxlength=1000) }}</P>
 
     <P><input type="submit" name="submit_button" value="update expressions"> </P>

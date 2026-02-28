@@ -17,16 +17,16 @@
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form.csrf_token }}
+    {{ form_new_symbol.csrf_token }}
     <P>
-      {{ form.relation_latex.label}}: {{ form.relation_latex(size=50, maxlength=1000, value=relation_dict['latex']) }} <BR/>
+      {{ form_new_symbol.relation_latex.label}}: {{ form_new_symbol.relation_latex(size=50, maxlength=1000, value=relation_dict['latex']) }} <BR/>
       &nbsp;<BR/>
-      {{form.relation_name_latex.label }}: {{ form.relation_name_latex(size=50, maxlength=1000, value=relation_dict['name_latex']) }}<BR/>
+      {{form_new_symbol.relation_name_latex.label }}: {{ form_new_symbol.relation_name_latex(size=50, maxlength=1000, value=relation_dict['name_latex']) }}<BR/>
       &nbsp;<BR/>
-      {{form.relation_description_latex.label }}: {{ form.relation_description_latex(size=50, maxlength=1000, value=relation_dict['description_latex']) }}<BR/>
+      {{form_new_symbol.relation_description_latex.label }}: {{ form_new_symbol.relation_description_latex(size=50, maxlength=1000, value=relation_dict['description_latex']) }}<BR/>
       &nbsp;<BR/>
 
-      {{form.relation_reference_latex.label }}: {{ form.relation_reference_latex(size=50, maxlength=1000, value=relation_dict['reference_latex']) }}<BR/>
+      {{form_new_symbol.relation_reference_latex.label }}: {{ form_new_symbol.relation_reference_latex(size=50, maxlength=1000, value=relation_dict['reference_latex']) }}<BR/>
       &nbsp;<BR/>
 
       <input type="submit" value="Edit relation">

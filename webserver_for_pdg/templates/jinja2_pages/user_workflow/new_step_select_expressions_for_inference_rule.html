@@ -37,9 +37,9 @@
 -->
 
 <form method="post" action="">
-  {{ form.csrf_token }}
+  {{ form_new_step.csrf_token }}
 
-  {{ form.note_before_step_latex.label }}: {{ form.note_before_step_latex(size=50, maxlength=300, id="note_before") }}
+  {{ form_new_step.note_before_step_latex.label }}: {{ form_new_step.note_before_step_latex(size=50, maxlength=300, id="note_before") }}
 
   <P>input count: {{ inference_rule_dict['number_of_inputs'] }}<BR>
 
@@ -142,7 +142,7 @@
   {% endif %}
 
 
-  <P>{{ form.note_after_step_latex.label }}: {{ form.note_after_step_latex(size=50, maxlength=300, id="note_after") }}
+  <P>{{ form_new_step.note_after_step_latex.label }}: {{ form_new_step.note_after_step_latex(size=50, maxlength=300, id="note_after") }}
 
 
   <P><input type="submit" name="submit_button" value="add step">

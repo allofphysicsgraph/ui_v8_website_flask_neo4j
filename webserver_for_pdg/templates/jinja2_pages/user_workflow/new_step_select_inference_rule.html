@@ -89,7 +89,7 @@ function latex_filter() {
           {{ inference_rule_dict['name_latex'] }}
         </a>
       </td>
-      <td>{{ inference_rule_dict['latex'] | safe }}</td>
+      <td><span class="mathjax_ignore">{{ inference_rule_dict['latex'] | safe }}</span></td> <!-- https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/119 -->
       <td>{{ inference_rule_dict['number_of_inputs'] }}</td>
       <td>{{ inference_rule_dict['number_of_feeds'] }}</td>
       <td>{{ inference_rule_dict['number_of_outputs'] }}</td>

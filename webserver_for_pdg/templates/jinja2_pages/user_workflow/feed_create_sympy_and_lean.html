@@ -20,17 +20,17 @@
 <P>symbols lookup: {{ symbol_id_dict }}
 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form.csrf_token }}
+    {{ form_new_feed_sympy.csrf_token }}
     <!-- using sympy_str_lhs even though feeds don't distinguish LHS and RHS-->
-    <P>{{ form.sympy_str.label}}: 
-       {{ form.sympy_str(cols=80, rows=5, 
+    <P>{{ form_new_feed_sympy.sympy_str.label}}: 
+       {{ form_new_feed_sympy.sympy_str(cols=80, rows=5, 
                          maxlength=1000) }}</P>
                          <!--
                           "TextArea doesn't have a value attribute,"
                          value=revised_feed_with_str) }}</P>
                          -->
-    <P>{{ form.lean_str.label}}: 
-       {{ form.lean_str(size=100, 
+    <P>{{ form_new_feed_sympy.lean_str.label}}: 
+       {{ form_new_feed_sympy.lean_str(size=100, 
                         maxlength=1000) }}</P>
 
     <P><input type="submit" name="submit_button" value="update feed"></P>

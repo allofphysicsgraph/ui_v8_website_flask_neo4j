@@ -17,13 +17,13 @@
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form.csrf_token }}
+    {{ form_vector_properties.csrf_token }}
     <P>
-      {{ form.vector_latex.label}}: {{ form.vector_latex(size=50, maxlength=1000, value=vector_dict['latex']|e) }} <BR/>
+      {{ form_vector_properties.vector_latex.label}}: {{ form_vector_properties.vector_latex(size=50, maxlength=1000, value=vector_dict['latex']|e) }} <BR/>
       &nbsp;<BR/>
-      {{form.vector_name_latex.label }}: {{ form.vector_name_latex(size=50, maxlength=1000, value=vector_dict['name_latex']|e) }}<BR/>
+      {{form_vector_properties.vector_name_latex.label }}: {{ form_vector_properties.vector_name_latex(size=50, maxlength=1000, value=vector_dict['name_latex']|e) }}<BR/>
       &nbsp;<BR/>
-      {{form.vector_description_latex.label }}: {{ form.vector_description_latex(size=50, maxlength=1000, value=vector_dict['description_latex']|e) }}<BR/>
+      {{form_vector_properties.vector_description_latex.label }}: {{ form_vector_properties.vector_description_latex(size=50, maxlength=1000, value=vector_dict['description_latex']|e) }}<BR/>
       &nbsp;<BR/>
       <input type="submit" value="Edit vector">
     </P>

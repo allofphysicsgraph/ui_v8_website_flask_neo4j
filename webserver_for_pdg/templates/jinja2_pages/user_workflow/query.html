@@ -25,14 +25,14 @@
 {% if submitted_query is defined %}
   {% if submitted_query|length > 0 %}
     For the query <BR>
-    {{ submitted_query.replace('\r','\\\\r') | safe }}<BR> <!-- https://stackoverflow.com/a/35215981/1164295 -->
+    <span class="mathjax_ignore">{{ submitted_query | safe }}</span><BR> <!-- https://stackoverflow.com/a/35215981/1164295 -->
     the results are
   {% endif %}
 {% endif %}
 
 <UL>
 {% for record in list_of_records %}
-    <LI>{{ record.replace('\r','\\\\r') | safe }}</LI>
+    <LI><span class="mathjax_ignore">{{ record.replace | safe }}</span></LI>
 {% endfor %}
 </UL>
 

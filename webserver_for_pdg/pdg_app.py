@@ -1268,7 +1268,7 @@ def to_add_derivation() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    web_form = SpecifyNewDerivationForm()
+    web_form_new_derivation = SpecifyNewDerivationForm()
 
     # TODO: check that the name of the derivation doesn't
     #       conflict with existing derivation names
@@ -1308,14 +1308,16 @@ def to_add_derivation() -> werkzeug.Response:
 
     logger.info("request.method=" + str(request.method))  # POST
 
-    if request.method == "POST" and not web_form.validate():
-        flash("pdg_app/to_add_derivation: " + str(web_form.errors))
-        logger.error(str(web_form.errors))
-    if request.method == "POST" and web_form.validate():
+    if request.method == "POST" and not web_form_new_derivation.validate():
+        flash("pdg_app/to_add_derivation: " + str(web_form_new_derivation.errors))
+        logger.error(str(web_form_new_derivation.errors))
+    if request.method == "POST" and web_form_new_derivation.validate():
         logger.info("request.form =" + str(request.form))
 
         # this preserves the LaTeX backslashes exactly as the user typed them.
-        derivation_name_latex = str(web_form.derivation_name_latex.data).strip()
+        derivation_name_latex = str(
+            web_form_new_derivation.derivation_name_latex.data
+        ).strip()
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not derivation_name_latex.isascii():
@@ -1326,7 +1328,7 @@ def to_add_derivation() -> werkzeug.Response:
 
         # this preserves the LaTeX backslashes exactly as the user typed them.
         derivation_reference_latex = str(
-            web_form.derivation_reference_latex.data
+            web_form_new_derivation.derivation_reference_latex.data
         ).strip()
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
@@ -1340,7 +1342,7 @@ def to_add_derivation() -> werkzeug.Response:
             )
 
         # this preserves the LaTeX backslashes exactly as the user typed them.
-        abstract_latex = str(web_form.abstract_latex.data).strip()
+        abstract_latex = str(web_form_new_derivation.abstract_latex.data).strip()
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not abstract_latex.isascii():
@@ -1414,7 +1416,7 @@ def to_add_derivation() -> werkzeug.Response:
         "jinja2_pages/user_workflow/derivation_create.html",
         title="Create Derivation",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form=web_form_new_derivation,
         list_of_derivation_dicts=list_of_derivation_dicts,
         number_of_steps_per_derivation=number_of_steps_per_derivation,
     )
@@ -1765,7 +1767,7 @@ def to_edit_derivation_metadata(
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    web_form = SpecifyNewDerivationForm()
+    web_form_edit_derivation = SpecifyNewDerivationForm()
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -1784,10 +1786,13 @@ def to_edit_derivation_metadata(
             + " does not exist in database</H1>."
         )
 
-    if request.method == "POST" and not web_form.validate():
-        flash("pdg_app/to_edit_derivation_metadata: " + str(web_form.errors))
-        logger.error(str(web_form.errors))
-    if request.method == "POST" and web_form.validate():
+    if request.method == "POST" and not web_form_edit_derivation.validate():
+        flash(
+            "pdg_app/to_edit_derivation_metadata: "
+            + str(web_form_edit_derivation.errors)
+        )
+        logger.error(str(web_form_edit_derivation.errors))
+    if request.method == "POST" and web_form_edit_derivation.validate():
         logger.info("to_edit_derivation_metadata: request.form = " + str(request.form))
 
         # request.form =  ImmutableMultiDict(('derivation_name_latex', 'this isa'), ('abstract_latex', 'heresasdf00')])
@@ -1795,7 +1800,7 @@ def to_edit_derivation_metadata(
         # sanitize Latex
         # TODO: notify user if what they submitted has been altered.
         derivation_name_latex = latex.make_string_safe_for_latex(
-            str(web_form.derivation_name_latex.data).strip()
+            str(web_form_edit_derivation.derivation_name_latex.data).strip()
         )
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not derivation_name_latex.isascii():
@@ -1805,7 +1810,7 @@ def to_edit_derivation_metadata(
             return f"<h1>Input must be ASCII only</h1>\n{escape(derivation_name_latex)}"
 
         derivation_reference_latex = latex.make_string_safe_for_latex(
-            str(web_form.derivation_reference_latex.data).strip()
+            str(web_form_edit_derivation.derivation_reference_latex.data).strip()
         )
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not derivation_reference_latex.isascii():
@@ -1818,7 +1823,7 @@ def to_edit_derivation_metadata(
             )
 
         abstract_latex = latex.make_string_safe_for_latex(
-            str(web_form.abstract_latex.data).strip()
+            str(web_form_edit_derivation.abstract_latex.data).strip()
         )
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not abstract_latex.isascii():
@@ -1853,7 +1858,7 @@ def to_edit_derivation_metadata(
         "jinja2_pages/user_workflow/derivation_edit_metadata.html",
         title="Edit derivation metadata",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form=web_form_edit_derivation,
         derivation_dict=derivation_dict,
     )
 
@@ -2396,12 +2401,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         # )
         # feed_lean = str(web_form_new_feed.feed_lean.data).strip().replace("\\", "\\\\")
 
-        feed_latex = (
-            str(web_form_new_feed.feed_latex.data).strip()
-        )
-        feed_sympy = (
-            str(web_form_new_feed.feed_sympy.data).strip()
-        )
+        feed_latex = str(web_form_new_feed.feed_latex.data).strip()
+        feed_sympy = str(web_form_new_feed.feed_sympy.data).strip()
         feed_lean = str(web_form_new_feed.feed_lean.data).strip()
 
         logger.info("feed_latex=" + str(feed_latex))
@@ -2550,7 +2551,7 @@ def to_add_expression() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    web_form = SpecifyNewExpressionForm()
+    web_form_add_expression = SpecifyNewExpressionForm()
 
     # Used in _table_of_expressions.html which is referenced in expression_create.html
     list_of_expression_dicts = []
@@ -2656,20 +2657,15 @@ def to_add_expression() -> werkzeug.Response:
 
     # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
 
-    if request.method == "POST" and not web_form.validate():
-        flash("pdg_app/to_add_expression: " + str(web_form.errors))
-        logger.error(str(web_form.errors))
-    if request.method == "POST" and web_form.validate():
+    if request.method == "POST" and not web_form_add_expression.validate():
+        flash("pdg_app/to_add_expression: " + str(web_form_add_expression.errors))
+        logger.error(str(web_form_add_expression.errors))
+    if request.method == "POST" and web_form_add_expression.validate():
         logger.info("request.form = " + str(request.form))
 
-        # ('expression_latex_lhs', '\\vec{F}'), ('symbol_relation_id_to_add', '2903733'),
-        # ('expression_latex_rhs', 'm \\vec{a}'), ('expression_latex_condition', ''),
-        # ('expression_name_latex', ''), ('expression_reference_latex', ''), ('expression_description_latex', '')])
-
-        # expression_latex_lhs = (
-        #     str(web_form.expression_latex_lhs.data).strip().replace("\\", "\\\\")
-        # )
-        expression_latex_lhs = str(web_form.expression_latex_lhs.data).strip()
+        expression_latex_lhs = str(
+            web_form_add_expression.expression_latex_lhs.data
+        ).strip()
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not expression_latex_lhs.isascii():
@@ -2694,13 +2690,9 @@ def to_add_expression() -> werkzeug.Response:
 
         logger.info(str(expression_relation))
 
-        # expression_latex_rhs = (
-        #     str(web_form.expression_latex_rhs.data).strip().replace("\\", "\\\\")
-        # )
-        expression_latex_rhs = str(web_form.expression_latex_rhs.data).strip()
-        # expression_latex_condition = (
-        #     str(web_form.expression_latex_condition.data).strip().replace("\\", "\\\\")
-        # )
+        expression_latex_rhs = str(
+            web_form_add_expression.expression_latex_rhs.data
+        ).strip()
 
         # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
         if not expression_latex_rhs.isascii():
@@ -2708,7 +2700,7 @@ def to_add_expression() -> werkzeug.Response:
             return f"<h1>Input must be ASCII only</h1>\n{escape(expression_latex_rhs)}"
 
         expression_latex_condition = str(
-            web_form.expression_latex_condition.data
+            web_form_add_expression.expression_latex_condition.data
         ).strip()
         if not expression_latex_condition.isascii():
             logger.error(
@@ -2719,7 +2711,9 @@ def to_add_expression() -> werkzeug.Response:
                 expression_latex_condition
             )
 
-        expression_name_latex = str(web_form.expression_name_latex.data).strip()
+        expression_name_latex = str(
+            web_form_add_expression.expression_name_latex.data
+        ).strip()
         if not expression_name_latex.isascii():
             logger.error(
                 "Non-ascii expression_name_latex: " + str(expression_name_latex)
@@ -2727,7 +2721,7 @@ def to_add_expression() -> werkzeug.Response:
             return f"<h1>Input must be ASCII only</h1>\n{escape(expression_name_latex)}"
 
         expression_reference_latex = str(
-            web_form.expression_reference_latex.data
+            web_form_add_expression.expression_reference_latex.data
         ).strip()
         if not expression_reference_latex.isascii():
             logger.error(
@@ -2739,7 +2733,7 @@ def to_add_expression() -> werkzeug.Response:
             )
 
         expression_description_latex = str(
-            web_form.expression_description_latex.data
+            web_form_add_expression.expression_description_latex.data
         ).strip()
         if not expression_description_latex.isascii():
             logger.error(
@@ -2800,7 +2794,7 @@ def to_add_expression() -> werkzeug.Response:
         "jinja2_pages/user_workflow/expression_create.html",
         title="Create Expression",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form=web_form_add_expression,
         # dict_of_derivation_dicts_that_use_expression=dict_of_derivation_dicts_that_use_expression,  # Used in _table_of_expressions.html
         # list_of_symbol_dicts_per_expression_id=symbol_dicts_per_expression_id,  # Used in _table_of_expressions.html
         # dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,  # Used in _table_of_expressions.html which is referenced in expression_create.html
@@ -2822,7 +2816,7 @@ def to_add_feed() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    web_form = SpecifyNewFeedForm()
+    web_form_add_feed = SpecifyNewFeedForm()
 
     list_of_feed_dicts = []
     with graphDB_Driver.session() as session:
@@ -2856,14 +2850,13 @@ def to_add_feed() -> werkzeug.Response:
         )
     )
 
-    if request.method == "POST" and not web_form.validate():
-        flash("pdg_app/to_add_feed: " + str(web_form.errors))
-        logger.error(str(web_form.errors))
-    if request.method == "POST" and web_form.validate():
+    if request.method == "POST" and not web_form_add_feed.validate():
+        flash("pdg_app/to_add_feed: " + str(web_form_add_feed.errors))
+        logger.error(str(web_form_add_feed.errors))
+    if request.method == "POST" and web_form_add_feed.validate():
         logger.info("request.form = " + str(request.form))
 
-        # feed_latex = str(web_form.feed_latex.data).strip().replace("\\", "\\\\")
-        feed_latex = str(web_form.feed_latex.data).strip()
+        feed_latex = str(web_form_add_feed.feed_latex.data).strip()
 
         logger.info("feed_latex:" + str(feed_latex))
         # TODO: validate that this string is actually Latex before adding to database
@@ -2943,7 +2936,7 @@ def to_add_feed() -> werkzeug.Response:
         "jinja2_pages/user_workflow/feed_create.html",
         title="Create Feed",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form=web_form_add_feed,
         dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,
         list_of_nonoperation_symbol_dicts=list_of_nonoperation_symbol_dicts,
         symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,  # _table_of_feeds.html
@@ -3037,7 +3030,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
     query_time_dict = {}  # type: query_timing_result_type
     logger.info("operation_id: " + str(operation_id))
 
-    web_form = SpecifyNewSymbolOperationForm()
+    web_form_edit_operation = SpecifyNewSymbolOperationForm()
     web_form_no_options = NoOptionsForm()
 
     # get properties of this operation
@@ -3068,19 +3061,25 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
 
     logger.info("request.method =" + str(request.method))
 
-    if request.method == "POST" and not web_form.validate():
-        flash("pdg_app/to_edit_operation: " + str(web_form.errors))
-        logger.error(str(web_form.errors))
-    if request.method == "POST" and web_form.validate():
+    if request.method == "POST" and not web_form_edit_operation.validate():
+        flash("pdg_app/to_edit_operation: " + str(web_form_edit_operation.errors))
+        logger.error(str(web_form_edit_operation.errors))
+    if request.method == "POST" and web_form_edit_operation.validate():
         logger.info("request.form = " + str(request.form))
 
-        operation_latex = str(web_form.operation_latex.data).strip()
-        operation_name_latex = str(web_form.operation_name_latex.data).strip()
-        operation_description_latex = str(
-            web_form.operation_description_latex.data
+        operation_latex = str(web_form_edit_operation.operation_latex.data).strip()
+        operation_name_latex = str(
+            web_form_edit_operation.operation_name_latex.data
         ).strip()
-        operation_reference_latex = str(web_form.operation_reference_latex.data).strip()
-        operation_number_of_arguments = int(web_form.operation_argument_count.data)
+        operation_description_latex = str(
+            web_form_edit_operation.operation_description_latex.data
+        ).strip()
+        operation_reference_latex = str(
+            web_form_edit_operation.operation_reference_latex.data
+        ).strip()
+        operation_number_of_arguments = int(
+            web_form_edit_operation.operation_argument_count.data
+        )
 
         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
@@ -3110,7 +3109,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
         "jinja2_pages/user_workflow/symbol_operation_edit.html",
         title="Edit Operation",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form_edit_operation=web_form_edit_operation,
         form_no_options=web_form_no_options,
         operation_dict=operation_dict,
         list_of_expression_dicts=list_of_expression_dicts,
@@ -3198,7 +3197,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
         "jinja2_pages/user_workflow/symbol_relation_edit.html",
         title="Edit Relation",
         query_time_dict=query_time_dict,
-        form=web_form_new_symbol,
+        form_new_symbol=web_form_new_symbol,
         form_no_options=web_form_no_options,
         relation_dict=relation_dict,
         list_of_expression_dicts=list_of_expression_dicts,
@@ -3320,7 +3319,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
         "jinja2_pages/user_workflow/symbol_scalar_edit.html",
         title="Edit Scalar",
         query_time_dict=query_time_dict,
-        form=web_form_symbol_properties,
+        form_symbol_properties=web_form_symbol_properties,
         form_no_options=web_form_no_options,
         scalar_dict=scalar_dict,
         list_of_expression_dicts=list_of_expression_dicts,
@@ -3376,7 +3375,7 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
         "jinja2_pages/user_workflow/symbol_vector_edit.html",
         title="Edit Vector",
         query_time_dict=query_time_dict,
-        form=web_form_vector_properties,
+        form_vector_properties=web_form_vector_properties,
         form_no_options=web_form_no_options,
         vector_dict=vector_dict,
         list_of_expression_dicts=list_of_expression_dicts,
@@ -3433,7 +3432,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
         "jinja2_pages/user_workflow/symbol_matrix_edit.html",
         title="Edit Matrix",
         query_time_dict=query_time_dict,
-        form=web_form_matrix_properties,
+        form_matrix_properties=web_form_matrix_properties,
         form_no_options=web_form_no_options,
         matrix_dict=matrix_dict,
         list_of_expression_dicts=list_of_expression_dicts,
@@ -3978,7 +3977,7 @@ def to_add_operation() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    web_form = SpecifyNewSymbolOperationForm()
+    web_form_add_operation = SpecifyNewSymbolOperationForm()
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -4009,21 +4008,27 @@ def to_add_operation() -> werkzeug.Response:
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    if request.method == "POST" and not web_form.validate():
-        flash("pdg_app/to_add_operation: " + str(web_form.errors))
-        logger.error(str(web_form.errors))
-    if request.method == "POST" and web_form.validate():
+    if request.method == "POST" and not web_form_add_operation.validate():
+        flash("pdg_app/to_add_operation: " + str(web_form_add_operation.errors))
+        logger.error(str(web_form_add_operation.errors))
+    if request.method == "POST" and web_form_add_operation.validate():
         logger.info("request.form = " + str(request.form))
 
         # request.form =  ImmutableMultiDict([('input1', 'a = b'), ('submit_button', 'Submit')])
 
-        operation_latex = str(web_form.operation_latex.data).strip()
-        operation_name_latex = str(web_form.operation_name_latex.data).strip()
-        operation_description_latex = str(
-            web_form.operation_description_latex.data
+        operation_latex = str(web_form_add_operation.operation_latex.data).strip()
+        operation_name_latex = str(
+            web_form_add_operation.operation_name_latex.data
         ).strip()
-        operation_reference_latex = str(web_form.operation_reference_latex.data).strip()
-        operation_argument_count = int(web_form.operation_argument_count.data)
+        operation_description_latex = str(
+            web_form_add_operation.operation_description_latex.data
+        ).strip()
+        operation_reference_latex = str(
+            web_form_add_operation.operation_reference_latex.data
+        ).strip()
+        operation_argument_count = int(
+            web_form_add_operation.operation_argument_count.data
+        )
 
         logger.info("operation_latex:" + str(operation_latex))
         logger.info("operation_name_latex:" + str(operation_name_latex))
@@ -4061,7 +4066,7 @@ def to_add_operation() -> werkzeug.Response:
         "jinja2_pages/user_workflow/symbol_operation_create.html",
         title="Create Operation",
         query_time_dict=query_time_dict,
-        form_operation_properties=web_form,
+        form_operation_properties=web_form_add_operation,
         list_of_operation_dicts=list_of_operation_dicts,
         dict_of_expression_dicts_that_use_operation=dict_of_expression_dicts_that_use_operation,
         dict_of_derivation_dicts_that_use_operation=dict_of_derivation_dicts_that_use_operation,
@@ -4078,7 +4083,7 @@ def to_add_relation() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    web_form = SpecifyNewSymbolRelationForm()
+    web_form_add_relation = SpecifyNewSymbolRelationForm()
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -4111,20 +4116,24 @@ def to_add_relation() -> werkzeug.Response:
 
     logger.info("before validate - request.form = " + str(request.form))
 
-    if request.method == "POST" and not web_form.validate():
-        flash("pdg_app/to_add_relation: " + str(web_form.errors))
-        logger.error(str(web_form.errors))
-    if request.method == "POST" and web_form.validate():
+    if request.method == "POST" and not web_form_add_relation.validate():
+        flash("pdg_app/to_add_relation: " + str(web_form_add_relation.errors))
+        logger.error(str(web_form_add_relation.errors))
+    if request.method == "POST" and web_form_add_relation.validate():
         logger.info(" after validate - request.form = " + str(request.form))
 
         # request.form =
 
-        relation_latex = str(web_form.relation_latex.data).strip()
-        relation_name_latex = str(web_form.relation_name_latex.data).strip()
-        relation_description_latex = str(
-            web_form.relation_description_latex.data
+        relation_latex = str(web_form_add_relation.relation_latex.data).strip()
+        relation_name_latex = str(
+            web_form_add_relation.relation_name_latex.data
         ).strip()
-        relation_reference_latex = str(web_form.relation_reference_latex.data).strip()
+        relation_description_latex = str(
+            web_form_add_relation.relation_description_latex.data
+        ).strip()
+        relation_reference_latex = str(
+            web_form_add_relation.relation_reference_latex.data
+        ).strip()
         relation_argument_count = 2
 
         logger.info("relation_latex:" + str(relation_latex))
@@ -4162,7 +4171,7 @@ def to_add_relation() -> werkzeug.Response:
         "jinja2_pages/user_workflow/symbol_relation_create.html",
         title="Create Relation",
         query_time_dict=query_time_dict,
-        form_relation_properties=web_form,
+        form_relation_properties=web_form_add_relation,
         list_of_relation_dicts=list_of_relation_dicts,
         dict_of_expression_dicts_that_use_relation=dict_of_expression_dicts_that_use_relation,
         dict_of_derivation_dicts_that_use_relation=dict_of_derivation_dicts_that_use_relation,
@@ -4189,7 +4198,7 @@ def to_add_step_select_expressions(
     logger.info("derivation_id:" + str(derivation_id))
     logger.info("inference_rule_id:" + str(inference_rule_id))
 
-    web_form = SpecifyNewStepForm()
+    web_form_new_step = SpecifyNewStepForm()
 
     # get list of expressions
     list_of_expression_dicts = []
@@ -4259,14 +4268,20 @@ def to_add_step_select_expressions(
 
     logger.info("inference_rule_dict is " + str(inference_rule_dict))
 
-    if request.method == "POST" and not web_form.validate():
-        flash("pdg_app/to_add_step_select_expressions: " + str(web_form.errors))
-        logger.error(str(web_form.errors))
-    if request.method == "POST" and web_form.validate():
+    if request.method == "POST" and not web_form_new_step.validate():
+        flash(
+            "pdg_app/to_add_step_select_expressions: " + str(web_form_new_step.errors)
+        )
+        logger.error(str(web_form_new_step.errors))
+    if request.method == "POST" and web_form_new_step.validate():
         logger.info("request.form = " + str(request.form))
 
-        note_before_step_latex = str(web_form.note_before_step_latex.data).strip()
-        note_after_step_latex = str(web_form.note_after_step_latex.data).strip()
+        note_before_step_latex = str(
+            web_form_new_step.note_before_step_latex.data
+        ).strip()
+        note_after_step_latex = str(
+            web_form_new_step.note_after_step_latex.data
+        ).strip()
 
         # there's an arbitrary number of input, feed, and output expressions to add
         list_of_input_expression_IDs = []
@@ -4369,7 +4384,7 @@ def to_add_step_select_expressions(
         "jinja2_pages/user_workflow/new_step_select_expressions_for_inference_rule.html",
         title="Add Step: Select Expressions",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form_new_step=web_form_new_step,
         list_of_expression_IDs=list_of_expression_IDs,
         list_of_feed_IDs=list_of_feed_IDs,
         dict_of_expression_dicts=dict_of_expression_dicts,
@@ -4389,7 +4404,7 @@ def to_add_symbols_and_operations_for_expression(
     """
     expression_id is the numeric ID of the expression
 
-    This step comes immediately after the Latex expression is provided.
+    This action comes immediately after the Latex expression is provided.
 
     Although Latex-to-SymPy could be performed after the Latex is provided,
     sometimes the symbols used in the latex inhibit conversion to Latex.
@@ -4507,8 +4522,7 @@ def to_add_symbols_and_operations_for_expression(
 
     # TODO: this is missing relation operators like "="
     logger.info(
-        "to_add_symbols_and_operations_for_expression list_of_sympy_symbols_from_expr="
-        + str(list_of_sympy_symbols_from_expr)
+        "list_of_sympy_symbols_from_expr= " + str(list_of_sympy_symbols_from_expr)
     )
 
     # do any of the list_of_sympy_symbols_from_expr
@@ -4661,7 +4675,7 @@ def to_add_symbols_and_operations_for_expression(
         "jinja2_pages/user_workflow/expression_create_symbols_and_operations.html",
         title="Create Expression: Add Symbols",
         query_time_dict=query_time_dict,
-        form=web_form_no_options,
+        form_no_options=web_form_no_options,
         expression_dict=expression_dict,
         list_of_potential_matching_symbols_from_sympy=list_of_potential_matching_symbols_from_sympy,
         potential_symbols_found_in_Latex_expression=potential_symbols_found_in_Latex_expression,
@@ -4703,7 +4717,7 @@ def to_add_sympy_and_lean_for_expression(
     symbol_id_dict = request.args.to_dict()
     logger.info("symbol_id_dict=" + str(symbol_id_dict))
 
-    web_form = SpecifyNewExpressionSympyLeanForm()
+    web_form_new_expression_sympy = SpecifyNewExpressionSympyLeanForm()
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -4813,9 +4827,9 @@ def to_add_sympy_and_lean_for_expression(
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        sympy_str_lhs = str(web_form.sympy_str_lhs.data).strip()
-        sympy_str_rhs = str(web_form.sympy_str_rhs.data).strip()
-        lean_str = str(web_form.lean_str.data).strip()
+        sympy_str_lhs = str(web_form_new_expression_sympy.sympy_str_lhs.data).strip()
+        sympy_str_rhs = str(web_form_new_expression_sympy.sympy_str_rhs.data).strip()
+        lean_str = str(web_form_new_expression_sympy.lean_str.data).strip()
 
         logger.info("submitted sympy_str_lhs = " + str(sympy_str_lhs))
         logger.info("submitted sympy_str_rhs = " + str(sympy_str_rhs))
@@ -4898,8 +4912,8 @@ def to_add_sympy_and_lean_for_expression(
         return redirect(url_for("to_list_expressions"))
 
     # set the default text
-    web_form.sympy_str_lhs.data = revised_expr_lhs_with_str
-    web_form.sympy_str_rhs.data = revised_expr_rhs_with_str
+    web_form_new_expression_sympy.sympy_str_lhs.data = revised_expr_lhs_with_str
+    web_form_new_expression_sympy.sympy_str_rhs.data = revised_expr_rhs_with_str
 
     return render_template(
         "jinja2_pages/user_workflow/expression_create_sympy_and_lean.html",
@@ -4910,7 +4924,7 @@ def to_add_sympy_and_lean_for_expression(
         revised_expr_lhs=revised_expr_lhs,
         revised_expr_rhs=revised_expr_rhs,
         symbol_id_dict=symbol_id_dict,
-        form=web_form,
+        form_new_expression_sympy=web_form_new_expression_sympy,
         expression_dict=expression_dict,
     )
 
@@ -5101,7 +5115,7 @@ def to_add_symbols_and_operations_for_feed(
         "jinja2_pages/user_workflow/feed_create_symbols_and_operations.html",
         title="Create Feed: Add Symbols",
         query_time_dict=query_time_dict,
-        form=web_form_no_options,
+        form_no_options=web_form_no_options,
         feed_dict=feed_dict,
         list_of_potential_matching_symbols_from_sympy=list_of_potential_matching_symbols_from_sympy,
         potential_symbols_found_in_Latex_feed=potential_symbols_found_in_Latex_feed,
@@ -5134,7 +5148,7 @@ def to_add_sympy_and_lean_for_feed(
     symbol_id_dict = request.args.to_dict()
     logger.info("symbol_id_dict=" + str(symbol_id_dict))
 
-    web_form = SpecifyNewFeedSympyLeanForm()
+    web_form_new_feed_sympy = SpecifyNewFeedSympyLeanForm()
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -5179,8 +5193,8 @@ def to_add_sympy_and_lean_for_feed(
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        sympy_str = str(web_form.sympy_str.data).strip()
-        lean_str = str(web_form.lean_str.data).strip()
+        sympy_str = str(web_form_new_feed_sympy.sympy_str.data).strip()
+        lean_str = str(web_form_new_feed_sympy.lean_str.data).strip()
 
         logger.info("submitted sympy_str=" + str(sympy_str))
 
@@ -5227,7 +5241,7 @@ def to_add_sympy_and_lean_for_feed(
         logger.info("[TRACE] end " + str(trace_id))
         return redirect(url_for("to_list_feeds"))
 
-    web_form.sympy_str.data = revised_feed_with_str
+    web_form_new_feed_sympy.sympy_str.data = revised_feed_with_str
     logger.info("[TRACE] end " + str(trace_id))
     return render_template(
         "jinja2_pages/user_workflow/feed_create_sympy_and_lean.html",
@@ -5237,7 +5251,7 @@ def to_add_sympy_and_lean_for_feed(
         revised_expr=revised_expr,
         revised_feed_with_str=revised_feed_with_str,
         symbol_id_dict=symbol_id_dict,
-        form=web_form,
+        form_new_feed_sympy=web_form_new_feed_sympy,
         feed_dict=feed_dict,
     )
 
@@ -5253,7 +5267,7 @@ def to_add_inference_rule() -> werkzeug.Response:
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    web_form = SpecifyNewInferenceRuleForm()
+    web_form_new_infrule = SpecifyNewInferenceRuleForm()
 
     list_of_inference_rule_dicts = []
     with graphDB_Driver.session() as session:
@@ -5272,24 +5286,28 @@ def to_add_inference_rule() -> werkzeug.Response:
         )
     )
 
-    if request.method == "POST" and not web_form.validate():
-        flash("pdg_app/to_add_inference_rule" + str(web_form.errors))
-        logger.error(str(web_form.errors))
-    if request.method == "POST" and web_form.validate():
+    if request.method == "POST" and not web_form_new_infrule.validate():
+        flash("pdg_app/to_add_inference_rule" + str(web_form_new_infrule.errors))
+        logger.error(str(web_form_new_infrule.errors))
+    if request.method == "POST" and web_form_new_infrule.validate():
         logger.info("request.form = " + str(request.form))
 
         # request.form =  ImmutableMultiDict([('inference_rule_name', 'add x to both sides'),
         # ('inference_rule_latex', 'add _ to both sides'),
         # ('inference_rule_number_of_inputs', '1'), ('inference_rule_number_of_feeds', '1'), ('inference_rule_number_of_outputs', '1')])
 
-        inference_rule_name = str(web_form.inference_rule_name.data).strip()
-        inference_rule_latex = str(web_form.inference_rule_latex.data).strip()
+        inference_rule_name = str(web_form_new_infrule.inference_rule_name.data).strip()
+        inference_rule_latex = str(
+            web_form_new_infrule.inference_rule_latex.data
+        ).strip()
         number_of_inputs = int(
-            str(web_form.inference_rule_number_of_inputs.data).strip()
+            str(web_form_new_infrule.inference_rule_number_of_inputs.data).strip()
         )
-        number_of_feeds = int(str(web_form.inference_rule_number_of_feeds.data).strip())
+        number_of_feeds = int(
+            str(web_form_new_infrule.inference_rule_number_of_feeds.data).strip()
+        )
         number_of_outputs = int(
-            str(web_form.inference_rule_number_of_outputs.data).strip()
+            str(web_form_new_infrule.inference_rule_number_of_outputs.data).strip()
         )
         author_name_latex = latex.make_string_safe_for_latex(current_user.email)
 
@@ -5385,7 +5403,7 @@ def to_add_inference_rule() -> werkzeug.Response:
         "jinja2_pages/user_workflow/inference_rule_create.html",
         title="Create Inference Rule",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form=web_form_new_infrule,
         list_of_inference_rule_dicts=list_of_inference_rule_dicts,
         dict_of_derivations_used_per_inference_rule=dict_of_derivations_used_per_inference_rule,
     )
@@ -5401,7 +5419,7 @@ def to_edit_step(
     logger.info("[TRACE] start " + str(trace_id))
     query_time_dict = {}  # type: query_timing_result_type
 
-    web_form = SpecifyNewStepForm()
+    web_form_new_step = SpecifyNewStepForm()
 
     # TODO: Verify that derivation_id exists
     # TODO: verify that step_id exists
@@ -5425,11 +5443,11 @@ def to_edit_step(
             break
     logger.info("to_edit_step: this_step_dict=" + str(this_step_dict))
 
-    if request.method == "POST" and not web_form.validate():
-        flash("pdg_app/to_edit_step: " + str(web_form.errors))
-        logger.error(str(web_form.errors))
+    if request.method == "POST" and not web_form_new_step.validate():
+        flash("pdg_app/to_edit_step: " + str(web_form_new_step.errors))
+        logger.error(str(web_form_new_step.errors))
     if (
-        request.method == "POST" and web_form.validate()
+        request.method == "POST" and web_form_new_step.validate()
     ):  # form always validates because no field is required
         logger.info("to_edit_step: request.form = " + str(request.form))
 
@@ -5437,8 +5455,12 @@ def to_edit_step(
 
         logger.info("len(request.form.keys())=" + str(len(request.form.keys())))
 
-        note_before_step_latex = str(web_form.note_before_step_latex.data).strip()
-        note_after_step_latex = str(web_form.note_after_step_latex.data).strip()
+        note_before_step_latex = str(
+            web_form_new_step.note_before_step_latex.data
+        ).strip()
+        note_after_step_latex = str(
+            web_form_new_step.note_after_step_latex.data
+        ).strip()
 
         logger.info("note_before_step_latex " + str(note_before_step_latex))
         logger.info("note_after_step_latex " + str(note_after_step_latex))
@@ -5458,7 +5480,7 @@ def to_edit_step(
         "jinja2_pages/user_workflow/step_edit.html",
         title="Edit Step",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form=web_form_new_step,
         step_dict=this_step_dict,
     )
 
@@ -5660,13 +5682,13 @@ def to_query() -> werkzeug.Response:
     # When the form button is clicked the method is POST
     logger.info("to_query: request.method=" + str(request.method))
 
-    web_form = CypherQueryForm()
+    web_form_cypher = CypherQueryForm()
 
-    if request.method == "POST" and not web_form.validate():
-        flash("pdg_app/to_query: " + str(web_form.errors))
-        logger.error(str(web_form.errors))
-    if request.method == "POST" and web_form.validate():
-        query = str(web_form.query.data).strip()
+    if request.method == "POST" and not web_form_cypher.validate():
+        flash("pdg_app/to_query: " + str(web_form_cypher.errors))
+        logger.error(str(web_form_cypher.errors))
+    if request.method == "POST" and web_form_cypher.validate():
+        query = str(web_form_cypher.query.data).strip()
         logger.info("to_query: form valid; query via web form: " + str(query))
     elif request.method == "POST":  # form did not validate
         logger.info("to_query: form did not validate")
@@ -5868,7 +5890,7 @@ def to_query() -> werkzeug.Response:
         "jinja2_pages/user_workflow/query.html",
         title="Query",
         query_time_dict=query_time_dict,
-        form=web_form,
+        form=web_form_cypher,
         submitted_query=query,
         list_of_records=list_of_records_with_hyperlinks,
         derivation_id=derivation_id,

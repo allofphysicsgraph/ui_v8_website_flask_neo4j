@@ -36,10 +36,12 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 <P>{{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}
 -->
 
+<!--
 dict_of_nonoperation_symbol_dicts_in_expression: <BR>
-{{dict_of_nonoperation_symbol_dicts_in_expression}}
+{ { dict_of_nonoperation_symbol_dicts_in_expression } }
+-->
 
-<table border="1" id="symbol_table" class="sortable">
+<table border="1" id="symbols_used_table" class="sortable">
   <tr>
     <th>ID</th>
     <th>latex</th>
@@ -86,22 +88,54 @@ dict_of_nonoperation_symbol_dicts_in_expression: <BR>
     <H3>Add Non-operation Symbol used in Expression</h3>
   </legend>
 
-dict_of_nonoperation_symbol_dicts_not_in_expression:<BR>
-
-{% for symbol_id, symbol_dict in dict_of_nonoperation_symbol_dicts_not_in_expression.items() %}
-<UL>
-    <LI>{{ symbol_id }}: {{ symbol_dict }}</LI>
-</UL>
-{% endfor %}
-
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
-    <P><!--symbol count: { { list_of_symbol_IDs|length } }-->
-    <select name="symbol_select_id_to_add" class="selectpicker form-control" id="symbol_select">
-      {% for symbol_id in dict_of_nonoperation_symbol_dicts_not_in_expression.keys() %}
-      <option value="{{ symbol_id }}">{{ symbol_id }}, {{ dict_of_nonoperation_symbol_dicts_not_in_expression[symbol_id]['latex'] }} </option>
+
+    <table border="1" id="symbols_not_used_table" class="sortable">
+      <tr>
+        <th></th>
+        <th>ID</th>
+        <th>latex</th>
+        <th>name</th>
+        <th>description</th>
+        <th>reference</th>
+        <th>dimension: time</th>
+        <th>dimension: length</th>
+        <th>dimension: mass</th>
+        <th>dimension: electric charge</th>
+        <th>dimension: luminous intensity</th>
+        <th>dimension: amount of substance</th>
+        <th>dimension: temperature</th>
+        <th>scope</th>
+        <th>domain</th>
+      </tr>
+      {% for symbol_id, symbol_dict in dict_of_nonoperation_symbol_dicts_not_in_expression.items() %}
+      <tr>
+        <td><input type="checkbox" name="symbol_id_to_connect_to_expression-{{ loop.index }}" value="{{ symbol_dict['id'] }}"></td>
+        <td>
+          <a href="{{ url_for('to_edit_node', node_id=symbol_id ) }}">
+              {{ symbol_id }}
+          </a>
+        </td>
+        <td>{{ symbol_dict['latex']|e }}<BR>
+          \({{ symbol_dict['latex']|e }}\)</td>
+        <td>{{ symbol_dict['name_latex'] }}</td>
+        <td>{{ symbol_dict['description_latex'] }}</td>
+        <td>{{ symbol_dict['reference_latex'] }}</td>
+        <td>{{ symbol_dict['dimension_time'] }}</td>
+        <td>{{ symbol_dict['dimension_length'] }}</td>
+        <td>{{ symbol_dict['dimension_mass'] }}</td>
+        <td>{{ symbol_dict['dimension_electric_charge'] }}</td>
+        <td>{{ symbol_dict['dimension_luminous_intensity'] }}</td>
+        <td>{{ symbol_dict['dimension_amount_of_substance'] }}</td>
+        <td>{{ symbol_dict['dimension_temperature'] }}</td>
+        <td>{{ symbol_dict['scope'] }}</td>
+        <td>{{ symbol_dict['domain'] }}</td>
+      </tr>
       {% endfor %}
-    </select>
+    </table>
+
+
     <input type="submit" name="add symbol to expr" value="add symbol to expression">
   </form>
 
@@ -145,7 +179,7 @@ dict_of_nonoperation_symbol_dicts_not_in_expression:<BR>
 dict_of_operation_dicts_in_expression:<BR>
 {{ dict_of_operation_dicts_in_expression }}
 
-<table border="1" id="operation_table" class="sortable">
+<table border="1" id="operations_used_table" class="sortable">
   <tr>
     <th>ID</th>
     <th>latex</th>
@@ -169,11 +203,29 @@ dict_of_operation_dicts_in_expression:<BR>
     <H3>Add operation used in Expression</h3>
   </legend>
 
-dict_of_operation_dicts_not_in_expression<BR>
-{% for operation_id, operation_dict in dict_of_operation_dicts_not_in_expression.items() %}
-<UL>
-    <LI>{{ operation_id }}: {{ operation_dict }}
-</UL>
+  <table border="1" id="operations_used_table" class="sortable">
+    <tr>
+      <th></th>
+      <th>ID</th>
+      <th>latex</th>
+      <th>name</th>
+      <th>number of arguments</th>
+      <th>description</th>
+    </tr>
+    {% for operation_id, operation_dict in dict_of_operation_dicts_not_in_expression.items() %}
+    <tr>
+      <td><input type="checkbox" name="operation_id_to_connect_to_expression-{{ loop.index }}" value="{{ operation_dict['id'] }}">
+      <td><a href="{{ url_for('to_edit_operation', operation_id=symbol_id) }}">{{ symbol_id }}</a></td> <!-- ID -->
+      <td>{{ symbol_dict['latex'] }}</td> <!-- latex -->
+      <td>{{ symbol_dict['name_latex'] }}</td> <!-- name -->
+      <td>{{ symbol_dict['argument_count'] }}</td>
+      <td>{{ symbol_dict['description_latex'] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+
+
 {% endfor %}
 
   <form method="post" action="" onsubmit="return checkForm(this);">

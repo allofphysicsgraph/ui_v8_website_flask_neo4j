@@ -42,7 +42,7 @@
         <LI>number of inputs: {{ step_dict['inference rule dict']['number_of_inputs'] }};
             feeds:            {{ step_dict['inference rule dict']['number_of_feeds'] }};
             outputs:          {{ step_dict['inference rule dict']['number_of_outputs'] }}</LI>
-        <LI>{{ step_dict['inference rule dict']['latex'].replace('\r','\\\\r') }}</LI>
+        <LI><span class="mathjax_ignore">{{ step_dict['inference rule dict']['latex'] }}</span></LI>
       </ul>
     </td> <!-- inference rule -->
     <td>{% for m_dict in step_dict['list of input dicts'] %}
