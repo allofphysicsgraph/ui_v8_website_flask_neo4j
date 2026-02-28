@@ -1525,7 +1525,7 @@ def get_node_labels_from_property(
     return result.data()
 
 
-def add_symbol_to_feed(tx, symbol_id: str, expression_or_feed_id: str) -> None:
+def add_symbol_to_feed(tx, symbol_id: str, feed_id: str) -> None:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
