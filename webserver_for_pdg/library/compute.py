@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 
 
 def generate_random_id(
-    graphDB_Driver, query_time_dict: query_timing_result_type, node_type: str
+    graphDB_Driver, query_time_dict: query_timing_result_type
 ) -> Tuple[unique_numeric_id_as_str, query_timing_result_type]:
     """
     create statically defined numeric IDs for nodes in the graph
@@ -52,7 +52,6 @@ def generate_random_id(
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    # print("node_type=", node_type)
 
     try:
         assert node_type in list_of_valid.node_types
@@ -62,12 +61,10 @@ def generate_random_id(
     list_of_existing_IDs = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_existing_IDs = session.read_transaction(
-            neo4j_query.get_list_IDs, node_type
+        list_of_existing_IDs = session.read_transaction(neo4j_query.get_list_IDs)
+        query_time_dict["compute/generate_random_id: get_list_IDs " + trace_id] = round(
+            time.time() - query_start_time, 3
         )
-        query_time_dict[
-            "compute/generate_random_id: get_list_IDs" + node_type + " " + trace_id
-        ] = round(time.time() - query_start_time, 3)
 
     found_new_ID = False
     while not found_new_ID:
@@ -147,7 +144,7 @@ def add_url_to_shortened_list(now_str: str, current_user_email, user_url: str) -
     return lookup
 
 
-def get_url_from_shortened_list(lookup: str) -> tuple[str, str]:
+def get_url_from_shortened_list(lookup: str) -> Tuple[str, str]:
     """
     Given the `lookup`, what is the URL?
 
@@ -261,6 +258,47 @@ def send_email_with_msmtp(
 
     logger.info("[TRACE] end " + trace_id)
     return
+
+
+def check_whether_inference_rule_exists(
+    graphDB_Driver, query_time_dict, inference_rule_name: str, inference_rule_latex: str
+) -> Tuple[bool, str, query_timing_result_type]:
+
+    # https://neo4j.com/docs/python-manual/current/session-api/
+    list_of_inference_rule_dicts = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_inference_rule_dicts = session.read_transaction(
+            neo4j_query.get_nodes_of_type, "inference_rule"
+        )
+        query_time_dict[
+            "pdg_app/to_add_inference_rule: get_nodes_of_type inference_rule "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    for inference_rule_dict in list_of_inference_rule_dicts:
+        # logger.info("inference_rule_dict is " + str(inference_rule_dict))
+        # logger.info(
+        #     "inference_rule_dict['name_latex'] "
+        #     + str(inference_rule_dict["name_latex"])
+        # )
+        if inference_rule_name == inference_rule_dict["name_latex"]:
+            logger.info("[TRACE] end " + str(trace_id))
+            return (
+                True,
+                "INVALID INPUT: inference rule with that name already exists",
+                query_time_dict,
+            )
+
+        if inference_rule_latex == inference_rule_dict["latex"]:
+            logger.info("[TRACE] end " + str(trace_id))
+            return (
+                True,
+                "INVALID INPUT: inference rule with that latex already exists",
+                query_time_dict,
+            )
+
+    return False, "no message", query_time_dict
 
 
 def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
