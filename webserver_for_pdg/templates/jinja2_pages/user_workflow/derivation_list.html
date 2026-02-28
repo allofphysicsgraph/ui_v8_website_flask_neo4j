@@ -29,10 +29,12 @@ function select_derivation() {
   input = document.getElementById('derivation_input');
   filter = input.value.toUpperCase();
   // 2023-12-17: below was previously for UL/LI but I switched to TR/TD since the derivations are a table.
-  tr = document.getElementById("derivation_table");
+  table = document.getElementById("derivation_table");
 
-  // Loop through all table rows, and hide those who don't match the search query
-  for (i = 0; i < tr.length; i++) {
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows; hide those who don't match the search query
+  for (i = 1; i < tr.length; i++) {
     td = tr[i].getElementsByTagName("td")[0]; // name column
     console.log(td)
     if (td) {
