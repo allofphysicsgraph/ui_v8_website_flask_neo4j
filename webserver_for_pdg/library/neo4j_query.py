@@ -43,21 +43,15 @@ from . import list_of_valid
 logger = logging.getLogger(__name__)
 
 
-def get_list_IDs(tx: Transaction, node_type: str) -> List[str]:
+def get_list_IDs(tx: Transaction) -> List[str]:
     """
-    for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a list of all PDG IDs for the nodes
-
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + str(trace_id))
 
-    logger.info("node_type=" + str(node_type))
-    assert node_type in list_of_valid.node_types
-
     list_of_IDs = []  # type: List[str]
-    for result in tx.run("MATCH (n:" + node_type + ") RETURN n.id"):
-        # print(result.data())
+    for result in tx.run("MATCH (n) RETURN n.id"):
         list_of_IDs.append(result.data()["n.id"])
 
     logger.info("[TRACE] end " + str(trace_id))
