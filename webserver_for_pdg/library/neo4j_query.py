@@ -494,6 +494,25 @@ def get_nodes_of_type(tx: Transaction, node_type: str) -> list:
     return node_list
 
 
+def get_derivations(tx: Transaction) -> list:
+    """
+    return a list of all nodes
+
+    >>> list_nodes_of_type(tx: Transaction)
+    """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + str(trace_id))
+
+    query = f"MATCH (n:derivation) RETURN n ORDER BY n.name_latex"
+
+    node_list = []  # type: List[dict]
+    for result in tx.run(query):
+        node_list.append(result.data()["n"])
+
+    logger.info("[TRACE] end " + str(trace_id))
+    return node_list
+
+
 def get_count_nodes_of_type(tx: Transaction, node_type: str) -> int:
     """
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
