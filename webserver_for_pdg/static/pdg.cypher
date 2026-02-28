@@ -1,6 +1,4 @@
 :begin
-CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000000005", name_latex:"curl curl identity", reference_latex:""});
-CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000000006", name_latex:"derivation of Schrodinger Equation", reference_latex:""});
 CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000000007", name_latex:"electric field wave equation: from time dependent to time independent", reference_latex:""});
 CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000000008", name_latex:"frequency relations", reference_latex:""});
 CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000000009", name_latex:"integration by parts", reference_latex:""});
@@ -2155,6 +2153,13 @@ CREATE (:expression {author_name_latex:"ben.is.located@gmail.com", created_datet
 CREATE (:expression {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_13-00-31-662004", description_latex:"", id:"1219718533", latex_condition:"", latex_lhs:"|\\vec{F}|", latex_relation:"=", latex_rhs:"F", lean:"", name_latex:"", reference_latex:"", sympy:"Eq(Abs(Symbol('pdg0004202')),Symbol('pdg0004202'))", sympy_lhs:"Abs(Symbol('pdg0004202'))", sympy_rhs:"Symbol('pdg0004202')"});
 CREATE (:step {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_13-01-58-465558", id:"3536094510", note_after_step_latex:"", note_before_step_latex:""});
 CREATE (:step {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_13-02-39-741214", id:"1526680035", note_after_step_latex:"", note_before_step_latex:""});
+CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000000005", name_latex:"curl curl identity", reference_latex:""});
+CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000000006", name_latex:"derivation of Schrodinger Equation", reference_latex:""});
+CREATE (:inference_rule {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_22-09-27-241975", id:"1379304934", latex:"Absolute value of both sides", name_latex:"magnitude of vectors", number_of_feeds:0, number_of_inputs:1, number_of_outputs:1});
+CREATE (:expression {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_22-39-04-598575", description_latex:"", id:"5272284986", latex_condition:"", latex_lhs:"|\\vec{F}|", latex_relation:"=", latex_rhs:"|m\\ \\vec{a}|", lean:"", name_latex:"magnitude of vector representation of Newton's second law", reference_latex:"", sympy:"Eq(Abs(Symbol('pdg0000006777')),Abs(Mul(Symbol('pdg0000009863'),Symbol('pdg0000002423')))", sympy_lhs:"Abs(Symbol('pdg0000006777'))", sympy_rhs:"Abs(Mul(Symbol('pdg0000009863'),Symbol('pdg0000002423'))"});
+CREATE (:step {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_22-42-34-002083", id:"5105423606", note_after_step_latex:"", note_before_step_latex:""});
+CREATE (:step {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_22-52-39-213458", id:"8541442722", note_after_step_latex:"", note_before_step_latex:""});
+CREATE (:step {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_22-53-36-058780", id:"8319876201", note_after_step_latex:"", note_before_step_latex:""});
 :commit
 :begin
 CREATE CONSTRAINT ON (node:derivation) ASSERT (node.id) IS UNIQUE;
@@ -2172,11 +2177,6 @@ CREATE CONSTRAINT ON (node:`UNIQUE IMPORT LABEL`) ASSERT (node.`UNIQUE IMPORT ID
 :commit
 CALL db.awaitIndexes(300);
 :begin
-MATCH (n1:step{id:"0001029890"}), (n2:feed{id:"0006656532"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
-MATCH (n1:step{id:"0001848471"}), (n2:feed{id:"0004264724"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
-MATCH (n1:step{id:"0002741906"}), (n2:feed{id:"0003954314"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
-MATCH (n1:step{id:"0004614728"}), (n2:feed{id:"0007563791"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
-MATCH (n1:step{id:"0005590554"}), (n2:feed{id:"5075406409"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"4"}]->(n2);
 MATCH (n1:step{id:"0005590554"}), (n2:feed{id:"5803210729"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"5"}]->(n2);
 MATCH (n1:step{id:"0006462728"}), (n2:feed{id:"0006563727"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0006463728"}), (n2:feed{id:"0007636749"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
@@ -7882,6 +7882,29 @@ MATCH (n1:step{id:"1526680035"}), (n2:inference_rule{id:"0000111981"}) CREATE (n
 MATCH (n1:step{id:"1526680035"}), (n2:expression{id:"1219718533"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:expression{id:"6831694380"}), (n2:scalar{id:"0000009140"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:expression{id:"7575859312"}), (n2:scalar{id:"0000004326"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:step{id:"0001029890"}), (n2:feed{id:"0006656532"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0001848471"}), (n2:feed{id:"0004264724"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0002741906"}), (n2:feed{id:"0003954314"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0004614728"}), (n2:feed{id:"0007563791"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0005590554"}), (n2:feed{id:"5075406409"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"4"}]->(n2);
+MATCH (n1:expression{id:"5272284986"}), (n2:vector{id:"0000002423"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"5272284986"}), (n2:scalar{id:"0000002423"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"5272284986"}), (n2:vector{id:"0000006777"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"5272284986"}), (n2:scalar{id:"0000006777"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"5272284986"}), (n2:scalar{id:"0000009863"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:derivation{id:"0008996667"}), (n2:step{id:"5105423606"}) CREATE (n1)-[r:HAS_STEP {sequence_index:3}]->(n2);
+MATCH (n1:step{id:"5105423606"}), (n2:inference_rule{id:"1379304934"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
+MATCH (n1:step{id:"5105423606"}), (n2:expression{id:"0007455074"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"5105423606"}), (n2:expression{id:"5272284986"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:derivation{id:"0008996667"}), (n2:step{id:"8541442722"}) CREATE (n1)-[r:HAS_STEP {sequence_index:4}]->(n2);
+MATCH (n1:step{id:"8541442722"}), (n2:inference_rule{id:"0000111732"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
+MATCH (n1:step{id:"8541442722"}), (n2:expression{id:"1075552184"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"8541442722"}), (n2:expression{id:"1219718533"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"1"}]->(n2);
+MATCH (n1:step{id:"8541442722"}), (n2:expression{id:"5272284986"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"2"}]->(n2);
+MATCH (n1:step{id:"8541442722"}), (n2:expression{id:"5345738321"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:derivation{id:"0008996667"}), (n2:step{id:"8319876201"}) CREATE (n1)-[r:HAS_STEP {sequence_index:5}]->(n2);
+MATCH (n1:step{id:"8319876201"}), (n2:inference_rule{id:"0000111341"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
+MATCH (n1:step{id:"8319876201"}), (n2:expression{id:"5345738321"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
 :commit
 :begin
 MATCH (n:`UNIQUE IMPORT LABEL`)  WITH n LIMIT 20000 REMOVE n:`UNIQUE IMPORT LABEL` REMOVE n.`UNIQUE IMPORT ID`;
