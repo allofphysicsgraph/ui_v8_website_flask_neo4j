@@ -479,9 +479,15 @@ def get_nodes_of_type(tx: Transaction, node_type: str) -> list:
 
     assert node_type in list_of_valid.node_types
 
+    # node_list = []  # type: List[dict]
+    # for result in tx.run("MATCH (n:" + node_type + ") RETURN n"):
+    #     # print(result.data()["n"])
+    #     node_list.append(result.data()["n"])
+
+    query = f"MATCH (n:{node_type}) RETURN n ORDER BY n.id"
+
     node_list = []  # type: List[dict]
-    for result in tx.run("MATCH (n:" + node_type + ") RETURN n"):
-        # print(result.data()["n"])
+    for result in tx.run(query):
         node_list.append(result.data()["n"])
 
     logger.info("[TRACE] end " + str(trace_id))
