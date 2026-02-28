@@ -97,7 +97,7 @@ dict_of_nonoperation_symbol_dicts_not_in_expression:<BR>
       <option value="{{ symbol_id }}">{{ symbol_id }}, {{ dict_of_nonoperation_symbol_dicts_not_in_expression[symbol_id]['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" value="add symbol to expression">
+    <input type="submit" name="add symbol to expr" value="add symbol to expression">
   </form>
 
   <P>Symbol not listed? <a href="{{ url_for('to_add_symbol') }}">Create a new symbol</a>
@@ -115,7 +115,7 @@ dict_of_nonoperation_symbol_dicts_not_in_expression:<BR>
       <option value="{{ symbol_id }}">{{ symbol_id }}, {{ dict_of_nonoperation_symbol_dicts_in_expression[symbol_id]['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" value="remove symbol from expression">
+    <input type="submit" name="remove symbol from expr" value="remove symbol from expression">
   </form>
 </fieldset>
 
@@ -175,7 +175,7 @@ dict_of_operation_dicts_not_in_expression<BR>
       <option value="{{ symbol_id }}">{{ symbol_id }}, {{ symbol_dict['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" name="add operation" value="add operation to expression">
+    <input type="submit" name="add operation to expr" value="add operation to expression">
   </form>
 
   <P>Operation not listed? <a href="{{ url_for('to_add_operation') }}">Create a new operation</a>
@@ -197,7 +197,7 @@ dict_of_operation_dicts_in_expression<BR>
       <option value="{{ symbol_id }}">{{ symbol_id }}, {{ symbol_dict['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" name="remove operation" value="remove operation from expression">
+    <input type="submit" name="remove operation from expr" value="remove operation from expression">
   </form>
 </fieldset>
 </fieldset>
@@ -224,7 +224,7 @@ dict_of_relation_dicts_not_in_expression<BR>
       <option value="{{ symbol_id }}">{{ symbol_id }}, {{ symbol_dict['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" name="update relation" value="update relation used in expression">
+    <input type="submit" name="update relation in expr" value="update relation used in expression">
   </form>
 
 </fieldset>
@@ -294,9 +294,9 @@ dict_of_relation_dicts_not_in_expression<BR>
        {{ form_new_expression.expression_reference_latex(size=50, maxlength=1000, value=expression_dict['reference_latex']) }}
 
     <P>{{ form_new_expression.expression_description_latex.label }} (optional): 
-       {{ form_new_expression.expression_description_latex(size=50, maxlength=1000, value=expression_dict['descdescription_latexription']) }}<BR/>
+       {{ form_new_expression.expression_description_latex(size=50, maxlength=1000, value=expression_dict['description_latex']) }}<BR/>
       &nbsp;<BR/>
-      <input type="submit" name="edit expr" value="Edit expression">
+      <input type="submit" name="edit expression latex" value="Edit expression">
     </P>
   </form>
 </fieldset>
@@ -317,7 +317,7 @@ dict_of_relation_dicts_not_in_expression<BR>
     <P>{{form_expression_sympy.sympy_str_rhs.label}}: {{ form_expression_sympy.sympy_str_rhs(size=50, maxlength=1000, value=expression_dict['sympy_rhs']) }}
     <P>{{form_expression_sympy.lean_str.label}}:      {{ form_expression_sympy.lean_str(size=50, maxlength=1000, value=expression_dict['lean']) }}
   
-  <P><input type="submit" name="edit expr sympy" value="Edit expression SymPy and Lean">
+  <P><input type="submit" name="edit expression sympy" value="Edit expression SymPy and Lean">
   </form>
 
 </fieldset>
@@ -335,7 +335,7 @@ dict_of_relation_dicts_not_in_expression<BR>
     <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
 
-    <input type="submit" name="delete expr" value="Delete expression">
+    <input type="submit" name="delete expression" value="Delete expression">
     </form>
 </fieldset>
 
