@@ -17,6 +17,7 @@ import re
 import hashlib
 import csv
 import uuid
+import subprocess
 
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
@@ -111,7 +112,7 @@ def generate_lookup_for_shorten_url(shorten_url_file: str) -> str:
     return random_string
 
 
-def add_url_to_shortened_list(now_str, current_user_email, user_url) -> str:
+def add_url_to_shortened_list(now_str: str, current_user_email, user_url: str) -> str:
     """
     User's email is part of the database in case someone decides to put something naughty in the database
 
@@ -146,7 +147,7 @@ def add_url_to_shortened_list(now_str, current_user_email, user_url) -> str:
     return lookup
 
 
-def get_url_from_shortened_list(lookup) -> str:
+def get_url_from_shortened_list(lookup: str) -> tuple[str, str]:
     """
     Given the `lookup`, what is the URL?
 
@@ -198,7 +199,8 @@ def send_email_with_msmtp(
         recipients_list = recipients
 
     if not recipients_list:
-        print("Error: No recipients specified.", file=sys.stderr)
+        # print("No recipients specified.", file=sys.stderr)
+        logger.error("No recipients specified.")
         return False
 
     headers = f"Subject: {subject}\n"
@@ -232,23 +234,29 @@ def send_email_with_msmtp(
         return True
 
     except FileNotFoundError:
-        print("Error: 'msmtp' command not found.", file=sys.stderr)
-        print(
-            "Please ensure msmtp is installed and in your system's PATH.",
-            file=sys.stderr,
-        )
-        print("\nhere what was going to be sent:\n")
-        print(message)
+        # print("Error: 'msmtp' command not found.", file=sys.stderr)
+        # print(
+        #     "Please ensure msmtp is installed and in your system's PATH.",
+        #     file=sys.stderr,
+        # )
+        # print("\nhere what was going to be sent:\n")
+        # print(message)
+
+        logger.error("'msmtp' command not found.")
+        logger.error("Please ensure msmtp is installed and in your system's PATH.")
+        logger.error("\nhere what was going to be sent:\n")
+        logger.error(str(message))
+
         return False
 
     except subprocess.CalledProcessError as err:
         # This block runs if msmtp fails (e.g., auth error, network issue).
-        print("Error sending email:", file=sys.stderr)
-        print(f"msmtp exit code: {e.returncode}", file=sys.stderr)
-        print("\n--- msmtp STDOUT ---", file=sys.stderr)
-        print(e.stdout.decode(), file=sys.stderr)
-        print("\n--- msmtp STDERR ---", file=sys.stderr)
-        print(e.stderr.decode(), file=sys.stderr)
+        logger.error("Error sending email:")
+        logger.error(f"msmtp exit code: {err.returncode}")
+        logger.error("\n--- msmtp STDOUT ---")
+        logger.error(err.stdout.decode())
+        logger.error("\n--- msmtp STDERR ---")
+        logger.error(err.stderr.decode())
         return False
 
     logger.info("[TRACE] end " + trace_id)
@@ -273,7 +281,7 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
                         "converting to Sympy: "
                         + str(type(err).__name__)
                         + ": "
-                        + +str(err)
+                        + str(err)
                     )
                     sympy_as_latex_per_feed_id[this_feed_dict["id"]] = (
                         "error converting"
