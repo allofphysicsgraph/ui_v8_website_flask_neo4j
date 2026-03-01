@@ -10,26 +10,82 @@
 <P>Hello {{ user_name }}
 
 <P>Your contributions:
-
-<P>Earliest contribution: {{ earliest_date }}
-
-<P>Your most recent contribution was on {{ latest_date }}
-
-<P>Derivations you created:
 <UL>
-{% for derivation_dict in list_of_derivations %}
-  <LI><a href="{ { deriv_name } }">{{ derivation_dict }}</a></LI>
-{% endfor %}
+  <LI>{{ number_of_contributions }} contributions
+  <LI>Earliest contribution: {{ earliest_date }}
+  <LI>Your most recent contribution was on {{ latest_date }}
 </UL>
 
-<P>Expressions you created:
-<UL>
-{% for expression_dict in list_of_expressions %}
-  <LI><a href="{ { expr_id } }">{{ expression_dict }}</a></LI>
-{% endfor %}
-</UL>
+<style>
+  td {
+    vertical-align: top;
+  }
+</style>
 
-TODO: list_of_symbols
+<table border="1" id="expression_table" class="sortable">
+  <tr>
+    <th>Derivations you created</th>
+    <th>Expressions you created</th>
+    <th>Inference Rules you created</th>
+    <th>Symbols you created</th>
+    <th>Operations you created</th>
+    <th>Relations you created</th>
+  </tr>
+  <tr>
+    <td>
+      <UL>
+      {% for derivation_dict in list_of_derivations %}
+        <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
+      {% endfor %}
+      </UL>
+    </td>
+    <td>
+      <UL>
+      {% for expression_dict in list_of_expressions %}
+        <LI><a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id']) }}">{{ expression_dict['id'] }}</a>: {{ expression_dict['name_latex'] }}</LI>
+      {% endfor %}
+      </UL>
+    </td>
+    <td>
+      <UL>
+      {% for infrule_dict in list_of_infrules %}
+        <LI><a href="{{ url_for('to_edit_inference_rule', inference_rule_id=infrule_dict['id']) }}">{{ infrule_dict['name_latex'] }}</a></LI>
+      {% endfor %}
+      </UL>
+    </td>
+    <td>
+      <UL>
+      {% for symbol_dict in list_of_symbols %}
+        <LI><a href="{{ url_for('to_edit_node', node_id=symbol_dict['id']) }}">{{ symbol_dict['id'] }}</a>: \( {{ symbol_dict['latex'] }} \)</LI>
+      {% endfor %}
+      </UL>
+    </td>
+    <td>
+      <UL>
+      {% for operation_dict in list_of_operations %}
+        <LI><a href="{{ url_for('to_edit_operation', operation_id=operation_dict['id']) }}">{{ operation_dict['id'] }}</a>: \( {{ operation_dict['latex'] }} \)</LI>
+      {% endfor %}
+      </UL>
+    </td>
+    <td>
+      <UL>
+      {% for relation_dict in list_of_relations %}
+        <LI><a href="{{ url_for('to_edit_relation', relation_id=relation_dict['id']) }}">{{ relation_dict['id'] }}</a>: \( {{ relation_dict['latex'] }} \)</LI>
+      {% endfor %}
+      </UL>
+    </td>
+  </tr>
+</table>
+
+<!--
+<P>list_of_derivations:
+  { { list_of_derivations } }
+
+<P>expression_dict:
+  { { expression_dict } }
+
+<P>list_of_symbols:
+  { { list_of_symbols }}
+-->
 
 {% endblock %}
-

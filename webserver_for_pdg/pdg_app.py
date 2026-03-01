@@ -2065,7 +2065,9 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     if request.method == "POST" and "add symbol to expr" in request.form:
         logger.info("request.form = " + str(request.form))
 
-        symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
+        for key, val in request.form.items():
+            if "symbol_id_to_connect_to_expression" in key:
+                symbol_id_to_add = str(val)
 
         logger.info("symbol_id_to_add: " + symbol_id_to_add)
 
@@ -2899,8 +2901,6 @@ def to_add_feed() -> werkzeug.Response:
         )
     elif request.method == "POST":
         logger.info("to_add_feed: request.form = " + str(request.form))
-
-        # request.form =  ImmutableMultiDict([('symbol_select_id_to_add', '3819395')])
 
         feed_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict
@@ -6785,16 +6785,16 @@ def my_profile():
             number_of_contributions,
             list_of_derivations,
             list_of_expressions,
+            list_of_infrules,
             list_of_symbols,
+            list_of_operations,
+            list_of_relations,
         ) = session.read_transaction(neo4j_query.get_user_stats, author)
         query_time_dict[
             "pdg_app/to_add_derivation: get_nodes_of_type derivation" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("len(list_of_dates)= " + str(len(list_of_dates)))
-
-    # logger.info(list_of_dates[0])
-    # logger.info(list_of_dates[1])
+    # logger.info("len(list_of_dates)= " + str(len(list_of_dates)))
 
     earliest_date = min(list_of_dates)
     latest_date = max(list_of_dates)
@@ -6802,11 +6802,15 @@ def my_profile():
     return render_template(
         "jinja2_pages/profile.html",
         user_name=author,
+        number_of_contributions=number_of_contributions,
         latest_date=latest_date,
         earliest_date=earliest_date,
         list_of_derivations=list_of_derivations,
         list_of_expressions=list_of_expressions,
+        list_of_infrules=list_of_infrules,
         list_of_symbols=list_of_symbols,
+        list_of_operations=list_of_operations,
+        list_of_relations=list_of_relations,
         title="Profile for " + author,
     )
 
