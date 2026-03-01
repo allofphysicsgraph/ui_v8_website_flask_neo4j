@@ -26,9 +26,6 @@ Associating expressions with symbols enables the validation of expressions and s
   <form method="post" action="">
   {{ form_no_options.csrf_token }}
 
-<!--
-{ % for symbol_dict in list_of_symbol_dicts % }
--->
 {% if potential_symbols_found_in_Latex_expression|length==0 %}
 <P>No matching symbols were identified. That's bad. See 
 <a href="{{ url_for('to_list_scalars') }}">list of scalars</a> or 
