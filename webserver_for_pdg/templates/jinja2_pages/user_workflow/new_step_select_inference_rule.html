@@ -10,7 +10,8 @@
 
 <!-- TODO: sometimes "name_latex" won't look right in HTML -->
 <P>Which inference rule does this new step use in the derivation 
-{{ derivation_dict['name_latex'] }} ?</P>
+  <a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">
+{{ derivation_dict['name_latex'] }}</a>?</P>
 
 
 {% if list_of_inference_rule_dicts|length > 0 %}
