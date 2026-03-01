@@ -77,6 +77,169 @@ def generate_random_id(
     return str(new_id), query_time_dict
 
 
+def guess_symbols_from_latex(graphDB_Driver, query_time_dict, expression_dict):
+    """
+    after users enter latex, guess which symbols they want to associate with expression
+
+    The naive option would be to return to the user the complete list of
+    symbols and then ask the user to select relevant symbols.
+
+    There are multiple tactics to enact that are more clever:
+      * given a Latex expression, use SymPy to identify possible symbols.
+      and, separately
+      * given a Latex expression, and given all existing symbols, return a list of matching symbols
+
+    The first tactic is likely to result in an undercount,
+    the second tactic will result in an overcount.
+
+    I'll use keyword SYMBOL_SEARCH_SYMPY for the first tactic and
+                     SYMBOL_SEARCH_LATEX for the second tactic.
+    Order doesn't matter for the two tactics since they are independent.
+
+    """
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_symbol_dicts = session.read_transaction(
+            neo4j_query.get_nodes_of_type, "symbol"
+        )
+        query_time_dict[
+            "pdg_app/to_add_symbols_and_operations_for_expression, get_nodes_of_type symbol "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    # SYMBOL_SEARCH_SYMPY
+
+    cleaned_latex_str_lhs = remove_latex_presention_markings(
+        expression_dict["latex_lhs"]
+    )
+    cleaned_latex_str_relation = remove_latex_presention_markings(
+        expression_dict["latex_relation"]
+    )
+    cleaned_latex_str_rhs = remove_latex_presention_markings(
+        expression_dict["latex_rhs"]
+    )
+    logger.info("cleaned_latex_str_lhs=" + str(cleaned_latex_str_lhs))
+    logger.info("cleaned_latex_str_relation=" + str(cleaned_latex_str_relation))
+    logger.info("cleaned_latex_str_rhs=" + str(cleaned_latex_str_rhs))
+
+    try:
+        sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
+            cleaned_latex_str_lhs
+        )
+    except Exception as err:
+        flash(
+            "pdg_app/to_add_symbols_and_operations_for_expression: sympy_expr_lhs: "
+            + str(type(err).__name__)
+            + str(err)
+        )
+        logger.error("sympy_expr_lhs: " + str(err))
+        sympy_expr_lhs = None
+    # ERROR: SymPy can't convert "="
+    # sympy_expr_relation = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
+    #     cleaned_latex_str_relation
+    # )
+    try:
+        sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
+            cleaned_latex_str_rhs
+        )
+    except Exception as err:
+        flash(
+            "pdg_app/to_add_symbols_and_operations_for_expression: sympy_expr_rhs: "
+            + str(type(err).__name__)
+            + str(err)
+        )
+        logger.error("sympy_expr_rhs: " + str(err))
+        sympy_expr_rhs = None
+
+    logger.info("sympy_expr_lhs=" + str(sympy_expr_lhs))
+    # logger.info("sympy_expr_relation=", str(sympy_expr_relation))
+    logger.info("sympy_expr_rhs=" + str(sympy_expr_rhs))
+
+    list_of_sympy_symbols_from_expr = []
+    list_of_sympy_symbols_from_expr += (
+        latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr_lhs)
+    )
+    # list_of_sympy_symbols_from_expr += (
+    #     latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(
+    #         sympy_expr_relation
+    #     )
+    # )
+    list_of_sympy_symbols_from_expr += (
+        latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr_rhs)
+    )
+
+    # TODO: this is missing relation operators like "="
+    logger.info(
+        "list_of_sympy_symbols_from_expr= " + str(list_of_sympy_symbols_from_expr)
+    )
+
+    # do any of the list_of_sympy_symbols_from_expr
+    # show up in list_of_symbol_dicts?
+    list_of_potential_matching_symbols_from_sympy = []
+    for this_symbol_dict in list_of_symbol_dicts:
+        logger.info("this_symbol_dict=" + str(this_symbol_dict))
+        for this_symbol_from_sympy in list_of_sympy_symbols_from_expr:
+            logger.info(str(this_symbol_from_sympy))
+            if this_symbol_dict["latex"] == str(this_symbol_from_sympy):
+                list_of_potential_matching_symbols_from_sympy.append(
+                    this_symbol_dict["id"]
+                )
+
+    logger.info(
+        "list_of_potential_matching_symbols_from_sympy= "
+        + str(list_of_potential_matching_symbols_from_sympy)
+    )
+
+    # SYMBOL_SEARCH_LATEX
+    # given a Latex expression, and given all existing symbols,
+    # sort existing symbol_latex by length,
+    # then search (starting with the longest symbols first) for each symbol in the expression
+    # provide the user with the list of guessed symbols
+    # There may be multiple matching symbol IDs for a given latex symbol, e.g., "x"
+    # TODO: matching the symbol "a" just because the Latex string contains "\frac" is a false positive.
+
+    list_of_symbol_latex = []  # type: List[str]
+    dict_of_symbol_dicts = {}
+    for this_symbol_dict in list_of_symbol_dicts:
+        dict_of_symbol_dicts[this_symbol_dict["id"]] = this_symbol_dict
+        # list_of_symbol_latex.append(this_symbol_dict["latex"])
+
+    # https://stackoverflow.com/a/2587419/1164295
+    # list_of_symbol_latex.sort(key=len)
+
+    # # https://stackoverflow.com/a/73050/1164295
+    # list_of_symbol_dicts_sorted_by_latex = sorted(
+    #     list_of_symbol_dicts, key=lambda d: d["latex"]
+    # )
+
+    # logger.info("list_of_symbol_dicts_sorted_by_latex=", list_of_symbol_dicts_sorted_by_latex)
+
+    # SYMBOL_SEARCH_LATEX, continued
+    # TODO: search (starting with the longest symbols first) for each symbol in the expression
+    # provide the user with the list of guessed symbols
+    # There may be multiple matching symbol IDs for a given latex symbol, e.g., "x"
+
+    potential_symbols_found_in_Latex_expression = []  # type: List[str]
+    # symbol_id_dict = {}
+
+    for this_symbol_dict in list_of_symbol_dicts:
+        if (
+            (this_symbol_dict["latex"] in expression_dict["latex_lhs"])
+            or (this_symbol_dict["latex"] in expression_dict["latex_relation"])
+            or (this_symbol_dict["latex"] in expression_dict["latex_rhs"])
+        ):
+            potential_symbols_found_in_Latex_expression.append(this_symbol_dict)
+
+            # symbol_id_dict[this_symbol_dict["latex"]] = this_symbol_dict["id"]
+
+    logger.info(
+        "potential_symbols_found_in_Latex_expression="
+        + str(potential_symbols_found_in_Latex_expression)
+    )
+
+    return query_time_dict, potential_symbols_found_in_Latex_expression
+
+
 def hash_of_string(str_to_hash: str) -> str:
     """
     convert string to bytes, then get hash
@@ -296,6 +459,8 @@ def send_email_with_msmtp(
 def check_whether_inference_rule_exists(
     graphDB_Driver, query_time_dict, inference_rule_name: str, inference_rule_latex: str
 ) -> Tuple[bool, str, query_timing_result_type]:
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # https://neo4j.com/docs/python-manual/current/session-api/
     list_of_inference_rule_dicts = []
@@ -316,7 +481,7 @@ def check_whether_inference_rule_exists(
         #     + str(inference_rule_dict["name_latex"])
         # )
         if inference_rule_name == inference_rule_dict["name_latex"]:
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
             return (
                 True,
                 "INVALID INPUT: inference rule with that name already exists",
@@ -324,13 +489,14 @@ def check_whether_inference_rule_exists(
             )
 
         if inference_rule_latex == inference_rule_dict["latex"]:
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
             return (
                 True,
                 "INVALID INPUT: inference rule with that latex already exists",
                 query_time_dict,
             )
 
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return False, "no message", query_time_dict
 
 

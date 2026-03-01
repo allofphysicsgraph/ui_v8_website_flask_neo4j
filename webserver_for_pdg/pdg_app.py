@@ -1885,11 +1885,10 @@ def to_add_step_select_inference_rule(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_inference_rule_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "inference_rule"
+            neo4j_query.get_inference_rules
         )
         query_time_dict[
-            "pdg_app/to_add_step_select_inference_rule: get_nodes_of_type inference_rule"
-            + trace_id
+            "pdg_app/to_add_step_select_inference_rule: get_inference_rules" + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info("list_of_inference_rule_dicts=" + str(list_of_inference_rule_dicts))
 
@@ -4428,167 +4427,18 @@ def to_add_symbols_and_operations_for_expression(
         ] = round(time.time() - query_start_time, 3)
         logger.info("expression_dict=" + str(expression_dict))
 
-        # list_of_symbol_dicts, query_time_dict = compute.get_list_of_all_symbol_dicts(
-        #     graphDB_Driver, query_time_dict
-        # )
-
-        # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_symbol_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "symbol"
+    query_time_dict, potential_symbols_found_in_Latex_expression = (
+        compute.guess_symbols_from_latex(
+            graphDB_Driver, query_time_dict, expression_dict
         )
-        query_time_dict[
-            "pdg_app/to_add_symbols_and_operations_for_expression, get_nodes_of_type symbol "
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-    # logger.info("list_of_symbols" + str(list_of_symbol_dicts))
-
-    # The naive option would be to return to the user the complete list of
-    # symbols and then ask the user to select relevant symbols.
-    #
-    # There are multiple tactics to enact that are more clever:
-    #   * given a Latex expression, use SymPy to identify possible symbols.
-    #   and, separately
-    #   * given a Latex expression, and given all existing symbols, return a list of matching symbols
-    #
-    # The first tactic is likely to result in an undercount,
-    # the second tactic will result in an overcount.
-    #
-    # I'll use keyword SYMBOL_SEARCH_SYMPY for the first tactic and
-    #  SYMBOL_SEARCH_LATEX for the second tactic.
-    # Order doesn't matter for the two tactics since they are independent.
-
-    # SYMBOL_SEARCH_SYMPY
-
-    cleaned_latex_str_lhs = compute.remove_latex_presention_markings(
-        expression_dict["latex_lhs"]
-    )
-    cleaned_latex_str_relation = compute.remove_latex_presention_markings(
-        expression_dict["latex_relation"]
-    )
-    cleaned_latex_str_rhs = compute.remove_latex_presention_markings(
-        expression_dict["latex_rhs"]
-    )
-    logger.info("cleaned_latex_str_lhs=" + str(cleaned_latex_str_lhs))
-    logger.info("cleaned_latex_str_relation=" + str(cleaned_latex_str_relation))
-    logger.info("cleaned_latex_str_rhs=" + str(cleaned_latex_str_rhs))
-
-    try:
-        sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
-            cleaned_latex_str_lhs
-        )
-    except Exception as err:
-        flash(
-            "pdg_app/to_add_symbols_and_operations_for_expression: sympy_expr_lhs: "
-            + str(type(err).__name__)
-            + str(err)
-        )
-        logger.error("sympy_expr_lhs: " + str(err))
-        sympy_expr_lhs = None
-    # ERROR: SymPy can't convert "="
-    # sympy_expr_relation = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
-    #     cleaned_latex_str_relation
-    # )
-    try:
-        sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
-            cleaned_latex_str_rhs
-        )
-    except Exception as err:
-        flash(
-            "pdg_app/to_add_symbols_and_operations_for_expression: sympy_expr_rhs: "
-            + str(type(err).__name__)
-            + str(err)
-        )
-        logger.error("sympy_expr_rhs: " + str(err))
-        sympy_expr_rhs = None
-    logger.info("sympy_expr_lhs=" + str(sympy_expr_lhs))
-    # logger.info("sympy_expr_relation=", str(sympy_expr_relation))
-    logger.info("sympy_expr_rhs=" + str(sympy_expr_rhs))
-
-    list_of_sympy_symbols_from_expr = []
-    list_of_sympy_symbols_from_expr += (
-        latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr_lhs)
-    )
-    # list_of_sympy_symbols_from_expr += (
-    #     latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(
-    #         sympy_expr_relation
-    #     )
-    # )
-    list_of_sympy_symbols_from_expr += (
-        latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr_rhs)
     )
 
-    # TODO: this is missing relation operators like "="
-    logger.info(
-        "list_of_sympy_symbols_from_expr= " + str(list_of_sympy_symbols_from_expr)
-    )
-
-    # do any of the list_of_sympy_symbols_from_expr
-    # show up in list_of_symbol_dicts?
-    list_of_potential_matching_symbols_from_sympy = []
-    for this_symbol_dict in list_of_symbol_dicts:
-        logger.info("this_symbol_dict=" + str(this_symbol_dict))
-        for this_symbol_from_sympy in list_of_sympy_symbols_from_expr:
-            logger.info(str(this_symbol_from_sympy))
-            if this_symbol_dict["latex"] == str(this_symbol_from_sympy):
-                list_of_potential_matching_symbols_from_sympy.append(
-                    this_symbol_dict["id"]
-                )
-    logger.info(
-        "list_of_potential_matching_symbols_from_sympy="
-        + str(list_of_potential_matching_symbols_from_sympy)
-    )
-
-    # SYMBOL_SEARCH_LATEX
-    # given a Latex expression, and given all existing symbols,
-    # sort existing symbol_latex by length,
-    # then search (starting with the longest symbols first) for each symbol in the expression
-    # provide the user with the list of guessed symbols
-    # There may be multiple matching symbol IDs for a given latex symbol, e.g., "x"
-    # TODO: matching the symbol "a" just because the Latex string contains "\frac" is a false positive.
-
-    list_of_symbol_latex = []  # type: List[str]
-    dict_of_symbol_dicts = {}
-    for this_symbol_dict in list_of_symbol_dicts:
-        dict_of_symbol_dicts[this_symbol_dict["id"]] = this_symbol_dict
-        # list_of_symbol_latex.append(this_symbol_dict["latex"])
-
-    # https://stackoverflow.com/a/2587419/1164295
-    # list_of_symbol_latex.sort(key=len)
-
-    # # https://stackoverflow.com/a/73050/1164295
-    # list_of_symbol_dicts_sorted_by_latex = sorted(
-    #     list_of_symbol_dicts, key=lambda d: d["latex"]
-    # )
-
-    # logger.info("list_of_symbol_dicts_sorted_by_latex=", list_of_symbol_dicts_sorted_by_latex)
-
-    # SYMBOL_SEARCH_LATEX, continued
-    # TODO: search (starting with the longest symbols first) for each symbol in the expression
-    # provide the user with the list of guessed symbols
-    # There may be multiple matching symbol IDs for a given latex symbol, e.g., "x"
-
-    potential_symbols_found_in_Latex_expression = []  # type: List[str]
-    symbol_id_dict = {}
-
-    for this_symbol_dict in list_of_symbol_dicts:
-        if (
-            (this_symbol_dict["latex"] in expression_dict["latex_lhs"])
-            or (this_symbol_dict["latex"] in expression_dict["latex_relation"])
-            or (this_symbol_dict["latex"] in expression_dict["latex_rhs"])
-        ):
-            potential_symbols_found_in_Latex_expression.append(this_symbol_dict)
-
-            symbol_id_dict[this_symbol_dict["latex"]] = this_symbol_dict["id"]
+    # query_time_dict, derivations_per_symbol = compute.derivations_per_symbol(potential_symbols_found_in_Latex_expression)
 
     # The checkboxes are determined dynamically,
     # so I don't see how a class-based form could be used.
     if request.method == "POST":
-        logger.info(
-            "to_add_symbols_and_operations_for_expression request.form = "
-            + str(request.form)
-        )
+        logger.info("request.form = " + str(request.form))
 
         # there are four possible choices for the user:
         # - no symbols were matched (see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/67)
@@ -4630,14 +4480,10 @@ def to_add_symbols_and_operations_for_expression(
         list_of_symbol_IDs_in_expression = []  # type: List[str]
         symbol_id_dict = {}  # type: Dict[str, str]
 
-        # TODO: Neo4j inside loop causes high latency
-        # request.form =
-        for ke, symbol_id in request.form.items():
-            # logger.info("key=", ke)
-            # logger.info("value=", val)
-            if "symbol_id_to_connect_to_expression" in ke:
+        with graphDB_Driver.session() as session:
+            for ke, symbol_id in request.form.items():
+                if "symbol_id_to_connect_to_expression" in ke:
 
-                with graphDB_Driver.session() as session:
                     query_start_time = time.time()
                     list_of_inference_rule_dicts = session.write_transaction(
                         neo4j_query.connect_symbol_to_expression,
@@ -4649,7 +4495,7 @@ def to_add_symbols_and_operations_for_expression(
                         + trace_id
                     ] = round(time.time() - query_start_time, 3)
 
-                symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
+                    symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
 
         logger.info("symbol_id_dict=" + str(symbol_id_dict))
         # example output: {'a': '5638458', 'b': '7152159'}
@@ -4676,7 +4522,7 @@ def to_add_symbols_and_operations_for_expression(
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
         expression_dict=expression_dict,
-        list_of_potential_matching_symbols_from_sympy=list_of_potential_matching_symbols_from_sympy,
+        derivation_per_symbol_id=derivation_per_symbol_id,
         potential_symbols_found_in_Latex_expression=potential_symbols_found_in_Latex_expression,
         list_of_symbol_dicts=list_of_symbol_dicts,
     )
