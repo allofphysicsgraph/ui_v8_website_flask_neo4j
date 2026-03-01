@@ -86,11 +86,6 @@ def validate_step(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
-    # logger.debug(str(inference_rule_dict))
-    # logger.debug(str(list_of_input_dicts))
-    # logger.debug(str(list_of_feed_dicts))
-    # logger.debug(str(list_of_output_dicts))
-
     name_latex = inference_rule_dict["name_latex"]
 
     # CATEGORY: derivation mechanics
@@ -114,7 +109,23 @@ def validate_step(
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "no validation is available for assumptions"
 
-    elif name_latex == "add X to both sides":
+    for this_input in list_of_input_dicts:
+        if "sympy_lhs" not in this_input.keys():
+            return "missing SymPy for LHS of expression " + this_input["id"]
+        if "sympy_rhs" not in this_input.keys():
+            return "missing SymPy for RHS of expression " + this_input["id"]
+
+    for this_feed in list_of_feed_dicts:
+        if "sympy" not in this_feed.keys():
+            return "missing SymPy for feed " + this_feedput["id"]
+
+    for this_output in list_of_output_dicts:
+        if "sympy_lhs" not in this_output.keys():
+            return "missing SymPy for LHS of expression " + this_output["id"]
+        if "sympy_rhs" not in this_output.keys():
+            return "missing SymPy for RHS of expression " + this_output["id"]
+
+    if name_latex == "add X to both sides":
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return add_X_to_both_sides(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -509,14 +520,15 @@ def validate_step(
 
     else:
         # logger.error("unexpected inf rule:" + step_dict["inf rule"])
-        logger.warning("unexpected inf rule:" + name_latex)
+        logger.warning("unexpected inf rule: " + name_latex)
         # raise Exception(
         #     "sympy_validate_step/validate_step Unexpected inf rule: "
         #     + name_latex
         # )
-        return "unrecognized inference rule"
+        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        return "unrecognized inference rule: " + name_latex
 
-    logger.info("[TRACE] end " + trace_id)
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return "This message should not be seen"
 
 
@@ -524,6 +536,9 @@ def parse_to_sympy(expr_str: str):
     """
     Helper function to replace eval() and handle empty strings
     """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+
     if not expr_str:  # gracefully handle empty strings like ''
         logger.error("Empty string instead of SymPy")
         raise Exception("Empty string instead of SymPy")
@@ -534,6 +549,7 @@ def parse_to_sympy(expr_str: str):
     #     logger.error(str(type(err).__name__) + ": " + str(err) + " : " + str(expr_str))
     #     return None
 
+    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return res
 
 
