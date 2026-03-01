@@ -1,4 +1,12 @@
 
+https://github.com/allofphysicsgraph/task-tracker/issues/163
+De Moivre's Formula; proof by induction
+
+
+https://github.com/allofphysicsgraph/task-tracker/issues/46
+Euler by MacLaurin; infinite series
+
+
 ---
 
 Delete the manual `trace_id` and `query_time_dict`; replace it with Flask's `@app.before_request` and `g` object.
