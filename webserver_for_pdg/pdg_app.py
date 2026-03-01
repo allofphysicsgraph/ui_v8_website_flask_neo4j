@@ -65,7 +65,6 @@ import time
 import random
 import datetime
 import uuid
-
 import xmltodict
 
 # https://docs.python.org/3/library/typing.html
@@ -1377,7 +1376,7 @@ def to_add_derivation() -> werkzeug.Response:
         #     flash("   reference altered to " + str(derivation_reference_latex_SAFE))
         # derivation_reference_latex = derivation_reference_latex_SAFE
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         derivation_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict
@@ -1834,7 +1833,7 @@ def to_edit_derivation_metadata(
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
@@ -2184,7 +2183,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             logger.info("expression_latex_rhs=" + str(expression_latex_rhs))
             logger.info("expression_latex_condition=" + str(expression_latex_condition))
 
-            author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+            author_name_latex = compute.encode_user_identifier(current_user.email)
 
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
@@ -2414,7 +2413,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # alter node properties based on user input
         if feed_dict["latex"] != feed_latex:
@@ -2753,7 +2752,7 @@ def to_add_expression() -> werkzeug.Response:
         logger.info("expression_name_latex:" + str(expression_name_latex))
         logger.info("expression_description_latex" + str(expression_description_latex))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -2866,7 +2865,7 @@ def to_add_feed() -> werkzeug.Response:
         feed_sympy = "TODO"  # TODO: if promoting existing symbol, this can be filled in immediately
         feed_lean = "TODO"
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -2910,7 +2909,7 @@ def to_add_feed() -> werkzeug.Response:
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         for symbol_dict in list_of_nonoperation_symbol_dicts:
             if symbol_dict["id"] == request.form["symbol_select_id_to_add"]:
@@ -3081,7 +3080,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
             web_form_edit_operation.operation_argument_count.data
         )
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -3171,7 +3170,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
             web_form_new_symbol.relation_reference_latex.data
         ).strip()
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -3273,7 +3272,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
             web_form_symbol_properties.symbol_reference_latex.data
         ).strip()
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # TODO: Neo4j inside loop causes high latency
         # instead of changing every property,
@@ -3504,7 +3503,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
             graphDB_Driver, query_time_dict
         )
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -3632,7 +3631,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
             web_form_scalar_properties.dimension_luminous_intensity.data
         )
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -3799,7 +3798,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
             web_form_vector_properties.vector_number_of_entries.data
         ).strip()
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -3918,7 +3917,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
             web_form_matrix_properties.matrix_number_of_columns.data
         ).strip()
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -4035,7 +4034,7 @@ def to_add_operation() -> werkzeug.Response:
         logger.info("operation_description_latex" + str(operation_description_latex))
         logger.info("operation_argument_count" + str(operation_argument_count))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         operation_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict
@@ -4141,7 +4140,7 @@ def to_add_relation() -> werkzeug.Response:
         logger.info("relation_description_latex" + str(relation_description_latex))
         logger.info("relation_argument_count" + str(relation_argument_count))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # %f = Microsecond as a decimal number, zero-padded on the left.
         now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -4299,7 +4298,7 @@ def to_add_step_select_expressions(
                 logger.info("out adding" + str(v))
                 list_of_output_expression_IDs.append(str(v))
 
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         step_id, query_time_dict = compute.generate_random_id(
             graphDB_Driver, query_time_dict
@@ -5308,7 +5307,7 @@ def to_add_inference_rule() -> werkzeug.Response:
             number_of_outputs = int(
                 str(web_form_new_infrule.inference_rule_number_of_outputs.data).strip()
             )
-            author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+            author_name_latex = compute.encode_user_identifier(current_user.email)
 
             infrule_exists, message, query_time_dict = (
                 compute.check_whether_inference_rule_exists(
@@ -5514,7 +5513,7 @@ def to_edit_inference_rule(
         number_of_outputs = int(
             str(web_form_edit.inference_rule_number_of_outputs.data).strip()
         )
-        author_name_latex = latex.make_string_safe_for_latex(current_user.email)
+        author_name_latex = compute.encode_user_identifier(current_user.email)
 
         # https://neo4j.com/docs/python-manual/current/session-api/
         list_of_inference_rule_dicts = []
@@ -6778,6 +6777,8 @@ def my_profile():
 
     author = current_user.email
 
+    author_hash = compute.encode_user_identifier(current_user.email)
+
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         (
@@ -6802,6 +6803,7 @@ def my_profile():
     return render_template(
         "jinja2_pages/profile.html",
         user_name=author,
+        user_hash=author_hash,
         number_of_contributions=number_of_contributions,
         latest_date=latest_date,
         earliest_date=earliest_date,
@@ -7078,7 +7080,9 @@ def to_shorten():
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    lookup = compute.add_url_to_shortened_list(now_str, current_user.email, user_url)
+    user_id = compute.encode_user_identifier(current_user.email)
+
+    lookup = compute.add_url_to_shortened_list(now_str, user_id, user_url)
 
     return (
         '<H1><a href="/expand/'
