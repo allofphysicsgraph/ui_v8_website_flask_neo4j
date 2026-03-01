@@ -34,7 +34,7 @@ import cv2  # type: ignore
 from . import compute
 
 # ORDERING: this has to come before the functions that use this type
-from .compute import unique_numeric_id_as_str, query_timing_result_type
+from .compute import unique_numeric_id_as_str, query_timing_result_type,hash_of_string
 from . import neo4j_query
 
 import logging
@@ -73,27 +73,6 @@ def hash_of_file(filename_with_full_path: str) -> str:
     logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return hashed_file
 
-
-def hash_of_string(str_to_hash: str) -> str:
-    """
-    convert string to bytes, then get hash
-
-    Args:
-        str_to_hash: string to be hashed
-    Returns:
-        hash as string
-    Raises:
-        None
-
-    >>> hash_of_string('a_string')
-    """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
-
-    hashed_str = hashlib.md5(str_to_hash.encode("utf-8")).hexdigest()
-
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
-    return hashed_str
 
 
 def make_string_safe_for_latex(unsafe_str: str) -> str:
