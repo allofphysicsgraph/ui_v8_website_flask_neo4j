@@ -1,13 +1,13 @@
 
 <!--
-<P>For debugging purposes, here is the all the info available:
+    dict_of_derivation_dicts_that_use_feed:
+{{dict_of_derivation_dicts_that_use_feed}}
 
-<!- - { { list_of_feed_dicts } } - ->
-
+list_of_feed_dicts:
 <ul>
-{ % for this_feed_dict in list_of_feed_dicts %}
-<li>{ { this_feed_dict }}</li>
-{ % endfor %}
+{% for this_feed_dict in list_of_feed_dicts %}
+<li>{{ this_feed_dict }}</li>
+{% endfor %}
 </ul>
 -->
 
