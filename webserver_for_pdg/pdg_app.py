@@ -6767,31 +6767,47 @@ def to_rss(path):
 
 
 @web_app.route("/profile", methods=["GET", "POST"])
+@login_required
 def my_profile():
     """
-    # TODO -- this is just a stub
-
-    https://github.com/allofphysicsgraph/proofofconcept/issues/126
-    >>>
+    https://github.com/allofphysicsgraph/task-tracker/issues/124
     """
-    # TODO
-    sign_up_date = "2020-04-12"
-    # TODO
-    last_previous_contribution_date = "2020-04-10"
-    # TODO
-    list_of_derivs = ["fun deriv", "another deriv"]
-    # TODO
-    list_of_exprs = ["424252", "525252"]
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + str(trace_id))
+    query_time_dict = {}  # type: query_timing_result_type
+
+    author = current_user.email
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        (
+            list_of_dates,
+            number_of_contributions,
+            list_of_derivations,
+            list_of_expressions,
+            list_of_symbols,
+        ) = session.read_transaction(neo4j_query.get_user_stats, author)
+        query_time_dict[
+            "pdg_app/to_add_derivation: get_nodes_of_type derivation" + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    logger.info("len(list_of_dates)= " + str(len(list_of_dates)))
+
+    # logger.info(list_of_dates[0])
+    # logger.info(list_of_dates[1])
+
+    earliest_date = min(list_of_dates)
+    latest_date = max(list_of_dates)
 
     return render_template(
         "jinja2_pages/profile.html",
-        title="Profile",
-        # user_name=user_name,
-        sign_up_date=sign_up_date,
-        last_previous_contribution_date=last_previous_contribution_date,
-        list_of_derivs=list_of_derivs,
-        list_of_exprs=list_of_exprs,
-        # title="PDG profile for " + user_name,
+        user_name=author,
+        latest_date=latest_date,
+        earliest_date=earliest_date,
+        list_of_derivations=list_of_derivations,
+        list_of_expressions=list_of_expressions,
+        list_of_symbols=list_of_symbols,
+        title="Profile for " + author,
     )
 
 

@@ -221,6 +221,66 @@ def constrain_unique_id(tx: Transaction) -> None:
     return
 
 
+def get_user_stats(tx: Transaction, author: str):
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + str(trace_id))
+
+    logger.info("author=" + author)
+
+    result = tx.run(
+        "MATCH (d:derivation) WHERE d.author_name_latex = $author_name RETURN d",
+        author_name=author,
+    )
+    list_of_derivations = result.data()
+
+    result = tx.run(
+        "MATCH (d:expression) WHERE d.author_name_latex = $author_name RETURN d",
+        author_name=author,
+    )
+    list_of_expressions = result.data()
+
+    result = tx.run(
+        "MATCH (d:symbol) WHERE d.author_name_latex = $author_name RETURN d",
+        author_name=author,
+    )
+    list_of_symbols = result.data()
+
+    result = tx.run(
+        """
+    MATCH (n)
+    WHERE n.author_name_latex = $author_name
+      AND n.created_datetime IS NOT NULL
+    RETURN collect(n.created_datetime) AS created_dates_list
+    """,
+        author_name=author,
+    )
+    res = result.data()
+
+    logger.info("res= " + str(res))
+
+    list_of_dates = res[0]["created_dates_list"]
+
+    query = """
+    MATCH (n)
+    WHERE n.author_name_latex = $author_name
+    RETURN count(n) AS author_count
+    """
+
+    result = tx.run(query, author_name=author)
+    # Fetch the first record and the specific key
+    record = result.single()
+    number_of_contributions = record["author_count"] if record else 0
+
+    return (
+        list_of_dates,
+        number_of_contributions,
+        list_of_derivations,
+        list_of_expressions,
+        list_of_symbols,
+    )
+
+
 def get_derivations_that_use_expression(tx: Transaction, expression_id: str):
     """ """
     trace_id = str(uuid.uuid4())
