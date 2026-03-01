@@ -228,56 +228,90 @@ def get_user_stats(tx: Transaction, author: str):
 
     logger.info("author=" + author)
 
-    result = tx.run(
-        "MATCH (d:derivation) WHERE d.author_name_latex = $author_name RETURN d",
-        author_name=author,
-    )
-    list_of_derivations = result.data()
+    # result = tx.run(
+    #     "MATCH (d:derivation) WHERE d.author_name_latex = $author_name RETURN d",
+    #     author_name=author,
+    # )
+    # # list_of_derivations = result.data()
+    # list_of_derivations = result.value("d")
 
-    result = tx.run(
-        "MATCH (d:expression) WHERE d.author_name_latex = $author_name RETURN d",
-        author_name=author,
-    )
-    list_of_expressions = result.data()
+    # result = tx.run(
+    #     "MATCH (e:expression) WHERE e.author_name_latex = $author_name RETURN e",
+    #     author_name=author,
+    # )
+    # # list_of_expressions = result.data()
+    # list_of_expressions = result.value("e")
 
-    result = tx.run(
-        "MATCH (d:symbol) WHERE d.author_name_latex = $author_name RETURN d",
-        author_name=author,
-    )
-    list_of_symbols = result.data()
+    # result = tx.run(
+    #     "MATCH (s:symbol) WHERE s.author_name_latex = $author_name RETURN s",
+    #     author_name=author,
+    # )
+    # list_of_symbols = result.value("s")
 
-    result = tx.run(
-        """
-    MATCH (n)
-    WHERE n.author_name_latex = $author_name
-      AND n.created_datetime IS NOT NULL
-    RETURN collect(n.created_datetime) AS created_dates_list
-    """,
-        author_name=author,
-    )
-    res = result.data()
+    # result = tx.run(
+    #     """
+    # MATCH (n)
+    # WHERE n.author_name_latex = $author_name
+    #   AND n.created_datetime IS NOT NULL
+    # RETURN collect(n.created_datetime) AS created_dates_list
+    # """,
+    #     author_name=author,
+    # )
+    # res = result.data()
 
-    logger.info("res= " + str(res))
+    # logger.info("res= " + str(res))
 
-    list_of_dates = res[0]["created_dates_list"]
+    # list_of_dates = res[0]["created_dates_list"]
+
+    # result = tx.run(
+    #     """
+    # MATCH (n)
+    # WHERE n.author_name_latex = $author_name
+    # RETURN count(n) AS author_count
+    # """,
+    #     author_name=author,
+    # )
+    # # Fetch the first record and the specific key
+    # record = result.single()
+    # number_of_contributions = record["author_count"] if record else 0
+
+    # return (
+    #     list_of_dates,
+    #     number_of_contributions,
+    #     list_of_derivations,
+    #     list_of_expressions,
+    #     list_of_symbols,
+    # )
 
     query = """
     MATCH (n)
     WHERE n.author_name_latex = $author_name
-    RETURN count(n) AS author_count
+    RETURN 
+        collect(CASE WHEN "derivation" IN labels(n) THEN n END) AS derivations,
+        collect(CASE WHEN "expression" IN labels(n) THEN n END) AS expressions,
+        collect(CASE WHEN "inference_rule" IN labels(n) THEN n END) AS infrules,
+        collect(CASE WHEN "symbol" IN labels(n) THEN n END) AS symbols,
+        collect(CASE WHEN "operation" IN labels(n) THEN n END) AS operations,
+        collect(CASE WHEN "relation" IN labels(n) THEN n END) AS relations,
+        collect(n.created_datetime) AS created_dates,
+        count(n) AS total_contributions
     """
 
     result = tx.run(query, author_name=author)
-    # Fetch the first record and the specific key
     record = result.single()
-    number_of_contributions = record["author_count"] if record else 0
+
+    if not record:
+        return [], 0, [], [], [], [], [], []
 
     return (
-        list_of_dates,
-        number_of_contributions,
-        list_of_derivations,
-        list_of_expressions,
-        list_of_symbols,
+        record["created_dates"],
+        record["total_contributions"],
+        record["derivations"],
+        record["expressions"],
+        record["infrules"],
+        record["symbols"],
+        record["operations"],
+        record["relations"],
     )
 
 
