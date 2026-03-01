@@ -215,11 +215,11 @@ dict_of_operation_dicts_in_expression:<BR>
     {% for operation_id, operation_dict in dict_of_operation_dicts_not_in_expression.items() %}
     <tr>
       <td><input type="checkbox" name="operation_id_to_connect_to_expression-{{ loop.index }}" value="{{ operation_dict['id'] }}">
-      <td><a href="{{ url_for('to_edit_operation', operation_id=symbol_id) }}">{{ symbol_id }}</a></td> <!-- ID -->
-      <td>{{ symbol_dict['latex'] }}</td> <!-- latex -->
-      <td>{{ symbol_dict['name_latex'] }}</td> <!-- name -->
-      <td>{{ symbol_dict['argument_count'] }}</td>
-      <td>{{ symbol_dict['description_latex'] }}</td>
+      <td><a href="{{ url_for('to_edit_operation', operation_id=symbol_id) }}">{{ operation_id }}</a></td> <!-- ID -->
+      <td>{{ operation_dict['latex'] }}</td> <!-- latex -->
+      <td>{{ operation_dict['name_latex'] }}</td> <!-- name -->
+      <td>{{ operation_dict['argument_count'] }}</td>
+      <td>{{ operation_dict['description_latex'] }}</td>
     </tr>
     {% endfor %}
   </table>
