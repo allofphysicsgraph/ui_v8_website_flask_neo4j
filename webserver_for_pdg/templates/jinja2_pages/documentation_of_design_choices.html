@@ -233,6 +233,17 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 <HR/>
 <P>&nbsp;</P>
 
+<H2 id="feed connection"><i>Decision</i>: Are feeds single use?</H2>
+
+<P>Suppose a step has feed "x/2". Should other steps re-use that feed? Should other derivations re-use that feed?
+Or should feeds only be connected to a single step?
+
+<P><em>current status</em>: Feeds should only be used once.
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
 <H2 id="render graphs viz"><i>Decision</i>: How to render graphs visually?</H2>
 
 <P><em>current status</em>:  using d3js and graphviz.
