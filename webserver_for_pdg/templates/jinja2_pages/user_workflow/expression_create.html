@@ -15,8 +15,6 @@
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
 
-
-
 Latex:
 <table border="1">
   <tr>
@@ -36,6 +34,9 @@ Latex:
 { { form.expression_relation() } }
 -->
 
+<!--
+  {{list_of_relation_dicts}}
+-->
 
     <select name="symbol_relation_id_to_add" class="selectpicker form-control" id="relation_select">
       {% for relation_dict in list_of_relation_dicts %}
