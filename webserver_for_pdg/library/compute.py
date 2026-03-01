@@ -98,6 +98,7 @@ def hash_of_string(str_to_hash: str) -> str:
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
     return hashed_str
 
+
 def encode_user_identifier(user_identifier: str) -> str:
     """ """
     trace_id = str(uuid.uuid4())

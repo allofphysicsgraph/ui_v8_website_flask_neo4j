@@ -523,7 +523,7 @@ class SpecifyNewDerivationForm(FlaskForm):
     )
     abstract_latex = StringField(
         "abstract (latex)",
-        validators=[validators.InputRequired(), validators.Length(min=5, max=10000)],
+        validators=[validators.Length(min=0, max=10000)],
     )
 
 
