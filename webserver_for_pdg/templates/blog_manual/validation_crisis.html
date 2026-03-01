@@ -1,0 +1,66 @@
+Not sure if the problem is that I'm not a mathematician, but proofs are too short to be understandable to me. As an example,
+<pre>De Moivre's Formula
+(cos x + isin x)n = cos(nx) + isin(nx)
+
+Proof:
+(1) (eix)n = einx
+(2) (cos x + i sin x)n = cos(nx) + isin(nx)  [Applying Euler's formula above]
+</pre>
+source: <a href="https://fermatslasttheorem.blogspot.com/2006/02/eulers-formula.html">https://fermatslasttheorem.blogspot.com/2006/02/eulers-formula.html</a>
+
+<p>Happily, Wikipedia provides a more detailed <a href="https://en.wikipedia.org/wiki/De_Moivre%27s_formula#Proof_by_induction">proof by induction</a>&nbsp;with more steps.</p>
+
+
+ <p>
+        The truth of de Moivre's theorem can be established by using mathematical induction for natural numbers, and extended to all integers from there. For an integer <i class="texhtml">n</i>, call the following statement <span class="texhtml"><i>S</i>(<i>n</i>)</span>:
+    </p>
+
+    <div class="indent">
+        \[(\cos x + i \sin x)^n = \cos nx + i \sin nx.\]
+    </div>
+
+    <p>
+        For <span class="texhtml"><i>n</i> &gt; 0</span>, we proceed by <a href="https://en.wikipedia.org/wiki/Mathematical_induction">mathematical induction</a>. <span class="texhtml"><i>S</i>(1)</span> is clearly true. For our hypothesis, we assume <span class="texhtml"><i>S</i>(<i>k</i>)</span> is true for some natural <i class="texhtml">k</i>. That is, we assume
+    </p>
+
+    <div class="indent">
+        \[\left(\cos x + i \sin x\right)^k = \cos kx + i \sin kx. \]
+    </div>
+
+    <p>Now, considering <span class="texhtml"><i>S</i>(<i>k</i> + 1)</span>:</p>
+
+    <div class="indent">
+        \begin{alignat}{2}
+         \left(\cos x+i\sin x\right)^{k+1} &amp; = \left(\cos x+i\sin x\right)^{k} \left(\cos x+i\sin x\right)\\
+         &amp; = \left(\cos kx + i\sin kx \right) \left(\cos x+i\sin x\right) &amp;&amp;\qquad \text{via induction hypothesis}\\
+         &amp; = \cos kx \cos x - \sin kx \sin x + i \left(\cos kx \sin x + \sin kx \cos x\right)\\
+         &amp; = \cos ((k+1)x) + i\sin ((k+1)x) &amp;&amp;\qquad \text{via trigonometric identities}
+        \end{alignat}
+    </div>
+
+    <p>See <a href="https://en.wikipedia.org/wiki/Trigonometric_identities#Angle_sum_and_difference_identities">angle sum and difference identities</a>.</p>
+
+    <p>
+        We deduce that <span class="texhtml"><i>S</i>(<i>k</i>)</span> implies <span class="texhtml"><i>S</i>(<i>k</i> + 1)</span>. By the principle of mathematical induction it follows that the result is true for all natural numbers. Now, <span class="texhtml"><i>S</i>(0)</span> is clearly true since <span class="texhtml">cos(0<i>x</i>) + <i>i</i> sin(0<i>x</i>) = 1 + 0<i>i</i> = 1</span>. Finally, for the negative integer cases, we consider an exponent of <span class="texhtml">−<i>n</i></span> for natural <i class="texhtml">n</i>.
+    </p>
+
+    <div class="indent">
+        \begin{align}
+         \left(\cos x + i\sin x\right)^{-n} &amp; = \big( \left(\cos x + i\sin x\right)^n \big)^{-1} \\
+         &amp; = \left(\cos nx + i\sin nx\right)^{-1} \\
+         &amp; =  \cos nx - i\sin nx \qquad\qquad(*)\\
+         &amp; = \cos(-nx) + i\sin (-nx).\\
+        \end{align}
+    </div>
+
+    <p>
+        The equation (*) is a result of the identity
+    </p>
+    
+    <div class="indent">
+        \[z^{-1} = \frac{\bar z}{|z|^2},\]
+    </div>
+
+    <p>
+        for <span class="texhtml"><i>z</i> = cos <i>nx</i> + <i>i</i> sin <i>nx</i></span>. Hence, <span class="texhtml"><i>S</i>(<i>n</i>)</span> holds for all integers <i class="texhtml">n</i>.
+    </p>
