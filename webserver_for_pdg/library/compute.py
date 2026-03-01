@@ -77,6 +77,38 @@ def generate_random_id(
     return str(new_id), query_time_dict
 
 
+def hash_of_string(str_to_hash: str) -> str:
+    """
+    convert string to bytes, then get hash
+
+    Args:
+        str_to_hash: string to be hashed
+    Returns:
+        hash as string
+    Raises:
+        None
+
+    >>> hash_of_string('a_string')
+    """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+
+    hashed_str = hashlib.sha256(str_to_hash.encode("utf-8")).hexdigest()
+
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    return hashed_str
+
+def encode_user_identifier(user_identifier: str) -> str:
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    user_id = user_identifier.strip().lower()
+    hash_object = hashlib.sha256(user_id.encode("utf-8"))
+    hex_dig = hash_object.hexdigest()
+    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    return hex_dig
+
+
 def generate_lookup_for_shorten_url(shorten_url_file: str) -> str:
     """
     TODO: if URL already exists in CSV, then just return existing lookup
