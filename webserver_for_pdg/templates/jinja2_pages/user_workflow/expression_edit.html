@@ -12,7 +12,13 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   <a href="{{ url_for('to_list_vectors') }}?referrer=expession_edit">vector symbols</a>,
   <a href="{{ url_for('to_list_matrices') }}?referrer=expession_edit">matrix symbols</a>.</P>
 
-<P>TODO: list derivations that use this expression. That would provide context.
+<P>derivations that use this expression:<BR>
+  {{derivations_that_use_expression}}
+<UL>
+{ % for derivation_dict in dict_of_derivation_dicts_that_use_expression[expression_dict['id']] %}
+<LI><a href="{ { url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{ { derivation_dict['name_latex'] }}</a></LI>
+{ % endfor %}
+</UL>
 
 <P>expression_dict: <BR>{{ expression_dict }}
 
