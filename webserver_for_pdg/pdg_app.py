@@ -1999,20 +1999,25 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     web_form_expression_sympy.sympy_str_rhs.data = expression_dict.get("sympy_rhs", "")
     web_form_expression_sympy.lean_str.data = expression_dict.get("lean_str", "")
 
-    if "sympy_lhs" in expression_dict.keys():
+    if "sympy_lhs" in expression_dict.keys() and len(expression_dict["sympy_lhs"]) > 0:
         error_msg = latex_and_sympy.create_AST_png_for_latex(
             expression_dict["sympy_lhs"], expression_dict["id"] + "_LHS"
         )
         if len(error_msg) > 0:
             flash("pdg_app/to_edit_expression: " + str(error_msg))
             logger.error(str(error_msg))
-    if "sympy_rhs" in expression_dict.keys():
+    else:
+        flash("pdg_app/to_edit_expression: no sympy_lhs to create picture from")
+
+    if "sympy_rhs" in expression_dict.keys() and len(expression_dict["sympy_rhs"]) > 0:
         error_msg = latex_and_sympy.create_AST_png_for_latex(
             expression_dict["sympy_rhs"], expression_dict["id"] + "_RHS"
         )
         if len(error_msg) > 0:
             flash("pdg_app/to_edit_expression: " + str(error_msg))
             logger.error(str(error_msg))
+    else:
+        flash("pdg_app/to_edit_expression: no sympy_rhs to create picture from")
 
     dict_of_nonoperation_symbol_dicts_in_expression, query_time_dict = (
         compute.get_dict_of_nonoperation_symbol_dicts_in_expression(
@@ -5433,7 +5438,7 @@ def to_query() -> werkzeug.Response:
 
     # When the page is reached directly for the first time the method is GET
     # When the form button is clicked the method is POST
-    logger.info("to_query: request.method=" + str(request.method))
+    logger.info("request.method=" + str(request.method))
 
     web_form_cypher = CypherQueryForm()
 
@@ -5442,16 +5447,16 @@ def to_query() -> werkzeug.Response:
         logger.error(str(web_form_cypher.errors))
     if request.method == "POST" and web_form_cypher.validate():
         query = str(web_form_cypher.query.data).strip()
-        logger.info("to_query: form valid; query via web form: " + str(query))
+        logger.info("form valid; query via web form: " + str(query))
     elif request.method == "POST":  # form did not validate
-        logger.info("to_query: form did not validate")
+        logger.info("form did not validate")
     elif request.method == "GET":  # query via URL keyword, or new page load
         query_str = request.args.get("cypher", None)
         if query_str:
             logger.info("query via URL: " + str(query_str))
             query = query_str
 
-    logger.info("to_query: query=" + str(query))
+    logger.info("query=" + str(query))
 
     if query:
         list_of_records = []  # type: List[str]
@@ -5465,6 +5470,7 @@ def to_query() -> werkzeug.Response:
                 query_time_dict["pdg_app/to_query: user_query " + trace_id] = round(
                     time.time() - query_start_time, 3
                 )
+            # logger.info("list_of_records=" + str(list_of_records))
         except neo4j.exceptions.ClientError:
             list_of_records = ["WRITE OPERATIONS NOT ALLOWED (3)"]
         except neo4j.exceptions.TransactionError:
@@ -5502,10 +5508,10 @@ def to_query() -> werkzeug.Response:
                 "&#39;derivation&#39;",
                 '&#39;<a href="list_derivations">derivation</a>&#39;',
             )
-            revised_record = revised_record.replace(
-                "&#39;step&#39;",
-                '&#39;<a href="list_steps">step</a>&#39;',
-            )
+            # revised_record = revised_record.replace(
+            #     "&#39;step&#39;",
+            #     '&#39;<a href="list_steps">step</a>&#39;',
+            # )
             revised_record = revised_record.replace(
                 "&#39;feed&#39;",
                 '&#39;<a href="list_feeds">feed</a>&#39;',
@@ -5520,19 +5526,19 @@ def to_query() -> werkzeug.Response:
             )
             revised_record = revised_record.replace(
                 "&#39;scalar&#39;",
-                '&#39;<a href="../list_scalars">scalar</a>&#39;',
+                '&#39;<a href="list_scalars">scalar</a>&#39;',
             )
             revised_record = revised_record.replace(
                 "&#39;operation&#39;",
-                '&#39;<a href="/list_operations">operation</a>&#39;',
+                '&#39;<a href="list_operations">operation</a>&#39;',
             )
             revised_record = revised_record.replace(
                 "&#39;relation&#39;",
-                '&#39;<a href="/list_relations">relation</a>&#39;',
+                '&#39;<a href="list_relations">relation</a>&#39;',
             )
             revised_record = revised_record.replace(
                 "&#39;vector&#39;",
-                '&#39;<a href="/list_vectors">vector</a>&#39;',
+                '&#39;<a href="list_vectors">vector</a>&#39;',
             )
             revised_record = revised_record.replace(
                 "&#39;matrix&#39;",
@@ -5637,6 +5643,10 @@ def to_query() -> werkzeug.Response:
         step_id = list_of_step_dicts[0]["id"]
     else:
         step_id = "THEREARENOSTEPS"
+
+    # logger.info(
+    #     "list_of_records_with_hyperlinks=" + str(list_of_records_with_hyperlinks)
+    # )
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -6571,15 +6581,26 @@ def my_profile():
             list_of_symbols,
             list_of_operations,
             list_of_relations,
-        ) = session.read_transaction(neo4j_query.get_user_stats, author)
+        ) = session.read_transaction(neo4j_query.get_user_stats, author_hash)
         query_time_dict[
             "pdg_app/to_add_derivation: get_nodes_of_type derivation" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     # logger.info("len(list_of_dates)= " + str(len(list_of_dates)))
 
-    earliest_date = min(list_of_dates)
-    latest_date = max(list_of_dates)
+    try:
+        earliest_date = min(list_of_dates)
+    except Exception as err:
+        earliest_date = None
+        flash("pdg_app/my_profile: " + str(err))
+        logger.error(str(err))
+
+    try:
+        latest_date = max(list_of_dates)
+    except Exception as err:
+        earliest_date = None
+        flash("pdg_app/my_profile: " + str(err))
+        logger.error(str(err))
 
     return render_template(
         "jinja2_pages/profile.html",
@@ -7229,8 +7250,17 @@ def to_blog(YYYY: str, MM: str, blog_title: str):
 
 
 @web_app.route("/blog/page", methods=["GET"])
+@web_app.route("/blog/page/", methods=["GET"])
 def to_blog_manual():
-    return render_template("blog_manual/validation_crisis.html")
+    return render_template("blog_manual/index.html")
+
+
+@web_app.route("/blog/page/<YYYY>/<MM>/<blog_title>", methods=["GET"])
+def to_blog_manual_page():
+    return render_template(
+        "blog_manual/" + YYYY + "/" + MM + "/" + blog_title + ".html", title=blog_title
+    )
+
 
 ###########################################################################
 
