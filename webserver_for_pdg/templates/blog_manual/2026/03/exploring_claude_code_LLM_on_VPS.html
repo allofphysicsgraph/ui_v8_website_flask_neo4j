@@ -1,0 +1,48 @@
+<p>See instructions on&nbsp;<a href="https://code.claude.com/docs/en/quickstart">https://code.claude.com/docs/en/quickstart</a></p>
+
+<p>Created an account</p>
+<p>With a 512MB RAM VPS I get
+</p><pre>$ cat /proc/meminfo
+MemTotal:         469352 kB
+MemFree:          163468 kB
+MemAvailable:     248336 kB
+...
+
+$ curl -fsSL https://claude.ai/install.sh | bash
+Setting up Claude Code...
+bash: line 150: 27308 Killed        "$binary_path" install ${TARGET:+"$TARGET"}
+</pre>
+<p>Upsize to 8GB of RAM</p>
+<pre>
+$ cat /proc/meminfo
+MemTotal:        8132504 kB
+MemFree:         7461540 kB
+MemAvailable:    7597056 kB
+...
+
+$ curl -fsSL https://claude.ai/install.sh | bash
+Setting up Claude Code...
+✔ Claude Code successfully installed!        
+  Version: 2.1.50
+  Location: ~/.local/bin/claude
+  Next: Run claude --help to get started
+⚠ Setup notes:
+  • Native installation exists but ~/.local/bin is not in your PATH. Run:
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc &amp;&amp; source ~/.bashrc
+✅ Installation complete!
+
+$ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc &amp;&amp; source ~/.bashrc
+</pre>
+
+<pre>
+$ claude
+Claude Code can be used with your Claude subscription or billed based on API usage through your Console account.
+ Select login method:            
+ ❯ 1. Claude account with subscription · Pro, Max, Team, or Enterprise
+   2. Anthropic Console account · API usage billing
+   3. 3rd-party platform · Amazon Bedrock, Microsoft Foundry, or Vertex AI
+</pre>
+
+<P>Claude "Pro" is $17 per month with annual subscription discount ($200 billed up front). $20 if billed monthly.
+
+

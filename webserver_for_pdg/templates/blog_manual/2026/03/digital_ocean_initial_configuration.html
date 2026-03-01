@@ -1,0 +1,103 @@
+<p>In the DigitalOcean Droplet configuration select Ubuntu OS, then manually-set password for root.</p>
+  
+<h1>Logging in</h1>
+  
+<p>From my laptop can then log into the server using
+  </p><pre>  $ ssh root@SERVERIPHERE
+  </pre>
+
+On the droplet, create a new user and group
+<pre># sudo adduser pdg
+# sudo adduser pdg sudo
+# sudo addgroup pdg_grp
+# sudo usermod -aG pdg_grp pdg
+</pre>
+<p>The -a (append) and -G (groups) options ensure the user is added to the new group without being removed from their other groups.
+</p><p>Validating,
+</p><pre># groups pdg
+pdg : pdg sudo users pdg_grp
+# id pdg
+uid=1000(pdg) gid=1000(pdg) groups=1000(pdg),27(sudo),100(users),1001(pdg_grp)
+</pre>
+<p>Copy my public cert from my laptop to the server
+</p><pre>$ ssh-copy-id pdg@SERVERIPHERE
+</pre>
+On the server I exited the root SSH session and logged back in as pdg:
+<pre>$ ssh -i ~/.ssh/KEYNAMEHERE pdg@SERVERIPHERE
+$ sudo vi /etc/ssh/sshd_config
+     PermitRootLogin no
+     PubkeyAuthentication yes
+     PasswordAuthentication no
+     PermitEmptyPasswords no
+     AuthorizedKeysFile      .ssh/authorized_keys .ssh/authorized_keys2
+</pre>
+
+<h1>Updating bash configuration</h1>
+<p>Added to ~/.bash_aliases
+ </p><pre> 
+alias vi='vim'
+
+alias s='git status'
+alias p='git push'
+
+# do not overwrite existing files
+set -o noclobber
+
+alias nothing='docker ps; git pull; git push; git status'
+alias ll="ls -hal"
+alias ..="cd .."
+alias grin="grep -R -i -n --color"
+</pre>
+and to ~/.bashrc
+ <pre># HISTSIZE determines the number of commands remembered in memory during the current session.
+# HISTFILESIZE determines the maximum number of lines allowed in the history file
+export HISTSIZE=100000
+export HISTFILESIZE=200000
+
+export HISTTIMEFORMAT="%h %d %H:%M:%S "
+
+shopt -s histappend
+shopt -s cmdhist
+</pre>
+<h1>OS updates</h1>
+<pre>$ sudo apt update
+$ sudo apt upgrade
+$ sudo apt -y install make
+</pre>
+<h1>Install Docker</h1>
+<pre>$ sudo apt update
+$ sudo apt install apt-transport-https curl
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+$ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release &amp;&amp; echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+$ sudo apt update
+$ sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+$ sudo systemctl is-active docker
+active
+</pre>
+<p>as per https://linuxiac.com/how-to-install-docker-on-ubuntu-24-04-lts/ 
+
+</p><p>Then add pdg to docker group
+</p><pre>$ sudo usermod -a -G docker pdg
+</pre>
+<p>as per https://stackoverflow.com/questions/47854463/docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socke/48450294#48450294
+
+</p><h1>Enable Upload to GitHub</h1>
+  <pre>$ ssh-keygen
+$ cat ~/.ssh/id_ed25519.pub
+</pre>
+<p>Upload public key to my profile, https://github.com/settings/keys
+  
+</p><h1>Clone git repo</h1>
+<p>On the server
+  </p><pre>$ git clone git@github.com:allofphysicsgraph/ui_v8_website_flask_neo4j.git
+$ cd /home/pdg/ui_v8_website_flask_neo4j
+</pre>
+<p>On my laptop
+    </p><pre>$ scp -i ~/.ssh/KEYNAMEHERE neo4j_pdg/plugins/apoc.jar pdg@SERVERIPHERE:/home/pdg
+  </pre>
+<p>On the server
+    </p><pre>cd /home/pdg/ui_v8_website_flask_neo4j
+echo "UID=$(id -u)" &gt; .env
+echo "GID=$(id -g)" &gt;&gt; .env
+</pre>  
+
