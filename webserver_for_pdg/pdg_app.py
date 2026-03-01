@@ -25,12 +25,12 @@ See https://allofphysics.com/documentation/conventions
 # convention: every Python function starts with
 ```
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 ```
 and exits with
 ```
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     return
 ```
 # reason: This enables creation of a flamegraph <https://www.brendangregg.com/flamegraphs.html>
@@ -374,7 +374,7 @@ def callback():
     https://realpython.com/flask-google-login/
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     # Get authorization code Google sent back to you
     code = request.args.get("code")
 
@@ -451,7 +451,7 @@ def callback():
     if not next_url or not is_safe_url(next_url):
         next_url = url_for("to_navigation", referrer="login")
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return redirect(next_url)
 
 
@@ -995,7 +995,7 @@ def to_index():
     placeholder for landing page that provides context before user goes to_navigation
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
 
     query_time_dict = {}  # type: query_timing_result_type
     T_and_f_derivation_ID = "0000884319"
@@ -1010,7 +1010,7 @@ def to_index():
         flash("pdg_app/to_index: " + str(type(err).__name__) + str(err))
         d3js_json_filename = ""
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template("jinja2_pages/index.html", json_for_d3js=d3js_json_filename)
 
 
@@ -1035,7 +1035,7 @@ def to_navigation():
     >>> to_navigation()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] main start " + str(trace_id))
+    logger.info("[TRACE] main start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("Is user anonymous?")
@@ -1054,7 +1054,7 @@ def to_navigation():
         if "file" not in request.files:
             error_message_for_user = "ERROR: file not in request files"
             logger.error("file not in request files")
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id)
             return redirect(request.url)
         file_obj = request.files["file"]
 
@@ -1064,12 +1064,12 @@ def to_navigation():
         if file_obj.filename == "":
             error_message_for_user = "WARN: no selected file"
             logger.info("to_navigation: WARN: no selected file")
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id)
             return redirect(request.url)
         if "upload_cypher" in request.form.keys():
             allowed_bool = True
         else:
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id)
             raise Exception("unrecognized button")
 
         if file_obj and allowed_bool:
@@ -1234,7 +1234,7 @@ def to_navigation():
             time.time() - query_start_time, 3
         )
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
 
     # TODO: leverage content from navigation_OLD.html
     return render_template(
@@ -1264,7 +1264,7 @@ def to_add_derivation() -> werkzeug.Response:
     http://localhost:5000/new_derivation?derivation_name=asdf123&derivation_abstract=4924858miminginasf
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_new_derivation = SpecifyNewDerivationForm()
@@ -1402,7 +1402,7 @@ def to_add_derivation() -> werkzeug.Response:
             query_time_dict["pdg_app/to_add_derivation: add_derivation " + trace_id] = (
                 round(time.time() - query_start_time, 3)
             )
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(
             url_for(
                 "to_add_step_select_inference_rule",
@@ -1410,7 +1410,7 @@ def to_add_derivation() -> werkzeug.Response:
             )
         )
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/derivation_create.html",
         title="Create Derivation",
@@ -1435,7 +1435,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
     >>> to_review_derivation()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_delete = NoOptionsForm()
@@ -1518,7 +1518,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                 logger.error(str(type(err).__name__) + str(err))
                 pdf_filename = "error.pdf"
 
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id)
             return redirect(
                 url_for(
                     "static",
@@ -1552,10 +1552,10 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                     + str(err)
                 )
                 logger.error(str(type(err).__name__) + str(err))
-                logger.info("[TRACE] end " + str(trace_id))
+                logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("select_from_existing_derivations"))
 
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id)
             return redirect(
                 url_for(
                     "static",
@@ -1590,7 +1590,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
                 query_time_dict[
                     "pdg_app/to_review_derivation: delete_node derivation " + trace_id
                 ] = round(time.time() - query_start_time, 3)
-            logger.info("[TRACE]  end " + str(trace_id))
+            logger.info("[TRACE]  end " + trace_id)
             return redirect(url_for("to_list_derivations"))
         else:
             flash(
@@ -1684,7 +1684,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
             logger.info(str(step_id))
             derivation_step_validity_dict[step_id] = err
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/derivation_review.html",
         title="Review Derivation",
@@ -1706,7 +1706,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
     User wants to delete step or edit step
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # get properties for derivation ID
@@ -1745,7 +1745,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
         graphDB_Driver, derivation_id, query_time_dict
     )
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/derivation_select_step.html",
         title="Derivation: Select Step",
@@ -1763,7 +1763,7 @@ def to_edit_derivation_metadata(
 ) -> werkzeug.Response:
     """ """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_edit_derivation = SpecifyNewDerivationForm()
@@ -1849,10 +1849,10 @@ def to_edit_derivation_metadata(
                 "pdg_app/to_edit_derivation_metadata: edit_derivation_metadata"
                 + trace_id
             ] = round(time.time() - query_start_time, 3)
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_review_derivation", derivation_id=derivation_id))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/derivation_edit_metadata.html",
         title="Edit derivation metadata",
@@ -1874,7 +1874,7 @@ def to_add_step_select_inference_rule(
     What inference rule should be used for this step?
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info(
@@ -1921,7 +1921,7 @@ def to_add_step_select_inference_rule(
         "to_add_step_select_inference_rule: derivation_dict:" + str(derivation_dict)
     )
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/new_step_select_inference_rule.html",
         title="Add Step: Select Inference rule",
@@ -1930,10 +1930,10 @@ def to_add_step_select_inference_rule(
         derivation_dict=derivation_dict,
     )
     # # workflow shouldn't reach this condition, but if it does,
-    # logger.info("[TRACE] end " + str(trace_id))
+    # logger.info("[TRACE] end " + trace_id)
     # raise Exception("How did you reach this?")
 
-    # logger.info("[TRACE] end " + str(trace_id))
+    # logger.info("[TRACE] end " + trace_id)
     # return redirect(url_for("to_review_derivation", derivation_id=derivation_id))
 
 
@@ -1948,7 +1948,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     - delete the expression
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("expression_id: " + str(expression_id))
@@ -1967,6 +1967,15 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             "pdg_app/to_edit_expression: get_node_properties_from_id expression "
             + trace_id
         ] = round(time.time() - query_start_time, 3)
+
+        query_start_time = time.time()
+        derivations_that_use_expression = session.read_transaction(
+            neo4j_query.get_derivations_that_use_expression, expression_dict["id"]
+        )
+        query_time_dict[
+            "pdg_app/to_list_feeds: get_all_derivations_for_every_expression" + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
     logger.info("expression_dict:" + str(expression_dict))
 
     if expression_dict is None:
@@ -2279,7 +2288,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
             )
         return redirect(url_for("to_list_expressions"))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/expression_edit.html",
         title="Edit Expression",
@@ -2293,6 +2302,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         dict_of_operation_dicts_in_expression=dict_of_operation_dicts_in_expression,
         dict_of_operation_dicts_not_in_expression=dict_of_operation_dicts_not_in_expression,
         dict_of_relation_dicts_not_in_expression=dict_of_relation_dicts_not_in_expression,
+        derivations_that_use_expression=derivations_that_use_expression,
     )
 
 
@@ -2303,7 +2313,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     edit feed
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("feed_id: " + str(feed_id))
@@ -2447,7 +2457,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 query_time_dict[
                     "pdg_app/to_edit_feed: edit_node_property feed lean " + trace_id
                 ] = round(time.time() - query_start_time, 3)
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_list_feeds"))
 
     if request.method == "POST":
@@ -2522,10 +2532,10 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 ] = round(time.time() - query_start_time, 3)
             return redirect(url_for("to_edit_feed", feed_id=feed_id))
 
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_list_feeds"))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/feed_edit.html",
         title="Edit Feed",
@@ -2548,7 +2558,7 @@ def to_add_expression() -> werkzeug.Response:
     novel expression
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_add_expression = SpecifyNewExpressionForm()
@@ -2781,7 +2791,7 @@ def to_add_expression() -> werkzeug.Response:
             )
 
         # after user provides latex for expression have them provide symbol count
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(
             url_for(
                 "to_add_symbols_and_operations_for_expression",
@@ -2789,7 +2799,7 @@ def to_add_expression() -> werkzeug.Response:
             )
         )
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/expression_create.html",
         title="Create Expression",
@@ -2813,7 +2823,7 @@ def to_add_feed() -> werkzeug.Response:
     novel feed
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_add_feed = SpecifyNewFeedForm()
@@ -2827,6 +2837,14 @@ def to_add_feed() -> werkzeug.Response:
         query_time_dict["pdg_app/to_add_feed: list_nodes_of_type " + trace_id] = round(
             time.time() - query_start_time, 3
         )
+
+        query_start_time = time.time()
+        dict_of_derivation_dicts_that_use_feed = session.read_transaction(
+            neo4j_query.get_derivations_for_every_feed
+        )
+        query_time_dict[
+            "pdg_app/to_list_feeds: get_all_derivations_for_every_feed" + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
     symbol_IDs_per_feed_id = {}  # type: Dict[str,list]  # _table_of_feeds.html
     for this_feed_dict in list_of_feed_dicts:
@@ -2890,7 +2908,7 @@ def to_add_feed() -> werkzeug.Response:
             ] = round(time.time() - query_start_time, 3)
 
         # after user provides latex for feed have them provide symbol count
-        logger.info("[TRACE]  end " + str(trace_id))
+        logger.info("[TRACE]  end " + trace_id)
         return redirect(
             url_for(
                 "to_add_symbols_and_operations_for_feed",
@@ -2929,7 +2947,7 @@ def to_add_feed() -> werkzeug.Response:
                     ] = round(time.time() - query_start_time, 3)
             return redirect(url_for("to_add_feed"))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/feed_create.html",
         title="Create Feed",
@@ -2940,6 +2958,7 @@ def to_add_feed() -> werkzeug.Response:
         symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,  # _table_of_feeds.html
         list_of_feed_dicts=list_of_feed_dicts,
         sympy_as_latex_per_feed_id=sympy_as_latex_per_feed_id,
+        dict_of_derivation_dicts_that_use_feed=dict_of_derivation_dicts_that_use_feed,  # _table_of_feeds.html
     )
 
 
@@ -2952,7 +2971,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
     >>> to_edit_node()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
@@ -2965,7 +2984,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
     logger.info("dict_of_symbol_id_and_type=" + str(dict_of_symbol_id_and_type))
 
     if dict_of_symbol_id_and_type[node_id] == "derivation":
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_review_derivation", derivation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "step":
         # which derivation is this step in?
@@ -2979,33 +2998,33 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 "pdg_app/to_edit_node: get_derivation_id_from_step_id " + trace_id
             ] = round(time.time() - query_start_time, 3)
 
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(
             url_for("to_edit_step", derivation_id=derivation_id, step_id=node_id)
         )
     elif dict_of_symbol_id_and_type[node_id] == "inference_rule":
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_inference_rule", inference_rule_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "feed":
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_feed", feed_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "operation":
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_operation", operation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "relation":
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_relation", relation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "scalar":
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_scalar", scalar_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "vector":
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_vector", vector_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "matrix":
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_matrix", matrix_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "value_with_units":
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(
             url_for("to_edit_constant_value_and_units", value_with_units=node_id)
         )
@@ -3024,7 +3043,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
     edit operation
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
     logger.info("operation_id: " + str(operation_id))
 
@@ -3102,7 +3121,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
 
     # logger.info("operation_dict:", operation_dict)
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_operation_edit.html",
         title="Edit Operation",
@@ -3121,7 +3140,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
     edit relation
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
     logger.info("relation_id: " + str(relation_id))
 
@@ -3190,7 +3209,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
 
         return redirect(url_for("to_list_relations"))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_relation_edit.html",
         title="Edit Relation",
@@ -3215,7 +3234,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
     >>> to_edit_scalar()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
     logger.info("scalar_id: " + str(scalar_id))
 
@@ -3309,10 +3328,10 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
         # TODO: delete symbol
 
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_list_scalars"))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_edit.html",
         title="Edit Scalar",
@@ -3333,7 +3352,7 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
     >>> to_edit_vector()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
     logger.info("vector_id: " + str(vector_id))
 
@@ -3368,7 +3387,7 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
             "pdg_app/to_edit_vector: node_properties " + vector_id + " " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_vector_edit.html",
         title="Edit Vector",
@@ -3389,7 +3408,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
     >>> to_edit_matrix()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("matrix_id: " + str(matrix_id))
@@ -3425,7 +3444,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
             "pdg_app/to_edit_matrix: node_properties " + matrix_id + " " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_matrix_edit.html",
         title="Edit Matrix",
@@ -3442,7 +3461,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
 )
 def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_constant_properties = SpecifyNewConstantNumberForm()
@@ -3521,7 +3540,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
                 author_name_latex,
             )
 
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_list_scalars"))
 
     with graphDB_Driver.session() as session:
@@ -3558,7 +3577,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
         dict_of_derivations_that_use_scalar[scalar_id] = list_of_derivation_names
     dict_of_derivation_dicts_that_use_scalar = dict_of_derivations_that_use_scalar
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_constant_values_create.html",
         title="Add Value and Units",
@@ -3585,7 +3604,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
     novel scalar symbol
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_scalar_properties = SpecifyNewSymbolScalarForm()
@@ -3713,7 +3732,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
         dict_of_derivations_that_use_scalar[scalar_id] = list_of_derivation_names
     dict_of_derivation_dicts_that_use_scalar = dict_of_derivations_that_use_scalar
 
-    logger.info("[trace] end " + str(trace_id))
+    logger.info("[trace] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_create.html",
         title="Create Scalar",
@@ -3732,7 +3751,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
     novel vector
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_vector_properties = SpecifyNewSymbolVectorForm()
@@ -3825,7 +3844,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
             )
         return redirect(url_for("to_list_vectors"))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_vector_create.html",
         title="Create Vector",
@@ -3844,7 +3863,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
     novel matrix
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_matrix_properties = SpecifyNewSymbolMatrixForm()
@@ -3942,10 +3961,10 @@ def to_add_symbol_matrix() -> werkzeug.Response:
                 now_str,
                 author_name_latex,
             )
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_list_matrices"))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_matrix_create.html",
         title="Create Matrix",
@@ -3972,7 +3991,7 @@ def to_add_operation() -> werkzeug.Response:
     novel operation
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_add_operation = SpecifyNewSymbolOperationForm()
@@ -4056,10 +4075,10 @@ def to_add_operation() -> werkzeug.Response:
                 now_str,
                 author_name_latex,
             )
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_list_operations"))
 
-    logger.info("[trace] end " + str(trace_id))
+    logger.info("[trace] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_operation_create.html",
         title="Create Operation",
@@ -4078,7 +4097,7 @@ def to_add_relation() -> werkzeug.Response:
     novel relation
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_add_relation = SpecifyNewSymbolRelationForm()
@@ -4161,10 +4180,10 @@ def to_add_relation() -> werkzeug.Response:
                 now_str,
                 author_name_latex,
             )
-            logger.info("[trace] end " + str(trace_id))
+            logger.info("[trace] end " + trace_id)
         return redirect(url_for("to_list_relations"))
 
-    logger.info("[trace] end " + str(trace_id))
+    logger.info("[trace] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_relation_create.html",
         title="Create Relation",
@@ -4190,7 +4209,7 @@ def to_add_step_select_expressions(
     here we assume all expressions already exist
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("derivation_id:" + str(derivation_id))
@@ -4377,7 +4396,7 @@ def to_add_step_select_expressions(
         )
 
     # first visit to this page
-    logger.info("[trace] end " + str(trace_id))
+    logger.info("[trace] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/new_step_select_expressions_for_inference_rule.html",
         title="Add Step: Select Expressions",
@@ -4410,7 +4429,7 @@ def to_add_symbols_and_operations_for_expression(
     r_{\rm Earth} = 6
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_no_options = NoOptionsForm()
@@ -4433,7 +4452,9 @@ def to_add_symbols_and_operations_for_expression(
         )
     )
 
+    # TODO:
     # query_time_dict, derivations_per_symbol = compute.derivations_per_symbol(potential_symbols_found_in_Latex_expression)
+    derivation_per_symbol_id = {}
 
     # The checkboxes are determined dynamically,
     # so I don't see how a class-based form could be used.
@@ -4495,27 +4516,27 @@ def to_add_symbols_and_operations_for_expression(
                         + trace_id
                     ] = round(time.time() - query_start_time, 3)
 
-                    symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
+                    # symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
 
         logger.info("symbol_id_dict=" + str(symbol_id_dict))
         # example output: {'a': '5638458', 'b': '7152159'}
         #         or      {'m': '3973021', '\\vec{a}': '3506734', '\\vec{F}': '3235432'}
 
         if next_page_enter_SymPy_and_Lean:
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id)
             return redirect(
                 url_for(
                     "to_add_sympy_and_lean_for_expression",
                     expression_id=expression_id,
-                    **symbol_id_dict,  # Unpack the dictionary into keyword arguments
+                    # **symbol_id_dict,  # Unpack the dictionary into keyword arguments
                     # symbol_id_dict=json.dumps(symbol_id_dict),
                 )
             )
         else:
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_list_expressions"))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/expression_create_symbols_and_operations.html",
         title="Create Expression: Add Symbols",
@@ -4524,7 +4545,6 @@ def to_add_symbols_and_operations_for_expression(
         expression_dict=expression_dict,
         derivation_per_symbol_id=derivation_per_symbol_id,
         potential_symbols_found_in_Latex_expression=potential_symbols_found_in_Latex_expression,
-        list_of_symbol_dicts=list_of_symbol_dicts,
     )
 
 
@@ -4545,7 +4565,7 @@ def to_add_sympy_and_lean_for_expression(
 
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # logger.info("type(symbol_id_dict)=" + str(type(symbol_id_dict)))
@@ -4559,8 +4579,8 @@ def to_add_sympy_and_lean_for_expression(
     # except json.JSONDecodeError:
     #     return "Invalid dictionary format", 400
 
-    symbol_id_dict = request.args.to_dict()
-    logger.info("symbol_id_dict=" + str(symbol_id_dict))
+    # symbol_id_dict = request.args.to_dict()
+    # logger.info("symbol_id_dict=" + str(symbol_id_dict))
 
     web_form_new_expression_sympy = SpecifyNewExpressionSympyLeanForm()
 
@@ -4574,100 +4594,15 @@ def to_add_sympy_and_lean_for_expression(
         ] = round(time.time() - query_start_time, 3)
     logger.info("expression_dict=" + str(expression_dict))
 
-    # guess the SymPy based on the Latex provided
-    cleaned_latex_lhs_str = compute.remove_latex_presention_markings(
-        expression_dict["latex_lhs"]
+    # TODO: populate from Neo4j query
+    symbol_id_dict = {"latex symbol": "id of symbol"}
+
+    # TODO
+    query_time_dict, revised_expr_lhs, revised_expr_rhs = (
+        compute.guess_sympy_from_expression(
+            graphDB_Driver, query_time_dict, expression_dict
+        )
     )
-    logger.info("cleaned_latex_lhs_str=" + str(cleaned_latex_lhs_str))
-
-    cleaned_latex_rhs_str = compute.remove_latex_presention_markings(
-        expression_dict["latex_rhs"]
-    )
-    logger.info("cleaned_latex_rhs_str=" + str(cleaned_latex_rhs_str))
-    try:
-        sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
-            cleaned_latex_lhs_str
-        )
-    except Exception as err:
-        flash(
-            "pdg_app/to_add_sympy_and_lean_for_expression: sympy_expr_lhs: "
-            + str(type(err).__name__)
-            + str(err)
-        )
-        logger.error("sympy_expr_lhs: " + str(type(err).__name__) + str(err))
-        sympy_expr_lhs = None
-    logger.info("sympy_expr_lhs=" + str(sympy_expr_lhs))
-
-    try:
-        sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
-            cleaned_latex_rhs_str
-        )
-    except Exception as err:
-        flash(
-            "pdg_app/to_add_sympy_and_lean_for_expression: sympy_expr_rhs: "
-            + str(type(err).__name__)
-            + str(err)
-        )
-        logger.error("sympy_expr_rhs: " + str(type(err).__name__) + str(err))
-        sympy_expr_rhs = None
-
-    logger.info("sympy_expr_rhs=" + str(sympy_expr_rhs))
-
-    # list_of_sympy_symbols = latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr)
-    # logger.info("list_of_sympy_symbols=",list_of_sympy_symbols)
-
-    # look at each sympy_symbol replaced with PDG symbol
-
-    try:
-        revised_expr_lhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
-            sympy_expr_lhs, symbol_id_dict
-        )
-    except Exception as err:
-        flash(
-            "pdg_app/to_add_sympy_and_lean_for_expression: revised_expr_lhs: "
-            + str(type(err).__name__)
-            + str(err)
-        )
-        logger.error("revised_expr_lhs = " + str(type(err).__name__) + str(err))
-        revised_expr_lhs = None
-    try:
-        revised_expr_rhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
-            sympy_expr_rhs, symbol_id_dict
-        )
-    except Exception as err:
-        flash(
-            "pdg_app/to_add_sympy_and_lean_for_expression: revised_expr_rhs: "
-            + str(type(err).__name__)
-            + str(err)
-        )
-        logger.error("revised_expr_rhs = " + str(type(err).__name__) + str(err))
-        revised_expr_lhs = None
-
-    logger.info(
-        "revised_expr_lhs,rhs=" + str(revised_expr_lhs) + " " + str(revised_expr_rhs)
-    )
-
-    if revised_expr_lhs:
-        revised_expr_lhs_with_str = re.sub(
-            r"(pdg\d\d\d\d\d\d\d)", r"Symbol('\1')", str(revised_expr_lhs)
-        )
-    else:
-        revised_expr_lhs_with_str = None
-    if revised_expr_rhs:
-        revised_expr_rhs_with_str = re.sub(
-            r"(pdg\d\d\d\d\d\d\d)", r"Symbol('\1')", str(revised_expr_rhs)
-        )
-        revised_expr_rhs_with_str = None
-
-    # # revised_expr_with_str = re.sub(r"^Eq", "Eq", revised_expr_with_str)
-    # revised_expr_with_str = (
-    #     "Eq(" + revised_expr_lhs_with_str + "," + revised_expr_rhs_with_str + ")"
-    # )
-
-    # logger.info(
-    #     "to_add_sympy_and_lean_for_expression: revised_expr_with_str="
-    #     + str(revised_expr_with_str)
-    # )
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -4679,11 +4614,11 @@ def to_add_sympy_and_lean_for_expression(
         logger.info("submitted sympy_str_lhs = " + str(sympy_str_lhs))
         logger.info("submitted sympy_str_rhs = " + str(sympy_str_rhs))
 
-        if expression_dict["latex_relation"] == "=":
-            sympy_str_combined = "Eq(" + sympy_str_lhs + "," + sympy_str_rhs + ")"
-        else:
-            logger.info(str(expression_dict["latex_relation"]))
-            raise Exception("to_add_sympy_and_lean_for_expression: unknown relation")
+        # if expression_dict["latex_relation"] == "=":
+        #     sympy_str_combined = "Eq(" + sympy_str_lhs + "," + sympy_str_rhs + ")"
+        # else:
+        #     logger.info(str(expression_dict["latex_relation"]))
+        #     raise Exception("to_add_sympy_and_lean_for_expression: unknown relation")
 
         try:
             # CAVEAT: sympy_str must use single quotes (') since neo4j query uses (")
@@ -4697,7 +4632,7 @@ def to_add_sympy_and_lean_for_expression(
                     sympy_str_lhs,
                 )
                 query_time_dict[
-                    "pdg_app/to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
+                    "pdg_app/to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy_lhs "
                     + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
@@ -4711,23 +4646,23 @@ def to_add_sympy_and_lean_for_expression(
                     sympy_str_rhs,
                 )
                 query_time_dict[
-                    "pdg_app/to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
+                    "pdg_app/to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy_rhs "
                     + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
-                # with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                list_of_inference_rule_dicts = session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "expression",
-                    expression_id,
-                    "sympy",  # BUG
-                    sympy_str_combined,
-                )
-                query_time_dict[
-                    "pdg_app/to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
-                    + trace_id
-                ] = round(time.time() - query_start_time, 3)
+                # # with graphDB_Driver.session() as session:
+                # query_start_time = time.time()
+                # list_of_inference_rule_dicts = session.write_transaction(
+                #     neo4j_query.edit_node_property,
+                #     "expression",
+                #     expression_id,
+                #     "sympy",  # BUG
+                #     sympy_str_combined,
+                # )
+                # query_time_dict[
+                #     "pdg_app/to_add_sympy_and_lean_for_expression: edit_node_property, expression sympy"
+                #     + trace_id
+                # ] = round(time.time() - query_start_time, 3)
 
                 # with graphDB_Driver.session() as session:
                 query_start_time = time.time()
@@ -4753,7 +4688,7 @@ def to_add_sympy_and_lean_for_expression(
                 )
             )
 
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_list_expressions"))
 
     # set the default text
@@ -4762,10 +4697,10 @@ def to_add_sympy_and_lean_for_expression(
 
     return render_template(
         "jinja2_pages/user_workflow/expression_create_sympy_and_lean.html",
-        title="Add Expression: Create SymPy and Lean",
+        title="Create SymPy and Lean for new expression",
         query_time_dict=query_time_dict,
-        sympy_expr_lhs=sympy_expr_lhs,
-        sympy_expr_rhs=sympy_expr_rhs,
+        # sympy_expr_lhs=sympy_expr_lhs,
+        # sympy_expr_rhs=sympy_expr_rhs,
         revised_expr_lhs=revised_expr_lhs,
         revised_expr_rhs=revised_expr_rhs,
         symbol_id_dict=symbol_id_dict,
@@ -4792,7 +4727,7 @@ def to_add_symbols_and_operations_for_feed(
     r_{\rm Earth} = 6
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_no_options = NoOptionsForm()
@@ -4945,7 +4880,7 @@ def to_add_symbols_and_operations_for_feed(
         )
         # example output: {'a': '5638458', 'b': '7152159'}
 
-        logger.info("[trace] end " + str(trace_id))
+        logger.info("[trace] end " + trace_id)
         return redirect(
             url_for(
                 "to_add_sympy_and_lean_for_feed",
@@ -4955,7 +4890,7 @@ def to_add_symbols_and_operations_for_feed(
             )
         )
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/feed_create_symbols_and_operations.html",
         title="Create Feed: Add Symbols",
@@ -4979,7 +4914,7 @@ def to_add_sympy_and_lean_for_feed(
     derivation_id is the numeric ID of the derivation being edited
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # symbol_id_dict = eval(symbol_id_dict)
@@ -5075,7 +5010,7 @@ def to_add_sympy_and_lean_for_feed(
         except neo4j.exceptions.CypherSyntaxError as err:
             flash("pdg_app/to_add_sympy_and_lean_for_feed ERROR:" + str(err))
             logger.error(str(err))
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id)
             return redirect(
                 url_for(
                     "to_add_symbols_and_operations_for_feed",
@@ -5083,11 +5018,11 @@ def to_add_sympy_and_lean_for_feed(
                 )
             )
 
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_list_feeds"))
 
     web_form_new_feed_sympy.sympy_str.data = revised_feed_with_str
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/feed_create_sympy_and_lean.html",
         title="Create Feed: Add SymPy and Lean",
@@ -5108,7 +5043,7 @@ def to_add_inference_rule() -> werkzeug.Response:
     create inference rule
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_new_infrule = SpecifyNewInferenceRuleForm()
@@ -5210,13 +5145,13 @@ def to_add_inference_rule() -> werkzeug.Response:
                     now_str=now_str,
                     author_name_latex=author_name_latex,
                 )
-            logger.info("[TRACE] end " + str(trace_id))
+            logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_list_inference_rules"))
         else:
             flash("pdg_app/to_add_inference_rule: " + str(web_form_new_infrule.errors))
             logger.error(str(web_form_new_infrule.errors))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/inference_rule_create.html",
         title="Create Inference Rule",
@@ -5234,7 +5169,7 @@ def to_edit_step(
 ) -> werkzeug.Response:
     """ """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_new_step = SpecifyNewStepForm()
@@ -5293,7 +5228,7 @@ def to_edit_step(
                 note_after_step_latex,
             )
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/step_edit.html",
         title="Edit Step",
@@ -5310,7 +5245,7 @@ def to_edit_inference_rule(
 ) -> werkzeug.Response:
     """ """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # TODO: verify that inference_rule_id exists before editing
@@ -5392,7 +5327,7 @@ def to_edit_inference_rule(
                     "pdg_app/to_edit_inference_rule INVALID INPUT: inference rule with that name already exists"
                 )
 
-                logger.info("[TRACE] end " + str(trace_id))
+                logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("to_add_inference_rule"))
             if inference_rule_latex == inference_rule_dict["latex"]:
                 logger.error(
@@ -5403,7 +5338,7 @@ def to_edit_inference_rule(
                     "pdg_app/to_edit_inference_ruleINVALID INPUT: inference rule with that latex already exists"
                 )
 
-                logger.info("[TRACE] end " + str(trace_id))
+                logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("to_add_inference_rule"))
 
         logger.info(
@@ -5462,7 +5397,7 @@ def to_edit_inference_rule(
         "to_edit_inference_rule inference_rule_dict " + str(inference_rule_dict)
     )
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/inference_rule_edit.html",
         title="Edit Inference Rule",
@@ -5489,7 +5424,7 @@ def to_query() -> werkzeug.Response:
     When there is no pipe then the string is converted to HTML safe text
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_records_with_hyperlinks = ["nothing returned from Neo4j"]  # type: List[str]
@@ -5703,7 +5638,7 @@ def to_query() -> werkzeug.Response:
     else:
         step_id = "THEREARENOSTEPS"
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/query.html",
         title="Query",
@@ -5723,7 +5658,7 @@ def to_list_feeds() -> werkzeug.Response:
     >>> to_list_feeds()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_feed_dicts = []
@@ -5768,7 +5703,7 @@ def to_list_feeds() -> werkzeug.Response:
         graphDB_Driver, query_time_dict
     )
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/feed_list.html",
         title="Feeds list",
@@ -5787,7 +5722,7 @@ def to_list_operations() -> werkzeug.Response:
     >>> to_list_operations()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_operation_dicts = []
@@ -5823,7 +5758,7 @@ def to_list_operations() -> werkzeug.Response:
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_operation_list.html",
         title="Operation list",
@@ -5840,7 +5775,7 @@ def to_list_relations() -> werkzeug.Response:
     >>> to_list_relations()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_relation_dicts = []  # type: List[dict]
@@ -5878,7 +5813,7 @@ def to_list_relations() -> werkzeug.Response:
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_relation_list.html",
         title="Relation list",
@@ -5895,7 +5830,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
     >>> to_list_constant_values()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -5916,7 +5851,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
             "pdg_app/to_add_value_and_units get_node_properties_from_id " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_constant_values_list.html",
         title="Constants list",
@@ -5938,7 +5873,7 @@ def to_edit_constant_value_and_units(
     >>> to_edit_constant_value_and_units()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -5991,7 +5926,7 @@ def to_edit_constant_value_and_units(
             "pdg_app/to_list_constant_values get_values_for_constant" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_constant_values_edit.html",
         title="Edit Constants",
@@ -6010,7 +5945,7 @@ def to_list_scalars() -> str:
     >>> to_list_scalars()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6083,7 +6018,7 @@ def to_list_scalars() -> str:
         dict_of_derivations_that_use_scalar[scalar_id] = list_of_derivation_names
     dict_of_derivation_dicts_that_use_scalar = dict_of_derivations_that_use_scalar
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_list.html",
         title="Scalar list",
@@ -6100,7 +6035,7 @@ def to_list_vectors() -> str:
     >>> to_list_vectors()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6135,7 +6070,7 @@ def to_list_vectors() -> str:
             "pdg_app/to_list_vectors: get_all_derivations_for_every_symbol " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_vector_list.html",
         title="Vector list",
@@ -6152,7 +6087,7 @@ def to_list_matrices() -> str:
     >>> to_list_matrices()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6185,7 +6120,7 @@ def to_list_matrices() -> str:
             "pdg_app/to_list_matrices: get_all_derivations_for_every_symbol " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_matrix_list.html",
         title="Matrix list",
@@ -6205,7 +6140,7 @@ def to_list_expressions() -> str:
     >>> to_list_expressions()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
 
     query_time_dict = {}  # type: query_timing_result_type
 
@@ -6274,7 +6209,7 @@ def to_list_expressions() -> str:
     #     logger.error(str(type(err).__name__) + str(err))
     #     list_of_expression_dicts = []
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/expression_list.html",
         title="Expression list",
@@ -6297,7 +6232,7 @@ def to_list_derivations() -> str:
     >>> to_list_derivations()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # query_time_dict = compute.convert_expr_sympy_pdg_symbols_to_neo4j_edge(
@@ -6314,7 +6249,7 @@ def to_list_derivations() -> str:
     #     # TODO: this derivation_id should come from request.form; I just don't know the field yet
     #     derivation_id = "5389624"
     #
-    #     logger.info("[TRACE] end " + str(trace_id))
+    #     logger.info("[TRACE] end " + trace_id)
     #     return redirect(url_for(to_review_derivation, derivation_id))
 
     # https://neo4j.com/docs/python-manual/current/session-api/
@@ -6342,7 +6277,7 @@ def to_list_derivations() -> str:
 
     # TODO: convert derivation_dict['abstract_latex'] to HTML using pandoc
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/derivation_list.html",
         title="Derivation list",
@@ -6358,7 +6293,7 @@ def to_list_inference_rules() -> str:
     >>> to_show_all_inference_rules()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     list_of_inference_rule_dicts = []
@@ -6381,7 +6316,7 @@ def to_list_inference_rules() -> str:
     for inference_rule_dict in list_of_inference_rule_dicts:
         logger.info("to_list_inference_rules " + str(inference_rule_dict))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/inference_rule_list.html",
         title="Inference rule list",
@@ -6399,7 +6334,7 @@ def to_delete_graph_content() -> werkzeug.Response:
     https://neo4j.com/developer/kb/large-delete-transaction-best-practices-in-neo4j/
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     # https://neo4j.com/docs/python-manual/current/session-api/
@@ -6412,7 +6347,7 @@ def to_delete_graph_content() -> werkzeug.Response:
             "pdg_app/to_delete_graph_content: delete_all_nodes_and_relationships"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return redirect(url_for("to_navigation"))
 
 
@@ -6429,7 +6364,7 @@ def to_export_json() -> werkzeug.Response:
 
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6443,7 +6378,7 @@ def to_export_json() -> werkzeug.Response:
     # <Record file='all.json' source='database: nodes(4), rels(0)' format='json' nodes=4 relationships=0 properties=16 time=123 rows=4 batchSize=-1 batches=0 done=True data=None>
 
     # "dumping_grounds" is a variable set in the docker-compose file using variable NEO4J_dbms_directories_import
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return redirect(url_for("static", filename="dumping_grounds/pdg.jsonl"))
 
 
@@ -6451,7 +6386,7 @@ def to_export_json() -> werkzeug.Response:
 def to_export_metadata_schema():
     """ """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6467,7 +6402,7 @@ def to_export_metadata_schema():
 
     json_string = json.dumps(res["stats"], indent=2)
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return Response(json_string, mimetype="application/json")
 
     # alternative:
@@ -6485,7 +6420,7 @@ def to_export_metadata_schema():
 def to_export_csv() -> werkzeug.Response:
     """ """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6497,7 +6432,7 @@ def to_export_csv() -> werkzeug.Response:
 
     logger.info("res=" + str(res))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return redirect(url_for("static", filename="dumping_grounds/pdg.csv"))
 
 
@@ -6505,7 +6440,7 @@ def to_export_csv() -> werkzeug.Response:
 def to_export_graphml() -> werkzeug.Response:
     """ """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6517,7 +6452,7 @@ def to_export_graphml() -> werkzeug.Response:
 
     logger.info("res=" + str(res))
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return redirect(url_for("static", filename="dumping_grounds/pdg.graphml"))
 
 
@@ -6535,7 +6470,7 @@ def to_export_cypher() -> werkzeug.Response:
     # https://stackoverflow.com/a/20894360/1164295
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
@@ -6548,7 +6483,7 @@ def to_export_cypher() -> werkzeug.Response:
     logger.info("res=" + str(res))
     # <Record file='all.cypher' batches=1 source='database: nodes(4), rels(0)' format='cypher' nodes=4 relationships=0 properties=16 time=13 rows=4 batchSize=20000>
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return redirect(url_for("static", filename="dumping_grounds/pdg.cypher"))
 
 
@@ -6618,7 +6553,7 @@ def my_profile():
     https://github.com/allofphysicsgraph/task-tracker/issues/124
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     author = current_user.email
@@ -6675,7 +6610,7 @@ def search_redirect_to_google():
     This search only works via webform since the value is grabbed from form value "search"
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     logger.info(
         "request.url: " + str(request.url)
     )  # https://stackoverflow.com/a/46176337/1164295
@@ -6741,11 +6676,11 @@ def static_dir():
     >>> static_dir()
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id))
+    logger.info("[TRACE] start " + trace_id)
     # https://stackoverflow.com/a/3207973/1164295
     _, _, filenames = next(os.walk("static"))
     filenames.sort()
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/static_dir.html",
         list_of_files=filenames,
@@ -7323,20 +7258,20 @@ def to_class_notes_subpage(which_class: str):
     class notes from school
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + str(trace_id) + "] ")
+    logger.info("[TRACE] start " + trace_id + "] ")
 
     if which_class == "overview":
         logger.info("URL is overview")
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return render_template("class_notes/overview.html", title="overview")
     elif which_class == "math402_mathematical_physics_hale":
         logger.info("URL is 402")
-        logger.info("[TRACE] end " + str(trace_id))
+        logger.info("[TRACE] end " + trace_id)
         return render_template(
             "class_notes/math402_mathematical_physics_hale.html", title="Math 402"
         )
 
-    logger.info("[TRACE] end " + str(trace_id))
+    logger.info("[TRACE] end " + trace_id)
     return render_template("class_notes_overview.html", title="class notes overview")
 
 

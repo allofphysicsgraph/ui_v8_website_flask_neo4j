@@ -77,6 +77,93 @@ def generate_random_id(
     return str(new_id), query_time_dict
 
 
+def guess_sympy_from_expression(graphDB_Driver, query_time_dict, expression_dict):
+    """
+    guess the SymPy based on the Latex
+    """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    cleaned_latex_lhs_str = remove_latex_presention_markings(
+        expression_dict["latex_lhs"]
+    )
+    logger.info("cleaned_latex_lhs_str=" + str(cleaned_latex_lhs_str))
+
+    cleaned_latex_rhs_str = remove_latex_presention_markings(
+        expression_dict["latex_rhs"]
+    )
+    logger.info("cleaned_latex_rhs_str=" + str(cleaned_latex_rhs_str))
+
+    try:
+        sympy_expr_lhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
+            cleaned_latex_lhs_str
+        )
+    except Exception as err:
+        logger.error("sympy_expr_lhs: " + str(type(err).__name__) + str(err))
+        sympy_expr_lhs = None
+
+    logger.info("sympy_expr_lhs= " + str(sympy_expr_lhs))
+
+    try:
+        sympy_expr_rhs = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
+            cleaned_latex_rhs_str
+        )
+    except Exception as err:
+        logger.error("sympy_expr_rhs: " + str(type(err).__name__) + str(err))
+        sympy_expr_rhs = None
+
+    logger.info("sympy_expr_rhs= " + str(sympy_expr_rhs))
+
+    # list_of_sympy_symbols = latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr)
+    # logger.info("list_of_sympy_symbols=",list_of_sympy_symbols)
+
+    # look at each sympy_symbol replaced with PDG symbol
+
+    try:
+        revised_expr_lhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
+            sympy_expr_lhs, symbol_id_dict
+        )
+    except Exception as err:
+        logger.error("revised_expr_lhs = " + str(type(err).__name__) + str(err))
+        revised_expr_lhs = None
+    try:
+        revised_expr_rhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
+            sympy_expr_rhs, symbol_id_dict
+        )
+    except Exception as err:
+        logger.error("revised_expr_rhs = " + str(type(err).__name__) + str(err))
+        revised_expr_lhs = None
+
+    logger.info(
+        "revised_expr_lhs,rhs=" + str(revised_expr_lhs) + " " + str(revised_expr_rhs)
+    )
+
+    if revised_expr_lhs:
+        revised_expr_lhs_with_str = re.sub(
+            r"(pdg\d\d\d\d\d\d\d)", r"Symbol('\1')", str(revised_expr_lhs)
+        )
+    else:
+        revised_expr_lhs_with_str = None
+    if revised_expr_rhs:
+        revised_expr_rhs_with_str = re.sub(
+            r"(pdg\d\d\d\d\d\d\d)", r"Symbol('\1')", str(revised_expr_rhs)
+        )
+        revised_expr_rhs_with_str = None
+
+    # # revised_expr_with_str = re.sub(r"^Eq", "Eq", revised_expr_with_str)
+    # revised_expr_with_str = (
+    #     "Eq(" + revised_expr_lhs_with_str + "," + revised_expr_rhs_with_str + ")"
+    # )
+
+    # logger.info(
+    #     "to_add_sympy_and_lean_for_expression: revised_expr_with_str="
+    #     + str(revised_expr_with_str)
+    # )
+
+    logger.info("[TRACE] end " + trace_id)
+    return query_time_dict, revised_expr_lhs_with_str, revised_expr_rhs_with_str
+
+
 def guess_symbols_from_latex(graphDB_Driver, query_time_dict, expression_dict):
     """
     after users enter latex, guess which symbols they want to associate with expression
@@ -97,6 +184,9 @@ def guess_symbols_from_latex(graphDB_Driver, query_time_dict, expression_dict):
     Order doesn't matter for the two tactics since they are independent.
 
     """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_symbol_dicts = session.read_transaction(
@@ -237,6 +327,7 @@ def guess_symbols_from_latex(graphDB_Driver, query_time_dict, expression_dict):
         + str(potential_symbols_found_in_Latex_expression)
     )
 
+    logger.info("[TRACE] end " + trace_id)
     return query_time_dict, potential_symbols_found_in_Latex_expression
 
 
@@ -254,22 +345,22 @@ def hash_of_string(str_to_hash: str) -> str:
     >>> hash_of_string('a_string')
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] start " + trace_id)
 
     hashed_str = hashlib.sha256(str_to_hash.encode("utf-8")).hexdigest()
 
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] end " + trace_id)
     return hashed_str
 
 
 def encode_user_identifier(user_identifier: str) -> str:
     """ """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] start " + trace_id)
     user_id = user_identifier.strip().lower()
     hash_object = hashlib.sha256(user_id.encode("utf-8"))
     hex_dig = hash_object.hexdigest()
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] end " + trace_id)
     return hex_dig
 
 
@@ -460,7 +551,7 @@ def check_whether_inference_rule_exists(
     graphDB_Driver, query_time_dict, inference_rule_name: str, inference_rule_latex: str
 ) -> Tuple[bool, str, query_timing_result_type]:
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] start " + trace_id)
 
     # https://neo4j.com/docs/python-manual/current/session-api/
     list_of_inference_rule_dicts = []
@@ -481,7 +572,7 @@ def check_whether_inference_rule_exists(
         #     + str(inference_rule_dict["name_latex"])
         # )
         if inference_rule_name == inference_rule_dict["name_latex"]:
-            logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+            logger.info("[TRACE] end " + trace_id)
             return (
                 True,
                 "INVALID INPUT: inference rule with that name already exists",
@@ -489,21 +580,21 @@ def check_whether_inference_rule_exists(
             )
 
         if inference_rule_latex == inference_rule_dict["latex"]:
-            logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+            logger.info("[TRACE] end " + trace_id)
             return (
                 True,
                 "INVALID INPUT: inference rule with that latex already exists",
                 query_time_dict,
             )
 
-    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] end " + trace_id)
     return False, "no message", query_time_dict
 
 
 def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
     """ """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    logger.info("[TRACE] start " + trace_id)
 
     sympy_as_latex_per_feed_id = {}  # type: Dict[str, str]
     for this_feed_dict in list_of_feed_dicts:
