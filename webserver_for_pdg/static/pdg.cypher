@@ -13,14 +13,14 @@ CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.
 CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000000018", name_latex:"time invariant force conserves energy", reference_latex:""});
 CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000129143", name_latex:"escape velocity", reference_latex:""});
 CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000142831", name_latex:"Schwarzschild radius for non-rotating black hole", reference_latex:"https://en.wikipedia.org/wiki/Derivation_of_the_Schwarzschild_solution"});
-CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000146432", name_latex:"coefficient of thermal expansion using the equation of state for an ideal gas", reference_latex:"https://notendur.hi.is/hj/EE2/HD1lausn.pdf"});
+CREATE (:derivation {abstract_latex:"", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", id:"0000146432", name_latex:"coefficient of thermal expansion using the equation of state for an ideal gas", reference_latex:"https://hj.hi.is/EE2/HD1lausn.pdf"});
 CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000187793", name_latex:"equations of motion in 2D (calculus)", reference_latex:""});
 CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000201726", name_latex:"angle of maximum distance for projectile motion", reference_latex:""});
 CREATE (:derivation {abstract_latex:"from https://www.youtube.com/watch?v=fJYdFIZlD8k", author_name_latex:"ben.is.located@gmail.com", id:"0000207210", name_latex:"Newton's Law of Gravitation", reference_latex:""});
 CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000282755", name_latex:"radius for satellite in geostationary orbit", reference_latex:"https://en.wikipedia.org/wiki/Geostationary_orbit#Derivation_of_geostationary_altitude"});
 CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000332170", name_latex:"equations of motion in 1D with constant acceleration - SUVAT (algebra)", reference_latex:"https://en.wikipedia.org/wiki/Equations_of_motion"});
 CREATE (:derivation {abstract_latex:"https://www.youtube.com/watch?v=5F1XcTjpJs4 - Derivation of Gravitational Potential Energy by Rhett Allain", author_name_latex:"ben.is.located@gmail.com", id:"0000374317", name_latex:"velocity at distance r of object dropped from infinity", reference_latex:""});
-CREATE (:derivation {abstract_latex:"", author_name_latex:"ben.is.located@gmail.com", id:"0000375160", name_latex:"coefficient of isothermal compressibility using the equation of state for an ideal gas", reference_latex:"https://notendur.hi.is/hj/EE2/HD1lausn.pdf"});
+CREATE (:derivation {abstract_latex:"", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", id:"0000375160", name_latex:"coefficient of isothermal compressibility using the equation of state for an ideal gas", reference_latex:"https://hj.hi.is/EE2/HD1lausn.pdf"});
 CREATE (:derivation {abstract_latex:"from \\cite{1999_Tipler_Llewellyn}, page 9", author_name_latex:"ben.is.located@gmail.com", id:"0000387954", name_latex:"speed of Earth around Sun", reference_latex:""});
 CREATE (:derivation {abstract_latex:"https://www.youtube.com/watch?v=QTiqF-HtkS0 and https://www.youtube.com/watch?v=3Yls-t3B49U", author_name_latex:"ben.is.located@gmail.com", id:"0000513999", name_latex:"first law of thermodynamics", reference_latex:""});
 CREATE (:derivation {abstract_latex:"\\cite{2001_HRW}; see figure 34-27 on page 824", author_name_latex:"ben.is.located@gmail.com", id:"0000522862", name_latex:"optics: Law of refraction to Brewster's angle", reference_latex:""});
@@ -2160,6 +2160,14 @@ CREATE (:expression {author_name_latex:"ben.is.located@gmail.com", created_datet
 CREATE (:step {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_22-42-34-002083", id:"5105423606", note_after_step_latex:"", note_before_step_latex:""});
 CREATE (:step {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_22-52-39-213458", id:"8541442722", note_after_step_latex:"", note_before_step_latex:""});
 CREATE (:step {author_name_latex:"ben.is.located@gmail.com", created_datetime:"2026-02-28_22-53-36-058780", id:"8319876201", note_after_step_latex:"", note_before_step_latex:""});
+CREATE (:derivation {abstract_latex:"", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-01_14-06-23-459141", id:"6470318827", name_latex:"Euler's equation from MacLaurin series", reference_latex:"https://fermatslasttheorem.blogspot.com/2006/02/eulers-formula.html"});
+CREATE (:expression {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-01_14-13-41-223833", description_latex:"a Maclaurin series is a special case of a Taylor series where the expansion point is always x=0.", id:"9605409442", latex_condition:"{\\rm the\\ function\\ is\\ infinitely\\ differentiable\\ at\\ x = 0.}", latex_lhs:"f(x)", latex_relation:"=", latex_rhs:"f(0)+f'(x)\\ x + \\frac{f''(x)\\ x^2}{2!} + \\frac{f'''(x)\\ x^3}{3!} + ...", name_latex:"MacLaurin series with expanded terms", reference_latex:"https://en.wikipedia.org/wiki/Taylor_series"});
+CREATE (:expression {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-01_14-18-02-534007", description_latex:"a Maclaurin series is a special case of a Taylor series where the expansion point is always x=0.", id:"8637447837", latex_condition:"{\\rm the\\ function\\ is\\ infinitely\\ differentiable\\ at\\ x = 0.}", latex_lhs:"f(x)", latex_relation:"=", latex_rhs:"\\sum_{n=0}^{\\infty} \\frac{f^n(0)}{n!} x^n", name_latex:"MacLaurin series as summation", reference_latex:"https://en.wikipedia.org/wiki/Taylor_series"});
+CREATE (:step {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-01_14-19-41-297707", id:"6153626590", note_after_step_latex:"", note_before_step_latex:""});
+CREATE (:step {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-01_14-44-00-184445", id:"4027484551", note_after_step_latex:"", note_before_step_latex:""});
+CREATE (:step {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-01_14-46-58-323422", id:"1215301421", note_after_step_latex:"", note_before_step_latex:""});
+CREATE (:expression {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-01_15-05-53-683114", description_latex:"", id:"7764834870", latex_condition:"{\\rm the\\ function\\ is\\ infinitely\\ differentiable\\ at}\\ x = a.", latex_lhs:"f(x)", latex_relation:"=", latex_rhs:"\\sum_{n=0}^{\\infty} \\frac{f^n(a)}{n!} (x-a)^n", name_latex:"Taylor series as summation", reference_latex:"https://en.wikipedia.org/wiki/Taylor_series"});
+CREATE (:step {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-01_16-09-19-320345", id:"6323048763", note_after_step_latex:"", note_before_step_latex:""});
 :commit
 :begin
 CREATE CONSTRAINT ON (node:derivation) ASSERT (node.id) IS UNIQUE;
@@ -7905,6 +7913,21 @@ MATCH (n1:step{id:"8541442722"}), (n2:expression{id:"5345738321"}) CREATE (n1)-[
 MATCH (n1:derivation{id:"0008996667"}), (n2:step{id:"8319876201"}) CREATE (n1)-[r:HAS_STEP {sequence_index:5}]->(n2);
 MATCH (n1:step{id:"8319876201"}), (n2:inference_rule{id:"0000111341"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
 MATCH (n1:step{id:"8319876201"}), (n2:expression{id:"5345738321"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:expression{id:"9605409442"}), (n2:scalar{id:"0000001464"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"8637447837"}), (n2:scalar{id:"0000001464"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:derivation{id:"6470318827"}), (n2:step{id:"6153626590"}) CREATE (n1)-[r:HAS_STEP {sequence_index:0}]->(n2);
+MATCH (n1:step{id:"6153626590"}), (n2:inference_rule{id:"0000111981"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
+MATCH (n1:step{id:"6153626590"}), (n2:expression{id:"8637447837"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:derivation{id:"6470318827"}), (n2:step{id:"4027484551"}) CREATE (n1)-[r:HAS_STEP {sequence_index:1}]->(n2);
+MATCH (n1:step{id:"4027484551"}), (n2:inference_rule{id:"0000111981"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
+MATCH (n1:step{id:"4027484551"}), (n2:expression{id:"9605409442"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:derivation{id:"6470318827"}), (n2:step{id:"1215301421"}) CREATE (n1)-[r:HAS_STEP {sequence_index:2}]->(n2);
+MATCH (n1:step{id:"1215301421"}), (n2:inference_rule{id:"0000111550"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
+MATCH (n1:step{id:"1215301421"}), (n2:expression{id:"8637447837"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"1215301421"}), (n2:expression{id:"9605409442"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"1"}]->(n2);
+MATCH (n1:derivation{id:"6470318827"}), (n2:step{id:"6323048763"}) CREATE (n1)-[r:HAS_STEP {sequence_index:3}]->(n2);
+MATCH (n1:step{id:"6323048763"}), (n2:inference_rule{id:"0000111981"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
+MATCH (n1:step{id:"6323048763"}), (n2:expression{id:"7764834870"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
 :commit
 :begin
 MATCH (n:`UNIQUE IMPORT LABEL`)  WITH n LIMIT 20000 REMOVE n:`UNIQUE IMPORT LABEL` REMOVE n.`UNIQUE IMPORT ID`;
