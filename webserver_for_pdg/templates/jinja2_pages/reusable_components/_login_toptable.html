@@ -8,7 +8,7 @@
           <td align="right">
           <!-- https://github.com/allofphysicsgraph/proofofconcept/issues/110 -->
           {% if not current_user.is_anonymous %}
-            Logged in as {{ current_user.name }} |
+            Logged in as <a href="{{ url_for('my_profile') }}">{{ current_user.name }}</a> |
             <!--
               <a href="{{ url_for('to_logout') }}">Log out locally</a>
             -->
