@@ -97,6 +97,20 @@ input, textarea, select {
 
 <!-- https://physicsderivationgraph.blogspot.com/2020/05/live-display-of-input.html -->
 <script>
+  // Object to hold our typing timers for the different inputs
+  var typingTimers = {};
+  var doneTypingInterval = 300; // Wait 300ms after typing stops before rendering
+
+  function livePreview(input_id, display_checkbox_id, preview_id, output_id) {
+    // Clear the previous timer if the user is still typing
+    clearTimeout(typingTimers[input_id]);
+    
+    // Set a new timer
+    typingTimers[input_id] = setTimeout(function () {
+      convert(input_id, display_checkbox_id, preview_id, output_id);
+    }, doneTypingInterval);
+  }
+
   function convert(input_id, display_checkbox_id, preview_id, output_id) {
     //console.log(input_id)
     //console.log(display_checkbox_id)

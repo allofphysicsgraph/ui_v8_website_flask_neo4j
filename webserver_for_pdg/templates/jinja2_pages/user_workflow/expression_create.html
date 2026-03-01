@@ -24,7 +24,7 @@ Latex:
                                 type="text",
                                 pattern="^[\x20-\x7F]+$", 
                                 onkeyup="latex_filter()", 
-                                oninput="validateASCII(this)", 
+                                oninput="validateASCII(this); livePreview('input_latex_lhs', 'display_input_latex_lhs', 'preview_input_latex_lhs', 'output_input_latex_lhs');", 
                                 onchange="onChangeFunction();") }}</td>
 <!-- https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84 -->
     <td>
@@ -50,7 +50,7 @@ Latex:
                                 id="input_latex_rhs", 
                                 type="text",
                                 pattern="^[\x20-\x7F]+$", 
-                                oninput="validateASCII(this)", 
+                                oninput="validateASCII(this); livePreview('input_latex_rhs', 'display_input_latex_rhs', 'preview_input_latex_rhs', 'output_input_latex_rhs');", 
                                 onchange="onChangeFunction();") }}</td>
     <td>when</td>
     <td>{{ form.expression_latex_condition(size=50, 
@@ -58,7 +58,7 @@ Latex:
                                 id="input_latex_condition", 
                                 type="text",
                                 pattern="^[\x20-\x7F]+$", 
-                                oninput="validateASCII(this)", 
+                                oninput="validateASCII(this); livePreview('input_latex_condition', 'display_input_latex_condition', 'preview_input_latex_condition', 'output_input_latex_condition');", 
                                 onchange="onChangeFunction();") }}</td>
 <!-- https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84 -->
   </tr>
@@ -71,7 +71,9 @@ Latex:
         Leave blank for "always true"</td> <!-- condition -->
   </tr>
   <tr>
-    <td><input type="checkbox" 
+    <td>
+      <!--
+      <input type="checkbox" 
               id="display_input_latex_lhs" 
               checked="" 
               onchange="convert('input_latex_lhs',
@@ -87,10 +89,13 @@ Latex:
                                'preview_input_latex_lhs',
                                'output_input_latex_lhs')">
               <br clear="all">
+        -->
         <div id="output_input_latex_lhs"></div>
       </td> <!-- LHS -->
     <td></td> <!-- relation -->
-    <td>    <P><input type="checkbox" 
+    <td>   
+      <!--
+     <P><input type="checkbox" 
               id="display_input_latex_rhs" 
               checked="" 
               onchange="convert('input_latex_rhs',
@@ -106,10 +111,13 @@ Latex:
                                'preview_input_latex_rhs',
                                'output_input_latex_rhs')">
               <br clear="all">
+            -->
         <div id="output_input_latex_rhs"></div>
     </td> <!-- RHS -->
     <td></td> <!-- when -->
-    <td><input type="checkbox" 
+    <td>
+<!--
+      <input type="checkbox" 
               id="display_input_latex_condition" 
               checked="" 
               onchange="convert('input_latex_condition',
@@ -125,6 +133,7 @@ Latex:
                                'preview_input_latex_condition',
                                'output_input_latex_condition')">
               <br clear="all">
+            -->
         <div id="output_input_latex_condition"></div>
       </td> <!-- condition -->
   </tr>
