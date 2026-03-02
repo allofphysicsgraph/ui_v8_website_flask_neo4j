@@ -865,6 +865,13 @@ def get_symbols_not_in_expression(
             ):
                 symbols_not_in_expression_but_might_be_relevant.append(this_symbol)
 
+    # Prompt used:
+    # I have a list of dictionaries in Python and one of the keys in each dictionary is latex. How do I sort that list of dictionaries by the values for the key latex?
+    symbols_not_in_expression_but_might_be_relevant = sorted(
+        symbols_not_in_expression_but_might_be_relevant,
+        key=lambda x: x["latex"].lower(),
+    )
+
     logger.info("[TRACE] end " + trace_id)
     return symbols_not_in_expression_but_might_be_relevant, query_time_dict
 
