@@ -210,12 +210,7 @@ def guess_symbols_from_latex(graphDB_Driver, query_time_dict, expression_dict):
             cleaned_latex_str_lhs
         )
     except Exception as err:
-        flash(
-            "pdg_app/to_add_symbols_and_operations_for_expression: sympy_expr_lhs: "
-            + str(type(err).__name__)
-            + str(err)
-        )
-        logger.error("sympy_expr_lhs: " + str(err))
+        logger.error("sympy_expr_lhs: " + str(type(err).__name__) + str(err))
         sympy_expr_lhs = None
     # ERROR: SymPy can't convert "="
     # sympy_expr_relation = latex_and_sympy.cleaned_latex_str_to_sympy_expression(
@@ -226,12 +221,7 @@ def guess_symbols_from_latex(graphDB_Driver, query_time_dict, expression_dict):
             cleaned_latex_str_rhs
         )
     except Exception as err:
-        flash(
-            "pdg_app/to_add_symbols_and_operations_for_expression: sympy_expr_rhs: "
-            + str(type(err).__name__)
-            + str(err)
-        )
-        logger.error("sympy_expr_rhs: " + str(err))
+        logger.error("sympy_expr_rhs: " + str(type(err).__name__) + str(err))
         sympy_expr_rhs = None
 
     logger.info("sympy_expr_lhs=" + str(sympy_expr_lhs))
@@ -452,7 +442,7 @@ def get_url_from_shortened_list(lookup: str) -> Tuple[str, str]:
 
 
 def send_email_with_msmtp(
-    recipients: Union[str, List[str]], subject: str, body: str, from_address: str = None
+    recipients: Union[str, List[str]], subject: str, body: str, from_address: str
 ):
     """
     Sends an email using the system's msmtp command.
