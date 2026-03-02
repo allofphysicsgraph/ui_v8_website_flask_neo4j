@@ -477,7 +477,7 @@ def get_symbols_for_feed(tx: Transaction, feed_id: str) -> List[dict]:
     MATCH (e:feed {id: $eid})-[:IS_COMPRISED_OF]->(s:symbol) 
     RETURN properties(s) AS props
     """
-    result = tx.run(query, eid=expression_id)
+    result = tx.run(query, eid=feed_id)
 
     symbol_list = [res["props"] for res in result.data()]
 
@@ -502,120 +502,6 @@ def get_operations_for_expression(tx: Transaction, expression_id: str) -> List[d
 
     logger.info("[TRACE] end " + trace_id)
     return symbol_list
-
-
-# def get_symbol_IDs_in_expression(tx: Transaction, expression_id: str) -> List[str]:
-#     """match (s:symbol) because nodes are created with multiple labels (e.g. :symbol:scalar)"""
-#     trace_id = str(uuid.uuid4())
-#     logger.info("[TRACE] start " + trace_id)
-#     query = (
-#         "MATCH (e:expression)-[:IS_COMPRISED_OF]->(s:symbol) "
-#         "WHERE e.id = $id "
-#         "RETURN s.id"
-#     )
-#     result = tx.run(query, id=expression_id)
-#     logger.info("[TRACE] end " + trace_id)
-#     return [record["s.id"] for record in result]
-
-
-# def get_symbol_IDs_in_every_feed(tx: Transaction):
-#     """
-#     `MATCH (f:feed)` selects all nodes with the label feed, regardless of whether you passed an ID list or not.
-#     `OPTIONAL MATCH ...` is like a "Left Outer Join" in SQL. It attempts to find the pattern (f)-[:IS_COMPRISED_OF]->(s:symbol).
-#         - If the pattern exists, s will contain the symbol node.
-#         - If the pattern does not exist (the feed has no symbols), f is still kept in the result, but s will be null.
-#     `collect(s.id)` aggregation function automatically ignores null values. Therefore, if s is null (because of the OPTIONAL MATCH), the result is an empty list [] rather than [null].
-#     """
-#     trace_id = str(uuid.uuid4())
-#     logger.info("[TRACE] start " + trace_id)
-
-#     query = """
-#     MATCH (f:feed)
-#     OPTIONAL MATCH (f)-[:IS_COMPRISED_OF]->(s:symbol)
-#     RETURN f.id as feed_id, collect(s.id) as symbol_ids
-#     """
-#     result = tx.run(query)
-
-#     res = result.data()
-
-#     # logger.info("res=" + str(res))
-
-#     feed_has_symbols = {}
-#     for this_dict in res:
-#         feed_has_symbols[this_dict["feed_id"]] = this_dict["symbol_ids"]
-
-#     logger.info("[TRACE] end " + trace_id)
-#     return feed_has_symbols
-
-
-# def get_symbol_IDs_in_feed(tx: Transaction, feed_id: str) -> List[str]:
-#     """match (s:symbol) because nodes are created with multiple labels (e.g. :symbol:scalar)"""
-#     trace_id = str(uuid.uuid4())
-#     logger.info("[TRACE] start " + trace_id)
-#     logger.info("feed_id=" + feed_id)
-
-#     query = "MATCH (f:feed)-[:IS_COMPRISED_OF]->(s:symbol) WHERE f.id = $id RETURN s.id"
-#     result = tx.run(query, id=feed_id)
-#     logger.info("[TRACE] end " + trace_id)
-#     return [record["s.id"] for record in result]
-
-
-# def get_list_of_symbol_IDs_per_category_in_expression_or_feed(
-#     tx, expression_or_feed: str, expression_or_feed_id: str, symbol_category: str
-# ) -> List[str]:
-#     """
-#     an expression has one or more symbols
-#     This read query returns which symbol IDs are used for the provided expression ID
-
-#     this is the opposite query of `expressions_that_use_symbol`
-#     """
-#     trace_id = str(uuid.uuid4())
-#     logger.info("[TRACE] start " + trace_id)
-
-#     logger.info("expression_or_feed=" + expression_or_feed)
-#     assert expression_or_feed in ["expression", "feed"]
-#     logger.info("symbol_category=" + symbol_category)
-#     assert symbol_category in list_of_valid.symbol_categories
-
-#     # symbol_list = []  # type: List[str]
-#     # for result in tx.run(
-#     #     "MATCH (e:"
-#     #     + expression_or_feed
-#     #     + ")-[:IS_COMPRISED_OF]->(s:"
-#     #     + symbol_category
-#     #     + ") WHERE e.id='"
-#     #     + expression_or_feed_id
-#     #     + "' RETURN s.id"
-#     # ):
-#     #     symbol_list.append(result.data()["s.id"])
-
-#     # Sanitize dynamic labels to prevent injection and handle special characters
-#     # Neo4j uses backticks to escape label names. Escape existing backticks by doubling them.
-#     safe_source_label = f"`{expression_or_feed.replace('`', '``')}`"
-#     safe_target_label = f"`{symbol_category.replace('`', '``')}`"
-
-#     # Construct Query using f-strings and Parameters
-#     # Labels cannot be parameterized, so we inject the sanitized strings.
-#     # Values (like IDs) MUST be parameterized ($id).
-#     query = (
-#         f"MATCH (e:{safe_source_label})-[:IS_COMPRISED_OF]->(s:{safe_target_label}) "
-#         "WHERE e.id = $id "
-#         "RETURN s.id"
-#     )
-
-#     result = tx.run(query, id=expression_or_feed_id)
-
-#     # logger.info(
-#     #     "expression_or_feed_id="
-#     #     + str(expression_or_feed_id)
-#     #     + "symbol_list="
-#     #     + str(symbol_list)
-#     # )
-
-#     logger.info("[TRACE] end " + trace_id)
-
-#     # Pythonic list comprehension (faster than .data())
-#     return [record["s.id"] for record in result]
 
 
 def get_nodes_of_type(tx: Transaction, node_type: str) -> list:
@@ -1113,12 +999,6 @@ def get_list_of_step_dicts_in_this_derivation(
     return list_of_step_dicts
 
 
-# def get_list_of_symbol_IDs_per_derivation(tx: Transaction, derivation_id: str):
-#     """ """
-#     # TODO
-#     return list_of_symbol_IDs
-
-
 def get_step_has_sequence_index(tx: Transaction, step_id: str) -> int:
     """
     >>> step_has_sequence_index()
@@ -1559,39 +1439,6 @@ def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
 
     logger.info("[TRACE] end " + trace_id)
     return
-
-
-# def disconnect_symbol_from_expression(
-#     tx, symbol_id: str, expression_id: str, symbol_category: str
-# ) -> None:
-#     """
-#     called by "edit expression"
-
-#     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
-#     """
-#     trace_id = str(uuid.uuid4())
-#     logger.info("[TRACE] start " + trace_id)
-
-#     logger.info(
-#         "symbol_category="
-#         + symbol_category
-#     )
-#     assert symbol_category in list_of_valid.symbol_categories
-
-#     result = tx.run(
-#         "MATCH (e:expression)-[r:IS_COMPRISED_OF]->(s:"
-#         + symbol_category
-#         + ")"
-#         + 'WHERE e.id="'
-#         + str(expression_id)
-#         + '" AND s.id="'
-#         + str(symbol_id)
-#         + '"  DELETE r'
-#     )
-#     logger.info("result.data=" + str(result.data()))
-
-#     logger.info("[TRACE] end " + trace_id)
-#     return
 
 
 def disconnect_symbol_from_feed(tx, symbol_id: str, feed_id: str) -> None:
