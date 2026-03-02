@@ -240,6 +240,13 @@ MATCH ()-[r]->() WITH type(r) AS relationshipType, keys(r) AS keys UNWIND (CASE 
     <td>See also <a href="{{ url_for('to_list_scalars') }}">table of scalar symbols</a></td>
   </tr>
   <tr>
+    <td id="feeds connected to more than one step">feeds connected to more than one step
+      <a href="#feeds connected to more than one step">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (f:feed)--(s:step) WITH f, count(s) AS stepCount WHERE stepCount > 1 RETURN f, stepCount">
+MATCH (f:feed)--(s:step) WITH f, count(s) AS stepCount WHERE stepCount &gt; 1 RETURN f, stepCount</a></td>
+    <td></td>
+  </tr>
+  <tr>
     <td id="list steps for a derivation">list steps for a derivation
      <a href="#list steps for a derivation">#</a></td>
     <td><a href="{{ url_for('to_query') }}?cypher=MATCH (m:derivation)-[:HAS_STEP]->(n:step)  WHERE m.id='{{derivation_id}}' RETURN n">
