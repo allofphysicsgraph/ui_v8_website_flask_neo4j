@@ -1102,7 +1102,7 @@ def api_create_derivation():
     author_name_latex = "ben"
 
     derivation_id, query_time_dict = compute.generate_random_id(
-        graphDB_Driver, query_time_dict, "derivation"
+        graphDB_Driver, query_time_dict
     )
     logger.info("pdg_app/api_create_derivation: derivation_id=" + derivation_id)
 
@@ -1332,7 +1332,7 @@ def api_create_expression():
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
     expression_id, query_time_dict = compute.generate_random_id(
-        graphDB_Driver, query_time_dict, "expression"
+        graphDB_Driver, query_time_dict
     )
 
     # https://neo4j.com/docs/python-manual/current/session-api/
@@ -1635,7 +1635,7 @@ def api_create_scalar_symbol():
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
     scalar_id, query_time_dict = compute.generate_random_id(
-        graphDB_Driver, query_time_dict, "scalar"
+        graphDB_Driver, query_time_dict
     )
 
     # https://neo4j.com/docs/python-manual/current/session-api/
@@ -1788,7 +1788,7 @@ def api_create_operation_symbol():
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
     operation_id, query_time_dict = compute.generate_random_id(
-        graphDB_Driver, query_time_dict, "operation"
+        graphDB_Driver, query_time_dict
     )
 
     # https://neo4j.com/docs/python-manual/current/session-api/
@@ -1890,7 +1890,7 @@ def api_create_relation_symbol():
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
     relation_id, query_time_dict = compute.generate_random_id(
-        graphDB_Driver, query_time_dict, "relation"
+        graphDB_Driver, query_time_dict
     )
 
     # https://neo4j.com/docs/python-manual/current/session-api/
