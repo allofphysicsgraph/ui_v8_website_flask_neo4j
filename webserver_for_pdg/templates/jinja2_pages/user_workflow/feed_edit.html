@@ -7,7 +7,13 @@
 or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of feeds</a>
 </P>
 
+<!--
+  symbols_in_feed:
+  {{ symbols_in_feed }}
 
+  symbols_not_in_feed:
+  {{ symbols_not_in_feed }}
+-->
 
 <P>See also 
   <a href="{{ url_for('to_list_scalars') }}?referrer=expession_edit">scalar symbols</a>,
@@ -42,10 +48,10 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     <th>scope</th>
     <th>domain</th>
   </tr>
-  {% for symbol_dict in symbols_in_feed.items() %}
+  {% for symbol_dict in symbols_in_feed %}
   <tr>
     <td>
-      <a href="{{ url_for('to_edit_scalar', symbol_id=symbol_dict['id'] ) }}">
+      <a href="{{ url_for('to_edit_scalar', scalar_id=symbol_dict['id'] ) }}">
           {{ symbol_dict['id'] }}
       </a>
     </td>
@@ -75,11 +81,11 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     {{ form_no_options.csrf_token }}
     <P>
     <select name="symbol_select_id_to_add" class="selectpicker form-control" id="symbol_select">
-      {% for symbol_dict in symbols_not_in_feed.keys() %}
+      {% for symbol_dict in symbols_not_in_feed %}
       <option value="{{ symbol_dict['id'] }}">{{ symbol_dict['id'] }}, {{ symbol_dict['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" value="add symbol to expression">
+    <input type="submit" name="add symbol" value="add symbol to feed">
   </form>
 </fieldset>
 
@@ -90,12 +96,12 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P>
-    <select name="symbol_select_id_to_remove" class="selectpicker form-control" id="symbol_select">
-      {% for symbol_dict in symbols_in_feed.keys() %}
+    <select name="symbol_select_id_to_disconnect" class="selectpicker form-control" id="symbol_select">
+      {% for symbol_dict in symbols_in_feed %}
       <option value="{{ symbol_dict['id'] }}">{{ symbol_dict['id'] }}, {{ symbol_dict['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" value="remove symbol from expression">
+    <input type="submit" name="remove symbol" value="remove symbol from feed">
   </form>
 </fieldset>
 
@@ -108,17 +114,17 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form_new_expression.csrf_token }}
-    <P>{{ form_new_expression.feed_latex.label}} (<B>required</B>): 
-       {{ form_new_expression.feed_latex(size=50, 
+    {{ form_new_feed.csrf_token }}
+    <P>{{ form_new_feed.feed_latex.label}} (<B>required</B>): 
+       {{ form_new_feed.feed_latex(size=50, 
                     maxlength=1000, 
-                    value=expression_dict['latex'],
+                    value=feed_dict['latex'],
                     id="input_latex") }} 
 
         <div id="output_input_latex"></div>
 
 
-      <input type="submit" value="Edit feed">
+      <input type="submit" name="edit" value="Edit feed">
     </P>
   </form>
 </fieldset>
@@ -131,7 +137,7 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
 
-    <input type="submit" value="Delete feed">
+    <input type="submit" name="delete" value="Delete feed">
     </form>
 </fieldset>
 
