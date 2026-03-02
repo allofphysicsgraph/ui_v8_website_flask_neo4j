@@ -2318,14 +2318,15 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         query_time_dict[
             "pdg_app/to_edit_feed: get_node_properties_from_id feed " + trace_id
         ] = round(time.time() - query_start_time, 3)
-    logger.info("feed_dict:" + str(feed_dict))
 
-    if feed_dict is None:
-        return "<H1>Feed ID " + str(feed_id) + " does not exist in database</H1>."
+        logger.info("feed_dict:" + str(feed_dict))
 
-    # editing the feed includes modifying the symbols present.
+        if feed_dict is None:
+            return "<H1>Feed ID " + str(feed_id) + " does not exist in database</H1>."
 
-    with graphDB_Driver.session() as session:
+        # editing the feed includes modifying the symbols present.
+
+        # with graphDB_Driver.session() as session:
         query_start_time = time.time()
         symbols_in_feed = session.read_transaction(
             neo4j_query.get_symbols_for_feed, feed_id
@@ -2334,7 +2335,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
             "pdg_app/to_edit_feed get_all_symbol_IDs_in_feed " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-        logger.info("feed_id=" + str(feed_id))
+        logger.info("symbols_in_feed=" + str(symbols_in_feed))
 
         # with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -2351,6 +2352,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
             "pdg_app/to_edit_feed: get_nodes_of_type symbol " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
+    symbol_id_in_feed = []
     for this_symbol in symbols_in_feed:
         symbol_id_in_feed.append(this_symbol["id"])
 
@@ -2360,69 +2362,12 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         if this_symbol["id"] not in symbol_id_in_feed:
             symbols_not_in_feed.append(this_symbol)
 
-    if request.method == "POST" and not web_form_new_feed.validate():
-        flash("pdg_app/to_edit_feed: " + str(web_form_new_feed.errors))
-        logger.error(str(web_form_new_feed.errors))
-    if request.method == "POST" and web_form_new_feed.validate():
-        logger.info("request.form = " + str(request.form))
-
-        feed_latex = str(web_form_new_feed.feed_latex.data).strip()
-        feed_sympy = str(web_form_new_feed.feed_sympy.data).strip()
-        feed_lean = str(web_form_new_feed.feed_lean.data).strip()
-
-        logger.info("feed_latex=" + str(feed_latex))
-        logger.info("feed_sympy=" + str(feed_sympy))
-        logger.info("feed_lean=" + str(feed_lean))
-
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-        author_name_latex = compute.encode_user_identifier(current_user.email)
-
-        # alter node properties based on user input
-        if feed_dict["latex"] != feed_latex:
-            # https://neo4j.com/docs/python-manual/current/session-api/
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.edit_node_property, "feed", feed_id, "latex", feed_latex
-                )
-                query_time_dict[
-                    "pdg_app/to_edit_feed: edit_node_property feed latex " + trace_id
-                ] = round(time.time() - query_start_time, 3)
-
-        if feed_dict["sympy"] != feed_sympy:
-            # https://neo4j.com/docs/python-manual/current/session-api/
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.edit_node_property, "feed", feed_id, "sympy", feed_sympy
-                )
-                query_time_dict[
-                    "pdg_app/to_edit_feed: edit_node_property feed sympy " + trace_id
-                ] = round(time.time() - query_start_time, 3)
-
-        if feed_dict["lean"] != feed_lean:
-            # https://neo4j.com/docs/python-manual/current/session-api/
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.edit_node_property, "feed", feed_id, "lean", feed_lean
-                )
-                query_time_dict[
-                    "pdg_app/to_edit_feed: edit_node_property feed lean " + trace_id
-                ] = round(time.time() - query_start_time, 3)
-        logger.info("[TRACE] end " + trace_id)
-        return redirect(url_for("to_list_feeds"))
-
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
+        logger.info("request.form.keys()= " + str())
 
-        logger.info("request.form.keys()= " + str(request.form.keys()))
+        if "delete" in request.form.keys():
 
-        # the "delete" button returns a dict with only the csrf token, so len==1
-        if len(request.form.keys()) == 1:
-            # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 session.write_transaction(
@@ -2433,9 +2378,33 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 query_time_dict["pdg_app/to_edit_feed: delete_node " + trace_id] = (
                     round(time.time() - query_start_time, 3)
                 )
-            return redirect(url_for("to_edit_feed", feed_id=feed_id))
 
-        if "symbol_select_id_to_disconnect" in request.form.keys():
+            logger.info("[TRACE] end " + trace_id)
+            return redirect(url_for("to_list_feeds"))
+        elif "add symbol" in request.form.keys():
+
+            symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
+            logger.info("symbol_id_to_add=" + str(symbol_id_to_add))
+
+            # TODO: user provided a symbol, but adding is per-category
+            # FAULT EXPECTED for non-scalar add
+
+            # https://neo4j.com/docs/python-manual/current/session-api/
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.connect_symbol_to_feed,
+                    symbol_id_to_add,
+                    feed_id,
+                )
+                query_time_dict[
+                    "pdg_app/to_edit_feed: connect_symbol_to_feed " + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+            logger.info("[TRACE] end " + trace_id)
+            return redirect(url_for("to_edit_feed", feed_id=feed_id))
+        elif "remove symbol" in request.form.keys():
+
             symbol_id_to_disconnect = str(
                 request.form["symbol_select_id_to_disconnect"]
             )
@@ -2456,32 +2425,79 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                 query_time_dict[
                     "pdg_app/to_edit_feed: disconnect_symbol_from_feed " + trace_id
                 ] = round(time.time() - query_start_time, 3)
+
+            logger.info("[TRACE] end " + trace_id)
+            return redirect(url_for("to_edit_feed", feed_id=feed_id))
+        elif "edit" in request.form.keys():
+
+            if web_form_new_feed.validate():
+                feed_latex = str(web_form_new_feed.feed_latex.data).strip()
+                feed_sympy = str(web_form_new_feed.feed_sympy.data).strip()
+                feed_lean = str(web_form_new_feed.feed_lean.data).strip()
+
+                logger.info("feed_latex=" + str(feed_latex))
+                logger.info("feed_sympy=" + str(feed_sympy))
+                logger.info("feed_lean=" + str(feed_lean))
+
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
+                author_name_latex = compute.encode_user_identifier(current_user.email)
+
+                with graphDB_Driver.session() as session:
+                    if feed_dict["latex"] != feed_latex:
+                        query_start_time = time.time()
+                        session.write_transaction(
+                            neo4j_query.edit_node_property,
+                            "feed",
+                            feed_id,
+                            "latex",
+                            feed_latex,
+                        )
+                        query_time_dict[
+                            "pdg_app/to_edit_feed: edit_node_property feed latex "
+                            + trace_id
+                        ] = round(time.time() - query_start_time, 3)
+                    if feed_dict["sympy"] != feed_sympy:
+                        query_start_time = time.time()
+                        session.write_transaction(
+                            neo4j_query.edit_node_property,
+                            "feed",
+                            feed_id,
+                            "sympy",
+                            feed_sympy,
+                        )
+                        query_time_dict[
+                            "pdg_app/to_edit_feed: edit_node_property feed sympy "
+                            + trace_id
+                        ] = round(time.time() - query_start_time, 3)
+                    if feed_dict["lean"] != feed_lean:
+                        query_start_time = time.time()
+                        session.write_transaction(
+                            neo4j_query.edit_node_property,
+                            "feed",
+                            feed_id,
+                            "lean",
+                            feed_lean,
+                        )
+                        query_time_dict[
+                            "pdg_app/to_edit_feed: edit_node_property feed lean "
+                            + trace_id
+                        ] = round(time.time() - query_start_time, 3)
+
+            else:
+                flash("pdg_app/to_edit_feed: " + str(web_form_new_feed.errors))
+                logger.error(str(web_form_new_feed.errors))
+
+            logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_edit_feed", feed_id=feed_id))
 
-        if "symbol_select_id_to_add" in request.form.keys():
-            symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
-            logger.info("to_edit_feed: symbol_id_to_add=" + str(symbol_id_to_add))
-
-            # TODO: user provided a symbol, but adding is per-category
-            # FAULT EXPECTED for non-scalar add
-
-            # https://neo4j.com/docs/python-manual/current/session-api/
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.connect_symbol_to_feed,
-                    symbol_id_to_add,
-                    feed_id,
-                )
-                query_time_dict[
-                    "pdg_app/to_edit_feed: connect_symbol_to_feed " + trace_id
-                ] = round(time.time() - query_start_time, 3)
+        else:
+            flash("unrecognized form POSTed: " + str(request.form))
+            logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_edit_feed", feed_id=feed_id))
 
-        logger.info("[TRACE] end " + trace_id)
-        return redirect(url_for("to_list_feeds"))
-
-    sympy_as_latex_per_feed_id = compute.get_sympy_as_latex_per_feed_id(list_of_feeds)
+    # sympy_as_latex_per_feed_id = compute.get_sympy_as_latex_per_feed_id(list_of_feeds)
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -2490,10 +2506,11 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
         form_new_feed=web_form_new_feed,
-        dict_of_symbols_in_feed=dict_of_symbols_in_feed,
+        symbols_in_feed=symbols_in_feed,
+        symbols_not_in_feed=symbols_not_in_feed,
         # dict_of_symbols_not_in_feed=dict_of_symbols_not_in_feed,
         feed_dict=feed_dict,
-        sympy_as_latex_per_feed_id=sympy_as_latex_per_feed_id,  # Used in _table_of_feeds.html
+        # sympy_as_latex_per_feed_id=sympy_as_latex_per_feed_id,  # Used in _table_of_feeds.html
     )
 
 
@@ -2715,6 +2732,14 @@ def to_add_feed() -> werkzeug.Response:
         )
 
         query_start_time = time.time()
+        list_of_symbols = session.read_transaction(
+            neo4j_query.get_nodes_of_type, "symbol"
+        )
+        query_time_dict["pdg_app/to_add_feed: list_nodes_of_type " + trace_id] = round(
+            time.time() - query_start_time, 3
+        )
+
+        query_start_time = time.time()
         dict_of_derivations_that_use_feed = session.read_transaction(
             neo4j_query.get_derivations_for_every_feed
         )
@@ -2722,99 +2747,133 @@ def to_add_feed() -> werkzeug.Response:
             "pdg_app/to_list_feeds: get_all_derivations_for_every_feed" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    # symbol_IDs_per_feed_id = {}  # type: Dict[str,list]  # _table_of_feeds.html
-    # for this_feed_dict in list_of_feeds:
-    #     symbol_IDs_per_feed_id[this_feed_dict["id"]], query_time_dict = (
-    #         compute.get_symbols_in_feed(
-    #             graphDB_Driver, query_time_dict, "feed", this_feed_dict["id"]
-    #         )
-    #     )
-
+    # TODO: investigate the relevance of this
     sympy_as_latex_per_feed_id = compute.get_sympy_as_latex_per_feed_id(list_of_feeds)
 
-    # list_of_symbols, query_time_dict = compute.get_all_symbols(
-    #     graphDB_Driver, query_time_dict
-    # )
-
-    if request.method == "POST" and not web_form_add_feed.validate():
-        flash("pdg_app/to_add_feed: " + str(web_form_add_feed.errors))
-        logger.error(str(web_form_add_feed.errors))
-    if request.method == "POST" and web_form_add_feed.validate():
+    if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        feed_latex = str(web_form_add_feed.feed_latex.data).strip()
+        if "new multi-symbol" in request.form.keys():
+            if web_form_add_feed.validate():
+                feed_latex = str(web_form_add_feed.feed_latex.data).strip()
+                logger.info("feed_latex:" + str(feed_latex))
 
-        logger.info("feed_latex:" + str(feed_latex))
-        # TODO: validate that this string is actually Latex before adding to database
+                # TODO: validate that this string is actually Latex before adding to database
 
-        feed_sympy = "TODO"  # TODO: if promoting existing symbol, this can be filled in immediately
-        feed_lean = "TODO"
+                feed_lean = "TODO"
+                feed_sympy = "TODO"
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        feed_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict
-        )
+                feed_id, query_time_dict = compute.generate_random_id(
+                    graphDB_Driver, query_time_dict
+                )
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_feed,
-                feed_id,
-                feed_latex,
-                feed_sympy,
-                feed_lean,
-                now_str,
-                author_name_latex,
-            )
-            query_time_dict[
-                "pdg_app/to_add_feed: add_feed new multi-symbol " + trace_id
-            ] = round(time.time() - query_start_time, 3)
-
-        # after user provides latex for feed have them provide symbol count
-        logger.info("[TRACE]  end " + trace_id)
-        return redirect(
-            url_for(
-                "to_add_symbols_and_operations_for_feed",
-                feed_id=feed_id,
-            )
-        )
-    elif request.method == "POST":
-        logger.info("to_add_feed: request.form = " + str(request.form))
-
-        feed_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict
-        )
-
-        # as per https://strftime.org/
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-        author_name_latex = compute.encode_user_identifier(current_user.email)
-
-        # TODO
-        list_of_symbols = []
-        for symbol_dict in list_of_symbols:
-            if symbol_dict["id"] == request.form["symbol_select_id_to_add"]:
                 # https://neo4j.com/docs/python-manual/current/session-api/
                 with graphDB_Driver.session() as session:
                     query_start_time = time.time()
                     session.write_transaction(
                         neo4j_query.add_feed,
                         feed_id,
-                        symbol_dict["latex"],
-                        "Symbol('pdg" + symbol_dict["id"] + "')",
-                        feed_lean="",
-                        now_str=now_str,
-                        author_name_latex=author_name_latex,
+                        feed_latex,
+                        now_str,
+                        author_name_latex,
                     )
                     query_time_dict[
-                        "pdg_app/to_add_feed: add_feed promoted symbol " + trace_id
+                        "pdg_app/to_add_feed: add_feed new multi-symbol " + trace_id
                     ] = round(time.time() - query_start_time, 3)
+
+                logger.info("[TRACE] end " + trace_id)
+                return redirect(
+                    url_for(
+                        "to_add_symbols_and_operations_for_feed",
+                        feed_id=feed_id,
+                    )
+                )
+
+            else:
+                flash("pdg_app/to_add_feed: " + str(web_form_new_feed.errors))
+                logger.error(str(web_form_new_feed.errors))
+                return redirect(url_for("to_add_feed"))
+
+        elif "promote existing" in request.form.keys():
+            nominated_symbol_id = request.form["symbol_select_id_to_add"]
+            logger.info("nominated_symbol_id=" + str(nominated_symbol_id))
+
+            feed_id, query_time_dict = compute.generate_random_id(
+                graphDB_Driver, query_time_dict
+            )
+
+            # as per https://strftime.org/
+            # %f = Microsecond as a decimal number, zero-padded on the left.
+            now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
+            author_name_latex = compute.encode_user_identifier(current_user.email)
+
+            with graphDB_Driver.session() as session:
+
+                # get the symbol key-value pairs so we can later populate the feed
+                query_start_time = time.time()
+                symbol_dict = session.read_transaction(
+                    neo4j_quer.get_node_properties_from_id,
+                    "symbol",
+                    nominated_symbol_id,
+                )
+                query_time_dict[
+                    "pdg_app/to_add_feed: get_node_properties_from_id symbol "
+                    + trace_id
+                ] = round(time.time() - query_start_time, 3)
+                logger.info("symbol_dict=" + str(symbol_dict))
+
+                # use the symbol key-value pair to populate feed
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.add_feed,
+                    feed_id,
+                    symbol_dict["latex"],
+                    now_str,
+                    author_name_latex,
+                )
+                query_time_dict[
+                    "pdg_app/to_add_feed: add_feed new multi-symbol " + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+                # use the symbol key-value pair to populate feed
+                query_start_time = time.time()
+                list_of_inference_rule_dicts = session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "feed",
+                    feed_id,
+                    "sympy",
+                    symbol_dict["sympy"],
+                )
+                query_time_dict[
+                    "pdg_app/to_add_feed: edit_node_property, feed sympy" + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+                # use the symbol key-value pair to populate feed
+                query_start_time = time.time()
+                list_of_inference_rule_dicts = session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "feed",
+                    feed_id,
+                    "lean",
+                    symbol_dict["lean"],
+                )
+                query_time_dict[
+                    "pdg_app/to_add_feed: edit_node_property, feed lean" + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+        else:
+            flash(
+                "pdg_app/to_add_feed: unrecognized form in POST: "
+                + str(request.form.keys())
+            )
+            logger.error(str(request.form.keys()))
+            logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_add_feed"))
 
     logger.info("[TRACE] end " + trace_id)
@@ -2823,8 +2882,7 @@ def to_add_feed() -> werkzeug.Response:
         title="Create Feed",
         query_time_dict=query_time_dict,
         form=web_form_add_feed,
-        # list_of_symbols=list_of_symbols,
-        # symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,  # _table_of_feeds.html
+        list_of_symbols=list_of_symbols,  # feed_create.html (for the dropdown of promoting a symbol to feed)
         list_of_feeds=list_of_feeds,
         sympy_as_latex_per_feed_id=sympy_as_latex_per_feed_id,
         dict_of_derivations_that_use_feed=dict_of_derivations_that_use_feed,  # _table_of_feeds.html
@@ -3414,10 +3472,17 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
             neo4j_query.get_node_properties_from_id, "scalar", scalar_id
         )
         query_time_dict[
-            "pdg_app/to_add_value_and_units get_node_properties_from_id " + trace_id
+            "pdg_app/to_add_value_and_units get_node_properties_from_id scalar " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-        # with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        dict_of_expressions_that_use_scalar = session.read_transaction(
+            neo4j_query.get_expressions_for_every_symbol
+        )
+        query_time_dict[
+            "pdg_app/to_add_value_and_units get_expressions_for_every_symbol " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
         query_start_time = time.time()
         dict_of_derivations_that_use_scalar = session.read_transaction(
             neo4j_query.get_derivations_for_every_symbol
@@ -4553,7 +4618,7 @@ def to_add_symbols_and_operations_for_feed(
     This step comes immediately after the Latex expression is provided.
 
     Although Latex-to-SymPy could be performed after the Latex is provided,
-    sometimes the symbols used in the latex inhibit converstion to Latex.
+    sometimes the symbols used in the latex inhibit conversion to Latex.
     For example,
     r_{\rm Earth} = 6
     """
@@ -4678,20 +4743,16 @@ def to_add_symbols_and_operations_for_feed(
     # The checkboxes are determined dynamically,
     # so I don't see how a class-based form could be used.
     if request.method == "POST":
-        logger.info(
-            "symbols_and_operations_for_feed request.form = " + str(request.form)
-        )
+        logger.info("request.form = " + str(request.form))
 
         list_of_symbol_IDs_in_expression = []  # type: List[str]
 
-        # TODO: Neo4j inside loop causes high latency
-        # request.form =
-        for ke, symbol_id in request.form.items():
-            # logger.info("key=", ke)
-            # logger.info("value=", val)
-            if "symbol_id_to_connect_to_expression" in ke:
+        with graphDB_Driver.session() as session:
+            for ke, symbol_id in request.form.items():
+                # logger.info("key=", ke)
+                # logger.info("value=", val)
+                if "symbol_id_to_connect_to_expression" in ke:
 
-                with graphDB_Driver.session() as session:
                     query_start_time = time.time()
                     list_of_inference_rule_dicts = session.write_transaction(
                         neo4j_query.connect_symbol_to_feed,
