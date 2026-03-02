@@ -2087,19 +2087,21 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     if request.method == "POST" and "add operation to expr" in request.form:
         logger.info("request.form = " + str(request.form))
 
-        operation_id = request.form["symbol_select_id_to_add"]
-
         with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_inference_rule_dicts = session.write_transaction(
-                neo4j_query.connect_symbol_to_expression,
-                operation_id,
-                expression_id,
-            )
-            query_time_dict[
-                "pdg_app/to_add_symbols_and_operations_for_expression: connect_symbol_to_expression"
-                + trace_id
-            ] = round(time.time() - query_start_time, 3)
+            for key, val in request.form.items():
+                if "operation_id_to_connect_to_expression" in key:
+                    operation_id = val
+
+                    query_start_time = time.time()
+                    list_of_inference_rule_dicts = session.write_transaction(
+                        neo4j_query.connect_symbol_to_expression,
+                        operation_id,
+                        expression_id,
+                    )
+                    query_time_dict[
+                        "pdg_app/to_add_symbols_and_operations_for_expression: connect_symbol_to_expression"
+                        + trace_id
+                    ] = round(time.time() - query_start_time, 3)
         return redirect(url_for("to_edit_expression", expression_id=expression_id))
 
     if request.method == "POST" and "remove operation from expr" in request.form:
@@ -2627,32 +2629,6 @@ def to_add_expression() -> werkzeug.Response:
             sorted_list_of_relation_dicts.append(this_relation_dict)
     list_of_relation_dicts = sorted_list_of_relation_dicts
 
-    # list_of_expression_IDs = []  # type: List[str]
-    # for this_expression_dict in list_of_expression_dicts:
-    #     list_of_expression_IDs.append(this_expression_dict["id"])
-
-    # with graphDB_Driver.session() as session:
-    #     query_start_time = time.time()
-    #     dict_of_derivation_dicts_that_use_expression = session.read_transaction(
-    #         neo4j_query.get_derivations_for_every_expression
-    #     )
-    #     query_time_dict[
-    #         "pdg_app/to_add_expression: get_all_derivations_for_every_expression"
-    #         + trace_id
-    #     ] = round(time.time() - query_start_time, 3)
-
-    #     # with graphDB_Driver.session() as session:
-    #     query_start_time = time.time()
-    #     symbol_dicts_per_expression_id = session.read_transaction(
-    #         neo4j_query.get_symbols_for_every_expression,
-    #         list_of_expression_IDs,
-    #     )
-    #     query_time_dict[
-    #         "pdg_app/to_add_expression: get_symbols_for_every_expression " + trace_id
-    #     ] = round(time.time() - query_start_time, 3)
-
-    # list_of_relation_dropdown_tuples = [("eq", "="), ("<", "lt")]
-
     if request.method == "POST" and not web_form_add_expression.validate():
         flash("pdg_app/to_add_expression: " + str(web_form_add_expression.errors))
         logger.error(str(web_form_add_expression.errors))
@@ -2792,7 +2768,6 @@ def to_add_expression() -> werkzeug.Response:
         query_time_dict=query_time_dict,
         form=web_form_add_expression,
         # dict_of_derivation_dicts_that_use_expression=dict_of_derivation_dicts_that_use_expression,  # Used in _table_of_expressions.html
-        # list_of_symbol_dicts_per_expression_id=symbol_dicts_per_expression_id,  # Used in _table_of_expressions.html
         # dict_of_all_symbol_dicts=dict_of_all_symbol_dicts,  # Used in _table_of_expressions.html which is referenced in expression_create.html
         list_of_relation_dicts=list_of_relation_dicts,  # Used in expression_create.html
         # symbol_IDs_per_expression_id=symbol_IDs_per_expression_id,  # Used in _table_of_expressions.html which is referenced in expression_create.html
@@ -5677,10 +5652,15 @@ def to_list_feeds() -> werkzeug.Response:
             + str(dict_of_derivation_dicts_that_use_feed)
         )
 
+        list_of_feed_IDs = []
+        for this_feed in list_of_feed_dicts:
+            list_of_feed_IDs.append(this_feed["id"])
+
         # with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        symbol_IDs_per_feed_id = session.read_transaction(
-            neo4j_query.get_symbol_IDs_in_every_feed
+        symbol_dicts_per_expression_id = session.read_transaction(
+            neo4j_query.get_symbols_for_every_feed,
+            list_of_feed_IDs,
         )
         query_time_dict[
             "pdg_app/to_list_feeds: get_all_symbol_IDs_in_every_feed" + trace_id
@@ -5688,10 +5668,6 @@ def to_list_feeds() -> werkzeug.Response:
 
     sympy_as_latex_per_feed_id = compute.get_sympy_as_latex_per_feed_id(
         list_of_feed_dicts
-    )
-
-    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
-        graphDB_Driver, query_time_dict
     )
 
     logger.info("[TRACE] end " + trace_id)
@@ -6153,9 +6129,6 @@ def to_list_expressions() -> str:
     for this_expression_dict in list_of_expression_dicts:
         list_of_expression_IDs.append(this_expression_dict["id"])
 
-    # list_of_symbol_dicts_per_expression_id = (
-    #     {}
-    # )  # type: Dict[str,list] # _table_of_expressions.html
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         symbol_dicts_per_expression_id = session.read_transaction(
@@ -6206,7 +6179,7 @@ def to_list_expressions() -> str:
         title="Expression list",
         query_time_dict=query_time_dict,
         list_of_expression_dicts=list_of_expression_dicts,
-        list_of_symbol_dicts_per_expression_id=symbol_dicts_per_expression_id,
+        symbols_per_expression_id=symbol_dicts_per_expression_id,
         dict_of_derivation_dicts_that_use_expression=dict_of_derivation_dicts_that_use_expression,
         dimensional_consistency_per_expression_id=dimensional_consistency_per_expression_id,  # Used in _table_of_expressions.html which is referenced in expression_list.html
     )
