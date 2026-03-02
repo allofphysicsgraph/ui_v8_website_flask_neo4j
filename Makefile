@@ -93,6 +93,8 @@ black_in:
 mypy_out:
 	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) mypy --install-types --non-interactive --check-untyped-defs webserver_for_pdg/pdg_app.py webserver_for_pdg/library
 
+pytest_out:
+	$(DOCKER_OR_PODMAN) exec --workdir /scratch/tests_of_webpage/playwright/ -it `$(DOCKER_OR_PODMAN) ps | grep flask-webserver | cut -d' ' -f1` pytest --exitfirst
 
 # keep the conf folder since that has the configuration
 # keep plugin folder since that has apocalypse
