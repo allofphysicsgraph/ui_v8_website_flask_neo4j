@@ -13,15 +13,19 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   <a href="{{ url_for('to_list_matrices') }}?referrer=expession_edit">matrix symbols</a>.</P>
 
 <P>derivations that use this expression:<BR>
+  <!--
   {{derivations_that_use_expression}}
+-->
 <UL>
 {% for derivation_dict in derivations_that_use_expression %}
 <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
 {% endfor %}
 </UL>
 
-<P>expression_dict: <BR>{{ expression_dict }}
-
+<!--
+<P>expression_dict: <BR>
+  {{ expression_dict }}
+-->
 
 <table border="1">
   <tr>
@@ -94,6 +98,7 @@ dict_of_nonoperation_symbol_dicts_in_expression: <BR>
     <H3>Add Symbol to Expression</h3>
   </legend>
 
+<P>This table is based on guesses informed by strings in the expression.
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
 
@@ -182,9 +187,14 @@ dict_of_nonoperation_symbol_dicts_in_expression: <BR>
      { % endfor % }
    -->
 
-operations_in_expression:<BR>
+<!--
+<P>operations_in_expression:<BR>
 {{ operations_in_expression }}
+-->
 
+{% if operations_in_expression|length == 0 %}
+<P>There are no operations associated with this expression.
+{% else %}
 <table border="1" id="operations_used_table" class="sortable">
   <tr>
     <th>ID</th>
@@ -203,11 +213,15 @@ operations_in_expression:<BR>
   </tr>
   {% endfor %}
 </table>
+{% endif %}
 
 <fieldset>
   <legend>
     <H3>Add operation used in Expression</h3>
   </legend>
+
+  <form method="post" action="" onsubmit="return checkForm(this);">
+    {{ form_no_options.csrf_token }}
 
   <table border="1" id="operations_used_table" class="sortable">
     <tr>
@@ -230,40 +244,45 @@ operations_in_expression:<BR>
     {% endfor %}
   </table>
 
-
-  <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form_no_options.csrf_token }}
+<!--
     <P>
     <select name="symbol_select_id_to_add" class="selectpicker form-control" id="symbol_select">
       {% for operation_dict in operations_not_in_expression %}
       <option value="{{ operation_dict['id'] }}">{{ operation_dict['id'] }}, {{ operation_dict['latex'] }} </option>
       {% endfor %}
     </select>
+  -->
     <input type="submit" name="add operation to expr" value="add operation to expression">
   </form>
 
   <P>Operation not listed? <a href="{{ url_for('to_add_operation') }}">Create a new operation</a>
 </fieldset>
 
+
+{% if operations_in_expression|length == 0 %}
+There are no operations associated with this expression, so there's nothing to remove.
+{% else %}
 <fieldset>
   <legend>
     <H3>Remove operation used in Expression</h3>
   </legend>
 
+<!--
 operations_in_expression<BR>
 {{ operations_in_expression }}
-
+-->
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P><!-- operation count: { { list_of_operation_IDs|length } } -->
     <select name="symbol_select_id_to_remove" class="selectpicker form-control" id="symbol_select">
       {% for operation_dict in operations_in_expression %}
-      <option value="{{ operation_dict['id'] }}">{{ operation_dict['id'] }}, {{ operation_dict['latex'] }} </option>
+      <option value="{{ operation_dict['id'] }}">{{ operation_dict['id'] }}, {{ operation_dict['latex'] }}, {{ operation_dict['name_latex'] }} </option>
       {% endfor %}
     </select>
     <input type="submit" name="remove operation from expr" value="remove operation from expression">
   </form>
 </fieldset>
+{% endif %}
 </fieldset>
 
 <fieldset>
@@ -277,15 +296,16 @@ operations_in_expression<BR>
     <H3>Change Relation used in Expression</h3>
   </legend>
 
+<!--
 relations_not_in_expression<BR>
 {{ relations_not_in_expression }}
-
+-->
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P><!-- operation count: { { list_of_operation_IDs|length } } -->
     <select name="relation_select_id_to_update" class="selectpicker form-control" id="symbol_select">
-      {% for symbol_dict in relations_not_in_expression %}
-      <option value="{{ symbol_dict['id'] }}">{{ symbol_dict['id'] }}, {{ symbol_dict['latex'] }} </option>
+      {% for relation_dict in relations_not_in_expression %}
+      <option value="{{ relation_dict['id'] }}">{{ relation_dict['id'] }}, {{ relation_dict['latex'] }}, {{ relation_dict['name_latex']}} </option>
       {% endfor %}
     </select>
     <input type="submit" name="update relation in expr" value="update relation used in expression">
@@ -301,13 +321,16 @@ relations_not_in_expression<BR>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_new_expression.csrf_token }}
+
     <P>{{ form_new_expression.expression_latex_lhs.label}} (<B>required</B>): 
        {{ form_new_expression.expression_latex_lhs(size=50, 
                     maxlength=1000, 
                     value=expression_dict['latex_lhs'],
-                    id="input_latex", 
+                    id="input_latex_lhs", 
+                    oninput="livePreview('input_latex_lhs', 'output_input_latex_lhs');",
                     onchange="onChangeFunction();") }} 
 
+<!--
     <P><input type="checkbox" 
               id="display_input_latex_lhs" 
               checked="" 
@@ -324,15 +347,18 @@ relations_not_in_expression<BR>
                                'preview_input_latex_lhs',
                                'output_input_latex_lhs')">
               <br clear="all">
+            -->
         <div id="output_input_latex_lhs"></div>
 
     <P>{{ form_new_expression.expression_latex_rhs.label}} (<B>required</B>): 
        {{ form_new_expression.expression_latex_rhs(size=50, 
                     maxlength=1000, 
                     value=expression_dict['latex_rhs'],
-                    id="input_latex", 
+                    id="input_latex_rhs", 
+                    oninput="livePreview('input_latex_rhs', 'output_input_latex_rhs');",
                     onchange="onChangeFunction();") }} 
 
+<!--
     <P><input type="checkbox" 
               id="display_input_latex_rhs" 
               checked="" 
@@ -349,6 +375,7 @@ relations_not_in_expression<BR>
                                'preview_input_latex_rhs',
                                'output_input_latex_rhs')">
               <br clear="all">
+            -->
         <div id="output_input_latex_rhs"></div>
 
 
