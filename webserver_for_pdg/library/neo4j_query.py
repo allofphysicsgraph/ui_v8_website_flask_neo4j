@@ -1839,13 +1839,13 @@ def add_feed(
     tx: Transaction,
     feed_id: str,
     feed_latex: str,
-    feed_sympy: str,
-    feed_lean: str,
     now_str: str,
     author_name_latex: str,
 ) -> None:
     """
     nothing returned by function because action is to write change to Neo4j database
+
+    the `sympy` and `lean` property keys do not get populated because that is a separate action
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -1864,9 +1864,7 @@ def add_feed(
         "id": str(feed_id),
         "latex": str(feed_latex),
         "author": str(author_name_latex),
-        "created": now_str,
-        "sympy": str(feed_sympy),
-        "lean": str(feed_lean),
+        "created": now_str
     }
 
     query = """
@@ -1874,14 +1872,10 @@ def add_feed(
         ON CREATE SET 
             f.created_datetime = $created,
             f.latex = $latex,
-            f.author_name_latex = $author,
-            f.sympy = $sympy,
-            f.lean = $lean
+            f.author_name_latex = $author
         ON MATCH SET 
             f.latex = $latex,
-            f.author_name_latex = $author,
-            f.sympy = $sympy,
-            f.lean = $lean
+            f.author_name_latex = $author
     """
 
     result = tx.run(query, params)
