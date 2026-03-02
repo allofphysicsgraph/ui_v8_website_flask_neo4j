@@ -117,7 +117,7 @@ def validate_step(
 
     for this_feed in list_of_feed_dicts:
         if "sympy" not in this_feed.keys():
-            return "missing SymPy for feed " + this_feedput["id"]
+            return "missing SymPy for feed " + this_feed["id"]
 
     for this_output in list_of_output_dicts:
         if "sympy_lhs" not in this_output.keys():
