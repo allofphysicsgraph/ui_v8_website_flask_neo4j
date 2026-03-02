@@ -9,6 +9,7 @@ import random
 import tokenize
 import uuid
 import logging
+from typing import NewType, Dict, List, Tuple
 
 # import time  # this creates a conflict with sympy's `time`
 
@@ -77,20 +78,12 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
 
 
 def dimensional_consistency(
-    expression_dict: dict,
-    list_of_symbol_IDs_in_expression: list,
-    dict_of_all_symbol_dicts: dict,
+    expression_dict: dict, symbols_in_expression: List[dict]
 ) -> str:
     """
     see sympy_validate_expression.README.md for more explanation.
 
     The error handling here is similar to `compute/get_sympy_as_latex_per_expr_id`
-
-    >>> expression_dict = {'id': '9942'}
-    >>> dict_of_all_symbol_dicts = {'9942': {'id': '9942'}}
-    >>> dimensional_consistency(expression_dict,
-                                dict_of_all_symbol_dicts)
-    unknown
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -200,10 +193,8 @@ def dimensional_consistency(
     # for each symbol used in the expression,
     # convert the numeric value for each dimension
     # into a SymPy expression that gets multiplied together for all dimensions
-    for symbol_id in list_of_symbol_IDs_in_expression:
-        # print("symbol_id=", symbol_id)
-        this_symbol_dict = dict_of_all_symbol_dicts[symbol_id]
-        # print("this_symbol_dict=", this_symbol_dict)
+    for this_symbol_dict in symbols_in_expression:
+
         symbol_dim_powers = ""
         if this_symbol_dict["dimension_time"] != 0:
             symbol_dim_powers += (
@@ -250,7 +241,7 @@ def dimensional_consistency(
         logger.info("symbol_dim_powers_result=" + str(symbol_dim_powers_result))
 
         # TODO: `exec` seems bad?
-        exec("pdg" + str(symbol_id) + " = " + symbol_dim_powers_result)
+        exec("pdg" + str(this_symbol_dict["id"]) + " = " + symbol_dim_powers_result)
 
     # now that the symbol dimensions have been set,
     # evaluate the dimensionality of the expression

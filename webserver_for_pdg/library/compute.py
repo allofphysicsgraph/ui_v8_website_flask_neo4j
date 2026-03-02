@@ -705,42 +705,19 @@ def get_dimensional_consistency_per_expression_id(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    dict_of_all_symbol_dicts, query_time_dict = get_dict_of_all_symbol_dicts(
-        graphDB_Driver, query_time_dict
-    )
-
     # TODO: Neo4j inside loop causes high latency
     for this_expression_dict in list_of_expression_dicts:
+
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
-            list_of_symbol_scalar_IDs_in_expression = session.read_transaction(
-                neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-                "expression",
-                this_expression_dict["id"],
-                "scalar",
+            symbols_in_expression = session.read_transaction(
+                neo4j_query.get_symbols_for_expression, expression_id
             )
-            query_time_dict["pdg_app/symbols_in_expression: " + trace_id] = round(
-                time.time() - query_start_time, 3
-            )
-
-        logger.info(
-            "list_of_symbol_scalar_IDs_in_expression="
-            + str(list_of_symbol_scalar_IDs_in_expression)
-        )
-
-        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/83
-        # # TODO
-        # with graphDB_Driver.session() as session:
-        #     query_start_time = time.time()
-        #     list_of_symbol_vector_IDs_in_expression = session.read_transaction(
-        #         neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-        #         "expression",
-        #         this_expression_dict["id"],
-        #         "vector",
-        #     )
-        #     query_time_dict["pdg_app/symbols_in_expression: " + trace_id] = round(
-        #         time.time() - query_start_time, 3
-        #     )
+            query_time_dict[
+                "pdg_app/get_dimensional_consistency_per_expression_id: get_symbols_for_expression "
+                + expression_id
+                + trace_id
+            ] = round(time.time() - query_start_time, 3)
 
         # TODO: vector dimensions should be consistent
 
@@ -749,9 +726,7 @@ def get_dimensional_consistency_per_expression_id(
         # try:
         dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
             sympy_validate_expression.dimensional_consistency(
-                this_expression_dict,
-                list_of_symbol_scalar_IDs_in_expression,
-                dict_of_all_symbol_dicts,
+                this_expression_dict, symbols_in_expression
             )
         )
         # except Exception as err:
@@ -839,409 +814,143 @@ def remove_file_debris(
     return
 
 
-def get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
+def get_symbols_not_in_expression(
+    expression_dict,
+    symbols_in_expression,
     graphDB_Driver,
     query_time_dict: query_timing_result_type,
-    expression_or_feed: str,
-    expression_id: unique_numeric_id_as_str,
-) -> Tuple[List[str], query_timing_result_type]:
-    """
-    TODO: eliminate this function
-    """
+) -> Tuple[dict, query_timing_result_type]:
+    """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_symbol_IDs_in_expression_or_feed = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-            expression_or_feed,
-            expression_id,
-            "relation",
-        )
-        query_time_dict[
-            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed relation"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
+    logger.info("symbols_in_expression=" + str(symbols_in_expression))
+
+    logger.info("expression_dict=" + str(expression_dict))
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-            expression_or_feed,
-            expression_id,
-            "scalar",
-        )
+        all_symbols = session.read_transaction(neo4j_query.get_symbols)
         query_time_dict[
-            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed scalar"
-            + trace_id
+            "compute/get_symbols_not_in_expression, get_symbols " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-            expression_or_feed,
-            expression_id,
-            "vector",
-        )
-        query_time_dict[
-            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed vector"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
+    logger.info("all_symbols= " + str(all_symbols))
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_symbol_IDs_in_expression_or_feed += session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-            expression_or_feed,
-            expression_id,
-            "matrix",
-        )
-        query_time_dict[
-            "compute/get_list_of_symbol_IDs_in_expression_or_feed get_list_of_symbol_IDs_per_category_in_expression_or_feed matrix"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
+    all_symbol_IDs = []
+    for this_symbol in all_symbols:
+        all_symbol_IDs.append(this_symbol["id"])
+
+    logger.info("all_symbol_IDs=" + str(all_symbol_IDs))
+
+    symbol_IDs_in_expression = []
+    for this_symbol in symbols_in_expression:
+        symbol_IDs_in_expression.append(this_symbol["id"])
+
+    logger.info("symbol_IDs_in_expression=" + str(symbol_IDs_in_expression))
+
+    candidate_symbols = []
+
+    for this_symbol_ID in all_symbol_IDs:
+        if this_symbol_ID not in symbol_IDs_in_expression:
+            candidate_symbols.append(this_symbol_ID)
+
+    symbols_not_in_expression_but_might_be_relevant = []
+    # given list of candidate symbols that are not currently associated with expression,
+    # does the symbol latex match LHS str or RHS str? If yes, symbols_not_in_expression.append(this_symbol_id)
+    for this_symbol in all_symbols:
+        if this_symbol["id"] in candidate_symbols:
+            if (this_symbol["latex"] in expression_dict["latex_lhs"]) or (
+                this_symbol["latex"] in expression_dict["latex_rhs"]
+            ):
+                symbols_not_in_expression_but_might_be_relevant.append(this_symbol)
 
     logger.info("[TRACE] end " + trace_id)
-    return list_of_symbol_IDs_in_expression_or_feed, query_time_dict
+    return symbols_not_in_expression_but_might_be_relevant, query_time_dict
 
 
-def get_list_of_all_nonoperation_symbol_dicts(
-    graphDB_Driver, query_time_dict: query_timing_result_type
-) -> Tuple[list, query_timing_result_type]:
-    """
-    TODO: eliminate this function
-
-    use for "new feed" when promoting existing symbols to feed
-
-    a better Cypher query might make this function slimmer
-
-    MATCH (n)
-    WHERE n:scalar OR n:vector OR n:matrix
-    RETURN n, label(n)
-
-    (based on https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887 )
-
-    >>> get_list_of_all_nonoperation_symbol_dicts
-    """
+def get_operations_not_in_expression(
+    expression_dict,
+    operations_in_expression,
+    graphDB_Driver,
+    query_time_dict: query_timing_result_type,
+) -> Tuple[dict, query_timing_result_type]:
+    """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    list_of_nonoperation_symbol_dicts = []  # type: List[dict]
+    logger.info("operations_in_expression=" + str(operations_in_expression))
+
+    logger.info("expression_dict=" + str(expression_dict))
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_scalar_symbol_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "scalar"
-        )
+        all_operations = session.read_transaction(neo4j_query.get_operations)
         query_time_dict[
-            "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
-            + trace_id
+            "compute/get_operations_not_in_expression, get_operations " + trace_id
         ] = round(time.time() - query_start_time, 3)
-    for this_symbol_dict in list_of_scalar_symbol_dicts:
-        this_symbol_dict["symbol_category"] = "scalar"
-        list_of_nonoperation_symbol_dicts.append(this_symbol_dict)
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_vector_symbol_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "vector"
-        )
-        query_time_dict[
-            "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    for this_symbol_dict in list_of_vector_symbol_dicts:
-        this_symbol_dict["symbol_category"] = "vector"
-        list_of_nonoperation_symbol_dicts.append(this_symbol_dict)
+    logger.info("all_operations= " + str(all_operations))
 
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_matrix_symbol_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "matrix"
-        )
-        query_time_dict[
-            "compute/get_list_of_all_nonoperation_symbol_dicts, list_nodes_of_type"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    for this_symbol_dict in list_of_matrix_symbol_dicts:
-        this_symbol_dict["symbol_category"] = "matrix"
-        list_of_nonoperation_symbol_dicts.append(this_symbol_dict)
+    all_operation_IDs = []
+    for this_operation in all_operations:
+        all_operation_IDs.append(this_operation["id"])
+
+    operation_IDs_in_expression = []
+    for this_operation in operations_in_expression:
+        operation_IDs_in_expression.append(this_operation["id"])
+
+    candidate_operations = []
+
+    for this_operation_ID in all_operation_IDs:
+        if this_operation_ID not in operation_IDs_in_expression:
+            candidate_operations.append(this_operation_ID)
+
+    operations_not_in_expression_but_might_be_relevant = []
+    # given list of candidate operations that are not currently associated with expression,
+    # does the operation latex match LHS str or RHS str? If yes, operations_not_in_expression.append(this_operation_id)
+    for this_operation in all_operations:
+        if this_operation["id"] in candidate_operations:
+            if (this_operation["latex"] in expression_dict["latex_lhs"]) or (
+                this_operation["latex"] in expression_dict["latex_rhs"]
+            ):
+                operations_not_in_expression_but_might_be_relevant.append(
+                    this_operation
+                )
 
     logger.info("[TRACE] end " + trace_id)
-    return list_of_nonoperation_symbol_dicts, query_time_dict
+    return operations_not_in_expression_but_might_be_relevant, query_time_dict
 
 
-def get_dict_of_all_symbol_dicts(
-    graphDB_Driver, query_time_dict: query_timing_result_type
+def get_relations_not_in_expression(
+    expression_dict,
+    relation_latex: str,
+    graphDB_Driver,
+    query_time_dict: query_timing_result_type,
 ) -> Tuple[dict, query_timing_result_type]:
-    """
-    a better Cypher query might make this function slimmer
-
-    MATCH (n)
-    WHERE n:symbol
-    RETURN n, label(n)
-
-    (based on https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887 )
-
-    >>>
-    """
+    """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    dict_of_all_symbol_dicts = {}  # type: Dict[str,dict]
+    logger.info("expression_dict=" + str(expression_dict))
 
-    dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "operation"
-    )
-    for ke, val in dict_of_all_operation_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        all_relations = session.read_transaction(neo4j_query.get_relations)
+        query_time_dict[
+            "compute/get_relations_not_in_expression, get_relations " + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
-    dict_of_all_scalar_dicts, query_time_dict = get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "scalar"
-    )
-    for ke, val in dict_of_all_scalar_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
+    logger.info("all_relations= " + str(all_relations))
 
-    dict_of_all_vector_dicts, query_time_dict = get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "vector"
-    )
-    for ke, val in dict_of_all_vector_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
+    candidate_relations = []
 
-    dict_of_all_matrix_dicts, query_time_dict = get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "matrix"
-    )
-    for ke, val in dict_of_all_matrix_dicts.items():
-        dict_of_all_symbol_dicts[ke] = val
+    for this_relation in all_relations:
+        if this_relation["latex"] != relation_latex:
+            candidate_relations.append(this_relation)
 
     logger.info("[TRACE] end " + trace_id)
-    return dict_of_all_symbol_dicts, query_time_dict
-
-
-def get_dict_of_all_nonoperation_symbol_dicts(
-    graphDB_Driver, query_time_dict: query_timing_result_type
-) -> Tuple[dict, query_timing_result_type]:
-    """
-    a better Cypher query might make this function slimmer
-
-    MATCH (n)
-    WHERE n:symbol
-    RETURN n, label(n)
-
-    (based on https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887 )
-
-    >>>
-    """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-
-    dict_of_all_nonoperation_symbol_dicts = {}  # type: Dict[str,dict]
-
-    dict_of_all_scalar_dicts, query_time_dict = get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "scalar"
-    )
-    for ke, val in dict_of_all_scalar_dicts.items():
-        dict_of_all_nonoperation_symbol_dicts[ke] = val
-
-    dict_of_all_vector_dicts, query_time_dict = get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "vector"
-    )
-    for ke, val in dict_of_all_vector_dicts.items():
-        dict_of_all_nonoperation_symbol_dicts[ke] = val
-
-    dict_of_all_matrix_dicts, query_time_dict = get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "matrix"
-    )
-    for ke, val in dict_of_all_matrix_dicts.items():
-        dict_of_all_nonoperation_symbol_dicts[ke] = val
-
-    logger.info("[TRACE] end " + trace_id)
-    return dict_of_all_nonoperation_symbol_dicts, query_time_dict
-
-
-def get_dict_of_nonoperation_symbol_dicts_in_expression(
-    expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
-) -> Tuple[dict, query_timing_result_type]:
-    """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    dict_of_all_nonoperation_symbol_dicts, query_time_dict = (
-        get_dict_of_all_nonoperation_symbol_dicts(graphDB_Driver, query_time_dict)
-    )
-
-    list_of_nonoperation_symbol_IDs_in_expression, query_time_dict = (
-        get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
-            graphDB_Driver, query_time_dict, "expression", expression_id
-        )
-    )
-
-    logger.info(
-        "list_of_nonoperation_symbol_IDs_in_expression="
-        + str(list_of_nonoperation_symbol_IDs_in_expression)
-    )
-
-    dict_of_nonoperation_symbol_dicts_in_expression = {}
-    for this_symbol_ID in list_of_nonoperation_symbol_IDs_in_expression:
-        dict_of_nonoperation_symbol_dicts_in_expression[this_symbol_ID] = (
-            dict_of_all_nonoperation_symbol_dicts[this_symbol_ID]
-        )
-
-    return dict_of_nonoperation_symbol_dicts_in_expression, query_time_dict
-
-
-def get_dict_of_nonoperation_symbol_dicts_not_in_expression(
-    expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
-) -> Tuple[dict, query_timing_result_type]:
-    """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    dict_of_all_nonoperation_symbol_dicts, query_time_dict = (
-        get_dict_of_all_nonoperation_symbol_dicts(graphDB_Driver, query_time_dict)
-    )
-
-    list_of_nonoperation_symbol_IDs_in_expression, query_time_dict = (
-        get_list_of_nonoperation_symbol_IDs_in_expression_or_feed(
-            graphDB_Driver, query_time_dict, "expression", expression_id
-        )
-    )
-
-    dict_of_nonoperation_symbol_dicts_in_expression, query_time_dict = (
-        get_dict_of_nonoperation_symbol_dicts_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
-        )
-    )
-
-    dict_of_nonoperation_symbol_dicts_not_in_expression = {}  # TODO
-
-    for this_symbol_id in dict_of_all_nonoperation_symbol_dicts.keys():
-        if this_symbol_id not in dict_of_nonoperation_symbol_dicts_in_expression.keys():
-            dict_of_nonoperation_symbol_dicts_not_in_expression[this_symbol_id] = (
-                dict_of_all_nonoperation_symbol_dicts[this_symbol_id]
-            )
-
-    return dict_of_nonoperation_symbol_dicts_not_in_expression, query_time_dict
-
-
-def get_dict_of_operation_dicts_in_expression(
-    expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
-) -> Tuple[dict, query_timing_result_type]:
-    """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-
-    dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "operation"
-    )
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_operation_IDs_in_expression = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-            "expression",
-            expression_id,
-            "operation",
-        )
-        query_time_dict[
-            "compute/get_dict_of_operation_dicts_in_expression get_list_of_symbol_IDs_per_category_in_expression_or_feed operation"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-    dict_of_operation_dicts_in_expression = {}
-
-    for this_operation_ID in list_of_operation_IDs_in_expression:
-        logger.info(
-            "pdg_app/to_edit_expression: this_operation_ID=" + str(this_operation_ID)
-        )
-        dict_of_operation_dicts_in_expression[this_operation_ID] = (
-            dict_of_all_operation_dicts[this_operation_ID]
-        )
-    logger.info(
-        "pdg_app/to_edit_expression: dict_of_operation_dicts_in_expression="
-        + str(dict_of_operation_dicts_in_expression)
-    )
-
-    return dict_of_operation_dicts_in_expression, query_time_dict
-
-
-def get_dict_of_operation_dicts_not_in_expression(
-    expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
-) -> Tuple[dict, query_timing_result_type]:
-    """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-
-    dict_of_all_operation_dicts, query_time_dict = get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "operation"
-    )
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_operation_IDs_in_expression = session.read_transaction(
-            neo4j_query.get_list_of_symbol_IDs_per_category_in_expression_or_feed,
-            "expression",
-            expression_id,
-            "operation",
-        )
-        query_time_dict[
-            "compute/get_dict_of_operation_dicts_not_in_expression get_list_of_symbol_IDs_per_category_in_expression_or_feed operation"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-    dict_of_operation_dicts_in_expression, query_time_dict = (
-        get_dict_of_operation_dicts_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
-        )
-    )
-
-    dict_of_operation_dicts_not_in_expression = {}
-
-    for this_operation_id in dict_of_all_operation_dicts.keys():
-        if this_operation_id not in dict_of_operation_dicts_in_expression.keys():
-            dict_of_operation_dicts_not_in_expression[this_operation_id] = (
-                dict_of_all_operation_dicts[this_operation_id]
-            )
-
-    return dict_of_operation_dicts_not_in_expression, query_time_dict
-
-
-def get_dict_of_relation_dicts_not_in_expression(
-    expression_id: str, graphDB_Driver, query_time_dict: query_timing_result_type
-) -> Tuple[dict, query_timing_result_type]:
-    """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-
-    dict_of_all_relation_dicts, query_time_dict = get_dict_of_node_dicts(
-        graphDB_Driver, query_time_dict, "relation"
-    )
-
-    logger.info("dict_of_all_relation_dicts=" + str(dict_of_all_relation_dicts))
-
-    # what is the relation currently used in this expression?
-    expression_dict = {}
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        expression_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "expression", expression_id
-        )
-        query_time_dict[
-            "pdg_app/to_edit_expression: get_node_properties_from_id expression "
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    logger.info("pdg_app/to_edit_expression: expression_dict:" + str(expression_dict))
-    logger.info("relation is " + str(expression_dict["latex_relation"]))
-
-    dict_of_relation_dicts_not_in_expression = {}
-
-    for relation_id in dict_of_all_relation_dicts.keys():
-        if relation_id != expression_dict["latex_relation"]:
-            dict_of_relation_dicts_not_in_expression[relation_id] = (
-                dict_of_all_relation_dicts[relation_id]
-            )
-
-    return dict_of_relation_dicts_not_in_expression, query_time_dict
+    return candidate_relations, query_time_dict
 
 
 def get_dict_of_node_dicts(

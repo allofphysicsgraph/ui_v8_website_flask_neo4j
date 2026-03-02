@@ -2019,59 +2019,41 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
     else:
         flash("pdg_app/to_edit_expression: no sympy_rhs to create picture from")
 
-    dict_of_nonoperation_symbol_dicts_in_expression, query_time_dict = (
-        compute.get_dict_of_nonoperation_symbol_dicts_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        symbols_in_expression = session.read_transaction(
+            neo4j_query.get_symbols_for_expression, expression_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_expression: get_symbols_for_expression expression "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        query_start_time = time.time()
+        operations_in_expression = session.read_transaction(
+            neo4j_query.get_operations_for_expression, expression_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_expression: get_operations_for_expression expression "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    symbols_not_in_expression, query_time_dict = compute.get_symbols_not_in_expression(
+        expression_dict, symbols_in_expression, graphDB_Driver, query_time_dict
+    )
+
+    operations_not_in_expression, query_time_dict = (
+        compute.get_operations_not_in_expression(
+            expression_dict, operations_in_expression, graphDB_Driver, query_time_dict
         )
     )
-
-    logger.info(
-        "dict_of_nonoperation_symbol_dicts_in_expression: "
-        + str(dict_of_nonoperation_symbol_dicts_in_expression)
-    )
-
-    dict_of_nonoperation_symbol_dicts_not_in_expression, query_time_dict = (
-        compute.get_dict_of_nonoperation_symbol_dicts_not_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
+    relations_not_in_expression, query_time_dict = (
+        compute.get_relations_not_in_expression(
+            expression_dict,
+            expression_dict["latex_relation"],
+            graphDB_Driver,
+            query_time_dict,
         )
-    )
-
-    logger.info(
-        "dict_of_nonoperation_symbol_dicts_not_in_expression: "
-        + str(dict_of_nonoperation_symbol_dicts_not_in_expression)
-    )
-
-    dict_of_operation_dicts_in_expression, query_time_dict = (
-        compute.get_dict_of_operation_dicts_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
-        )
-    )
-
-    logger.info(
-        "dict_of_operation_dicts_in_expression: "
-        + str(dict_of_operation_dicts_in_expression)
-    )
-
-    dict_of_operation_dicts_not_in_expression, query_time_dict = (
-        compute.get_dict_of_operation_dicts_not_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
-        )
-    )
-
-    logger.info(
-        "dict_of_operation_dicts_not_in_expression: "
-        + str(dict_of_operation_dicts_not_in_expression)
-    )
-
-    dict_of_relation_dicts_not_in_expression, query_time_dict = (
-        compute.get_dict_of_relation_dicts_not_in_expression(
-            expression_id, graphDB_Driver, query_time_dict
-        )
-    )
-
-    logger.info(
-        "dict_of_relation_dicts_not_in_expression: "
-        + str(dict_of_relation_dicts_not_in_expression)
     )
 
     if request.method == "POST" and "add symbol to expr" in request.form:
@@ -2302,11 +2284,11 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
         form_no_options=web_form_no_options,
         form_new_expression=web_form_new_expression,
         form_expression_sympy=web_form_expression_sympy,
-        dict_of_nonoperation_symbol_dicts_in_expression=dict_of_nonoperation_symbol_dicts_in_expression,
-        dict_of_nonoperation_symbol_dicts_not_in_expression=dict_of_nonoperation_symbol_dicts_not_in_expression,
-        dict_of_operation_dicts_in_expression=dict_of_operation_dicts_in_expression,
-        dict_of_operation_dicts_not_in_expression=dict_of_operation_dicts_not_in_expression,
-        dict_of_relation_dicts_not_in_expression=dict_of_relation_dicts_not_in_expression,
+        symbols_in_expression=symbols_in_expression,
+        symbols_not_in_expression=symbols_not_in_expression,
+        operations_in_expression=operations_in_expression,
+        operations_not_in_expression=operations_not_in_expression,
+        relations_not_in_expression=relations_not_in_expression,
         derivations_that_use_expression=derivations_that_use_expression,
     )
 
@@ -2341,9 +2323,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     # editing the feed includes modifying the symbols present.
 
-    dict_of_all_symbol_dicts, query_time_dict = compute.get_dict_of_all_symbol_dicts(
-        graphDB_Driver, query_time_dict
-    )
+    # TODO: fix this
+    dict_of_all_symbol_dicts = {}
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -4478,7 +4459,7 @@ def to_add_symbols_and_operations_for_expression(
                 url_for(
                     "to_add_sympy_and_lean_for_expression",
                     expression_id=expression_id,
-                    **symbol_id_dict,  # Unpack the dictionary into keyword arguments
+                    # **symbol_id_dict,  # Unpack the dictionary into keyword arguments
                     # symbol_id_dict=json.dumps(symbol_id_dict),
                 )
             )
@@ -4697,8 +4678,8 @@ def to_add_sympy_and_lean_for_expression(
         return redirect(url_for("to_list_expressions"))
 
     # set the default text
-    web_form_new_expression_sympy.sympy_str_lhs.data = revised_expr_lhs_with_str
-    web_form_new_expression_sympy.sympy_str_rhs.data = revised_expr_rhs_with_str
+    # web_form_new_expression_sympy.sympy_str_lhs.data = revised_expr_lhs_with_str
+    # web_form_new_expression_sympy.sympy_str_rhs.data = revised_expr_rhs_with_str
 
     return render_template(
         "jinja2_pages/user_workflow/expression_create_sympy_and_lean.html",
@@ -7256,7 +7237,7 @@ def to_blog_manual():
 
 
 @web_app.route("/blog/page/<YYYY>/<MM>/<blog_title>", methods=["GET"])
-def to_blog_manual_page():
+def to_blog_manual_page(YYYY: str, MM: str, blog_title: str):
     return render_template(
         "blog_manual/" + YYYY + "/" + MM + "/" + blog_title + ".html", title=blog_title
     )

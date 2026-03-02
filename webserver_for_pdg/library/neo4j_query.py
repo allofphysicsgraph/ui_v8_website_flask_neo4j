@@ -326,12 +326,26 @@ def get_derivations_that_use_expression(tx: Transaction, expression_id: str):
         """
     MATCH (d:derivation)-[:HAS_STEP]->(s:step)-[]->(e:expression)
     WHERE e.id = $expressionID
-    RETURN d
+    RETURN DISTINCT d
     """,
         expressionID=expression_id,
     )
 
-    list_of_dicts = result.data()
+    # record["d"] accesses the node, .data() converts that specific node to a dict
+
+    # if the expression is not used in any derivations then `record` is None and the list comprehension fails
+    # try:
+    #     list_of_dicts = [record["d"].data() for record in result]
+    # except Exception as err:
+    #     logger.error(str(err))
+    #     list_of_dicts = []
+
+    list_of_dicts_extra_key = result.data()
+
+    list_of_dicts = []
+    if len(list_of_dicts_extra_key) > 0:
+        for this_res in list_of_dicts_extra_key:
+            list_of_dicts.append(this_res["d"])
 
     logger.info("list_of_dicts=" + str(list_of_dicts))
 
@@ -426,9 +440,27 @@ def get_symbols_for_expression(tx: Transaction, expression_id: str) -> List[dict
     """
     result = tx.run(query, eid=expression_id)
 
-    for res in result:
-        logger.info("res=" + str(res))
-        symbol_list.append(res)
+    symbol_list = [res["props"] for res in result.data()]
+
+    logger.info("[TRACE] end " + trace_id)
+    return symbol_list
+
+
+def get_operations_for_expression(tx: Transaction, expression_id: str) -> List[dict]:
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    logger.info("expression_id =" + expression_id)
+    symbol_list = []  # type: List[dict]
+
+    query = """
+    MATCH (e:expression {id: $eid})-[:IS_COMPRISED_OF]->(s:operation) 
+    RETURN properties(s) AS props
+    """
+    result = tx.run(query, eid=expression_id)
+
+    symbol_list = [res["props"] for res in result.data()]
+
     logger.info("[TRACE] end " + trace_id)
     return symbol_list
 
@@ -1544,6 +1576,48 @@ def disconnect_symbol_from_feed(tx, symbol_id: str, feed_id: str) -> None:
 
     logger.info("[TRACE] end " + trace_id)
     return
+
+
+def get_symbols(tx: Transaction):
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    query = """
+    MATCH (s:symbol)
+    RETURN s
+    """
+    result = tx.run(query)
+    logger.info("[TRACE] end " + trace_id)
+    return result.value()
+
+
+def get_operations(tx: Transaction):
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    query = """
+    MATCH (s:operation)
+    RETURN s
+    """
+    result = tx.run(query)
+    logger.info("[TRACE] end " + trace_id)
+    return result.value()
+
+
+def get_relations(tx: Transaction):
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    query = """
+    MATCH (s:relation)
+    RETURN s
+    """
+    result = tx.run(query)
+    logger.info("[TRACE] end " + trace_id)
+    return result.value()
 
 
 def get_node_labels_from_property(
