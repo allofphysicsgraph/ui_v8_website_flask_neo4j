@@ -20,25 +20,27 @@
                                 id="input_latex", 
                                 type="text",
                                 pattern="^[\x20-\x7F]+$", 
-                                oninput="validateASCII(this)"") }} </P>
+                                oninput="validateASCII(this);") }} </P>
 
         <div id="output_input_latex"></div>
 
 
-    <P><input type="submit" value="add multi-symbol feed">
+    <P><input type="submit" name="new multi-symbol" value="add multi-symbol feed">
     </P>
   </form>
 
+<!--
 <fieldset>
   <legend>actions</legend>
 <ul>
-  <LI><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=new_step_select_expressions_for_inference_rule">add new scalar</a></LI>
-  <LI><a href="{{ url_for('to_add_symbol_vector') }}?referrer=new_step_select_expressions_for_inference_rule">add new vector</a></LI>
-  <LI><a href="{{ url_for('to_add_symbol_matrix') }}?referrer=new_step_select_expressions_for_inference_rule">add new matrix</a></LI>
-  <LI><a href="{{ url_for('to_add_operation') }}?referrer=new_step_select_expressions_for_inference_rule">add new operation</a></LI>
-  <LI><a href="{{ url_for('to_add_relation') }}?referrer=new_step_select_expressions_for_inference_rule">add new relation</a></LI>
+  <LI><a href="{{ url_for('to_add_symbol_scalar') }}?referrer=new_feed">add new scalar</a></LI>
+  <LI><a href="{{ url_for('to_add_symbol_vector') }}?referrer=new_feed">add new vector</a></LI>
+  <LI><a href="{{ url_for('to_add_symbol_matrix') }}?referrer=new_feed">add new matrix</a></LI>
+  <LI><a href="{{ url_for('to_add_operation') }}?referrer=new_feed">add new operation</a></LI>
+  <LI><a href="{{ url_for('to_add_relation') }}?referrer=new_feed">add new relation</a></LI>
 </ul>
 </fieldset>
+-->
 
 </fieldset>
 xor
@@ -51,11 +53,11 @@ xor
     {{ form.csrf_token }}
 
     <select name="symbol_select_id_to_add" class="selectpicker form-control" id="symbol_select">
-      {% for this_symbol_dict in list_of_nonoperation_symbol_dicts %}
+      {% for this_symbol_dict in list_of_symbols %}
       <option value="{{ this_symbol_dict['id'] }}">{{ this_symbol_dict['id'] }}, {{ this_symbol_dict['latex'] }} </option>
       {% endfor %}
     </select>
-    <input type="submit" value="promote symbol to feed">
+    <input type="submit" name="promote existing" value="promote symbol to feed">
 
   </form>
 </fieldset>
