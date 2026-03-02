@@ -2327,7 +2327,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        dict_of_symbols_in_feed = session.read_transaction(
+        symbols_in_feed = session.read_transaction(
             neo4j_query.get_symbols_for_feed, feed_id
         )
         query_time_dict[
@@ -2351,7 +2351,6 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
             "pdg_app/to_edit_feed: get_nodes_of_type symbol " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    symbol_id_in_feed = []
     for this_symbol in symbols_in_feed:
         symbol_id_in_feed.append(this_symbol["id"])
 
@@ -2797,6 +2796,8 @@ def to_add_feed() -> werkzeug.Response:
 
         author_name_latex = compute.encode_user_identifier(current_user.email)
 
+        # TODO
+        list_of_symbols = []
         for symbol_dict in list_of_symbols:
             if symbol_dict["id"] == request.form["symbol_select_id_to_add"]:
                 # https://neo4j.com/docs/python-manual/current/session-api/
@@ -2822,8 +2823,8 @@ def to_add_feed() -> werkzeug.Response:
         title="Create Feed",
         query_time_dict=query_time_dict,
         form=web_form_add_feed,
-        list_of_symbols=list_of_symbols,
-        symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,  # _table_of_feeds.html
+        # list_of_symbols=list_of_symbols,
+        # symbol_IDs_per_feed_id=symbol_IDs_per_feed_id,  # _table_of_feeds.html
         list_of_feeds=list_of_feeds,
         sympy_as_latex_per_feed_id=sympy_as_latex_per_feed_id,
         dict_of_derivations_that_use_feed=dict_of_derivations_that_use_feed,  # _table_of_feeds.html
@@ -4335,8 +4336,6 @@ def to_add_symbols_and_operations_for_expression(
                 url_for(
                     "to_add_sympy_and_lean_for_expression",
                     expression_id=expression_id,
-                    # **symbol_id_dict,  # Unpack the dictionary into keyword arguments
-                    # symbol_id_dict=json.dumps(symbol_id_dict),
                 )
             )
         elif (
@@ -4361,7 +4360,6 @@ def to_add_symbols_and_operations_for_expression(
             )
 
         list_of_symbol_IDs_in_expression = []  # type: List[str]
-        symbol_id_dict = {}  # type: Dict[str, str]
 
         with graphDB_Driver.session() as session:
             for ke, symbol_id in request.form.items():
@@ -4378,20 +4376,12 @@ def to_add_symbols_and_operations_for_expression(
                         + trace_id
                     ] = round(time.time() - query_start_time, 3)
 
-                    # symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
-
-        logger.info("symbol_id_dict=" + str(symbol_id_dict))
-        # example output: {'a': '5638458', 'b': '7152159'}
-        #         or      {'m': '3973021', '\\vec{a}': '3506734', '\\vec{F}': '3235432'}
-
         if next_page_enter_SymPy_and_Lean:
             logger.info("[TRACE] end " + trace_id)
             return redirect(
                 url_for(
                     "to_add_sympy_and_lean_for_expression",
                     expression_id=expression_id,
-                    # **symbol_id_dict,  # Unpack the dictionary into keyword arguments
-                    # symbol_id_dict=json.dumps(symbol_id_dict),
                 )
             )
         else:
@@ -4419,30 +4409,10 @@ def to_add_sympy_and_lean_for_expression(
 ) -> werkzeug.Response:
     """
     add sympy and lean for expression_id
-
-    example symbol_id_dict
-        {'a': '5638458', 'b': '7152159'}
-    or
-        {'m': '3973021', '\\vec{a}': '3506734', '\\vec{F}': '3235432'}
-
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
-
-    # logger.info("type(symbol_id_dict)=" + str(type(symbol_id_dict)))
-    # TODO this is a security risk - evaluating user-provided string from URL
-    # To fix this, pass the arguments as key-value pairs ?a=5638458&b=7152159
-    # symbol_id_dict = eval(symbol_id_dict)
-
-    # try:
-    #     # Safely parse the JSON string back into a dictionary
-    #     symbol_id_dict = json.loads(symbol_id_dict)
-    # except json.JSONDecodeError:
-    #     return "Invalid dictionary format", 400
-
-    # symbol_id_dict = request.args.to_dict()
-    # logger.info("symbol_id_dict=" + str(symbol_id_dict))
 
     web_form_new_expression_sympy = SpecifyNewExpressionSympyLeanForm()
 
@@ -4455,9 +4425,6 @@ def to_add_sympy_and_lean_for_expression(
             "pdg_app/to_add_sympy_and_lean_for_expression, node_properties " + trace_id
         ] = round(time.time() - query_start_time, 3)
     logger.info("expression_dict=" + str(expression_dict))
-
-    # TODO: populate from Neo4j query
-    symbol_id_dict = {"latex symbol": "id of symbol"}
 
     # TODO
     query_time_dict, revised_expr_lhs, revised_expr_rhs = (
@@ -4556,6 +4523,8 @@ def to_add_sympy_and_lean_for_expression(
     # set the default text
     # web_form_new_expression_sympy.sympy_str_lhs.data = revised_expr_lhs_with_str
     # web_form_new_expression_sympy.sympy_str_rhs.data = revised_expr_rhs_with_str
+
+    symbol_id_dict = {"latex symbol": "symbol ID"}
 
     return render_template(
         "jinja2_pages/user_workflow/expression_create_sympy_and_lean.html",
@@ -4714,7 +4683,6 @@ def to_add_symbols_and_operations_for_feed(
         )
 
         list_of_symbol_IDs_in_expression = []  # type: List[str]
-        symbol_id_dict = {}  # type: Dict[str, str]
 
         # TODO: Neo4j inside loop causes high latency
         # request.form =
@@ -4735,20 +4703,11 @@ def to_add_symbols_and_operations_for_feed(
                         + trace_id
                     ] = round(time.time() - query_start_time, 3)
 
-                symbol_id_dict[dict_of_symbol_dicts[symbol_id]["latex"]] = symbol_id
-
-        logger.info(
-            "symbols_and_operations_for_feed symbol_id_dict=" + str(symbol_id_dict)
-        )
-        # example output: {'a': '5638458', 'b': '7152159'}
-
         logger.info("[trace] end " + trace_id)
         return redirect(
             url_for(
                 "to_add_sympy_and_lean_for_feed",
                 feed_id=feed_id,
-                # **symbol_id_dict,  # Unpack the dictionary into keyword arguments
-                # symbol_id_dict=json.dumps(symbol_id_dict),
             )
         )
 
@@ -4779,17 +4738,6 @@ def to_add_sympy_and_lean_for_feed(
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
-    # symbol_id_dict = eval(symbol_id_dict)
-
-    # try:
-    #     # Safely parse the JSON string back into a dictionary
-    #     symbol_id_dict = json.loads(symbol_id_dict)
-    # except json.JSONDecodeError:
-    #     return "Invalid dictionary format", 400
-
-    # symbol_id_dict = request.args.to_dict()
-    # logger.info("symbol_id_dict=" + str(symbol_id_dict))
-
     web_form_new_feed_sympy = SpecifyNewFeedSympyLeanForm()
 
     with graphDB_Driver.session() as session:
@@ -4802,9 +4750,6 @@ def to_add_sympy_and_lean_for_feed(
         ] = round(time.time() - query_start_time, 3)
     logger.info("feed_dict=" + str(feed_dict))
 
-    # logger.info("symbol_id_dict=" + str(symbol_id_dict))
-    # symbol_id_dict= {'a': '5638458', 'b': '7152159'}
-
     # provide a guess for the SymPy based on the Latex provided
 
     cleaned_latex_str = compute.remove_latex_presention_markings(feed_dict["latex"])
@@ -4813,13 +4758,9 @@ def to_add_sympy_and_lean_for_feed(
         cleaned_latex_str
     )
     logger.info("sympy_expr=" + str(sympy_expr))
-    # list_of_sympy_symbols = latex_and_sympy.list_of_sympy_symbols_in_sympy_expression(sympy_expr)
-    # logger.info("list_of_sympy_symbols=",list_of_sympy_symbols)
-
-    # look at each sympy_symbol replaced with PDG symbol
 
     # TODO: rewrite
-    symbol_id_dict = {}
+    symbol_id_dict = {"latex symbol": "symbol ID"}
     revised_expr = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
         sympy_expr, symbol_id_dict
     )
@@ -5864,7 +5805,6 @@ def to_list_scalars() -> str:
         #     list_of_derivations
         # )
 
-    dict_of_derivations_that_use_scalar = {}  # type: Dict[str,list]
     for (
         scalar_id,
         list_of_derivations,
