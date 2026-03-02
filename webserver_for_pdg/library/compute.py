@@ -150,15 +150,8 @@ def guess_sympy_from_expression(graphDB_Driver, query_time_dict, expression_dict
         )
         revised_expr_rhs_with_str = None
 
-    # # revised_expr_with_str = re.sub(r"^Eq", "Eq", revised_expr_with_str)
-    # revised_expr_with_str = (
-    #     "Eq(" + revised_expr_lhs_with_str + "," + revised_expr_rhs_with_str + ")"
-    # )
-
-    # logger.info(
-    #     "to_add_sympy_and_lean_for_expression: revised_expr_with_str="
-    #     + str(revised_expr_with_str)
-    # )
+    logger.info("revised_expr_lhs_with_str=" + str(revised_expr_lhs_with_str))
+    logger.info("revised_expr_rhs_with_str=" + str(revised_expr_rhs_with_str))
 
     logger.info("[TRACE] end " + trace_id)
     return query_time_dict, revised_expr_lhs_with_str, revised_expr_rhs_with_str
@@ -711,17 +704,17 @@ def get_dimensional_consistency_per_expression_id(
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             symbols_in_expression = session.read_transaction(
-                neo4j_query.get_symbols_for_expression, expression_id
+                neo4j_query.get_symbols_for_expression, this_expression_dict["id"]
             )
             query_time_dict[
                 "pdg_app/get_dimensional_consistency_per_expression_id: get_symbols_for_expression "
-                + expression_id
+                + this_expression_dict["id"]
                 + trace_id
             ] = round(time.time() - query_start_time, 3)
 
         # TODO: vector dimensions should be consistent
-
         # TODO: vector shape should be consistent
+        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/83
 
         # try:
         dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
