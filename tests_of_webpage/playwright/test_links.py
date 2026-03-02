@@ -56,6 +56,9 @@ def test_get_login_page(page: Page):
 def test_get_index_page(page: Page):
     page.goto(URL+"/index")
 
+    expect(page.get_by_role("heading", name="Physics Derivation Graph")).to_be_visible()
+
+
 def test_get_choose_new_symbol_page(page: Page):
     page.goto(URL+"/new_symbol")
 
@@ -68,20 +71,37 @@ def test_get_query_page(page: Page):
 def test_get_list_feeds_page(page: Page):
     page.goto(URL+"/list_feeds")
 
+    expect(page.get_by_role("heading", name="List of Feeds")).to_be_visible()
+
 def test_get_list_operations_page(page: Page):
     page.goto(URL+"/list_operations")
+
+    expect(page.get_by_role("heading", name="List of Operations")).to_be_visible()
+
+
 
 def test_get_list_relations_page(page: Page):
     page.goto(URL+"/list_relations")
 
+    expect(page.get_by_role("heading", name="List of relations")).to_be_visible()
+
+
 def test_get_list_scalars_page(page: Page):
     page.goto(URL+"/list_scalars")
+
+    # If there are no scalar then header will be something else
+    expect(page.get_by_role("heading", name=re.compile("aka symbols of dimension 0"))).to_be_visible()
 
 def test_get_list_vectors_page(page: Page):
     page.goto(URL+"/list_vectors")
 
+    # If there are no vectors then header will be something else
+    expect(page.get_by_role("heading", name=re.compile("aka symbols of dimension 1"))).to_be_visible()
+
 def test_get_list_matrices_page(page: Page):
     page.goto(URL+"/list_matrices")
+
+    # Page will have either header "Create matrix symbol" or ____
 
 def test_get_list_expressions_page(page: Page):
     page.goto(URL+"/list_expressions")
@@ -91,6 +111,7 @@ def test_get_list_expressions_page(page: Page):
 def test_get_list_derivations_page(page: Page):
     page.goto(URL+"/list_derivations")
 
+    # if there are no derivations present then the heading is "Actions for Derivations"
     expect(page).to_have_title(re.compile("Derivation list"))
 
 def test_link_list_derivations_to_curl_curl(page: Page):
