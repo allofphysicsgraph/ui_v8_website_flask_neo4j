@@ -57,7 +57,7 @@
         {% endfor %}
         </UL>
     </td> <!-- used in derivation -->
-    <td><UL>{% for symbol_dict in list_of_symbol_dicts_per_expression_id[expression_dict['id']] %}
+    <td><UL>{% for symbol_dict in symbols_per_expression_id[expression_dict['id']] %}
         <LI><a href="{{ url_for('to_edit_node', node_id=symbol_dict['id']) }}" title="see more about this symbol">
              {{ symbol_dict['id'] }}</a>:  \( {{ symbol_dict['latex']|e }} \)</LI>
       {% endfor %}
