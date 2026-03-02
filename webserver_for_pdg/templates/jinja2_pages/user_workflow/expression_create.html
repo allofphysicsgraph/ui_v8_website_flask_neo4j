@@ -39,7 +39,7 @@ Latex:
 -->
 
     <select name="symbol_relation_id_to_add" class="selectpicker form-control" id="relation_select">
-      {% for relation_dict in list_of_relation_dicts %}
+      {% for relation_dict in list_of_relations %}
       <option value="{{ relation_dict['id'] }}">\({{ relation_dict['latex'] }}\)</option>
       {% endfor %}
     </select>
@@ -210,7 +210,7 @@ function latex_filter() {
   
 </fieldset>
 
-{% if list_of_expression_dicts|length > 0 %}
+{% if list_of_expressions|length > 0 %}
 {% include 'jinja2_pages/reusable_components/_table_of_expressions_mini.html' %}
 {% endif %}
 

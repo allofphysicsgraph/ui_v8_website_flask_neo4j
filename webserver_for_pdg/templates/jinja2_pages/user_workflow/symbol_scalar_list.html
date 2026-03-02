@@ -8,7 +8,7 @@
 
 <!--
 <P>All symbols:
-{ % for symbol_dict in list_of_symbol_dicts %}
+{ % for symbol_dict in list_of_symbols %}
 <UL>
   <LI>{ { symbol_dict }}</LI>
 </UL>
@@ -16,11 +16,11 @@
 -->
 
 
-{% if list_of_scalar_dicts|length > 0 %}
+{% if list_of_scalars|length > 0 %}
 
 <fieldset>
 <legend>
-  <H2 id="scalar">There are {{ list_of_scalar_dicts|length }} Scalars, aka symbols of dimension 0</h2>
+  <H2 id="scalar">There are {{ list_of_scalars|length }} Scalars, aka symbols of dimension 0</h2>
 </legend>
 
 <P>The symbol ID links to a page where you can edit the symbol<BR>

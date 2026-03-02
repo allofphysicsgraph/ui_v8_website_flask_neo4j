@@ -1,11 +1,11 @@
 <!--
 <P>For debugging purposes, here is the all the info available:
 -->
-<!-- { { list_of_inference_rule_dicts } } -->
+<!-- { { list_of_inference_rules } } -->
 
 <!--
 <ul>
-{ % for this_inference_dict in list_of_inference_rule_dicts % }
+{ % for this_inference_dict in list_of_inference_rules % }
 <li>{ { this_inference_dict } }</li>
 { % endfor % }
 </ul>
@@ -20,7 +20,7 @@
     <th>output count</th>
     <th>used in derivation</th>
   </tr>
-  {% for inference_rule_dict in list_of_inference_rule_dicts %}
+  {% for inference_rule_dict in list_of_inference_rules %}
   <tr>
     <td>
       <a href="{{ url_for('to_edit_inference_rule', inference_rule_id=inference_rule_dict['id'] ) }}">

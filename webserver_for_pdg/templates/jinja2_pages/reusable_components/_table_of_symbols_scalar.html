@@ -3,9 +3,9 @@
 <P>For debugging purposes, here is the all the info available:
 
 <ul>
-{ % for this_scalar_dict in list_of_scalar_dicts %}
-<li>{ { this_scalar_dict }}</li>
-{ % endfor %}
+{% for this_scalar_dict in list_of_scalars %}
+<li>{{ this_scalar_dict }}</li>
+{% endfor %}
 </ul>
 -->
 
@@ -29,7 +29,7 @@
     <th><small>dimension:</small> amount of substance</th>
     <th><small>dimension:</small> temperature</th>
   </tr>
-  {% for scalar_dict in list_of_scalar_dicts %}
+  {% for scalar_dict in list_of_scalars %}
   <tr>
     <td>
       <a href="{{ url_for('to_edit_scalar', scalar_id=scalar_dict['id'] ) }}">
@@ -42,14 +42,14 @@
     <td>{{ scalar_dict['description_latex'] }}</td>
     <td>{{ scalar_dict['scope'] }}</td>
     <td>{{ scalar_dict['domain'] }}</td>
-    <td><UL>{% for expression_dict in dict_of_expression_dicts_that_use_scalar[scalar_dict['id']] %}
+    <td><UL>{% for expression_dict in dict_of_expressions_that_use_scalar[scalar_dict['id']] %}
       
         <LI><a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id']) }}?referrer=table_of_symbols_dimension0">{{ expression_dict['id'] }}</a></LI>
       
         {% endfor %}
         </UL>
     </td> <!-- used in expressions -->
-    <td><UL>{% for derivation_dict in dict_of_derivation_dicts_that_use_scalar[scalar_dict['id']] %}
+    <td><UL>{% for derivation_dict in dict_of_derivations_that_use_scalar[scalar_dict['id']] %}
       
         <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
       

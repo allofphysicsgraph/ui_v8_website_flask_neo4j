@@ -243,7 +243,7 @@ Or should feeds only be connected to a single step?
 
 <P><em>current status</em>: Feeds should only be used once.
 
-<P>Cypher query to <a href="{{ url_for('to_query') }}">find feeds connected to more than one step</a>:
+<P>Cypher query to <a href="{{ url_for('to_query') }}#feeds%20connected%20to%20more%20than%20one%20step">find feeds connected to more than one step</a>:
 <pre>
   MATCH (f:feed)--(s:step)
 WITH f, count(s) AS stepCount

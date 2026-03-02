@@ -1,14 +1,21 @@
 
 <!--
-    dict_of_derivation_dicts_that_use_feed:
-{{dict_of_derivation_dicts_that_use_feed}}
+dict_of_derivations_that_use_feed:
+{{dict_of_derivations_that_use_feed}}
 
-list_of_feed_dicts:
+list_of_feeds:
 <ul>
-{% for this_feed_dict in list_of_feed_dicts %}
+{% for this_feed_dict in list_of_feeds %}
 <li>{{ this_feed_dict }}</li>
 {% endfor %}
 </ul>
+
+
+sympy_as_latex_per_feed_id:
+{{sympy_as_latex_per_feed_id}}
+
+symbols_per_feed_id:
+{{symbols_per_feed_id}}
 -->
 
 <table border="1" id="feed_table" class="sortable">
@@ -23,7 +30,7 @@ list_of_feed_dicts:
     <th><a href="https://www.sympy.org/">sympy</a></th>
     <th><a href="https://github.com/leanprover/lean4">lean 4</a></th>
   </tr>
-  {% for feed_dict in list_of_feed_dicts %}
+  {% for feed_dict in list_of_feeds %}
   <tr>
     <td>
       <a href="{{ url_for('to_edit_feed', feed_id=feed_dict['id'] ) }}" title="see more about this feed">
@@ -39,14 +46,14 @@ list_of_feed_dicts:
            {{ feed_dict['latex']|e }}</td>
     <td>{{ feed_dict['name_latex'] }}</td>
     <td>{{ feed_dict['description_latex'] }}</td>
-    <td><UL>{% for derivation_dict in dict_of_derivation_dicts_that_use_feed[feed_dict['id']] %}
+    <td><UL>{% for derivation_dict in dict_of_derivations_that_use_feed[feed_dict['id']] %}
       
         <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
       
         {% endfor %}
         </UL>
     </td> <!-- used in derivation -->
-    <td><UL>{% for symbol_dict in list_of_symbols_per_feed_id[feed_dict['id']] %}
+    <td><UL>{% for symbol_dict in symbols_per_feed_id[feed_dict['id']] %}
         <LI><a href="{{ url_for('to_edit_node', node_id=symbol_dict['id']) }}" title="see more about this symbol">
              {{ symbol_dict['id'] }}</a>:  \( {{ symbol_dict['latex']|e }} \)</LI>
       {% endfor %}

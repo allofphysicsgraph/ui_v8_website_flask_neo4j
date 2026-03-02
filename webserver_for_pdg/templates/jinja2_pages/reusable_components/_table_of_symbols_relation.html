@@ -4,16 +4,16 @@
 <!- - { { list_of_symbol_dicts } } - ->
 
 <ul>
-{ % for this_symbol_dict in list_of_relation_dicts %}
+{ % for this_symbol_dict in list_of_relations %}
 <li>{ { this_symbol_dict }}</li>
 { % endfor %}
 </ul>
 -->
-<P>dict_of_expression_dicts_that_use_relation:<BR>
-{{ dict_of_expression_dicts_that_use_relation }}
+<P>dict_of_expressions_that_use_relation:<BR>
+{{ dict_of_expressions_that_use_relation }}
 
-<P>dict_of_derivation_dicts_that_use_relation:<BR>
-{{ dict_of_derivation_dicts_that_use_relation }}
+<P>dict_of_derivations_that_use_relation:<BR>
+{{ dict_of_derivations_that_use_relation }}
 
 <table border="1" id="relation_table" class="sortable">
   <tr>
@@ -25,7 +25,7 @@
     <th>used in derivation</th>
     <th>reference</th>
   </tr>
-  {% for symbol_dict in list_of_relation_dicts %}
+  {% for symbol_dict in list_of_relations %}
   <tr>
     <td>
       <a href="{{ url_for('to_edit_relation', relation_id=symbol_dict['id'] ) }}">
@@ -36,14 +36,14 @@
           {{ symbol_dict['latex'].replace('\t','\\\\t').replace('\n','\\\\n') }}</td>
     <td>{{ symbol_dict['name_latex'] }}</td>
     <td>{{ symbol_dict['description_latex'] }}</td>
-    <td><UL>{% for expression_dict in dict_of_expression_dicts_that_use_relation[symbol_dict['id']] %}
+    <td><UL>{% for expression_dict in dict_of_expressions_that_use_relation[symbol_dict['id']] %}
       
         <LI><a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id']) }}?referrer=table_of_symbols_requires_arguments">{{ expression_dict['id'] }}</a></LI>
       
         {% endfor %}
         </UL>
     </td> <!-- used in expressions -->
-    <td><UL>{% for derivation_dict in dict_of_derivation_dicts_that_use_relation[symbol_dict['id']] %}
+    <td><UL>{% for derivation_dict in dict_of_derivations_that_use_relation[symbol_dict['id']] %}
       
         <LI><a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a></LI>
       
