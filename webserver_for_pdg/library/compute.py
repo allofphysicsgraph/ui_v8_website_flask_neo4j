@@ -53,10 +53,6 @@ def generate_random_id(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    try:
-        assert node_type in list_of_valid.node_types
-    except Exception as err:
-        logger.error(str(type(err).__name__) + ": " + str(err))
 
     list_of_existing_IDs = []
     with graphDB_Driver.session() as session:
@@ -119,6 +115,8 @@ def guess_sympy_from_expression(graphDB_Driver, query_time_dict, expression_dict
 
     # look at each sympy_symbol replaced with PDG symbol
 
+    # TODO:
+    symbol_id_dict = {}
     try:
         revised_expr_lhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
             sympy_expr_lhs, symbol_id_dict
