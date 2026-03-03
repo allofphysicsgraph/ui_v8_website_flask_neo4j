@@ -28,7 +28,8 @@ In Cypher queries
 
 """
 
-import neo4j  # needed for exception handling
+# needed for exception handling
+import neo4j  # type: ignore
 
 from neo4j import Record, Transaction
 import random  # for trace IDs
