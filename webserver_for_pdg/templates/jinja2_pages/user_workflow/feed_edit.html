@@ -114,9 +114,9 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form_new_feed.csrf_token }}
-    <P>{{ form_new_feed.feed_latex.label}} (<B>required</B>): 
-       {{ form_new_feed.feed_latex(size=50, 
+    {{ form_edit_feed.csrf_token }}
+    <P>{{ form_edit_feed.feed_latex.label}} (<B>required</B>): 
+       {{ form_edit_feed.feed_latex(size=50, 
                     maxlength=1000, 
                     value=feed_dict['latex'],
                     id="input_latex") }} 
