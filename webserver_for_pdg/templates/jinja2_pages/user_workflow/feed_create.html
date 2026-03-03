@@ -15,13 +15,13 @@ list_of_symbols:
 
 <fieldset>
   <legend>
-    <H2>Create new multi-symbol feed</H2>
+    <H2>Create new multi-symbol feed, or a feed that is a number</H2>
   </legend>
 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form.csrf_token }}
-    <P>{{ form.feed_latex.label}} (<B>required</B>): 
-       {{ form.feed_latex(size=50, 
+    {{ form_new_feed.csrf_token }}
+    <P>{{ form_new_feed.feed_latex.label}} (<B>required</B>): 
+       {{ form_new_feed.feed_latex(size=50, 
                                 maxlength=1000,
                                 id="input_latex", 
                                 type="text",
@@ -31,7 +31,7 @@ list_of_symbols:
         <div id="output_input_latex"></div>
 
 
-    <P><input type="submit" name="new multi-symbol" value="add multi-symbol feed">
+    <P><input type="submit" name="new multi-symbol or  numeric" value="add multi-symbol or numeric feed">
     </P>
   </form>
 
@@ -58,7 +58,7 @@ list_of_symbols:
 
 
   <form method="post" action="" onsubmit="return checkForm(this);">
-    {{ form.csrf_token }}
+    {{ form_no_options.csrf_token }}
 
     <select name="symbol_select_id_to_add" class="selectpicker form-control" id="symbol_select">
       {% for this_symbol_dict in list_of_symbols %}
