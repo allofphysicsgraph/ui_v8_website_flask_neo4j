@@ -1,68 +1,67 @@
 
 <!-- https://physicsderivationgraph.blogspot.com/2020/05/live-display-of-input.html -->
 <script>
-  // Object to hold our typing timers for the different inputs
-  var typingTimers = {};
-  var doneTypingInterval = 300; // Wait 300ms after typing stops before rendering
+// Object to hold our typing timers for the different inputs
+var typingTimers = {};
+var doneTypingInterval = 300; 
 
-  function livePreview(input_id, display_checkbox_id, preview_id, output_id) {
+function livePreview(input_id, display_checkbox_id, preview_id, output_id) {
+
     // Clear the previous timer if the user is still typing
     clearTimeout(typingTimers[input_id]);
-    
+
     // Set a new timer
     typingTimers[input_id] = setTimeout(function () {
-      convert(input_id, display_checkbox_id, preview_id, output_id);
+        convert(input_id, display_checkbox_id, preview_id, output_id);
     }, doneTypingInterval);
-  }
+}
 
-  function convert(input_id, display_checkbox_id, preview_id, output_id) {
-    //console.log(input_id)
-    //console.log(display_checkbox_id)
-    //console.log(preview_id)
-    //console.log(output_id)
-    //
+function convert(input_id, display_checkbox_id, preview_id, output_id) {
+
     //  Get the TeX input
-    //
     var input = document.getElementById(input_id).value.trim();
-    //
-    //  Disable the display and render buttons until MathJax is done
-    //
-    var display = document.getElementById(display_checkbox_id);
-    var button = document.getElementById(preview_id);
-    button.disabled = display.disabled = true;
-    //
-    //  Clear the old output
-    //
-    output = document.getElementById(output_id);
+    
+    // Check if optional elements exist before trying to use them
+    var displayCheckbox = display_checkbox_id ? document.getElementById(display_checkbox_id) : null;
+    var previewButton = preview_id ? document.getElementById(preview_id) : null;
+
+    // Disable elements only if they exist
+    if (previewButton) previewButton.disabled = true;
+    //checks if the checkbox exists. When it doesn't, it defaults to true 
+    // (which renders the LaTeX in "Display Mode" centered/large). 
+    // If you want it to look like inline text, change true to false.
+    if (displayCheckbox) displayCheckbox.disabled = true;
+
+    var output = document.getElementById(output_id);
     output.innerHTML = '';
-    //
+
     //  Reset the tex labels (and automatic equation numbers, though there aren't any here).
     //  Get the conversion options (metrics and display settings)
     //  Convert the input to CommonHTML output and use a promise to wait for it to be ready
     //    (in case an extension needs to be loaded dynamically).
-    //
     MathJax.texReset();
     var options = MathJax.getMetricsFor(output);
-    options.display = display.checked;
+    
+    // Logic change: If there is no checkbox, default to 'true' (Display Mode)
+    // or 'false' (Inline Mode) based on your preference.
+    options.display = displayCheckbox ? displayCheckbox.checked : true;
+
     MathJax.tex2chtmlPromise(input, options).then(function (node) {
-      //
+
       //  The promise returns the typeset node, which we add to the output
       //  Then update the document to include the adjusted CSS for the
       //    content of the new equation.
-      //
-      output.appendChild(node);
-      MathJax.startup.document.clear();
-      MathJax.startup.document.updateDocument();
+        output.appendChild(node);
+        MathJax.startup.document.clear();
+        MathJax.startup.document.updateDocument();
     }).catch(function (err) {
-      //
-      //  If there was an error, put the message into the output instead
-      //
-      output.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
+
+        //  If there was an error, put the message into the output instead
+        output.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
     }).then(function () {
-      //
-      //  Error or not, re-enable the display and render buttons
-      //
-      button.disabled = display.disabled = false;
+        // Re-enable elements only if they exist
+        if (previewButton) previewButton.disabled = false;
+        if (displayCheckbox) displayCheckbox.disabled = false;
     });
-  }
+}
 </script>
