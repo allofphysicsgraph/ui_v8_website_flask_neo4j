@@ -27,6 +27,13 @@ secure==0.3.0
 # code formatting and consistency checking
 #mypy==1.19.1 as of 2026-01-24 on arm64
 mypy
+
+# type hints for some packages are a separate package
+types-WTForms
+types-oauthlib
+types-requests
+types-xmltodict
+
 #black==26.1.0 as of 2026-01-24 on arm64
 black
 #flake8==7.3.0 as of 2026-01-24 on arm64
