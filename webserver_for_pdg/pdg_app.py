@@ -76,7 +76,7 @@ import re
 
 # https://gist.github.com/ibeex/3257877
 from logging.handlers import RotatingFileHandler
-import neo4j
+import neo4j  # type: ignore
 
 # https://hplgit.github.io/web4sciapps/doc/pub/._web4sa_flask004.html
 from flask import (
@@ -139,6 +139,8 @@ from flask_login import (
     LoginManager,
     UserMixin,
 )  # type: ignore
+
+from flask.typing import ResponseReturnValue
 
 # https://stackoverflow.com/questions/6323860/sibling-package-imports/50193944
 # 2025-01-01: BHP commented out the `sys.path.append` and instead used
@@ -282,8 +284,10 @@ from library.google_auth_user_account import User
 import requests
 
 # https://realpython.com/flask-google-login/
-GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
-GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
+# GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
+# GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
+GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
+GOOGLE_CLIENT_SECRET = os.environ["GOOGLE_CLIENT_SECRET"]
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
 from oauthlib.oauth2 import WebApplicationClient  # type: ignore
@@ -1255,7 +1259,7 @@ def to_navigation():
 
 @web_app.route("/new_derivation", methods=["GET", "POST"])
 @login_required
-def to_add_derivation() -> werkzeug.Response:
+def to_add_derivation() -> ResponseReturnValue:
     """
     create new derivation
     user provides deritivation name and abstract
@@ -1422,7 +1426,9 @@ def to_add_derivation() -> werkzeug.Response:
 
 
 @web_app.route("/review_derivation/<derivation_id>", methods=["GET", "POST"])
-def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_review_derivation(
+    derivation_id: unique_numeric_id_as_str,
+) -> ResponseReturnValue:
     """
     options from this page:
     * add step to existing derivation
@@ -1701,7 +1707,7 @@ def to_review_derivation(derivation_id: unique_numeric_id_as_str) -> werkzeug.Re
 
 
 @web_app.route("/select_step/<derivation_id>", methods=["GET", "POST"])
-def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_select_step(derivation_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     User wants to delete step or edit step
     """
@@ -1760,7 +1766,7 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> werkzeug.Response
 @login_required
 def to_edit_derivation_metadata(
     derivation_id: unique_numeric_id_as_str,
-) -> werkzeug.Response:
+) -> ResponseReturnValue:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -1867,7 +1873,7 @@ def to_edit_derivation_metadata(
 )
 def to_add_step_select_inference_rule(
     derivation_id: unique_numeric_id_as_str,
-) -> werkzeug.Response:
+) -> ResponseReturnValue:
     """
     add new step to existing derivation
 
@@ -1939,7 +1945,7 @@ def to_add_step_select_inference_rule(
 
 @web_app.route("/edit_expression/<expression_id>", methods=["GET", "POST"])
 @login_required
-def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     authenticated user can edit expression by
     - alter the Latex of either LHS or RHS
@@ -2297,7 +2303,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
 @web_app.route("/edit_feed/<feed_id>", methods=["GET", "POST"])
 @login_required
-def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit feed
     """
@@ -2516,7 +2522,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
 @web_app.route("/new_expression", methods=["GET", "POST"])
 @login_required
-def to_add_expression() -> werkzeug.Response:
+def to_add_expression() -> ResponseReturnValue:
     """
     novel expression
     """
@@ -2714,7 +2720,7 @@ def to_add_expression() -> werkzeug.Response:
 
 @web_app.route("/new_feed", methods=["GET", "POST"])
 @login_required
-def to_add_feed() -> werkzeug.Response:
+def to_add_feed() -> ResponseReturnValue:
     """
     novel feed
     """
@@ -2753,15 +2759,19 @@ def to_add_feed() -> werkzeug.Response:
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        if "new multi-symbol" in request.form.keys():
+        if "new multi-symbol or numeric" in request.form.keys():
             if web_form_add_feed.validate():
                 feed_latex = str(web_form_add_feed.feed_latex.data).strip()
                 logger.info("feed_latex:" + str(feed_latex))
 
                 # TODO: validate that this string is actually Latex before adding to database
 
-                feed_lean = "TODO"
-                feed_sympy = "TODO"
+                # determine whether input is numeric
+                try:
+                    float(feed_latex)
+                    is_numeric = True
+                except ValueError:
+                    is_numeric = False
 
                 author_name_latex = compute.encode_user_identifier(current_user.email)
 
@@ -2787,12 +2797,15 @@ def to_add_feed() -> werkzeug.Response:
                     ] = round(time.time() - query_start_time, 3)
 
                 logger.info("[TRACE] end " + trace_id)
-                return redirect(
-                    url_for(
-                        "to_add_symbols_and_operations_for_feed",
-                        feed_id=feed_id,
+                if is_numeric:
+                    return redirect(url_for("to_list_feeds"))
+                else:
+                    return redirect(
+                        url_for(
+                            "to_add_symbols_and_operations_for_feed",
+                            feed_id=feed_id,
+                        )
                     )
-                )
 
             else:
                 flash("pdg_app/to_add_feed: " + str(web_form_add_feed.errors))
@@ -2841,6 +2854,8 @@ def to_add_feed() -> werkzeug.Response:
                     "pdg_app/to_add_feed: add_feed new multi-symbol " + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
+                symbol_as_sympy = "Symbol('pdg" + symbol_dict["id"] + "')"
+
                 # use the symbol key-value pair to populate feed
                 query_start_time = time.time()
                 list_of_inference_rule_dicts = session.write_transaction(
@@ -2848,11 +2863,13 @@ def to_add_feed() -> werkzeug.Response:
                     "feed",
                     feed_id,
                     "sympy",
-                    symbol_dict["sympy"],
+                    symbol_as_sympy,
                 )
                 query_time_dict[
                     "pdg_app/to_add_feed: edit_node_property, feed sympy" + trace_id
                 ] = round(time.time() - query_start_time, 3)
+
+                symbol_as_lean = ""  # TODO; as of 2026-03-03 BHP isn't clear what this representation is supposed to be
 
                 # use the symbol key-value pair to populate feed
                 query_start_time = time.time()
@@ -2861,7 +2878,7 @@ def to_add_feed() -> werkzeug.Response:
                     "feed",
                     feed_id,
                     "lean",
-                    symbol_dict["lean"],
+                    symbol_as_lean,
                 )
                 query_time_dict[
                     "pdg_app/to_add_feed: edit_node_property, feed lean" + trace_id
@@ -2881,7 +2898,7 @@ def to_add_feed() -> werkzeug.Response:
         "jinja2_pages/user_workflow/feed_create.html",
         title="Create Feed",
         query_time_dict=query_time_dict,
-        form=web_form_add_feed,
+        form_new_feed=web_form_add_feed,
         list_of_symbols=list_of_symbols,  # feed_create.html (for the dropdown of promoting a symbol to feed)
         list_of_feeds=list_of_feeds,
         sympy_as_latex_per_feed_id=sympy_as_latex_per_feed_id,
@@ -2891,7 +2908,7 @@ def to_add_feed() -> werkzeug.Response:
 
 @web_app.route("/edit_node/<node_id>", methods=["GET", "POST"])
 @login_required
-def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_edit_node(node_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit any node -- actually redirect to respective subcategory
 
@@ -2961,7 +2978,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
 @web_app.route("/edit_operation/<operation_id>", methods=["GET", "POST"])
 @login_required
-def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit operation
     """
@@ -3058,7 +3075,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> werkzeug.Respon
 
 @web_app.route("/edit_relation/<relation_id>", methods=["GET", "POST"])
 @login_required
-def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_edit_relation(relation_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit relation
     """
@@ -3146,7 +3163,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> werkzeug.Response
 
 @web_app.route("/edit_scalar/<scalar_id>", methods=["GET", "POST"])
 @login_required
-def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit symbol:
     - change the Latex
@@ -3268,7 +3285,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
 @web_app.route("/edit_vector/<vector_id>", methods=["GET", "POST"])
 @login_required
-def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_edit_vector(vector_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit vector
 
@@ -3324,7 +3341,7 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> werkzeug.Response:
 
 @web_app.route("/edit_matrix/<matrix_id>", methods=["GET", "POST"])
 @login_required
-def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit matrix
 
@@ -3382,7 +3399,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> werkzeug.Response:
 @web_app.route(
     "/new_symbol_scalar_constant_value_and_units/<scalar_id>/", methods=["GET", "POST"]
 )
-def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Response:
+def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
@@ -3531,7 +3548,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
 
 @web_app.route("/new_symbol_scalar", methods=["GET", "POST"])
 @login_required
-def to_add_symbol_scalar() -> werkzeug.Response:
+def to_add_symbol_scalar() -> ResponseReturnValue:
     """
     novel scalar symbol
     """
@@ -3678,7 +3695,7 @@ def to_add_symbol_scalar() -> werkzeug.Response:
 
 @web_app.route("/new_symbol_vector", methods=["GET", "POST"])
 @login_required
-def to_add_symbol_vector() -> werkzeug.Response:
+def to_add_symbol_vector() -> ResponseReturnValue:
     """
     novel vector
     """
@@ -3790,7 +3807,7 @@ def to_add_symbol_vector() -> werkzeug.Response:
 
 @web_app.route("/new_symbol_matrix", methods=["GET", "POST"])
 @login_required
-def to_add_symbol_matrix() -> werkzeug.Response:
+def to_add_symbol_matrix() -> ResponseReturnValue:
     """
     novel matrix
     """
@@ -3909,7 +3926,7 @@ def to_add_symbol_matrix() -> werkzeug.Response:
 
 
 @web_app.route("/new_symbol", methods=["GET", "POST"])
-def to_add_symbol() -> werkzeug.Response:
+def to_add_symbol() -> ResponseReturnValue:
     """
     novel symbol
     """
@@ -3918,7 +3935,7 @@ def to_add_symbol() -> werkzeug.Response:
 
 @web_app.route("/new_operation", methods=["GET", "POST"])
 @login_required
-def to_add_operation() -> werkzeug.Response:
+def to_add_operation() -> ResponseReturnValue:
     """
     novel operation
     """
@@ -4024,7 +4041,7 @@ def to_add_operation() -> werkzeug.Response:
 
 @web_app.route("/new_relation", methods=["GET", "POST"])
 @login_required
-def to_add_relation() -> werkzeug.Response:
+def to_add_relation() -> ResponseReturnValue:
     """
     novel relation
     """
@@ -4132,7 +4149,7 @@ def to_add_relation() -> werkzeug.Response:
 )
 def to_add_step_select_expressions(
     derivation_id: unique_numeric_id_as_str, inference_rule_id: unique_numeric_id_as_str
-) -> werkzeug.Response:
+) -> ResponseReturnValue:
     """
     derivation_id is the numeric ID of the derivation being edited
 
@@ -4347,7 +4364,7 @@ def to_add_step_select_expressions(
 )
 def to_add_symbols_and_operations_for_expression(
     expression_id: unique_numeric_id_as_str,
-) -> werkzeug.Response:
+) -> ResponseReturnValue:
     """
     expression_id is the numeric ID of the expression
 
@@ -4473,7 +4490,7 @@ def to_add_symbols_and_operations_for_expression(
 )
 def to_add_sympy_and_lean_for_expression(
     expression_id: unique_numeric_id_as_str,
-) -> werkzeug.Response:
+) -> ResponseReturnValue:
     """
     add sympy and lean for expression_id
     """
@@ -4613,7 +4630,7 @@ def to_add_sympy_and_lean_for_expression(
 )
 def to_add_symbols_and_operations_for_feed(
     feed_id: unique_numeric_id_as_str,
-) -> werkzeug.Response:
+) -> ResponseReturnValue:
     """
     feed_id is the numeric ID of the expression
 
@@ -4629,6 +4646,7 @@ def to_add_symbols_and_operations_for_feed(
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_no_options = NoOptionsForm()
+    web_form_new_feed = SpecifyNewFeedForm()
 
     # get the Latex for this expression_id
     with graphDB_Driver.session() as session:
@@ -4780,6 +4798,7 @@ def to_add_symbols_and_operations_for_feed(
         title="Create Feed: Add Symbols",
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
+        form_new_feed=web_form_new_feed,
         feed_dict=feed_dict,
         list_of_potential_matching_symbols_from_sympy=list_of_potential_matching_symbols_from_sympy,
         potential_symbols_found_in_Latex_feed=potential_symbols_found_in_Latex_feed,
@@ -4793,7 +4812,7 @@ def to_add_symbols_and_operations_for_feed(
 )
 def to_add_sympy_and_lean_for_feed(
     feed_id: unique_numeric_id_as_str,
-) -> werkzeug.Response:
+) -> ResponseReturnValue:
     """
     derivation_id is the numeric ID of the derivation being edited
     """
@@ -4906,7 +4925,7 @@ def to_add_sympy_and_lean_for_feed(
 
 @web_app.route("/new_inference_rule", methods=["GET", "POST"])
 @login_required
-def to_add_inference_rule() -> werkzeug.Response:
+def to_add_inference_rule() -> ResponseReturnValue:
     """
     create inference rule
     """
@@ -5034,7 +5053,7 @@ def to_add_inference_rule() -> werkzeug.Response:
 @login_required
 def to_edit_step(
     derivation_id: unique_numeric_id_as_str, step_id: unique_numeric_id_as_str
-) -> werkzeug.Response:
+) -> ResponseReturnValue:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -5110,7 +5129,7 @@ def to_edit_step(
 @login_required
 def to_edit_inference_rule(
     inference_rule_id: unique_numeric_id_as_str,
-) -> werkzeug.Response:
+) -> ResponseReturnValue:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -5278,7 +5297,7 @@ def to_edit_inference_rule(
 
 
 @web_app.route("/query", methods=["GET", "POST"])
-def to_query() -> werkzeug.Response:
+def to_query() -> ResponseReturnValue:
     """
     page for submitting Cypher queries
 
@@ -5524,7 +5543,7 @@ def to_query() -> werkzeug.Response:
 
 
 @web_app.route("/list_feeds", methods=["GET", "POST"])
-def to_list_feeds() -> werkzeug.Response:
+def to_list_feeds() -> ResponseReturnValue:
     """
     >>> to_list_feeds()
     """
@@ -5584,7 +5603,7 @@ def to_list_feeds() -> werkzeug.Response:
 
 
 @web_app.route("/list_operations", methods=["GET", "POST"])
-def to_list_operations() -> werkzeug.Response:
+def to_list_operations() -> ResponseReturnValue:
     """
     >>> to_list_operations()
     """
@@ -5637,7 +5656,7 @@ def to_list_operations() -> werkzeug.Response:
 
 
 @web_app.route("/list_relations", methods=["GET", "POST"])
-def to_list_relations() -> werkzeug.Response:
+def to_list_relations() -> ResponseReturnValue:
     """
     >>> to_list_relations()
     """
@@ -5805,7 +5824,7 @@ def to_edit_constant_value_and_units(
 
 
 @web_app.route("/list_scalars", methods=["GET", "POST"])
-def to_list_scalars() -> str:
+def to_list_scalars() -> ResponseReturnValue:
     """
     a table
 
@@ -5894,7 +5913,7 @@ def to_list_scalars() -> str:
 
 
 @web_app.route("/list_vectors", methods=["GET", "POST"])
-def to_list_vectors() -> str:
+def to_list_vectors() -> ResponseReturnValue:
     """
     >>> to_list_vectors()
     """
@@ -5946,7 +5965,7 @@ def to_list_vectors() -> str:
 
 
 @web_app.route("/list_matrices", methods=["GET", "POST"])
-def to_list_matrices() -> str:
+def to_list_matrices() -> ResponseReturnValue:
     """
     >>> to_list_matrices()
     """
@@ -5999,7 +6018,7 @@ def to_list_matrices() -> str:
     "/list_expressions/", methods=["GET", "POST"]
 )  # this is here so that if someone tries to edit an expression without specifying the ID they get to the list of expressions
 @web_app.route("/list_expressions", methods=["GET", "POST"])
-def to_list_expressions() -> str:
+def to_list_expressions() -> ResponseReturnValue:
     """
     >>> to_list_expressions()
     """
@@ -6084,7 +6103,7 @@ def to_list_expressions() -> str:
     "/edit_derivation_metadata", methods=["GET", "POST"]
 )  # this is here so that if someone tries to edit metadata without specifying the ID they are directed to the list of derivations
 @web_app.route("/list_derivations", methods=["GET", "POST"])
-def to_list_derivations() -> str:
+def to_list_derivations() -> ResponseReturnValue:
     """
     this page is a gateway for the task "which existing derivation to edit?"
 
@@ -6147,7 +6166,7 @@ def to_list_derivations() -> str:
 
 
 @web_app.route("/list_inference_rules")
-def to_list_inference_rules() -> str:
+def to_list_inference_rules() -> ResponseReturnValue:
     """
     >>> to_show_all_inference_rules()
     """
@@ -6166,7 +6185,7 @@ def to_list_inference_rules() -> str:
         ] = round(time.time() - query_start_time, 3)
     dict_of_derivations_used_per_inference_rule, query_time_dict = (
         compute.get_dict_of_derivations_used_per_inference_rule(
-            graphDB_Driver, query_time_dict, list_of_inference_rule_dicts
+            graphDB_Driver, query_time_dict, list_of_inference_rules
         )
     )
 
@@ -6186,7 +6205,7 @@ def to_list_inference_rules() -> str:
 
 @web_app.route("/delete_all")
 @login_required
-def to_delete_graph_content() -> werkzeug.Response:
+def to_delete_graph_content() -> ResponseReturnValue:
     """
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
     https://neo4j.com/developer/kb/large-delete-transaction-best-practices-in-neo4j/
@@ -6210,7 +6229,7 @@ def to_delete_graph_content() -> werkzeug.Response:
 
 
 @web_app.route("/export_to_json")
-def to_export_json() -> werkzeug.Response:
+def to_export_json() -> ResponseReturnValue:
     """
     Produces JSON Lines (.jsonl) rather than JSON (JavaScript Object Notation)
 
@@ -6275,7 +6294,7 @@ def to_export_metadata_schema():
 
 
 @web_app.route("/export_to_csv")
-def to_export_csv() -> werkzeug.Response:
+def to_export_csv() -> ResponseReturnValue:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -6295,7 +6314,7 @@ def to_export_csv() -> werkzeug.Response:
 
 
 @web_app.route("/export_to_graphml")
-def to_export_graphml() -> werkzeug.Response:
+def to_export_graphml() -> ResponseReturnValue:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -6315,7 +6334,7 @@ def to_export_graphml() -> werkzeug.Response:
 
 
 @web_app.route("/export_to_cypher")
-def to_export_cypher() -> werkzeug.Response:
+def to_export_cypher() -> ResponseReturnValue:
     """
 
     # apoc.export.cypherQuery()
@@ -6349,7 +6368,7 @@ def to_export_cypher() -> werkzeug.Response:
 
 
 @web_app.route("/api_via_js")
-def to_api_via_js() -> str:
+def to_api_via_js() -> ResponseReturnValue:
     """
     HTML page created with help from Google's Gemini 2.0 LLM (free!) 2025-01-xx
     """
@@ -6361,7 +6380,7 @@ def to_api_via_js() -> str:
 
 @web_app.route("/api_documentation")
 @web_app.route("/documentation/api")
-def to_api_documentation() -> str:
+def to_api_documentation() -> ResponseReturnValue:
     """
     HTML page generated by Google's Gemini 2.0 LLM (free!) 2025-01-xx
     """
@@ -6371,7 +6390,7 @@ def to_api_documentation() -> str:
 
 
 @web_app.route("/workflow_documentation")
-def to_workflow_documenation() -> str:
+def to_workflow_documenation() -> ResponseReturnValue:
     """
     HTML page generated by Google's Gemini 2.0 LLM (free!) 2025-01-xx
 
