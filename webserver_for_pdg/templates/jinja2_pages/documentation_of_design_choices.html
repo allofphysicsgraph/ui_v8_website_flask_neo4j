@@ -406,17 +406,39 @@ def to_api_via_js() -&gt; str:
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id="interface"><i>Decision</i>: Interface</H2>
+<H2 id="interface"><i>Decision</i>: Is an interface needed?</H2>
+
+<P><em>current status</em>: Direct write access to Neo4j is not allowed.
+
+<P>One could imagine allowing read-write access to the property graph database. That would allow users to make changes that violate the schema.
+A property graph is overly permissive regarding what nodes, edges, and properties are allowable. 
+
+<P>Having an interface enforces compliance with the schema. The interface enforces
+  <UL>
+    <LI>only certain nodes, edges, and properties are allowed
+    <LI>consistency of references; e.g. disconnected nodes are less likely
+    <LI>a specific sequence of actions -- a workflow. An interface guides which actions can be taken at any point in the process. For example, the user can't jump directly to adding sympy for an expression, they are only directed there after entering a new expression.
+  </UL>
+
+<P>The backdoor to this is exporting the database and then importing modified content.
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id="interface"><i>Decision</i>: Which interface modality?</H2>
 
 <P><em>current status</em>: primarily using web UI to read and write to Neo4j database. Exploring use of API.
 
 <P>Plan to support API.
 
-<p>Why web ui? Why not a GUI? Or command line?</p>
-
-<p>Accessibility. Most users wouldn't be comfortable with command line UI. The web UI enforces the Neo4j schema.</p>
+<p>Why web ui? Why not a GUI? Or command line?<BR>
+Accessibility. Most users wouldn't be comfortable with command line UI. The web UI enforces the Neo4j schema.</p>
 
 <P>The motive for adding the API is so that other developers can provide a better UI.
+
+<P>The reason to start with the web interface is to figure out which actions should be allowed and which actions should not be allowed. 
+The same set of constraints and workflow will apply to the API.
 
 <P>&nbsp;</P>
 <HR/>
