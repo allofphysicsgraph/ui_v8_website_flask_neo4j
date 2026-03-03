@@ -53,7 +53,6 @@ def generate_random_id(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-
     list_of_existing_IDs = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()

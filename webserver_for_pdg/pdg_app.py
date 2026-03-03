@@ -3472,7 +3472,8 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
             neo4j_query.get_node_properties_from_id, "scalar", scalar_id
         )
         query_time_dict[
-            "pdg_app/to_add_value_and_units get_node_properties_from_id scalar " + trace_id
+            "pdg_app/to_add_value_and_units get_node_properties_from_id scalar "
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
         query_start_time = time.time()
@@ -3480,7 +3481,8 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> werkzeug.Resp
             neo4j_query.get_expressions_for_every_symbol
         )
         query_time_dict[
-            "pdg_app/to_add_value_and_units get_expressions_for_every_symbol " + trace_id
+            "pdg_app/to_add_value_and_units get_expressions_for_every_symbol "
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
 
         query_start_time = time.time()

@@ -1864,7 +1864,7 @@ def add_feed(
         "id": str(feed_id),
         "latex": str(feed_latex),
         "author": str(author_name_latex),
-        "created": now_str
+        "created": now_str,
     }
 
     query = """
