@@ -1,0 +1,21 @@
+
+<!-- https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84 -->
+<script>
+function validateASCII(inputElement) {
+    let value = inputElement.value;
+    let asciiOnlyValue = '';
+    
+    // Iterate through each character and keep only ASCII characters
+    for (let i = 0; i < value.length; i++) {
+        // Check if the character code is within the ASCII range (0-127)
+        // For only printable ASCII, use range 32-126
+        if (value.charCodeAt(i) >= 0 && value.charCodeAt(i) <= 127) {
+            asciiOnlyValue += value[i];
+        }
+    }
+    
+    // Update the input field value, removing non-ASCII characters
+    inputElement.value = asciiOnlyValue;
+}
+</script>
+

@@ -1,0 +1,21 @@
+
+<!-- updated sorttable from
+     https://github.com/stuartlangridge/sorttable/blob/master/sorttable/sorttable.js
+     to fix this problem
+     https://github.com/stuartlangridge/sorttable/issues/6
+-->
+<!-- https://www.kryogenix.org/code/browser/sorttable/ -->
+<script type="text/javascript" src="{{ url_for('static', filename='sorttable.js') }}"></script>
+<style>
+  /*
+     Sortable tables
+     https://www.kryogenix.org/code/browser/sorttable/
+     https://github.com/allofphysicsgraph/proofofconcept/issues/68
+   */
+  table.sortable thead {
+    background-color:#eee;
+    color:#666666;
+    font-weight: bold;
+    cursor: default;
+  }
+</style>

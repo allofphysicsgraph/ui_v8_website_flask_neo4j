@@ -1,0 +1,17 @@
+
+<!-- if inclusion of Mathjax on pages which don't have latex becomes a significant source of latency, see
+     http://docs.mathjax.org/en/latest/web/typeset.html#loading-mathjax-only-on-pages-with-math -->
+<!-- http://docs.mathjax.org/en/latest/input/tex/eqnumbers.html -->
+<script type="text/x-mathjax-config;executed=true">
+  MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "AMS"} } });
+</script>
+<script type="text/javascript">
+  window.MathJax = {
+    tex: {
+      tags: 'ams'
+    }
+  };
+</script>
+    <script id="MathJax-script" async
+    src="{{ url_for('static', filename='mathjax/es5/tex-chtml.js') }}"></script>
+
