@@ -2308,7 +2308,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
     logger.info("feed_id: " + str(feed_id))
 
     web_form_no_options = NoOptionsForm()
-    web_form_new_feed = SpecifyEditFeedForm()
+    web_form_edit_feed = SpecifyEditFeedForm()
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -2430,10 +2430,10 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
             return redirect(url_for("to_edit_feed", feed_id=feed_id))
         elif "edit" in request.form.keys():
 
-            if web_form_new_feed.validate():
-                feed_latex = str(web_form_new_feed.feed_latex.data).strip()
-                feed_sympy = str(web_form_new_feed.feed_sympy.data).strip()
-                feed_lean = str(web_form_new_feed.feed_lean.data).strip()
+            if web_form_edit_feed.validate():
+                feed_latex = str(web_form_edit_feed.feed_latex.data).strip()
+                feed_sympy = str(web_form_edit_feed.feed_sympy.data).strip()
+                feed_lean = str(web_form_edit_feed.feed_lean.data).strip()
 
                 logger.info("feed_latex=" + str(feed_latex))
                 logger.info("feed_sympy=" + str(feed_sympy))
@@ -2486,8 +2486,8 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
                         ] = round(time.time() - query_start_time, 3)
 
             else:
-                flash("pdg_app/to_edit_feed: " + str(web_form_new_feed.errors))
-                logger.error(str(web_form_new_feed.errors))
+                flash("pdg_app/to_edit_feed: " + str(web_form_edit_feed.errors))
+                logger.error(str(web_form_edit_feed.errors))
 
             logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_edit_feed", feed_id=feed_id))
@@ -2505,7 +2505,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> werkzeug.Response:
         title="Edit Feed",
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
-        form_new_feed=web_form_new_feed,
+        form_edit_feed=web_form_edit_feed,
         symbols_in_feed=symbols_in_feed,
         symbols_not_in_feed=symbols_not_in_feed,
         # dict_of_symbols_not_in_feed=dict_of_symbols_not_in_feed,
@@ -2795,8 +2795,8 @@ def to_add_feed() -> werkzeug.Response:
                 )
 
             else:
-                flash("pdg_app/to_add_feed: " + str(web_form_new_feed.errors))
-                logger.error(str(web_form_new_feed.errors))
+                flash("pdg_app/to_add_feed: " + str(web_form_add_feed.errors))
+                logger.error(str(web_form_add_feed.errors))
                 return redirect(url_for("to_add_feed"))
 
         elif "promote existing" in request.form.keys():
@@ -2818,7 +2818,7 @@ def to_add_feed() -> werkzeug.Response:
                 # get the symbol key-value pairs so we can later populate the feed
                 query_start_time = time.time()
                 symbol_dict = session.read_transaction(
-                    neo4j_quer.get_node_properties_from_id,
+                    neo4j_query.get_node_properties_from_id,
                     "symbol",
                     nominated_symbol_id,
                 )
@@ -6155,7 +6155,6 @@ def to_list_inference_rules() -> str:
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
-    list_of_inference_rule_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_inference_rules = session.read_transaction(
