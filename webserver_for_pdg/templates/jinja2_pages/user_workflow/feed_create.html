@@ -2,6 +2,12 @@
 {% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 {% block content %}
 
+<!--
+list_of_symbols:
+{{list_of_symbols}}
+-->
+
+
 <P>
   Return to <a href="{{ url_for('to_navigation') }}?referrer=feed_create">navigation page</a>
   or <a href="{{ url_for('to_list_feeds') }}?referrer=feed_create">list of feeds</a>.
@@ -20,7 +26,7 @@
                                 id="input_latex", 
                                 type="text",
                                 pattern="^[\x20-\x7F]+$", 
-                                oninput="validateASCII(this);") }} </P>
+                                oninput="validateASCII(this); livePreview('input_latex', null, null, 'output_input_latex');") }} </P>
 
         <div id="output_input_latex"></div>
 
@@ -50,15 +56,16 @@
     <H2>Promote existing symbol to feed</H2>
   </legend>
 
+
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
 
     <select name="symbol_select_id_to_add" class="selectpicker form-control" id="symbol_select">
       {% for this_symbol_dict in list_of_symbols %}
-      <option value="{{ this_symbol_dict['id'] }}">{{ this_symbol_dict['id'] }}, {{ this_symbol_dict['latex'] }} </option>
+      <option value="{{ this_symbol_dict['id'] }}">{{ this_symbol_dict['id'] }}, {{ this_symbol_dict['latex'] }}, {{this_symbol_dict['name_latex']}} </option>
       {% endfor %}
     </select>
-    <input type="submit" name="promote existing" value="promote symbol to feed">
+    <P><input type="submit" name="promote existing" value="promote symbol to feed">
 
   </form>
 </fieldset>
