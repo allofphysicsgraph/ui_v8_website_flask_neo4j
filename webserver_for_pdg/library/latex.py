@@ -492,8 +492,11 @@ def create_tex_file_for_derivation(
 
         latex_file_handle.write("\\title{" + str(derivation_dict["name_latex"]) + "}\n")
         latex_file_handle.write("\\date{\\today}\n")
+        # potentially clever idea is to substitute actual email if the user who
+        # is logged in is also the author of the derivation.
+        # that would require passing current_user.email and checking against the hash
         latex_file_handle.write(
-            "\\author{" + str(derivation_dict["author_name_latex"]) + "}\n"
+            "%\\author{" + str(derivation_dict["author_name_latex"]) + "}\n"
         )
         latex_file_handle.write("\\setlength{\\topmargin}{-.5in}\n")
         latex_file_handle.write("\\setlength{\\textheight}{9in}\n")
