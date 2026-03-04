@@ -17,7 +17,7 @@
     <th>abstract</th>
     <th>number of steps</th>
     <th>reference</th>
-    <th>author</th>
+    <!-- <th>author</th> -->
   </tr>
   {% for derivation_dict in list_of_derivations %}
   <tr>
@@ -29,7 +29,7 @@
     <td>{{ derivation_dict['abstract_latex']}}</td>
     <td>{{ number_of_steps_per_derivation[derivation_dict['id']] }}</td>
     <td>{{ derivation_dict['reference_latex'] }}</td>
-    <td>{{ derivation_dict['author_name_latex'] }}</td>
+    <!-- <td>{{ derivation_dict['author_name_latex'] }}</td> -->
   </tr>
   {% endfor %}
 </table>
