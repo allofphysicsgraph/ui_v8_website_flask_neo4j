@@ -1267,12 +1267,12 @@ def write_step_to_graphviz_file(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
-    logger.info("step_id =", step_id)
+    logger.info("step_id =" + step_id)
 
-    logger.info("inference_rule_dict", inference_rule_dict)
-    logger.info("list_of_input_dicts", list_of_input_dicts)
-    logger.info("list_of_feed_dicts", list_of_feed_dicts)
-    logger.info("list_of_output_dicts", list_of_output_dicts)
+    logger.info("inference_rule_dict" + str(inference_rule_dict))
+    logger.info("list_of_input_dicts" + str(list_of_input_dicts))
+    logger.info("list_of_feed_dicts" + str(list_of_feed_dicts))
+    logger.info("list_of_output_dicts" + str(list_of_output_dicts))
 
     # inference rule
     png_filename_no_extension = "".join(
