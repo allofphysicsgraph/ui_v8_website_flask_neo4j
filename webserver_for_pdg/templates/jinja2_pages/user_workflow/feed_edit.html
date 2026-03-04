@@ -20,17 +20,26 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
   <a href="{{ url_for('to_list_vectors') }}?referrer=expession_edit">vector symbols</a>,
   <a href="{{ url_for('to_list_matrices') }}?referrer=expession_edit">matrix symbols</a>.</P>
 
-<P>TODO: list derivations that use this feed. That could help provide context.
+{% if list_of_derivations_that_use_feed|length > 1 %}
+<H1>This feed is involved with more than one derivation. That's bad! Please fix this situation.</H1>
+{% endif %}
+
+
+<P>This feed is used in the derivation
+<UL>{%for this_derivation in list_of_derivations_that_use_feed %}
+  <LI><a href="{{ url_for('to_review_derivation', derivation_id=this_derivation['id']) }}">{{this_derivation['name_latex']}}</a></LI>
+  {% endfor %}
+</UL>
 
 <fieldset>
   <legend>
     <H2>Scalar symbols in Feed</h2>
   </legend>
 
-<P>\({{ feed_dict['latex'] }}\)
-
-<P>{{ feed_dict['latex'] }}
+<P>\({{ feed_dict['latex'] }}\)<BR>
+{{ feed_dict['latex'] }}
   
+<P>
 <table border="1" id="symbol_table" class="sortable">
   <tr>
     <th>ID</th>
@@ -82,7 +91,7 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     <P>
     <select name="symbol_select_id_to_add" class="selectpicker form-control" id="symbol_select">
       {% for symbol_dict in symbols_not_in_feed %}
-      <option value="{{ symbol_dict['id'] }}">{{ symbol_dict['id'] }}, {{ symbol_dict['latex'] }} </option>
+      <option value="{{ symbol_dict['id'] }}">{{ symbol_dict['id'] }}, {{ symbol_dict['latex'] }}, {{ symbol_dict['name_latex'] }} </option>
       {% endfor %}
     </select>
     <input type="submit" name="add symbol" value="add symbol to feed">
@@ -98,7 +107,7 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     <P>
     <select name="symbol_select_id_to_disconnect" class="selectpicker form-control" id="symbol_select">
       {% for symbol_dict in symbols_in_feed %}
-      <option value="{{ symbol_dict['id'] }}">{{ symbol_dict['id'] }}, {{ symbol_dict['latex'] }} </option>
+      <option value="{{ symbol_dict['id'] }}">{{ symbol_dict['id'] }}, {{ symbol_dict['latex'] }}, {{ symbol_dict['name_latex'] }} </option>
       {% endfor %}
     </select>
     <input type="submit" name="remove symbol" value="remove symbol from feed">
@@ -136,7 +145,7 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
                     id="input_lean") }} 
 
 
-      <input type="submit" name="edit" value="Edit feed">
+      <P><input type="submit" name="edit" value="Edit feed">
     </P>
   </form>
 </fieldset>
