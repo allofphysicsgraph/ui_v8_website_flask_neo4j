@@ -22,14 +22,20 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
 
 {% if list_of_derivations_that_use_feed|length > 1 %}
 <H1>This feed is involved with more than one derivation. That's bad! Please fix this situation.</H1>
+
+<H3><a href="{{ url_for('to_add_feed') }}">Create a new feed</a></H3>
 {% endif %}
 
 
+{% if list_of_derivations_that_use_feed|length==0 %}
+<P>This feed is not used in any derivations
+{% else %}
 <P>This feed is used in the derivation
 <UL>{%for this_derivation in list_of_derivations_that_use_feed %}
   <LI><a href="{{ url_for('to_review_derivation', derivation_id=this_derivation['id']) }}">{{this_derivation['name_latex']}}</a></LI>
   {% endfor %}
 </UL>
+{% endif %}
 
 <fieldset>
   <legend>
@@ -82,6 +88,9 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
   {% endfor %}
 </table>
 
+{% if symbols_not_in_feed|length == 0 %}
+<P>No symbols are available to be added.
+{% else %}
 <fieldset>
   <legend>
     <H2>Add Symbol used in Feed</h2>
@@ -97,7 +106,12 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     <input type="submit" name="add symbol" value="add symbol to feed">
   </form>
 </fieldset>
+{% endif %}
 
+
+{% if symbols_in_feed|length == 0 %}
+<P>No symbols are available to be removed.
+{% else %}
 <fieldset>
   <legend>
     <H2>Remove Symbol used in Feed</h2>
@@ -113,6 +127,7 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     <input type="submit" name="remove symbol" value="remove symbol from feed">
   </form>
 </fieldset>
+{% endif %}
 
 </fieldset>
 

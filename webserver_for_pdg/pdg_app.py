@@ -1477,10 +1477,10 @@ def to_review_derivation(
         # with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_step_dicts = session.read_transaction(
-            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+            neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
         query_time_dict[
-            "pdg_app/to_review_derivation: get_list_of_step_dicts_in_this_derivation"
+            "pdg_app/to_review_derivation: get_list_of_steps_in_this_derivation"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
@@ -1741,11 +1741,10 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> ResponseReturnVal
         # with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_step_dicts = session.read_transaction(
-            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+            neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
         query_time_dict[
-            "pdg_app/to_select_step: get_list_of_step_dicts_in_this_derivation"
-            + trace_id
+            "pdg_app/to_select_step: get_list_of_steps_in_this_derivation" + trace_id
         ] = round(time.time() - query_start_time, 3)
     # logger.info("list_of_step_dicts=" + str(list_of_step_dicts))
 
@@ -2748,6 +2747,7 @@ def to_add_feed() -> ResponseReturnValue:
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_add_feed = SpecifyNewFeedForm()
+    web_form_no_options = NoOptionsForm()
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -2903,6 +2903,8 @@ def to_add_feed() -> ResponseReturnValue:
                     "pdg_app/to_add_feed: edit_node_property, feed lean" + trace_id
                 ] = round(time.time() - query_start_time, 3)
 
+            return redirect(url_for("to_list_feeds"))
+
         else:
             flash(
                 "pdg_app/to_add_feed: unrecognized form in POST: "
@@ -2918,6 +2920,7 @@ def to_add_feed() -> ResponseReturnValue:
         title="Create Feed",
         query_time_dict=query_time_dict,
         form_new_feed=web_form_add_feed,
+        form_no_options=web_form_no_options,
         list_of_symbols=list_of_symbols,  # feed_create.html (for the dropdown of promoting a symbol to feed)
         list_of_feeds=list_of_feeds,
         sympy_as_latex_per_feed_id=sympy_as_latex_per_feed_id,
@@ -5073,40 +5076,163 @@ def to_add_inference_rule() -> ResponseReturnValue:
 def to_edit_step(
     derivation_id: unique_numeric_id_as_str, step_id: unique_numeric_id_as_str
 ) -> ResponseReturnValue:
-    """ """
+    """
+    to figure out which feeds could be swapped in I was
+    - determining which feeds were not used
+    - getting expressions used by this step
+    - matching latex strings between feeds and expressions
+    However, an easier search is "feeds not connected to steps"
+
+    """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_edit_step = SpecifyNewStepForm()
+    web_form_swap_feeds = NoOptionsForm()
     web_form_delete = NoOptionsForm()
+    web_form_swap_index = NoOptionsForm()
 
     # TODO: Verify that derivation_id exists
     # TODO: verify that step_id exists
     # TODO: verify that step_id is associated with Derivation_id
 
+    # I could just retrieve the specific step, but getting all the steps
+    # allows me to also figure out the sequence numbers that are in use.
     # list all steps in this derivation
     list_of_step_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_step_dicts = session.read_transaction(
-            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+            neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
         query_time_dict[
-            "pdg_app/to_edit_step: get_list_of_step_dicts_in_this_derivation "
-            + trace_id
+            "pdg_app/to_edit_step: get_list_of_steps_in_this_derivation " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
+        query_start_time = time.time()
+        list_of_feeds_used_in_step = session.read_transaction(
+            neo4j_query.get_feeds_used_in_step, step_id
+        )
+        query_time_dict["pdg_app/to_edit_step: get_feeds_used_in_step " + trace_id] = (
+            round(time.time() - query_start_time, 3)
+        )
+
+        query_start_time = time.time()
+        list_of_feeds_not_connected_to_any_step = session.read_transaction(
+            neo4j_query.get_feeds_not_connected_to_any_step
+        )
+        query_time_dict[
+            "pdg_app/to_edit_feed: get_feeds_not_connected_to_any_step feed " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        query_start_time = time.time()
+        derivation_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_feed: get_node_properties_from_id derivation " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    # this loop does two things:
+    #  - gets the relevant step_dict that matches the user-provided ID
+    #  and
+    #  - gets the list of sequence indicies
+    list_of_sequence_values = []  # type: List[str]
     for each_step_dict in list_of_step_dicts:
+        list_of_sequence_values.append(each_step_dict["sequence_index"])
         if each_step_dict["id"] == step_id:
             this_step_dict = each_step_dict
-            break
-    logger.info("to_edit_step: this_step_dict=" + str(this_step_dict))
+            # break
+
+    list_of_sequence_values.sort()
+    logger.info("step_dict=" + str(this_step_dict))
+    logger.info("list_of_sequence_values= " + str(list_of_sequence_values))
+
+    sequence_swap_list = compute.get_placement_options(
+        list_of_sequence_values, this_step_dict["sequence_index"]
+    )
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        if "edit" in request.form:
+        if "replace feed" in request.form:
+            logger.info("replacing feed in step " + step_id)
+
+            old_feed_id = request.form["feed_used_field_name"]
+            new_feed_id = request.form["feed_replacement_field_name"]
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.edit_step_feed,
+                    step_id,
+                    old_feed_id,
+                    new_feed_id,
+                )
+                query_time_dict["pdg_app/to_edit_step: edit_step_notes " + trace_id] = (
+                    round(time.time() - query_start_time, 3)
+                )
+
+            # maybe better to redirect to review derivation?
+            return redirect(
+                url_for("to_review_derivation", derivation_id=derivation_id)
+            )
+            # return redirect(
+            #     url_for("to_edit_step", derivation_id=derivation_id, step_id=step_id)
+            # )
+
+        elif "reorder indices" in request.form:
+            logger.info("reorder indices for " + step_id)
+
+            option_index = request.form["sequence_field_name"]
+            logger.info("option_index=" + str(option_index))
+
+            option_int = int(option_index)
+
+            # Find where the element currently is
+            current_idx = list_of_sequence_values.index(step_dict["sequence_index"])
+
+            # Create a list without the selected element
+            # (Matches the 'others' list logic from the previous step)
+            new_list = [
+                x for i, x in enumerate(list_of_sequence_values) if i != current_idx
+            ]
+
+            # Calculate the target insertion index
+            # If the user picked an option that appeared BEFORE the original spot,
+            # the index matches. If they picked an option AFTER, we add 1
+            # to account for the slot we skipped in the dropdown.
+            if html_idx < current_idx:
+                target_idx = html_idx
+            else:
+                target_idx = html_idx + 1
+
+            # Insert the element at the new position
+            new_list.insert(target_idx, selected_element)
+
+            logger.info("new_list=" + str(new_list))
+
+            with graphDB_Driver.session() as session:
+                for index, old_value in list_of_sequence_values.enumerate():
+                    if new_list[index] != old_value:
+                        query_start_time = time.time()
+                        session.write_transaction(
+                            neo4j_query.edit_node_property,
+                            "step",
+                            step_dict["id"],
+                            "sequence_index",
+                            new_list[index],
+                        )
+                        query_time_dict[
+                            "pdg_app/to_edit_step: edit_step_notes " + trace_id
+                        ] = round(time.time() - query_start_time, 3)
+
+            return redirect(
+                url_for("to_review_derivation", derivation_id=derivation_id)
+            )
+
+        elif "edit" in request.form:
             if web_form_edit_step.validate():
                 logger.info("editing step " + step_id)
                 note_before_step_latex = str(
@@ -5128,9 +5254,9 @@ def to_edit_step(
                         note_before_step_latex,
                         note_after_step_latex,
                     )
-                query_time_dict["pdg_app/to_edit_step: edit_step_notes " + trace_id] = (
-                    round(time.time() - query_start_time, 3)
-                )
+                    query_time_dict[
+                        "pdg_app/to_edit_step: edit_step_notes " + trace_id
+                    ] = round(time.time() - query_start_time, 3)
 
             else:
                 flash("pdg_app/to_edit_step: " + str(web_form_edit_step.errors))
@@ -5159,8 +5285,15 @@ def to_edit_step(
         title="Edit Step",
         query_time_dict=query_time_dict,
         form_edit_step=web_form_edit_step,
+        form_swap_feeds=web_form_swap_feeds,
         form_delete=web_form_delete,
+        form_swap_index=web_form_swap_index,
         step_dict=this_step_dict,
+        derivation_dict=derivation_dict,
+        sequence_swap_list=sequence_swap_list,
+        list_of_feeds_used_in_step=list_of_feeds_used_in_step,
+        list_of_feeds_not_connected_to_any_step=list_of_feeds_not_connected_to_any_step,
+        # list_of_feeds_not_in_step_with_overlapping_latex=list_of_feeds_not_in_step_with_overlapping_latex,
     )
 
 

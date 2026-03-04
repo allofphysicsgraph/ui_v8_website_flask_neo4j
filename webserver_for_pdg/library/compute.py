@@ -92,6 +92,54 @@ def generate_random_id(
     return str(new_id), query_time_dict
 
 
+def get_placement_options(
+    list_of_sequence_values: List[str], selected_sequence_index: str
+) -> List[str]:
+    """
+    >>> list_of_str = ['a', 'c', 'f', 'm', 'p', 'u']
+    >>> selected = 'f'
+    >>> get_placement_options(list_of_str, selected)
+    """
+    if len(list_of_sequence_values) == 0:
+        logger.error("empty list provided")
+        return [""]
+
+    if selected_sequence_index not in list_of_sequence_values:
+        logger.error(
+            selected_sequence_index
+            + " not in list_of_sequence_values="
+            + str(list_of_sequence_values)
+        )
+        return [""]
+
+    # Identify the current position
+    current_idx = list_of_sequence_values.index(selected_sequence_index)
+
+    # Create a list of the other elements
+    others = [x for i, x in enumerate(list_of_sequence_values) if i != current_idx]
+    n = len(others)
+
+    options = []  # type: List[str]
+
+    # Iterate through all possible gaps in the 'others' list
+    # There are n + 1 possible insertion points
+    for i in range(n + 1):
+        # Skip the position that would result in the current ordering
+        # Moving the element to its current index in the 'others' list
+        # is functionally doing nothing.
+        if i == current_idx:
+            continue
+
+        if i == 0:
+            options.append(f"before '{others[0]}'")
+        elif i == n:
+            options.append(f"after '{others[-1]}'")
+        else:
+            options.append(f"between '{others[i-1]}' and '{others[i]}'")
+
+    return options
+
+
 def guess_sympy_from_expression(graphDB_Driver, query_time_dict, expression_dict):
     """
     guess the SymPy based on the Latex
@@ -1059,7 +1107,7 @@ def get_dict_of_steps_in_derivation(
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_step_dicts = session.read_transaction(
-            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+            neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
         query_time_dict[
             "compute/get_dict_of_steps_in_derivation: steps_in_this_derivation"
@@ -1086,10 +1134,10 @@ def get_dict_of_steps_in_derivation(
         with graphDB_Driver.session() as session:
             query_start_time = time.time()
             sequence_index = session.read_transaction(
-                neo4j_query.get_step_has_sequence_index, this_step_dict["id"]
+                neo4j_query.get_sequence_index_for_step, this_step_dict["id"]
             )
             query_time_dict[
-                "compute/get_dict_of_steps_in_derivation: get_step_has_sequence_index"
+                "compute/get_dict_of_steps_in_derivation: get_sequence_index_for_step"
                 + trace_id
             ] = round(time.time() - query_start_time, 3)
         # print("sequence_index=", sequence_index)

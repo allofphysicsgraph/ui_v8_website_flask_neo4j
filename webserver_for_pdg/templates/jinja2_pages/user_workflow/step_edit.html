@@ -6,6 +6,7 @@
   or return to <a href="{{ url_for('to_list_scalars') }}?referrer=step_edit">list of scalar symbols</a>
 </P>
 
+<P>step_dict:<BR>
 {{ step_dict }}
 
 <!-- Render the initial values on page load -->
@@ -16,12 +17,12 @@
   });
 </script>
 
+<P>This step is used in <a href="{{ url_for('to_review_derivation', derivation_id=derivation_dict['id']) }}">{{ derivation_dict['name_latex'] }}</a>
+
 <fieldset>
   <legend>
-    <H2>Edit Step</h2>
+    <H2>Edit Notes</h2>
   </legend>
-
-<P>change note before step
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_edit_step.csrf_token }}
@@ -43,7 +44,54 @@
 
 <fieldset>
   <legend>
-    Delete step
+    <H2>Edit Sequence Number</h2>
+  </legend>
+  {{ form_swap_index.csrf_token }}
+
+<P>Current sequence index: {{ step_dict['sequence_index'] }}
+
+<select name="sequence_field_name" class="selectpicker form-control" id="sequence_field_id">
+{% for this_option in sequence_swap_list %}
+<option value="{{ loop.index0 }}">{{ this_option }}</option>
+{% endfor %}
+</select>
+
+<input type="submit" name="reorder indices" value="reorder step indices">
+
+</fieldset>
+
+<fieldset>
+  <legend>
+    <H2>Replace Feed</h2>
+  </legend>
+
+<form method="post" action="" onsubmit="return checkForm(this);">
+{{ form_swap_feeds.csrf_token }}
+
+  <P>Feeds used in this Step:
+
+<select name="feed_used_field_name" class="selectpicker form-control" id="feed_used_field_id">
+{% for this_feed in list_of_feeds_used_in_step %}
+  <option value="{{ this_feed['id'] }}">{{ this_feed['id'] }}, {{ this_feed['latex'] }}</option>
+{% endfor %}
+</select>
+
+  <P>Select Feed to substitute:
+
+<select name="feed_replacement_field_name" class="selectpicker form-control" id="feed_replacement_field_id">
+{% for this_feed in list_of_feeds_not_connected_to_any_step %}
+  <option value="{{ this_feed['id'] }}">{{ this_feed['id'] }}, {{ this_feed['latex'] }}</option>
+{% endfor %}
+</select>
+
+<input type="submit" name="replace feed" value="replace selected feeds">
+
+</form>
+</fieldset>
+
+<fieldset>
+  <legend>
+    <H2>Delete Step</H2>
   </legend>
 
 <form method="post" action="" onsubmit="return checkForm(this);">

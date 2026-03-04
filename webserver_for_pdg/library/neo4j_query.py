@@ -998,13 +998,11 @@ def get_number_of_steps_per_derivation(tx: Transaction) -> dict:
     return {record["derivation_id"]: record["step_count"] for record in result}
 
 
-def get_list_of_step_dicts_in_this_derivation(
-    tx: Transaction, derivation_id: str
-) -> list:
+def get_list_of_steps_in_this_derivation(tx: Transaction, derivation_id: str) -> list:
     """
     For a given derivation, what are all the associated step IDs?
 
-    >>> get_list_of_step_dicts_in_this_derivation(tx: Transaction)
+    >>> get_list_of_steps_in_this_derivation(tx: Transaction)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -1022,10 +1020,24 @@ def get_list_of_step_dicts_in_this_derivation(
     return list_of_step_dicts
 
 
-def get_step_has_sequence_index(tx: Transaction, step_id: str) -> int:
-    """
-    >>> step_has_sequence_index()
-    """
+def get_feeds_used_in_step(tx: Transaction, step_id: str) -> List[dict]:
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    logger.info("step_id=" + str(step_id))
+
+    list_of_feeds = []  # type: List[dict]
+    for result in tx.run(
+        'MATCH (:step {id:"' + step_id + '"})-[:HAS_FEED]->(f:feed) RETURN f'
+    ):
+        list_of_feeds.append(result.data()["f"])
+
+    logger.info("[TRACE] end " + trace_id)
+    return list_of_feeds
+
+
+def get_sequence_index_for_step(tx: Transaction, step_id: str) -> int:
+    """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     sequence_index = 0
@@ -1034,9 +1046,7 @@ def get_step_has_sequence_index(tx: Transaction, step_id: str) -> int:
     )
     # print(type(result)) # don't access the `result` variable more than once, as mentioned on https://neo4j.com/docs/python-manual/current/transformers/
     sequence_index = result.data()[0]["r.sequence_index"]
-    logger.info(
-        "neo4j_query/step_has_sequence_index: sequence_index=" + str(sequence_index)
-    )
+    logger.info("sequence_index=" + str(sequence_index))
 
     logger.info("[TRACE] end " + trace_id)
     return sequence_index
@@ -1106,12 +1116,7 @@ def get_expressions_from_step_id_and_expr_type(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    logger.info(
-        "neo4j_query/step_has_expressions: step_id="
-        + step_id
-        + "; expression_type="
-        + expression_type
-    )
+    logger.info("step_id=" + step_id + "; expression_type=" + expression_type)
     assert (
         expression_type == "HAS_INPUT"
         or expression_type == "HAS_FEED"
@@ -1126,8 +1131,6 @@ def get_expressions_from_step_id_and_expr_type(
     #     + expression_type
     #     + "]->(m:expression) RETURN m"
     # )
-
-    list_of_expression_dicts = []  # type: List[dict]
 
     if expression_type == "HAS_FEED":
         destination_node_type = "feed"
@@ -1144,6 +1147,7 @@ def get_expressions_from_step_id_and_expr_type(
     #     + ") RETURN m"
     # )
 
+    list_of_expression_dicts = []  # type: List[dict]
     for result in tx.run(
         'MATCH (:step {id:"'
         + step_id
@@ -1157,6 +1161,34 @@ def get_expressions_from_step_id_and_expr_type(
         list_of_expression_dicts.append(result.data()["m"])
 
     # print("list_of_expression_dicts=", list_of_expression_dicts)
+
+    logger.info("[TRACE] end " + trace_id)
+    return list_of_expression_dicts
+
+
+def get_feeds_not_connected_to_any_step(tx: Transaction) -> List[dict]:
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    list_of_feeds = []  # type: List[dict]
+    for result in tx.run("MATCH (f:feed) WHERE NOT (f)<-[:HAS_FEED]-(:step) RETURN f"):
+        list_of_feeds.append(result.data()["f"])
+    logger.info("[TRACE] end " + trace_id)
+    return list_of_feeds
+
+
+def get_expressions_from_step_id(tx: Transaction, step_id: str) -> List[dict]:
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    logger.info("step_id=" + step_id)
+
+    list_of_expression_dicts = []  # type: List[dict]
+    for result in tx.run(
+        'MATCH (:step {id:"' + step_id + '"})-[]->(e:expression) RETURN e'
+    ):
+        list_of_expression_dicts.append(result.data()["e"])
 
     logger.info("[TRACE] end " + trace_id)
     return list_of_expression_dicts
@@ -1287,8 +1319,47 @@ def add_inference_rule(
     return
 
 
+def edit_step_feed(
+    tx: Transaction, step_id: str, old_feed_id: str, new_feed_id: str
+) -> None:
+    """
+    `MATCH (s:step ...)-[old_rel:HAS_FEED]->(old_f:feed ...)` finds the specific step and the specific old feed, along with the existing relationship (old_rel) connecting them.
+    `MATCH (new_f:feed ...)` locates the node for the new feed.
+    `WITH ..., old_rel.sequence_index AS saved_index` is the crucial step. It captures the value of the sequence_index from the edge we are about to delete and carries it forward in memory.
+    `DELETE old_rel` removes the edge between the step and the old feed.
+    `CREATE (s)-[new_rel:HAS_FEED]->(new_f)` creates the new relationship. (Note: Use MERGE instead of CREATE if you want to prevent duplicate edges if the relationship already exists).
+    `SET new_rel.sequence_index = saved_index` applies the captured string value to the newly created edge.
+    """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    params = {
+        "step_id": str(step_id),
+        "old_feed_id": str(old_feed_id),
+        "new_feed_id": str(new_feed_id),
+    }
+
+    query = """
+    MATCH (s:step {id: $step_id})-[old_rel:HAS_FEED]->(old_f:feed {id: $old_feed_id})
+    MATCH (new_f:feed {id: $new_feed_id})
+    WITH s, old_rel, old_rel.sequence_index AS saved_index, new_f
+    DELETE old_rel
+    CREATE (s)-[new_rel:HAS_FEED]->(new_f)
+    SET new_rel.sequence_index = saved_index
+    RETURN s.id AS step_id, new_f.id AS feed_id, new_rel.sequence_index AS sequence_index
+    """
+
+    result = tx.run(query, params)
+
+    logger.info("[TRACE] end " + trace_id)
+    return
+
+
 def edit_step_notes(
-    tx, step_id: str, note_before_step_latex: str, note_after_step_latex: str
+    tx: Transaction,
+    step_id: str,
+    note_before_step_latex: str,
+    note_after_step_latex: str,
 ) -> None:
     """
     TODO: deprecate this in favor of edit_node_properties
@@ -1654,14 +1725,14 @@ def get_list_of_sequence_values_for_derivation_id(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    list_of_sequence_values = []  # type: List[int]
-
     logger.info("derivation_id=" + derivation_id)
-    logger.info(
-        'MATCH (d:derivation {id:"'
-        + derivation_id
-        + '"})-[r]->(s:step) RETURN r.sequence_index'
-    )
+    # logger.info(
+    #     'MATCH (d:derivation {id:"'
+    #     + derivation_id
+    #     + '"})-[r]->(s:step) RETURN r.sequence_index'
+    # )
+
+    list_of_sequence_values = []  # type: List[int]
     for result in tx.run(
         'MATCH (d:derivation {id:"'
         + derivation_id
