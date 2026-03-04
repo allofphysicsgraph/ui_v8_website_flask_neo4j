@@ -1454,13 +1454,22 @@ def to_review_derivation(
             neo4j_query.get_node_properties_from_id, "derivation", derivation_id
         )
         query_time_dict[
-            "pdg_app/to_review_derivation: node_properties, derivation " + trace_id
+            "pdg_app/to_review_derivation: get_node_properties_from_id, derivation "
+            + trace_id
         ] = round(time.time() - query_start_time, 3)
         logger.info("derivation_dict:" + str(derivation_dict))
 
         all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
             graphDB_Driver, derivation_id, query_time_dict
         )
+
+        query_start_time = time.time()
+        symbols_in_derivation = session.read_transaction(
+            neo4j_query.get_symbols_for_derivation, derivation_id
+        )
+        query_time_dict[
+            "pdg_app/to_review_derivation: get_symbols_for_derivation " + trace_id
+        ] = round(time.time() - query_start_time, 3)
 
         # logger.info("to_review_derivation all_steps=" + str(all_steps))
 
@@ -1499,8 +1508,8 @@ def to_review_derivation(
     if request.method == "POST":
         logger.info("to_review_derivation: request.form = " + str(request.form))
 
-        if request.form["submit_button"] == "generate_pdf":
-            # request.form = ImmutableMultiDict([('derivation_selected', 'another deriv'), ('submit_button', 'generate_pdf')])
+        if "generate pdf" in request.form:
+            logger.info("request.form=" + str(request.form))
 
             # path_to_pdf = "/code/static/dumping_grounds/"  # should end with slash
 
@@ -1534,7 +1543,7 @@ def to_review_derivation(
                 )
             )
 
-        elif request.form["submit_button"] == "generate_tex":
+        elif "generate tex" in request.form:
             # request.form = ImmutableMultiDict([('derivation_selected', 'another deriv'), ('submit_button', 'generate_tex')])
 
             # path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
@@ -1571,7 +1580,7 @@ def to_review_derivation(
                 )
             )
 
-        elif request.form["submit_button"] == "delete derivation and steps":
+        elif "delete derivation" in request.form:
             # delete derivation (yikes!). Here's how:
             # 1) for each step, delete step node
             # 2) delete derivation node
@@ -1696,6 +1705,7 @@ def to_review_derivation(
         title="Review Derivation",
         query_time_dict=query_time_dict,
         derivation_dict=derivation_dict,
+        symbols_in_derivation=symbols_in_derivation,
         derivation_graphviz_png_filename=derivation_graphviz_png_filename,
         # derivation_graphviz_svg_filename=derivation_graphviz_svg_filename,
         json_for_d3js=d3js_json_filename,
@@ -2344,11 +2354,11 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
         logger.info("symbols_in_feed=" + str(symbols_in_feed))
 
         # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_feeds = session.read_transaction(neo4j_query.get_nodes_of_type, "feed")
-        query_time_dict["pdg_app/to_edit_feed: get_nodes_of_type feed " + trace_id] = (
-            round(time.time() - query_start_time, 3)
-        )
+        # query_start_time = time.time()
+        # list_of_feeds = session.read_transaction(neo4j_query.get_nodes_of_type, "feed")
+        # query_time_dict["pdg_app/to_edit_feed: get_nodes_of_type feed " + trace_id] = (
+        #     round(time.time() - query_start_time, 3)
+        # )
 
         query_start_time = time.time()
         list_of_symbols = session.read_transaction(
@@ -2358,15 +2368,26 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
             "pdg_app/to_edit_feed: get_nodes_of_type symbol " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
+        query_start_time = time.time()
+        list_of_derivations_that_use_feed = session.read_transaction(
+            neo4j_query.get_derivations_that_use_feed, feed_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_feed: get_derivations_that_use_feed " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    symbol_latex_in_feed = []
     symbol_id_in_feed = []
     for this_symbol in symbols_in_feed:
         symbol_id_in_feed.append(this_symbol["id"])
+        symbol_latex_in_feed.append(this_symbol["latex"])
 
     # create new dict of symbols NOT used in feed
     symbols_not_in_feed = []
     for this_symbol in list_of_symbols:
         if this_symbol["id"] not in symbol_id_in_feed:
-            symbols_not_in_feed.append(this_symbol)
+            if this_symbol["latex"] in feed_dict["latex"]:
+                symbols_not_in_feed.append(this_symbol)
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -2391,9 +2412,6 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
 
             symbol_id_to_add = str(request.form["symbol_select_id_to_add"])
             logger.info("symbol_id_to_add=" + str(symbol_id_to_add))
-
-            # TODO: user provided a symbol, but adding is per-category
-            # FAULT EXPECTED for non-scalar add
 
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
@@ -2514,6 +2532,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
         form_edit_feed=web_form_edit_feed,
         symbols_in_feed=symbols_in_feed,
         symbols_not_in_feed=symbols_not_in_feed,
+        list_of_derivations_that_use_feed=list_of_derivations_that_use_feed,
         # dict_of_symbols_not_in_feed=dict_of_symbols_not_in_feed,
         feed_dict=feed_dict,
         # sympy_as_latex_per_feed_id=sympy_as_latex_per_feed_id,  # Used in _table_of_feeds.html
@@ -5059,7 +5078,8 @@ def to_edit_step(
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
-    web_form_new_step = SpecifyNewStepForm()
+    web_form_edit_step = SpecifyNewStepForm()
+    web_form_delete = NoOptionsForm()
 
     # TODO: Verify that derivation_id exists
     # TODO: verify that step_id exists
@@ -5083,36 +5103,54 @@ def to_edit_step(
             break
     logger.info("to_edit_step: this_step_dict=" + str(this_step_dict))
 
-    if request.method == "POST" and not web_form_new_step.validate():
-        flash("pdg_app/to_edit_step: " + str(web_form_new_step.errors))
-        logger.error(str(web_form_new_step.errors))
-    if (
-        request.method == "POST" and web_form_new_step.validate()
-    ):  # form always validates because no field is required
-        logger.info("to_edit_step: request.form = " + str(request.form))
+    if request.method == "POST":
+        logger.info("request.form = " + str(request.form))
 
-        # TODO: how to detect user wants to delete step?
+        if "edit" in request.form:
+            if web_form_edit_step.validate():
+                logger.info("editing step " + step_id)
+                note_before_step_latex = str(
+                    web_form_edit_step.note_before_step_latex.data
+                ).strip()
+                note_after_step_latex = str(
+                    web_form_edit_step.note_after_step_latex.data
+                ).strip()
 
-        logger.info("len(request.form.keys())=" + str(len(request.form.keys())))
+                logger.info("note_before_step_latex " + str(note_before_step_latex))
+                logger.info("note_after_step_latex " + str(note_after_step_latex))
 
-        note_before_step_latex = str(
-            web_form_new_step.note_before_step_latex.data
-        ).strip()
-        note_after_step_latex = str(
-            web_form_new_step.note_after_step_latex.data
-        ).strip()
+                # TODO: deprecate this "edit_step_notes" and replace with edit_node_properties
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.edit_step_notes,
+                        step_id,
+                        note_before_step_latex,
+                        note_after_step_latex,
+                    )
+                query_time_dict["pdg_app/to_edit_step: edit_step_notes " + trace_id] = (
+                    round(time.time() - query_start_time, 3)
+                )
 
-        logger.info("note_before_step_latex " + str(note_before_step_latex))
-        logger.info("note_after_step_latex " + str(note_after_step_latex))
+            else:
+                flash("pdg_app/to_edit_step: " + str(web_form_edit_step.errors))
+                logger.error(str(web_form_edit_step.errors))
 
-        # TODO: deprecate this "edit_step_notes" and replace with edit_node_properties
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_step_notes,
-                step_id,
-                note_before_step_latex,
-                note_after_step_latex,
+            return redirect(
+                url_for("to_edit_step", derivation_id=derivation_id, step_id=step_id)
+            )
+
+        elif "delete" in request.form:
+            logger.info("deleting step " + step_id)
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(neo4j_query.delete_node, step_id, "step")
+                query_time_dict["pdg_app/to_edit_step: delete_node " + trace_id] = (
+                    round(time.time() - query_start_time, 3)
+                )
+            return redirect(
+                url_for("to_review_derivation", derivation_id=derivation_id)
             )
 
     logger.info("[TRACE] end " + trace_id)
@@ -5120,7 +5158,8 @@ def to_edit_step(
         "jinja2_pages/user_workflow/step_edit.html",
         title="Edit Step",
         query_time_dict=query_time_dict,
-        form=web_form_new_step,
+        form_edit_step=web_form_edit_step,
+        form_delete=web_form_delete,
         step_dict=this_step_dict,
     )
 
@@ -5556,7 +5595,7 @@ def to_list_feeds() -> ResponseReturnValue:
         query_start_time = time.time()
         list_of_feeds = session.read_transaction(neo4j_query.get_nodes_of_type, "feed")
         query_time_dict[
-            "pdg_app/to_list_feeds: list_nodes_of_type, feed " + trace_id
+            "pdg_app/to_list_feeds: get_nodes_of_type, feed " + trace_id
         ] = round(time.time() - query_start_time, 3)
         logger.info("list_of_operations " + str(list_of_feeds))
 
@@ -5584,7 +5623,7 @@ def to_list_feeds() -> ResponseReturnValue:
             list_of_feed_IDs,
         )
         query_time_dict[
-            "pdg_app/to_list_feeds: get_all_symbol_IDs_in_every_feed" + trace_id
+            "pdg_app/to_list_feeds: get_symbols_for_every_feed" + trace_id
         ] = round(time.time() - query_start_time, 3)
 
     sympy_as_latex_per_feed_id = compute.get_sympy_as_latex_per_feed_id(list_of_feeds)
@@ -6190,7 +6229,7 @@ def to_list_inference_rules() -> ResponseReturnValue:
     )
 
     logger.info("inference rule list:")
-    for inference_rule_dict in list_of_inference_rule_dicts:
+    for inference_rule_dict in list_of_inference_rules:
         logger.info("to_list_inference_rules " + str(inference_rule_dict))
 
     logger.info("[TRACE] end " + trace_id)
