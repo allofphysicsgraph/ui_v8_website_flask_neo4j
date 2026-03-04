@@ -95,7 +95,7 @@ dict_of_nonoperation_symbol_dicts_in_expression: <BR>
 
 <fieldset>
   <legend>
-    <H3>Add Symbol to Expression</h3>
+    <H3>Add Symbol to Expression \({{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}\)</h3>
   </legend>
 
 <P>This table is based on guesses informed by strings in the expression.
@@ -155,7 +155,7 @@ dict_of_nonoperation_symbol_dicts_in_expression: <BR>
 
 <fieldset>
   <legend>
-    <H3>Remove Symbol used in Expression</h3>
+    <H3>Remove Symbol used in Expression \({{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}\)</h3>
   </legend>
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
