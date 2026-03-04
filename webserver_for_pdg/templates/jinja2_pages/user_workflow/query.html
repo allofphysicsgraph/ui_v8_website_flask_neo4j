@@ -239,6 +239,15 @@ MATCH ()-[r]->() WITH type(r) AS relationshipType, keys(r) AS keys UNWIND (CASE 
                                                   MATCH (n:value_with_units) RETURN n</a></td>
     <td>See also <a href="{{ url_for('to_list_scalars') }}">table of scalar symbols</a></td>
   </tr>
+
+  <tr>
+    <td id="feeds not connected to any step">feeds not connected to any step
+      <a href="#feeds not connected to any step">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (f:feed) WHERE NOT (f)<-[:HAS_FEED]-(:step) RETURN f">
+MATCH (f:feed) WHERE NOT (f)<-[:HAS_FEED]-(:step) RETURN f</a></td>
+    <td></td>
+  </tr>
+
   <tr>
     <td id="feeds connected to more than one step">feeds connected to more than one step
       <a href="#feeds connected to more than one step">#</a></td>
