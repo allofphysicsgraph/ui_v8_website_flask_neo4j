@@ -18,7 +18,7 @@
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
     <P>{{ form.query.label}}: {{ form.query(size=100, minlength=1) }}
-    <input type="submit" value="query graph">
+    <input type="submit" name="query submitted" value="query graph">
   </form>
 </fieldset>
 

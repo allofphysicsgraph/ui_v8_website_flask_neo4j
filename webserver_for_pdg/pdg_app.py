@@ -3996,58 +3996,65 @@ def to_add_operation() -> ResponseReturnValue:
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    if request.method == "POST" and not web_form_add_operation.validate():
-        flash("pdg_app/to_add_operation: " + str(web_form_add_operation.errors))
-        logger.error(str(web_form_add_operation.errors))
-    if request.method == "POST" and web_form_add_operation.validate():
+    if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        # request.form =  ImmutableMultiDict([('input1', 'a = b'), ('submit_button', 'Submit')])
+        if "new operation" in request.form:
+            if web_form_add_operation.validate():
 
-        operation_latex = str(web_form_add_operation.operation_latex.data).strip()
-        operation_name_latex = str(
-            web_form_add_operation.operation_name_latex.data
-        ).strip()
-        operation_description_latex = str(
-            web_form_add_operation.operation_description_latex.data
-        ).strip()
-        operation_reference_latex = str(
-            web_form_add_operation.operation_reference_latex.data
-        ).strip()
-        operation_argument_count = int(
-            web_form_add_operation.operation_argument_count.data
-        )
+                operation_latex = str(
+                    web_form_add_operation.operation_latex.data
+                ).strip()
+                operation_name_latex = str(
+                    web_form_add_operation.operation_name_latex.data
+                ).strip()
+                operation_description_latex = str(
+                    web_form_add_operation.operation_description_latex.data
+                ).strip()
+                operation_reference_latex = str(
+                    web_form_add_operation.operation_reference_latex.data
+                ).strip()
+                operation_argument_count = int(
+                    web_form_add_operation.operation_argument_count.data
+                )
 
-        logger.info("operation_latex:" + str(operation_latex))
-        logger.info("operation_name_latex:" + str(operation_name_latex))
-        logger.info("operation_description_latex" + str(operation_description_latex))
-        logger.info("operation_argument_count" + str(operation_argument_count))
+                logger.info("operation_latex:" + str(operation_latex))
+                logger.info("operation_name_latex:" + str(operation_name_latex))
+                logger.info(
+                    "operation_description_latex" + str(operation_description_latex)
+                )
+                logger.info("operation_argument_count" + str(operation_argument_count))
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        operation_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict
-        )
+                operation_id, query_time_dict = compute.generate_random_id(
+                    graphDB_Driver, query_time_dict
+                )
 
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_operation_symbol,
-                operation_id,
-                operation_name_latex,
-                operation_latex,
-                operation_description_latex,
-                operation_reference_latex,
-                operation_argument_count,
-                now_str,
-                author_name_latex,
-            )
-            logger.info("[TRACE] end " + trace_id)
-        return redirect(url_for("to_list_operations"))
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_operation_symbol,
+                        operation_id,
+                        operation_name_latex,
+                        operation_latex,
+                        operation_description_latex,
+                        operation_reference_latex,
+                        operation_argument_count,
+                        now_str,
+                        author_name_latex,
+                    )
+                    logger.info("[TRACE] end " + trace_id)
+
+                return redirect(url_for("to_list_operations"))
+            else:
+                flash("pdg_app/to_add_operation: " + str(web_form_add_operation.errors))
+                logger.error(str(web_form_add_operation.errors))
+                return redirect(url_for("to_add_operation"))
 
     logger.info("[trace] end " + trace_id)
     return render_template(
@@ -4104,55 +4111,59 @@ def to_add_relation() -> ResponseReturnValue:
 
     logger.info("before validate - request.form = " + str(request.form))
 
-    if request.method == "POST" and not web_form_add_relation.validate():
-        flash("pdg_app/to_add_relation: " + str(web_form_add_relation.errors))
-        logger.error(str(web_form_add_relation.errors))
-    if request.method == "POST" and web_form_add_relation.validate():
-        logger.info(" after validate - request.form = " + str(request.form))
+    if request.method == "POST":
+        logger.info("request.form = " + str(request.form))
+        if "new relation" in request.form:
+            if web_form_add_relation.validate():
 
-        # request.form =
+                relation_latex = str(web_form_add_relation.relation_latex.data).strip()
+                relation_name_latex = str(
+                    web_form_add_relation.relation_name_latex.data
+                ).strip()
+                relation_description_latex = str(
+                    web_form_add_relation.relation_description_latex.data
+                ).strip()
+                relation_reference_latex = str(
+                    web_form_add_relation.relation_reference_latex.data
+                ).strip()
+                relation_argument_count = 2
 
-        relation_latex = str(web_form_add_relation.relation_latex.data).strip()
-        relation_name_latex = str(
-            web_form_add_relation.relation_name_latex.data
-        ).strip()
-        relation_description_latex = str(
-            web_form_add_relation.relation_description_latex.data
-        ).strip()
-        relation_reference_latex = str(
-            web_form_add_relation.relation_reference_latex.data
-        ).strip()
-        relation_argument_count = 2
+                logger.info("relation_latex:" + str(relation_latex))
+                logger.info("relation_name_latex:" + str(relation_name_latex))
+                logger.info(
+                    "relation_description_latex" + str(relation_description_latex)
+                )
+                logger.info("relation_argument_count" + str(relation_argument_count))
 
-        logger.info("relation_latex:" + str(relation_latex))
-        logger.info("relation_name_latex:" + str(relation_name_latex))
-        logger.info("relation_description_latex" + str(relation_description_latex))
-        logger.info("relation_argument_count" + str(relation_argument_count))
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+                relation_id, query_time_dict = compute.generate_random_id(
+                    graphDB_Driver, query_time_dict
+                )
 
-        relation_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict
-        )
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_relation_symbol,
+                        relation_id,
+                        relation_name_latex,
+                        relation_latex,
+                        relation_description_latex,
+                        relation_reference_latex,
+                        now_str,
+                        author_name_latex,
+                    )
+                logger.info("[trace] end " + trace_id)
+                return redirect(url_for("to_list_relations"))
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_relation_symbol,
-                relation_id,
-                relation_name_latex,
-                relation_latex,
-                relation_description_latex,
-                relation_reference_latex,
-                now_str,
-                author_name_latex,
-            )
-            logger.info("[trace] end " + trace_id)
-        return redirect(url_for("to_list_relations"))
+            else:
+                flash("pdg_app/to_add_relation: " + str(web_form_add_relation.errors))
+                logger.error(str(web_form_add_relation.errors))
+                return redirect(url_for("to_add_relation"))
 
     logger.info("[trace] end " + trace_id)
     return render_template(
@@ -4254,115 +4265,122 @@ def to_add_step_select_expressions(
 
     logger.info("inference_rule_dict is " + str(inference_rule_dict))
 
-    if request.method == "POST" and not web_form_new_step.validate():
-        flash(
-            "pdg_app/to_add_step_select_expressions: " + str(web_form_new_step.errors)
-        )
-        logger.error(str(web_form_new_step.errors))
-    if request.method == "POST" and web_form_new_step.validate():
+    if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        note_before_step_latex = str(
-            web_form_new_step.note_before_step_latex.data
-        ).strip()
-        note_after_step_latex = str(
-            web_form_new_step.note_after_step_latex.data
-        ).strip()
+        if "new step" in request.form:
+            if web_form_new_step.validate():
 
-        # there's an arbitrary number of input, feed, and output expressions to add
-        list_of_input_expression_IDs = []
-        list_of_feed_expression_IDs = []
-        list_of_output_expression_IDs = []
-        for k, v in request.form.items():
-            logger.info("k=" + str(k) + "v=" + str(v))
-            if "input" in k:  # field name is what matters here
-                logger.info("input adding" + str(v))
-                list_of_input_expression_IDs.append(str(v))
-            if "feed" in k:  # field name is what matters here
-                logger.info("feed adding" + str(v))
-                list_of_feed_expression_IDs.append(str(v))
-            if "output" in k:  # field name is what matters here
-                logger.info("out adding" + str(v))
-                list_of_output_expression_IDs.append(str(v))
+                note_before_step_latex = str(
+                    web_form_new_step.note_before_step_latex.data
+                ).strip()
+                note_after_step_latex = str(
+                    web_form_new_step.note_after_step_latex.data
+                ).strip()
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                # there's an arbitrary number of input, feed, and output expressions to add
+                list_of_input_expression_IDs = []
+                list_of_feed_expression_IDs = []
+                list_of_output_expression_IDs = []
+                for k, v in request.form.items():
+                    logger.info("k=" + str(k) + "v=" + str(v))
+                    if "input" in k:  # field name is what matters here
+                        logger.info("input adding" + str(v))
+                        list_of_input_expression_IDs.append(str(v))
+                    if "feed" in k:  # field name is what matters here
+                        logger.info("feed adding" + str(v))
+                        list_of_feed_expression_IDs.append(str(v))
+                    if "output" in k:  # field name is what matters here
+                        logger.info("out adding" + str(v))
+                        list_of_output_expression_IDs.append(str(v))
 
-        step_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict
-        )
-        logger.info("generated step_id=" + str(step_id))
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        # for the derivation, determine the list of all sequence_index values,
-        #       then increment max to get the sequence_index for this step
-        list_of_sequence_values = []
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_sequence_values = session.read_transaction(
-                neo4j_query.get_list_of_sequence_values_for_derivation_id, derivation_id
-            )
-            query_time_dict[
-                "pdg_app/to_add_step_select_expressions: get_list_of_sequence_values_for_derivation_id "
-                + trace_id
-            ] = round(time.time() - query_start_time, 3)
-        logger.info("list_of_sequence_values=" + str(list_of_sequence_values))
-        if len(list_of_sequence_values) > 0:
-            new_sequence_value = int(max(list_of_sequence_values) + 1)
-        else:
-            new_sequence_value = 0
-
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-        try:
-            assert (
-                (len(list_of_input_expression_IDs) > 0)
-                or (len(list_of_feed_expression_IDs) > 0)
-                or (len(list_of_output_expression_IDs) > 0)
-            )
-        except AssertionError as err:
-            flash("pdg_app/to_add_step_select_expressions: " + str(err))
-            logger.error(str(err))
-            return redirect(
-                url_for(
-                    "to_add_step_select_expressions",
-                    derivation_id=derivation_id,
-                    inference_rule_id=inference_rule_id,
+                step_id, query_time_dict = compute.generate_random_id(
+                    graphDB_Driver, query_time_dict
                 )
-            )
+                logger.info("generated step_id=" + str(step_id))
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            # query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.connect_step_to_derivation,
-                step_id,
-                derivation_id,
-                inference_rule_id,
-                new_sequence_value,
-                now_str,
-                note_before_step_latex,
-                note_after_step_latex,
-                author_name_latex,
-            )
+                # for the derivation, determine the list of all sequence_index values,
+                #       then increment max to get the sequence_index for this step
+                list_of_sequence_values = []
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    list_of_sequence_values = session.read_transaction(
+                        neo4j_query.get_list_of_sequence_values_for_derivation_id,
+                        derivation_id,
+                    )
+                    query_time_dict[
+                        "pdg_app/to_add_step_select_expressions: get_list_of_sequence_values_for_derivation_id "
+                        + trace_id
+                    ] = round(time.time() - query_start_time, 3)
+                logger.info("list_of_sequence_values=" + str(list_of_sequence_values))
+                if len(list_of_sequence_values) > 0:
+                    new_sequence_value = int(max(list_of_sequence_values) + 1)
+                else:
+                    new_sequence_value = 0
 
-            # adding expressions can only be done after step exists
-            session.write_transaction(
-                neo4j_query.connect_expressions_to_step,
-                step_id,
-                now_str,
-                list_of_input_expression_IDs,
-                list_of_feed_expression_IDs,
-                list_of_output_expression_IDs,
-                author_name_latex,
-            )
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        return redirect(
-            url_for(
-                "to_review_derivation",
-                derivation_id=derivation_id,
-            )
-        )
+                try:
+                    assert (
+                        (len(list_of_input_expression_IDs) > 0)
+                        or (len(list_of_feed_expression_IDs) > 0)
+                        or (len(list_of_output_expression_IDs) > 0)
+                    )
+                except AssertionError as err:
+                    flash("pdg_app/to_add_step_select_expressions: " + str(err))
+                    logger.error(str(err))
+                    return redirect(
+                        url_for(
+                            "to_add_step_select_expressions",
+                            derivation_id=derivation_id,
+                            inference_rule_id=inference_rule_id,
+                        )
+                    )
+
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    # query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.connect_step_to_derivation,
+                        step_id,
+                        derivation_id,
+                        inference_rule_id,
+                        new_sequence_value,
+                        now_str,
+                        note_before_step_latex,
+                        note_after_step_latex,
+                        author_name_latex,
+                    )
+
+                    # adding expressions can only be done after step exists
+                    session.write_transaction(
+                        neo4j_query.connect_expressions_to_step,
+                        step_id,
+                        now_str,
+                        list_of_input_expression_IDs,
+                        list_of_feed_expression_IDs,
+                        list_of_output_expression_IDs,
+                        author_name_latex,
+                    )
+
+                return redirect(
+                    url_for(
+                        "to_review_derivation",
+                        derivation_id=derivation_id,
+                    )
+                )
+
+            else:
+                flash(
+                    "pdg_app/to_add_step_select_expressions: "
+                    + str(web_form_new_step.errors)
+                )
+                logger.error(str(web_form_new_step.errors))
+                return redirect(url_for("to_add_step_select_expressions"))
 
     # first visit to this page
     logger.info("[trace] end " + trace_id)
@@ -4974,91 +4992,104 @@ def to_add_inference_rule() -> ResponseReturnValue:
         )
     )
 
-    if request.method == "POST" and "new infrule" in request.form:
+    if request.method == "POST":
         logger.info("request.form=" + str(request.form))
 
-        if web_form_new_infrule.validate():
-            logger.info("request.form = " + str(request.form))
+        if "new infrule" in request.form:
 
-            inference_rule_name = str(
-                web_form_new_infrule.inference_rule_name.data
-            ).strip()
-            logger.info("inference_rule_name: " + str(inference_rule_name))
+            if web_form_new_infrule.validate():
+                logger.info("request.form = " + str(request.form))
 
-            inference_rule_latex = str(
-                web_form_new_infrule.inference_rule_latex.data
-            ).strip()
-            number_of_inputs = int(
-                str(web_form_new_infrule.inference_rule_number_of_inputs.data).strip()
-            )
-            number_of_feeds = int(
-                str(web_form_new_infrule.inference_rule_number_of_feeds.data).strip()
-            )
-            number_of_outputs = int(
-                str(web_form_new_infrule.inference_rule_number_of_outputs.data).strip()
-            )
-            author_name_latex = compute.encode_user_identifier(current_user.email)
+                inference_rule_name = str(
+                    web_form_new_infrule.inference_rule_name.data
+                ).strip()
+                logger.info("inference_rule_name: " + str(inference_rule_name))
 
-            infrule_exists, message, query_time_dict = (
-                compute.check_whether_inference_rule_exists(
-                    graphDB_Driver,
-                    query_time_dict,
-                    inference_rule_name,
-                    inference_rule_latex,
+                inference_rule_latex = str(
+                    web_form_new_infrule.inference_rule_latex.data
+                ).strip()
+                number_of_inputs = int(
+                    str(
+                        web_form_new_infrule.inference_rule_number_of_inputs.data
+                    ).strip()
                 )
-            )
-            if infrule_exists:
-                flash("pdg_app/to_add_inference_rule: " + message)
-                return redirect(url_for("to_add_inference_rule"))
-
-            logger.info("status: No conflicting name or latex detected")
-
-            inference_rule_id, query_time_dict = compute.generate_random_id(
-                graphDB_Driver, query_time_dict
-            )
-            logger.info("new inference_rule_id: " + str(inference_rule_id))
-
-            try:
-                assert (
-                    (int(number_of_inputs) > 0)
-                    or (int(number_of_feeds) > 0)
-                    or (int(number_of_outputs) > 0)
+                number_of_feeds = int(
+                    str(
+                        web_form_new_infrule.inference_rule_number_of_feeds.data
+                    ).strip()
                 )
-                assert int(number_of_inputs) >= 0
-                assert int(number_of_feeds) >= 0
-                assert int(number_of_outputs) >= 0
-            except AssertionError as err:
-                # TODO: getting assertion error wipes whatever the user provided. That's bad.
+                number_of_outputs = int(
+                    str(
+                        web_form_new_infrule.inference_rule_number_of_outputs.data
+                    ).strip()
+                )
+                author_name_latex = compute.encode_user_identifier(current_user.email)
+
+                infrule_exists, message, query_time_dict = (
+                    compute.check_whether_inference_rule_exists(
+                        graphDB_Driver,
+                        query_time_dict,
+                        inference_rule_name,
+                        inference_rule_latex,
+                    )
+                )
+                if infrule_exists:
+                    flash("pdg_app/to_add_inference_rule: " + message)
+                    return redirect(url_for("to_add_inference_rule"))
+
+                logger.info("status: No conflicting name or latex detected")
+
+                inference_rule_id, query_time_dict = compute.generate_random_id(
+                    graphDB_Driver, query_time_dict
+                )
+                logger.info("new inference_rule_id: " + str(inference_rule_id))
+
+                try:
+                    assert (
+                        (int(number_of_inputs) > 0)
+                        or (int(number_of_feeds) > 0)
+                        or (int(number_of_outputs) > 0)
+                    )
+                    assert int(number_of_inputs) >= 0
+                    assert int(number_of_feeds) >= 0
+                    assert int(number_of_outputs) >= 0
+                except AssertionError as err:
+                    # TODO: getting assertion error wipes whatever the user provided. That's bad.
+                    flash(
+                        "pdg_app/to_add_inference_rule Assertion error; try again. "
+                        + str(err)
+                    )
+                    logger.error(str(err))
+                    return redirect(url_for("to_add_inference_rule"))
+
+                # as per https://strftime.org/
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_inference_rule,
+                        inference_rule_id=inference_rule_id,
+                        inference_rule_name=inference_rule_name,
+                        inference_rule_latex=inference_rule_latex,
+                        number_of_inputs=number_of_inputs,
+                        number_of_feeds=number_of_feeds,
+                        number_of_outputs=number_of_outputs,
+                        now_str=now_str,
+                        author_name_latex=author_name_latex,
+                    )
+                logger.info("[TRACE] end " + trace_id)
+                return redirect(url_for("to_list_inference_rules"))
+            else:
                 flash(
-                    "pdg_app/to_add_inference_rule Assertion error; try again. "
-                    + str(err)
+                    "pdg_app/to_add_inference_rule: " + str(web_form_new_infrule.errors)
                 )
-                logger.error(str(err))
-                return redirect(url_for("to_add_inference_rule"))
-
-            # as per https://strftime.org/
-            # %f = Microsecond as a decimal number, zero-padded on the left.
-            now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-            # https://neo4j.com/docs/python-manual/current/session-api/
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.add_inference_rule,
-                    inference_rule_id=inference_rule_id,
-                    inference_rule_name=inference_rule_name,
-                    inference_rule_latex=inference_rule_latex,
-                    number_of_inputs=number_of_inputs,
-                    number_of_feeds=number_of_feeds,
-                    number_of_outputs=number_of_outputs,
-                    now_str=now_str,
-                    author_name_latex=author_name_latex,
-                )
-            logger.info("[TRACE] end " + trace_id)
-            return redirect(url_for("to_list_inference_rules"))
+                logger.error(str(web_form_new_infrule.errors))
         else:
-            flash("pdg_app/to_add_inference_rule: " + str(web_form_new_infrule.errors))
-            logger.error(str(web_form_new_infrule.errors))
+            flash("pdg_app/to_add_inference_rule: unrecognized button")
+            logger.error("unrecognized button")
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -5142,15 +5173,15 @@ def to_edit_step(
     for each_step_dict in list_of_step_dicts:
         list_of_sequence_values.append(each_step_dict["sequence_index"])
         if each_step_dict["id"] == step_id:
-            this_step_dict = each_step_dict
+            step_dict = each_step_dict
             # break
 
     list_of_sequence_values.sort()
-    logger.info("step_dict=" + str(this_step_dict))
+    logger.info("step_dict=" + str(step_dict))
     logger.info("list_of_sequence_values= " + str(list_of_sequence_values))
 
     sequence_swap_list = compute.get_placement_options(
-        list_of_sequence_values, this_step_dict["sequence_index"]
+        list_of_sequence_values, step_dict["sequence_index"]
     )
 
     if request.method == "POST":
@@ -5203,18 +5234,18 @@ def to_edit_step(
             # If the user picked an option that appeared BEFORE the original spot,
             # the index matches. If they picked an option AFTER, we add 1
             # to account for the slot we skipped in the dropdown.
-            if html_idx < current_idx:
-                target_idx = html_idx
+            if option_int < current_idx:
+                target_idx = option_int
             else:
-                target_idx = html_idx + 1
+                target_idx = option_int + 1
 
             # Insert the element at the new position
-            new_list.insert(target_idx, selected_element)
+            new_list.insert(target_idx, step_dict["sequence_index"])
 
             logger.info("new_list=" + str(new_list))
 
             with graphDB_Driver.session() as session:
-                for index, old_value in list_of_sequence_values.enumerate():
+                for index, old_value in enumerate(list_of_sequence_values):
                     if new_list[index] != old_value:
                         query_start_time = time.time()
                         session.write_transaction(
@@ -5288,7 +5319,7 @@ def to_edit_step(
         form_swap_feeds=web_form_swap_feeds,
         form_delete=web_form_delete,
         form_swap_index=web_form_swap_index,
-        step_dict=this_step_dict,
+        step_dict=step_dict,
         derivation_dict=derivation_dict,
         sequence_swap_list=sequence_swap_list,
         list_of_feeds_used_in_step=list_of_feeds_used_in_step,
@@ -5312,116 +5343,20 @@ def to_edit_inference_rule(
     web_form_edit = SpecifyNewInferenceRuleForm()
     web_form_delete = NoOptionsForm()
 
-    if request.method == "POST":
-        logger.info(" request.form no validate = " + str(request.form))
-
-        if request.form["submit_button"] == "delete inference rule":
-            logger.info("delete inf rule")
-
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.delete_node, inference_rule_id, "inference_rule"
-                )
-                query_time_dict[
-                    "pdg_app/to_edit_inference_rule: delete_node inference_rule"
-                    + trace_id
-                ] = round(time.time() - query_start_time, 3)
-
-            return redirect(url_for("to_list_inference_rules"))
-
-    if request.method == "POST" and not web_form_edit.validate():
-        flash("pdg_app/to_edit_inference_rule: " + str(web_form_edit.errors))
-        logger.error(str(web_form_edit.errors))
-    if request.method == "POST" and web_form_edit.validate():
-        logger.info("to_edit_inference_rule validated")
-        logger.info("to_edit_inference_rule request.form valid = " + str(request.form))
-
-        # request.form =  ImmutableMultiDict(('inference_rule_name', 'asdfmmimimimim'), ('inference_rule_latex', 'mimimmkm'), ('inference_rule_number_of_inputs', '1'), ('inference_rule_number_of_feeds', '1'), ('inference_rule_number_of_outputs', '1')])
-
-        inference_rule_name = str(web_form_edit.inference_rule_name.data).strip()
-        inference_rule_latex = str(web_form_edit.inference_rule_latex.data).strip()
-        logger.info(
-            "to_edit_inference_rule: inference_rule_latex=" + str(inference_rule_latex)
-        )
-        number_of_inputs = int(
-            str(web_form_edit.inference_rule_number_of_inputs.data).strip()
-        )
-        number_of_feeds = int(
-            str(web_form_edit.inference_rule_number_of_feeds.data).strip()
-        )
-        number_of_outputs = int(
-            str(web_form_edit.inference_rule_number_of_outputs.data).strip()
-        )
-        author_name_latex = compute.encode_user_identifier(current_user.email)
-
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        list_of_inference_rule_dicts = []
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_inference_rule_dicts = session.read_transaction(
-                neo4j_query.get_nodes_of_type, "inference_rule"
-            )
-            query_time_dict[
-                "pdg_app/to_edit_inference_rule: get_nodes_of_type inference_rule"
-                + trace_id
-            ] = round(time.time() - query_start_time, 3)
-
-        for inference_rule_dict in list_of_inference_rule_dicts:
-            logger.info(
-                "pdg_app/to_edit_inference_rule inference_rule_dict="
-                + str(inference_rule_dict)
-            )
-            logger.info("inference_rule_name " + str(inference_rule_name))
-            logger.info(
-                "inference_rule_dict['inference_rule_name'] "
-                + str(inference_rule_dict["inference_rule_name"])
-            )
-            if inference_rule_name == inference_rule_dict["inference_rule_name"]:
-                logger.error(
-                    "INVALID INPUT: inference rule with that name already exists"
-                )
-                # TODO: a notice should be provided to the user
-                flash(
-                    "pdg_app/to_edit_inference_rule INVALID INPUT: inference rule with that name already exists"
-                )
-
-                logger.info("[TRACE] end " + trace_id)
-                return redirect(url_for("to_add_inference_rule"))
-            if inference_rule_latex == inference_rule_dict["latex"]:
-                logger.error(
-                    "INVALID INPUT: inference rule with that latex already exists"
-                )
-                # TODO: a notice should be provided to the user
-                flash(
-                    "pdg_app/to_edit_inference_ruleINVALID INPUT: inference rule with that latex already exists"
-                )
-
-                logger.info("[TRACE] end " + trace_id)
-                return redirect(url_for("to_add_inference_rule"))
-
-        logger.info(
-            "to_edit_inference_rule status: No conflicting name or latex detected"
-        )
-
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_inference_rule,
-                inference_rule_id=inference_rule_id,
-                inference_rule_name=inference_rule_name,
-                inference_rule_latex=inference_rule_latex,
-                number_of_inputs=number_of_inputs,
-                number_of_feeds=number_of_feeds,
-                number_of_outputs=number_of_outputs,
-                author_name_latex=author_name_latex,
-            )
-            query_time_dict[
-                "pdg_app/to_edit_inference_rule: add_inference_rule " + trace_id
-            ] = round(time.time() - query_start_time, 3)
-
     with graphDB_Driver.session() as session:
+
+        query_start_time = time.time()
+        inference_rule_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "inference_rule", inference_rule_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_inference_rule: get_node_properties_from_id " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        logger.info(
+            "to_edit_inference_rule inference_rule_dict " + str(inference_rule_dict)
+        )
+
         query_start_time = time.time()
         list_of_derivations_that_use_this_inference_rule_id = session.read_transaction(
             neo4j_query.get_derivations_that_use_inference_rule,
@@ -5439,20 +5374,125 @@ def to_edit_inference_rule(
         }.values()
     )
 
-    # get properties for inference rule
-    inference_rule_dict = {}
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        inference_rule_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "inference_rule", inference_rule_id
-        )
-        query_time_dict[
-            "pdg_app/to_edit_inference_rule: get_node_properties_from_id " + trace_id
-        ] = round(time.time() - query_start_time, 3)
+    if request.method == "POST":
+        logger.info(" request.form = " + str(request.form))
 
-    logger.info(
-        "to_edit_inference_rule inference_rule_dict " + str(inference_rule_dict)
-    )
+        if "delete infrule" in request.form:
+            logger.info("delete inf rule")
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.delete_node, inference_rule_id, "inference_rule"
+                )
+                query_time_dict[
+                    "pdg_app/to_edit_inference_rule: delete_node inference_rule"
+                    + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+            return redirect(url_for("to_list_inference_rules"))
+
+        elif "update infrule" in request.form:
+            if web_form_edit.validate():
+
+                inference_rule_name = str(
+                    web_form_edit.inference_rule_name.data
+                ).strip()
+                inference_rule_latex = str(
+                    web_form_edit.inference_rule_latex.data
+                ).strip()
+                logger.info(
+                    "to_edit_inference_rule: inference_rule_latex="
+                    + str(inference_rule_latex)
+                )
+                number_of_inputs = int(
+                    str(web_form_edit.inference_rule_number_of_inputs.data).strip()
+                )
+                number_of_feeds = int(
+                    str(web_form_edit.inference_rule_number_of_feeds.data).strip()
+                )
+                number_of_outputs = int(
+                    str(web_form_edit.inference_rule_number_of_outputs.data).strip()
+                )
+                author_name_latex = compute.encode_user_identifier(current_user.email)
+
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                list_of_inference_rule_dicts = []
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    list_of_inference_rule_dicts = session.read_transaction(
+                        neo4j_query.get_nodes_of_type, "inference_rule"
+                    )
+                    query_time_dict[
+                        "pdg_app/to_edit_inference_rule: get_nodes_of_type inference_rule"
+                        + trace_id
+                    ] = round(time.time() - query_start_time, 3)
+
+                for inference_rule_dict in list_of_inference_rule_dicts:
+                    logger.info(
+                        "pdg_app/to_edit_inference_rule inference_rule_dict="
+                        + str(inference_rule_dict)
+                    )
+                    logger.info("inference_rule_name " + str(inference_rule_name))
+                    logger.info(
+                        "inference_rule_dict['inference_rule_name'] "
+                        + str(inference_rule_dict["inference_rule_name"])
+                    )
+                    if (
+                        inference_rule_name
+                        == inference_rule_dict["inference_rule_name"]
+                    ):
+                        logger.error(
+                            "INVALID INPUT: inference rule with that name already exists"
+                        )
+                        # TODO: a notice should be provided to the user
+                        flash(
+                            "pdg_app/to_edit_inference_rule INVALID INPUT: inference rule with that name already exists"
+                        )
+
+                        logger.info("[TRACE] end " + trace_id)
+                        return redirect(url_for("to_add_inference_rule"))
+                    if inference_rule_latex == inference_rule_dict["latex"]:
+                        logger.error(
+                            "INVALID INPUT: inference rule with that latex already exists"
+                        )
+                        # TODO: a notice should be provided to the user
+                        flash(
+                            "pdg_app/to_edit_inference_ruleINVALID INPUT: inference rule with that latex already exists"
+                        )
+
+                        logger.info("[TRACE] end " + trace_id)
+                        return redirect(url_for("to_add_inference_rule"))
+
+                logger.info(
+                    "to_edit_inference_rule status: No conflicting name or latex detected"
+                )
+
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_inference_rule,
+                        inference_rule_id=inference_rule_id,
+                        inference_rule_name=inference_rule_name,
+                        inference_rule_latex=inference_rule_latex,
+                        number_of_inputs=number_of_inputs,
+                        number_of_feeds=number_of_feeds,
+                        number_of_outputs=number_of_outputs,
+                        author_name_latex=author_name_latex,
+                    )
+                    query_time_dict[
+                        "pdg_app/to_edit_inference_rule: add_inference_rule " + trace_id
+                    ] = round(time.time() - query_start_time, 3)
+
+            else:
+                flash("pdg_app/to_edit_inference_rule: " + str(web_form_edit.errors))
+                logger.error(str(web_form_edit.errors))
+                return redirect(url_for("to_edit_inference_rule"))
+        else:
+            flash("pdg_app/to_edit_inference_rule: unrecognized button")
+            logger.error("unrecognized button")
+            return redirect(url_for("to_edit_inference_rule"))
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -5494,19 +5534,22 @@ def to_query() -> ResponseReturnValue:
 
     web_form_cypher = CypherQueryForm()
 
-    if request.method == "POST" and not web_form_cypher.validate():
-        flash("pdg_app/to_query: " + str(web_form_cypher.errors))
-        logger.error(str(web_form_cypher.errors))
-    if request.method == "POST" and web_form_cypher.validate():
-        query = str(web_form_cypher.query.data).strip()
-        logger.info("form valid; query via web form: " + str(query))
-    elif request.method == "POST":  # form did not validate
-        logger.info("form did not validate")
+    if request.method == "POST":
+        if "query submitted" in request.form:
+            if web_form_cypher.validate():
+                query = str(web_form_cypher.query.data).strip()
+                logger.info("form valid; query via web form: " + str(query))
+            else:
+                flash("pdg_app/to_query: " + str(web_form_cypher.errors))
+                logger.error(str(web_form_cypher.errors))
     elif request.method == "GET":  # query via URL keyword, or new page load
         query_str = request.args.get("cypher", None)
         if query_str:
             logger.info("query via URL: " + str(query_str))
             query = query_str
+    else:
+        logger.error("unrecognized method: " + str(request.method))
+        return redirect(url_for("to_query"))
 
     logger.info("query=" + str(query))
 
@@ -7036,7 +7079,7 @@ def scrape_arxiv():
         for entry in rss_entries:
             reason = ""
 
-            rss_title_to_search = entry.get("title", None).lower()
+            rss_title_to_search = entry["title"].lower()
 
             logger.info(
                 "user_provided_title_keywords_list: "
@@ -7047,7 +7090,7 @@ def scrape_arxiv():
                     if users_title_keyword in rss_title_to_search:
                         reason += users_title_keyword + " (title) AND "
 
-            rss_description_to_search = entry.get("description", None).lower()
+            rss_description_to_search = entry["description"].lower()
 
             logger.info(
                 "user_provided_description_keywords_list: "
@@ -7060,7 +7103,7 @@ def scrape_arxiv():
                     if users_description_keyword in rss_description_to_search:
                         reason += users_description_keyword + " (description) AND "
 
-            rss_authors_to_search = entry.get("dc:creator", None).lower()
+            rss_authors_to_search = entry["dc:creator"].lower()
 
             logger.info("user_provided_author_list: " + str(user_provided_author_list))
             if user_provided_author_list:
