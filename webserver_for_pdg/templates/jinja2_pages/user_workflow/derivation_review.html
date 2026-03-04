@@ -6,6 +6,7 @@
             <a href="{{ url_for('to_list_derivations') }}?referrer=derivation_review">list derivations</a>
 </P>
 
+
 <H2>Review {{ derivation_dict['name_latex'] }}</H2>
 
 <!--<P> Derivation dictionary: -->
@@ -27,6 +28,12 @@
     <th>step validity (as per <a href="https://www.sympy.org/">SymPy</a>)</th>
   </tr>
   {% for step_id, step_dict in all_steps.items() %}
+
+  {% if step_dict['note_before_step_latex'] %}
+  <tr>
+    <td colspan="6">step_dict['note_before_step_latex']</td>
+  </tr>
+  {% endif %}
   <tr>
     <td>
       <a href="{{ url_for('to_edit_step', derivation_id=derivation_dict['id'], step_id=step_id ) }}">
@@ -68,12 +75,29 @@
     </td>
     <td>{{ derivation_step_validity_dict[step_id] }}</td> <!-- valid -->
   </tr>
+  {% if step_dict['note_before_step_latex'] %}
+  <tr>
+    <td colspan="6">step_dict['note_before_step_latex']</td>
+  </tr>
+  {% endif %}
+
   {% endfor %}
 </table>
 
+<H2>Symbols used in {{ derivation_dict['name_latex'] }}</H2>
+
+
+<UL>{% for this_symbol in symbols_in_derivation %}
+  <LI><a href="{{ url_for('to_edit_node', node_id=this_symbol['id']) }}">{{ this_symbol['id'] }}</a>: \( {{ this_symbol['latex'] }} \)</LI>
+  {% endfor %}
+</UL>
+
+
 <P>
   <a href="{{ url_for('static', filename=derivation_graphviz_png_filename) }}">
-    <img src="{{ url_for('static', filename=derivation_graphviz_png_filename) }}">
+    <img src="{{ url_for('static', filename=derivation_graphviz_png_filename) }}" 
+         alt="Steps and expressions for {{ derivation_dict['name_latex'] }}" 
+         style="border: 5px solid black;">
   </a>
 
 <!-- See https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/14 
@@ -90,8 +114,7 @@
 { % endfor % }
 </ul>
 -->
-<P>
-
+<P>d3js visualization of steps and expressions in {{ derivation_dict['name_latex'] }}
   <center>
     <svg id='viz'></svg> <!-- uses JSON from json_for_d3js -->
 <BR/>
@@ -126,9 +149,9 @@ the following two were removed because the user should click on step ID in table
     {{ form_tex_pdf.csrf_token }}
 
 
-    <button type="submit" class="btn btn-default" name="submit_button" value="generate_tex">generate tex file</button>
+    <input type="submit" name="generate tex" value="generate tex file">
     &nbsp;&nbsp; xor &nbsp;&nbsp;
-    <button type="submit" class="btn btn-default" name="submit_button" value="generate_pdf">generate PDF file</button>
+    <input type="submit" name="generate pdf" value="generate PDF file">
   </form>
 </fieldset>
 
@@ -144,7 +167,7 @@ the following two were removed because the user should click on step ID in table
 
 <!--    <button type="submit" class="btn btn-default" name="submit_button" value="delete derivation and steps">delete derivation and steps</button>-->
 
-<input type="submit" name="submit_button" value="delete derivation and steps">
+<input type="submit" name="delete derivation" value="delete derivation and steps">
 
   </form>
 </fieldset>
