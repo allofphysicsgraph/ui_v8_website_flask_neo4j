@@ -810,6 +810,28 @@ def get_derivations_for_every_expression(
     return res_dict
 
 
+def get_symbols_for_derivation(tx: Transaction, derivation_id: str) -> List[dict]:
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    logger.info("derivaion_id=" + derivation_id)
+
+    query = """
+    MATCH (d:derivation {id: $derivation_id})
+      -[:HAS_STEP]->(:step)
+      -[:HAS_FEED|HAS_INPUT|HAS_OUTPUT]->()
+      -[:IS_COMPRISED_OF]->(s:symbol)
+    RETURN DISTINCT s
+    """
+
+    result = tx.run(query, derivation_id=derivation_id)
+
+    logger.info("[TRACE] end " + trace_id)
+
+    # list comprehension convert Node objects to dicts directly
+    return [dict(record["s"]) for record in result]
+
+
 def get_derivations_that_use_feed(
     tx: Transaction, feed_id: str
 ) -> List[Dict[str, Any]]:
@@ -1275,12 +1297,20 @@ def edit_step_notes(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    result = tx.run(
-        'MERGE (s:step {id:"' + str(step_id) + '", '
-        'SET s ={id:"' + str(step_id) + '", '
-        'note_before_step_latex: "' + str(note_before_step_latex) + '", '
-        'note_before_step_latex: "' + str(note_after_step_latex) + '"}'
-    )
+    params = {
+        "step_id": str(step_id),
+        "before": str(note_before_step_latex),
+        "after": str(note_after_step_latex),
+    }
+
+    # Use $ variable names in the query string
+    query = """
+    MERGE (s:step {id: $step_id})
+    SET s.note_before_step_latex = $before,
+        s.note_after_step_latex = $after
+    """
+
+    result = tx.run(query, params)
 
     logger.info("[TRACE] end " + trace_id)
     return
@@ -1567,9 +1597,11 @@ def connect_symbol_to_feed(tx, symbol_id: str, feed_id: str) -> None:
     # To avoid triggering a Cartesian product, use
     result = tx.run(
         "MATCH (f:feed {id: '" + feed_id + "'})"
-        "MATCH (n {id: '" + symbol_id + "'})"
-        "MERGE (f)-[r:IS_COMPRISED_OF]->(s)"
+        "MATCH (s {id: '" + symbol_id + "'})"
+        "MERGE (f)-[:IS_COMPRISED_OF]->(s)"
     )
+
+    logger.info("result=" + str(result))
 
     logger.info("[TRACE] end " + trace_id)
     return
