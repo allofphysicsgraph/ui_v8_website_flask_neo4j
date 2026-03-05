@@ -183,7 +183,7 @@ def guess_sympy_from_expression(graphDB_Driver, query_time_dict, expression_dict
     # look at each sympy_symbol replaced with PDG symbol
 
     # TODO:
-    symbol_id_dict = {}
+    symbol_id_dict = {}  # type: Dict[str, str]
     try:
         revised_expr_lhs = sympy_validate_expression.convert_sympy_expr_to_pdg_symbols(
             sympy_expr_lhs, symbol_id_dict
