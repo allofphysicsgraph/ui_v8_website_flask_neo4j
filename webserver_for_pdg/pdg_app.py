@@ -1311,108 +1311,121 @@ def to_add_derivation() -> ResponseReturnValue:
 
     logger.info("request.method=" + str(request.method))  # POST
 
-    if request.method == "POST" and not web_form_new_derivation.validate():
-        flash("pdg_app/to_add_derivation: " + str(web_form_new_derivation.errors))
-        logger.error(str(web_form_new_derivation.errors))
-    if request.method == "POST" and web_form_new_derivation.validate():
+    if request.method == "POST":
         logger.info("request.form =" + str(request.form))
+        if "new derivation" in request.form:
+            if web_form_new_derivation.validate():
+                # this preserves the LaTeX backslashes exactly as the user typed them.
+                derivation_name_latex = str(
+                    web_form_new_derivation.derivation_name_latex.data
+                ).strip()
 
-        # this preserves the LaTeX backslashes exactly as the user typed them.
-        derivation_name_latex = str(
-            web_form_new_derivation.derivation_name_latex.data
-        ).strip()
+                # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+                if not derivation_name_latex.isascii():
+                    logger.error(
+                        "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
+                    )
+                    return f"<h1>Input must be ASCII only</h1>\n{escape(derivation_name_latex)}"
 
-        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-        if not derivation_name_latex.isascii():
-            logger.error(
-                "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
-            )
-            return f"<h1>Input must be ASCII only</h1>\n{escape(derivation_name_latex)}"
+                # this preserves the LaTeX backslashes exactly as the user typed them.
+                derivation_reference_latex = str(
+                    web_form_new_derivation.derivation_reference_latex.data
+                ).strip()
 
-        # this preserves the LaTeX backslashes exactly as the user typed them.
-        derivation_reference_latex = str(
-            web_form_new_derivation.derivation_reference_latex.data
-        ).strip()
+                # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+                if not derivation_reference_latex.isascii():
+                    logger.error(
+                        "Non-ascii derivation_reference_latex: "
+                        + str(derivation_reference_latex)
+                    )
+                    return "<H1>Input must be ASCII only</H1>\n" + str(
+                        derivation_reference_latex
+                    )
 
-        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-        if not derivation_reference_latex.isascii():
-            logger.error(
-                "Non-ascii derivation_reference_latex: "
-                + str(derivation_reference_latex)
-            )
-            return "<H1>Input must be ASCII only</H1>\n" + str(
-                derivation_reference_latex
-            )
+                # this preserves the LaTeX backslashes exactly as the user typed them.
+                abstract_latex = str(
+                    web_form_new_derivation.abstract_latex.data
+                ).strip()
 
-        # this preserves the LaTeX backslashes exactly as the user typed them.
-        abstract_latex = str(web_form_new_derivation.abstract_latex.data).strip()
+                # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+                if not abstract_latex.isascii():
+                    logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
+                    return (
+                        f"<h1>Input must be ASCII only</h1>\n{escape(abstract_latex)}"
+                    )
 
-        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-        if not abstract_latex.isascii():
-            logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
-            return f"<h1>Input must be ASCII only</h1>\n{escape(abstract_latex)}"
+                # 2025-01-04, BHP: the following has been commented out
+                # because the safety of string should be applied on writing, not reading
+                #
+                # derivation_name_latex_SAFE = latex.make_string_safe_for_latex(
+                #     derivation_name_latex
+                # )
+                # if derivation_name_latex_SAFE != derivation_name_latex:
+                #     logger.info("   derivation name submitted:" + str(derivation_name_latex))
+                #     logger.info("   derivation name altered:" + str(derivation_name_latex_SAFE))
+                #     flash("derivation name altered to " + str(derivation_name_latex_SAFE))
+                # derivation_name_latex = derivation_name_latex_SAFE
 
-        # 2025-01-04, BHP: the following has been commented out
-        # because the safety of string should be applied on writing, not reading
-        #
-        # derivation_name_latex_SAFE = latex.make_string_safe_for_latex(
-        #     derivation_name_latex
-        # )
-        # if derivation_name_latex_SAFE != derivation_name_latex:
-        #     logger.info("   derivation name submitted:" + str(derivation_name_latex))
-        #     logger.info("   derivation name altered:" + str(derivation_name_latex_SAFE))
-        #     flash("derivation name altered to " + str(derivation_name_latex_SAFE))
-        # derivation_name_latex = derivation_name_latex_SAFE
+                # abstract_latex_SAFE = latex.make_string_safe_for_latex(abstract_latex)
+                # if abstract_latex_SAFE != abstract_latex:
+                #     logger.info("   abstract submitted:" + str(abstract_latex))
+                #     logger.info("   abstract altered:" + str(abstract_latex))
+                #     flash("   abstract altered to " + str(abstract_latex_SAFE))
+                # abstract_latex = abstract_latex_SAFE
 
-        # abstract_latex_SAFE = latex.make_string_safe_for_latex(abstract_latex)
-        # if abstract_latex_SAFE != abstract_latex:
-        #     logger.info("   abstract submitted:" + str(abstract_latex))
-        #     logger.info("   abstract altered:" + str(abstract_latex))
-        #     flash("   abstract altered to " + str(abstract_latex_SAFE))
-        # abstract_latex = abstract_latex_SAFE
+                # derivation_reference_latex_SAFE = latex.make_string_safe_for_latex(
+                #     derivation_reference_latex
+                # )
+                # if derivation_reference_latex_SAFE != derivation_reference_latex:
+                #     logger.info("   reference submitted:" + str(derivation_reference_latex))
+                #     logger.info("   reference altered:" + str(derivation_reference_latex))
+                #     flash("   reference altered to " + str(derivation_reference_latex_SAFE))
+                # derivation_reference_latex = derivation_reference_latex_SAFE
 
-        # derivation_reference_latex_SAFE = latex.make_string_safe_for_latex(
-        #     derivation_reference_latex
-        # )
-        # if derivation_reference_latex_SAFE != derivation_reference_latex:
-        #     logger.info("   reference submitted:" + str(derivation_reference_latex))
-        #     logger.info("   reference altered:" + str(derivation_reference_latex))
-        #     flash("   reference altered to " + str(derivation_reference_latex_SAFE))
-        # derivation_reference_latex = derivation_reference_latex_SAFE
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                derivation_id, query_time_dict = compute.generate_random_id(
+                    graphDB_Driver, query_time_dict
+                )
+                logger.info("to_add_derivation: derivation_id=" + str(derivation_id))
 
-        derivation_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict
-        )
-        logger.info("to_add_derivation: derivation_id=" + str(derivation_id))
+                # as per https://strftime.org/
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        # as per https://strftime.org/
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_derivation,
+                        derivation_id,
+                        now_str,
+                        derivation_name_latex,
+                        abstract_latex,
+                        derivation_reference_latex,
+                        author_name_latex,
+                    )
+                    query_time_dict[
+                        "pdg_app/to_add_derivation: add_derivation " + trace_id
+                    ] = round(time.time() - query_start_time, 3)
+                logger.info("[TRACE] end " + trace_id)
+                return redirect(
+                    url_for(
+                        "to_add_step_select_inference_rule",
+                        derivation_id=derivation_id,
+                    )
+                )
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_derivation,
-                derivation_id,
-                now_str,
-                derivation_name_latex,
-                abstract_latex,
-                derivation_reference_latex,
-                author_name_latex,
-            )
-            query_time_dict["pdg_app/to_add_derivation: add_derivation " + trace_id] = (
-                round(time.time() - query_start_time, 3)
-            )
-        logger.info("[TRACE] end " + trace_id)
-        return redirect(
-            url_for(
-                "to_add_step_select_inference_rule",
-                derivation_id=derivation_id,
-            )
-        )
+            else:
+                flash(
+                    "pdg_app/to_add_derivation: " + str(web_form_new_derivation.errors)
+                )
+                logger.error(str(web_form_new_derivation.errors))
+                return redirect(url_for("to_add_derivation"))
+        else:
+            flash("pdg_app/to_add_derivation: unrecognized button")
+            logger.error("unrecognized button")
+            return redirect(url_for("to_add_derivation"))
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -1800,72 +1813,84 @@ def to_edit_derivation_metadata(
             + " does not exist in database</H1>."
         )
 
-    if request.method == "POST" and not web_form_edit_derivation.validate():
-        flash(
-            "pdg_app/to_edit_derivation_metadata: "
-            + str(web_form_edit_derivation.errors)
-        )
-        logger.error(str(web_form_edit_derivation.errors))
-    if request.method == "POST" and web_form_edit_derivation.validate():
-        logger.info("to_edit_derivation_metadata: request.form = " + str(request.form))
+    if request.method == "POST":
+        logger.info("request.form = " + str(request.form))
 
-        # request.form =  ImmutableMultiDict(('derivation_name_latex', 'this isa'), ('abstract_latex', 'heresasdf00')])
+        if "edit metadata" in request.form:
+            if web_form_edit_derivation.validate():
+                # sanitize Latex
+                # TODO: notify user if what they submitted has been altered.
+                derivation_name_latex = latex.make_string_safe_for_latex(
+                    str(web_form_edit_derivation.derivation_name_latex.data).strip()
+                )
+                # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+                if not derivation_name_latex.isascii():
+                    logger.error(
+                        "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
+                    )
+                    return f"<h1>Input must be ASCII only</h1>\n{escape(derivation_name_latex)}"
 
-        # sanitize Latex
-        # TODO: notify user if what they submitted has been altered.
-        derivation_name_latex = latex.make_string_safe_for_latex(
-            str(web_form_edit_derivation.derivation_name_latex.data).strip()
-        )
-        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-        if not derivation_name_latex.isascii():
-            logger.error(
-                "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
-            )
-            return f"<h1>Input must be ASCII only</h1>\n{escape(derivation_name_latex)}"
+                derivation_reference_latex = latex.make_string_safe_for_latex(
+                    str(
+                        web_form_edit_derivation.derivation_reference_latex.data
+                    ).strip()
+                )
+                # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+                if not derivation_reference_latex.isascii():
+                    logger.error(
+                        "Non-ascii derivation_reference_latex: "
+                        + str(derivation_reference_latex)
+                    )
+                    return "<H1>Input must be ASCII only</H1>\n" + str(
+                        derivation_reference_latex
+                    )
 
-        derivation_reference_latex = latex.make_string_safe_for_latex(
-            str(web_form_edit_derivation.derivation_reference_latex.data).strip()
-        )
-        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-        if not derivation_reference_latex.isascii():
-            logger.error(
-                "Non-ascii derivation_reference_latex: "
-                + str(derivation_reference_latex)
-            )
-            return "<H1>Input must be ASCII only</H1>\n" + str(
-                derivation_reference_latex
-            )
+                abstract_latex = latex.make_string_safe_for_latex(
+                    str(web_form_edit_derivation.abstract_latex.data).strip()
+                )
+                # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+                if not abstract_latex.isascii():
+                    logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
+                    return (
+                        f"<h1>Input must be ASCII only</h1>\n{escape(abstract_latex)}"
+                    )
 
-        abstract_latex = latex.make_string_safe_for_latex(
-            str(web_form_edit_derivation.abstract_latex.data).strip()
-        )
-        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-        if not abstract_latex.isascii():
-            logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
-            return f"<h1>Input must be ASCII only</h1>\n{escape(abstract_latex)}"
+                # as per https://strftime.org/
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        # as per https://strftime.org/
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.edit_derivation_metadata,
+                        derivation_id,
+                        derivation_name_latex,
+                        derivation_reference_latex,
+                        abstract_latex,
+                        author_name_latex,
+                    )
+                    query_time_dict[
+                        "pdg_app/to_edit_derivation_metadata: edit_derivation_metadata"
+                        + trace_id
+                    ] = round(time.time() - query_start_time, 3)
+                logger.info("[TRACE] end " + trace_id)
+                return redirect(
+                    url_for("to_review_derivation", derivation_id=derivation_id)
+                )
 
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.edit_derivation_metadata,
-                derivation_id,
-                derivation_name_latex,
-                derivation_reference_latex,
-                abstract_latex,
-                author_name_latex,
-            )
-            query_time_dict[
-                "pdg_app/to_edit_derivation_metadata: edit_derivation_metadata"
-                + trace_id
-            ] = round(time.time() - query_start_time, 3)
-        logger.info("[TRACE] end " + trace_id)
-        return redirect(url_for("to_review_derivation", derivation_id=derivation_id))
+            else:
+                flash(
+                    "pdg_app/to_edit_derivation_metadata: "
+                    + str(web_form_edit_derivation.errors)
+                )
+                logger.error(str(web_form_edit_derivation.errors))
+                return redirect(url_for("to_edit_derivation_metadata"))
+        else:
+            flash("pdg_app/to_edit_derivation_metadata: unrecognized button")
+            logger.error("unrecognized button")
+            return redirect(url_for("to_edit_derivation_metadata"))
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -2071,226 +2096,271 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseRetur
         )
     )
 
-    if request.method == "POST" and "add symbol to expr" in request.form:
+    if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        for key, val in request.form.items():
-            if "symbol_id_to_connect_to_expression" in key:
-                symbol_id_to_add = str(val)
+        if "add symbol to expr" in request.form:
 
-        logger.info("symbol_id_to_add: " + symbol_id_to_add)
-
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.connect_symbol_to_expression,
-                symbol_id_to_add,
-                expression_id,
-            )
-            query_time_dict[
-                "pdg_app/to_edit_expression: connect_symbol_to_expression"
-            ] = round(time.time() - query_start_time, 3)
-        return redirect(url_for("to_edit_expression", expression_id=expression_id))
-
-    if request.method == "POST" and "remove symbol from expr" in request.form:
-        logger.info("request.form = " + str(request.form))
-
-        flash("pdg_app/to_edit_expression: Not enacted 'remove symbol from expr' yet")
-        return redirect(url_for("to_edit_expression", expression_id=expression_id))
-
-    if request.method == "POST" and "add operation to expr" in request.form:
-        logger.info("request.form = " + str(request.form))
-
-        with graphDB_Driver.session() as session:
             for key, val in request.form.items():
-                if "operation_id_to_connect_to_expression" in key:
-                    operation_id = val
+                if "symbol_id_to_connect_to_expression" in key:
+                    symbol_id_to_add = str(val)
 
-                    query_start_time = time.time()
-                    list_of_inference_rule_dicts = session.write_transaction(
-                        neo4j_query.connect_symbol_to_expression,
-                        operation_id,
-                        expression_id,
-                    )
-                    query_time_dict[
-                        "pdg_app/to_add_symbols_and_operations_for_expression: connect_symbol_to_expression"
-                        + trace_id
-                    ] = round(time.time() - query_start_time, 3)
-        return redirect(url_for("to_edit_expression", expression_id=expression_id))
-
-    if request.method == "POST" and "remove operation from expr" in request.form:
-        logger.info("request.form = " + str(request.form))
-
-        flash(
-            "pdg_app/to_edit_expression: Not enacted 'remove operation from expr' yet"
-        )
-        return redirect(url_for("to_edit_expression", expression_id=expression_id))
-
-    if request.method == "POST" and "update relation in expr" in request.form:
-        if web_form_new_expression.validate():
-            logger.info("request.form = " + str(request.form))
-        else:  # invalid form submitted
-            flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
-            logger.error(
-                "web_form_new_expression.errors:" + str(web_form_new_expression.errors)
-            )
-    if request.method == "POST" and "edit expression latex" in request.form:
-        if web_form_new_expression.validate():
-            logger.info("request.form = " + str(request.form))
-
-            # sanitize latex
-            # TODO: notify user if text was edited
-            # expression_latex_lhs = latex.make_string_safe_for_latex(
-            #     str(web_form_new_expression.expression_latex_lhs.data)
-            #     .strip()
-            #     .replace("\\", "\\\\")  # due to Neo4j
-            # )
-            expression_latex_lhs = latex.make_string_safe_for_latex(
-                str(web_form_new_expression.expression_latex_lhs.data).strip()
-            )
-
-            # the web UI dropdown returns the symbol ID (and not Latex string)
-            #'symbol_relation_id_to_add', '2222545'
-            expression_relation_id = request.form["symbol_relation_id_to_add"]
-
-            # look up the Latex string. (The other option is to change the schema to expr -> HAS_RELATION -> symbol)
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                expression_relation = session.read_transaction(
-                    neo4j_query.get_relation_latex, expression_relation_id
-                )
-                query_time_dict[
-                    "pdg_app/to_edit_expression: get_relation_latex " + trace_id
-                ] = round(time.time() - query_start_time, 3)
-
-            # expression_latex_rhs = latex.make_string_safe_for_latex(
-            #     str(web_form_new_expression.expression_latex_rhs.data)
-            #     .strip()
-            #     .replace("\\", "\\\\")  # due to Neo4j
-            # )
-            expression_latex_rhs = latex.make_string_safe_for_latex(
-                str(web_form_new_expression.expression_latex_rhs.data).strip()
-            )
-            # expression_latex_condition = latex.make_string_safe_for_latex(
-            #     str(web_form_new_expression.expression_latex_condition.data)
-            #     .strip()
-            #     .replace("\\", "\\\\")  # due to Neo4j
-            # )
-            expression_latex_condition = latex.make_string_safe_for_latex(
-                str(web_form_new_expression.expression_latex_condition.data).strip()
-                # .replace("\\", "\\\\")  # due to Neo4j
-            )
-            expression_name_latex = latex.make_string_safe_for_latex(
-                str(web_form_new_expression.expression_name_latex.data).strip()
-            )
-            expression_reference_latex = latex.make_string_safe_for_latex(
-                str(web_form_new_expression.expression_name_latex.data).strip()
-            )
-            expression_description_latex = latex.make_string_safe_for_latex(
-                str(web_form_new_expression.expression_description_latex.data).strip()
-            )
-
-            logger.info("expression_latex_lhs=" + str(expression_latex_lhs))
-            logger.info("expression_latex_rhs=" + str(expression_latex_rhs))
-            logger.info("expression_latex_condition=" + str(expression_latex_condition))
-
-            author_name_latex = compute.encode_user_identifier(current_user.email)
+            logger.info("symbol_id_to_add: " + symbol_id_to_add)
 
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 session.write_transaction(
-                    neo4j_query.edit_expression,
+                    neo4j_query.connect_symbol_to_expression,
+                    symbol_id_to_add,
                     expression_id,
-                    expression_latex_lhs,
-                    expression_relation,
-                    expression_latex_rhs,
-                    expression_latex_condition,
-                    expression_name_latex,
-                    expression_description_latex,
-                    expression_reference_latex,
-                    author_name_latex,
                 )
                 query_time_dict[
-                    "pdg_app/to_edit_expression: edit_expression " + trace_id
+                    "pdg_app/to_edit_expression: connect_symbol_to_expression"
                 ] = round(time.time() - query_start_time, 3)
-
             return redirect(url_for("to_edit_expression", expression_id=expression_id))
 
-        else:  # invalid form submitted
-            flash("pdg_app/to_edit_expression: " + str(web_form_new_expression.errors))
-            logger.error(
-                "web_form_new_expression.errors: " + str(web_form_new_expression.errors)
+        elif "remove symbol from expr" in request.form:
+            logger.info("request.form = " + str(request.form))
+
+            # TODO
+
+            flash(
+                "pdg_app/to_edit_expression: Not enacted 'remove symbol from expr' yet"
             )
-    if request.method == "POST" and "edit expression sympy" in request.form:
-        logger.info("request.form = " + str(request.form))
-        if web_form_expression_sympy.validate():
+            return redirect(url_for("to_edit_expression", expression_id=expression_id))
+
+        elif "add operation to expr" in request.form:
             logger.info("request.form = " + str(request.form))
 
             with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "expression",
-                    expression_id,
-                    "sympy_lhs",
-                    request.form["sympy_str_lhs"],
-                )
-                query_time_dict[
-                    "pdg_app/to_edit_feed: edit_node_property expression sympy_lhs "
-                    + trace_id
-                ] = round(time.time() - query_start_time, 3)
+                for key, val in request.form.items():
+                    if "operation_id_to_connect_to_expression" in key:
+                        operation_id = val
 
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "expression",
-                    expression_id,
-                    "sympy_rhs",
-                    request.form["sympy_str_rhs"],
-                )
-                query_time_dict[
-                    "pdg_app/to_edit_feed: edit_node_property expression sympy_rhs "
-                    + trace_id
-                ] = round(time.time() - query_start_time, 3)
+                        query_start_time = time.time()
+                        list_of_inference_rule_dicts = session.write_transaction(
+                            neo4j_query.connect_symbol_to_expression,
+                            operation_id,
+                            expression_id,
+                        )
+                        query_time_dict[
+                            "pdg_app/to_add_symbols_and_operations_for_expression: connect_symbol_to_expression"
+                            + trace_id
+                        ] = round(time.time() - query_start_time, 3)
 
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "expression",
-                    expression_id,
-                    "lean",
-                    request.form["lean_str"],
-                )
-                query_time_dict[
-                    "pdg_app/to_edit_feed: edit_node_property expression lean "
-                    + trace_id
-                ] = round(time.time() - query_start_time, 3)
             return redirect(url_for("to_edit_expression", expression_id=expression_id))
 
-        else:  # invalid form submitted
-            flash(
-                "pdg_app/to_edit_expression: " + str(web_form_expression_sympy.errors)
-            )
-            logger.error(
-                "web_form_new_expression.errors: "
-                + str(web_form_expression_sympy.errors)
-            )
-    if request.method == "POST" and "delete expression" in request.form:
-        logger.info("request.form = " + str(request.form))
-        logger.info("request.form.keys()" + str(request.form.keys()))
+        elif "remove operation from expr" in request.form:
+            logger.info("request.form = " + str(request.form))
 
-        logger.info("Deleting expression: " + str(expression_id))
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.delete_node, expression_id, "expression"
+            # TODO
+
+            flash(
+                "pdg_app/to_edit_expression: Not enacted 'remove operation from expr' yet"
             )
-            query_time_dict["to_edit_expression: delete_node"] = round(
-                time.time() - query_start_time, 3
-            )
-        return redirect(url_for("to_list_expressions"))
+            return redirect(url_for("to_edit_expression", expression_id=expression_id))
+
+        elif "update relation in expr" in request.form:
+            if web_form_new_expression.validate():
+                logger.info("request.form = " + str(request.form))
+                # TODO
+                return redirect(
+                    url_for("to_edit_expression", expression_id=expression_id)
+                )
+
+            else:  # invalid form submitted
+                flash(
+                    "pdg_app/to_edit_expression: " + str(web_form_new_expression.errors)
+                )
+                logger.error(
+                    "web_form_new_expression.errors:"
+                    + str(web_form_new_expression.errors)
+                )
+                return redirect(
+                    url_for("to_edit_expression", expression_id=expression_id)
+                )
+
+        elif "edit expression latex" in request.form:
+            if web_form_new_expression.validate():
+                logger.info("request.form = " + str(request.form))
+
+                # sanitize latex
+                # TODO: notify user if text was edited
+                # expression_latex_lhs = latex.make_string_safe_for_latex(
+                #     str(web_form_new_expression.expression_latex_lhs.data)
+                #     .strip()
+                #     .replace("\\", "\\\\")  # due to Neo4j
+                # )
+                expression_latex_lhs = latex.make_string_safe_for_latex(
+                    str(web_form_new_expression.expression_latex_lhs.data).strip()
+                )
+
+                # the web UI dropdown returns the symbol ID (and not Latex string)
+                #'symbol_relation_id_to_add', '2222545'
+                expression_relation_id = request.form["symbol_relation_id_to_add"]
+
+                # look up the Latex string. (The other option is to change the schema to expr -> HAS_RELATION -> symbol)
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    expression_relation = session.read_transaction(
+                        neo4j_query.get_relation_latex, expression_relation_id
+                    )
+                    query_time_dict[
+                        "pdg_app/to_edit_expression: get_relation_latex " + trace_id
+                    ] = round(time.time() - query_start_time, 3)
+
+                # expression_latex_rhs = latex.make_string_safe_for_latex(
+                #     str(web_form_new_expression.expression_latex_rhs.data)
+                #     .strip()
+                #     .replace("\\", "\\\\")  # due to Neo4j
+                # )
+                expression_latex_rhs = latex.make_string_safe_for_latex(
+                    str(web_form_new_expression.expression_latex_rhs.data).strip()
+                )
+                # expression_latex_condition = latex.make_string_safe_for_latex(
+                #     str(web_form_new_expression.expression_latex_condition.data)
+                #     .strip()
+                #     .replace("\\", "\\\\")  # due to Neo4j
+                # )
+                expression_latex_condition = latex.make_string_safe_for_latex(
+                    str(web_form_new_expression.expression_latex_condition.data).strip()
+                    # .replace("\\", "\\\\")  # due to Neo4j
+                )
+                expression_name_latex = latex.make_string_safe_for_latex(
+                    str(web_form_new_expression.expression_name_latex.data).strip()
+                )
+                expression_reference_latex = latex.make_string_safe_for_latex(
+                    str(web_form_new_expression.expression_name_latex.data).strip()
+                )
+                expression_description_latex = latex.make_string_safe_for_latex(
+                    str(
+                        web_form_new_expression.expression_description_latex.data
+                    ).strip()
+                )
+
+                logger.info("expression_latex_lhs=" + str(expression_latex_lhs))
+                logger.info("expression_latex_rhs=" + str(expression_latex_rhs))
+                logger.info(
+                    "expression_latex_condition=" + str(expression_latex_condition)
+                )
+
+                author_name_latex = compute.encode_user_identifier(current_user.email)
+
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.edit_expression,
+                        expression_id,
+                        expression_latex_lhs,
+                        expression_relation,
+                        expression_latex_rhs,
+                        expression_latex_condition,
+                        expression_name_latex,
+                        expression_description_latex,
+                        expression_reference_latex,
+                        author_name_latex,
+                    )
+                    query_time_dict[
+                        "pdg_app/to_edit_expression: edit_expression " + trace_id
+                    ] = round(time.time() - query_start_time, 3)
+
+                return redirect(
+                    url_for("to_edit_expression", expression_id=expression_id)
+                )
+
+            else:
+                flash(
+                    "pdg_app/to_edit_expression: " + str(web_form_new_expression.errors)
+                )
+                logger.error(
+                    "web_form_new_expression.errors: "
+                    + str(web_form_new_expression.errors)
+                )
+                return redirect(
+                    url_for("to_edit_expression", expression_id=expression_id)
+                )
+
+        elif "edit expression sympy" in request.form:
+            logger.info("request.form = " + str(request.form))
+            if web_form_expression_sympy.validate():
+                logger.info("request.form = " + str(request.form))
+
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.edit_node_property,
+                        "expression",
+                        expression_id,
+                        "sympy_lhs",
+                        request.form["sympy_str_lhs"],
+                    )
+                    query_time_dict[
+                        "pdg_app/to_edit_feed: edit_node_property expression sympy_lhs "
+                        + trace_id
+                    ] = round(time.time() - query_start_time, 3)
+
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.edit_node_property,
+                        "expression",
+                        expression_id,
+                        "sympy_rhs",
+                        request.form["sympy_str_rhs"],
+                    )
+                    query_time_dict[
+                        "pdg_app/to_edit_feed: edit_node_property expression sympy_rhs "
+                        + trace_id
+                    ] = round(time.time() - query_start_time, 3)
+
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.edit_node_property,
+                        "expression",
+                        expression_id,
+                        "lean",
+                        request.form["lean_str"],
+                    )
+                    query_time_dict[
+                        "pdg_app/to_edit_feed: edit_node_property expression lean "
+                        + trace_id
+                    ] = round(time.time() - query_start_time, 3)
+                return redirect(
+                    url_for("to_edit_expression", expression_id=expression_id)
+                )
+
+            else:  # invalid form submitted
+                flash(
+                    "pdg_app/to_edit_expression: "
+                    + str(web_form_expression_sympy.errors)
+                )
+                logger.error(
+                    "web_form_new_expression.errors: "
+                    + str(web_form_expression_sympy.errors)
+                )
+                return redirect(
+                    url_for("to_edit_expression", expression_id=expression_id)
+                )
+
+        elif "delete expression" in request.form:
+            logger.info("request.form = " + str(request.form))
+            logger.info("request.form.keys()" + str(request.form.keys()))
+
+            logger.info("Deleting expression: " + str(expression_id))
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.delete_node, expression_id, "expression"
+                )
+                query_time_dict["to_edit_expression: delete_node"] = round(
+                    time.time() - query_start_time, 3
+                )
+            return redirect(url_for("to_list_expressions"))
+        else:
+            flash("pdg_app/to_edit_expression: unrecognized button")
+            logger.error("unrecognized button")
+            return redirect(url_for("to_edit_expression", expression_id=expression_id))
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -2593,137 +2663,152 @@ def to_add_expression() -> ResponseReturnValue:
             sorted_list_of_relations.append(this_relation_dict)
     list_of_relations = sorted_list_of_relations
 
-    if request.method == "POST" and not web_form_add_expression.validate():
-        flash("pdg_app/to_add_expression: " + str(web_form_add_expression.errors))
-        logger.error(str(web_form_add_expression.errors))
-    if request.method == "POST" and web_form_add_expression.validate():
+    if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        expression_latex_lhs = str(
-            web_form_add_expression.expression_latex_lhs.data
-        ).strip()
+        if "new expression" in request.form:
+            if web_form_add_expression.validate():
+                expression_latex_lhs = str(
+                    web_form_add_expression.expression_latex_lhs.data
+                ).strip()
 
-        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-        if not expression_latex_lhs.isascii():
-            logger.error("Non-ascii expression_latex_lhs: " + str(expression_latex_lhs))
-            return f"<h1>Input must be ASCII only</h1>\n{escape(expression_latex_lhs)}"
+                # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+                if not expression_latex_lhs.isascii():
+                    logger.error(
+                        "Non-ascii expression_latex_lhs: " + str(expression_latex_lhs)
+                    )
+                    return f"<h1>Input must be ASCII only</h1>\n{escape(expression_latex_lhs)}"
 
-        # the web UI dropdown returns the symbol ID (and not Latex string)
-        #'symbol_relation_id_to_add', '2222545'
-        expression_relation_id = request.form["symbol_relation_id_to_add"]
+                # the web UI dropdown returns the symbol ID (and not Latex string)
+                #'symbol_relation_id_to_add', '2222545'
+                expression_relation_id = request.form["symbol_relation_id_to_add"]
 
-        logger.info("expression_relation_id: " + expression_relation_id)
+                logger.info("expression_relation_id: " + expression_relation_id)
 
-        # look up the Latex string. (The other option is to change the schema to expr -> HAS_RELATION -> symbol)
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            expression_relation = session.read_transaction(
-                neo4j_query.get_relation_latex, expression_relation_id
-            )
-            query_time_dict[
-                "pdg_app/to_edit_expression: get_relation_latex " + trace_id
-            ] = round(time.time() - query_start_time, 3)
+                # look up the Latex string. (The other option is to change the schema to expr -> HAS_RELATION -> symbol)
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    expression_relation = session.read_transaction(
+                        neo4j_query.get_relation_latex, expression_relation_id
+                    )
+                    query_time_dict[
+                        "pdg_app/to_edit_expression: get_relation_latex " + trace_id
+                    ] = round(time.time() - query_start_time, 3)
 
-        logger.info(str(expression_relation))
+                logger.info(str(expression_relation))
 
-        expression_latex_rhs = str(
-            web_form_add_expression.expression_latex_rhs.data
-        ).strip()
+                expression_latex_rhs = str(
+                    web_form_add_expression.expression_latex_rhs.data
+                ).strip()
 
-        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-        if not expression_latex_rhs.isascii():
-            logger.error("Non-ascii expression_latex_rhs: " + str(expression_latex_rhs))
-            return f"<h1>Input must be ASCII only</h1>\n{escape(expression_latex_rhs)}"
+                # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
+                if not expression_latex_rhs.isascii():
+                    logger.error(
+                        "Non-ascii expression_latex_rhs: " + str(expression_latex_rhs)
+                    )
+                    return f"<h1>Input must be ASCII only</h1>\n{escape(expression_latex_rhs)}"
 
-        expression_latex_condition = str(
-            web_form_add_expression.expression_latex_condition.data
-        ).strip()
-        if not expression_latex_condition.isascii():
-            logger.error(
-                "Non-ascii expression_latex_condition: "
-                + str(expression_latex_condition)
-            )
-            return "<H1>Input must be ASCII only</H1>\n" + str(
-                expression_latex_condition
-            )
+                expression_latex_condition = str(
+                    web_form_add_expression.expression_latex_condition.data
+                ).strip()
+                if not expression_latex_condition.isascii():
+                    logger.error(
+                        "Non-ascii expression_latex_condition: "
+                        + str(expression_latex_condition)
+                    )
+                    return "<H1>Input must be ASCII only</H1>\n" + str(
+                        expression_latex_condition
+                    )
 
-        expression_name_latex = str(
-            web_form_add_expression.expression_name_latex.data
-        ).strip()
-        if not expression_name_latex.isascii():
-            logger.error(
-                "Non-ascii expression_name_latex: " + str(expression_name_latex)
-            )
-            return f"<h1>Input must be ASCII only</h1>\n{escape(expression_name_latex)}"
+                expression_name_latex = str(
+                    web_form_add_expression.expression_name_latex.data
+                ).strip()
+                if not expression_name_latex.isascii():
+                    logger.error(
+                        "Non-ascii expression_name_latex: " + str(expression_name_latex)
+                    )
+                    return f"<h1>Input must be ASCII only</h1>\n{escape(expression_name_latex)}"
 
-        expression_reference_latex = str(
-            web_form_add_expression.expression_reference_latex.data
-        ).strip()
-        if not expression_reference_latex.isascii():
-            logger.error(
-                "Non-ascii expression_reference_latex: "
-                + str(expression_reference_latex)
-            )
-            return "<H1>Input must be ASCII only</H1>\n" + str(
-                expression_reference_latex
-            )
+                expression_reference_latex = str(
+                    web_form_add_expression.expression_reference_latex.data
+                ).strip()
+                if not expression_reference_latex.isascii():
+                    logger.error(
+                        "Non-ascii expression_reference_latex: "
+                        + str(expression_reference_latex)
+                    )
+                    return "<H1>Input must be ASCII only</H1>\n" + str(
+                        expression_reference_latex
+                    )
 
-        expression_description_latex = str(
-            web_form_add_expression.expression_description_latex.data
-        ).strip()
-        if not expression_description_latex.isascii():
-            logger.error(
-                "Non-ascii expression_description_latex: "
-                + str(expression_description_latex)
-            )
-            return "<H1>Input must be ASCII only</H1>\n" + str(
-                expression_description_latex
-            )
+                expression_description_latex = str(
+                    web_form_add_expression.expression_description_latex.data
+                ).strip()
+                if not expression_description_latex.isascii():
+                    logger.error(
+                        "Non-ascii expression_description_latex: "
+                        + str(expression_description_latex)
+                    )
+                    return "<H1>Input must be ASCII only</H1>\n" + str(
+                        expression_description_latex
+                    )
 
-        logger.info("expression_latex_lhs:" + str(expression_latex_lhs))
-        logger.info("expression_latex_rhs:" + str(expression_latex_rhs))
-        # TODO: validate that this string is actually Latex before adding to database
+                logger.info("expression_latex_lhs:" + str(expression_latex_lhs))
+                logger.info("expression_latex_rhs:" + str(expression_latex_rhs))
+                # TODO: validate that this string is actually Latex before adding to database
 
-        logger.info("expression_name_latex:" + str(expression_name_latex))
-        logger.info("expression_description_latex" + str(expression_description_latex))
+                logger.info("expression_name_latex:" + str(expression_name_latex))
+                logger.info(
+                    "expression_description_latex" + str(expression_description_latex)
+                )
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        expression_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict
-        )
+                expression_id, query_time_dict = compute.generate_random_id(
+                    graphDB_Driver, query_time_dict
+                )
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_expression,
-                expression_id,
-                expression_name_latex,
-                expression_latex_lhs,
-                expression_relation,
-                expression_latex_rhs,
-                expression_latex_condition,
-                expression_description_latex,
-                expression_reference_latex,
-                now_str,
-                author_name_latex,
-            )
-            query_time_dict["pdg_app/to_add_expression: add_expression " + trace_id] = (
-                round(time.time() - query_start_time, 3)
-            )
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_expression,
+                        expression_id,
+                        expression_name_latex,
+                        expression_latex_lhs,
+                        expression_relation,
+                        expression_latex_rhs,
+                        expression_latex_condition,
+                        expression_description_latex,
+                        expression_reference_latex,
+                        now_str,
+                        author_name_latex,
+                    )
+                    query_time_dict[
+                        "pdg_app/to_add_expression: add_expression " + trace_id
+                    ] = round(time.time() - query_start_time, 3)
 
-        # after user provides latex for expression have them provide symbol count
-        logger.info("[TRACE] end " + trace_id)
-        return redirect(
-            url_for(
-                "to_add_symbols_and_operations_for_expression",
-                expression_id=expression_id,
-            )
-        )
+                # after user provides latex for expression have them provide symbol count
+                logger.info("[TRACE] end " + trace_id)
+                return redirect(
+                    url_for(
+                        "to_add_symbols_and_operations_for_expression",
+                        expression_id=expression_id,
+                    )
+                )
+            else:
+                flash(
+                    "pdg_app/to_add_expression: " + str(web_form_add_expression.errors)
+                )
+                logger.error(str(web_form_add_expression.errors))
+                return redirect(url_for("to_add_expression"))
+        else:
+            flash("pdg_app/to_add_expression: unrecognized button")
+            logger.error("unrecognized button")
+            return redirect(url_for("to_add_expression"))
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -3040,46 +3125,62 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnV
 
     logger.info("request.method =" + str(request.method))
 
-    if request.method == "POST" and not web_form_edit_operation.validate():
-        flash("pdg_app/to_edit_operation: " + str(web_form_edit_operation.errors))
-        logger.error(str(web_form_edit_operation.errors))
-    if request.method == "POST" and web_form_edit_operation.validate():
+    if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        operation_latex = str(web_form_edit_operation.operation_latex.data).strip()
-        operation_name_latex = str(
-            web_form_edit_operation.operation_name_latex.data
-        ).strip()
-        operation_description_latex = str(
-            web_form_edit_operation.operation_description_latex.data
-        ).strip()
-        operation_reference_latex = str(
-            web_form_edit_operation.operation_reference_latex.data
-        ).strip()
-        operation_number_of_arguments = int(
-            web_form_edit_operation.operation_argument_count.data
-        )
+        if "add symbol to expr" in request.form:
+            if web_form_edit_operation.validate():
+                operation_latex = str(
+                    web_form_edit_operation.operation_latex.data
+                ).strip()
+                operation_name_latex = str(
+                    web_form_edit_operation.operation_name_latex.data
+                ).strip()
+                operation_description_latex = str(
+                    web_form_edit_operation.operation_description_latex.data
+                ).strip()
+                operation_reference_latex = str(
+                    web_form_edit_operation.operation_reference_latex.data
+                ).strip()
+                operation_number_of_arguments = int(
+                    web_form_edit_operation.operation_argument_count.data
+                )
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_operation_symbol,
-                operation_id,
-                operation_name_latex,
-                operation_latex,
-                operation_description_latex,
-                operation_reference_latex,
-                operation_number_of_arguments,
-                now_str,
-                author_name_latex,
-            )
-        return redirect(url_for("to_list_operations"))
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_operation_symbol,
+                        operation_id,
+                        operation_name_latex,
+                        operation_latex,
+                        operation_description_latex,
+                        operation_reference_latex,
+                        operation_number_of_arguments,
+                        now_str,
+                        author_name_latex,
+                    )
+                return redirect(url_for("to_list_operations"))
+            else:
+                flash(
+                    "pdg_app/to_edit_operation: " + str(web_form_edit_operation.errors)
+                )
+                logger.error(str(web_form_edit_operation.errors))
+                return redirect(url_for("to_edit_operation"))
+        elif "remove symbol from expr" in request.form:
+            # TODO
+            flash("pdg_app/to_edit_operation: NOT YET ENACTED")
+            logger.error("NOT YET ENACTED")
+            return redirect(url_for("to_edit_operation"))
+        else:
+            flash("pdg_app/to_edit_operation: unrecognized button")
+            logger.error("unrecognized button")
+            return redirect(url_for("to_edit_operation"))
 
     # logger.info("operation_dict:", operation_dict)
 
@@ -3135,41 +3236,50 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> ResponseReturnVal
     logger.info("request.method =" + str(request.method))
     logger.info("request.form = " + str(request.form))
 
-    if request.method == "POST" and not web_form_new_symbol.validate():
-        flash("pdg_app/to_edit_relation: " + str(web_form_new_symbol.errors))
-        logger.error(str(web_form_new_symbol.errors))
-    if request.method == "POST" and web_form_new_symbol.validate():
-        logger.info("in POST the request.form = " + str(request.form))
+    if request.method == "POST":
+        logger.info("request.form = " + str(request.form))
+        if "edit relation" in request.form:
+            if web_form_new_symbol.validate():
+                relation_latex = str(web_form_new_symbol.relation_latex.data).strip()
+                relation_name_latex = str(
+                    web_form_new_symbol.relation_name_latex.data
+                ).strip()
+                relation_description_latex = str(
+                    web_form_new_symbol.relation_description_latex.data
+                ).strip()
+                relation_reference_latex = str(
+                    web_form_new_symbol.relation_reference_latex.data
+                ).strip()
 
-        relation_latex = str(web_form_new_symbol.relation_latex.data).strip()
-        relation_name_latex = str(web_form_new_symbol.relation_name_latex.data).strip()
-        relation_description_latex = str(
-            web_form_new_symbol.relation_description_latex.data
-        ).strip()
-        relation_reference_latex = str(
-            web_form_new_symbol.relation_reference_latex.data
-        ).strip()
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_relation_symbol,
+                        relation_id,
+                        relation_name_latex,
+                        relation_latex,
+                        relation_description_latex,
+                        relation_reference_latex,
+                        now_str,
+                        author_name_latex,
+                    )
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_relation_symbol,
-                relation_id,
-                relation_name_latex,
-                relation_latex,
-                relation_description_latex,
-                relation_reference_latex,
-                now_str,
-                author_name_latex,
-            )
+                return redirect(url_for("to_list_relations"))
 
-        return redirect(url_for("to_list_relations"))
+            else:
+                flash("pdg_app/to_edit_relation: " + str(web_form_new_symbol.errors))
+                logger.error(str(web_form_new_symbol.errors))
+                return redirect(url_for("to_edit_relation", relation_id=relation_id))
+        else:
+            flash("pdg_app/to_edit_relation: unrecognized button")
+            logger.error("unrecognized button")
+            return redirect(url_for("to_edit_relation", relation_id=relation_id))
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -3229,69 +3339,66 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> ResponseReturnValue:
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
-        # ('scalar_latex', 'a'), ('scalar_name_latex', 'name of scalar'),
-        # ('scalar_description_latex', 'description of scalar'),
-        # ('scalar_reference_latex', 'this is a referec')])
 
-    if request.method == "POST" and not web_form_symbol_properties.validate():
-        flash("pdg_app/to_edit_scalar: " + str(web_form_symbol_properties.errors))
-        logger.error(str(web_form_symbol_properties.errors))
-    if request.method == "POST" and web_form_symbol_properties.validate():
-        logger.info("request.form validated")
+        if "edit scalar" in request.form:
+            if web_form_symbol_properties.validate():
+                symbol_latex = str(
+                    web_form_symbol_properties.symbol_latex.data
+                ).strip()  # .replace("\\","\\\\")
+                symbol_name_latex = str(
+                    web_form_symbol_properties.symbol_name_latex.data
+                ).strip()
+                symbol_description_latex = str(
+                    web_form_symbol_properties.symbol_description_latex.data
+                ).strip()
+                symbol_reference_latex = str(
+                    web_form_symbol_properties.symbol_reference_latex.data
+                ).strip()
 
-        symbol_latex = str(
-            web_form_symbol_properties.symbol_latex.data
-        ).strip()  # .replace("\\","\\\\")
-        symbol_name_latex = str(
-            web_form_symbol_properties.symbol_name_latex.data
-        ).strip()
-        symbol_description_latex = str(
-            web_form_symbol_properties.symbol_description_latex.data
-        ).strip()
-        symbol_reference_latex = str(
-            web_form_symbol_properties.symbol_reference_latex.data
-        ).strip()
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                # TODO: Neo4j inside loop causes high latency
+                # instead of changing every property,
+                # only change the properties that are different from symbol_dict
+                for symbol_property, symbol_property_value in scalar_dict.items():
 
-        # TODO: Neo4j inside loop causes high latency
-        # instead of changing every property,
-        # only change the properties that are different from symbol_dict
-        for symbol_property, symbol_property_value in scalar_dict.items():
+                    logger.info("symbol_property=" + str(symbol_property))
+                    logger.info("symbol_property_value=" + str(symbol_property_value))
 
-            logger.info("symbol_property=" + str(symbol_property))
-            logger.info("symbol_property_value=" + str(symbol_property_value))
+                    flash("pdg_app/to_edit_scalar: NOT ENACTED YET 942492482324")
+                    logger.error("NOT ENACTED YET 942492482324")
+                    # TODO: check which properties are different
+                    with graphDB_Driver.session() as session:
+                        query_start_time = time.time()
+                        session.write_transaction(
+                            neo4j_query.edit_node_property,
+                            "scalar",  # Neo4j node type
+                            scalar_id,
+                            "dimension_length",  # property to edit
+                            5,  # new value
+                        )
+                        query_time_dict[
+                            "pdg_app/to_edit_scalar: edit_node_property, argument_count"
+                            + trace_id
+                        ] = round(time.time() - query_start_time, 3)
 
-            flash("pdg_app/to_edit_scalar: NOT ENACTED YET 942492482324")
-            logger.error("NOT ENACTED YET 942492482324")
-            # TODO: check which properties are different
-            with graphDB_Driver.session() as session:
-                query_start_time = time.time()
-                session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "scalar",  # Neo4j node type
-                    scalar_id,
-                    "dimension_length",  # property to edit
-                    5,  # new value
+                return redirect(url_for("to_edit_scalar", scalar_id=scalar_id))
+            else:
+                flash(
+                    "pdg_app/to_edit_scalar: " + str(web_form_symbol_properties.errors)
                 )
-                query_time_dict[
-                    "pdg_app/to_edit_scalar: edit_node_property, argument_count"
-                    + trace_id
-                ] = round(time.time() - query_start_time, 3)
+                logger.error(str(web_form_symbol_properties.errors))
+        elif "delete scalar" in request.form:
+            flash("pdg_app/to_edit_scalar: NOT YET ENACTED")
+            # TODO: update the respective fields for this symbol
 
-        return redirect(url_for("to_edit_scalar", scalar_id=scalar_id))
+            # TODO: delete symbol
 
-    elif request.method == "POST":
-        logger.info("request.form = " + str(request.form))
-
-        logger.info("verification of form failed")
-
-        # TODO: update the respective fields for this symbol
-
-        # TODO: delete symbol
-
-        logger.info("[TRACE] end " + trace_id)
-        return redirect(url_for("to_list_scalars"))
+            logger.info("[TRACE] end " + trace_id)
+            return redirect(url_for("to_list_scalars"))
+        else:
+            flash("pdg_app/to_edit_scalar: unrecognized button")
+            logger.error("unrecognized button")
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -3437,75 +3544,6 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> ResponseRetur
             "pdg_app/to_add_value_and_units: list_nodes_of_type scalar " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    logger.info("request.form = " + str(request.form))
-
-    if request.method == "POST" and not web_form_constant_properties.validate():
-        flash(
-            "pdg_app/to_add_value_and_units: "
-            + str(web_form_constant_properties.errors)
-        )
-        logger.error(str(web_form_constant_properties.errors))
-    if request.method == "POST" and web_form_constant_properties.validate():
-        logger.info("request.form = " + str(request.form))
-
-        # request.form =  ImmutableMultiDict([('number_decimal', '5'),
-        #        ('number_power', '0.00'), ('mass_select_unit', 'stone'),
-        #        ('length_select_unit', 'meter'), ('temperature_select_unit', 'fahrenheit')])
-
-        number_decimal = float(web_form_constant_properties.number_decimal.data)
-        number_power = float(web_form_constant_properties.number_power.data)
-
-        dict_of_units = {}  # type: Dict[str,str]
-        if "mass_select_unit" in request.form.keys():
-            dict_of_units["dimension_mass_unit"] = request.form["mass_select_unit"]
-        if "time_select_unit" in request.form.keys():
-            dict_of_units["dimension_time_unit"] = request.form["time_select_unit"]
-        if "length_select_unit" in request.form.keys():
-            dict_of_units["dimension_length_unit"] = request.form["length_select_unit"]
-        if "temperature_select_unit" in request.form.keys():
-            dict_of_units["dimension_temperature_unit"] = request.form[
-                "temperature_select_unit"
-            ]
-        if "electric_charge_select_unit" in request.form.keys():
-            dict_of_units["dimension_electric_charge_unit"] = request.form[
-                "electric_charge_select_unit"
-            ]
-        if "amount_of_substance_select_unit" in request.form.keys():
-            dict_of_units["dimension_amount_of_substance_unit"] = request.form[
-                "amount_of_substance_select_unit"
-            ]
-        if "luminous_intensity_select_unit" in request.form.keys():
-            dict_of_units["dimension_luminous_intensity_unit"] = request.form[
-                "luminous_intensity_select_unit"
-            ]
-
-        value_with_units_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict
-        )
-
-        author_name_latex = compute.encode_user_identifier(current_user.email)
-
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_constant_value_with_units,
-                scalar_id,
-                value_with_units_id,
-                number_decimal,
-                number_power,
-                dict_of_units,
-                now_str,
-                author_name_latex,
-            )
-
-        logger.info("[TRACE] end " + trace_id)
-        return redirect(url_for("to_list_scalars"))
-
-    with graphDB_Driver.session() as session:
         query_start_time = time.time()
         scalar_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "scalar", scalar_id
@@ -3533,20 +3571,79 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> ResponseRetur
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    # dict_of_derivations_that_use_scalar = {}  # type: Dict[str,list]
-    # for (
-    #     scalar_id,
-    #     list_of_derivations,
-    # ) in dict_of_derivations_that_use_scalar.items():
-    #     list_of_derivation_names = []
+    if request.method == "POST":
+        logger.info("request.form = " + str(request.form))
 
-    #     for this_derivation_dict in list_of_derivations:
-    #         if this_derivation_dict["name_latex"] in list_of_derivation_names:
-    #             pass
-    #         else:
-    #             list_of_derivation_names.append(this_derivation_dict)
-    #     dict_of_derivations_that_use_scalar[scalar_id] = list_of_derivation_names
-    # derivations_that_use_scalar = dict_of_derivations_that_use_scalar
+        if "new value and dimension" in request.form:
+            if web_form_constant_properties.validate():
+                number_decimal = float(web_form_constant_properties.number_decimal.data)
+                number_power = float(web_form_constant_properties.number_power.data)
+
+                dict_of_units = {}  # type: Dict[str,str]
+                if "mass_select_unit" in request.form.keys():
+                    dict_of_units["dimension_mass_unit"] = request.form[
+                        "mass_select_unit"
+                    ]
+                if "time_select_unit" in request.form.keys():
+                    dict_of_units["dimension_time_unit"] = request.form[
+                        "time_select_unit"
+                    ]
+                if "length_select_unit" in request.form.keys():
+                    dict_of_units["dimension_length_unit"] = request.form[
+                        "length_select_unit"
+                    ]
+                if "temperature_select_unit" in request.form.keys():
+                    dict_of_units["dimension_temperature_unit"] = request.form[
+                        "temperature_select_unit"
+                    ]
+                if "electric_charge_select_unit" in request.form.keys():
+                    dict_of_units["dimension_electric_charge_unit"] = request.form[
+                        "electric_charge_select_unit"
+                    ]
+                if "amount_of_substance_select_unit" in request.form.keys():
+                    dict_of_units["dimension_amount_of_substance_unit"] = request.form[
+                        "amount_of_substance_select_unit"
+                    ]
+                if "luminous_intensity_select_unit" in request.form.keys():
+                    dict_of_units["dimension_luminous_intensity_unit"] = request.form[
+                        "luminous_intensity_select_unit"
+                    ]
+
+                value_with_units_id, query_time_dict = compute.generate_random_id(
+                    graphDB_Driver, query_time_dict
+                )
+
+                author_name_latex = compute.encode_user_identifier(current_user.email)
+
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_constant_value_with_units,
+                        scalar_id,
+                        value_with_units_id,
+                        number_decimal,
+                        number_power,
+                        dict_of_units,
+                        now_str,
+                        author_name_latex,
+                    )
+
+                logger.info("[TRACE] end " + trace_id)
+                return redirect(url_for("to_list_scalars"))
+
+            else:
+                flash(
+                    "pdg_app/to_add_value_and_units: "
+                    + str(web_form_constant_properties.errors)
+                )
+                logger.error(str(web_form_constant_properties.errors))
+        else:
+            flash("pdg_app/to_add_value_and_units: unrecognized button")
+            logger.error("unrecognized button")
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -3580,82 +3677,91 @@ def to_add_symbol_scalar() -> ResponseReturnValue:
 
     web_form_scalar_properties = SpecifyNewSymbolScalarForm()
 
-    if request.method == "POST" and not web_form_scalar_properties.validate():
-        flash("pdg_app/to_add_symbol_scalar: " + str(web_form_scalar_properties.errors))
-        logger.error(str(web_form_scalar_properties.errors))
-    if request.method == "POST" and web_form_scalar_properties.validate():
+    if request.method == "POST":
         logger.info("request.form = " + str(request.form))
+        if "new scalar" in request.form:
+            if web_form_scalar_properties.validate():
+                scalar_latex = str(web_form_scalar_properties.scalar_latex.data).strip()
+                scalar_name_latex = str(
+                    web_form_scalar_properties.scalar_name_latex.data
+                ).strip()
+                scalar_description_latex = str(
+                    web_form_scalar_properties.scalar_description_latex.data
+                ).strip()
+                scalar_reference_latex = str(
+                    web_form_scalar_properties.scalar_reference_latex.data
+                ).strip()
 
-        scalar_latex = str(web_form_scalar_properties.scalar_latex.data).strip()
-        scalar_name_latex = str(
-            web_form_scalar_properties.scalar_name_latex.data
-        ).strip()
-        scalar_description_latex = str(
-            web_form_scalar_properties.scalar_description_latex.data
-        ).strip()
-        scalar_reference_latex = str(
-            web_form_scalar_properties.scalar_reference_latex.data
-        ).strip()
+                logger.info("scalar_latex:" + str(scalar_latex))
+                logger.info("scalar_name_latex:" + str(scalar_name_latex))
+                logger.info("scalar_description_latex" + str(scalar_description_latex))
 
-        logger.info("scalar_latex:" + str(scalar_latex))
-        logger.info("scalar_name_latex:" + str(scalar_name_latex))
-        logger.info("scalar_description_latex" + str(scalar_description_latex))
+                scalar_scope = web_form_scalar_properties.scalar_scope.data
+                scalar_variable_or_constant = (
+                    web_form_scalar_properties.scalar_variable_or_constant.data
+                )
+                scalar_domain = web_form_scalar_properties.scalar_domain.data
+                dimension_length = web_form_scalar_properties.dimension_length.data
+                dimension_time = web_form_scalar_properties.dimension_time.data
+                dimension_mass = web_form_scalar_properties.dimension_mass.data
+                dimension_temperature = (
+                    web_form_scalar_properties.dimension_temperature.data
+                )
+                dimension_electric_charge = (
+                    web_form_scalar_properties.dimension_electric_charge.data
+                )
+                dimension_amount_of_substance = (
+                    web_form_scalar_properties.dimension_amount_of_substance.data
+                )
+                dimension_luminous_intensity = (
+                    web_form_scalar_properties.dimension_luminous_intensity.data
+                )
 
-        scalar_scope = web_form_scalar_properties.scalar_scope.data
-        scalar_variable_or_constant = (
-            web_form_scalar_properties.scalar_variable_or_constant.data
-        )
-        scalar_domain = web_form_scalar_properties.scalar_domain.data
-        dimension_length = web_form_scalar_properties.dimension_length.data
-        dimension_time = web_form_scalar_properties.dimension_time.data
-        dimension_mass = web_form_scalar_properties.dimension_mass.data
-        dimension_temperature = web_form_scalar_properties.dimension_temperature.data
-        dimension_electric_charge = (
-            web_form_scalar_properties.dimension_electric_charge.data
-        )
-        dimension_amount_of_substance = (
-            web_form_scalar_properties.dimension_amount_of_substance.data
-        )
-        dimension_luminous_intensity = (
-            web_form_scalar_properties.dimension_luminous_intensity.data
-        )
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+                scalar_id, query_time_dict = compute.generate_random_id(
+                    graphDB_Driver, query_time_dict
+                )
 
-        scalar_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict
-        )
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_scalar_symbol,
+                        scalar_id,
+                        scalar_name_latex,
+                        scalar_latex,
+                        scalar_description_latex,
+                        scalar_reference_latex,
+                        scalar_scope,
+                        scalar_variable_or_constant,
+                        scalar_domain,
+                        dimension_length,
+                        dimension_time,
+                        dimension_mass,
+                        dimension_temperature,
+                        dimension_electric_charge,
+                        dimension_amount_of_substance,
+                        dimension_luminous_intensity,
+                        now_str,
+                        author_name_latex,
+                    )
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_scalar_symbol,
-                scalar_id,
-                scalar_name_latex,
-                scalar_latex,
-                scalar_description_latex,
-                scalar_reference_latex,
-                scalar_scope,
-                scalar_variable_or_constant,
-                scalar_domain,
-                dimension_length,
-                dimension_time,
-                dimension_mass,
-                dimension_temperature,
-                dimension_electric_charge,
-                dimension_amount_of_substance,
-                dimension_luminous_intensity,
-                now_str,
-                author_name_latex,
-            )
+                if scalar_variable_or_constant == "constant":
+                    return redirect(
+                        url_for("to_add_value_and_units", scalar_id=scalar_id)
+                    )
+                return redirect(url_for("to_list_scalars"))
 
-        if scalar_variable_or_constant == "constant":
-            return redirect(url_for("to_add_value_and_units", scalar_id=scalar_id))
-        return redirect(url_for("to_list_scalars"))
+            else:
+                flash(
+                    "pdg_app/to_add_symbol_scalar: "
+                    + str(web_form_scalar_properties.errors)
+                )
+                logger.error(str(web_form_scalar_properties.errors))
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -3756,64 +3862,72 @@ def to_add_symbol_vector() -> ResponseReturnValue:
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    if request.method == "POST" and not web_form_vector_properties.validate():
-        flash("pdg_app/to_add_symbol_vector: " + str(web_form_vector_properties.errors))
-        logger.error(str(web_form_vector_properties.errors))
-    if request.method == "POST" and web_form_vector_properties.validate():
+    if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        vector_latex = str(web_form_vector_properties.vector_latex.data).strip()
-        vector_name_latex = str(
-            web_form_vector_properties.vector_name_latex.data
-        ).strip()
-        vector_description_latex = str(
-            web_form_vector_properties.vector_description_latex.data
-        ).strip()
-        vector_reference_latex = str(
-            web_form_vector_properties.vector_reference_latex.data
-        ).strip()
-        vector_is_composite = web_form_vector_properties.vector_is_composite.data
+        if "new vector" in request.form:
+            if web_form_vector_properties.validate():
+                vector_latex = str(web_form_vector_properties.vector_latex.data).strip()
+                vector_name_latex = str(
+                    web_form_vector_properties.vector_name_latex.data
+                ).strip()
+                vector_description_latex = str(
+                    web_form_vector_properties.vector_description_latex.data
+                ).strip()
+                vector_reference_latex = str(
+                    web_form_vector_properties.vector_reference_latex.data
+                ).strip()
+                vector_is_composite = (
+                    web_form_vector_properties.vector_is_composite.data
+                )
 
-        vector_size = str(web_form_vector_properties.vector_size.data).strip()
-        vector_orientation = str(
-            web_form_vector_properties.vector_orientation.data
-        ).strip()
+                vector_size = str(web_form_vector_properties.vector_size.data).strip()
+                vector_orientation = str(
+                    web_form_vector_properties.vector_orientation.data
+                ).strip()
 
-        logger.info("vector_latex:" + str(vector_latex))
-        logger.info("vector_name_latex:" + str(vector_name_latex))
-        logger.info("vector_description_latex" + str(vector_description_latex))
+                logger.info("vector_latex:" + str(vector_latex))
+                logger.info("vector_name_latex:" + str(vector_name_latex))
+                logger.info("vector_description_latex" + str(vector_description_latex))
 
-        vector_number_of_entries = str(
-            web_form_vector_properties.vector_number_of_entries.data
-        ).strip()
+                vector_number_of_entries = str(
+                    web_form_vector_properties.vector_number_of_entries.data
+                ).strip()
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        vector_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict
-        )
+                vector_id, query_time_dict = compute.generate_random_id(
+                    graphDB_Driver, query_time_dict
+                )
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_vector_symbol,
-                vector_id,
-                vector_name_latex,
-                vector_latex,
-                vector_description_latex,
-                vector_reference_latex,
-                vector_is_composite,
-                vector_size,
-                vector_orientation,
-                vector_number_of_entries,
-                now_str,
-                author_name_latex,
-            )
-        return redirect(url_for("to_list_vectors"))
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_vector_symbol,
+                        vector_id,
+                        vector_name_latex,
+                        vector_latex,
+                        vector_description_latex,
+                        vector_reference_latex,
+                        vector_is_composite,
+                        vector_size,
+                        vector_orientation,
+                        vector_number_of_entries,
+                        now_str,
+                        author_name_latex,
+                    )
+                return redirect(url_for("to_list_vectors"))
+
+            else:
+                flash(
+                    "pdg_app/to_add_symbol_vector: "
+                    + str(web_form_vector_properties.errors)
+                )
+                logger.error(str(web_form_vector_properties.errors))
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -3869,71 +3983,77 @@ def to_add_symbol_matrix() -> ResponseReturnValue:
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    if request.method == "POST" and not web_form_matrix_properties.validate():
-        flash("pdg_app/to_add_symbol_matrix: " + str(web_form_matrix_properties.errors))
-        logger.error(str(web_form_matrix_properties.errors))
-    if request.method == "POST" and web_form_matrix_properties.validate():
+    if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        # request.form =  ImmutableMultiDict([('matrix_latex', '\\hat{p}'),
-        #       ('matrix_name_latex', ''), ('matrix_description_latex', ''),
-        #       ('matrix_reference_latex', ''), ('matrix_size', 'arbitrary'),
-        #       ('matrix_number_of_rows', '1'), ('matrix_number_of_columns', '1')])
+        if "new matrix" in request.form:
+            if web_form_matrix_properties.validate():
+                matrix_latex = str(web_form_matrix_properties.matrix_latex.data).strip()
+                matrix_name_latex = str(
+                    web_form_matrix_properties.matrix_name_latex.data
+                ).strip()
+                matrix_description_latex = str(
+                    web_form_matrix_properties.matrix_description_latex.data
+                ).strip()
+                matrix_reference_latex = str(
+                    web_form_matrix_properties.matrix_reference_latex.data
+                ).strip()
 
-        matrix_latex = str(web_form_matrix_properties.matrix_latex.data).strip()
-        matrix_name_latex = str(
-            web_form_matrix_properties.matrix_name_latex.data
-        ).strip()
-        matrix_description_latex = str(
-            web_form_matrix_properties.matrix_description_latex.data
-        ).strip()
-        matrix_reference_latex = str(
-            web_form_matrix_properties.matrix_reference_latex.data
-        ).strip()
+                matrix_is_composite = (
+                    web_form_matrix_properties.matrix_is_composite.data
+                )
 
-        matrix_is_composite = web_form_matrix_properties.matrix_is_composite.data
+                matrix_size = str(web_form_matrix_properties.matrix_size.data).strip()
 
-        matrix_size = str(web_form_matrix_properties.matrix_size.data).strip()
+                logger.info("matrix_latex:" + str(matrix_latex))
+                logger.info("matrix_name_latex:" + str(matrix_name_latex))
+                logger.info("matrix_description_latex" + str(matrix_description_latex))
 
-        logger.info("matrix_latex:" + str(matrix_latex))
-        logger.info("matrix_name_latex:" + str(matrix_name_latex))
-        logger.info("matrix_description_latex" + str(matrix_description_latex))
+                matrix_number_of_rows = str(
+                    web_form_matrix_properties.matrix_number_of_rows.data
+                ).strip()
+                matrix_number_of_columns = str(
+                    web_form_matrix_properties.matrix_number_of_columns.data
+                ).strip()
 
-        matrix_number_of_rows = str(
-            web_form_matrix_properties.matrix_number_of_rows.data
-        ).strip()
-        matrix_number_of_columns = str(
-            web_form_matrix_properties.matrix_number_of_columns.data
-        ).strip()
+                author_name_latex = compute.encode_user_identifier(current_user.email)
 
-        author_name_latex = compute.encode_user_identifier(current_user.email)
+                # %f = Microsecond as a decimal number, zero-padded on the left.
+                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-        # %f = Microsecond as a decimal number, zero-padded on the left.
-        now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+                matrix_id, query_time_dict = compute.generate_random_id(
+                    graphDB_Driver, query_time_dict
+                )
 
-        matrix_id, query_time_dict = compute.generate_random_id(
-            graphDB_Driver, query_time_dict
-        )
+                # https://neo4j.com/docs/python-manual/current/session-api/
+                with graphDB_Driver.session() as session:
+                    query_start_time = time.time()
+                    session.write_transaction(
+                        neo4j_query.add_matrix_symbol,
+                        matrix_id,
+                        matrix_name_latex,
+                        matrix_latex,
+                        matrix_description_latex,
+                        matrix_reference_latex,
+                        matrix_is_composite,
+                        matrix_size,
+                        matrix_number_of_rows,
+                        matrix_number_of_columns,
+                        now_str,
+                        author_name_latex,
+                    )
+                logger.info("[TRACE] end " + trace_id)
+                return redirect(url_for("to_list_matrices"))
 
-        # https://neo4j.com/docs/python-manual/current/session-api/
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.add_matrix_symbol,
-                matrix_id,
-                matrix_name_latex,
-                matrix_latex,
-                matrix_description_latex,
-                matrix_reference_latex,
-                matrix_is_composite,
-                matrix_size,
-                matrix_number_of_rows,
-                matrix_number_of_columns,
-                now_str,
-                author_name_latex,
-            )
-        logger.info("[TRACE] end " + trace_id)
-        return redirect(url_for("to_list_matrices"))
+            else:
+                flash(
+                    "pdg_app/to_add_symbol_matrix: "
+                    + str(web_form_matrix_properties.errors)
+                )
+                logger.error(str(web_form_matrix_properties.errors))
+        else:
+            flash("pdg_app/to_add_symbol_matrix: unrecognized button")
+            logger.error("unrecognized button")
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -3966,35 +4086,6 @@ def to_add_operation() -> ResponseReturnValue:
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_add_operation = SpecifyNewSymbolOperationForm()
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_operations = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "operation"
-        )
-        query_time_dict[
-            "pdg_app/to_add_operation: get_nodes_of_type operation " + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-        # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        dict_of_expressions_that_use_operation = session.read_transaction(
-            neo4j_query.get_expressions_for_every_operation
-        )
-        query_time_dict[
-            "pdg_app/to_add_operation: get_all_expressions_for_every_operation "
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-        # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        dict_of_derivations_that_use_operation = session.read_transaction(
-            neo4j_query.get_derivations_for_every_operation
-        )
-        query_time_dict[
-            "pdg_app/to_add_operation: get_all_derivations_for_every_operation "
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -4056,6 +4147,35 @@ def to_add_operation() -> ResponseReturnValue:
                 logger.error(str(web_form_add_operation.errors))
                 return redirect(url_for("to_add_operation"))
 
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_operations = session.read_transaction(
+            neo4j_query.get_nodes_of_type, "operation"
+        )
+        query_time_dict[
+            "pdg_app/to_add_operation: get_nodes_of_type operation " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        # with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        dict_of_expressions_that_use_operation = session.read_transaction(
+            neo4j_query.get_expressions_for_every_operation
+        )
+        query_time_dict[
+            "pdg_app/to_add_operation: get_all_expressions_for_every_operation "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        # with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        dict_of_derivations_that_use_operation = session.read_transaction(
+            neo4j_query.get_derivations_for_every_operation
+        )
+        query_time_dict[
+            "pdg_app/to_add_operation: get_all_derivations_for_every_operation "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
     logger.info("[trace] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_operation_create.html",
@@ -4079,37 +4199,6 @@ def to_add_relation() -> ResponseReturnValue:
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_add_relation = SpecifyNewSymbolRelationForm()
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_relations = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "relation"
-        )
-        query_time_dict[
-            "pdg_app/to_add_relation: get_nodes_of_type relation " + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-        # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        dict_of_expressions_that_use_relation = session.read_transaction(
-            neo4j_query.get_expressions_for_every_relation
-        )
-        query_time_dict[
-            "pdg_app/to_add_relation: get_all_expressions_for_every_relation "
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-        # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        dict_of_derivations_that_use_relation = session.read_transaction(
-            neo4j_query.get_derivations_for_every_relation
-        )
-        query_time_dict[
-            "pdg_app/to_add_relation: get_all_derivations_for_every_relation "
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-    logger.info("before validate - request.form = " + str(request.form))
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -4165,6 +4254,35 @@ def to_add_relation() -> ResponseReturnValue:
                 logger.error(str(web_form_add_relation.errors))
                 return redirect(url_for("to_add_relation"))
 
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_relations = session.read_transaction(
+            neo4j_query.get_nodes_of_type, "relation"
+        )
+        query_time_dict[
+            "pdg_app/to_add_relation: get_nodes_of_type relation " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        # with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        dict_of_expressions_that_use_relation = session.read_transaction(
+            neo4j_query.get_expressions_for_every_relation
+        )
+        query_time_dict[
+            "pdg_app/to_add_relation: get_all_expressions_for_every_relation "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        # with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        dict_of_derivations_that_use_relation = session.read_transaction(
+            neo4j_query.get_derivations_for_every_relation
+        )
+        query_time_dict[
+            "pdg_app/to_add_relation: get_all_derivations_for_every_relation "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
     logger.info("[trace] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_relation_create.html",
@@ -4198,72 +4316,6 @@ def to_add_step_select_expressions(
     logger.info("inference_rule_id:" + str(inference_rule_id))
 
     web_form_new_step = SpecifyNewStepForm()
-
-    # get list of expressions
-    list_of_expressions = []
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_expressions = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "expression"
-        )
-        query_time_dict[
-            "pdg_app/to_add_step_select_expressions: get_nodes_of_type expression "
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-        logger.info("list_of_expressions= " + str(list_of_expressions))
-
-        # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_feeds = session.read_transaction(neo4j_query.get_nodes_of_type, "feed")
-        query_time_dict[
-            "pdg_app/to_add_step_select_expressions: get_nodes_of_type feed " + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-    logger.info("list_of_feeds=" + str(list_of_feeds))
-
-    list_of_expression_IDs = []
-    for expression_dict in list_of_expressions:
-        list_of_expression_IDs.append(expression_dict["id"])
-
-    list_of_feed_IDs = []
-    for feed_dict in list_of_feeds:
-        list_of_feed_IDs.append(feed_dict["id"])
-
-    dict_of_expression_dicts = {}
-    for expression_dict in list_of_expressions:
-        dict_of_expression_dicts[expression_dict["id"]] = expression_dict
-
-    dict_of_feed_dicts = {}
-    for feed_dict in list_of_feeds:
-        dict_of_feed_dicts[feed_dict["id"]] = feed_dict
-
-    # get properties for derivation
-    derivation_dict = {}
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        derivation_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
-        )
-        query_time_dict[
-            "pdg_app/to_add_step_select_expressions: get_node_properties_from_id derivation "
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-        logger.info("derivation_dict is " + str(derivation_dict))
-
-        # inference_rule_dict = {}
-        # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        inference_rule_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "inference_rule", inference_rule_id
-        )
-        query_time_dict[
-            "pdg_app/to_add_step_select_expressions: get_node_properties_from_id inference_rule "
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-    logger.info("inference_rule_dict is " + str(inference_rule_dict))
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -4382,6 +4434,72 @@ def to_add_step_select_expressions(
                 logger.error(str(web_form_new_step.errors))
                 return redirect(url_for("to_add_step_select_expressions"))
 
+    # get list of expressions
+    list_of_expressions = []
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_expressions = session.read_transaction(
+            neo4j_query.get_nodes_of_type, "expression"
+        )
+        query_time_dict[
+            "pdg_app/to_add_step_select_expressions: get_nodes_of_type expression "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        logger.info("list_of_expressions= " + str(list_of_expressions))
+
+        # with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_feeds = session.read_transaction(neo4j_query.get_nodes_of_type, "feed")
+        query_time_dict[
+            "pdg_app/to_add_step_select_expressions: get_nodes_of_type feed " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    logger.info("list_of_feeds=" + str(list_of_feeds))
+
+    list_of_expression_IDs = []
+    for expression_dict in list_of_expressions:
+        list_of_expression_IDs.append(expression_dict["id"])
+
+    list_of_feed_IDs = []
+    for feed_dict in list_of_feeds:
+        list_of_feed_IDs.append(feed_dict["id"])
+
+    dict_of_expression_dicts = {}
+    for expression_dict in list_of_expressions:
+        dict_of_expression_dicts[expression_dict["id"]] = expression_dict
+
+    dict_of_feed_dicts = {}
+    for feed_dict in list_of_feeds:
+        dict_of_feed_dicts[feed_dict["id"]] = feed_dict
+
+    # get properties for derivation
+    derivation_dict = {}
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        derivation_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
+        )
+        query_time_dict[
+            "pdg_app/to_add_step_select_expressions: get_node_properties_from_id derivation "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        logger.info("derivation_dict is " + str(derivation_dict))
+
+        # inference_rule_dict = {}
+        # with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        inference_rule_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "inference_rule", inference_rule_id
+        )
+        query_time_dict[
+            "pdg_app/to_add_step_select_expressions: get_node_properties_from_id inference_rule "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    logger.info("inference_rule_dict is " + str(inference_rule_dict))
+
     # first visit to this page
     logger.info("[trace] end " + trace_id)
     return render_template(
@@ -4420,24 +4538,6 @@ def to_add_symbols_and_operations_for_expression(
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_no_options = NoOptionsForm()
-
-    # get the Latex for this expression_id
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        expression_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "expression", expression_id
-        )
-        query_time_dict[
-            "pdg_app/to_add_symbols_and_operations_for_expression, node_properties"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-        logger.info("expression_dict=" + str(expression_dict))
-
-    query_time_dict, potential_symbols_found_in_Latex_expression = (
-        compute.guess_symbols_from_latex(
-            graphDB_Driver, query_time_dict, expression_dict
-        )
-    )
 
     # TODO:
     # query_time_dict, derivations_per_symbol = compute.derivations_per_symbol(potential_symbols_found_in_Latex_expression)
@@ -4512,6 +4612,24 @@ def to_add_symbols_and_operations_for_expression(
             logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_list_expressions"))
 
+    # get the Latex for this expression_id
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        expression_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "expression", expression_id
+        )
+        query_time_dict[
+            "pdg_app/to_add_symbols_and_operations_for_expression, node_properties"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+        logger.info("expression_dict=" + str(expression_dict))
+
+    query_time_dict, potential_symbols_found_in_Latex_expression = (
+        compute.guess_symbols_from_latex(
+            graphDB_Driver, query_time_dict, expression_dict
+        )
+    )
+
     logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/expression_create_symbols_and_operations.html",
@@ -4539,23 +4657,6 @@ def to_add_sympy_and_lean_for_expression(
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_new_expression_sympy = SpecifyNewExpressionSympyLeanForm()
-
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        expression_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "expression", expression_id
-        )
-        query_time_dict[
-            "pdg_app/to_add_sympy_and_lean_for_expression, node_properties " + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    logger.info("expression_dict=" + str(expression_dict))
-
-    # TODO
-    query_time_dict, revised_expr_lhs, revised_expr_rhs = (
-        compute.guess_sympy_from_expression(
-            graphDB_Driver, query_time_dict, expression_dict
-        )
-    )
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -4643,6 +4744,23 @@ def to_add_sympy_and_lean_for_expression(
 
         logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_list_expressions"))
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        expression_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "expression", expression_id
+        )
+        query_time_dict[
+            "pdg_app/to_add_sympy_and_lean_for_expression, node_properties " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+    logger.info("expression_dict=" + str(expression_dict))
+
+    # TODO
+    query_time_dict, revised_expr_lhs, revised_expr_rhs = (
+        compute.guess_sympy_from_expression(
+            graphDB_Driver, query_time_dict, expression_dict
+        )
+    )
 
     # set the default text
     # web_form_new_expression_sympy.sympy_str_lhs.data = revised_expr_lhs_with_str

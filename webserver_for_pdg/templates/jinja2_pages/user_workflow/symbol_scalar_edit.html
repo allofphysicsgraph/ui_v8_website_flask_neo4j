@@ -26,7 +26,7 @@
 
     <P>{{form_symbol_properties.scalar_reference_latex.label }}: {{ form_symbol_properties.scalar_reference_latex(size=50, maxlength=1000, value=scalar_dict['reference_latex']|e) }}
 
-    <P><input type="submit" value="Edit scalar">
+    <P><input type="submit" name="edit scalar" value="Edit scalar">
     </P>
   </form>
 
@@ -43,7 +43,7 @@ TODO: edit dimension
   {{ form_no_options.csrf_token }}
   <P>
 
-  <input type="submit" value="Delete scalar">
+  <input type="submit" name="delete scalar" value="Delete scalar">
 
 </form>
 </fieldset>
