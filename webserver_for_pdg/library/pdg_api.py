@@ -2073,7 +2073,7 @@ def api_derivation_steps(derivation_id: str):
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_steps = session.read_transaction(
-            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+            neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
         query_time_dict["pdg_api/: "] = time.time() - query_start_time
     # logger.info("list_of_steps=" + str(list_of_steps))
@@ -2139,10 +2139,10 @@ def api_delete_derivation(derivation_id: str):
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_step_dicts = session.read_transaction(
-            neo4j_query.get_list_of_step_dicts_in_this_derivation, derivation_id
+            neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
         query_time_dict[
-            "pdg_app/to_review_derivation: get_list_of_step_dicts_in_this_derivation"
+            "pdg_app/to_review_derivation: get_list_of_steps_in_this_derivation"
         ] = round(time.time() - query_start_time, 3)
 
     for this_step_dict in list_of_step_dicts:
