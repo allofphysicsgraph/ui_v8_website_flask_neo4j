@@ -2171,6 +2171,10 @@ CREATE (:scalar:symbol {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485
 CREATE (:feed {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-04_19-11-22-742121", id:"6941869627", latex:"PE", lean:"", sympy:"Symbol('pdg0000004930')"});
 CREATE (:derivation {abstract_latex:"", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", id:"0000000008", name_latex:"frequency relations", reference_latex:""});
 CREATE (:feed {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-04_19-14-28-935250", id:"7408927653", latex:"KE", lean:"", sympy:"Symbol('pdg0000004929')"});
+CREATE (:expression {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-05_18-48-25-744569", description_latex:"", id:"6923310769", latex_condition:"{\\rm acceleration\\ is\\ constant}", latex_lhs:"F", latex_relation:"\\propto", latex_rhs:"m", lean:"", name_latex:"", reference_latex:"", sympy_lhs:"Symbol('pdg0000004202')", sympy_rhs:"Symbol('pdg0000005156')"});
+CREATE (:expression {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-05_18-51-09-464234", description_latex:"", id:"4664063894", latex_condition:"{\\rm acceleration\\ is\\ constant}", latex_lhs:"F", latex_relation:"\\propto", latex_rhs:"m_1", lean:"", name_latex:"", reference_latex:"", sympy_lhs:"Symbol('pdg0000004202')", sympy_rhs:"Symbol('pdg0000005022')"});
+CREATE (:expression {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-05_18-52-02-944988", description_latex:"", id:"7222189955", latex_condition:"{\\rm acceleration\\ is\\ constant}", latex_lhs:"F", latex_relation:"\\propto", latex_rhs:"m_2", lean:"", name_latex:"", reference_latex:"", sympy_lhs:"Symbol('pdg0000004202')", sympy_rhs:"Symbol('pdg0000004851')"});
+CREATE (:expression {author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", created_datetime:"2026-03-05_18-54-47-046540", description_latex:"", id:"1189963325", latex_condition:"{\\rm acceleration\\ is\\ constant}", latex_lhs:"F_{\\rm gravitation}", latex_relation:"\\propto", latex_rhs:"\\frac{1}{r^2}", lean:"", name_latex:"", reference_latex:"", sympy_lhs:"", sympy_rhs:"Pow(Symbol('pdg0000002530'),-2)"});
 :commit
 :begin
 CREATE CONSTRAINT ON (node:derivation) ASSERT (node.id) IS UNIQUE;
@@ -2207,6 +2211,7 @@ MATCH (n1:step{id:"0005969230"}), (n2:feed{id:"6749533119"}) CREATE (n1)-[r:HAS_
 MATCH (n1:step{id:"0005969230"}), (n2:feed{id:"4218009993"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"2"}]->(n2);
 MATCH (n1:step{id:"0005969230"}), (n2:feed{id:"1552869972"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"3"}]->(n2);
 MATCH (n1:step{id:"0003841414"}), (n2:feed{id:"0003838111"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
+MATCH (n1:expression{id:"6923310769"}), (n2:scalar{id:"0000004202"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:step{id:"0006719788"}), (n2:feed{id:"4522137851"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"1"}]->(n2);
 MATCH (n1:step{id:"0006719788"}), (n2:feed{id:"4188639044"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"2"}]->(n2);
 MATCH (n1:step{id:"0006719788"}), (n2:feed{id:"4755369593"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"3"}]->(n2);
@@ -2327,6 +2332,8 @@ MATCH (n1:step{id:"0009804800"}), (n2:feed{id:"5667870149"}) CREATE (n1)-[r:HAS_
 MATCH (n1:step{id:"0004485722"}), (n2:feed{id:"0009485858"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0004485722"}), (n2:feed{id:"0004831494"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"1"}]->(n2);
 MATCH (n1:step{id:"0004575140"}), (n2:feed{id:"3876446703"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0004575140"}), (n2:expression{id:"6923310769"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0004575140"}), (n2:expression{id:"4664063894"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0005751725"}), (n2:feed{id:"0009587738"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0004575140"}), (n2:feed{id:"7905984866"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"1"}]->(n2);
 MATCH (n1:step{id:"0005859994"}), (n2:feed{id:"0009485857"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
@@ -2334,6 +2341,8 @@ MATCH (n1:step{id:"0005940300"}), (n2:feed{id:"0000040490"}) CREATE (n1)-[r:HAS_
 MATCH (n1:step{id:"0005550676"}), (n2:feed{id:"3448601530"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0007455643"}), (n2:feed{id:"0009458842"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0007387809"}), (n2:feed{id:"2346952973"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0007387809"}), (n2:expression{id:"6923310769"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0007387809"}), (n2:expression{id:"7222189955"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0007387809"}), (n2:feed{id:"9594072504"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"1"}]->(n2);
 MATCH (n1:step{id:"0001306821"}), (n2:feed{id:"5089196493"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0001306821"}), (n2:feed{id:"1333474099"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"1"}]->(n2);
@@ -2403,6 +2412,7 @@ MATCH (n1:step{id:"0007925705"}), (n2:feed{id:"6038673136"}) CREATE (n1)-[r:HAS_
 MATCH (n1:step{id:"0007925705"}), (n2:feed{id:"1616666229"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"5"}]->(n2);
 MATCH (n1:step{id:"0002343637"}), (n2:feed{id:"5778176146"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0009887933"}), (n2:feed{id:"7410526982"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
+MATCH (n1:expression{id:"6923310769"}), (n2:scalar{id:"0000005156"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:step{id:"0004803359"}), (n2:feed{id:"6838659900"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"1"}]->(n2);
 MATCH (n1:step{id:"0004803359"}), (n2:feed{id:"9305761407"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"2"}]->(n2);
 MATCH (n1:step{id:"0004803359"}), (n2:feed{id:"5011888122"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"3"}]->(n2);
@@ -5463,6 +5473,10 @@ MATCH (n1:step{id:"0006831079"}), (n2:expression{id:"4938429483"}) CREATE (n1)-[
 MATCH (n1:step{id:"0005188363"}), (n2:expression{id:"6091977310"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0008465659"}), (n2:expression{id:"2501591100"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0005454987"}), (n2:expression{id:"4947831649"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0001345199"}), (n2:expression{id:"4664063894"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0001345199"}), (n2:expression{id:"7222189955"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"1"}]->(n2);
+MATCH (n1:step{id:"0001345199"}), (n2:expression{id:"1189963325"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"2"}]->(n2);
+MATCH (n1:step{id:"0001345199"}), (n2:expression{id:"1189963325"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0005679035"}), (n2:expression{id:"2907404069"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0008755752"}), (n2:expression{id:"3331824625"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0006228957"}), (n2:expression{id:"6892595652"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
@@ -6351,9 +6365,11 @@ MATCH (n1:step{id:"0008373472"}), (n2:expression{id:"0439492440"}) CREATE (n1)-[
 MATCH (n1:step{id:"0007878437"}), (n2:expression{id:"5177311762"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0007878437"}), (n2:expression{id:"4267808354"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"1"}]->(n2);
 MATCH (n1:step{id:"0008162484"}), (n2:expression{id:"3650370389"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0008162484"}), (n2:expression{id:"1189963325"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0008485747"}), (n2:expression{id:"7564894985"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0008485747"}), (n2:expression{id:"1202312210"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"1"}]->(n2);
 MATCH (n1:step{id:"0009492883"}), (n2:expression{id:"5345738321"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
+MATCH (n1:step{id:"0009492883"}), (n2:expression{id:"6923310769"}) CREATE (n1)-[r:HAS_OUTPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0001306821"}), (n2:expression{id:"9226945488"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0008571277"}), (n2:expression{id:"9585727710"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"0"}]->(n2);
 MATCH (n1:step{id:"0008571277"}), (n2:expression{id:"8582885111"}) CREATE (n1)-[r:HAS_INPUT {sequence_index:"1"}]->(n2);
@@ -6942,6 +6958,10 @@ MATCH (n1:feed{id:"3531380618"}), (n2:scalar{id:"0000001357"}) CREATE (n1)-[r:IS
 MATCH (n1:feed{id:"3531380618"}), (n2:scalar{id:"0000002530"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:feed{id:"3594626260"}), (n2:scalar{id:"0000002867"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:feed{id:"3634715785"}), (n2:scalar{id:"0000005156"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"4664063894"}), (n2:scalar{id:"0000004202"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"4664063894"}), (n2:scalar{id:"0000005022"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"7222189955"}), (n2:scalar{id:"0000004202"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"7222189955"}), (n2:scalar{id:"0000004851"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:feed{id:"3652511721"}), (n2:scalar{id:"0000001357"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:feed{id:"3685779219"}), (n2:scalar{id:"0000006235"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:feed{id:"3722461713"}), (n2:scalar{id:"0000001467"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
@@ -6961,6 +6981,7 @@ MATCH (n1:feed{id:"4188639044"}), (n2:scalar{id:"0000004037"}) CREATE (n1)-[r:IS
 MATCH (n1:feed{id:"4202292449"}), (n2:scalar{id:"0000006081"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:feed{id:"4213426349"}), (n2:scalar{id:"0000005579"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:feed{id:"4218009993"}), (n2:scalar{id:"0000004037"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:expression{id:"1189963325"}), (n2:scalar{id:"0000002530"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:feed{id:"4319470443"}), (n2:scalar{id:"0000004770"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:feed{id:"4437214608"}), (n2:scalar{id:"0000003192"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:feed{id:"4470433702"}), (n2:scalar{id:"0000005344"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
