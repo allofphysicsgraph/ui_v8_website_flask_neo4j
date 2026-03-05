@@ -316,6 +316,90 @@ def get_user_stats(tx: Transaction, author: str):
     )
 
 
+def get_list_of_input_expressions_used_in_step(
+    tx: Transaction, step_id: str
+) -> List[dict]:
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    logger.info("step_id= " + step_id)
+
+    result = tx.run(
+        """
+    MATCH (s:step)-[:HAS_INPUT]->(e:expression)
+    WHERE s.id = $step_id
+    RETURN DISTINCT e
+    """,
+        step_id=step_id,
+    )
+    list_of_dicts_extra_key = result.data()
+
+    list_of_dicts = []
+    if len(list_of_dicts_extra_key) > 0:
+        for this_res in list_of_dicts_extra_key:
+            list_of_dicts.append(this_res["e"])
+    logger.info("[TRACE] end " + trace_id)
+    return list_of_dicts
+
+
+def get_list_of_expressions_with_symbols_used_in_derivation(
+    tx: Transaction, derivation_id: str
+) -> List[dict]:
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    logger.info("derivation_id= " + derivation_id)
+
+    result = tx.run(
+        """
+MATCH (d:derivation {id: $derivation_id})
+  -[:HAS_STEP]->(:step)
+  -[:HAS_FEED|HAS_INPUT|HAS_OUTPUT]->()
+  -[:IS_COMPRISED_OF]->(s:symbol)
+WITH DISTINCT s
+MATCH (e:expression)-[:IS_COMPRISED_OF]->(s)
+RETURN DISTINCT e 
+ORDER BY e.id
+    """,
+        derivation_id=derivation_id,
+    )
+    list_of_dicts_extra_key = result.data()
+
+    list_of_dicts = []
+    if len(list_of_dicts_extra_key) > 0:
+        for this_res in list_of_dicts_extra_key:
+            list_of_dicts.append(this_res["e"])
+    logger.info("[TRACE] end " + trace_id)
+    return list_of_dicts
+
+
+def get_list_of_output_expressions_used_in_step(tx: Transaction, step_id) -> List[dict]:
+    """ """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    logger.info("step_id= " + step_id)
+
+    result = tx.run(
+        """
+    MATCH (s:step)-[:HAS_OUTPUT]->(e:expression)
+    WHERE s.id = $step_id
+    RETURN DISTINCT e
+    """,
+        step_id=step_id,
+    )
+    list_of_dicts_extra_key = result.data()
+
+    list_of_dicts = []
+    if len(list_of_dicts_extra_key) > 0:
+        for this_res in list_of_dicts_extra_key:
+            list_of_dicts.append(this_res["e"])
+    logger.info("[TRACE] end " + trace_id)
+    return list_of_dicts
+
+
 def get_derivations_that_use_expression(tx: Transaction, expression_id: str):
     """ """
     trace_id = str(uuid.uuid4())
@@ -1319,6 +1403,42 @@ def add_inference_rule(
     return
 
 
+def edit_step_input(
+    tx: Transaction, step_id: str, old_input_id: str, new_input_id: str
+) -> None:
+    """
+    `MATCH (s:step ...)-[old_rel:HAS_INPUT]->(old_e:expression ...)` finds the specific step and the specific old input, along with the existing relationship (old_rel) connecting them.
+    `MATCH (new_e:expression ...)` locates the node for the new input.
+    `WITH ..., old_rel.sequence_index AS saved_index` is the crucial step. It captures the value of the sequence_index from the edge we are about to delete and carries it forward in memory.
+    `DELETE old_rel` removes the edge between the step and the old input.
+    `CREATE (s)-[new_rel:HAS_INPUT]->(new_e)` creates the new relationship. (Note: Use MERGE instead of CREATE if you want to prevent duplicate edges if the relationship already exists).
+    `SET new_rel.sequence_index = saved_index` applies the captured string value to the newly created edge.
+    """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    params = {
+        "step_id": str(step_id),
+        "old_input_id": str(old_input_id),
+        "new_input_id": str(new_input_id),
+    }
+
+    query = """
+    MATCH (s:step {id: $step_id})-[old_rel:HAS_INPUT]->(old_e:expression {id: $old_input_id})
+    MATCH (new_e:expression {id: $new_input_id})
+    WITH s, old_rel, old_rel.sequence_index AS saved_index, new_e
+    DELETE old_rel
+    CREATE (s)-[new_rel:HAS_INPUT]->(new_e)
+    SET new_rel.sequence_index = saved_index
+    RETURN s.id AS step_id, new_e.id AS input_id, new_rel.sequence_index AS sequence_index
+    """
+
+    result = tx.run(query, params)
+
+    logger.info("[TRACE] end " + trace_id)
+    return
+
+
 def edit_step_feed(
     tx: Transaction, step_id: str, old_feed_id: str, new_feed_id: str
 ) -> None:
@@ -1347,6 +1467,42 @@ def edit_step_feed(
     CREATE (s)-[new_rel:HAS_FEED]->(new_f)
     SET new_rel.sequence_index = saved_index
     RETURN s.id AS step_id, new_f.id AS feed_id, new_rel.sequence_index AS sequence_index
+    """
+
+    result = tx.run(query, params)
+
+    logger.info("[TRACE] end " + trace_id)
+    return
+
+
+def edit_step_output(
+    tx: Transaction, step_id: str, old_output_id: str, new_output_id: str
+) -> None:
+    """
+    `MATCH (s:step ...)-[old_rel:HAS_OUTPUT]->(old_e:expression ...)` finds the specific step and the specific old output, along with the existing relationship (old_rel) connecting them.
+    `MATCH (new_e:expression ...)` locates the node for the new output.
+    `WITH ..., old_rel.sequence_index AS saved_index` is the crucial step. It captures the value of the sequence_index from the edge we are about to delete and carries it forward in memory.
+    `DELETE old_rel` removes the edge between the step and the old output.
+    `CREATE (s)-[new_rel:HAS_OUTPUT]->(new_e)` creates the new relationship. (Note: Use MERGE instead of CREATE if you want to prevent duplicate edges if the relationship already exists).
+    `SET new_rel.sequence_index = saved_index` applies the captured string value to the newly created edge.
+    """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    params = {
+        "step_id": str(step_id),
+        "old_output_id": str(old_output_id),
+        "new_output_id": str(new_output_id),
+    }
+
+    query = """
+    MATCH (s:step {id: $step_id})-[old_rel:HAS_OUTPUT]->(old_e:expression {id: $old_output_id})
+    MATCH (new_e:expression {id: $new_output_id})
+    WITH s, old_rel, old_rel.sequence_index AS saved_index, new_e
+    DELETE old_rel
+    CREATE (s)-[new_rel:HAS_OUTPUT]->(new_e)
+    SET new_rel.sequence_index = saved_index
+    RETURN s.id AS step_id, new_e.id AS output_id, new_rel.sequence_index AS sequence_index
     """
 
     result = tx.run(query, params)
