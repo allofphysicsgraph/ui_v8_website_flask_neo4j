@@ -1338,9 +1338,12 @@ def to_add_derivation() -> ResponseReturnValue:
                         "Non-ascii derivation_reference_latex: "
                         + str(derivation_reference_latex)
                     )
-                    return "<H1>Input must be ASCII only</H1>\n" + str(
-                        derivation_reference_latex
+                    flash(
+                        "pdg_app/to_add_expression: Input must be ASCII only: "
+                        + str(derivation_reference_latex)
                     )
+                    logger.info("[TRACE] end " + trace_id)
+                    return redirect(url_for("to_add_expression"))
 
                 # this preserves the LaTeX backslashes exactly as the user typed them.
                 abstract_latex = str(
@@ -1841,9 +1844,12 @@ def to_edit_derivation_metadata(
                         "Non-ascii derivation_reference_latex: "
                         + str(derivation_reference_latex)
                     )
-                    return "<H1>Input must be ASCII only</H1>\n" + str(
-                        derivation_reference_latex
+                    flash(
+                        "pdg_app/to_add_expression: Input must be ASCII only: "
+                        + str(derivation_reference_latex)
                     )
+                    logger.info("[TRACE] end " + trace_id)
+                    return redirect(url_for("to_add_expression"))
 
                 abstract_latex = latex.make_string_safe_for_latex(
                     str(web_form_edit_derivation.abstract_latex.data).strip()
@@ -2407,7 +2413,14 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
         logger.info("feed_dict:" + str(feed_dict))
 
         if feed_dict is None:
-            return "<H1>Feed ID " + str(feed_id) + " does not exist in database</H1>."
+            flash(
+                "pdg_app/to_edit_feed: Feed ID "
+                + str(feed_id)
+                + " does not exist in database"
+            )
+            logger.info("Feed ID " + str(feed_id) + " does not exist in database")
+            logger.info("[TRACE] end " + trace_id)
+            return redirect(url_for("to_edit_feed"))
 
         # editing the feed includes modifying the symbols present.
 
@@ -2460,7 +2473,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
-        logger.info("request.form.keys()= " + str())
+        logger.info("request.form.keys()= " + str(request.form.keys()))
 
         if "delete" in request.form.keys():
 
@@ -2706,7 +2719,12 @@ def to_add_expression() -> ResponseReturnValue:
                     logger.error(
                         "Non-ascii expression_latex_rhs: " + str(expression_latex_rhs)
                     )
-                    return f"<h1>Input must be ASCII only</h1>\n{escape(expression_latex_rhs)}"
+                    flash(
+                        "pdg_app/to_add_expression: Input must be ASCII only: "
+                        + str(expression_latex_rhs)
+                    )
+                    logger.info("[TRACE] end " + trace_id)
+                    return redirect(url_for("to_add_expression"))
 
                 expression_latex_condition = str(
                     web_form_add_expression.expression_latex_condition.data
@@ -2716,9 +2734,12 @@ def to_add_expression() -> ResponseReturnValue:
                         "Non-ascii expression_latex_condition: "
                         + str(expression_latex_condition)
                     )
-                    return "<H1>Input must be ASCII only</H1>\n" + str(
-                        expression_latex_condition
+                    flash(
+                        "pdg_app/to_add_expression: Input must be ASCII only: "
+                        + str(expression_latex_condition)
                     )
+                    logger.info("[TRACE] end " + trace_id)
+                    return redirect(url_for("to_add_expression"))
 
                 expression_name_latex = str(
                     web_form_add_expression.expression_name_latex.data
@@ -2727,7 +2748,12 @@ def to_add_expression() -> ResponseReturnValue:
                     logger.error(
                         "Non-ascii expression_name_latex: " + str(expression_name_latex)
                     )
-                    return f"<h1>Input must be ASCII only</h1>\n{escape(expression_name_latex)}"
+                    flash(
+                        "pdg_app/to_add_expression: Input must be ASCII only: "
+                        + str(expression_name_latex)
+                    )
+                    logger.info("[TRACE] end " + trace_id)
+                    return redirect(url_for("to_add_expression"))
 
                 expression_reference_latex = str(
                     web_form_add_expression.expression_reference_latex.data
@@ -2737,9 +2763,12 @@ def to_add_expression() -> ResponseReturnValue:
                         "Non-ascii expression_reference_latex: "
                         + str(expression_reference_latex)
                     )
-                    return "<H1>Input must be ASCII only</H1>\n" + str(
-                        expression_reference_latex
+                    flash(
+                        "pdg_app/to_add_expression: Input must be ASCII only: "
+                        + str(expression_reference_latex)
                     )
+                    logger.info("[TRACE] end " + trace_id)
+                    return redirect(url_for("to_add_expression"))
 
                 expression_description_latex = str(
                     web_form_add_expression.expression_description_latex.data
@@ -2749,9 +2778,12 @@ def to_add_expression() -> ResponseReturnValue:
                         "Non-ascii expression_description_latex: "
                         + str(expression_description_latex)
                     )
-                    return "<H1>Input must be ASCII only</H1>\n" + str(
-                        expression_description_latex
+                    flash(
+                        "pdg_app/to_add_expression: Input must be ASCII only: "
+                        + str(expression_description_latex)
                     )
+                    logger.info("[TRACE] end " + trace_id)
+                    return redirect(url_for("to_add_expression"))
 
                 logger.info("expression_latex_lhs:" + str(expression_latex_lhs))
                 logger.info("expression_latex_rhs:" + str(expression_latex_rhs))
