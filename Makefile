@@ -85,17 +85,19 @@ container_live:
                 $(WEBSERVER_IMAGE):$(CONTAINER_TAG) /bin/bash
 
 black_out:
-	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) make black_in
+	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch --entrypoint='' --workdir /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) make black_in
 
 black_in:
 	black -v --workers 1 webserver_for_pdg/*.py webserver_for_pdg/library/*.py
 
 mypy_out:
-	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch --entrypoint='' -w /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) mypy --install-types --non-interactive --check-untyped-defs webserver_for_pdg/pdg_app.py webserver_for_pdg/library
+	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch --entrypoint='' --workdir /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) mypy --install-types --non-interactive --check-untyped-defs webserver_for_pdg/pdg_app.py webserver_for_pdg/library
 
 pytest_out:
-	$(DOCKER_OR_PODMAN) exec --workdir /scratch/tests_of_webpage/playwright/ -it $(WEBSERVER_IMAGE):$(CONTAINER_TAG) pytest --exitfirst
-	#$(DOCKER_OR_PODMAN) exec --workdir /scratch/tests_of_webpage/playwright/ -it `$(DOCKER_OR_PODMAN) ps | grep flask-webserver | cut -d' ' -f1` pytest --exitfirst
+	$(DOCKER_OR_PODMAN) exec --workdir /scratch/tests_of_webpage/playwright/ -it `$(DOCKER_OR_PODMAN) ps | grep flask-webserver | cut -d' ' -f1` pytest --exitfirst
+# can't use 
+#$(DOCKER_OR_PODMAN) run -v`pwd`:/scratch --workdir /scratch/tests_of_webpage/playwright/ -it $(WEBSERVER_IMAGE):$(CONTAINER_TAG) pytest --exitfirst
+# for pytest because the webserver has to be running
 
 # keep the conf folder since that has the configuration
 # keep plugin folder since that has apocalypse
