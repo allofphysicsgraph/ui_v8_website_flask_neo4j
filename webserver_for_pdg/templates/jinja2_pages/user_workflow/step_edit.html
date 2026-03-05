@@ -44,7 +44,7 @@
 
 <fieldset>
   <legend>
-    <H2>Edit Sequence Number</h2>
+    <H2>Edit Sequence Number of Step</h2>
   </legend>
   {{ form_swap_index.csrf_token }}
 
@@ -56,13 +56,80 @@
 {% endfor %}
 </select>
 
-<input type="submit" name="reorder indices" value="reorder step indices">
+<input type="submit" name="reorder indices of step" value="reorder step indices">
 
 </fieldset>
 
 <fieldset>
   <legend>
-    <H2>Replace Feed</h2>
+    Change Sequence of an Input Expression
+  </legend>
+  TODO
+<form method="post" action="" onsubmit="return checkForm(this);">
+{{ form_swap_input_indices.csrf_token }}
+
+<input type="submit" name="reorder indices of input expressions" value="reorder input indices">
+
+</form>
+</fieldset>
+
+<fieldset>
+  <legend>
+    Change Sequence of a Feed
+  </legend>
+  TODO
+<form method="post" action="" onsubmit="return checkForm(this);">
+{{ form_swap_feed_indices.csrf_token }}
+
+<input type="submit" name="reorder indices of feeds" value="reorder feed indices">
+
+</form>
+</fieldset>
+
+<fieldset>
+  <legend>
+    Change Sequence of an Output Expression
+  </legend>
+  TODO
+<form method="post" action="" onsubmit="return checkForm(this);">
+{{ form_swap_output_indices.csrf_token }}
+
+<input type="submit" name="reorder indices of output expressions" value="reorder output indices">
+
+</form>
+</fieldset>
+
+<fieldset>
+  <legend>
+    <H2>Replace Input Expressions</h2>
+  </legend>
+  <form method="post" action="" onsubmit="return checkForm(this);">
+  {{ form_swap_input_expressions.csrf_token }}
+
+<P>Input Expressions in this step:
+
+<select name="input_expression_used_field_name" class="selectpicker form-control" id="input_expression_used_field_id">
+{% for this_expr in list_of_input_expressions_used_in_step %}
+  <option value="{{ this_expr['id'] }}">{{ this_expr['id'] }}, {{ this_expr['latex_lhs'] }}{{ this_expr['latex_relation'] }}{{ this_expr['latex_rhs'] }}</option>
+{% endfor %}
+</select>
+
+  <P>Select Input Expression to substitute:
+
+<select name="input_expression_replacement_field_name" class="selectpicker form-control" id="input_expression_replacement_field_id">
+{% for this_expr in list_of_expressions_with_symbols_used_in_derivation %}
+  <option value="{{ this_expr['id'] }}">{{ this_expr['id'] }}, {{ this_expr['latex_lhs'] }}{{ this_expr['latex_relation'] }}{{ this_expr['latex_rhs'] }}</option>
+{% endfor %}
+</select>
+
+<input type="submit" name="replace input expression" value="replace selected expression">
+
+</form>
+</fieldset>
+
+<fieldset>
+  <legend>
+    <H2>Replace Feeds</h2>
   </legend>
 
 <form method="post" action="" onsubmit="return checkForm(this);">
@@ -84,10 +151,39 @@
 {% endfor %}
 </select>
 
-<input type="submit" name="replace feed" value="replace selected feeds">
+<input type="submit" name="replace feed" value="replace selected feed">
 
 </form>
 </fieldset>
+
+<fieldset>
+  <legend>
+    <H2>Replace Output Expressions</h2>
+  </legend>
+  <form method="post" action="" onsubmit="return checkForm(this);">
+  {{ form_swap_output_expressions.csrf_token }}
+
+<P>Output Expressions in this step:
+
+<select name="output_expression_used_field_name" class="selectpicker form-control" id="output_expression_used_field_id">
+{% for this_expr in list_of_output_expressions_used_in_step %}
+  <option value="{{ this_expr['id'] }}">{{ this_expr['id'] }}, {{ this_expr['latex_lhs'] }}{{ this_expr['latex_relation'] }}{{ this_expr['latex_rhs'] }}</option>
+{% endfor %}
+</select>
+
+  <P>Select Output Expression to substitute:
+
+<select name="output_expression_replacement_field_name" class="selectpicker form-control" id="output_expression_replacement_field_id">
+{% for this_expr in list_of_expressions_with_symbols_used_in_derivation %}
+  <option value="{{ this_expr['id'] }}">{{ this_expr['id'] }}, {{ this_expr['latex_lhs'] }}{{ this_expr['latex_relation'] }}{{ this_expr['latex_rhs'] }}</option>
+{% endfor %}
+</select>
+
+<output type="submit" name="replace output expression" value="replace selected expression">
+
+</form>
+</fieldset>
+
 
 <fieldset>
   <legend>

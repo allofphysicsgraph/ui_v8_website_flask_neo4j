@@ -1512,43 +1512,10 @@ def to_review_derivation(
 
             # path_to_pdf = "/code/static/dumping_grounds/"  # should end with slash
 
-            # with graphDB_Driver.session() as session:
-            #     query_start_time = time.time()
-            #     list_of_inference_rule_dicts = session.read_transaction(
-            #         neo4j_query.get_nodes_of_type, "inference_rule"
-            #     )
-            #     query_time_dict[
-            #         "pdg_app/to_review_derivation: get_nodes_of_type inference_rule"
-            #         + trace_id
-            #     ] = round(time.time() - query_start_time, 3)
-
-            #     query_start_time = time.time()
-            #     list_of_sequence_values = session.read_transaction(
-            #         neo4j_query.get_list_of_sequence_values_for_derivation_id,
-            #         derivation_id,
-            #     )
-            #     query_time_dict[
-            #         "pdg_app/to_review_derivation: get_list_of_sequence_values_for_derivation_id"
-            #         + trace_id
-            #         + derivation_id
-            #     ] = round(time.time() - query_start_time, 3)
-            #     logger.info(" list_of_sequence_values=" + str(list_of_sequence_values))
-
-            list_of_step_dicts = []
-            list_of_inference_rule_dicts = []
-            list_of_sequence_values = []
-            for step_id, everything in all_steps.items():
-                list_of_step_dicts.append(everything["step dict"])
-                list_of_inference_rule_dicts.append(everything["inference rule dict"])
-                list_of_sequence_values.append(everything["sequence index"])
-
             try:
                 pdf_filename = latex.create_pdf_for_derivation(
                     all_steps,
                     derivation_dict,
-                    list_of_step_dicts,
-                    list_of_inference_rule_dicts,
-                    list_of_sequence_values,
                     "/code/static/",
                 )
             except Exception as err:
@@ -1576,21 +1543,10 @@ def to_review_derivation(
 
             # path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
 
-            list_of_step_dicts = []
-            list_of_inference_rule_dicts = []
-            list_of_sequence_values = []
-            for step_id, everything in all_steps.items():
-                list_of_step_dicts.append(everything["step dict"])
-                list_of_inference_rule_dicts.append(everything["inference rule dict"])
-                list_of_sequence_values.append(everything["sequence index"])
-
             try:
                 latex.create_tex_file_for_derivation(
                     all_steps,
                     derivation_dict,
-                    list_of_step_dicts,
-                    list_of_inference_rule_dicts,
-                    list_of_sequence_values,
                     "/code/static/",
                 )
                 tex_filename = str(derivation_id)
@@ -5322,7 +5278,12 @@ def to_edit_step(
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_edit_step = SpecifyNewStepForm()
+    web_form_swap_input_expressions = NoOptionsForm()
     web_form_swap_feeds = NoOptionsForm()
+    web_form_swap_output_expressions = NoOptionsForm()
+    web_form_swap_input_indices = NoOptionsForm()
+    web_form_swap_feed_indices = NoOptionsForm()
+    web_form_swap_output_indices = NoOptionsForm()
     web_form_delete = NoOptionsForm()
     web_form_swap_index = NoOptionsForm()
 
@@ -5333,7 +5294,6 @@ def to_edit_step(
     # I could just retrieve the specific step, but getting all the steps
     # allows me to also figure out the sequence numbers that are in use.
     # list all steps in this derivation
-    list_of_step_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_step_dicts = session.read_transaction(
@@ -5341,22 +5301,6 @@ def to_edit_step(
         )
         query_time_dict[
             "pdg_app/to_edit_step: get_list_of_steps_in_this_derivation " + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-        query_start_time = time.time()
-        list_of_feeds_used_in_step = session.read_transaction(
-            neo4j_query.get_feeds_used_in_step, step_id
-        )
-        query_time_dict["pdg_app/to_edit_step: get_feeds_used_in_step " + trace_id] = (
-            round(time.time() - query_start_time, 3)
-        )
-
-        query_start_time = time.time()
-        list_of_feeds_not_connected_to_any_step = session.read_transaction(
-            neo4j_query.get_feeds_not_connected_to_any_step
-        )
-        query_time_dict[
-            "pdg_app/to_edit_feed: get_feeds_not_connected_to_any_step feed " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
         query_start_time = time.time()
@@ -5393,7 +5337,51 @@ def to_edit_step(
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
 
-        if "replace feed" in request.form:
+        if "replace input expression" in request.form:
+            logger.info("replacing input expr in step " + step_id)
+
+            old_input_id = request.form["input_expression_used_field_name"]
+            new_input_id = request.form["input_expression_replacement_field_name"]
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.edit_step_input,
+                    step_id,
+                    old_input_id,
+                    new_input_id,
+                )
+                query_time_dict["pdg_app/to_edit_step: edit_step_input " + trace_id] = (
+                    round(time.time() - query_start_time, 3)
+                )
+
+            return redirect(
+                url_for("to_review_derivation", derivation_id=derivation_id)
+            )
+
+        elif "replace output expression" in request.form:
+            logger.info("replacing output expr in step " + step_id)
+
+            old_output_id = request.form["output_expression_used_field_name"]
+            new_output_id = request.form["output_expression_replacement_field_name"]
+
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                session.write_transaction(
+                    neo4j_query.edit_step_output,
+                    step_id,
+                    old_output_id,
+                    new_output_id,
+                )
+                query_time_dict[
+                    "pdg_app/to_edit_step: edit_step_output " + trace_id
+                ] = round(time.time() - query_start_time, 3)
+
+            return redirect(
+                url_for("to_review_derivation", derivation_id=derivation_id)
+            )
+
+        elif "replace feed" in request.form:
             logger.info("replacing feed in step " + step_id)
 
             old_feed_id = request.form["feed_used_field_name"]
@@ -5407,11 +5395,10 @@ def to_edit_step(
                     old_feed_id,
                     new_feed_id,
                 )
-                query_time_dict["pdg_app/to_edit_step: edit_step_notes " + trace_id] = (
+                query_time_dict["pdg_app/to_edit_step: edit_step_feed " + trace_id] = (
                     round(time.time() - query_start_time, 3)
                 )
 
-            # maybe better to redirect to review derivation?
             return redirect(
                 url_for("to_review_derivation", derivation_id=derivation_id)
             )
@@ -5419,7 +5406,7 @@ def to_edit_step(
             #     url_for("to_edit_step", derivation_id=derivation_id, step_id=step_id)
             # )
 
-        elif "reorder indices" in request.form:
+        elif "reorder indices of step" in request.form:
             logger.info("reorder indices for " + step_id)
 
             option_index = request.form["sequence_field_name"]
@@ -5469,6 +5456,15 @@ def to_edit_step(
                 url_for("to_review_derivation", derivation_id=derivation_id)
             )
 
+        elif "reorder indices of input expressions" in request.form:
+            logger.info("reorder indices of input expressions")
+            option_index = request.form["sequence_field_name"]
+
+        elif "reorder indices of feeds" in request.form:
+            logger.info("reorder indices of feeds")
+        elif "reorder indices of output expressions" in request.form:
+            logger.info("reorder indices of output expressions")
+
         elif "edit" in request.form:
             if web_form_edit_step.validate():
                 logger.info("editing step " + step_id)
@@ -5516,21 +5512,74 @@ def to_edit_step(
                 url_for("to_review_derivation", derivation_id=derivation_id)
             )
 
+    with graphDB_Driver.session() as session:
+
+        query_start_time = time.time()
+        list_of_feeds_used_in_step = session.read_transaction(
+            neo4j_query.get_feeds_used_in_step, step_id
+        )
+        query_time_dict["pdg_app/to_edit_step: get_feeds_used_in_step " + trace_id] = (
+            round(time.time() - query_start_time, 3)
+        )
+
+        query_start_time = time.time()
+        list_of_feeds_not_connected_to_any_step = session.read_transaction(
+            neo4j_query.get_feeds_not_connected_to_any_step
+        )
+        query_time_dict[
+            "pdg_app/to_edit_feed: get_feeds_not_connected_to_any_step feed " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        query_start_time = time.time()
+        list_of_input_expressions_used_in_step = session.read_transaction(
+            neo4j_query.get_list_of_input_expressions_used_in_step, step_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_step: get_list_of_input_expressions_used_in_step "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        query_start_time = time.time()
+        list_of_expressions_with_symbols_used_in_derivation = session.read_transaction(
+            neo4j_query.get_list_of_expressions_with_symbols_used_in_derivation,
+            derivation_id,
+        )
+        query_time_dict[
+            "pdg_app/to_edit_step: get_list_of_expressions_with_symbols_used_in_derivation "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+        query_start_time = time.time()
+        list_of_output_expressions_used_in_step = session.read_transaction(
+            neo4j_query.get_list_of_output_expressions_used_in_step, step_id
+        )
+        query_time_dict[
+            "pdg_app/to_edit_step: get_list_of_output_expressions_used_in_step "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
     logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/step_edit.html",
         title="Edit Step",
         query_time_dict=query_time_dict,
         form_edit_step=web_form_edit_step,
+        form_swap_input_expressions=web_form_swap_input_expressions,
         form_swap_feeds=web_form_swap_feeds,
+        form_swap_output_expressions=web_form_swap_output_expressions,
+        form_swap_input_indices=web_form_swap_input_indices,
+        form_swap_feed_indices=web_form_swap_feed_indices,
+        form_swap_output_indices=web_form_swap_output_indices,
         form_delete=web_form_delete,
         form_swap_index=web_form_swap_index,
         step_dict=step_dict,
         derivation_dict=derivation_dict,
         sequence_swap_list=sequence_swap_list,
+        list_of_input_expressions_used_in_step=list_of_input_expressions_used_in_step,
+        list_of_expressions_with_symbols_used_in_derivation=list_of_expressions_with_symbols_used_in_derivation,
         list_of_feeds_used_in_step=list_of_feeds_used_in_step,
         list_of_feeds_not_connected_to_any_step=list_of_feeds_not_connected_to_any_step,
-        # list_of_feeds_not_in_step_with_overlapping_latex=list_of_feeds_not_in_step_with_overlapping_latex,
+        list_of_output_expressions_used_in_step=list_of_output_expressions_used_in_step,
     )
 
 
