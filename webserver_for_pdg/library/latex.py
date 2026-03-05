@@ -370,16 +370,15 @@ def edges_in_derivation_for_d3js(all_steps: dict) -> List[Tuple[str, str]]:
 
 
 def create_tex_file_for_derivation(
-    derivation_id: unique_numeric_id_as_str,
     all_steps: dict,
     derivation_dict: dict,
     list_of_step_dicts_in_this_derivation: list,
     list_of_inference_rule_dicts: list,
     list_of_sequence_values: list,
     path_to_tex_file: str,
-):
+) -> None:
     """
-    In v7 the PDG I started allowing inference rule names
+    In v7 of the PDG I started allowing inference rule names
     to have spaces. (In versions prior to 7 the inference rule names were
     camel case.) When I implemented this function in v7 I learned why the
     inference rule names had been camel case: Latex does not like
@@ -388,17 +387,12 @@ def create_tex_file_for_derivation(
 
     Args:
         derivation_id: numeric identifier of the derivation
-    Returns:
-        tex_filename: pass back filename without extension because bibtex cannot handle .tex
-    Raises:
 
-    >>> path_to_tex_file = "/code/static/"  # must end with /
-    >>> generate_tex_for_derivation("000001", path_to_tex_file)
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
-    tex_filename = derivation_id
+    tex_filename = derivation_dict["id"]
 
     compute.remove_file_debris(
         [path_to_tex_file], [tex_filename], ["tex", "log", "pdf", "aux"]
@@ -641,24 +635,21 @@ def create_tex_file_for_derivation(
 
 
 def create_pdf_for_derivation(
-    derivation_id: unique_numeric_id_as_str,
     all_steps,
-    derivation_dict,
-    list_of_step_dicts,
-    list_of_inference_rule_dicts,
-    list_of_sequence_values,
+    derivation_dict: dict,
+    list_of_step_dicts: List[dict],
+    list_of_inference_rule_dicts: List[dict],
+    list_of_sequence_values: List[dict],
     path_to_pdf: str,
 ) -> str:
     """
 
     Args:
-        derivation_id: numeric identifier of the derivation
         path_to_pdf = "/code/static/"  # must end with /
     Returns:
         pdf_filename + ".pdf":
     Raises:
 
-    >>> create_pdf_for_derivation("000001", "myemail@address.com","pdg.db")
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
@@ -670,12 +661,11 @@ def create_pdf_for_derivation(
 
     # destination for the PDF once file is built
 
-    pdf_filename = derivation_id
+    pdf_filename = derivation_dict["id"]
 
-    tex_filename_without_extension = derivation_id
+    tex_filename_without_extension = derivation_dict["id"]
 
     create_tex_file_for_derivation(
-        derivation_id,
         all_steps,
         derivation_dict,
         list_of_step_dicts,
@@ -1011,13 +1001,11 @@ def create_tex_file_for_latex_string(
 
 
 def create_derivation_png(
-    graphDB_Driver,
-    query_time_dict: query_timing_result_type,
     derivation_id: unique_numeric_id_as_str,
     derivation_name_latex: str,
-    list_of_step_dicts_in_this_derivation: dict,
+    all_steps: dict,
     path_to_output_png: str,
-) -> Tuple[str, query_timing_result_type]:
+) -> str:
     """
     for a clear description of the graphviz language, see
     https://www.graphviz.org/doc/info/lang.html
@@ -1031,14 +1019,10 @@ def create_derivation_png(
     Raises:
 
 
-    >>> create_derivation_png("000001", "pdg.db")
     """
     trace_id = str(uuid.uuid4())
     # logger.info("[trace start " + trace_id + " " + str(time.time()))
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
-
-    # print("latex/create_derivation_png: list_of_step_dicts_in_this_derivation=",
-    #     list_of_step_dicts_in_this_derivation)
 
     dot_filename = path_to_output_png + "derivation_" + derivation_id + ".dot"
     with open(dot_filename, "w") as file_handle:
@@ -1051,25 +1035,15 @@ def create_derivation_png(
         )
         file_handle.write("fontsize=12;\n")
 
-        for this_step_dict in list_of_step_dicts_in_this_derivation:
-            logger.info("step_dict=" + str(this_step_dict))
-
-            (
-                inference_rule_dict,
-                list_of_input_dicts,
-                list_of_feed_dicts,
-                list_of_output_dicts,
-                query_time_dict,
-            ) = compute.input_feed_output_infrule_for_step(
-                graphDB_Driver, query_time_dict, this_step_dict["id"]
-            )
+        for step_id, everything in all_steps.items():
+            # logger.info("step_dict=" + str(this_step_dict))
 
             write_step_to_graphviz_file(
-                this_step_dict["id"],
-                inference_rule_dict,
-                list_of_input_dicts,
-                list_of_feed_dicts,
-                list_of_output_dicts,
+                step_id,
+                everything["inference rule dict"],
+                everything["list of input dicts"],
+                everything["list of feed dicts"],
+                everything["list of output dicts"],
                 file_handle,
                 path_to_output_png,
             )
@@ -1141,7 +1115,7 @@ def create_derivation_png(
     # return True, "no invalid latex", output_filename
     logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     # return output_filename_png, output_filename_svg, query_time_dict
-    return output_filename_png, query_time_dict
+    return output_filename_png
 
 
 def create_step_graphviz_png(
