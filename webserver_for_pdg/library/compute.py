@@ -726,7 +726,7 @@ def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
     return list_of_expression_dicts
 
 
-def get_dimensional_consistency_per_expression_id(
+def get_dimensional_consistency_for_every_expression(
     graphDB_Driver, query_time_dict: query_timing_result_type
 ):
     """
@@ -742,41 +742,40 @@ def get_dimensional_consistency_per_expression_id(
 
     dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
 
-    list_of_expression_dicts = []
+    # list_of_expression_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_expression_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "expression"
         )
         query_time_dict[
-            "pdg_app/get_dimensional_consistency_per_expression_id: get_nodes_of_type expression "
+            "pdg_app/get_dimensional_consistency_for_every_expression: get_nodes_of_type expression "
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
-    # TODO: Neo4j inside loop causes high latency
-    for this_expression_dict in list_of_expression_dicts:
+        # with graphDB_Driver.session() as session:
+        for this_expression_dict in list_of_expression_dicts:
 
-        with graphDB_Driver.session() as session:
             query_start_time = time.time()
             symbols_in_expression = session.read_transaction(
                 neo4j_query.get_symbols_for_expression, this_expression_dict["id"]
             )
             query_time_dict[
-                "pdg_app/get_dimensional_consistency_per_expression_id: get_symbols_for_expression "
+                "pdg_app/get_dimensional_consistency_for_every_expression: get_symbols_for_expression "
                 + this_expression_dict["id"]
                 + trace_id
             ] = round(time.time() - query_start_time, 3)
 
-        # TODO: vector dimensions should be consistent
-        # TODO: vector shape should be consistent
-        # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/83
+            # TODO: vector dimensions should be consistent
+            # TODO: vector shape should be consistent
+            # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/83
 
-        # try:
-        dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
-            sympy_validate_expression.dimensional_consistency(
-                this_expression_dict, symbols_in_expression
+            # try:
+            dimensional_consistency_per_expression_id[this_expression_dict["id"]] = (
+                sympy_validate_expression.dimensional_consistency(
+                    this_expression_dict, symbols_in_expression
+                )
             )
-        )
         # except Exception as err:
 
         #     dimensional_consistency_per_expression_id[this_expression_dict["id"]] = str(
@@ -1097,41 +1096,89 @@ def get_dict_of_steps_in_derivation(
     query_time_dict: query_timing_result_type,
 ):
     """
-    >>> get_dict_of_steps_in_derivation()
+    returns dict with keys "step ID" and value dict with keys
+    - sequence index
+    - infrule dict
+    - list of input dicts
+    - list of feed dicts
+    - list of output dicts
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
     # list all steps in this derivation
-    list_of_step_dicts = []
+
+    all_steps = {}
+
+    # list_of_steps = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
-        list_of_step_dicts = session.read_transaction(
+        list_of_steps = session.read_transaction(
             neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
         query_time_dict[
             "compute/get_dict_of_steps_in_derivation: steps_in_this_derivation"
             + trace_id
         ] = round(time.time() - query_start_time, 3)
-    logger.info(
-        "list of steps for" + str(derivation_id) + ":" + str(list_of_step_dicts)
-    )
-
-    # TODO: Neo4j inside loop causes high latency
-    all_steps = {}
-    for this_step_dict in list_of_step_dicts:
-        logger.info('this_step_dict["id"]:' + this_step_dict["id"])
-        (
-            inference_rule_dict,
-            list_of_input_dicts,
-            list_of_feed_dicts,
-            list_of_output_dicts,
-            query_time_dict,
-        ) = input_feed_output_infrule_for_step(
-            graphDB_Driver, query_time_dict, this_step_dict["id"]
+        logger.info(
+            "list of steps for " + str(derivation_id) + ":" + str(list_of_steps)
         )
 
-        with graphDB_Driver.session() as session:
+        for this_step_dict in list_of_steps:
+            logger.info("step id:" + this_step_dict["id"])
+
+            # inference_rule_dict = {}
+            # list_of_input_dicts = [] # type: List[dict]
+            # list_of_feed_dicts = [] # type: List[dict]
+            # list_of_output_dicts = [] # type: List[dict]
+
+            query_start_time = time.time()
+            inference_rule_dict = session.read_transaction(
+                neo4j_query.get_inference_rule_connected_to_step_ID,
+                this_step_dict["id"],
+            )
+            query_time_dict[
+                "compute/input_feed_output_infrule_for_step: get_inference_rule_connected_to_step_ID"
+                + trace_id
+            ] = round(time.time() - query_start_time, 3)
+            # print("inference_rule_dict=", inference_rule_dict)
+            # with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_input_dicts = session.read_transaction(
+                neo4j_query.get_expressions_from_step_id_and_expr_type,
+                this_step_dict["id"],
+                "HAS_INPUT",
+            )
+            query_time_dict[
+                "compute/input_feed_output_infrule_for_step: get_expressions_from_step_id_and_expr_type HAS_INPUT"
+                + trace_id
+            ] = round(time.time() - query_start_time, 3)
+            # print("list_of_input_dicts=", list_of_input_dicts)
+            # with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_feed_dicts = session.read_transaction(
+                neo4j_query.get_expressions_from_step_id_and_expr_type,
+                this_step_dict["id"],
+                "HAS_FEED",
+            )
+            query_time_dict[
+                "compute/input_feed_output_infrule_for_step: get_expressions_from_step_id_and_expr_type, HAS_FEED"
+                + trace_id
+            ] = round(time.time() - query_start_time, 3)
+            # print("list_of_feed_dicts=", list_of_feed_dicts)
+            # with graphDB_Driver.session() as session:
+            query_start_time = time.time()
+            list_of_output_dicts = session.read_transaction(
+                neo4j_query.get_expressions_from_step_id_and_expr_type,
+                this_step_dict["id"],
+                "HAS_OUTPUT",
+            )
+            query_time_dict[
+                "compute/input_feed_output_infrule_for_step: get_expressions_from_step_id_and_expr_type, HAS_OUTPUT"
+                + trace_id
+            ] = round(time.time() - query_start_time, 3)
+            # print("list_of_output_dicts=", list_of_output_dicts)
+
             query_start_time = time.time()
             sequence_index = session.read_transaction(
                 neo4j_query.get_sequence_index_for_step, this_step_dict["id"]
@@ -1140,15 +1187,15 @@ def get_dict_of_steps_in_derivation(
                 "compute/get_dict_of_steps_in_derivation: get_sequence_index_for_step"
                 + trace_id
             ] = round(time.time() - query_start_time, 3)
-        # print("sequence_index=", sequence_index)
 
-        all_steps[this_step_dict["id"]] = {
-            "sequence index": sequence_index,
-            "inference rule dict": inference_rule_dict,
-            "list of input dicts": list_of_input_dicts,
-            "list of feed dicts": list_of_feed_dicts,
-            "list of output dicts": list_of_output_dicts,
-        }
+            all_steps[this_step_dict["id"]] = {
+                "sequence index": sequence_index,
+                "step dict": this_step_dict,
+                "inference rule dict": inference_rule_dict,
+                "list of input dicts": list_of_input_dicts,
+                "list of feed dicts": list_of_feed_dicts,
+                "list of output dicts": list_of_output_dicts,
+            }
 
     # sorting on `id` isn't relevant to rendered HTML tables.
     # sorted_all_steps = dict(sorted(all_steps.items()))
@@ -1161,76 +1208,24 @@ def get_dict_of_steps_in_derivation(
     return sorted_all_steps, query_time_dict
 
 
-def input_feed_output_infrule_for_step(
-    graphDB_Driver, query_time_dict: query_timing_result_type, step_id: str
-) -> Tuple[dict, List[dict], List[dict], List[dict], query_timing_result_type]:
-    """
-    >>> input_feed_output_infrule_for_step()
-    """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+# def input_feed_output_infrule_for_step(
+#     graphDB_Driver, query_time_dict: query_timing_result_type, step_id: str
+# ) -> Tuple[dict, List[dict], List[dict], List[dict], query_timing_result_type]:
+#     """
+#     >>> input_feed_output_infrule_for_step()
+#     """
+#     trace_id = str(uuid.uuid4())
+#     logger.info("[TRACE] start " + trace_id)
 
-    inference_rule_dict = {}
-    list_of_input_dicts = []
-    list_of_feed_dicts = []
-    list_of_output_dicts = []
 
-    # https://neo4j.com/docs/python-manual/current/session-api/
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        inference_rule_dict = session.read_transaction(
-            neo4j_query.get_inference_rule_connected_to_step_ID, step_id
-        )
-        query_time_dict[
-            "compute/get_dict_of_steps_in_derivation: get_inference_rule_connected_to_step_ID"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    # print("inference_rule_dict=", inference_rule_dict)
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_input_dicts = session.read_transaction(
-            neo4j_query.get_expressions_from_step_id_and_expr_type,
-            step_id,
-            "HAS_INPUT",
-        )
-        query_time_dict[
-            "compute/get_dict_of_steps_in_derivation: get_expressions_from_step_id_and_expr_type HAS_INPUT"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    # print("list_of_input_dicts=", list_of_input_dicts)
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_feed_dicts = session.read_transaction(
-            neo4j_query.get_expressions_from_step_id_and_expr_type,
-            step_id,
-            "HAS_FEED",
-        )
-        query_time_dict[
-            "compute/get_dict_of_steps_in_derivation: get_expressions_from_step_id_and_expr_type, HAS_FEED"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    # print("list_of_feed_dicts=", list_of_feed_dicts)
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_output_dicts = session.read_transaction(
-            neo4j_query.get_expressions_from_step_id_and_expr_type,
-            step_id,
-            "HAS_OUTPUT",
-        )
-        query_time_dict[
-            "compute/get_dict_of_steps_in_derivation: get_expressions_from_step_id_and_expr_type, HAS_OUTPUT"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    # print("list_of_output_dicts=", list_of_output_dicts)
-
-    logger.info("[TRACE] end " + trace_id)
-    return (
-        inference_rule_dict,
-        list_of_input_dicts,
-        list_of_feed_dicts,
-        list_of_output_dicts,
-        query_time_dict,
-    )
+#     logger.info("[TRACE] end " + trace_id)
+#     return (
+#         inference_rule_dict,
+#         list_of_input_dicts,
+#         list_of_feed_dicts,
+#         list_of_output_dicts,
+#         query_time_dict,
+#     )
 
 
 def remove_latex_presention_markings(latex_str: str) -> str:
