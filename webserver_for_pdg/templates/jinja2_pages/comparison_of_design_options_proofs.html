@@ -18,11 +18,107 @@
   <a href="{{ url_for('to_conventions_documentation') }}?referrer=comparison_of_proof_assistants">jargon</a> used in the Physics Derivation Graph.
 </P>
 
-<H2 id="Rocq">Rocq</H2>
+<P>What constitutes a viable proof assistant option? Cited by a journal like <a href="https://afm.episciences.org/">Annals of Formalized Mathematics</a>,
+  <blockquote>"Examples of popular proof assistants include <a href="https://wiki.portal.chalmers.se/agda/pmwiki.php">Agda</a>, <a href="https://rocq-prover.org/">Rocq</a>, <a href="https://hol-light.github.io/">HOL Light</a>, <a href="https://isabelle.in.tum.de/">Isabelle</a>, <a href="https://lean-lang.org/">Lean</a>, and <a href="https://mizar.uwb.edu.pl/">Mizar</a>."</blockquote>
 
-<P><a href="https://en.wikipedia.org/wiki/Rocq">https://en.wikipedia.org/wiki/Rocq</a>
 
-<H2 id="Lean">Lean</H2>
+<table border=1>
+    <thead>
+        <tr>
+            <th>Aspect</th>
+            <th><a href="https://wiki.portal.chalmers.se/agda/pmwiki.php">Agda</a></th> <!-- Agda -->
+            <th><a href="https://rocq-prover.org/">Rocq</a></th> <!-- Rocq -->
+            <th><a href="https://hol-light.github.io/">HOL Light</a></th> <!-- HOL Light -->
+            <th><a href="https://isabelle.in.tum.de/">Isabelle</a></th> <!-- Isabelle -->
+            <th><a href="https://lean-lang.org/">Lean</a></th> <!-- Lean -->
+            <th><a href="https://mizar.uwb.edu.pl/">Mizar</a></th> <!-- Mizar -->
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>wikipedia page</td>
+            <td><a href="https://en.wikipedia.org/wiki/Agda_(programming_language)">Agda</a></td> <!-- Agda -->
+            <td><a href="https://en.wikipedia.org/wiki/Rocq">Rocq</a></td> <!-- Rocq -->
+            <td><a href="https://en.wikipedia.org/wiki/HOL_Light">HOL Light</a></td> <!-- HOL Light -->
+            <td><a href="https://en.wikipedia.org/wiki/Isabelle_(proof_assistant)">Isabelle</a></td> <!-- Isabelle -->
+            <td><a href="https://en.wikipedia.org/wiki/Lean_(proof_assistant)">Lean</a></td> <!-- Lean -->
+            <td><a href="https://en.wikipedia.org/wiki/Mizar_system">Mizar</a></td> <!-- Mizar -->
+        </tr>
+        <tr>
+            <td>Primary Community</td>
+            <td>Computer scientists, Programming Language (PL) researchers, HoTT theorists.</td>
+            <td>Large mix of industry (software verification) and academic mathematicians.</td>
+            <td>Hardware verification specialists and extreme minimalists.</td>
+            <td>Computer science departments and formal methods researchers.</td>
+            <td>Working research mathematicians and "Mathlib" contributors.</td>
+            <td>Traditional mathematicians focused on a human-readable library.</td>
+        </tr>
+        <tr>
+            <td>Foundational Logic</td>
+            <td>Dependent Type Theory (DTT) / Constructive.</td>
+            <td>Calculus of Inductive Constructions (CIC).</td>
+            <td>Higher-Order Logic (Simple Type Theory).</td>
+            <td>Higher-Order Logic (built on a meta-logic).</td>
+            <td>Dependent Type Theory (similar to Rocq).</td>
+            <td>Tarski-Grothendieck Set Theory.</td>
+        </tr>
+        <tr>
+            <td>Strengths</td>
+            <td>Beautiful syntax; "Programs are Proofs"; excellent for Homotopy Type Theory.</td>
+            <td>Powerful tactic engine; highly stable; massive industry track record (e.g., CompCert).</td>
+            <td>Extremely small, trustworthy kernel; very fast execution of simple proofs.</td>
+            <td>"Sledgehammer" (powerful automation); very readable proof scripts (Isar syntax).</td>
+            <td>Unified, massive math library (mathlib); excellent VS Code integration; fast-growing.</td>
+            <td>Human-readable language style; the oldest continuous math library (MML).</td>
+        </tr>
+        <tr>
+            <td>Weaknesses</td>
+            <td>Lacks the heavy automation/tactics found in Isabelle or Rocq.</td>
+            <td>Steep learning curve; legacy fragmentation across 30 years of development.</td>
+            <td>Sparse user interface; requires OCaml proficiency; less automated than Isabelle.</td>
+            <td>The "Logic of Choice" (HOL) is not constructive; heavy resource usage.</td>
+            <td>Rapid version changes (transitioning to Lean 4 was difficult); heavy RAM requirements.</td>
+            <td>Hard to extend; lacks modern IDE features; rigid structure for new users.</td>
+        </tr>
+        <tr>
+            <td>Math Coverage</td>
+            <td>Strong in Category Theory, Type Theory, and Logic.</td>
+            <td>Broad coverage; famous for Feit-Thompson (Group Theory) and Four Color Theorem.</td>
+            <td>Very deep in Analysis and Geometry (famous for the Flyspeck Project).</td>
+            <td>Massive "Archive of Formal Proofs" (AFP) covering diverse undergraduate/graduate math.</td>
+            <td>Modern research math (Perfectoid spaces, Liquid Tensor Experiment, Algebra).</td>
+            <td>Extensive library (MML) covering a wide range of classical mathematics.</td>
+        </tr>
+        <tr>
+            <td>Automation Style</td>
+            <td>Mostly manual/structural; relies on "interactive editing" via Emacs.</td>
+            <td>Ltac tactic language allows users to write custom automation scripts.</td>
+            <td>Manual tactic application via OCaml prompts.</td>
+            <td>Excellent: Sledgehammer connects to external solvers (Z3, Vampire, E).</td>
+            <td>Strong: "Aesop" and "Tactic" frameworks; growing AI/LLM integration.</td>
+            <td>The "Checker" automatically fills in "obvious" gaps between steps.</td>
+        </tr>
+        <tr>
+            <td>Library Philosophy</td>
+            <td>Decentralized; standard library is separate from specialized research.</td>
+            <td>Decentralized; many independent packages managed via Opam.</td>
+            <td>Monolithic: Centered around a core set of files used by the community.</td>
+            <td>The AFP (Archive of Formal Proofs) acts as a curated journal for libraries.</td>
+            <td>Hyper-centralized: One giant repository (mathlib) that keeps everything in sync.</td>
+            <td>Monolithic: The Mizar Mathematical Library (MML) is a single, integrated body.</td>
+        </tr>
+    </tbody>
+</table>
+<P>Prompt to Gemini 3 Flash on 2026-03-05: 
+  <pre>
+Create an HTML table that has, as columns, Agda, Rocq, HOL Light, Isabelle, Lean, and Mizar.
+The rows should have aspects that compare the proof assistants. Example comparisons might include
+- which communities is the proof assistant popular with?
+- strengths and weaknesses
+- what aspects of math are covered?
+
+Come up with additional rows for comparison and fill in the table with an assessment.
+</pre>
 
 <H2 id="HOL"><a href="https://hol-theorem-prover.org/">HOL</a></H2>
 
@@ -35,10 +131,5 @@
 <P>An attempted Docker image: <a href="https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/sandbox/docker_images/ocaml_alipne_with_hol_works/Dockerfile">https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/sandbox/docker_images/ocaml_alipne_with_hol_works/Dockerfile</a><BR>
   and <a href="https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/sandbox/docker_images/ocaml_alpine_with_HOL/Dockerfile">https://github.com/allofphysicsgraph/proofofconcept/blob/gh-pages/sandbox/docker_images/ocaml_alpine_with_HOL/Dockerfile</a>
 
-<H2>Isabelle</H2>
-
-<P><a href="https://en.wikipedia.org/wiki/Isabelle_(proof_assistant)">https://en.wikipedia.org/wiki/Isabelle_(proof_assistant)</a>
-
-<P><a href="https://isabelle.in.tum.de/">https://isabelle.in.tum.de/</a>
 
 {% endblock %}
