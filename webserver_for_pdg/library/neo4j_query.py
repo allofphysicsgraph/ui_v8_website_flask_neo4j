@@ -821,7 +821,7 @@ def get_symbols_for_derivation(tx: Transaction, derivation_id: str) -> List[dict
       -[:HAS_STEP]->(:step)
       -[:HAS_FEED|HAS_INPUT|HAS_OUTPUT]->()
       -[:IS_COMPRISED_OF]->(s:symbol)
-    RETURN DISTINCT s
+    RETURN DISTINCT s ORDER BY toLower(s.latex)
     """
 
     result = tx.run(query, derivation_id=derivation_id)
