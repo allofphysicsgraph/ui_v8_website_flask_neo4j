@@ -31,6 +31,7 @@ from typing import TextIO, Tuple, List
 # image dimensions in pixels
 import cv2  # type: ignore
 
+# provides remove_file_debris
 from . import compute
 
 # ORDERING: this has to come before the functions that use this type
@@ -251,8 +252,11 @@ def create_d3js_json(
                 # TODO: account for input_dict['latex_condition']
                 expression_latex = (
                     this_expression_dict["latex_lhs"]
+                    + " "
                     + this_expression_dict["latex_relation"]
+                    + " "
                     + this_expression_dict["latex_rhs"]
+                    + " "
                 )
                 png_name = (
                     "expression_"
@@ -336,7 +340,6 @@ def create_d3js_json(
 
 def edges_in_derivation_for_d3js(all_steps: dict) -> List[Tuple[str, str]]:
     """
-
     str in the Tuples:
     - step_id
     - expression_dict["id"]
@@ -372,12 +375,11 @@ def edges_in_derivation_for_d3js(all_steps: dict) -> List[Tuple[str, str]]:
 def create_tex_file_for_derivation(
     all_steps: dict,
     derivation_dict: dict,
-    list_of_step_dicts_in_this_derivation: list,
-    list_of_inference_rule_dicts: list,
-    list_of_sequence_values: list,
     path_to_tex_file: str,
 ) -> None:
     """
+    This is called from `create_pdf_for_derivation` and from `pdg_app/review_derivation`
+
     In v7 of the PDG I started allowing inference rule names
     to have spaces. (In versions prior to 7 the inference rule names were
     camel case.) When I implemented this function in v7 I learned why the
@@ -385,14 +387,19 @@ def create_tex_file_for_derivation(
     newcommand names to have underscore in them; see https://tex.stackexchange.com/questions/306110/new-command-with-an-underscore
     Therefore, I remove all spaces from the inference rule name.
 
-    Args:
-        derivation_id: numeric identifier of the derivation
-
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     tex_filename = derivation_dict["id"]
+
+    list_of_step_dicts = []
+    list_of_inference_rule_dicts = []
+    list_of_sequence_values = []
+    for step_id, everything in all_steps.items():
+        list_of_step_dicts.append(everything["step dict"])
+        list_of_inference_rule_dicts.append(everything["inference rule dict"])
+        list_of_sequence_values.append(everything["sequence index"])
 
     compute.remove_file_debris(
         [path_to_tex_file], [tex_filename], ["tex", "log", "pdf", "aux"]
@@ -409,6 +416,8 @@ def create_tex_file_for_derivation(
         latex_file_handle.write(
             "\\usepackage{amsmath,amssymb,amsfonts}\n"
         )  # https://tex.stackexchange.com/questions/32100/what-does-each-ams-package-do
+
+        # dvipdfmx support multi‐byte character encodings; not clear to BHP how critical this is since PDG requires ASCII
         latex_file_handle.write(
             "\\usepackage[dvipdfmx,colorlinks=true,pdfkeywords={physics derivation graph}]{hyperref}\n"
         )
@@ -506,119 +515,99 @@ def create_tex_file_for_derivation(
         )
         if len(derivation_dict["abstract_latex"]) > 0:
             # fixed bug https://github.com/allofphysicsgraph/proofofconcept/issues/249
-            # safe_string = dat["derivations"][derivation_id]["notes"]
-            #                latex_file_handle.write(safe_string + "\n")
             latex_file_handle.write(derivation_dict["abstract_latex"] + "\n")
         latex_file_handle.write("\\end{abstract}\n")
 
-        for linear_indx in list_of_sequence_values:
-            # print("linear_indx=", linear_indx)
-            for step_dict in list_of_step_dicts_in_this_derivation:
-                # print("step_dict=", step_dict)
+        # steps are ordered by linear index, so outer loop isn't necessary
+        # for linear_indx in list_of_sequence_values:
+        for step_id, everything in all_steps.items():
 
-                inference_rule_name = all_steps[step_dict["id"]]["inference rule dict"][
-                    "name_latex"
-                ]
-                # print("inference_rule_latex = ", inference_rule_latex)
+            inference_rule_name = everything["inference rule dict"]["name_latex"]
 
-                list_of_input_expression_latex = []
-                for this_input_dict in all_steps[step_dict["id"]][
-                    "list of input dicts"
-                ]:
-                    # print("this_input_dict=", this_input_dict)
-                    # this_input_dict= {'m': {'sympy_lhs': "sympy.Symbol('pdg9592623')", 'reference_latex': '', 'latex_condition': '', 'sympy_rhs': "sympy.Symbol('pdg7689637')", 'description_latex': '', 'latex_lhs': 'a', 'name_latex': '', 'lean': '', 'latex_rhs': 'b', 'author_name_latex': 'ben', 'id': '3636307', 'sympy': "sympy.Eq(sympy.Symbol('pdg9592623'),sympy.Symbol('pdg7689637'))", 'latex_relation': '='}}
-                    list_of_input_expression_latex.append(
-                        this_input_dict["latex_lhs"]
-                        + this_input_dict["latex_relation"]
-                        + this_input_dict["latex_rhs"]
-                    )
+            list_of_input_expression_latex = []
+            for this_input_dict in everything["list of input dicts"]:
+                list_of_input_expression_latex.append(
+                    this_input_dict["latex_lhs"]
+                    + this_input_dict["latex_relation"]
+                    + this_input_dict["latex_rhs"]
+                )
 
-                list_of_feed_latex = []
-                for this_feed_dict in all_steps[step_dict["id"]]["list of feed dicts"]:
-                    list_of_feed_latex.append(this_feed_dict["latex"])
+            list_of_feed_latex = []
+            for this_feed_dict in everything["list of feed dicts"]:
+                list_of_feed_latex.append(this_feed_dict["latex"])
 
-                list_of_output_expression_latex = []
-                for this_output_dict in all_steps[step_dict["id"]][
-                    "list of output dicts"
-                ]:
-                    list_of_output_expression_latex.append(
-                        this_output_dict["latex_lhs"]
-                        + this_output_dict["latex_relation"]
-                        + this_output_dict["latex_rhs"]
-                    )
+            list_of_output_expression_latex = []
+            for this_output_dict in everything["list of output dicts"]:
+                list_of_output_expression_latex.append(
+                    this_output_dict["latex_lhs"]
+                    + this_output_dict["latex_relation"]
+                    + this_output_dict["latex_rhs"]
+                )
 
-                if step_dict["sequence_index"] == linear_indx:
+            latex_file_handle.write("\n")
+            if len(everything["step dict"]["note_before_step_latex"]) > 0:
+                latex_file_handle.write(
+                    everything["step dict"]["note_before_step_latex"] + "\n"
+                )
 
-                    latex_file_handle.write("\n")
-                    if len(step_dict["note_before_step_latex"]) > 0:
-                        latex_file_handle.write(
-                            step_dict["note_before_step_latex"] + "\n"
-                        )
+            if (
+                "image" in everything["step dict"].keys()
+            ):  # as of 2025-01-02 `image` isn't a valid key in the schema
+                latex_file_handle.write("\\begin{center}\n")
+                latex_file_handle.write("\\begin{figure}\n")
+                #        shutil.copy(
+                #            "static/diagrams/" + step_dict["image"]["file name"],
+                #        step_dict["image"]["file name"],
+                # )
+                latex_file_handle.write(
+                    "\\includegraphics{"
+                    + everything["step dict"]["image"]["file name"]
+                    + "}\n"
+                )
+                latex_file_handle.write(
+                    "\\caption{" + everything["step dict"]["image"]["caption"] + "}\n"
+                )
+                latex_file_handle.write(
+                    "\\label{fig:" + everything["step dict"]["image"]["label"] + "}\n"
+                )
+                latex_file_handle.write("\\end{figure}\n")
+                latex_file_handle.write("\\end{center}\n")
+            # using the newcommand, populate the expression identifiers
+            latex_file_handle.write("% step ID = " + step_id + "\n")
+            latex_file_handle.write(
+                # digits cannot be used to name macros
+                "\\"
+                + "".join(filter(str.isalpha, inference_rule_name))
+            )
+            for feed_latex in list_of_feed_latex:
+                latex_file_handle.write("{" + feed_latex + "}")
+            for input_latex in list_of_input_expression_latex:
+                this_str = str(input_latex) + str(derivation_dict["name_latex"])
+                local_id = hash_of_string(this_str)
 
-                    if (
-                        "image" in step_dict.keys()
-                    ):  # as of 2025-01-02 `image` isn't a valid key in the schema
-                        latex_file_handle.write("\\begin{center}\n")
-                        latex_file_handle.write("\\begin{figure}\n")
-                        #        shutil.copy(
-                        #            "static/diagrams/" + step_dict["image"]["file name"],
-                        #        step_dict["image"]["file name"],
-                        # )
-                        latex_file_handle.write(
-                            "\\includegraphics{"
-                            + step_dict["image"]["file name"]
-                            + "}\n"
-                        )
-                        latex_file_handle.write(
-                            "\\caption{" + step_dict["image"]["caption"] + "}\n"
-                        )
-                        latex_file_handle.write(
-                            "\\label{fig:" + step_dict["image"]["label"] + "}\n"
-                        )
-                        latex_file_handle.write("\\end{figure}\n")
-                        latex_file_handle.write("\\end{center}\n")
-                    # using the newcommand, populate the expression identifiers
-                    latex_file_handle.write("% step ID = " + step_dict["id"] + "\n")
-                    latex_file_handle.write(
-                        # digits cannot be used to name macros
-                        "\\"
-                        + "".join(filter(str.isalpha, inference_rule_name))
-                    )
-                    for feed_latex in list_of_feed_latex:
-                        latex_file_handle.write("{" + feed_latex + "}")
-                    for input_latex in list_of_input_expression_latex:
+                latex_file_handle.write("{" + local_id + "}")
+            for output_latex in list_of_output_expression_latex:
+                this_str = str(output_latex) + str(derivation_dict["name_latex"])
+                local_id = hash_of_string(this_str)
 
-                        this_str = str(input_latex) + str(derivation_dict["name_latex"])
-                        local_id = hash_of_string(this_str)
+                latex_file_handle.write("{" + local_id + "}")
+            latex_file_handle.write("\n")
 
-                        latex_file_handle.write("{" + local_id + "}")
-                    for output_latex in list_of_output_expression_latex:
+            # write output expressions
+            for output_latex in list_of_output_expression_latex:
 
-                        this_str = str(output_latex) + str(
-                            derivation_dict["name_latex"]
-                        )
-                        local_id = hash_of_string(this_str)
+                this_str = str(output_latex) + str(derivation_dict["name_latex"])
+                local_id = hash_of_string(this_str)
 
-                        latex_file_handle.write("{" + local_id + "}")
-                    latex_file_handle.write("\n")
+                latex_file_handle.write("\\begin{equation}\n")
+                latex_file_handle.write(output_latex + "\n")
+                latex_file_handle.write("\\label{eq:" + local_id + "}\n")
+                latex_file_handle.write("\\end{equation}\n")
 
-                    # write output expressions
-                    for output_latex in list_of_output_expression_latex:
-
-                        this_str = str(output_latex) + str(
-                            derivation_dict["name_latex"]
-                        )
-                        local_id = hash_of_string(this_str)
-
-                        latex_file_handle.write("\\begin{equation}\n")
-                        latex_file_handle.write(output_latex + "\n")
-                        latex_file_handle.write("\\label{eq:" + local_id + "}\n")
-                        latex_file_handle.write("\\end{equation}\n")
-
-                    if len(step_dict["note_after_step_latex"]) > 0:
-                        latex_file_handle.write(
-                            step_dict["note_after_step_latex"] + "\n"
-                        )  # TODO: if the note contains a $ or %, shenanigans arise
+            if len(everything["step dict"]["note_after_step_latex"]) > 0:
+                latex_file_handle.write(
+                    everything["step dict"]["note_after_step_latex"] + "\n"
+                )  # TODO: if the note contains a $ or %, shenanigans arise
 
         # TODO: only create a bibliography if the .tex file contains "cite"
 
@@ -637,9 +626,6 @@ def create_tex_file_for_derivation(
 def create_pdf_for_derivation(
     all_steps,
     derivation_dict: dict,
-    list_of_step_dicts: List[dict],
-    list_of_inference_rule_dicts: List[dict],
-    list_of_sequence_values: List[dict],
     path_to_pdf: str,
 ) -> str:
     """
@@ -668,9 +654,6 @@ def create_pdf_for_derivation(
     create_tex_file_for_derivation(
         all_steps,
         derivation_dict,
-        list_of_step_dicts,
-        list_of_inference_rule_dicts,
-        list_of_sequence_values,
         path_to_pdf,
     )
 
@@ -1272,7 +1255,9 @@ def write_step_to_graphviz_file(
         # TODO: account for input_dict['latex_condition']
         input_latex = (
             input_dict["latex_lhs"]
+            + " "
             + input_dict["latex_relation"]
+            + " "
             + input_dict["latex_rhs"]
         )
         png_filename_no_extension = (
@@ -1297,7 +1282,9 @@ def write_step_to_graphviz_file(
         # TODO: account for output_dict['latex_condition']
         output_latex = (
             output_dict["latex_lhs"]
+            + " "
             + output_dict["latex_relation"]
+            + " "
             + output_dict["latex_rhs"]
         )
 

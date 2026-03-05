@@ -55,7 +55,7 @@
     <td>{% for m_dict in step_dict['list of input dicts'] %}
       <OL>
         <LI><a href="{{ url_for('to_edit_expression', expression_id=m_dict['id']) }}">{{m_dict['id']}}</a><BR>
-        \({{ m_dict['latex_lhs'] }}{{ m_dict['latex_relation'] }}{{ m_dict['latex_rhs'] }}\)</LI>
+        \({{ m_dict['latex_lhs'] }} {{ m_dict['latex_relation'] }} {{ m_dict['latex_rhs'] }}\)</LI>
       </OL>
         {% endfor %}
     </td>
@@ -69,7 +69,7 @@
     <td>{% for m_dict in step_dict['list of output dicts'] %}
       <OL>
         <LI><a href="{{ url_for('to_edit_expression', expression_id=m_dict['id']) }}">{{m_dict['id']}}</a><BR>
-        \({{ m_dict['latex_lhs'] }}{{ m_dict['latex_relation'] }}{{ m_dict['latex_rhs'] }}\)</LI>
+        \({{ m_dict['latex_lhs'] }} {{ m_dict['latex_relation'] }} {{ m_dict['latex_rhs'] }}\)</LI>
       </OL>
         {% endfor %}
     </td>
