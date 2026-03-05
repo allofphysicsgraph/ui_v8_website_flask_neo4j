@@ -1475,6 +1475,13 @@ def to_review_derivation(
         ] = round(time.time() - query_start_time, 3)
         logger.info("derivation_dict:" + str(derivation_dict))
 
+        if derivation_dict is None:
+            flash(
+                "pdg_app/to_review_derivation: invalid derivation_id: "
+                + str(derivation_id)
+            )
+            return redirect(url_for("to_list_derivations"))
+
         all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
             graphDB_Driver, derivation_id, query_time_dict
         )
@@ -1753,6 +1760,12 @@ def to_select_step(derivation_id: unique_numeric_id_as_str) -> ResponseReturnVal
         ] = round(time.time() - query_start_time, 3)
         logger.info("derivation_dict:" + str(derivation_dict))
 
+        if derivation_dict is None:
+            flash(
+                "pdg_app/to_select_step: invalid derivation_id: " + str(derivation_id)
+            )
+            return redirect(url_for("to_list_derivations"))
+
         # list_of_step_dicts = []
         # with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -1810,11 +1823,12 @@ def to_edit_derivation_metadata(
     logger.info("to_edit_derivation_metadata: derivation_dict:" + str(derivation_dict))
 
     if derivation_dict is None:
-        return (
-            "<H1>Derivation ID "
+        flash(
+            "pdg_app/to_edit_derivation_metadata: Derivation ID "
             + str(derivation_id)
-            + " does not exist in database</H1>."
+            + " does not exist in database"
         )
+        return redirect(url_for("to_list_derivations"))
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -1918,6 +1932,8 @@ def to_add_step_select_inference_rule(
     add new step to existing derivation
 
     What inference rule should be used for this step?
+
+    TODO:
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -1936,7 +1952,26 @@ def to_add_step_select_inference_rule(
         query_time_dict[
             "pdg_app/to_add_step_select_inference_rule: get_inference_rules" + trace_id
         ] = round(time.time() - query_start_time, 3)
+
+        # get properties of this derivation
+        query_start_time = time.time()
+        derivation_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
+        )
+        query_time_dict[
+            "pdg_app/to_add_step_select_inference_rule: get_node_properties_from_id derivation"
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    if derivation_dict is None:
+        flash(
+            "pdg_app/to_add_step_select_inference_rule: derivation_id not recognized:"
+            + str(derivation_id)
+        )
+        return redirect(url_for("to_list_derivations"))
+
     logger.info("list_of_inference_rule_dicts=" + str(list_of_inference_rule_dicts))
+    logger.info("derivation_dict:" + str(derivation_dict))
 
     if len(list_of_inference_rule_dicts) == 0:
         redirect(url_for("to_add_inference_rule"))
@@ -1951,21 +1986,6 @@ def to_add_step_select_inference_rule(
     list_of_inference_rule_IDs = []
     for inference_rule_dict in list_of_inference_rule_dicts:
         list_of_inference_rule_IDs.append(inference_rule_dict["id"])
-
-    # get properties of this derivation
-    derivation_dict = {}
-    with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        derivation_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
-        )
-        query_time_dict[
-            "pdg_app/to_add_step_select_inference_rule: get_node_properties_from_id derivation"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-    logger.info(
-        "to_add_step_select_inference_rule: derivation_dict:" + str(derivation_dict)
-    )
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -2013,6 +2033,13 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseRetur
             "pdg_app/to_edit_expression: get_node_properties_from_id expression "
             + trace_id
         ] = round(time.time() - query_start_time, 3)
+
+        if expression_dict is None:
+            flash(
+                "pdg_app/to_edit_expression: expression_id not recognized: "
+                + str(expression_id)
+            )
+            return redirect(url_for("to_list_expressions"))
 
         query_start_time = time.time()
         derivations_that_use_expression = session.read_transaction(
@@ -2420,7 +2447,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
             )
             logger.info("Feed ID " + str(feed_id) + " does not exist in database")
             logger.info("[TRACE] end " + trace_id)
-            return redirect(url_for("to_edit_feed"))
+            return redirect(url_for("to_list_feeds"))
 
         # editing the feed includes modifying the symbols present.
 
@@ -3137,11 +3164,12 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnV
         )
 
         if operation_dict is None:
-            return (
-                "<H1>operation ID "
+            flash(
+                "pdg_app/to_edit_operation: operation ID "
                 + str(operation_id)
-                + " does not exist in database</H1>."
+                + " does not exist in database."
             )
+            return redirect(url_for("to_list_operations"))
 
         # with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -3250,11 +3278,12 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> ResponseReturnVal
         )
 
         if relation_dict is None:
-            return (
-                "<H1>Relation ID "
+            flash(
+                "pdg_app/to_edit_relation: Relation ID "
                 + str(relation_id)
-                + " does not exist in database</H1>."
+                + " does not exist in database."
             )
+            return redirect(url_for("to_list_relations"))
 
         # with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -3356,9 +3385,12 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> ResponseReturnValue:
         logger.info("scalar_dict:" + str(scalar_dict))
 
         if scalar_dict is None:
-            return (
-                "<H1>Scalar ID " + str(scalar_id) + " does not exist in database</H1>."
+            flash(
+                "pdg_app/to_edit_scalar: Scalar ID "
+                + str(scalar_id)
+                + " does not exist in database."
             )
+            return redirect(url_for("to_list_scalars"))
 
         # with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -3475,9 +3507,12 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> ResponseReturnValue:
         logger.info("vector_dict:" + str(vector_dict))
 
         if vector_dict is None:
-            return (
-                "<H1>Vector ID " + str(vector_id) + " does not exist in database</H1>."
+            flash(
+                "pdg_app/to_edit_vector: Vector ID "
+                + str(vector_id)
+                + " does not exist in database."
             )
+            return redirect(url_for("to_list_vectors"))
 
         # with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -3532,9 +3567,12 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> ResponseReturnValue:
         logger.info("matrix_dict:" + str(matrix_dict))
 
         if matrix_dict is None:
-            return (
-                "<H1>Matrix ID " + str(matrix_id) + " does not exist in database</H1>."
+            flash(
+                "pdg_app/to_edit_matrix: Matrix ID "
+                + str(matrix_id)
+                + " does not exist in database."
             )
+            return redirect(url_for("to_list_matrices"))
 
         # with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -3584,6 +3622,10 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> ResponseRetur
             "pdg_app/to_add_value_and_units get_node_properties_from_id scalar "
             + trace_id
         ] = round(time.time() - query_start_time, 3)
+
+        if scalar_dict is None:
+            flash("pdg_app/to_add_value_and_units: scalar_id not found")
+            return redirect(url_for("to_navigation"))
 
         query_start_time = time.time()
         dict_of_expressions_that_use_scalar = session.read_transaction(
@@ -4517,6 +4559,10 @@ def to_add_step_select_expressions(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
+        if derivation_dict is None:
+            flash("pdg_app/to_add_step_select_expressions: derivation_id not found")
+            return redirect(url_for("to_list_derivations"))
+
         logger.info("derivation_dict is " + str(derivation_dict))
 
         # inference_rule_dict = {}
@@ -4529,6 +4575,10 @@ def to_add_step_select_expressions(
             "pdg_app/to_add_step_select_expressions: get_node_properties_from_id inference_rule "
             + trace_id
         ] = round(time.time() - query_start_time, 3)
+
+        if inference_rule_dict is None:
+            flash("pdg_app/to_add_step_select_expressions: inference_rule_id not found")
+            return redirect(url_for("to_list_inference_rules"))
 
     logger.info("inference_rule_dict is " + str(inference_rule_dict))
 
@@ -4655,6 +4705,12 @@ def to_add_symbols_and_operations_for_expression(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
         logger.info("expression_dict=" + str(expression_dict))
+
+    if expression_dict is None:
+        flash(
+            "pdg_app/to_add_symbols_and_operations_for_expression: expression_id not found"
+        )
+        return redirect(url_for("to_list_expressions"))
 
     query_time_dict, potential_symbols_found_in_Latex_expression = (
         compute.guess_symbols_from_latex(
@@ -4785,6 +4841,11 @@ def to_add_sympy_and_lean_for_expression(
         query_time_dict[
             "pdg_app/to_add_sympy_and_lean_for_expression, node_properties " + trace_id
         ] = round(time.time() - query_start_time, 3)
+
+    if expression_dict is None:
+        flash("pdg_app/to_add_sympy_and_lean_for_expression: expression_id not found")
+        return redirect(url_for("to_list_expressions"))
+
     logger.info("expression_dict=" + str(expression_dict))
 
     # TODO
@@ -4849,6 +4910,10 @@ def to_add_symbols_and_operations_for_feed(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
         logger.info("symbols_and_operations_for_feed: feed_dict=" + str(feed_dict))
+
+        if feed_dict is None:
+            flash("pdg_app/to_add_symbols_and_operations_for_feed: feed_id not found")
+            return redirect(url_for("to_list_feeds"))
 
         # with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -5020,6 +5085,11 @@ def to_add_sympy_and_lean_for_feed(
         query_time_dict[
             "pdg_app/to_add_sympy_and_lean_for_feed, node_properties " + trace_id
         ] = round(time.time() - query_start_time, 3)
+
+    if feed_dict is None:
+        flash("pdg_app/to_add_sympy_and_lean_for_feed: feed_id not found")
+        return redirect(url_for("to_list_feeds"))
+
     logger.info("feed_dict=" + str(feed_dict))
 
     # provide a guess for the SymPy based on the Latex provided
@@ -5315,6 +5385,10 @@ def to_edit_step(
             "pdg_app/to_edit_feed: get_node_properties_from_id derivation " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
+    if derivation_dict is None:
+        flash("pdg_app/to_edit_step: derivation_id not found")
+        return redirect(url_for("to_list_derivations"))
+
     # this loop does two things:
     #  - gets the relevant step_dict that matches the user-provided ID
     #  and
@@ -5502,6 +5576,10 @@ def to_edit_inference_rule(
         query_time_dict[
             "pdg_app/to_edit_inference_rule: get_node_properties_from_id " + trace_id
         ] = round(time.time() - query_start_time, 3)
+
+        if inference_rule_dict is None:
+            flash("pdg_app/to_edit_inference_rule: inference_rule_id not found")
+            return redirect(url_for("to_list_inference_rules"))
 
         logger.info(
             "to_edit_inference_rule inference_rule_dict " + str(inference_rule_dict)
@@ -6076,7 +6154,7 @@ def to_list_relations() -> ResponseReturnValue:
 
 
 @web_app.route("/list_constant_values/<scalar_id>", methods=["GET", "POST"])
-def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
+def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     >>> to_list_constant_values()
     """
@@ -6102,6 +6180,10 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
             "pdg_app/to_add_value_and_units get_node_properties_from_id " + trace_id
         ] = round(time.time() - query_start_time, 3)
 
+    if scalar_dict is None:
+        flash("pdg_app/to_list_constant_values: scalar_id not found")
+        return redirect(url_for("to_navigation"))
+
     logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_scalar_constant_values_list.html",
@@ -6117,7 +6199,7 @@ def to_list_constant_values(scalar_id: unique_numeric_id_as_str) -> str:
 )
 def to_edit_constant_value_and_units(
     value_and_units_id: unique_numeric_id_as_str,
-) -> str:
+) -> ResponseReturnValue:
     """
     edit value and units for a constant
 
@@ -6140,11 +6222,12 @@ def to_edit_constant_value_and_units(
         ] = round(time.time() - query_start_time, 3)
 
         if value_and_units_dict is None:
-            return (
-                "<H1>value_and_units ID "
+            flash(
+                "pdg_app/to_edit_constant_value_and_units: value_and_units ID "
                 + str(value_and_units_id)
                 + " does not exist in database</H1>."
             )
+            return redirect(url_for("to_navigation"))
 
         # which scalar has this value?
         # with graphDB_Driver.session() as session:
