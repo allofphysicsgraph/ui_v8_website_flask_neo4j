@@ -116,6 +116,13 @@
     <td></td>
   </tr>
   <tr>
+    <td id="step ID is associated with which derivation">step ID is associated with which derivation
+      <a href="#step ID is associated with which derivation">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (d:derivation)-[:HAS_STEP]->(s:step) WHERE s.id = $stepId RETURN d.id">
+MATCH (d:derivation)-[:HAS_STEP]->(s:step) WHERE s.id = $stepId RETURN d.id</a></td>
+    <td></td>
+  </tr>
+  <tr>
     <td id="step not connected to derivation">step not connected to derivation
       <a href="#step not connected to derivation">#</a></td>
     <td><a href="{{ url_for('to_query') }}?cypher=MATCH (s:step) WHERE NOT (:derivation)-[:HAS_STEP]->(s) RETURN s">
