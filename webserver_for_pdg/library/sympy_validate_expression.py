@@ -24,7 +24,7 @@ from sympy.physics.units import (
     charge,
 )  # type: ignore
 from sympy.physics.units.systems.si import dimsys_SI  # type: ignore
-from sympy.parsing.sympy_parser import parse_expr
+from sympy.parsing.sympy_parser import parse_expr  # type: ignore
 
 logger = logging.getLogger(__name__)
 
