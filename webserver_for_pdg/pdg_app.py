@@ -69,10 +69,17 @@ import xmltodict
 
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
-from typing import NewType, Dict, List, Any, Tuple, Union  # for type hinting
+from typing import NewType, Dict, List, Any, Tuple, Union, Optional  # for type hinting
 
 # https://docs.python.org/3/library/re.html
 import re
+
+# The type hint for `DecimalField` specifically looks for `decimal.Decimal`.
+# Mypy does not automatically assume an int should be promoted to a Decimal in this context.
+# Best practice is to initialize `Decimal` using a string (`Decimal("0")`)
+# rather than an integer or float to avoid precision issues,
+# though `Decimal(0)` would also satisfy mypy in this specific case.
+from decimal import Decimal
 
 # https://gist.github.com/ibeex/3257877
 from logging.handlers import RotatingFileHandler
@@ -817,9 +824,9 @@ class SpecifyNewSymbolScalarForm(FlaskForm):
 class SpecifyNewConstantNumberForm(FlaskForm):
     # , validators.Length(min=1, max=100) ?
     number_decimal = DecimalField(
-        label="decimal", validators=[validators.InputRequired()], default=0
+        label="decimal", validators=[validators.InputRequired()], default=Decimal("0")
     )
-    number_power = DecimalField(label="power", default=0)
+    number_power = DecimalField(label="power", default=Decimal("0"))
 
 
 class SpecifyNewSymbolVectorForm(FlaskForm):
@@ -1482,51 +1489,20 @@ def to_review_derivation(
             )
             return redirect(url_for("to_list_derivations"))
 
-        all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
-            graphDB_Driver, derivation_id, query_time_dict
-        )
+    all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
+        graphDB_Driver, derivation_id, query_time_dict
+    )
 
-        query_start_time = time.time()
-        symbols_in_derivation = session.read_transaction(
-            neo4j_query.get_symbols_for_derivation, derivation_id
-        )
-        query_time_dict[
-            "pdg_app/to_review_derivation: get_symbols_for_derivation " + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-        # logger.info("to_review_derivation all_steps=" + str(all_steps))
-
-        # list_of_step_dicts = []
-        # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_step_dicts = session.read_transaction(
-            neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
-        )
-        query_time_dict[
-            "pdg_app/to_review_derivation: get_list_of_steps_in_this_derivation"
-            + trace_id
-        ] = round(time.time() - query_start_time, 3)
-
-        # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_sequence_values = session.read_transaction(
-            neo4j_query.get_list_of_sequence_values_for_derivation_id, derivation_id
-        )
-        query_time_dict[
-            "pdg_app/to_review_derivation: get_list_of_sequence_values_for_derivation_id"
-            + trace_id
-            + derivation_id
-        ] = round(time.time() - query_start_time, 3)
-        logger.info(" list_of_sequence_values=" + str(list_of_sequence_values))
-
-        # with graphDB_Driver.session() as session:
-        query_start_time = time.time()
-        list_of_inference_rule_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "inference_rule"
-        )
-        query_time_dict[
-            "pdg_app/to_review_derivation: get_nodes_of_type inference_rule" + trace_id
-        ] = round(time.time() - query_start_time, 3)
+    # # list_of_step_dicts = []
+    # # with graphDB_Driver.session() as session:
+    # query_start_time = time.time()
+    # list_of_step_dicts = session.read_transaction(
+    #     neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
+    # )
+    # query_time_dict[
+    #     "pdg_app/to_review_derivation: get_list_of_steps_in_this_derivation"
+    #     + trace_id
+    # ] = round(time.time() - query_start_time, 3)
 
     if request.method == "POST":
         logger.info("to_review_derivation: request.form = " + str(request.form))
@@ -1536,9 +1512,38 @@ def to_review_derivation(
 
             # path_to_pdf = "/code/static/dumping_grounds/"  # should end with slash
 
+            # with graphDB_Driver.session() as session:
+            #     query_start_time = time.time()
+            #     list_of_inference_rule_dicts = session.read_transaction(
+            #         neo4j_query.get_nodes_of_type, "inference_rule"
+            #     )
+            #     query_time_dict[
+            #         "pdg_app/to_review_derivation: get_nodes_of_type inference_rule"
+            #         + trace_id
+            #     ] = round(time.time() - query_start_time, 3)
+
+            #     query_start_time = time.time()
+            #     list_of_sequence_values = session.read_transaction(
+            #         neo4j_query.get_list_of_sequence_values_for_derivation_id,
+            #         derivation_id,
+            #     )
+            #     query_time_dict[
+            #         "pdg_app/to_review_derivation: get_list_of_sequence_values_for_derivation_id"
+            #         + trace_id
+            #         + derivation_id
+            #     ] = round(time.time() - query_start_time, 3)
+            #     logger.info(" list_of_sequence_values=" + str(list_of_sequence_values))
+
+            list_of_step_dicts = []
+            list_of_inference_rule_dicts = []
+            list_of_sequence_values = []
+            for step_id, everything in all_steps.items():
+                list_of_step_dicts.append(everything["step dict"])
+                list_of_inference_rule_dicts.append(everything["inference rule dict"])
+                list_of_sequence_values.append(everything["sequence index"])
+
             try:
                 pdf_filename = latex.create_pdf_for_derivation(
-                    derivation_id,
                     all_steps,
                     derivation_dict,
                     list_of_step_dicts,
@@ -1571,9 +1576,16 @@ def to_review_derivation(
 
             # path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
 
+            list_of_step_dicts = []
+            list_of_inference_rule_dicts = []
+            list_of_sequence_values = []
+            for step_id, everything in all_steps.items():
+                list_of_step_dicts.append(everything["step dict"])
+                list_of_inference_rule_dicts.append(everything["inference rule dict"])
+                list_of_sequence_values.append(everything["sequence index"])
+
             try:
                 latex.create_tex_file_for_derivation(
-                    derivation_id,
                     all_steps,
                     derivation_dict,
                     list_of_step_dicts,
@@ -1608,19 +1620,16 @@ def to_review_derivation(
             # 1) for each step, delete step node
             # 2) delete derivation node
 
-            logger.info("list_of_step_dicts (to delete)=" + str(list_of_step_dicts))
+            # logger.info("list_of_step_dicts (to delete)=" + str(list_of_step_dicts))
 
-            # TODO: Neo4j inside loop causes high latency
-            for this_step_dict in list_of_step_dicts:
-                with graphDB_Driver.session() as session:
+            with graphDB_Driver.session() as session:
+                for step_id, everything in all_steps.items():
                     query_start_time = time.time()
-                    session.write_transaction(
-                        neo4j_query.delete_node, this_step_dict["id"], "step"
-                    )
+                    session.write_transaction(neo4j_query.delete_node, step_id, "step")
                     query_time_dict[
                         "pdg_app/to_review_derivation: delete_node step " + trace_id
                     ] = round(time.time() - query_start_time, 3)
-            with graphDB_Driver.session() as session:
+                # with graphDB_Driver.session() as session:
                 query_start_time = time.time()
                 session.write_transaction(
                     neo4j_query.delete_node, derivation_id, "derivation"
@@ -1637,6 +1646,15 @@ def to_review_derivation(
             )
             logger.error("unrecognized button in" + str(request.form))
 
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        symbols_in_derivation = session.read_transaction(
+            neo4j_query.get_symbols_for_derivation, derivation_id
+        )
+        query_time_dict[
+            "pdg_app/to_review_derivation: get_symbols_for_derivation " + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
     # only create d3js JSON if the HTML page is going to be rendered
     try:
         latex.create_d3js_json(derivation_id, all_steps, "/code/static/")
@@ -1647,67 +1665,33 @@ def to_review_derivation(
 
     d3js_json_filename = derivation_id + ".json"
 
-    # try:
-    #     query_time_dict = latex.create_d3js_json(
-    #         graphDB_Driver, query_time_dict, derivation_id, "/code/static/"
-    #     )
-    #     d3js_json_filename = derivation_id + ".json"
-    # except Exception as err:
-    #     # logger.error(str(err))
-    #     logger.info(str(err))
-    #     flash(str(err))
-    #     d3js_json_filename = ""
-    logger.info("to_review_derivation d3js_json_filename=" + str(d3js_json_filename))
+    logger.info("d3js_json_filename=" + str(d3js_json_filename))
 
     # only create graphviz PNG if the HTML page is going to be rendered
     # SVG isn't available yet; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/14
 
     derivation_name_latex = derivation_dict["name_latex"]
-    derivation_graphviz_png_filename, query_time_dict = latex.create_derivation_png(
-        graphDB_Driver,
-        query_time_dict,
+    derivation_graphviz_png_filename = latex.create_derivation_png(
         derivation_id,
         derivation_name_latex,
-        list_of_step_dicts,
+        all_steps,
         "/code/static/",
     )
 
     logger.info(
-        "to_review_derivation derivation_graphviz_png_filename="
-        + str(derivation_graphviz_png_filename)
+        "derivation_graphviz_png_filename=" + str(derivation_graphviz_png_filename)
     )
 
     # only validate steps if HTML page is going to be rendered
     derivation_step_validity_dict = {}
-    for step_id, step_dict in all_steps.items():
-
-        (
-            inference_rule_dict,
-            list_of_input_dicts,
-            list_of_feeds,
-            list_of_output_dicts,
-            query_time_dict,
-        ) = compute.input_feed_output_infrule_for_step(
-            graphDB_Driver, query_time_dict, step_id
-        )
-
-        logger.info(
-            "to_review_derivation inference_rule_dict" + str(inference_rule_dict)
-        )
-        logger.info(
-            "to_review_derivation list_of_input_dicts" + str(list_of_input_dicts)
-        )
-        logger.info("to_review_derivation list_of_feeds" + str(list_of_feeds))
-        logger.info(
-            "to_review_derivation list_of_output_dicts" + str(list_of_output_dicts)
-        )
-
+    for step_id, everything in all_steps.items():
+        logger.info("step_id=" + step_id)
         try:
             derivation_step_validity_dict[step_id] = sympy_validate_step.validate_step(
-                inference_rule_dict,
-                list_of_input_dicts,
-                list_of_feeds,
-                list_of_output_dicts,
+                everything["inference rule dict"],
+                everything["list of input dicts"],
+                everything["list of feed dicts"],
+                everything["list of output dicts"],
             )
         except Exception as err:
             flash(
@@ -1719,8 +1703,6 @@ def to_review_derivation(
                 + str(step_id)
             )
             logger.error(str(type(err).__name__) + str(err))
-            logger.info(str(step_id))
-            derivation_step_validity_dict[step_id] = err
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -1943,7 +1925,7 @@ def to_add_step_select_inference_rule(
         "to_add_step_select_inference_rule: derivation_id: " + str(derivation_id)
     )
 
-    list_of_inference_rule_dicts = []
+    # list_of_inference_rule_dicts = []
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
         list_of_inference_rule_dicts = session.read_transaction(
@@ -6514,7 +6496,7 @@ def to_list_expressions() -> ResponseReturnValue:
 
     # try:
     dimensional_consistency_per_expression_id, query_time_dict = (
-        compute.get_dimensional_consistency_per_expression_id(
+        compute.get_dimensional_consistency_for_every_expression(
             graphDB_Driver, query_time_dict
         )
     )
@@ -7298,9 +7280,9 @@ def scrape_arxiv():
 
     def find_arxiv_matches(
         rss_entries: List[Dict[str, Any]],  # each entry is an arxiv post
-        user_provided_title_keywords_list: List[str],
-        user_provided_description_keywords_list: List[str],
-        user_provided_author_list: List[str],
+        user_provided_title_keywords_list: Optional[List[str]],
+        user_provided_description_keywords_list: Optional[List[str]],
+        user_provided_author_list: Optional[List[str]],
     ) -> List[str]:
         """
         Finds matches in arXiv entries based on a set of keyword and author rules.
