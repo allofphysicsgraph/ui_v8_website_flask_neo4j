@@ -5628,6 +5628,10 @@ def to_edit_inference_rule(
             + trace_id
         ] = round(time.time() - query_start_time, 3)
 
+        if len(list_of_derivations_that_use_this_inference_rule_id)>0:
+            flash("pdg_app/to_edit_inference_rule: inference rule "+inference_rule_id+" is in use and thus cannot be edited")
+            return redirect(url_for("to_list_inference_rules")) # TODO: anchor link to infrule ID
+
     # This will keep the last dictionary encountered for each ID.
     list_of_derivations_that_use_this_inference_rule_id = list(
         {
