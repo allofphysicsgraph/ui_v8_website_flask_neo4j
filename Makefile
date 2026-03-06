@@ -88,7 +88,7 @@ black_out:
 	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch --entrypoint='' --workdir /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) make black_in
 
 black_in:
-	black -v --workers 1 webserver_for_pdg/*.py webserver_for_pdg/library/*.py
+	black -v --workers 1 webserver_for_pdg/*.py webserver_for_pdg/library/*.py tests_of_webpage/playwright/*.py
 
 mypy_out:
 	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch --entrypoint='' --workdir /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) mypy --install-types --non-interactive --check-untyped-defs webserver_for_pdg/pdg_app.py webserver_for_pdg/library
