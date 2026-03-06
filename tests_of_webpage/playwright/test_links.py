@@ -11,17 +11,18 @@ import json
 import os
 from playwright.sync_api import Page, expect
 
-
 # this is what is exposed inside the Docker container
-URL="http://localhost:5000"
+URL = "http://localhost:5000"
+
 
 def test_has_title(page: Page):
     page.goto(URL)
 
     # Expect a title to contain a substring.
-    expect(page).to_have_title(re.compile("Welcome")) 
+    expect(page).to_have_title(re.compile("Welcome"))
     # using a str would necessitate an exact match, whereas using `re` enables partial matches.
     # `.to_have_title` shows up in the HTML's <title> tag -- the browser tab
+
 
 def test_get_started_link(page: Page):
     page.goto(URL)
@@ -30,102 +31,217 @@ def test_get_started_link(page: Page):
     page.get_by_test_id("impatient-nav-link").click()
 
     # the following doesn't work because there are multiple `<a href="">navigation</a>`
-    #page.get_by_role("link", name="navigation").click()
+    # page.get_by_role("link", name="navigation").click()
 
     # Expects page to have a heading with the name of `Navigating`.
     expect(page.get_by_role("heading", name="Navigating")).to_be_visible()
 
 
 def test_get_nav_page(page: Page):
-    page.goto(URL+"/navigation")
+    page.goto(URL + "/navigation")
 
     expect(page).to_have_title(re.compile("site map"))
 
+
 def test_link_nav_page_to_derivations(page: Page):
-    page.goto(URL+"/navigation")
+    page.goto(URL + "/navigation")
 
     page.get_by_role("link", name="derivations").click()
 
     expect(page).to_have_title(re.compile("Derivation"))
 
 
-
 def test_get_login_page(page: Page):
-    page.goto(URL+"/login")
+    page.goto(URL + "/login")
+
 
 def test_get_index_page(page: Page):
-    page.goto(URL+"/index")
+    page.goto(URL + "/index")
 
     expect(page.get_by_role("heading", name="Physics Derivation Graph")).to_be_visible()
 
 
 def test_get_choose_new_symbol_page(page: Page):
-    page.goto(URL+"/new_symbol")
+    page.goto(URL + "/new_symbol")
 
 
 def test_get_query_page(page: Page):
-    page.goto(URL+"/query")
+    page.goto(URL + "/query")
 
     expect(page).to_have_title(re.compile("Query"))
 
+
+def test_get_review_derivation_instance(page: Page):
+    page.on("console", lambda msg: print(f"Console: {msg.text}"))
+    page.on("pageerror", lambda exc: print(f"JS Error: {exc}"))
+
+    page.goto(URL + "/review_derivation/0000201726")
+
+    expect(
+        page.get_by_role("heading", name=re.compile("Symbols used in"))
+    ).to_be_visible()
+
+    pdf_button = page.locator('input[name="generate pdf"]')
+
+    page.wait_for_load_state("networkidle")  # Wait for all scripts to finish loading
+
+    # When you click a button that triggers a download (especially one served with a
+    # `Content-Disposition: attachment` header), the browser does not navigate the
+    # page to a new URL. It stays on the current page while the file downloads in the background.
+
+    with page.expect_download() as download_info:
+        pdf_button.click(force=True)
+
+        download = download_info.value
+        print(f"Downloaded from: {download.url}")
+
+        # ASSERT AGAINST THE DOWNLOAD URL, NOT THE PAGE
+        expected_pdf_url = (
+            URL + "/static/0000201726.pdf?referrer=select_from_existing_derivations"
+        )
+        assert download.url == expected_pdf_url
+
+        # Wait for the download process to complete
+        path = (
+            download.path()
+        )  # This waits for the download to finish and returns local path
+        assert path is not None
+
+        # Check the filename
+        assert download.suggested_filename == "0000201726.pdf"
+
+    # Verify the page didn't navigate away
+    expect(page).to_have_url(URL + "/review_derivation/0000201726")
+
+
+def test_get_query_list_derivation_IDs(page: Page):
+    page.goto(URL + "/query?cypher=MATCH%20(n:derivation)%20RETURN%20n.id")
+
+    expect(page.get_by_role("heading", name="Cypher query")).to_be_visible()
+
+    raw_records = page.locator("ul li span.mathjax_ignore").all_text_contents()
+
+    derivation_ids = []
+    for text in raw_records:
+        match = re.search(r"n\.id='(\d+)'", text)
+        if match:
+            derivation_ids.append(match.group(1))
+
+    for dev_id in derivation_ids:
+        page.goto(f"{URL}/review_derivation/{dev_id}")
+
+        expect(
+            page.get_by_role("heading", name=re.compile("Symbols used in"))
+        ).to_be_visible()
+
+        pdf_button = page.locator('input[name="generate pdf"]')
+
+        page.wait_for_load_state(
+            "networkidle"
+        )  # Wait for all scripts to finish loading
+
+        # When you click a button that triggers a download (especially one served with a
+        # `Content-Disposition: attachment` header), the browser does not navigate the
+        # page to a new URL. It stays on the current page while the file downloads in the background.
+
+        with page.expect_download() as download_info:
+            pdf_button.click(force=True)
+
+            download = download_info.value
+            print(f"Downloaded from: {download.url}")
+
+            # ASSERT AGAINST THE DOWNLOAD URL, NOT THE PAGE
+            expected_pdf_url = (
+                URL
+                + "/static/"
+                + dev_id
+                + ".pdf?referrer=select_from_existing_derivations"
+            )
+            assert download.url == expected_pdf_url
+
+            # Wait for the download process to complete
+            path = (
+                download.path()
+            )  # This waits for the download to finish and returns local path
+            assert path is not None
+
+            # Check the filename
+            assert download.suggested_filename == dev_id + ".pdf"
+
+        # Verify the page didn't navigate away
+        expect(page).to_have_url(URL + "/review_derivation/" + dev_id)
+
+
 def test_get_list_feeds_page(page: Page):
-    page.goto(URL+"/list_feeds")
+    page.goto(URL + "/list_feeds")
 
     expect(page.get_by_role("heading", name="List of Feeds")).to_be_visible()
 
+
 def test_get_list_operations_page(page: Page):
-    page.goto(URL+"/list_operations")
+    page.goto(URL + "/list_operations")
 
     expect(page.get_by_role("heading", name="List of Operations")).to_be_visible()
 
 
-
 def test_get_list_relations_page(page: Page):
-    page.goto(URL+"/list_relations")
+    page.goto(URL + "/list_relations")
 
     expect(page.get_by_role("heading", name="List of relations")).to_be_visible()
 
 
 def test_get_list_scalars_page(page: Page):
-    page.goto(URL+"/list_scalars")
+    page.goto(URL + "/list_scalars")
 
     # If there are no scalar then header will be something else
-    expect(page.get_by_role("heading", name=re.compile("aka symbols of dimension 0"))).to_be_visible()
+    expect(
+        page.get_by_role("heading", name=re.compile("aka symbols of dimension 0"))
+    ).to_be_visible()
+
 
 def test_get_list_vectors_page(page: Page):
-    page.goto(URL+"/list_vectors")
+    page.goto(URL + "/list_vectors")
 
     # If there are no vectors then header will be something else
-    expect(page.get_by_role("heading", name=re.compile("aka symbols of dimension 1"))).to_be_visible()
+    expect(
+        page.get_by_role("heading", name=re.compile("aka symbols of dimension 1"))
+    ).to_be_visible()
+
 
 def test_get_list_matrices_page(page: Page):
-    page.goto(URL+"/list_matrices")
+    page.goto(URL + "/list_matrices")
 
     # Page will have either header "Create matrix symbol" or ____
 
+
 def test_get_list_expressions_page(page: Page):
-    page.goto(URL+"/list_expressions")
+    page.goto(URL + "/list_expressions")
 
     expect(page).to_have_title(re.compile("Expression"))
 
+
 def test_get_list_derivations_page(page: Page):
-    page.goto(URL+"/list_derivations")
+    page.goto(URL + "/list_derivations")
 
     # if there are no derivations present then the heading is "Actions for Derivations"
     expect(page).to_have_title(re.compile("Derivation list"))
 
+
 def test_link_list_derivations_to_curl_curl(page: Page):
-    page.goto(URL+"/list_derivations")
+    page.goto(URL + "/list_derivations")
 
     page.get_by_role("link", name="curl curl identity").click()
 
-    expect(page.get_by_role("heading", name="Review curl curl identity")).to_be_visible()
+    expect(
+        page.get_by_role("heading", name="Review curl curl identity")
+    ).to_be_visible()
+
 
 def test_get_list_inference_rules_page(page: Page):
-    page.goto(URL+"/list_inference_rules")
+    page.goto(URL + "/list_inference_rules")
 
     expect(page).to_have_title(re.compile("Inference"))
-    
+
 
 def test_get_export_json_page(page: Page):
     # page.goto(URL+"/export_to_json")
@@ -138,7 +254,7 @@ def test_get_export_json_page(page: Page):
         page.get_by_role("link", name="export as JSON").click()
 
         # another option is
-        #page.get_by_text("export", exact=True).click()
+        # page.get_by_text("export", exact=True).click()
 
     download = download_info.value
 
@@ -148,11 +264,12 @@ def test_get_export_json_page(page: Page):
 
     print(f"Downloaded file saved to: {save_path}")
     assert os.path.exists(save_path)
-    assert download.suggested_filename == "pdg.jsonl" # Verify the filename matches
+    assert download.suggested_filename == "pdg.jsonl"  # Verify the filename matches
 
     # Clean up (Optional but recommended so future tests don't get false positives)
     if os.path.exists(save_path):
         os.remove(save_path)
+
 
 def test_get_export_metadata_page(page: Page):
     """
@@ -164,17 +281,16 @@ def test_get_export_metadata_page(page: Page):
 
     # clicking the link navigates the current page to the JSON view:
     page.get_by_role("link", name="Export Metadata").click()
-    
+
     # Wait for the URL to change or the content to be visible
     # page.wait_for_url("**/export_metadata_schema")
     print(f"Current URL: {page.url}")
 
     page.wait_for_url(re.compile(r"export_metadata_schema"))
 
-
     # Browsers often wrap raw JSON in a <pre> tag
     content = page.locator("pre").inner_text()
-    
+
     # Parse and verify
     data = json.loads(content)
     assert "labelCount" in data.keys()
@@ -191,7 +307,7 @@ def test_get_export_csv_page(page: Page):
         page.get_by_role("link", name="export as CSV").click()
 
         # another option is
-        #page.get_by_text("export", exact=True).click()
+        # page.get_by_text("export", exact=True).click()
 
     download = download_info.value
 
@@ -201,7 +317,7 @@ def test_get_export_csv_page(page: Page):
 
     print(f"Downloaded file saved to: {save_path}")
     assert os.path.exists(save_path)
-    assert download.suggested_filename == "pdg.csv" # Verify the filename matches
+    assert download.suggested_filename == "pdg.csv"  # Verify the filename matches
 
     # Clean up (Optional but recommended so future tests don't get false positives)
     if os.path.exists(save_path):
@@ -219,7 +335,7 @@ def test_get_export_graphml_page(page: Page):
         page.get_by_role("link", name="export as GraphML").click()
 
         # another option is
-        #page.get_by_text("export", exact=True).click()
+        # page.get_by_text("export", exact=True).click()
 
     download = download_info.value
 
@@ -229,7 +345,7 @@ def test_get_export_graphml_page(page: Page):
 
     print(f"Downloaded file saved to: {save_path}")
     assert os.path.exists(save_path)
-    assert download.suggested_filename == "pdg.graphml" # Verify the filename matches
+    assert download.suggested_filename == "pdg.graphml"  # Verify the filename matches
 
     # Clean up (Optional but recommended so future tests don't get false positives)
     if os.path.exists(save_path):
@@ -247,7 +363,7 @@ def test_get_export_cypher_page(page: Page):
         page.get_by_role("link", name="export as Cypher").click()
 
         # another option is
-        #page.get_by_text("export", exact=True).click()
+        # page.get_by_text("export", exact=True).click()
 
     download = download_info.value
 
@@ -257,7 +373,7 @@ def test_get_export_cypher_page(page: Page):
 
     print(f"Downloaded file saved to: {save_path}")
     assert os.path.exists(save_path)
-    assert download.suggested_filename == "pdg.cypher" # Verify the filename matches
+    assert download.suggested_filename == "pdg.cypher"  # Verify the filename matches
 
     # Clean up (Optional but recommended so future tests don't get false positives)
     if os.path.exists(save_path):
@@ -265,165 +381,194 @@ def test_get_export_cypher_page(page: Page):
 
 
 def test_get_api_js_page(page: Page):
-    page.goto(URL+"/api_via_js")
+    page.goto(URL + "/api_via_js")
+
 
 def test_get_api_page(page: Page):
-    page.goto(URL+"/documentation/api")
+    page.goto(URL + "/documentation/api")
 
     expect(page).to_have_title(re.compile("API Documentation"))
 
     expect(page.get_by_role("heading", name="API Documentation")).to_be_visible()
-    
+
 
 def test_get_workflow_page(page: Page):
-    page.goto(URL+"/workflow_documentation")
+    page.goto(URL + "/workflow_documentation")
 
     expect(page).to_have_title(re.compile("Workflow"))
 
-    #expect(page.get_by_role("heading", name="Workflow")).to_be_visible()
-    expect(page.get_by_role("heading", name=re.compile("Workflow Interface Documentation"))).to_be_visible()
+    # expect(page.get_by_role("heading", name="Workflow")).to_be_visible()
+    expect(
+        page.get_by_role("heading", name=re.compile("Workflow Interface Documentation"))
+    ).to_be_visible()
 
-    
 
 def test_get_profile_page(page: Page):
-    page.goto(URL+"/profile")
+    page.goto(URL + "/profile")
+
 
 def test_get_search_page(page: Page):
-    page.goto(URL+"/search")
+    page.goto(URL + "/search")
+
 
 def test_get_favicon_page(page: Page):
-    page.goto(URL+"/favicon.ico")
+    page.goto(URL + "/favicon.ico")
+
 
 def test_get_robots_page(page: Page):
-    page.goto(URL+"/robots.txt")
+    page.goto(URL + "/robots.txt")
+
 
 def test_get_sitemap_page(page: Page):
-    page.goto(URL+"/sitemap.txt")
+    page.goto(URL + "/sitemap.txt")
+
 
 def test_get_static_dir_page(page: Page):
-    page.goto(URL+"/static_dir/")
+    page.goto(URL + "/static_dir/")
 
     expect(page.get_by_role("heading", name="File listing of static")).to_be_visible()
 
-def test_get_eval_LLM_page(page: Page):
-    page.goto(URL+"/documentation/evaluation_of_LLM_prompts")
 
-    expect(page.get_by_role("heading", name="Evaluation of LLM prompts")).to_be_visible()
+def test_get_eval_LLM_page(page: Page):
+    page.goto(URL + "/documentation/evaluation_of_LLM_prompts")
+
+    expect(
+        page.get_by_role("heading", name="Evaluation of LLM prompts")
+    ).to_be_visible()
+
 
 def test_get_overview_page(page: Page):
-    page.goto(URL+"/documentation/overview")
+    page.goto(URL + "/documentation/overview")
 
     expect(page.get_by_role("heading", name="Documentation")).to_be_visible()
 
+
 def test_get_user_page(page: Page):
-    page.goto(URL+"/documentation/user")
+    page.goto(URL + "/documentation/user")
 
     expect(page).to_have_title(re.compile("User Documentation"))
-    
+
 
 def test_get_developer_page(page: Page):
-    page.goto(URL+"/documentation/developer")
+    page.goto(URL + "/documentation/developer")
 
     expect(page).to_have_title(re.compile("Developer Documentation"))
-    
+
 
 def test_get_conventions_page(page: Page):
-    page.goto(URL+"/documentation/conventions")
+    page.goto(URL + "/documentation/conventions")
 
-    expect(page.get_by_role("heading", name="Conventions and Definitions")).to_be_visible()
-    
+    expect(
+        page.get_by_role("heading", name="Conventions and Definitions")
+    ).to_be_visible()
+
 
 def test_get_design_choices_page(page: Page):
-    page.goto(URL+"/documentation/design_choices")
+    page.goto(URL + "/documentation/design_choices")
 
-    #expect(page.get_by_role("heading", name="Design")).to_be_visible()
-    expect(page.get_by_role("heading", name=re.compile("Design Principles Documentation"))).to_be_visible()
-    
+    # expect(page.get_by_role("heading", name="Design")).to_be_visible()
+    expect(
+        page.get_by_role("heading", name=re.compile("Design Principles Documentation"))
+    ).to_be_visible()
+
 
 def test_get_dimensionality_page(page: Page):
-    page.goto(URL+"/documentation/dimensionality")
+    page.goto(URL + "/documentation/dimensionality")
 
     expect(page.get_by_role("heading", name="Dimensionality")).to_be_visible()
-    
+
 
 def test_get_roadmap_page(page: Page):
-    page.goto(URL+"/documentation/goals_roadmap")
+    page.goto(URL + "/documentation/goals_roadmap")
 
     expect(page.get_by_role("heading", name="Goals and Roadmap")).to_be_visible()
-    
+
 
 def test_get_hilbert_sixth_page(page: Page):
-    page.goto(URL+"/documentation/hilberts_sixth_problem")
+    page.goto(URL + "/documentation/hilberts_sixth_problem")
 
     expect(page.get_by_role("heading", name="Hilbert")).to_be_visible()
-    
+
 
 def test_get_faq_page(page: Page):
-    page.goto(URL+"/documentation/faq")
+    page.goto(URL + "/documentation/faq")
 
-    expect(page.get_by_role("heading", name="Frequently Asked Questions")).to_be_visible()
-    
+    expect(
+        page.get_by_role("heading", name="Frequently Asked Questions")
+    ).to_be_visible()
+
 
 def test_get_other_projects_page(page: Page):
-    page.goto(URL+"/documentation/other_projects")
+    page.goto(URL + "/documentation/other_projects")
 
     expect(page.get_by_role("heading", name="Other Projects")).to_be_visible()
 
 
 def test_get_expand_page(page: Page):
-    page.goto(URL+"/expand")
+    page.goto(URL + "/expand")
+
 
 def test_get_arxiv_page(page: Page):
-    page.goto(URL+"/arxiv_scraper")
+    page.goto(URL + "/arxiv_scraper")
+
 
 def test_get_common_errors_page(page: Page):
-    page.goto(URL+"/documentation/common_errors_in_college_math")
+    page.goto(URL + "/documentation/common_errors_in_college_math")
+
 
 def test_get_lit_review_page(page: Page):
-    page.goto(URL+"/documentation/literature_review")
-
+    page.goto(URL + "/documentation/literature_review")
 
     expect(page.get_by_role("heading", name="Literature Review")).to_be_visible()
-    
+
 
 def test_get_compare_cas_page(page: Page):
-    page.goto(URL+"/documentation/comparison_of_design_options/cas")
+    page.goto(URL + "/documentation/comparison_of_design_options/cas")
+
 
 def test_get_compare_graph_page(page: Page):
-    page.goto(URL+"/documentation/comparison_of_design_options/graph_drawing")
+    page.goto(URL + "/documentation/comparison_of_design_options/graph_drawing")
 
-    expect(page.get_by_role("heading", name="Comparison of Graph Drawing")).to_be_visible()
-    
+    expect(
+        page.get_by_role("heading", name="Comparison of Graph Drawing")
+    ).to_be_visible()
+
 
 def test_get_compare_proofs_page(page: Page):
-    page.goto(URL+"/documentation/comparison_of_design_options/proofs")
+    page.goto(URL + "/documentation/comparison_of_design_options/proofs")
+
 
 def test_get_compare_syntax_page(page: Page):
-    page.goto(URL+"/documentation/comparison_of_design_options/syntax")
+    page.goto(URL + "/documentation/comparison_of_design_options/syntax")
 
     expect(page.get_by_role("heading", name="Comparison of Syntax")).to_be_visible()
-    
+
 
 def test_get_compare_db_page(page: Page):
-    page.goto(URL+"/documentation/comparison_of_design_options/database")
+    page.goto(URL + "/documentation/comparison_of_design_options/database")
 
     expect(page.get_by_role("heading", name="Comparison of Database")).to_be_visible()
 
+
 def test_get_list_named_expressions_page(page: Page):
-    page.goto(URL+"/list_named_expressions")
+    page.goto(URL + "/list_named_expressions")
+
 
 def test_get_survey_named_expressions_page(page: Page):
-    page.goto(URL+"/survey_of_named_expressions")
+    page.goto(URL + "/survey_of_named_expressions")
+
 
 def test_get_blog_page(page: Page):
-    page.goto(URL+"/blog/")
+    page.goto(URL + "/blog/")
+
 
 def test_get_clickable_layers_page(page: Page):
-    page.goto(URL+"/clickable_layers")
+    page.goto(URL + "/clickable_layers")
+
 
 def test_get_class_notes_page(page: Page):
-    page.goto(URL+"/class_notes")
+    page.goto(URL + "/class_notes")
+
 
 def test_get_spectrum_precision_overview_page(page: Page):
-    page.goto(URL+"/spectrum_of_precision/overview")
-
+    page.goto(URL + "/spectrum_of_precision/overview")
