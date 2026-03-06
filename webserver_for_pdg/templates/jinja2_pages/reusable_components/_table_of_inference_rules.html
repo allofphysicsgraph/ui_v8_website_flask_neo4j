@@ -22,7 +22,7 @@
   </tr>
   {% for inference_rule_dict in list_of_inference_rules %}
   <tr>
-    <td>
+    <td id="{{ inference_rule_dict['id'] }}">
       <a href="{{ url_for('to_edit_inference_rule', inference_rule_id=inference_rule_dict['id'] ) }}">
         {{ inference_rule_dict['name_latex'] }}
       </a>

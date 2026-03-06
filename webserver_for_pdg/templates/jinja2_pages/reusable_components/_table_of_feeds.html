@@ -32,7 +32,7 @@ symbols_per_feed_id:
   </tr>
   {% for feed_dict in list_of_feeds %}
   <tr>
-    <td>
+    <td id="{{ feed_dict['id'] }}">
       <a href="{{ url_for('to_edit_feed', feed_id=feed_dict['id'] ) }}" title="see more about this feed">
           {{ feed_dict['id'] }}
       </a>

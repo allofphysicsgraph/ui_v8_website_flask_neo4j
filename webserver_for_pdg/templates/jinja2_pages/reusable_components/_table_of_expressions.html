@@ -36,7 +36,7 @@
   </tr>
   {% for expression_dict in list_of_expressions %}
   <tr>
-    <td>
+    <td id="{{ expression_dict['id'] }}">
       <a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id'] ) }}" title="see more about this expression">
           {{ expression_dict['id'] }}
       </a>

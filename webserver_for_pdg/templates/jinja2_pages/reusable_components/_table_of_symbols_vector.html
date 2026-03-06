@@ -26,7 +26,7 @@
   </tr>
   {% for vector_dict in list_of_vectors %}
   <tr>
-    <td>
+    <td id="{{ vector_dict['id'] }}">
       <a href="{{ url_for('to_edit_vector', vector_id=vector_dict['id'] ) }}">
           {{ vector_dict['id'] }}
       </a>

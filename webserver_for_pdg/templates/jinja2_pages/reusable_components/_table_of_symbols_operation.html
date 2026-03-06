@@ -28,7 +28,7 @@
   </tr>
   {% for symbol_dict in list_of_operations %}
   <tr>
-    <td>
+    <td id="{{ symbol_dict['id'] }}">
       <a href="{{ url_for('to_edit_operation', operation_id=symbol_dict['id'] ) }}">
           {{ symbol_dict['id'] }}
       </a>

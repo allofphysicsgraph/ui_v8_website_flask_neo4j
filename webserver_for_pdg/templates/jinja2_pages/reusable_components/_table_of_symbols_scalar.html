@@ -31,7 +31,7 @@
   </tr>
   {% for scalar_dict in list_of_scalars %}
   <tr>
-    <td>
+    <td id="{{ scalar_dict['id'] }}">
       <a href="{{ url_for('to_edit_scalar', scalar_id=scalar_dict['id'] ) }}">
           {{ scalar_dict['id'] }}
       </a>

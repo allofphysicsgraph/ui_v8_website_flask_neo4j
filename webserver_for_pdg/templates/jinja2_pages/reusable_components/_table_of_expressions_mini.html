@@ -10,7 +10,7 @@
   </tr>
   {% for expression_dict in list_of_expression_dicts %}
   <tr>
-    <td>
+    <td id="{{ expression_dict['id'] }}">
       <a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id'] ) }}" title="see more about this expression">
           {{ expression_dict['id'] }}
       </a>
@@ -21,7 +21,7 @@
          https://jinja.palletsprojects.com/en/3.0.x/templates/#working-with-manual-escaping
       -->
     <td>\( {{ expression_dict['latex_lhs']|e }} {{ expression_dict['latex_relation']|e }} {{ expression_dict['latex_rhs']|e }} \)<BR>
-          {{ expression_dict['latex_lhs']|e }}  {{ expression_dict['latex_relation']|e }} {{ expression_dict['latex_rhs']|e }}</td>
+           {{ expression_dict['latex_lhs']|e }} {{ expression_dict['latex_relation']|e }} {{ expression_dict['latex_rhs']|e }}</td>
   </TR>
   {% endfor %}
 </table>

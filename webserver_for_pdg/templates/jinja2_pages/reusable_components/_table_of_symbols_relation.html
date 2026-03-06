@@ -27,7 +27,7 @@
   </tr>
   {% for symbol_dict in list_of_relations %}
   <tr>
-    <td>
+    <td id="{{ symbol_dict['id'] }}">
       <a href="{{ url_for('to_edit_relation', relation_id=symbol_dict['id'] ) }}">
           {{ symbol_dict['id'] }}
       </a>

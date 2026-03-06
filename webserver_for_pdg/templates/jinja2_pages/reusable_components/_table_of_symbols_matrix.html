@@ -25,7 +25,7 @@
   </tr>
   {% for matrix_dict in list_of_matrices %}
   <tr>
-    <td>
+    <td id="{{ matrix_dict['id'] }}">
       <a href="{{ url_for('to_edit_matrix', matrix_id=matrix_dict['id'] ) }}">
           {{ matrix_dict['id'] }}
       </a>
