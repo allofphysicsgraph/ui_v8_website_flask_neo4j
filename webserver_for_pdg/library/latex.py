@@ -436,7 +436,16 @@ def create_tex_file_for_derivation(
 
         # first, write the inference rules as newcommand at top of .tex file
         latex_file_handle.write("% inference rules as newcommand for use in the body\n")
+        defined_rules = []  # type: List[str]
         for infrule_dict in list_of_inference_rule_dicts:
+
+            # list contains duplicate infrules because derivation can use infrule multiple times.
+            # However, newcommand only needs to be defined once.
+            if infrule_dict["name_latex"] in defined_rules:
+                continue  # skip the remaining code in this loop iteration
+            else:
+                defined_rules.append(infrule_dict["name_latex"])
+
             number_of_args = (
                 infrule_dict["number_of_feeds"]
                 + infrule_dict["number_of_inputs"]
@@ -528,7 +537,9 @@ def create_tex_file_for_derivation(
             for this_input_dict in everything["list of input dicts"]:
                 list_of_input_expression_latex.append(
                     this_input_dict["latex_lhs"]
+                    + " "
                     + this_input_dict["latex_relation"]
+                    + " "
                     + this_input_dict["latex_rhs"]
                 )
 
@@ -540,7 +551,9 @@ def create_tex_file_for_derivation(
             for this_output_dict in everything["list of output dicts"]:
                 list_of_output_expression_latex.append(
                     this_output_dict["latex_lhs"]
+                    + " "
                     + this_output_dict["latex_relation"]
+                    + " "
                     + this_output_dict["latex_rhs"]
                 )
 
@@ -580,7 +593,7 @@ def create_tex_file_for_derivation(
                 + "".join(filter(str.isalpha, inference_rule_name))
             )
             for feed_latex in list_of_feed_latex:
-                latex_file_handle.write("{" + feed_latex + "}")
+                latex_file_handle.write("{$" + feed_latex + "$}")
             for input_latex in list_of_input_expression_latex:
                 this_str = str(input_latex) + str(derivation_dict["name_latex"])
                 local_id = hash_of_string(this_str)
