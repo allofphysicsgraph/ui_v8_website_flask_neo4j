@@ -95,12 +95,7 @@ def apoc_export_csv(tx: Transaction, output_filename: str) -> dict:
     https://neo4j.com/docs/apoc/current/export/csv/
     https://neo4j.com/docs/apoc/current/overview/apoc.export/apoc.export.csv.all/
     """
-    # for result in tx.run(
-    #     "CALL apoc.export.csv.all('" + output_filename + "',{useTypes:true})"
-    # ):
-    #     pass
-    # logger.info("[TRACE] end " + trace_id)
-    # return result
+
     query = "CALL apoc.export.csv.all($file_name, {useTypes: true})"
 
     result = tx.run(query, file_name=output_filename)
@@ -116,12 +111,23 @@ def apoc_export_csv(tx: Transaction, output_filename: str) -> dict:
 def apoc_export_graphml(tx: Transaction, output_filename: str):
     """
     https://neo4j.com/docs/apoc/current/overview/apoc.export/
+
+    Why use .consume()?
+    - Efficiency: It discards the records immediately and retrieves the
+        `ResultSummary` (which contains metadata like execution time and counters).
+    - Completeness: In Neo4j, queries are lazily evaluated. If you don't
+         iterate through the results or call consume(), the procedure might
+         not fully execute or finalize before the transaction closes.
+    - Readability: It clearly signals that you are executing the procedure
+         for its side effects (exporting a file) rather than for the data it returns.
+
     """
-    for result in tx.run(
-        "CALL apoc.export.graphml.all('" + output_filename + "',{useTypes:true})"
-    ):
-        pass
-    return result
+
+    query = "CALL apoc.export.graphml.all($file, {useTypes: true})"
+    result = tx.run(query, file=output_filename)
+
+    # consume() exhausts the result stream and returns the ResultSummary
+    return result.consume()
 
 
 @trace_execution
@@ -137,12 +143,11 @@ def apoc_export_json(tx: Transaction, output_filename: str):
 
     """
 
-    for result in tx.run(
-        "CALL apoc.export.json.all('" + output_filename + "',{useTypes:true})"
-    ):
-        pass
+    query = "CALL apoc.export.json.all($file, {useTypes: true})"
+    result = tx.run(query, file=output_filename)
 
-    return result
+    # consume() exhausts the result stream and returns the ResultSummary
+    return result.consume()
 
 
 @trace_execution
@@ -155,7 +160,6 @@ def apoc_export_cypher(tx: Transaction, output_filename: str):
     For the PDG, docker-compose has a shared folder on the host accessible both Neo4j and Flask.
     The file from neo4j can then be accessed by Flask for providing to the user via the web interface.
 
-    >>> apoc_export_cypher(tx: Transaction)
     """
 
     # "cypher.all" produces 1 file with constraints
@@ -163,19 +167,6 @@ def apoc_export_cypher(tx: Transaction, output_filename: str):
     # TODO: possibly switch to
     # https://neo4j.com/labs/apoc/4.4/overview/apoc.export/apoc.export.cypher.query/
     # which produces separate files for relationships and nodes
-
-    # for result in tx.run(
-    #     "CALL apoc.export.cypher.all('" + output_filename + "', {"
-    #     # "format: 'cypher-shell'," # the output produced when using 'cypher-shell' is readable by `bin/cypher-shell --file dumping_grounds/pdg.cypher` but not the Python driver
-    #     "format: 'plain',"
-    #     "useOptimizations: {type: 'UNWIND_BATCH', unwindBatchSize: 20}"
-    #     "}) "
-    #     "YIELD file, batches, source, format, nodes, relationships, properties, time, rows, batchSize "
-    #     "RETURN file, batches, source, format, nodes, relationships, properties, time, rows, batchSize;"
-    # ):
-    #     pass
-
-    # return result
 
     query = """
     CALL apoc.export.cypher.all($file, $config)
@@ -233,61 +224,6 @@ def get_user_stats(tx: Transaction, author: str):
     """ """
 
     logger.info("author=" + author)
-
-    # result = tx.run(
-    #     "MATCH (d:derivation) WHERE d.author_name_latex = $author_name RETURN d",
-    #     author_name=author,
-    # )
-    # # list_of_derivations = result.data()
-    # list_of_derivations = result.value("d")
-
-    # result = tx.run(
-    #     "MATCH (e:expression) WHERE e.author_name_latex = $author_name RETURN e",
-    #     author_name=author,
-    # )
-    # # list_of_expressions = result.data()
-    # list_of_expressions = result.value("e")
-
-    # result = tx.run(
-    #     "MATCH (s:symbol) WHERE s.author_name_latex = $author_name RETURN s",
-    #     author_name=author,
-    # )
-    # list_of_symbols = result.value("s")
-
-    # result = tx.run(
-    #     """
-    # MATCH (n)
-    # WHERE n.author_name_latex = $author_name
-    #   AND n.created_datetime IS NOT NULL
-    # RETURN collect(n.created_datetime) AS created_dates_list
-    # """,
-    #     author_name=author,
-    # )
-    # res = result.data()
-
-    # logger.info("res= " + str(res))
-
-    # list_of_dates = res[0]["created_dates_list"]
-
-    # result = tx.run(
-    #     """
-    # MATCH (n)
-    # WHERE n.author_name_latex = $author_name
-    # RETURN count(n) AS author_count
-    # """,
-    #     author_name=author,
-    # )
-    # # Fetch the first record and the specific key
-    # record = result.single()
-    # number_of_contributions = record["author_count"] if record else 0
-
-    # return (
-    #     list_of_dates,
-    #     number_of_contributions,
-    #     list_of_derivations,
-    #     list_of_expressions,
-    #     list_of_symbols,
-    # )
 
     query = """
     MATCH (n)
@@ -414,15 +350,6 @@ def get_derivations_that_use_expression(tx: Transaction, expression_id: str):
         expressionID=expression_id,
     )
 
-    # record["d"] accesses the node, .data() converts that specific node to a dict
-
-    # if the expression is not used in any derivations then `record` is None and the list comprehension fails
-    # try:
-    #     list_of_dicts = [record["d"].data() for record in result]
-    # except Exception as err:
-    #     logger.error(str(err))
-    #     list_of_dicts = []
-
     list_of_dicts_extra_key = result.data()
 
     list_of_dicts = []
@@ -459,18 +386,26 @@ def get_relation_latex(tx: Transaction, relation_id: str):
 
 
 @trace_execution
-def get_scalar_id_that_has_value_and_units_id(tx: Transaction, value_and_units_id: str):
-    """ """
-    result = tx.run(
-        "MATCH (s:scalar)-[]->(v:value_with_units) WHERE v.id='"
-        + value_and_units_id
-        + "' RETURN s.id"
-    )
+def get_scalar_id_that_has_value_and_units_id(
+    tx: Transaction, value_and_units_id: str
+) -> str | None:
+    """Retrieves the scalar ID associated with a specific value_with_units ID."""
+    query = """
+    MATCH (s:scalar)-[:HAS_VALUE]->(v:value_with_units) 
+    WHERE v.id = $value_id 
+    RETURN s.id AS scalar_id
+    """
 
-    scalar_id = result.data()
-    logger.info(" scalar_id" + scalar_id)
+    result = tx.run(query, value_id=value_and_units_id)
+    record = result.single()
 
-    return scalar_id
+    if record:
+        scalar_id = record["scalar_id"]
+        logger.info(f"Found scalar_id: {scalar_id}")
+        return scalar_id
+
+    logger.warning(f"No scalar found for value_and_units_id: {value_and_units_id}")
+    return None
 
 
 @trace_execution
@@ -584,11 +519,6 @@ def get_nodes_of_type(tx: Transaction, node_type: str) -> list:
 
     assert node_type in list_of_valid.node_types
 
-    # node_list = []  # type: List[dict]
-    # for result in tx.run("MATCH (n:" + node_type + ") RETURN n"):
-    #     # print(result.data()["n"])
-    #     node_list.append(result.data()["n"])
-
     query = f"MATCH (n:{node_type}) RETURN n ORDER BY n.id"
 
     node_list = []  # type: List[dict]
@@ -634,7 +564,6 @@ def get_count_nodes_of_type(tx: Transaction, node_type: str) -> int:
     for a specific node type (e.g., derivation XOR step XOR symbol, etc)
     return a count of all nodes
 
-    >>> count_nodes_of_type(tx: Transaction)
     """
 
     # must be one of these node types. See also 'schema.log' file
@@ -879,15 +808,6 @@ def get_derivations_that_use_feed(
     """ """
     logger.info("feed_id=" + feed_id)
 
-    # # TODO: this should be derivation->step->feed
-    # list_of_derivation_dicts = []  # type: List[dict]
-    # for result in tx.run(
-    #     'MATCH (d:derivation)-[]->(s:step)-[]->(f:feed) WHERE f.id = "'
-    #     + str(feed_id)
-    #     + '" RETURN d'
-    # ):
-    #     list_of_derivation_dicts.append(result.data()["d"])
-
     query = """
     MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:HAS_FEED]->(f:feed)
     WHERE f.id = $feed_id
@@ -904,30 +824,23 @@ def get_derivations_that_use_feed(
 @trace_execution
 def get_derivations_that_use_inference_rule(
     tx: Transaction, inference_rule_id: str
-) -> list:
+) -> List[Dict]:
     """
     which derivations contain this inference rule?
-
-    >>> derivations_that_use_inference_rule()
     """
 
     logger.info("inference_rule_id=" + inference_rule_id)
 
-    list_of_derivation_dicts = []  # type: List[dict]
-    for result in tx.run(
-        'MATCH (d:derivation)-[]->(s:step)-[]->(i:inference_rule) WHERE i.id = "'
-        + str(inference_rule_id)
-        + '" RETURN d'
-    ):
-        list_of_derivation_dicts.append(result.data()["d"])
-        # print("list_of_derivations=", list_of_derivations)
+    query = """
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:USES_RULE]->(i:inference_rule)
+    WHERE i.id = $rule_id
+    RETURN d
+    """
 
-    # print(
-    #     "inference_rule_id=",
-    #     inference_rule_id,
-    #     "list_of_derivations=",
-    #     list_of_derivation_dicts,
-    # )
+    result = tx.run(query, rule_id=inference_rule_id)
+
+    # Use a list comprehension for a more Pythonic return
+    list_of_derivation_dicts = [record["d"] for record in result]
 
     return list_of_derivation_dicts
 
@@ -940,7 +853,6 @@ def get_expressions_that_use_symbol(tx, symbol_id: str) -> List[Dict[str, Any]]:
     Returns a list of expression nodes that are connected to a symbol
     of a specific category and ID.
 
-    >>> expressions_that_use_symbol()
     """
 
     logger.info("symbol_id = " + symbol_id)
@@ -948,15 +860,6 @@ def get_expressions_that_use_symbol(tx, symbol_id: str) -> List[Dict[str, Any]]:
     # assert symbol_category in list_of_valid.symbol_categories
 
     list_of_expression_dicts = []  # type: List[dict]
-
-    # for result in tx.run(
-    #     "MATCH (e:expression)-[:IS_COMPRISED_OF]->(s:"
-    #     + symbol_category
-    #     + ") WHERE s.id = '"
-    #     + str(symbol_id)
-    #     + "' RETURN e"
-    # ):
-    #     list_of_expression_dicts.append(result.data()["e"])
 
     query = """
         MATCH (e:expression)-[]->(s:symbol) 
@@ -1033,7 +936,6 @@ def get_list_of_steps_in_this_derivation(tx: Transaction, derivation_id: str) ->
     """
     For a given derivation, what are all the associated step IDs?
 
-    >>> get_list_of_steps_in_this_derivation(tx: Transaction)
     """
 
     query = """
@@ -1070,7 +972,12 @@ def get_sequence_index_for_step(tx: Transaction, step_id: str) -> int:
         'MATCH ()-[r:HAS_STEP]->(n:step {id:"' + step_id + '"}) RETURN r.sequence_index'
     )
     # print(type(result)) # don't access the `result` variable more than once, as mentioned on https://neo4j.com/docs/python-manual/current/transformers/
-    sequence_index = result.data()[0]["r.sequence_index"]
+
+    # sequence_index = result.data()[0]["r.sequence_index"]
+
+    data = result.data()
+    sequence_index = data[0]["r.sequence_index"] if data else None
+
     logger.info("sequence_index=" + str(sequence_index))
 
     return sequence_index
@@ -1081,7 +988,6 @@ def get_inference_rule_connected_to_step_ID(tx: Transaction, step_id: str):
     """
     use case: when displaying a derivation, user wants to see inference rule per step
 
-    >>> step_has_inference_rule()
     """
 
     result = tx.run(
@@ -1142,29 +1048,10 @@ def get_expressions_from_step_id_and_expr_type(
         or expression_type == "HAS_OUTPUT"
     )
 
-    # print("TODO: figure out how to get the sequence_index for this expression")
-    # print(
-    #     'MATCH (n:step {id:"'
-    #     + step_id
-    #     + '"})-[r:'
-    #     + expression_type
-    #     + "]->(m:expression) RETURN m"
-    # )
-
     if expression_type == "HAS_FEED":
         destination_node_type = "feed"
     else:
         destination_node_type = "expression"
-
-    # print(
-    #     'MATCH (:step {id:"'
-    #     + step_id
-    #     + '"})-[r:'
-    #     + expression_type
-    #     + "]->(m:"
-    #     + destination_node_type
-    #     + ") RETURN m"
-    # )
 
     list_of_expression_dicts = []  # type: List[dict]
     for result in tx.run(
@@ -1261,25 +1148,31 @@ def add_derivation(
 ) -> None:
     """
     Create a new derivation node
+
+    In the Neo4j Python driver, `tx.run()` is lazy. While the query is sent to the server,
+    the results aren't fully processed until you iterate over them. `.consume()` explicitly
+    tells the driver to discard the result records but wait for the query to finish and
+    return the metadata (summary). This is the standard way to ensure a "write" operation
+    completes when you don't need to return any data.
+
     """
 
-    # print(
-    #     derivation_id,
-    #     now_str,
-    #     derivation_name_latex,
-    #     derivation_abstract_latex,
-    #     author_name_latex,
-    # )
-
-    result = tx.run(
-        "merge (:derivation "
-        '{name_latex:"' + derivation_name_latex + '",'
-        ' abstract_latex:"' + derivation_abstract_latex + '",'
-        ' created_datetime:"' + now_str + '",'
-        ' reference_latex:"' + derivation_reference_latex + '",'
-        ' author_name_latex:"' + author_name_latex + '",'
-        ' id:"' + derivation_id + '"})'
-    )
+    tx.run(
+        "MERGE (:derivation {"
+        "  id: $id, "
+        "  name_latex: $name, "
+        "  abstract_latex: $abstract, "
+        "  created_datetime: $now, "
+        "  reference_latex: $ref, "
+        "  author_name_latex: $author"
+        "})",
+        id=derivation_id,
+        name=derivation_name_latex,
+        abstract=derivation_abstract_latex,
+        now=now_str,
+        ref=derivation_reference_latex,
+        author=author_name_latex,
+    ).consume()
 
     return
 
@@ -1312,17 +1205,30 @@ def add_inference_rule(
     assert int(number_of_feeds) >= 0
     assert int(number_of_outputs) >= 0
 
-    result = tx.run(
-        "merge (:inference_rule "
-        '{name_latex:"' + inference_rule_name + '", '
-        ' latex:"' + inference_rule_latex + '", '
-        ' created_datetime:"' + now_str + '",'
-        ' author_name_latex:"' + author_name_latex + '", '
-        ' id:"' + inference_rule_id + '", '
-        " number_of_inputs:" + str(number_of_inputs) + ", "
-        " number_of_feeds:" + str(number_of_feeds) + ", "
-        " number_of_outputs:" + str(number_of_outputs) + "})"
+    query = (
+        "MERGE (:inference_rule {"
+        "  id: $id, "
+        "  name_latex: $name, "
+        "  latex: $latex, "
+        "  created_datetime: $now, "
+        "  author_name_latex: $author, "
+        "  number_of_inputs: $inputs, "
+        "  number_of_feeds: $feeds, "
+        "  number_of_outputs: $outputs"
+        "})"
     )
+
+    tx.run(
+        query,
+        id=inference_rule_id,
+        name=inference_rule_name,
+        latex=inference_rule_latex,
+        now=now_str,
+        author=author_name_latex,
+        inputs=number_of_inputs,
+        feeds=number_of_feeds,
+        outputs=number_of_outputs,
+    ).consume()
 
     return
 
@@ -1356,7 +1262,7 @@ def edit_step_input(
     RETURN s.id AS step_id, new_e.id AS input_id, new_rel.sequence_index AS sequence_index
     """
 
-    result = tx.run(query, params)
+    tx.run(query, params).consume()
 
     return
 
@@ -1390,7 +1296,7 @@ def edit_step_feed(
     RETURN s.id AS step_id, new_f.id AS feed_id, new_rel.sequence_index AS sequence_index
     """
 
-    result = tx.run(query, params)
+    tx.run(query, params).consume()
 
     return
 
@@ -1424,7 +1330,7 @@ def edit_step_output(
     RETURN s.id AS step_id, new_e.id AS output_id, new_rel.sequence_index AS sequence_index
     """
 
-    result = tx.run(query, params)
+    tx.run(query, params).consume()
 
     return
 
@@ -1454,7 +1360,7 @@ def edit_step_notes(
         s.note_after_step_latex = $after
     """
 
-    result = tx.run(query, params)
+    tx.run(query, params).consume()
 
     return
 
@@ -1476,18 +1382,24 @@ def edit_expression(
     see https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887#update-node-properties-add-new-or-modify
     """
 
-    result = tx.run(
-        'MERGE (e:expression {id:"' + str(expression_id) + '"})'
-        'SET e = {id: "' + str(expression_id) + '",'
-        'name_latex: "' + str(expression_name_latex) + '",'
-        'description_latex: "' + str(expression_description_latex) + '",'
-        'reference_latex: "' + str(expression_reference_latex) + '",'
-        'author_name_latex:"' + author_name_latex + '",'
-        'latex_lhs: "' + str(expression_latex_lhs) + '",'
-        'latex_relation: "' + str(expression_latex_relation) + '",'
-        'latex_rhs: "' + str(expression_latex_rhs) + '",'
-        'latex_condition: "' + str(expression_latex_condition) + '"}'
-    )
+    properties = {
+        "id": expression_id,
+        "name_latex": expression_name_latex,
+        "description_latex": expression_description_latex,
+        "reference_latex": expression_reference_latex,
+        "author_name_latex": author_name_latex,
+        "latex_lhs": expression_latex_lhs,
+        "latex_relation": expression_latex_relation,
+        "latex_rhs": expression_latex_rhs,
+        "latex_condition": expression_latex_condition,
+    }
+
+    query = """
+    MERGE (e:expression {id: $id})
+    SET e += $props
+    """
+
+    tx.run(query, id=expression_id, props=properties).consume()
 
     return
 
@@ -1500,33 +1412,28 @@ def edit_node_property(
     property_value can be either str or int
 
     see https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887#update-node-properties-add-new-or-modify
+
+    Gemini 3.1 Pro warns that "MERGE" is bad since
+       If an ID doesn't exist, MERGE will create a new, empty node with that ID and apply the property.
+    However, I'm intentionally using `edit_node_property` to add properties if they are missing.
+    (Gemini 3.1 Pro says to use `MATCH` instead.)
     """
 
-    # print(
-    #     "node_type=",
-    #     node_type,
-    #     ", node_id=",
-    #     node_id,
-    #     ",property_key=",
-    #     property_key,
-    #     ", property_value=",
-    #     property_value,
-    # )
     assert node_type in list_of_valid.node_types
 
     # https://neo4j.com/docs/getting-started/cypher-intro/updating/
 
     # https://stackoverflow.com/a/15019884/1164295 says "bool is a subclass of int."
     if isinstance(property_value, int):
-        result = tx.run(
+        tx.run(
             "MERGE (n:" + str(node_type) + ' {id:"' + str(node_id) + '"})'
             "SET n." + str(property_key) + " = " + str(property_value)
-        )
+        ).consume()
     elif isinstance(property_value, str):  # string needs quotes
-        result = tx.run(
+        tx.run(
             "MERGE (n:" + str(node_type) + ' {id:"' + str(node_id) + '"})'
             "SET n." + str(property_key) + ' = "' + str(property_value) + '"'
-        )
+        ).consume()
 
     return
 
@@ -1543,19 +1450,30 @@ def edit_derivation_metadata(
     """
     TODO: deprecate this in favor of modify node properties
 
-    >>> edit_derivation_metadata()
+    `SET d += {map}` updates the properties listed in the map without deleting
+    other existing properties on the node. If you want to delete all other
+    properties and only keep these five, use `SET d = {map}`.
+
     """
 
-    result = tx.run(
-        'MERGE (d:derivation {id:"' + str(derivation_id) + '"})'
-        'SET d = {id: "' + str(derivation_id) + '",'
-        'name_latex: "' + str(derivation_name_latex) + '",'
-        'reference_latex: "' + str(derivation_reference_latex) + '",'
-        'author_name_latex:"' + author_name_latex + '",'
-        'abstract_latex: "' + str(abstract_latex) + '"}'
-    )
-    #'SET d.derivation_name_latex = "'+ str(derivation_name_latex) +'", '
-    #'SET d.abstract_latex = "'+ str(abstract_latex) +'"})'
+    query = """
+    MERGE (d:derivation {id: $id})
+    SET d = {
+        name_latex: $name,
+        reference_latex: $ref,
+        author_name_latex: $author,
+        abstract_latex: $abstract
+    }
+    """
+
+    tx.run(
+        query,
+        id=derivation_id,
+        name=derivation_name_latex,
+        ref=derivation_reference_latex,
+        author=author_name_latex,
+        abstract=abstract_latex,
+    ).consume()
 
     return
 
@@ -1597,10 +1515,9 @@ def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
     logger.info("node_type= " + node_type)
     assert node_type in list_of_valid.node_types
 
-    result = tx.run(
+    tx.run(
         "MATCH (d:" + node_type + ' {id:"' + node_id + '"}) DETACH DELETE d'
-    )
-    logger.info("result.data=" + str(result.data()))
+    ).consume()
 
     return
 
@@ -1613,15 +1530,14 @@ def disconnect_symbol_from_feed(tx, symbol_id: str, feed_id: str) -> None:
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
     """
 
-    result = tx.run(
+    tx.run(
         "MATCH (e:feed)-[r:IS_COMPRISED_OF]->(s)"
         + 'WHERE e.id="'
         + str(feed_id)
         + '" AND s.id="'
         + str(symbol_id)
         + '"  DELETE r'
-    )
-    logger.info("result.data=" + str(result.data()))
+    ).consume()
 
     return
 
@@ -1668,13 +1584,6 @@ def get_node_labels_from_property(
 ):
     """ """
 
-    # UNSAFE:
-    # result = tx.run(
-    # "MATCH (n)"
-    # "WHERE n."+property_key+" = '"+property_value+"'"
-    # "RETURN DISTINCT labels(n) AS NodeLabel, n"
-    # )
-
     # https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%22116092343D0xessOtQA9vha4u7SzIrLno%22%5D,%22action%22:%22open%22,%22userId%22:%22101193243042884231058%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing
     # use n[$key] to access the property dynamically
     # use $value to pass the value safely
@@ -1695,35 +1604,11 @@ def connect_symbol_to_feed(tx, symbol_id: str, feed_id: str) -> None:
     """ """
     logger.info("symbol_id=" + symbol_id + "; feed_id=" + feed_id)
 
-    # the following Cypher structure produces this warning:
-    #    If a part of a query contains multiple disconnected patterns, this will build a cartesian product between all those parts. This may produce a large amount of data and slow down query processing. While occasionally intended, it may often be possible to reformulate the query that avoids the use of this cross product, perhaps by adding a relationship between the different parts or by using OPTIONAL MATCH (identifier is: (s))'
-    # Gemini 3 Pro's explanation of the warning:
-    #    In Cypher, when you separate nodes with a comma in a single MATCH statement like this:
-    #    `MATCH (e:expression), (s:scalar)`
-    #    you are telling the database to find every possible combination of expressions and scalars. This is called a Cartesian Product
-    #
-    # result = tx.run(
-    #     "MATCH (e:"
-    #     + expression_or_feed
-    #     + "),(s:"
-    #     + symbol_category
-    #     + ") "
-    #     + 'WHERE e.id="'
-    #     + str(expression_or_feed_id)
-    #     + '" AND s.id="'
-    #     + str(symbol_id)
-    #     + '" '
-    #     + "MERGE (e)-[r:IS_COMPRISED_OF]->(s)"
-    # )
-
-    # To avoid triggering a Cartesian product, use
-    result = tx.run(
+    tx.run(
         "MATCH (f:feed {id: '" + feed_id + "'})"
         "MATCH (s {id: '" + symbol_id + "'})"
         "MERGE (f)-[:IS_COMPRISED_OF]->(s)"
-    )
-
-    logger.info("result=" + str(result))
+    ).consume()
 
     return
 
@@ -1733,33 +1618,11 @@ def connect_symbol_to_expression(tx, symbol_id: str, expression_id: str) -> None
     """ """
     logger.info("symbol_id=" + symbol_id + "; expression_id=" + expression_id)
 
-    # the following Cypher structure produces this warning:
-    #    If a part of a query contains multiple disconnected patterns, this will build a cartesian product between all those parts. This may produce a large amount of data and slow down query processing. While occasionally intended, it may often be possible to reformulate the query that avoids the use of this cross product, perhaps by adding a relationship between the different parts or by using OPTIONAL MATCH (identifier is: (s))'
-    # Gemini 3 Pro's explanation of the warning:
-    #    In Cypher, when you separate nodes with a comma in a single MATCH statement like this:
-    #    `MATCH (e:expression), (s:scalar)`
-    #    you are telling the database to find every possible combination of expressions and scalars. This is called a Cartesian Product
-    #
-    # result = tx.run(
-    #     "MATCH (e:"
-    #     + expression_or_feed
-    #     + "),(s:"
-    #     + symbol_category
-    #     + ") "
-    #     + 'WHERE e.id="'
-    #     + str(expression_or_feed_id)
-    #     + '" AND s.id="'
-    #     + str(symbol_id)
-    #     + '" '
-    #     + "MERGE (e)-[r:IS_COMPRISED_OF]->(s)"
-    # )
-
-    # To avoid triggering a Cartesian product, use
-    result = tx.run(
+    tx.run(
         "MATCH (e:expression {id: '" + expression_id + "'})"
         "MATCH (n {id: '" + symbol_id + "'})"
         "MERGE (e)-[r:IS_COMPRISED_OF]->(n)"
-    )
+    ).consume()
 
     return
 
@@ -1827,20 +1690,20 @@ def connect_step_to_derivation(
     # print(result.data()) # this just shows "[]"
 
     logger.info("step with edge " + derivation_id)
-    result = tx.run(
+    tx.run(
         "MATCH (a:derivation),(b:step) "
         'WHERE a.id="' + str(derivation_id) + '" AND b.id="' + str(step_id) + '" '
         "MERGE (a)-[r:HAS_STEP {sequence_index: "
         + str(new_sequence_value)
         + "}]->(b) RETURN r"
-    )
+    ).consume()
 
     logger.info("inference_rule_id " + inference_rule_id)
-    result = tx.run(
+    tx.run(
         "MATCH (a:step),(b:inference_rule) "
         'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(inference_rule_id) + '"'
         "MERGE (a)-[:HAS_INFERENCE_RULE]->(b)"
-    )
+    ).consume()
     # print(result.data()) # this just shows "[]"
 
     return
@@ -1852,7 +1715,7 @@ def connect_expressions_to_step(
     step_id: str,
     now_str: str,
     list_of_input_expression_IDs: list,
-    list_of_feed_expression_IDs: list,
+    list_of_feed_IDs: list,
     list_of_output_expression_IDs: list,
     author_name_latex: str,
 ) -> None:
@@ -1862,44 +1725,82 @@ def connect_expressions_to_step(
 
     assert (
         (len(list_of_input_expression_IDs) > 0)
-        or (len(list_of_feed_expression_IDs) > 0)
+        or (len(list_of_feed_IDs) > 0)
         or (len(list_of_output_expression_IDs) > 0)
     )
 
     logger.info("list_of_input_expression_IDs" + str(list_of_input_expression_IDs))
-    logger.info("list_of_feed_expression_IDs" + str(list_of_feed_expression_IDs))
+    logger.info("list_of_feed_IDs" + str(list_of_feed_IDs))
     logger.info("list_of_output_expression_IDs" + str(list_of_output_expression_IDs))
 
-    # input expressions
-    for input_index, input_id in enumerate(list_of_input_expression_IDs):
-        logger.info("input_id=" + input_id + "; input_index=" + str(input_index))
-        logger.info("step_id=" + step_id)
-        result = tx.run(
-            "MATCH (a:step),(b:expression) "
-            'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(input_id) + '" '
-            'MERGE (a)-[:HAS_INPUT {sequence_index: "' + str(input_index) + '"}]->(b)'
-        )
-        # print(result.data()) # this just shows "[]"
+    # # input expressions
+    # for input_index, input_id in enumerate(list_of_input_expression_IDs):
+    #     logger.info("input_id=" + input_id + "; input_index=" + str(input_index))
+    #     logger.info("step_id=" + step_id)
+    #     tx.run(
+    #         "MATCH (a:step),(b:expression) "
+    #         'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(input_id) + '" '
+    #         'MERGE (a)-[:HAS_INPUT {sequence_index: "' + str(input_index) + '"}]->(b)'
+    #     ).consume()
+    #     # print(result.data()) # this just shows "[]"
 
-    # feed expressions
-    for feed_index, feed_id in enumerate(list_of_feed_expression_IDs):
-        logger.info("feed_id=" + feed_id + "; feed_index=" + str(feed_index))
-        result = tx.run(
-            "MATCH (a:step),(b:feed) "
-            'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(feed_id) + '" '
-            'MERGE (a)-[:HAS_FEED {sequence_index: "' + str(feed_index) + '"}]->(b)'
-        )
-        # print(result.data()) # this just shows "[]"
+    inputs_data = [
+        {"id": exp_id, "idx": idx}
+        for idx, exp_id in enumerate(list_of_input_expression_IDs)
+    ]
 
-    # output expressions
-    for output_index, output_id in enumerate(list_of_output_expression_IDs):
-        logger.info("output_id=" + output_id + "; output_index=" + str(output_index))
-        result = tx.run(
-            "MATCH (a:step),(b:expression) "
-            'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(output_id) + '" '
-            'MERGE (a)-[:HAS_OUTPUT {sequence_index: "' + str(output_index) + '"}]->(b)'
-        )
-        # print(result.data()) # this just shows "[]"
+    query = """
+    MATCH (a:step {id: $step_id})
+    UNWIND $inputs AS input_data
+    MATCH (b:expression {id: input_data.id})
+    MERGE (a)-[:HAS_INPUT {sequence_index: input_data.idx}]->(b)
+    """
+    tx.run(query, step_id=step_id, inputs=inputs_data)
+
+    # # feed expressions
+    # for feed_index, feed_id in enumerate(list_of_feed_IDs):
+    #     logger.info("feed_id=" + feed_id + "; feed_index=" + str(feed_index))
+    #     tx.run(
+    #         "MATCH (a:step),(b:feed) "
+    #         'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(feed_id) + '" '
+    #         'MERGE (a)-[:HAS_FEED {sequence_index: "' + str(feed_index) + '"}]->(b)'
+    #     ).consume()
+    #     # print(result.data()) # this just shows "[]"
+
+    feeds_data = [
+        {"id": exp_id, "idx": idx} for idx, exp_id in enumerate(list_of_feed_IDs)
+    ]
+
+    query = """
+    MATCH (a:step {id: $step_id})
+    UNWIND $feeds AS feed_data
+    MATCH (b:expression {id: feed_data.id})
+    MERGE (a)-[:HAS_FEED {sequence_index: feed_data.idx}]->(b)
+    """
+    tx.run(query, step_id=step_id, feeds=feeds_data)
+
+    # # output expressions
+    # for output_index, output_id in enumerate(list_of_output_expression_IDs):
+    #     logger.info("output_id=" + output_id + "; output_index=" + str(output_index))
+    #     tx.run(
+    #         "MATCH (a:step),(b:expression) "
+    #         'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(output_id) + '" '
+    #         'MERGE (a)-[:HAS_OUTPUT {sequence_index: "' + str(output_index) + '"}]->(b)'
+    #     ).consume()
+    #     # print(result.data()) # this just shows "[]"
+
+    outputs_data = [
+        {"id": exp_id, "idx": idx}
+        for idx, exp_id in enumerate(list_of_output_expression_IDs)
+    ]
+
+    query = """
+    MATCH (a:step {id: $step_id})
+    UNWIND $outputs AS output_data
+    MATCH (b:expression {id: output_data.id})
+    MERGE (a)-[:HAS_OUTPUT {sequence_index: output_data.idx}]->(b)
+    """
+    tx.run(query, step_id=step_id, outputs=outputs_data)
 
     return
 
@@ -1924,20 +1825,6 @@ def add_expression(
     `add_expression` doesn't have `sympy_lhs`, `sympy_rhs`, `lean` because those are added in a separate action
 
     """
-
-    # result = tx.run(
-    #     "MERGE (:expression "
-    #     '{name_latex:"' + str(expression_name_latex) + '", '
-    #     ' latex_lhs:"' + str(expression_latex_lhs) + '", '
-    #     ' latex_relation:"' + str(expression_latex_relation) + '", '
-    #     ' latex_rhs:"' + str(expression_latex_rhs) + '", '
-    #     ' latex_condition: "' + str(expression_latex_condition) + '", '
-    #     ' created_datetime:"' + now_str + '",'
-    #     ' description_latex:"' + str(expression_description_latex) + '", '
-    #     ' reference_latex:"' + str(expression_reference_latex) + '", '
-    #     ' author_name_latex:"' + str(author_name_latex) + '", '
-    #     ' id:"' + str(expression_id) + '"})'
-    # )
 
     params = {
         "id": str(expression_id),
@@ -1974,7 +1861,7 @@ def add_expression(
             e.reference_latex = $ref,
             e.author_name_latex = $author
     """
-    tx.run(query, params)
+    tx.run(query, params).consume()
 
     return
 
@@ -1992,16 +1879,6 @@ def add_feed(
 
     the `sympy` and `lean` property keys do not get populated because that is a separate action
     """
-
-    # result = tx.run(
-    #     "merge (:feed "
-    #     '{latex:"' + str(feed_latex) + '", '
-    #     ' author_name_latex:"' + str(author_name_latex) + '", '
-    #     ' created_datetime:"' + now_str + '",'
-    #     ' sympy:"' + str(feed_sympy) + '", '
-    #     ' lean:"' + str(feed_lean) + '", '
-    #     ' id:"' + str(feed_id) + '"})'
-    # )
 
     params = {
         "id": str(feed_id),
@@ -2021,7 +1898,7 @@ def add_feed(
             f.author_name_latex = $author
     """
 
-    result = tx.run(query, params)
+    tx.run(query, params).consume()
 
     return
 
@@ -2042,18 +1919,6 @@ def add_quantum_operator_symbol(
     nothing returned by function because action is to write change to Neo4j database
 
     """
-
-    # result = tx.run(
-    #     "merge (:quantum_operator "
-    #     '{name_latex:"' + str(symbol_name) + '", '
-    #     ' latex:"' + str(symbol_latex) + '", '
-    #     ' description_latex:"' + str(symbol_description) + '", '
-    #     ' created_datetime:"' + now_str + '",'
-    #     ' author_name_latex:"' + str(author_name_latex) + '", '
-    #     " requires_arguments:" + str(symbol_requires_arguments) + ", "
-    #     ' reference_latex:"' + str(symbol_reference) + '", '
-    #     ' id:"' + str(symbol_id) + '"})'
-    # )
 
     params = {
         "id": str(symbol_id),
@@ -2085,7 +1950,7 @@ def add_quantum_operator_symbol(
             qo.reference_latex = $ref
             // Note: created_datetime is NOT updated here
     """
-    tx.run(query, params)
+    tx.run(query, params).consume()
 
     return
 
@@ -2113,7 +1978,7 @@ def add_constant_value_with_units(
     logger.info("neo4j_query/add_constant_value_with_units: str_to_add=" + str_to_add)
 
     # create new node for value
-    result = tx.run(
+    tx.run(
         "merge (:value_with_units "
         "{number_decimal:" + str(number_decimal) + ", "
         " number_power: " + str(number_power) + ", "
@@ -2125,7 +1990,7 @@ def add_constant_value_with_units(
         + ' author_name_latex:"'
         + str(author_name_latex)
         + '"})'
-    )
+    ).consume()
 
     # TODO, pointed out by Gemini 3 Pro on 2026-02-03:
     # In a parameterized query, you cannot inject raw string fragments for property names.
@@ -2160,7 +2025,7 @@ def add_constant_value_with_units(
     # tx.run(query, params)
 
     # create edge between scalar and value
-    result = tx.run(
+    tx.run(
         "MATCH (s:scalar),(v:value_with_units) "
         'WHERE s.id="'
         + str(scalar_id)
@@ -2168,7 +2033,7 @@ def add_constant_value_with_units(
         + str(value_with_units_id)
         + '" '
         "MERGE (s)-[:HAS_VALUE]->(v)"
-    )
+    ).consume()
 
     return
 
@@ -2200,27 +2065,6 @@ def add_scalar_symbol(
     assert len(symbol_latex) > 0
     assert len(symbol_scope) > 0
     assert len(symbol_variable_or_constant) > 0
-
-    # result = tx.run(
-    #     "merge (:symbol:scalar "
-    #     '{name_latex:"' + str(symbol_name) + '", '
-    #     ' latex:"' + str(symbol_latex) + '", '
-    #     ' description_latex:"' + str(symbol_description) + '", '
-    #     ' reference_latex:"' + str(symbol_reference) + '",'
-    #     ' scope:"' + str(symbol_scope) + '",'
-    #     ' variable_or_constant:"' + str(symbol_variable_or_constant) + '",'
-    #     ' domain:"' + str(symbol_domain) + '",'
-    #     " dimension_length: " + str(dimension_length) + ", "
-    #     " dimension_time: " + str(dimension_time) + ", "
-    #     " dimension_mass: " + str(dimension_mass) + ", "
-    #     " dimension_temperature: " + str(dimension_temperature) + ", "
-    #     " dimension_electric_charge: " + str(dimension_electric_charge) + ", "
-    #     " dimension_amount_of_substance: " + str(dimension_amount_of_substance) + ", "
-    #     " dimension_luminous_intensity: " + str(dimension_luminous_intensity) + ", "
-    #     ' created_datetime:"' + now_str + '",'
-    #     ' author_name_latex:"' + str(author_name_latex) + '", '
-    #     ' id:"' + str(symbol_id) + '"})'
-    # )
 
     params = {
         "id": str(symbol_id),
@@ -2305,19 +2149,6 @@ def add_vector_symbol(
     assert len(symbol_latex) > 0
 
     if symbol_size == "arbitrary":
-        # result = tx.run(
-        #     "merge (:symbol:vector "
-        #     '{name_latex:"' + str(symbol_name) + '", '
-        #     ' latex:"' + str(symbol_latex) + '", '
-        #     ' description_latex:"' + str(symbol_description) + '", '
-        #     ' reference_latex:"' + str(symbol_reference) + '", '
-        #     'orientation:"' + str(symbol_orientation) + '", '
-        #     " size: '" + str(symbol_size) + "',"
-        #     "is_composite:" + str(symbol_is_composite) + ","
-        #     ' created_datetime:"' + now_str + '",'
-        #     ' author_name_latex:"' + str(author_name_latex) + '", '
-        #     ' id:"' + str(symbol_id) + '"})'
-        # )
         params = {
             "id": str(symbol_id),
             "name": str(symbol_name),
@@ -2356,20 +2187,6 @@ def add_vector_symbol(
         result = tx.run(query, params)
 
     else:  # fixed size
-        # result = tx.run(
-        #     "merge (:symbol:vector "
-        #     '{name_latex:"' + str(symbol_name) + '", '
-        #     ' latex:"' + str(symbol_latex) + '", '
-        #     ' description_latex:"' + str(symbol_description) + '", '
-        #     ' reference_latex:"' + str(symbol_reference) + '", '
-        #     'orientation:"' + str(symbol_orientation) + '", '
-        #     " size: '" + str(symbol_size) + "',"
-        #     'number_of_entries:"' + str(symbol_number_of_entries) + '", '
-        #     "is_composite:" + str(symbol_is_composite) + ","
-        #     ' created_datetime:"' + now_str + '",'
-        #     ' author_name_latex:"' + str(author_name_latex) + '", '
-        #     ' id:"' + str(symbol_id) + '"})'
-        # )
         params = {
             "id": str(symbol_id),
             "name": str(symbol_name),
@@ -2434,18 +2251,6 @@ def add_matrix_symbol(
     assert len(symbol_latex) > 0
 
     if symbol_size == "arbitrary":
-        # result = tx.run(
-        #     "merge (:symbol:matrix "
-        #     '{name_latex:"' + str(symbol_name) + '", '
-        #     ' latex:"' + str(symbol_latex) + '", '
-        #     ' description_latex:"' + str(symbol_description) + '", '
-        #     ' reference_latex:"' + str(symbol_reference) + '", '
-        #     " size: '" + str(symbol_size) + "',"
-        #     " is_composite:" + str(symbol_is_composite) + ","
-        #     ' created_datetime:"' + now_str + '",'
-        #     ' author_name_latex:"' + str(author_name_latex) + '", '
-        #     ' id:"' + str(symbol_id) + '"})'
-        # )
         query = """
             MERGE (m:symbol:matrix {id: $id})
             ON CREATE SET
@@ -2481,20 +2286,6 @@ def add_matrix_symbol(
         result = tx.run(query, parameters)
 
     else:  # fixed size
-        # result = tx.run(
-        #     "merge (:matrix "
-        #     '{name_latex:"' + str(symbol_name) + '", '
-        #     ' latex:"' + str(symbol_latex) + '", '
-        #     ' description_latex:"' + str(symbol_description) + '", '
-        #     ' reference_latex:"' + str(symbol_reference) + '", '
-        #     " size: '" + str(symbol_size) + "',"
-        #     'number_of_rows:"' + str(symbol_number_of_rows) + '", '
-        #     'number_of_columns:"' + str(symbol_number_of_columns) + '", '
-        #     "is_composite:" + str(symbol_is_composite) + ","
-        #     ' created_datetime:"' + now_str + '",'
-        #     ' author_name_latex:"' + str(author_name_latex) + '", '
-        #     ' id:"' + str(symbol_id) + '"})'
-        # )
         query = """
             MERGE (m:matrix:symbol {id: $id})
             ON CREATE SET
@@ -2559,35 +2350,6 @@ def add_operation_symbol(
     assert len(operation_name) > 0
     assert len(operation_latex) > 0
     assert int(operation_argument_count) > 0
-
-    # BHP's (inadequate) attempt:
-    # result = tx.run(
-    #     "merge (:operation "
-    #     '{name_latex:"' + str(operation_name) + '", '
-    #     ' latex:"' + str(operation_latex) + '", '
-    #     ' description_latex:"' + str(operation_description_latex) + '", '
-    #     ' reference_latex:"' + str(operation_reference_latex) + '", '
-    #     " argument_count:" + str(operation_argument_count) + ", "
-    #     ' created_datetime:"' + now_str + '",'
-    #     ' author_name_latex:"' + str(author_name_latex) + '", '
-    #     ' id:"' + str(operation_id) + '"})'
-    # )
-    # Gemini 3 Pro's explanation of the inadequacy:
-    # The error happens because your current MERGE statement is trying to
-    # match a node that has all those specific properties at once.
-    #
-    # If any property (like the description or latex) is different from what
-    # is currently in the database, MERGE tries to create a new node. However,
-    # since you have a database constraint that says id must be unique,
-    # the database blocks this creation.
-    #
-    # To fix this, you need to:
-    # - MERGE only on the unique ID.
-    # - SET the other properties afterwards.
-    #
-    # You should also stop using string concatenation (+ str(x) +) to build queries.
-    # It causes syntax errors if your strings contain quotes and leaves you
-    # open to code injection attacks. Use parameters instead.
 
     query = """
         MERGE (o:operation {id: $id})
@@ -2708,6 +2470,17 @@ def user_query(tx: Transaction, query: str) -> list:
     User-submitted Cypher query for Neo4j database
 
     Read-only for Neo4j database
+
+    Allowing arbitrary users to pass raw Cypher queries is exceptionally dangerous.
+    While you catch `neo4j.exceptions.ClientError` to mimic read-only behavior, a clever user can still:
+    - Cause Denial of Service (DoS) by writing infinitely recursive paths (`MATCH p=()-[:REL*]-() RETURN p`).
+    - Bypass application-level security to read hidden nodes/passwords.
+    - Utilize `CALL apoc.*` procedures if they are enabled to interact with the host OS.
+
+    --> Do not rely on Python `try/except`. You must configure a **Read-Only Neo4j Database User** role
+        natively inside Neo4j, and the application must connect using that specific low-privilege credential
+        when executing `user_query`.
+
     """
 
     list_of_results = []
