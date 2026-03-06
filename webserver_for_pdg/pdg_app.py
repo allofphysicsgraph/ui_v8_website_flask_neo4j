@@ -246,6 +246,9 @@ class Config(object):
 
     SECRET_KEY = os.environ.get("SECRET_KEY")
 
+    if SECRET_KEY is None:
+        raise ValueError("No SECRET_KEY set")
+
 
 # ORDERING: this has to come before using the function wrapper
 # ORDERING: this has to be after the class "Config" is specified
@@ -1024,7 +1027,7 @@ def to_index():
         graphDB_Driver, T_and_f_derivation_ID, query_time_dict
     )
     try:
-        latex.create_d3js_json(T_and_f_derivation_ID, all_steps, "/code/static/")
+        latex.create_d3js_json(T_and_f_derivation_ID, all_steps, web_app.static_folder)
         d3js_json_filename = T_and_f_derivation_ID + ".json"
     except Exception as err:
         logger.error(str(type(err).__name__) + ": " + str(err))
@@ -1185,7 +1188,6 @@ def to_navigation():
     # 2026-01-29: Gemini 3 recommends using
     # result = session.run("MATCH (n) RETURN labels(n) as l, count(*) as c")
 
-    # number_of_derivations = -1  # initialize to an intentionally a non-sensical number
     with graphDB_Driver.session() as session, track_time(
         query_time_dict, "pdg_app/main" + trace_id
     ):
@@ -1351,7 +1353,8 @@ def to_add_derivation() -> ResponseReturnValue:
                     logger.error(
                         "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
                     )
-                    return f"<h1>Input must be ASCII only</h1>\n{escape(derivation_name_latex)}"
+                    flash(f"Input must be ASCII only:{escape(derivation_name_latex)}")
+                    return redirect(url_for("to_add_derivation"))
 
                 # this preserves the LaTeX backslashes exactly as the user typed them.
                 derivation_reference_latex = str(
@@ -1379,9 +1382,8 @@ def to_add_derivation() -> ResponseReturnValue:
                 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
                 if not abstract_latex.isascii():
                     logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
-                    return (
-                        f"<h1>Input must be ASCII only</h1>\n{escape(abstract_latex)}"
-                    )
+                    flash(f"Input must be ASCII only: {escape(abstract_latex)}")
+                    return redirect(url_for("to_add_expression"))
 
                 # 2025-01-04, BHP: the following has been commented out
                 # because the safety of string should be applied on writing, not reading
@@ -1539,7 +1541,7 @@ def to_review_derivation(
                 pdf_filename = latex.create_pdf_for_derivation(
                     all_steps,
                     derivation_dict,
-                    "/code/static/",
+                    web_app.static_folder,
                 )
             except Exception as err:
                 # logger.error(str(err))
@@ -1570,7 +1572,7 @@ def to_review_derivation(
                 latex.create_tex_file_for_derivation(
                     all_steps,
                     derivation_dict,
-                    "/code/static/",
+                    web_app.static_folder,
                 )
                 tex_filename = str(derivation_id)
             except Exception as err:
@@ -1640,7 +1642,7 @@ def to_review_derivation(
 
     # only create d3js JSON if the HTML page is going to be rendered
     try:
-        latex.create_d3js_json(derivation_id, all_steps, "/code/static/")
+        latex.create_d3js_json(derivation_id, all_steps, web_app.static_folder)
         # if that function fails then there's no JSON file for d3js
     except Exception as err:
         flash(
@@ -1660,7 +1662,7 @@ def to_review_derivation(
         derivation_id,
         derivation_name_latex,
         all_steps,
-        "/code/static/",
+        web_app.static_folder,
     )
 
     logger.info(
@@ -1816,7 +1818,8 @@ def to_edit_derivation_metadata(
                     logger.error(
                         "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
                     )
-                    return f"<h1>Input must be ASCII only</h1>\n{escape(derivation_name_latex)}"
+                    flash(f"Input must be ASCII only{escape(derivation_name_latex)}")
+                    return redirect(url_for("to_review_derivation"))
 
                 derivation_reference_latex = latex.make_string_safe_for_latex(
                     str(
@@ -1842,9 +1845,8 @@ def to_edit_derivation_metadata(
                 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
                 if not abstract_latex.isascii():
                     logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
-                    return (
-                        f"<h1>Input must be ASCII only</h1>\n{escape(abstract_latex)}"
-                    )
+                    flash(f"Input must be ASCII only: {escape(abstract_latex)}")
+                    return redirect(url_for("to_add_expression"))
 
                 # as per https://strftime.org/
                 # %f = Microsecond as a decimal number, zero-padded on the left.
@@ -2718,7 +2720,8 @@ def to_add_expression() -> ResponseReturnValue:
                     logger.error(
                         "Non-ascii expression_latex_lhs: " + str(expression_latex_lhs)
                     )
-                    return f"<h1>Input must be ASCII only</h1>\n{escape(expression_latex_lhs)}"
+                    flash(f"Input must be ASCII only{escape(expression_latex_lhs)}")
+                    return redirect(url_for("to_add_expression"))
 
                 # the web UI dropdown returns the symbol ID (and not Latex string)
                 #'symbol_relation_id_to_add', '2222545'
@@ -3152,7 +3155,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> ResponseReturnValue:
         raise Exception("ERROR: shouldn't reach here 9942892424")
 
     raise Exception("ERROR: shouldn't reach here 01948138481")
-    return "ERROR: definitely shouldn't get here"
+    return
 
 
 @web_app.route("/edit_operation/<operation_id>", methods=["GET", "POST"])
@@ -5464,12 +5467,19 @@ def to_edit_step(
     #  - gets the relevant step_dict that matches the user-provided ID
     #  and
     #  - gets the list of sequence indicies
+
+    step_dict = None
+
     list_of_sequence_values = []  # type: List[str]
     for each_step_dict in list_of_step_dicts:
         list_of_sequence_values.append(each_step_dict["sequence_index"])
         if each_step_dict["id"] == step_id:
             step_dict = each_step_dict
             # break
+
+    if step_dict is None:
+        flash("pdg_app/to_edit_step: step not found")
+        return redirect(url_for("to_review_derivation", derivation_id=derivation_id))
 
     list_of_sequence_values.sort()
     logger.info("step_dict=" + str(step_dict))
@@ -5951,6 +5961,9 @@ def to_query() -> ResponseReturnValue:
 
     possibly clean the URL using https://stackoverflow.com/a/26619855/1164295
 
+    Gemini 3.1 Pro says
+    Malicious users can cause Denial of Service (DoS) via Cartesian products,
+    or bypass application logic to scrape the entire database.
 
     Embedding Jinja2 expansions into the string passed to the web page doesn't work in either a case where you have safe or unsafe pipe
     The pipe safe situation means the string is interpreted as is with no alterations,
@@ -7529,8 +7542,6 @@ def scrape_arxiv():
         logger.info(str(user_query_author_list))
     else:
         user_query_author_list = None
-
-    # flash(user_query) # flash doesn't work since this isn't a jinja2 page :(
 
     def _format_match_message(entry: Dict[str, Any], reason: str) -> str:
         """Formats a consistent message for a found match."""
