@@ -5022,7 +5022,7 @@ MATCH (n1:step{id:"0008485725"}), (n2:inference_rule{id:"0000111299"}) CREATE (n
 MATCH (n1:step{id:"0008162484"}), (n2:inference_rule{id:"0000111237"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
 MATCH (n1:step{id:"0008485747"}), (n2:inference_rule{id:"0000111634"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
 MATCH (n1:step{id:"0009492883"}), (n2:inference_rule{id:"0000111457"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
-MATCH (n1:step{id:"0001306821"}), (n2:inference_rule{id:"0000111777"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
+MATCH (n1:step{id:"0001306821"}), (n2:inference_rule{id:"0000111236"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
 MATCH (n1:step{id:"0008571277"}), (n2:inference_rule{id:"0000111355"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
 MATCH (n1:step{id:"0008572265"}), (n2:inference_rule{id:"0000111634"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
 MATCH (n1:step{id:"0001608311"}), (n2:inference_rule{id:"0000111182"}) CREATE (n1)-[r:HAS_INFERENCE_RULE]->(n2);
