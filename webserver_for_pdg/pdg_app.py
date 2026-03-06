@@ -1018,7 +1018,7 @@ def to_index():
         d3js_json_filename = T_and_f_derivation_ID + ".json"
     except Exception as err:
         logger.error(str(type(err).__name__) + ": " + str(err))
-        flash("pdg_app/to_index: " + str(type(err).__name__) + str(err))
+        flash("pdg_app/to_index: " + str(type(err).__name__) + ": " + str(err))
         d3js_json_filename = ""
 
     logger.info("[TRACE] end " + trace_id)
@@ -1525,7 +1525,7 @@ def to_review_derivation(
                     + str(type(err).__name__)
                     + str(err)
                 )
-                logger.error(str(type(err).__name__) + str(err))
+                logger.error(str(type(err).__name__) + ": " + str(err))
                 pdf_filename = "error.pdf"
 
             logger.info("[TRACE] end " + trace_id)
@@ -1557,7 +1557,7 @@ def to_review_derivation(
                     + str(type(err).__name__)
                     + str(err)
                 )
-                logger.error(str(type(err).__name__) + str(err))
+                logger.error(str(type(err).__name__) + ": " + str(err))
                 logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("select_from_existing_derivations"))
 
@@ -1616,8 +1616,10 @@ def to_review_derivation(
         latex.create_d3js_json(derivation_id, all_steps, "/code/static/")
         # if that function fails then there's no JSON file for d3js
     except Exception as err:
-        flash("pdg_app/to_review_derivation: " + str(type(err).__name__) + str(err))
-        logger.error(str(type(err).__name__) + str(err))
+        flash(
+            "pdg_app/to_review_derivation: " + str(type(err).__name__) + ": " + str(err)
+        )
+        logger.error(str(type(err).__name__) + ": " + str(err))
 
     d3js_json_filename = derivation_id + ".json"
 
@@ -1658,7 +1660,7 @@ def to_review_derivation(
                 + " "
                 + str(step_id)
             )
-            logger.error(str(type(err).__name__) + str(err))
+            logger.error(str(type(err).__name__) + ": " + str(err))
 
     logger.info("[TRACE] end " + trace_id)
     return render_template(
@@ -6551,7 +6553,7 @@ def to_list_expressions() -> ResponseReturnValue:
     )
     # except Exception as err:
     #     flash("ERROR in to_list_expressions: " + str(err))
-    #     logger.error(str(type(err).__name__) + str(err))
+    #     logger.error(str(type(err).__name__) + ": " + str(err))
     #     dimensional_consistency_per_expression_id = {}
 
     # logger.info(
@@ -6563,7 +6565,7 @@ def to_list_expressions() -> ResponseReturnValue:
     list_of_expressions = compute.get_sympy_as_latex_per_expr_id(list_of_expressions)
     # except Exception as err:
     #     flash("ERROR in to_list_expressions: " + str(err))
-    #     logger.error(str(type(err).__name__) + str(err))
+    #     logger.error(str(type(err).__name__) + ": " + str(err))
     #     list_of_expressions = []
 
     logger.info("[TRACE] end " + trace_id)
