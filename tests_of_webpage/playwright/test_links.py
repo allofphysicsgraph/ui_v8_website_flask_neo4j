@@ -71,105 +71,6 @@ def test_get_query_page(page: Page):
     expect(page).to_have_title(re.compile("Query"))
 
 
-def test_get_review_derivation_instance(page: Page):
-    page.on("console", lambda msg: print(f"Console: {msg.text}"))
-    page.on("pageerror", lambda exc: print(f"JS Error: {exc}"))
-
-    page.goto(URL + "/review_derivation/0000201726")
-
-    expect(
-        page.get_by_role("heading", name=re.compile("Symbols used in"))
-    ).to_be_visible()
-
-    pdf_button = page.locator('input[name="generate pdf"]')
-
-    page.wait_for_load_state("networkidle")  # Wait for all scripts to finish loading
-
-    # When you click a button that triggers a download (especially one served with a
-    # `Content-Disposition: attachment` header), the browser does not navigate the
-    # page to a new URL. It stays on the current page while the file downloads in the background.
-
-    with page.expect_download() as download_info:
-        pdf_button.click(force=True)
-
-        download = download_info.value
-        print(f"Downloaded from: {download.url}")
-
-        # ASSERT AGAINST THE DOWNLOAD URL, NOT THE PAGE
-        expected_pdf_url = (
-            URL + "/static/0000201726.pdf?referrer=select_from_existing_derivations"
-        )
-        assert download.url == expected_pdf_url
-
-        # Wait for the download process to complete
-        path = (
-            download.path()
-        )  # This waits for the download to finish and returns local path
-        assert path is not None
-
-        # Check the filename
-        assert download.suggested_filename == "0000201726.pdf"
-
-    # Verify the page didn't navigate away
-    expect(page).to_have_url(URL + "/review_derivation/0000201726")
-
-
-def test_get_query_list_derivation_IDs(page: Page):
-    page.goto(URL + "/query?cypher=MATCH%20(n:derivation)%20RETURN%20n.id")
-
-    expect(page.get_by_role("heading", name="Cypher query")).to_be_visible()
-
-    raw_records = page.locator("ul li span.mathjax_ignore").all_text_contents()
-
-    derivation_ids = []
-    for text in raw_records:
-        match = re.search(r"n\.id='(\d+)'", text)
-        if match:
-            derivation_ids.append(match.group(1))
-
-    for dev_id in derivation_ids:
-        page.goto(f"{URL}/review_derivation/{dev_id}")
-
-        expect(
-            page.get_by_role("heading", name=re.compile("Symbols used in"))
-        ).to_be_visible()
-
-        pdf_button = page.locator('input[name="generate pdf"]')
-
-        page.wait_for_load_state(
-            "networkidle"
-        )  # Wait for all scripts to finish loading
-
-        # When you click a button that triggers a download (especially one served with a
-        # `Content-Disposition: attachment` header), the browser does not navigate the
-        # page to a new URL. It stays on the current page while the file downloads in the background.
-
-        with page.expect_download() as download_info:
-            pdf_button.click(force=True)
-
-            download = download_info.value
-            print(f"Downloaded from: {download.url}")
-
-            # ASSERT AGAINST THE DOWNLOAD URL, NOT THE PAGE
-            expected_pdf_url = (
-                URL
-                + "/static/"
-                + dev_id
-                + ".pdf?referrer=select_from_existing_derivations"
-            )
-            assert download.url == expected_pdf_url
-
-            # Wait for the download process to complete
-            path = (
-                download.path()
-            )  # This waits for the download to finish and returns local path
-            assert path is not None
-
-            # Check the filename
-            assert download.suggested_filename == dev_id + ".pdf"
-
-        # Verify the page didn't navigate away
-        expect(page).to_have_url(URL + "/review_derivation/" + dev_id)
 
 
 def test_get_list_feeds_page(page: Page):
@@ -572,3 +473,103 @@ def test_get_class_notes_page(page: Page):
 
 def test_get_spectrum_precision_overview_page(page: Page):
     page.goto(URL + "/spectrum_of_precision/overview")
+
+def test_get_review_derivation_instance(page: Page):
+    page.on("console", lambda msg: print(f"Console: {msg.text}"))
+    page.on("pageerror", lambda exc: print(f"JS Error: {exc}"))
+
+    page.goto(URL + "/review_derivation/0000201726")
+
+    expect(
+        page.get_by_role("heading", name=re.compile("Symbols used in"))
+    ).to_be_visible()
+
+    pdf_button = page.locator('input[name="generate pdf"]')
+
+    page.wait_for_load_state("networkidle")  # Wait for all scripts to finish loading
+
+    # When you click a button that triggers a download (especially one served with a
+    # `Content-Disposition: attachment` header), the browser does not navigate the
+    # page to a new URL. It stays on the current page while the file downloads in the background.
+
+    with page.expect_download() as download_info:
+        pdf_button.click(force=True)
+
+        download = download_info.value
+        print(f"Downloaded from: {download.url}")
+
+        # ASSERT AGAINST THE DOWNLOAD URL, NOT THE PAGE
+        expected_pdf_url = (
+            URL + "/static/0000201726.pdf?referrer=select_from_existing_derivations"
+        )
+        assert download.url == expected_pdf_url
+
+        # Wait for the download process to complete
+        path = (
+            download.path()
+        )  # This waits for the download to finish and returns local path
+        assert path is not None
+
+        # Check the filename
+        assert download.suggested_filename == "0000201726.pdf"
+
+    # Verify the page didn't navigate away
+    expect(page).to_have_url(URL + "/review_derivation/0000201726")
+
+
+def test_get_query_list_derivation_IDs(page: Page):
+    page.goto(URL + "/query?cypher=MATCH%20(n:derivation)%20RETURN%20n.id")
+
+    expect(page.get_by_role("heading", name="Cypher query")).to_be_visible()
+
+    raw_records = page.locator("ul li span.mathjax_ignore").all_text_contents()
+
+    derivation_ids = []
+    for text in raw_records:
+        match = re.search(r"n\.id='(\d+)'", text)
+        if match:
+            derivation_ids.append(match.group(1))
+
+    for dev_id in derivation_ids:
+        page.goto(f"{URL}/review_derivation/{dev_id}")
+
+        expect(
+            page.get_by_role("heading", name=re.compile("Symbols used in"))
+        ).to_be_visible()
+
+        pdf_button = page.locator('input[name="generate pdf"]')
+
+        page.wait_for_load_state(
+            "networkidle"
+        )  # Wait for all scripts to finish loading
+
+        # When you click a button that triggers a download (especially one served with a
+        # `Content-Disposition: attachment` header), the browser does not navigate the
+        # page to a new URL. It stays on the current page while the file downloads in the background.
+
+        with page.expect_download() as download_info:
+            pdf_button.click(force=True)
+
+            download = download_info.value
+            print(f"Downloaded from: {download.url}")
+
+            # ASSERT AGAINST THE DOWNLOAD URL, NOT THE PAGE
+            expected_pdf_url = (
+                URL
+                + "/static/"
+                + dev_id
+                + ".pdf?referrer=select_from_existing_derivations"
+            )
+            assert download.url == expected_pdf_url
+
+            # Wait for the download process to complete
+            path = (
+                download.path()
+            )  # This waits for the download to finish and returns local path
+            assert path is not None
+
+            # Check the filename
+            assert download.suggested_filename == dev_id + ".pdf"
+
+        # Verify the page didn't navigate away
+        expect(page).to_have_url(URL + "/review_derivation/" + dev_id)
