@@ -470,37 +470,93 @@ def create_tex_file_for_derivation(
                 latex_file_handle.write(
                     "\\newcommand\\"
                     + "".join(filter(str.isalpha, infrule_dict["name_latex"]))
-                    + "[9]{"
+                    + "[9]{%\n"
                     + "\\def\\ArgOne{{#1}}\n\\def\\ArgTwo{{#2}}\n\\def\\ArgThree{{#3}}\n\\def\\ArgFour{{#4}}\n\\def\\ArgFive{{#5}}\n"
                     + "\\def\\ArgSix{{#6}}\n\\def\\ArgSeven{{#7}}\n\\def\\ArgEight{{#8}}\n\\def\\ArgNine{{#9}}\n\\"
                     + "".join(filter(str.isalpha, infrule_dict["name_latex"]))
                     + "Relay\n"
                     + "}\n"
                 )
-                latex_file_handle.write(
+
+                logger.info("infrule latex=" + infrule_dict["latex"])
+
+                updated_latex = (
+                    infrule_dict["latex"]
+                    .replace("$#10$", "DOLLAR_HASHTAGTEN")
+                    .replace("$#11$", "DOLLAR_HASHTAGELEVEN")
+                    .replace("$#12$", "DOLLAR_HASHTAGTWELVE")
+                    .replace("$#13$", "DOLLAR_HASHTAGTHIRTEEN")
+                    .replace("$#14$", "DOLLAR_HASHTAGFOURTEEN")
+                )
+
+                updated_latex = (
+                    infrule_dict["latex"]
+                    .replace("#10", "BARE_HASHTAGTEN")
+                    .replace("#11", "BARE_HASHTAGELEVEN")
+                    .replace("#12", "BARE_HASHTAGTWELVE")
+                    .replace("#13", "BARE_HASHTAGTHIRTEEN")
+                    .replace("#14", "BARE_HASHTAGFOURTEEN")
+                )
+
+                logger.info("updated_latex with HASHTAG=" + updated_latex)
+
+                updated_latex = (
+                    updated_latex.replace("\r", "\\r")
+                    .replace("$#1$", "\\ensuremath{\\ArgOne{}}")
+                    .replace("$#2$", "\\ensuremath{\\ArgTwo{}}")
+                    .replace("$#3$", "\\ensuremath{\\ArgThree{}}")
+                    .replace("$#4$", "\\ensuremath{\\ArgFour{}}")
+                    .replace("$#5$", "\\ensuremath{\\ArgFive{}}")
+                    .replace("$#6$", "\\ensuremath{\\ArgSix{}}")
+                    .replace("$#7$", "\\ensuremath{\\ArgSeven{}}")
+                    .replace("$#8$", "\\ensuremath{\\ArgEight{}}")
+                    .replace("$#9$", "\\ensuremath{\\ArgNine{}}")
+                )
+
+                updated_latex = (
+                    updated_latex.replace("\r", "\\r")
+                    .replace("#1", "\\ArgOne{}")
+                    .replace("#2", "\\ArgTwo{}")
+                    .replace("#3", "\\ArgThree{}")
+                    .replace("#4", "\\ArgFour{}")
+                    .replace("#5", "\\ArgFive{}")
+                    .replace("#6", "\\ArgSix{}")
+                    .replace("#7", "\\ArgSeven{}")
+                    .replace("#8", "\\ArgEight{}")
+                    .replace("#9", "\\ArgNine{}")
+                )
+
+                logger.info("updated_latex replaced 1-9: " + updated_latex)
+
+                updated_latex = (
+                    updated_latex.replace("DOLLAR_HASHTAGTEN", "\\ensuremath{#1}")
+                    .replace("DOLLAR_HASHTAGELEVEN", "\\ensuremath{#2}")
+                    .replace("DOLLAR_HASHTAGTWELVE", "\\ensuremath{#3}")
+                    .replace("DOLLAR_HASHTAGTHIRTEEN", "\\ensuremath{#4}")
+                    .replace("DOLLAR_HASHTAGFOURTEEN", "\\ensuremath{#5}")
+                )
+                updated_latex = (
+                    updated_latex.replace("BARE_HASHTAGTEN", "#1")
+                    .replace("BARE_HASHTAGELEVEN", "#2")
+                    .replace("BARE_HASHTAGTWELVE", "#3")
+                    .replace("BARE_HASHTAGTHIRTEEN", "#4")
+                    .replace("BARE_HASHTAGFOURTEEN", "#5")
+                )
+
+                logger.info("updated_latex desired: " + updated_latex)
+
+                relay_str = (
                     "\\newcommand\\"
                     + "".join(filter(str.isalpha, infrule_dict["name_latex"]))
                     + "Relay["
                     + str(number_of_args - 9)
-                    + "]{"
-                    + infrule_dict["latex"]
-                    .replace("\r", "\\r")
-                    .replace("#1", "ArgOne")
-                    .replace("#2", "ArgTwo")
-                    .replace("#3", "ArgThree")
-                    .replace("#4", "ArgFour")
-                    .replace("#5", "ArgFive")
-                    .replace("#6", "ArgSix")
-                    .replace("#7", "ArgSeven")
-                    .replace("#8", "ArgEight")
-                    .replace("#9", "ArgNine")
-                    .replace("#10", "#1")
-                    .replace("#11", "#2")
-                    .replace("#12", "#3")
-                    .replace("#13", "#4")
-                    .replace("#14", "#5")
+                    + "]{%\n"
+                    + updated_latex
                     + "}\n"
                 )
+
+                logger.info("relay_str=" + relay_str)
+                latex_file_handle.write(relay_str)
 
         latex_file_handle.write("\\title{" + str(derivation_dict["name_latex"]) + "}\n")
         latex_file_handle.write("\\date{\\today}\n")
@@ -593,7 +649,8 @@ def create_tex_file_for_derivation(
                 + "".join(filter(str.isalpha, inference_rule_name))
             )
             for feed_latex in list_of_feed_latex:
-                latex_file_handle.write("{$" + feed_latex + "$}")
+                # latex_file_handle.write("{$" + feed_latex + "$}")
+                latex_file_handle.write("{" + feed_latex + "}")  # ensuremath
             for input_latex in list_of_input_expression_latex:
                 this_str = str(input_latex) + str(derivation_dict["name_latex"])
                 local_id = hash_of_string(this_str)
@@ -700,14 +757,15 @@ def create_pdf_for_derivation(
     latex_stdout = process.stdout.decode("utf-8")
     latex_stderr = process.stderr.decode("utf-8")
 
-    # logger.debug("latex std out: %s", latex_stdout)
-    # logger.debug("latex std err: %s", latex_stderr)
-
     if "Text line contains an invalid character" in latex_stdout:
-        # logger.error("no PDF generated - tex contains invalid character")
+        logger.error("no PDF generated - tex contains invalid character")
+        logger.error("latex std out: %s", latex_stdout)
+        logger.error("latex std err: %s", latex_stderr)
         raise Exception("no PDF generated - tex contains invalid character")
     if "No pages of output." in latex_stdout:
-        # logger.error("no PDF generated - reason unknown")
+        logger.error("no PDF generated")
+        logger.error("latex std out: %s", latex_stdout)
+        logger.error("latex std err: %s", latex_stderr)
         raise Exception("no PDF generated - reason unknown")
 
     # first of two bibtex runs
