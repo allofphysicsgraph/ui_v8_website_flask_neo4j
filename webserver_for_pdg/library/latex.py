@@ -196,7 +196,8 @@ def create_d3js_json(
 
         if not os.path.isfile(destination_folder + png_name + ".png"):
             create_png_from_latex(
-                "\\text{" + step_dict["inference rule dict"]["name_latex"] + "}",
+                step_dict["inference rule dict"]["name_latex"],
+                # "\\text{" + step_dict["inference rule dict"]["name_latex"] + "}",
                 destination_folder,
                 png_name,
             )
@@ -220,8 +221,8 @@ def create_d3js_json(
             + '"img": "/static/'
             + png_name
             + '.png", '
-            + '"url": "https://allofphysics.com/list_all_inference_rules?referrer=d3js#'
-            + step_dict["inference rule dict"]["name_latex"]
+            + '"url": "https://allofphysics.com/list_inference_rules?referrer=d3js#'
+            + step_dict["inference rule dict"]["id"]
             + '", "width": '
             + str(image.shape[1])
             + ", "
@@ -279,7 +280,7 @@ def create_d3js_json(
 
             if not os.path.isfile(destination_folder + png_name + ".png"):
                 create_png_from_latex(
-                    expression_latex,
+                    "$" + expression_latex + "$",
                     destination_folder,
                     png_name,
                 )
@@ -294,7 +295,7 @@ def create_d3js_json(
                 + '"img": "/static/'
                 + png_name
                 + '.png", '
-                + '"url": "https://allofphysiscs.com/list_all_expressions?referrer=d3js#'
+                + '"url": "https://allofphysics.com/list_expressions?referrer=d3js#'
                 + this_expression_dict["id"]
                 + '", "width": '
                 + str(image.shape[1])
@@ -851,9 +852,11 @@ def create_pdf_for_derivation(
 
 
 def create_png_from_latex(
-    input_latex_str: str, destination_folder: str, png_filename_no_extension: str
+    user_provided_latex: str, destination_folder: str, filename_no_extension: str
 ) -> None:
     """
+    if "destination_folder + filename_no_extension" doesn't exist,
+
     Used for both d3js representation and for graphviz.
     Relevant to both expressions and inference rules
 
@@ -878,128 +881,125 @@ def create_png_from_latex(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
-    logger.info("png_filename_no_extension" + str(png_filename_no_extension))
+    logger.info("latex = " + str(user_provided_latex))
+    logger.info("filename_no_extension" + str(filename_no_extension))
 
     destination_folder += "/"
 
-    #    logger.debug("png_filename_no_extension = %s", png_filename_no_extension)
-    #    logger.debug("input latex str = %s", input_latex_str)
+    if os.path.exists(destination_folder + filename_no_extension + ".png"):
+        logger.info("PNG already exists; do not recreate")
+        return
 
-    tmp_latex_folder = "tmp_latex_folder_for_create_png_from_latex_" + str(
+    # use a temp folder to limit the pollution associated with generating latex
+    tmp_folder = "tmp_latex_folder_for_create_png_from_latex_" + str(
         random.randint(1000000, 9999999)
     )
-    tmp_latex_folder_full_path = os.getcwd() + "/" + tmp_latex_folder + "/"
-    original_dir = os.getcwd()
-    os.mkdir(tmp_latex_folder_full_path)
-    os.chdir(tmp_latex_folder_full_path)
+    logger.info("tmp_folder=" + tmp_folder)
+    tmp_folder_full_path = os.getcwd() + "/" + tmp_folder + "/"
+    logger.info("tmp_folder_full_path=" + tmp_folder_full_path)
+    os.mkdir(tmp_folder_full_path)
 
-    tmp_file_no_extension_full_path = "lat"
+    create_tex_file_for_latex_string(
+        tmp_folder_full_path + filename_no_extension, user_provided_latex
+    )
 
-    # logger.debug("latex = " + str(input_latex_str))
-    logger.info("latex = " + str(input_latex_str))
-    create_tex_file_for_latex_string(tmp_file_no_extension_full_path, input_latex_str)
+    filename_with_tex_extension = filename_no_extension + ".tex"
+    logger.info("filename_with_tex_extension:" + filename_with_tex_extension)
 
-    tex_filename_with_hash = png_filename_no_extension + ".tex"
-    logger.info("tex_filename_with_hash:" + tex_filename_with_hash)
+    shutil.copy(
+        tmp_folder_full_path + filename_with_tex_extension,
+        destination_folder + filename_with_tex_extension,
+    )
 
-    # shutil.move(tmp_file_no_extension_full_path + ".tex", tex_filename_with_hash)
-    # logger.debug(str(os.listdir()))
+    process = subprocess.run(
+        ["latex", "-halt-on-error", tmp_folder_full_path + filename_with_tex_extension],
+        cwd=tmp_folder_full_path,
+        stdout=PIPE,
+        stderr=PIPE,
+        timeout=proc_timeout,
+    )
+    # https://stackoverflow.com/questions/41171791/how-to-suppress-or-capture-the-output-of-subprocess-run
+    latex_stdout = process.stdout.decode("utf-8")
+    latex_stderr = process.stderr.decode("utf-8")
 
-    # only make PNG if .tex did not exist
-    if not os.path.exists(destination_folder + tex_filename_with_hash):
-        shutil.copy(
-            tmp_file_no_extension_full_path + ".tex",
-            destination_folder + tex_filename_with_hash,
-        )
+    if not (os.path.isfile(tmp_folder_full_path + filename_no_extension + ".dvi")):
 
-        process = subprocess.run(
-            ["latex", "-halt-on-error", tmp_file_no_extension_full_path + ".tex"],
-            stdout=PIPE,
-            stderr=PIPE,
-            timeout=proc_timeout,
-        )
-        # https://stackoverflow.com/questions/41171791/how-to-suppress-or-capture-the-output-of-subprocess-run
-        latex_stdout = process.stdout.decode("utf-8")
-        latex_stderr = process.stderr.decode("utf-8")
+        logger.info(str(os.listdir(tmp_folder_full_path)))
 
-        #    logger.debug(str(os.listdir()))
-
-        # logger.debug("latex std out:" + str(latex_stdout))
-        # logger.debug("latex std err:" + str(latex_stderr))
         logger.info("latex std out:" + str(latex_stdout))
         logger.info("latex std err:" + str(latex_stderr))
 
         if "Text line contains an invalid character" in latex_stdout:
             # logging.error("tex input contains invalid charcter")
             logger.error("tex input contains invalid charcter")
-            shutil.copy(
-                destination_folder + "error.png",
-                destination_folder + png_filename_no_extension,
-            )
-            raise Exception("no png generated due to invalid character in tex input.")
-        #    compute.remove_file_debris(["./"], [tmp_file_no_extension_full_path], ["png"])
 
-        # dvipng file.dvi -T tight -o file.png
-        process = subprocess.run(
-            [
-                "dvipng",
-                tmp_file_no_extension_full_path + ".dvi",
-                "-T",
-                "tight",
-                "-o",
-                tmp_file_no_extension_full_path + ".png",
-            ],
-            stdout=PIPE,
-            stderr=PIPE,
-            timeout=proc_timeout,
+        shutil.copy(
+            "/code/static/error.png",
+            destination_folder + filename_no_extension + ".png",
         )
-        # https://stackoverflow.com/questions/41171791/how-to-suppress-or-capture-the-output-of-subprocess-run
-        png_stdout = process.stdout.decode("utf-8")
-        png_stderr = process.stderr.decode("utf-8")
+        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        return
+        # raise Exception("no png generated due to invalid character in tex input.")
+    #    compute.remove_file_debris(["./"], [tmp_file_no_extension_full_path], ["png"])
+
+    # dvipng file.dvi -T tight -o file.png
+    process = subprocess.run(
+        [
+            "dvipng",
+            tmp_folder_full_path + filename_no_extension + ".dvi",
+            "-T",
+            "tight",
+            "-o",
+            tmp_folder_full_path + filename_no_extension + ".png",
+        ],
+        cwd=tmp_folder_full_path,
+        stdout=PIPE,
+        stderr=PIPE,
+        timeout=proc_timeout,
+    )
+    # https://stackoverflow.com/questions/41171791/how-to-suppress-or-capture-the-output-of-subprocess-run
+    png_stdout = process.stdout.decode("utf-8")
+    png_stderr = process.stderr.decode("utf-8")
+
+    if not (os.path.isfile(tmp_folder_full_path + filename_no_extension + ".png")):
+        logger.info(str(os.listdir(tmp_folder_full_path)))
 
         if len(png_stdout) > 0:
-            if "This is dvipng" not in png_stdout:
-                # logger.debug("png std out %s", png_stdout)
-                logger.info("png std out " + png_stdout)
+            logger.info("png std out " + png_stdout)
+
+            # if "This is dvipng" not in png_stdout:
+            #     # logger.debug("png std out %s", png_stdout)
+            #     logger.info("png std out does not include 'This is dvipng'")
         if len(png_stderr) > 0:
             # logger.debug("png std err %s", png_stderr)
             logger.info("png std err " + png_stderr)
 
-        # logger.debug(str(os.listdir()))
-
-        if "No such file or directory" in png_stderr:
-            # logging.error("PNG creation failed for %s", png_filename_no_extension)
-            logger.info(
-                "PNG creation failed for " + png_filename_no_extension,
-            )
-            shutil.copy(
-                destination_folder + "error.png",
-                destination_folder + png_filename_no_extension,
-            )
-            # return False, "no PNG created. Check usepackage in latex"
-            raise Exception(
-                "no PNG created for "
-                + png_filename_no_extension
-                + ". Check 'usepackage' in latex"
-            )
-
-        if not (os.path.isfile(tmp_file_no_extension_full_path + ".png")):
-            # logging.error("PNG creation failed for %s", png_filename_no_extension)
-            logger.info("PNG creation failed for " + png_filename_no_extension)
-
-        shutil.move(
-            tmp_file_no_extension_full_path + ".png",
-            destination_folder + png_filename_no_extension + ".png",
+        shutil.copy(
+            "/code/static/error.png",
+            destination_folder + filename_no_extension + ".png",
         )
+        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        return
+        # return False, "no PNG created. Check usepackage in latex"
+        # raise Exception(
+        #     "no PNG created for "
+        #     + filename_no_extension
+        #     + "; Check 'usepackage' in latex"
+        # )
 
-    # logger.debug(destination_folder + png_filename_no_extension + ".png")
-    logger.info("dest:" + destination_folder + png_filename_no_extension + ".png")
+    shutil.move(
+        tmp_folder_full_path + filename_no_extension + ".png",
+        destination_folder + filename_no_extension + ".png",
+    )
+
+    # logger.debug(destination_folder + filename_no_extension + ".png")
+    logger.info("destination=" + destination_folder + filename_no_extension + ".png")
     # /code/static/addxtobothsides.png
 
-    os.chdir(original_dir)
-    shutil.rmtree(tmp_latex_folder_full_path)
+    # os.chdir(original_dir)  # this smells bad!
+    shutil.rmtree(tmp_folder_full_path)
 
-    #    if os.path.isfile(destination_folder + png_filename_no_extension):
+    #    if os.path.isfile(destination_folder + filename_no_extension):
     # os.remove('/code/static/'+name_of_png)
     #        logger.error("png already exists!")
 
@@ -1009,13 +1009,13 @@ def create_png_from_latex(
 
 
 def create_tex_file_for_latex_string(
-    tmp_file_no_extension_full_path: str, input_latex_str: str
+    tmp_file_no_extension_full_path: str, user_provided_latex: str
 ) -> None:
     """
 
     Args:
         tmp_file_no_extension_full_path:
-        input_latex_str:
+        user_provided_latex:
     Returns:
         None
 
@@ -1027,7 +1027,7 @@ def create_tex_file_for_latex_string(
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     logger.info("tmp_file_no_extension_full_path:" + tmp_file_no_extension_full_path)
-    logger.info("input_latex_str:" + input_latex_str)
+    logger.info("user_provided_latex:" + user_provided_latex)
 
     # compute.remove_file_debris(["./"], [tmp_file_no_extension_full_path], ["tex"])
 
@@ -1055,7 +1055,8 @@ def create_tex_file_for_latex_string(
 
         latex_file_handle.write("\\begin{document}\n")
         latex_file_handle.write("\\huge{\n")
-        latex_file_handle.write("$" + input_latex_str + "$\n")
+        latex_file_handle.write(user_provided_latex + "\n")
+        # latex_file_handle.write("$" + user_provided_latex + "$\n")
         latex_file_handle.write("}\n")
         latex_file_handle.write("\\end{document}\n")
     # logger.debug("wrote tex file")
@@ -1318,20 +1319,21 @@ def write_step_to_graphviz_file(
     logger.info("list_of_output_dicts" + str(list_of_output_dicts))
 
     # inference rule
-    png_filename_no_extension = "".join(
+    filename_no_extension = "".join(
         filter(str.isalnum, inference_rule_dict["name_latex"])
     )
-    if not os.path.isfile(path_to_output_png + png_filename_no_extension + ".png"):
+    if not os.path.isfile(path_to_output_png + filename_no_extension + ".png"):
         create_png_from_latex(
-            "\\text{" + inference_rule_dict["name_latex"] + "}",
+            inference_rule_dict["name_latex"],
+            # "\\text{" + inference_rule_dict["name_latex"] + "}",
             path_to_output_png,
-            png_filename_no_extension,
+            filename_no_extension,
         )
     file_handle.write(
         step_id
         + ' [shape=invtrapezium, color=blue, label="",image="'
         + path_to_output_png
-        + png_filename_no_extension
+        + filename_no_extension
         + ".png"
         + '",labelloc=b];\n'
     )
@@ -1346,19 +1348,19 @@ def write_step_to_graphviz_file(
             + " "
             + input_dict["latex_rhs"]
         )
-        png_filename_no_extension = (
+        filename_no_extension = (
             "expression_" + input_dict["id"] + "_" + hash_of_string(input_latex)
         )
-        if not os.path.isfile(path_to_output_png + png_filename_no_extension + ".png"):
+        if not os.path.isfile(path_to_output_png + filename_no_extension + ".png"):
             create_png_from_latex(
-                input_latex, path_to_output_png, png_filename_no_extension
+                "$" + input_latex + "$", path_to_output_png, filename_no_extension
             )
-        file_handle.write(png_filename_no_extension + " -> " + step_id + ";\n")
+        file_handle.write(filename_no_extension + " -> " + step_id + ";\n")
         file_handle.write(
-            png_filename_no_extension
+            filename_no_extension
             + ' [shape=ellipse, color=black,label="",image="'
             + path_to_output_png
-            + png_filename_no_extension
+            + filename_no_extension
             + ".png"
             + '",labelloc=b];\n'
         )
@@ -1374,38 +1376,40 @@ def write_step_to_graphviz_file(
             + output_dict["latex_rhs"]
         )
 
-        png_filename_no_extension = (
+        filename_no_extension = (
             "expression_" + output_dict["id"] + "_" + hash_of_string(output_latex)
         )
-        if not os.path.isfile(path_to_output_png + png_filename_no_extension + ".png"):
+        if not os.path.isfile(path_to_output_png + filename_no_extension + ".png"):
             create_png_from_latex(
-                output_latex, path_to_output_png, png_filename_no_extension
+                "$" + output_latex + "$", path_to_output_png, filename_no_extension
             )
-        file_handle.write(step_id + " -> " + png_filename_no_extension + ";\n")
+        file_handle.write(step_id + " -> " + filename_no_extension + ";\n")
         file_handle.write(
-            png_filename_no_extension
+            filename_no_extension
             + ' [shape=ellipse, color=black,label="",image="'
             + path_to_output_png
-            + png_filename_no_extension
+            + filename_no_extension
             + ".png"
             + '",labelloc=b];\n'
         )
 
     # feed expressions
     for feed_dict in list_of_feed_dicts:
-        png_filename_no_extension = (
+        filename_no_extension = (
             "feed_" + feed_dict["id"] + "_" + hash_of_string(feed_dict["latex"])
         )
-        if not os.path.isfile(path_to_output_png + png_filename_no_extension + ".png"):
+        if not os.path.isfile(path_to_output_png + filename_no_extension + ".png"):
             create_png_from_latex(
-                feed_dict["latex"], path_to_output_png, png_filename_no_extension
+                "$" + feed_dict["latex"] + "$",
+                path_to_output_png,
+                filename_no_extension,
             )
-        file_handle.write(png_filename_no_extension + " -> " + step_id + ";\n")
+        file_handle.write(filename_no_extension + " -> " + step_id + ";\n")
         file_handle.write(
-            png_filename_no_extension
+            filename_no_extension
             + ' [shape=box, color=red,label="",image="'
             + path_to_output_png
-            + png_filename_no_extension
+            + filename_no_extension
             + ".png"
             + '",labelloc=b];\n'
         )
