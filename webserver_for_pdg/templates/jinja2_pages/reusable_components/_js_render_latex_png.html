@@ -1,0 +1,44 @@
+<script type="text/javascript">
+    let debounceTimer;
+
+    function updateImage(latex_text, imgElement) {
+        if (!latex_text.trim()) {
+            imgElement.src = "";
+            imgElement.style.display = 'none';
+            return;
+        }
+
+        const url = `/api/v1/resources/png_from_latex/?tex=${encodeURIComponent(latex_text)}`;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(out => {
+                if (out.png_location) {
+                    imgElement.src = out.png_location;
+                    imgElement.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching the image:", err);
+            });
+    }
+
+    // Select all inputs with the class 'latex-input'
+    const inputFields = document.querySelectorAll('.latex-input');
+
+    // Loop through them and attach the event listener to each
+    inputFields.forEach(field => {
+        field.addEventListener('input', (e) => {
+            const currentText = e.target.value;
+            // Find the specific image linked via data-target
+            const targetId = field.getAttribute('data-target');
+            const imgElement = document.getElementById(targetId);
+
+            clearTimeout(debounceTimer);
+
+            debounceTimer = setTimeout(() => {
+                updateImage(currentText, imgElement);
+            }, 500); 
+        });
+    });
+</script>
