@@ -2526,8 +2526,8 @@ def claim_LHS_equals_RHS(
     input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
     input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
 
-    assert len(list_of_feed_dicts)==0
-    assert len(list_of_output_dicts)==0
+    assert len(list_of_feed_dicts) == 0
+    assert len(list_of_output_dicts) == 0
 
     logger.info("input_expr_sympy_lhs " + str(input_expr_sympy_lhs))
     logger.info("input_expr_sympy_rhs " + str(input_expr_sympy_rhs))
@@ -2562,7 +2562,7 @@ def function_is_even(
 
     sympy.cos(x) - sympy.cos(-x) == 0
     """
-    assert len(list_of_feed_dicts)==0
+    assert len(list_of_feed_dicts) == 0
 
     return "recognized infrule but not yet supported"
 
@@ -2583,7 +2583,7 @@ def function_is_odd(
 
     sympy.sin(-x) - -sympy.sin(x) == 0
     """
-    assert len(list_of_feed_dicts)==0
+    assert len(list_of_feed_dicts) == 0
 
     return "recognized infrule but not yet supported"
 
@@ -2619,7 +2619,7 @@ def conjugate_both_sides(
 
     Apply ^*; replace $i$ with $-i$
     """
-    assert len(list_of_feed_dicts)==0
+    assert len(list_of_feed_dicts) == 0
 
     return "recognized infrule but not yet supported"
 
@@ -2635,7 +2635,7 @@ def conjugate_transpose_both_sides(
 
     Apply ^+; replace $i$ with $-i$ and transpose matrices
     """
-    assert len(list_of_feed_dicts)==0
+    assert len(list_of_feed_dicts) == 0
 
     return "recognized infrule but not yet supported"
 
@@ -2649,7 +2649,7 @@ def distribute_conjugate_transpose_to_factors(
     Apply ^+; replace $i$ with $-i$ and transpose matrices, rotate bra-ket.
     this is a combination of "distribute conjugate" and then "distribute transpose"
     """
-    assert len(list_of_feed_dicts)==0
+    assert len(list_of_feed_dicts) == 0
 
     return "recognized infrule but not yet supported"
 
@@ -2662,7 +2662,7 @@ def distribute_conjugate_to_factors(
     """
     Apply ^*; replace $i$ with $-i$
     """
-    assert len(list_of_feed_dicts)==0
+    assert len(list_of_feed_dicts) == 0
 
     return "recognized infrule but not yet supported"
 
@@ -2675,7 +2675,7 @@ def expand_magnitude_to_conjugate(
     """
     replace |f|^2 with ff^*
     """
-    assert len(list_of_feed_dicts)==0
+    assert len(list_of_feed_dicts) == 0
 
     return "recognized infrule but not yet supported"
 
@@ -2705,8 +2705,8 @@ def simplify(
     logger.info(str(list_of_feed_dicts))  # should be empty
     logger.info(str(list_of_output_dicts))
 
-    assert len(list_of_feed_dicts)==0
-    
+    assert len(list_of_feed_dicts) == 0
+
     if not list_of_input_dicts[0]["sympy_lhs"]:
         logger.info("Not evaluated due to missing term in SymPy")
         return "Not evaluated due to missing term in SymPy"
@@ -2988,12 +2988,12 @@ def change_two_variables_in_expr(
     to get 'f + d = c'
 
     TODO: issue detected by Gemini 3 Pro on 2026-02-02:
-    The implementation uses chained substitution (.subs().subs()). This causes logical errors 
+    The implementation uses chained substitution (.subs().subs()). This causes logical errors
     if the variables being swapped are coupled (e.g., swapping x→y and y→x).
     Scenario: Input x + y, swap x->y and y->x.
     Mathematical Expectation: y + x.
     Code Behavior: (x+y).subs(x,y) becomes y+y. Then (y+y).subs(y,x) becomes x+x.
-    Result: The logic fails to handle simultaneous swaps or circular dependencies correctly. 
+    Result: The logic fails to handle simultaneous swaps or circular dependencies correctly.
     This logic applies to change_three_variables... and higher as well.
 
     # to run the doctest below, use
@@ -3052,11 +3052,15 @@ def change_two_variables_in_expr(
     output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
-        input_expr_sympy_lhs.subs({feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3}, simultaneous=True)
+        input_expr_sympy_lhs.subs(
+            {feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3}, simultaneous=True
+        )
         - output_expr_sympy_lhs
     )
     d2 = sympy.simplify(
-        input_expr_sympy_rhs.subs({feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3}, simultaneous=True)
+        input_expr_sympy_rhs.subs(
+            {feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3}, simultaneous=True
+        )
         - output_expr_sympy_rhs
     )
     if (d1 == 0) and (d2 == 0):
@@ -3111,11 +3115,25 @@ def change_three_variables_in_expr(
     output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
-        input_expr_sympy_lhs.subs({feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3, feed_sympy_4: feed_sympy_5}, simultaneous=True)
+        input_expr_sympy_lhs.subs(
+            {
+                feed_sympy_0: feed_sympy_1,
+                feed_sympy_2: feed_sympy_3,
+                feed_sympy_4: feed_sympy_5,
+            },
+            simultaneous=True,
+        )
         - output_expr_sympy_lhs
     )
     d2 = sympy.simplify(
-        input_expr_sympy_rhs.subs({feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3, feed_sympy_4: feed_sympy_5}, simultaneous=True)
+        input_expr_sympy_rhs.subs(
+            {
+                feed_sympy_0: feed_sympy_1,
+                feed_sympy_2: feed_sympy_3,
+                feed_sympy_4: feed_sympy_5,
+            },
+            simultaneous=True,
+        )
         - output_expr_sympy_rhs
     )
     if (d1 == 0) and (d2 == 0):
@@ -3150,11 +3168,27 @@ def change_four_variables_in_expr(
     output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
-        input_expr_sympy_lhs.subs({feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3, feed_sympy_4: feed_sympy_5, feed_sympy_6: feed_sympy_7}, simultaneous=True)
+        input_expr_sympy_lhs.subs(
+            {
+                feed_sympy_0: feed_sympy_1,
+                feed_sympy_2: feed_sympy_3,
+                feed_sympy_4: feed_sympy_5,
+                feed_sympy_6: feed_sympy_7,
+            },
+            simultaneous=True,
+        )
         - output_expr_sympy_lhs
     )
     d2 = sympy.simplify(
-        input_expr_sympy_rhs.subs({feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3, feed_sympy_4: feed_sympy_5, feed_sympy_6: feed_sympy_7}, simultaneous=True)
+        input_expr_sympy_rhs.subs(
+            {
+                feed_sympy_0: feed_sympy_1,
+                feed_sympy_2: feed_sympy_3,
+                feed_sympy_4: feed_sympy_5,
+                feed_sympy_6: feed_sympy_7,
+            },
+            simultaneous=True,
+        )
         - output_expr_sympy_rhs
     )
     if (d1 == 0) and (d2 == 0):
@@ -3191,11 +3225,29 @@ def change_five_variables_in_expr(
     output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
-        input_expr_sympy_lhs.subs({feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3, feed_sympy_4: feed_sympy_5, feed_sympy_6: feed_sympy_7,feed_sympy_8:feed_sympy_9}, simultaneous=True)
+        input_expr_sympy_lhs.subs(
+            {
+                feed_sympy_0: feed_sympy_1,
+                feed_sympy_2: feed_sympy_3,
+                feed_sympy_4: feed_sympy_5,
+                feed_sympy_6: feed_sympy_7,
+                feed_sympy_8: feed_sympy_9,
+            },
+            simultaneous=True,
+        )
         - output_expr_sympy_lhs
     )
     d2 = sympy.simplify(
-        input_expr_sympy_rhs.subs({feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3, feed_sympy_4: feed_sympy_5, feed_sympy_6: feed_sympy_7,feed_sympy_8:feed_sympy_9}, simultaneous=True)
+        input_expr_sympy_rhs.subs(
+            {
+                feed_sympy_0: feed_sympy_1,
+                feed_sympy_2: feed_sympy_3,
+                feed_sympy_4: feed_sympy_5,
+                feed_sympy_6: feed_sympy_7,
+                feed_sympy_8: feed_sympy_9,
+            },
+            simultaneous=True,
+        )
         - output_expr_sympy_rhs
     )
     if (d1 == 0) and (d2 == 0):
@@ -3234,11 +3286,31 @@ def change_six_variables_in_expr(
     output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
 
     d1 = sympy.simplify(
-        input_expr_sympy_lhs.subs({feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3, feed_sympy_4: feed_sympy_5, feed_sympy_6: feed_sympy_7,feed_sympy_8:feed_sympy_9,feed_sympy_10: feed_sympy_11}, simultaneous=True)
+        input_expr_sympy_lhs.subs(
+            {
+                feed_sympy_0: feed_sympy_1,
+                feed_sympy_2: feed_sympy_3,
+                feed_sympy_4: feed_sympy_5,
+                feed_sympy_6: feed_sympy_7,
+                feed_sympy_8: feed_sympy_9,
+                feed_sympy_10: feed_sympy_11,
+            },
+            simultaneous=True,
+        )
         - output_expr_sympy_lhs
     )
     d2 = sympy.simplify(
-        input_expr_sympy_rhs.subs({feed_sympy_0: feed_sympy_1, feed_sympy_2: feed_sympy_3, feed_sympy_4: feed_sympy_5, feed_sympy_6: feed_sympy_7,feed_sympy_8:feed_sympy_9,feed_sympy_10: feed_sympy_11}, simultaneous=True)
+        input_expr_sympy_rhs.subs(
+            {
+                feed_sympy_0: feed_sympy_1,
+                feed_sympy_2: feed_sympy_3,
+                feed_sympy_4: feed_sympy_5,
+                feed_sympy_6: feed_sympy_7,
+                feed_sympy_8: feed_sympy_9,
+                feed_sympy_10: feed_sympy_11,
+            },
+            simultaneous=True,
+        )
         - output_expr_sympy_rhs
     )
     if (d1 == 0) and (d2 == 0):
