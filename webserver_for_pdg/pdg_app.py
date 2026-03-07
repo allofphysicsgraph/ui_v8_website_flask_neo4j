@@ -7212,13 +7212,47 @@ def to_export_cypher() -> ResponseReturnValue:
 
 ###########################################################################
 
+# a sequential exploration of using the API to produce interactive content
 
-@web_app.route("/api_via_js")
-def to_api_via_js() -> ResponseReturnValue:
+
+@web_app.route("/api_json_to_console")
+def to_api_json_console() -> ResponseReturnValue:
     """
     HTML page created with help from Google's Gemini 2.0 LLM (free!) 2025-01-xx
     """
-    return render_template("js_with_api/api_js.html")
+    return render_template("js_with_api/api_json_to_console.html")
+
+
+@web_app.route("/api_json_to_page")
+def to_api_json_page() -> ResponseReturnValue:
+    """
+    HTML page created with help from Google's Gemini 2.0 LLM (free!) 2025-01-xx
+    """
+    return render_template("js_with_api/api_json_to_page.html")
+
+
+@web_app.route("/api_display_png")
+def to_api_display_png() -> ResponseReturnValue:
+    """
+    HTML page created with help from Google's Gemini 2.0 LLM (free!) 2025-01-xx
+    """
+    return render_template("js_with_api/api_display_png.html")
+
+
+@web_app.route("/api_png_dynamic")
+def to_api_png_dynamic() -> ResponseReturnValue:
+    """
+    HTML page created with help from Google's Gemini 2.0 LLM (free!) 2025-01-xx
+    """
+    return render_template("js_with_api/api_png_as_user_types.html")
+
+
+@web_app.route("/api_png_dynamic_multiple")
+def to_api_png_dynamic_multiple_input() -> ResponseReturnValue:
+    """
+    HTML page created with help from Google's Gemini 2.0 LLM (free!) 2025-01-xx
+    """
+    return render_template("js_with_api/api_png_as_user_types_multiple_inputs.html")
 
 
 ###########################################################################
