@@ -4,40 +4,41 @@
     <meta charset="UTF-8">
     <title>Live LaTeX Renderer</title>
     <style>
-        /* Hidden by default until an image exists */
-        #latex_image { display: none; margin-top: 10px; border: 1px solid #ccc; }
-        #latex_in { width: 300px; padding: 5px; }
+        /* Hide images initially if they have no src */
+        img[src=""] { display: none; }
+        img { margin-top: 10px; border: 1px solid #ccc; max-width: 100%; }
+        .latex-input { width: 300px; padding: 5px; margin-bottom: 10px; }
     </style>
 </head>
-
 <body>
 
-<P> input: <input type="text" id="latex_input" name="input_latex" placeholder="LaTeX here">
+    <p> input: <br>
+        <input type="text" class="latex-input" data-target="input_latex_image" placeholder="LaTeX here">
+        <br><img id="input_latex_image" src="" alt="Latex input">
+    </p>
 
-<p><img id="input_latex_image" src="" alt="Latex input"></p>
+    <p> description: <br>
+        <input type="text" class="latex-input" data-target="description_image" placeholder="LaTeX here">
+        <br><img id="description_image" src="" alt="description as Latex">
+    </p>
 
-<P> description: <input type="text" id="latex_description" name="description_latex" placeholder="LaTeX here">
-
-<p><img id="description_image" src="" alt="description as Latex"></p>
-
-<P> citation: <input type="text" id="latex_citation" name="citation_latex" placeholder="LaTeX here">
-
-<p><img id="citation_image" src="" alt="citation as Latex"></p>
+    <p> citation: <br>
+        <input type="text" class="latex-input" data-target="citation_image" placeholder="LaTeX here">
+        <br><img id="citation_image" src="" alt="citation as Latex">
+    </p>
 
     <script type="text/javascript">
-        const inputField = document.getElementById('latex_input');
-        const imgElement = document.getElementById('input_latex_image');
         let debounceTimer;
 
-        // Function to call your API
-        function updateImage(latex_input) {
-            if (!latex_input.trim()) {
+        // Modified function to accept the specific image element to update
+        function updateImage(latex_text, imgElement) {
+            if (!latex_text.trim()) {
+                imgElement.src = "";
                 imgElement.style.display = 'none';
                 return;
             }
 
-            // encodeURIComponent ensures special characters like + or / don't break the URL
-            const url = `/api/v1/resources/png_from_latex/${encodeURIComponent(latex_input)}`;
+            const url = `/api/v1/resources/png_from_latex/${encodeURIComponent(latex_text)}`;
 
             fetch(url)
                 .then(res => res.json())
@@ -52,17 +53,23 @@
                 });
         }
 
-        // Listen for input events
-        inputField.addEventListener('input', (e) => {
-            const currentText = e.target.value;
+        // Select all inputs with the class 'latex-input'
+        const inputFields = document.querySelectorAll('.latex-input');
 
-            // Clear the timer every time the user types a character
-            clearTimeout(debounceTimer);
+        // Loop through them and attach the event listener to each
+        inputFields.forEach(field => {
+            field.addEventListener('input', (e) => {
+                const currentText = e.target.value;
+                // Find the specific image linked via data-target
+                const targetId = field.getAttribute('data-target');
+                const imgElement = document.getElementById(targetId);
 
-            // Wait 500ms after the last keystroke before calling the API
-            debounceTimer = setTimeout(() => {
-                updateImage(currentText);
-            }, 500); 
+                clearTimeout(debounceTimer);
+
+                debounceTimer = setTimeout(() => {
+                    updateImage(currentText, imgElement);
+                }, 500); 
+            });
         });
     </script>
 
