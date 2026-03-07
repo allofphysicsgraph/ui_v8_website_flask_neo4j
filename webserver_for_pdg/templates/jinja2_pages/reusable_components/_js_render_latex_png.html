@@ -1,5 +1,4 @@
 <script type="text/javascript">
-    let debounceTimer;
 
     function updateImage(latex_text, imgElement) {
         if (!latex_text.trim()) {
@@ -11,11 +10,16 @@
         const url = `/api/v1/resources/png_from_latex/?tex=${encodeURIComponent(latex_text)}`;
 
         fetch(url)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+                return res.json();
+            })
             .then(out => {
                 if (out.png_location) {
                     imgElement.src = out.png_location;
                     imgElement.style.display = 'block';
+                } else {
+                    console.error("Backend did not return a png_location:", out);
                 }
             })
             .catch(err => {
@@ -23,22 +27,27 @@
             });
     }
 
-    // Select all inputs with the class 'latex-input'
-    const inputFields = document.querySelectorAll('.latex-input');
+    // wait for the HTML document to fully load before finding inputs
+    document.addEventListener("DOMContentLoaded", function() {
+        // Select all inputs with the class 'latex-input'
+        const inputFields = document.querySelectorAll('.latex-input');
 
-    // Loop through them and attach the event listener to each
-    inputFields.forEach(field => {
-        field.addEventListener('input', (e) => {
-            const currentText = e.target.value;
-            // Find the specific image linked via data-target
-            const targetId = field.getAttribute('data-target');
-            const imgElement = document.getElementById(targetId);
+        // Loop through them and attach the event listener to each
+        inputFields.forEach(field => {
+            let debounceTimer;
 
-            clearTimeout(debounceTimer);
+            field.addEventListener('input', (e) => {
+                const currentText = e.target.value;
+                // Find the specific image linked via data-target
+                const targetId = field.getAttribute('data-target');
+                const imgElement = document.getElementById(targetId);
 
-            debounceTimer = setTimeout(() => {
-                updateImage(currentText, imgElement);
-            }, 500); 
+                clearTimeout(debounceTimer);
+
+                debounceTimer = setTimeout(() => {
+                    updateImage(currentText, imgElement);
+                }, 500); 
+            });
         });
     });
 </script>
