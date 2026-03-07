@@ -11,7 +11,7 @@
 
   <!-- from https://stackoverflow.com/a/43175774/1164295 -->
   <script type="text/javascript">
-    let url = '/api/v1/resources/derivation/list';
+    let url = '/api/v1/resources/derivations';
 
     fetch(url) // `fetch()` is an asynchronous operation, meaning it doesn't happen instantly
       .then(res => res.json()) // `then` uses the result of the `fetch()` request once `fetch()` is successful.
@@ -34,7 +34,7 @@
 
 <!-- from https://reqbin.com/code/javascript/wc3qbk0b/javascript-fetch-json-example -->
 <script type="text/javascript">
-fetch('/api/v1/resources/inference_rule/list', {
+fetch('/api/v1/resources/inference_rule', {
     method: 'GET',
     headers: {'Accept': 'application/json'},
 })
