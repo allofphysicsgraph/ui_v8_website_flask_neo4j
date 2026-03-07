@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live LaTeX Renderer</title>
+    <style>
+        /* Hidden by default until an image exists */
+        #latex_image { display: none; margin-top: 10px; border: 1px solid #ccc; }
+        #latex_in { width: 300px; padding: 5px; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Changed ID to remove space for better JS practice -->
+    <input type="text" id="latex_in" name="input_latex" placeholder="LaTeX here">
+
+    <p>Rendered PNG:</p>
+    <img id="latex_image" src="" alt="Latex formula">
+
+    <script type="text/javascript">
+        const inputField = document.getElementById('latex_in');
+        const imgElement = document.getElementById('latex_image');
+        let debounceTimer;
+
+        // Function to call your API
+        function updateImage(latex_input) {
+            if (!latex_input.trim()) {
+                imgElement.style.display = 'none';
+                return;
+            }
+
+            // encodeURIComponent ensures special characters like + or / don't break the URL
+            const url = `/api/v1/resources/png_from_latex/${encodeURIComponent(latex_input)}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(out => {
+                    if (out.png_location) {
+                        imgElement.src = out.png_location;
+                        imgElement.style.display = 'block';
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetching the image:", err);
+                });
+        }
+
+        // Listen for input events
+        inputField.addEventListener('input', (e) => {
+            const currentText = e.target.value;
+
+            // Clear the timer every time the user types a character
+            clearTimeout(debounceTimer);
+
+            // Wait 500ms after the last keystroke before calling the API
+            debounceTimer = setTimeout(() => {
+                updateImage(currentText);
+            }, 500); 
+        });
+    </script>
+
+</body>  
+</html>

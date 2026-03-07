@@ -1,28 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
+    <style>
+        /* hide the image until the source is loaded to avoid a "broken" icon */
+        #latex_image { display: none; margin-top: 10px; border: 1px solid #ccc; }
+    </style>
 </head>
 
-<body>
+  <body>
 
-<P>Derivation list as JSON:</P>
-  <pre id="png_location"></pre>
+    <p>Rendered PNG:</p>
+    <img id="latex_image" src="" alt="Latex formula">
 
-  <script type="text/javascript">
-    let url = '/api/v1/resources/png_from_latex/hello';
+    <script type="text/javascript">
+      let latex_input = 'hello'; 
+      let url = `/api/v1/resources/png_from_latex/${latex_input}`;
 
+      fetch(url)
+        .then(res => res.json())
+        .then(out => {
+          const imgElement = document.getElementById('latex_image');          
+          imgElement.src = out.png_location;
+          // Make the image visible now that it has a source
+          imgElement.style.display = 'block';
+        })
+        .catch(err => {
+          console.error("Error fetching the image:", err);
+        });
+    </script>
 
-    fetch(url)
-      .then(res => res.json())
-      .then(out => {
-        const outputElement = document.getElementById('derivation_list_as_json');
-        outputElement.textContent = JSON.stringify(out, null, 2);
-      })
-      .catch(err => console.log(err));
-  </script>
-
-
-
-
-</body>  
+  </body>  
+</html>
