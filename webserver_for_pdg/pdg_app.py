@@ -127,6 +127,7 @@ from wtforms import (
     FormField,
     IntegerField,
     DecimalField,
+    ValidationError,
     RadioField,
     TextAreaField,  # multi-line tex input
     SubmitField,  # when the only input is a "submit" button
@@ -509,6 +510,18 @@ web_app.register_blueprint(api_bp)
 ######################## END importing blueprints (aka routes in other files) ##################
 
 
+class IsAscii:
+    def __init__(self, message=None):
+        self.message = message
+
+    def __call__(self, form, field):
+        if field.data and not str(field.data).strip().isascii():
+            logger.error(f"Non-ascii {field.name}: {field.data}")
+
+            message = self.message or f"Input must be ASCII only: {escape(field.data)}"
+            raise ValidationError(message)
+
+
 class NoOptionsForm(FlaskForm):
     """
     This is used when the HTML form deviates from using the FlaskForm buttons
@@ -539,15 +552,25 @@ class SpecifyNewDerivationForm(FlaskForm):
 
     derivation_name_latex = StringField(
         "derivation name (latex)",
-        validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
+        validators=[
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+            validators.Length(min=5, max=1000),
+        ],
     )
     derivation_reference_latex = StringField(
         "derivation reference (latex)",
-        validators=[validators.Length(min=0, max=1000)],
+        validators=[
+            validators.Length(min=0, max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     abstract_latex = StringField(
         "abstract (latex)",
-        validators=[validators.Length(min=0, max=10000)],
+        validators=[
+            validators.Length(min=0, max=10000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
 
 
@@ -562,11 +585,19 @@ class SpecifyNewInferenceRuleForm(FlaskForm):
 
     inference_rule_name = StringField(
         label="name (latex)",
-        validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
+        validators=[
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+            validators.Length(min=5, max=1000),
+        ],
     )
     inference_rule_latex = StringField(
         "latex",
-        validators=[validators.InputRequired(), validators.Length(min=5, max=10000)],
+        validators=[
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+            validators.Length(min=5, max=10000),
+        ],
     )
     inference_rule_number_of_inputs = IntegerField(
         "number of inputs (non-negative integer)",
@@ -594,11 +625,17 @@ class SpecifyNewStepForm(FlaskForm):
 
     note_before_step_latex = StringField(
         label="note before step (latex)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     note_after_step_latex = StringField(
         label="note after step (latex)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
 
 
@@ -623,7 +660,11 @@ class SpecifyNewExpressionForm(FlaskForm):
 
     expression_latex_lhs = StringField(
         label="LaTeX expression LHS",
-        validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
+        validators=[
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+            validators.Length(min=1, max=1000),
+        ],
     )
 
     # relation operation: ["=", "\lt", "\leq", "\gt", "\geq"]
@@ -637,25 +678,41 @@ class SpecifyNewExpressionForm(FlaskForm):
 
     expression_latex_rhs = StringField(
         label="LaTeX expression RHS",
-        validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
+        validators=[
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+            validators.Length(min=1, max=1000),
+        ],
     )
 
     expression_latex_condition = StringField(
         label="LaTeX expression condition",
-        validators=[validators.Length(min=0, max=1000)],
+        validators=[
+            validators.Length(min=0, max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
 
     expression_name_latex = StringField(
         label="name (LaTeX)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     expression_reference_latex = StringField(
         label="reference (LaTeX)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     expression_description_latex = StringField(
         label="description (LaTeX)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     submit_form = SubmitField("Submit")
 
@@ -669,7 +726,11 @@ class SpecifyNewFeedForm(FlaskForm):
 
     feed_latex = StringField(
         label="LaTeX feed",
-        validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
+        validators=[
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+            validators.Length(min=1, max=1000),
+        ],
     )
 
 
@@ -682,17 +743,28 @@ class SpecifyEditFeedForm(FlaskForm):
 
     feed_latex = StringField(
         label="LaTeX feed",
-        validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
+        validators=[
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+            validators.Length(min=1, max=1000),
+        ],
     )
 
     feed_sympy = StringField(
         label="SymPy feed",
-        validators=[validators.InputRequired(), validators.Length(min=1, max=1000)],
+        validators=[
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+            validators.Length(min=1, max=1000),
+        ],
     )
 
     feed_lean = StringField(
         label="Lean feed",
-        validators=[validators.Length(min=0, max=1000)],
+        validators=[
+            validators.Length(min=0, max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
 
 
@@ -709,17 +781,21 @@ class SpecifyNewExpressionSympyLeanForm(FlaskForm):
 
     sympy_str_lhs = TextAreaField(
         label="SymPy for LHS",
-        # validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
+        validators=[
+            IsAscii(message="Only ASCII is allowed")
+        ],  # validators.InputRequired(), validators.Length(min=5, max=1000)],
     )
 
     # TODO: relation dropdown
 
     sympy_str_rhs = TextAreaField(
         label="SymPy for RHS",
+        validators=[IsAscii(message="Only ASCII is allowed")],
         # validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
     )
     lean_str = StringField(
         label="Lean",
+        validators=[IsAscii(message="Only ASCII is allowed")],
         # validators=[validators.InputRequired(), validators.Length(min=5, max=10000)],
     )
 
@@ -737,11 +813,13 @@ class SpecifyNewFeedSympyLeanForm(FlaskForm):
 
     sympy_str = TextAreaField(
         label="SymPy for feed",
+        validators=[IsAscii(message="Only ASCII is allowed")],
         # validators=[validators.InputRequired(), validators.Length(min=5, max=1000)],
     )
 
     lean_str = StringField(
         label="Lean",
+        validators=[IsAscii(message="Only ASCII is allowed")],
         # validators=[validators.InputRequired(), validators.Length(min=5, max=10000)],
     )
 
@@ -753,16 +831,26 @@ class SpecifyNewSymbolScalarForm(FlaskForm):
 
     scalar_latex = StringField(
         label="LaTeX scalar",
-        validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
+        validators=[
+            validators.Length(min=1, max=1000),
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
 
     scalar_name_latex = StringField(
         label="name (LaTeX)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     scalar_description_latex = StringField(
         label="description (LaTeX)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     scalar_reference_latex = StringField("reference")
 
@@ -849,16 +937,26 @@ class SpecifyNewSymbolVectorForm(FlaskForm):
 
     vector_latex = StringField(
         label="LaTeX vector",
-        validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
+        validators=[
+            validators.Length(min=1, max=1000),
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
 
     vector_name_latex = StringField(
         label="name (LaTeX)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     vector_description_latex = StringField(
         label="description (LaTeX)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     vector_reference_latex = StringField("reference")
 
@@ -898,18 +996,30 @@ class SpecifyNewSymbolMatrixForm(FlaskForm):
 
     matrix_latex = StringField(
         label="LaTeX matrix",
-        validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
+        validators=[
+            validators.Length(min=1, max=1000),
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
 
     matrix_name_latex = StringField(
         label="name (LaTeX)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     matrix_description_latex = StringField(
         label="description (LaTeX)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
-    matrix_reference_latex = StringField("reference")
+    matrix_reference_latex = StringField(
+        label="reference", validators=[IsAscii(message="Only ASCII is allowed")]
+    )
 
     matrix_is_composite = BooleanField(
         label="is composite",
@@ -938,7 +1048,11 @@ class SpecifyNewSymbolMatrixForm(FlaskForm):
 class SpecifyNewSymbolOperationForm(FlaskForm):
     operation_latex = StringField(
         "LaTeX symbol",
-        validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
+        validators=[
+            validators.Length(min=1, max=1000),
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
 
     operation_argument_count = IntegerField(
@@ -949,11 +1063,18 @@ class SpecifyNewSymbolOperationForm(FlaskForm):
 
     operation_name_latex = StringField(
         "name (LaTeX)",
-        validators=[validators.InputRequired(), validators.Length(max=1000)],
+        validators=[
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+            validators.Length(max=1000),
+        ],
     )
     operation_description_latex = StringField(
         "description (LaTeX)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     operation_reference_latex = StringField("reference (LaTeX)")
 
@@ -961,16 +1082,27 @@ class SpecifyNewSymbolOperationForm(FlaskForm):
 class SpecifyNewSymbolRelationForm(FlaskForm):
     relation_latex = StringField(
         "LaTeX symbol",
-        validators=[validators.Length(min=1, max=1000), validators.InputRequired()],
+        validators=[
+            validators.Length(min=1, max=1000),
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
 
     relation_name_latex = StringField(
         "name (LaTeX)",
-        validators=[validators.InputRequired(), validators.Length(max=1000)],
+        validators=[
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+            validators.Length(max=1000),
+        ],
     )
     relation_description_latex = StringField(
         "description (LaTeX)",
-        validators=[validators.Length(max=1000)],
+        validators=[
+            validators.Length(max=1000),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
     relation_reference_latex = StringField("reference (LaTeX)")
 
@@ -985,7 +1117,10 @@ class CypherQueryForm(FlaskForm):
 
     query = StringField(
         "Cypher query",
-        validators=[validators.InputRequired()],
+        validators=[
+            validators.InputRequired(),
+            IsAscii(message="Only ASCII is allowed"),
+        ],
     )
 
 
@@ -1349,12 +1484,12 @@ def to_add_derivation() -> ResponseReturnValue:
                 ).strip()
 
                 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-                if not derivation_name_latex.isascii():
-                    logger.error(
-                        "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
-                    )
-                    flash(f"Input must be ASCII only:{escape(derivation_name_latex)}")
-                    return redirect(url_for("to_add_derivation"))
+                # if not derivation_name_latex.isascii():
+                #     logger.error(
+                #         "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
+                #     )
+                #     flash(f"Input must be ASCII only:{escape(derivation_name_latex)}")
+                #     return redirect(url_for("to_add_derivation"))
 
                 # this preserves the LaTeX backslashes exactly as the user typed them.
                 derivation_reference_latex = str(
@@ -1362,17 +1497,17 @@ def to_add_derivation() -> ResponseReturnValue:
                 ).strip()
 
                 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-                if not derivation_reference_latex.isascii():
-                    logger.error(
-                        "Non-ascii derivation_reference_latex: "
-                        + str(derivation_reference_latex)
-                    )
-                    flash(
-                        "pdg_app/to_add_expression: Input must be ASCII only: "
-                        + str(derivation_reference_latex)
-                    )
-                    logger.info("[TRACE] end " + trace_id)
-                    return redirect(url_for("to_add_expression"))
+                # if not derivation_reference_latex.isascii():
+                #     logger.error(
+                #         "Non-ascii derivation_reference_latex: "
+                #         + str(derivation_reference_latex)
+                #     )
+                #     flash(
+                #         "pdg_app/to_add_expression: Input must be ASCII only: "
+                #         + str(derivation_reference_latex)
+                #     )
+                #     logger.info("[TRACE] end " + trace_id)
+                #     return redirect(url_for("to_add_expression"))
 
                 # this preserves the LaTeX backslashes exactly as the user typed them.
                 abstract_latex = str(
@@ -1380,10 +1515,10 @@ def to_add_derivation() -> ResponseReturnValue:
                 ).strip()
 
                 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-                if not abstract_latex.isascii():
-                    logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
-                    flash(f"Input must be ASCII only: {escape(abstract_latex)}")
-                    return redirect(url_for("to_add_expression"))
+                # if not abstract_latex.isascii():
+                #     logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
+                #     flash(f"Input must be ASCII only: {escape(abstract_latex)}")
+                #     return redirect(url_for("to_add_expression"))
 
                 # 2025-01-04, BHP: the following has been commented out
                 # because the safety of string should be applied on writing, not reading
@@ -1814,12 +1949,12 @@ def to_edit_derivation_metadata(
                     str(web_form_edit_derivation.derivation_name_latex.data).strip()
                 )
                 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-                if not derivation_name_latex.isascii():
-                    logger.error(
-                        "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
-                    )
-                    flash(f"Input must be ASCII only{escape(derivation_name_latex)}")
-                    return redirect(url_for("to_review_derivation"))
+                # if not derivation_name_latex.isascii():
+                #     logger.error(
+                #         "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
+                #     )
+                #     flash(f"Input must be ASCII only{escape(derivation_name_latex)}")
+                #     return redirect(url_for("to_review_derivation"))
 
                 derivation_reference_latex = latex.make_string_safe_for_latex(
                     str(
@@ -1827,26 +1962,26 @@ def to_edit_derivation_metadata(
                     ).strip()
                 )
                 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-                if not derivation_reference_latex.isascii():
-                    logger.error(
-                        "Non-ascii derivation_reference_latex: "
-                        + str(derivation_reference_latex)
-                    )
-                    flash(
-                        "pdg_app/to_add_expression: Input must be ASCII only: "
-                        + str(derivation_reference_latex)
-                    )
-                    logger.info("[TRACE] end " + trace_id)
-                    return redirect(url_for("to_add_expression"))
+                # if not derivation_reference_latex.isascii():
+                #     logger.error(
+                #         "Non-ascii derivation_reference_latex: "
+                #         + str(derivation_reference_latex)
+                #     )
+                #     flash(
+                #         "pdg_app/to_add_expression: Input must be ASCII only: "
+                #         + str(derivation_reference_latex)
+                #     )
+                #     logger.info("[TRACE] end " + trace_id)
+                #     return redirect(url_for("to_add_expression"))
 
                 abstract_latex = latex.make_string_safe_for_latex(
                     str(web_form_edit_derivation.abstract_latex.data).strip()
                 )
                 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-                if not abstract_latex.isascii():
-                    logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
-                    flash(f"Input must be ASCII only: {escape(abstract_latex)}")
-                    return redirect(url_for("to_add_expression"))
+                # if not abstract_latex.isascii():
+                #     logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
+                #     flash(f"Input must be ASCII only: {escape(abstract_latex)}")
+                #     return redirect(url_for("to_add_expression"))
 
                 # as per https://strftime.org/
                 # %f = Microsecond as a decimal number, zero-padded on the left.
@@ -2716,12 +2851,12 @@ def to_add_expression() -> ResponseReturnValue:
                 ).strip()
 
                 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-                if not expression_latex_lhs.isascii():
-                    logger.error(
-                        "Non-ascii expression_latex_lhs: " + str(expression_latex_lhs)
-                    )
-                    flash(f"Input must be ASCII only{escape(expression_latex_lhs)}")
-                    return redirect(url_for("to_add_expression"))
+                # if not expression_latex_lhs.isascii():
+                #     logger.error(
+                #         "Non-ascii expression_latex_lhs: " + str(expression_latex_lhs)
+                #     )
+                #     flash(f"Input must be ASCII only{escape(expression_latex_lhs)}")
+                #     return redirect(url_for("to_add_expression"))
 
                 # the web UI dropdown returns the symbol ID (and not Latex string)
                 #'symbol_relation_id_to_add', '2222545'
@@ -2748,75 +2883,75 @@ def to_add_expression() -> ResponseReturnValue:
                 ).strip()
 
                 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-                if not expression_latex_rhs.isascii():
-                    logger.error(
-                        "Non-ascii expression_latex_rhs: " + str(expression_latex_rhs)
-                    )
-                    flash(
-                        "pdg_app/to_add_expression: Input must be ASCII only: "
-                        + str(expression_latex_rhs)
-                    )
-                    logger.info("[TRACE] end " + trace_id)
-                    return redirect(url_for("to_add_expression"))
+                # if not expression_latex_rhs.isascii():
+                #     logger.error(
+                #         "Non-ascii expression_latex_rhs: " + str(expression_latex_rhs)
+                #     )
+                #     flash(
+                #         "pdg_app/to_add_expression: Input must be ASCII only: "
+                #         + str(expression_latex_rhs)
+                #     )
+                #     logger.info("[TRACE] end " + trace_id)
+                #     return redirect(url_for("to_add_expression"))
 
                 expression_latex_condition = str(
                     web_form_add_expression.expression_latex_condition.data
                 ).strip()
-                if not expression_latex_condition.isascii():
-                    logger.error(
-                        "Non-ascii expression_latex_condition: "
-                        + str(expression_latex_condition)
-                    )
-                    flash(
-                        "pdg_app/to_add_expression: Input must be ASCII only: "
-                        + str(expression_latex_condition)
-                    )
-                    logger.info("[TRACE] end " + trace_id)
-                    return redirect(url_for("to_add_expression"))
+                # if not expression_latex_condition.isascii():
+                #     logger.error(
+                #         "Non-ascii expression_latex_condition: "
+                #         + str(expression_latex_condition)
+                #     )
+                #     flash(
+                #         "pdg_app/to_add_expression: Input must be ASCII only: "
+                #         + str(expression_latex_condition)
+                #     )
+                #     logger.info("[TRACE] end " + trace_id)
+                #     return redirect(url_for("to_add_expression"))
 
                 expression_name_latex = str(
                     web_form_add_expression.expression_name_latex.data
                 ).strip()
-                if not expression_name_latex.isascii():
-                    logger.error(
-                        "Non-ascii expression_name_latex: " + str(expression_name_latex)
-                    )
-                    flash(
-                        "pdg_app/to_add_expression: Input must be ASCII only: "
-                        + str(expression_name_latex)
-                    )
-                    logger.info("[TRACE] end " + trace_id)
-                    return redirect(url_for("to_add_expression"))
+                # if not expression_name_latex.isascii():
+                #     logger.error(
+                #         "Non-ascii expression_name_latex: " + str(expression_name_latex)
+                #     )
+                #     flash(
+                #         "pdg_app/to_add_expression: Input must be ASCII only: "
+                #         + str(expression_name_latex)
+                #     )
+                #     logger.info("[TRACE] end " + trace_id)
+                #     return redirect(url_for("to_add_expression"))
 
                 expression_reference_latex = str(
                     web_form_add_expression.expression_reference_latex.data
                 ).strip()
-                if not expression_reference_latex.isascii():
-                    logger.error(
-                        "Non-ascii expression_reference_latex: "
-                        + str(expression_reference_latex)
-                    )
-                    flash(
-                        "pdg_app/to_add_expression: Input must be ASCII only: "
-                        + str(expression_reference_latex)
-                    )
-                    logger.info("[TRACE] end " + trace_id)
-                    return redirect(url_for("to_add_expression"))
+                # if not expression_reference_latex.isascii():
+                #     logger.error(
+                #         "Non-ascii expression_reference_latex: "
+                #         + str(expression_reference_latex)
+                #     )
+                #     flash(
+                #         "pdg_app/to_add_expression: Input must be ASCII only: "
+                #         + str(expression_reference_latex)
+                #     )
+                #     logger.info("[TRACE] end " + trace_id)
+                #     return redirect(url_for("to_add_expression"))
 
                 expression_description_latex = str(
                     web_form_add_expression.expression_description_latex.data
                 ).strip()
-                if not expression_description_latex.isascii():
-                    logger.error(
-                        "Non-ascii expression_description_latex: "
-                        + str(expression_description_latex)
-                    )
-                    flash(
-                        "pdg_app/to_add_expression: Input must be ASCII only: "
-                        + str(expression_description_latex)
-                    )
-                    logger.info("[TRACE] end " + trace_id)
-                    return redirect(url_for("to_add_expression"))
+                # if not expression_description_latex.isascii():
+                #     logger.error(
+                #         "Non-ascii expression_description_latex: "
+                #         + str(expression_description_latex)
+                #     )
+                #     flash(
+                #         "pdg_app/to_add_expression: Input must be ASCII only: "
+                #         + str(expression_description_latex)
+                #     )
+                #     logger.info("[TRACE] end " + trace_id)
+                #     return redirect(url_for("to_add_expression"))
 
                 logger.info("expression_latex_lhs:" + str(expression_latex_lhs))
                 logger.info("expression_latex_rhs:" + str(expression_latex_rhs))
@@ -5358,7 +5493,7 @@ def to_add_inference_rule() -> ResponseReturnValue:
                 except AssertionError as err:
                     # TODO: getting assertion error wipes whatever the user provided. That's bad.
                     flash(
-                        "pdg_app/to_add_inference_rule Assertion error; try again. "
+                        "pdg_app/to_add_inference_rule Assertion error regarding number of inputs,feeds,outputs; try again. "
                         + str(err)
                     )
                     logger.error(str(err))
