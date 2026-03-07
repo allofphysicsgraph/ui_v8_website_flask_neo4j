@@ -2178,9 +2178,9 @@ def api_delete_derivation(derivation_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/inference_rule/<string:expression_id>/delete", methods=["DELETE"]
+    "/v1/resources/inference_rule/<string:infrule_id>/delete", methods=["DELETE"]
 )
-def api_delete_inference_rule():
+def api_delete_inference_rule(infrule_id: str):
     """
     delete inference rule
     """
@@ -2190,7 +2190,7 @@ def api_delete_inference_rule():
 @api_bp.route(
     "/v1/resources/expression/<string:expression_id>/delete", methods=["DELETE"]
 )
-def api_delete_expression():
+def api_delete_expression(expression_id: str):
     """
     delete expression
     """
