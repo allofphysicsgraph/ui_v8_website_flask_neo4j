@@ -1038,9 +1038,12 @@ def create_tex_file_for_latex_string(
         # if "usepackage{braket}" is on and the package is not available, the process pauses while waiting for user input
         # the web interface is not aware of this pause, so the page hangs
         # latex_file_handle.write("\\usepackage{braket}\n")
-        latex_file_handle.write(
-            "\\usepackage{amsmath}\n"
-        )  # https://tex.stackexchange.com/questions/32100/what-does-each-ams-package-do
+
+        # abstracts may have hyperlinks
+        latex_file_handle.write("\\usepackage{hyperref}\n")
+
+        # https://tex.stackexchange.com/questions/32100/what-does-each-ams-package-do
+        latex_file_handle.write("\\usepackage{amsmath}\n")
         # latex_file_handle.write("\\newcommand{\\when}[1]{{\\rm \\ when\\ }#1}\n")
         # latex_file_handle.write("\\newcommand{\\bra}[1]{\\langle #1 |}\n")
         # latex_file_handle.write("\\newcommand{\\ket}[1]{| #1\\rangle}\n")
