@@ -69,7 +69,7 @@ from flask import (
 
 import sys
 from typing import NewType, Dict, List
-import neo4j
+import neo4j  # type: ignore
 
 # from flask_wtf.csrf import generate_csrf
 # from initialize_flask import csrf  # imported so that we can set .exempt(bp)
@@ -2252,7 +2252,12 @@ def api_png_from_latex(user_input: str):
     if not os.path.exists(path_to_png_with_filename):
         latex.create_png_from_latex(user_input, path_to_png, hash_of_user_input)
 
-    return jsonify({"png_location": path_to_png_with_filename})
+    # trim "/code" prior to returning the path
+    path_to_png_with_filename_no_prefix_directory = path_to_png_with_filename[
+        len("/code") :
+    ]
+
+    return jsonify({"png_location": path_to_png_with_filename_no_prefix_directory})
 
 
 @api_bp.route("/v1/resources/cypher/", methods=["GET"])
