@@ -965,7 +965,7 @@ def get_feeds_used_in_step(tx: Transaction, step_id: str) -> List[dict]:
 
 
 @trace_execution
-def get_sequence_index_for_step(tx: Transaction, step_id: str) -> int:
+def get_sequence_index_for_step(tx: Transaction, step_id: str) -> int | None:
     """ """
     sequence_index = 0
     result = tx.run(
