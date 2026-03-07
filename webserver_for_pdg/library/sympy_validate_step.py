@@ -569,7 +569,7 @@ def validate_that_content_exists(
             logger.info("Not evaluated due to missing term in SymPy")
             return "Not evaluated due to missing term in SymPy"
 
-    return
+    return None
 
 
 def parse_to_sympy(expr_str: str):
