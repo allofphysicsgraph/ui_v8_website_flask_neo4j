@@ -53,6 +53,7 @@ import time
 import random
 import datetime
 import uuid
+import os
 
 from flask import (
     Blueprint,
@@ -79,6 +80,7 @@ logger = logging.getLogger(__name__)
 
 from . import neo4j_query
 from . import compute
+from . import latex
 from . import list_of_valid
 
 
@@ -2230,6 +2232,27 @@ def api_delete_operation(symbol_id: str):
 )
 def api_delete_relation(symbol_id: str):
     return jsonify({"STATUS": "TODO"})
+
+
+@api_bp.route(
+    "/v1/resources/png_from_latex/<string:user_input>", methods=["GET", "POST"]
+)
+def api_png_from_latex(user_input: str):
+    """
+    Need `GET` method otherwise user can't explore this endpoint from the browswer.
+    """
+    path_to_png = "/code/static/temp_for_latex_validation/"
+
+    os.makedirs(path_to_png, exist_ok=True)
+
+    hash_of_user_input = compute.hash_of_string(user_input)
+
+    path_to_png_with_filename = path_to_png + hash_of_user_input + ".png"
+
+    if not os.path.exists(path_to_png_with_filename):
+        latex.create_png_from_latex(user_input, path_to_png, hash_of_user_input)
+
+    return jsonify({"png_location": path_to_png_with_filename})
 
 
 @api_bp.route("/v1/resources/cypher/", methods=["GET"])
