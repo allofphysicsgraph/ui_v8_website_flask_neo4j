@@ -393,6 +393,8 @@ def create_tex_file_for_derivation(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
+    logger.info("path_to_tex_file=" + path_to_tex_file)
+
     tex_filename = derivation_dict["id"]
 
     list_of_step_dicts = []
@@ -711,6 +713,8 @@ def create_pdf_for_derivation(
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+
+    path_to_pdf += "/"
 
     logger.info("path_to_pdf=" + path_to_pdf)
 
@@ -1083,6 +1087,8 @@ def create_derivation_png(
     trace_id = str(uuid.uuid4())
     # logger.info("[trace start " + trace_id + " " + str(time.time()))
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+
+    path_to_output_png += "/"
 
     logger.info("path_to_output_png=" + path_to_output_png)
 
