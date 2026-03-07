@@ -161,6 +161,8 @@ def create_d3js_json(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
+    destination_folder += "/"
+
     d3js_json_filename = derivation_id + ".json"
 
     json_str = "{\n"
@@ -710,6 +712,8 @@ def create_pdf_for_derivation(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
+    logger.info("path_to_pdf=" + path_to_pdf)
+
     # to isolate the build process, create a temporary folder
     tmp_latex_folder = "tmp_latex_folder_" + str(random.randint(1000000, 9999999))
     tmp_latex_folder_full_path = os.getcwd() + "/" + tmp_latex_folder + "/"
@@ -864,13 +868,15 @@ def create_png_from_latex(
 
     Raises:
 
-    >>> destination_folder = "/code/static/"
+    >>> destination_folder = "/code/static"
     >>> create_png_from_latex('a \dot b \\nabla', 'a_filename')
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     logger.info("png_filename_no_extension" + str(png_filename_no_extension))
+
+    destination_folder += "/"
 
     #    logger.debug("png_filename_no_extension = %s", png_filename_no_extension)
     #    logger.debug("input latex str = %s", input_latex_str)
@@ -1077,6 +1083,8 @@ def create_derivation_png(
     trace_id = str(uuid.uuid4())
     # logger.info("[trace start " + trace_id + " " + str(time.time()))
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+
+    logger.info("path_to_output_png=" + path_to_output_png)
 
     dot_filename = path_to_output_png + "derivation_" + derivation_id + ".dot"
     with open(dot_filename, "w") as file_handle:
@@ -1296,6 +1304,7 @@ def write_step_to_graphviz_file(
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     logger.info("step_id =" + step_id)
+    logger.info("path_to_output_png=" + path_to_output_png)
 
     logger.info("inference_rule_dict" + str(inference_rule_dict))
     logger.info("list_of_input_dicts" + str(list_of_input_dicts))
