@@ -2235,12 +2235,24 @@ def api_delete_relation(symbol_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/png_from_latex/<string:user_input>", methods=["GET", "POST"]
+    "/v1/resources/png_from_latex/", methods=["GET", "POST"]
 )
-def api_png_from_latex(user_input: str):
+def api_png_from_latex():
     """
-    Need `GET` method otherwise user can't explore this endpoint from the browswer.
+    `GET` method is necessary; otherwise user can't explore this endpoint from the browswer.
+
+    Originally <string:user_input> was passed as an argument. 
+    Gemini 3.1 Pro says
+        LaTeX strings contain characters like backslashes \, curly braces {}, and 
+        sometimes forward slashes /. Even with encodeURIComponent, sending this 
+        much complex data as a URL Path will frequently cause your Flask backend 
+        (or web server like Nginx/Apache) to reject the request with a "404 Not Found" 
+        or "400 Bad Request" before your Python code even runs.
+
     """
+
+    user_input = request.args.get('tex')
+
     path_to_png = "/code/static/temp_for_latex_validation/"
 
     os.makedirs(path_to_png, exist_ok=True)
