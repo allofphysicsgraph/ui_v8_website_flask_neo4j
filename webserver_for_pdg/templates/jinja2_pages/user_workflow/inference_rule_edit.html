@@ -19,8 +19,25 @@ or return to <a href="{{ url_for('to_list_inference_rules') }}?referrer=inferenc
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_edit.csrf_token }}
     <P>
-      {{ form_edit.inference_rule_name.label}}: {{ form_edit.inference_rule_name(size=50, maxlength=1000, value=inference_rule_dict['name_latex']) }} Must be unique compared to all other inference rule names.<BR/>
-      {{form_edit.inference_rule_latex.label }}: {{ form_edit.inference_rule_latex(size=50, maxlength=1000, value=inference_rule_dict['latex']).replace('\r','\\r') }}
+      {{ form_edit.inference_rule_name.label}}: 
+                {{ form_edit.inference_rule_name(size=50, 
+                                                 maxlength=1000, 
+                                    class_="latex-input", 
+                                    data_target="infrule_name_latex_image",
+                                    pattern="^[\x20-\x7F]+$", 
+                                    oninput="validateASCII(this)", 
+                                                 value=inference_rule_dict['name_latex']) }} Must be unique compared to all other inference rule names.<BR/>
+<img id="infrule_name_latex_image" src="" alt="Latex input">
+<P>
+      {{form_edit.inference_rule_latex.label }}: 
+                {{ form_edit.inference_rule_latex(size=50, 
+                                                  maxlength=1000, 
+                                    class_="latex-input", 
+                                    data_target="infrule_as_latex_latex_image",
+                                    pattern="^[\x20-\x7F]+$", 
+                                    oninput="validateASCII(this)", 
+                                                  value=inference_rule_dict['latex']).replace('\r','\\r') }}
+<P><img id="infrule_as_latex_latex_image" src="" alt="Latex input">
       Refer to feeds using <code>$#1$</code> and refer to expressions using <code>Eq.~\ref{eq:#2}</code>
       <BR/>
 

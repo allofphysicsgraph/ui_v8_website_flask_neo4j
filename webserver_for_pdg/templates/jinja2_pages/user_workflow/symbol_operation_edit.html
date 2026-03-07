@@ -19,19 +19,30 @@
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_edit_operation.csrf_token }}
     <P>
-      {{ form_edit_operation.operation_latex.label}} <B>(required)</B>: {{ form_edit_operation.operation_latex(size=50, maxlength=1000, value=operation_dict['latex']) }} <BR/>
+      {{ form_edit_operation.operation_latex.label}} <B>(required)</B>: 
+          {{ form_edit_operation.operation_latex(size=50, 
+                                                 maxlength=1000, 
+                                                 value=operation_dict['latex']) }} <BR/>
       &nbsp;<BR/>
-      {{form_edit_operation.operation_name_latex.label }} <B>(required)</B>: {{ form_edit_operation.operation_name_latex(size=50, maxlength=1000, value=operation_dict['name_latex']) }}<BR/>
+      {{ form_edit_operation.operation_name_latex.label }} <B>(required)</B>: 
+          {{ form_edit_operation.operation_name_latex(size=50, 
+                                                      maxlength=1000, 
+                                                      value=operation_dict['name_latex']) }}<BR/>
       &nbsp;<BR/>
-      {{form_edit_operation.operation_description_latex.label }} <small><em>(optional)</em></small>: {{ form_edit_operation.operation_description_latex(size=50, maxlength=1000, value=operation_dict['description_latex']) }}<BR/>
+      {{form_edit_operation.operation_description_latex.label }} <small><em>(optional)</em></small>: 
+          {{ form_edit_operation.operation_description_latex(size=50, 
+                                                             maxlength=1000, 
+                                                             value=operation_dict['description_latex']) }}<BR/>
       &nbsp;<BR/>
 
-      {{form_edit_operation.operation_argument_count.label }} <B>(required)</B>: {{ form_edit_operation.operation_argument_count(
-      value=operation_dict['argument_count']) }}<BR>
+      {{form_edit_operation.operation_argument_count.label }} <B>(required)</B>: 
+           {{ form_edit_operation.operation_argument_count(
+                                      value=operation_dict['argument_count']) }}<BR>
       &nbsp;<BR/>
 
-      {{form_edit_operation.operation_reference_latex.label }} <small><em>(optional)</em></small>: {{form_edit_operation.operation_reference_latex(size=50, maxlength=1000, 
-      value=operation_dict['reference_latex']) }}<BR/>
+      {{form_edit_operation.operation_reference_latex.label }} <small><em>(optional)</em></small>: {{form_edit_operation.operation_reference_latex(size=50, 
+                                                  maxlength=1000, 
+                                                   value=operation_dict['reference_latex']) }}<BR/>
       &nbsp;<BR/>
 
       <input type="submit" value="Edit operation">

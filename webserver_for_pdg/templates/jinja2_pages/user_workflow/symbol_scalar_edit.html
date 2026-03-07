@@ -18,13 +18,25 @@
 
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_symbol_properties.csrf_token }}
-    <P>{{ form_symbol_properties.scalar_latex.label}}: {{ form_symbol_properties.scalar_latex(size=50, maxlength=1000, value=scalar_dict['latex']|e) }} 
+    <P>{{ form_symbol_properties.scalar_latex.label}}: 
+             {{ form_symbol_properties.scalar_latex(size=50, 
+                                                    maxlength=1000, 
+                                                    value=scalar_dict['latex']|e) }} 
     
-    <P>{{form_symbol_properties.scalar_name_latex.label }}: {{ form_symbol_properties.scalar_name_latex(size=50, maxlength=1000, value=scalar_dict['name_latex']|e) }}
+    <P>{{form_symbol_properties.scalar_name_latex.label }}: 
+             {{ form_symbol_properties.scalar_name_latex(size=50, 
+                                                         maxlength=1000, 
+                                                         value=scalar_dict['name_latex']|e) }}
     
-    <P>{{form_symbol_properties.scalar_description_latex.label }}: {{ form_symbol_properties.scalar_description_latex(size=50, maxlength=1000, value=scalar_dict['description_latex']|e) }}
+    <P>{{form_symbol_properties.scalar_description_latex.label }}: 
+             {{ form_symbol_properties.scalar_description_latex(size=50, 
+                                                                maxlength=1000, 
+                                                                value=scalar_dict['description_latex']|e) }}
 
-    <P>{{form_symbol_properties.scalar_reference_latex.label }}: {{ form_symbol_properties.scalar_reference_latex(size=50, maxlength=1000, value=scalar_dict['reference_latex']|e) }}
+    <P>{{form_symbol_properties.scalar_reference_latex.label }}: 
+             {{ form_symbol_properties.scalar_reference_latex(size=50, 
+                                                              maxlength=1000, 
+                                                              value=scalar_dict['reference_latex']|e) }}
 
     <P><input type="submit" name="edit scalar" value="Edit scalar">
     </P>

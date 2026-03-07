@@ -32,13 +32,16 @@
 
 
     <P>{{ form_relation_properties.relation_name_latex.label }} (<B>required</B>): 
-       {{ form_relation_properties.relation_name_latex(size=50, maxlength=1000) }}</p>
+       {{ form_relation_properties.relation_name_latex(size=50, 
+                                                       maxlength=1000) }}</p>
     
     <P>{{form_relation_properties.relation_description_latex.label }} (<small><em>optional</em></small>):  
-       {{ form_relation_properties.relation_description_latex(size=50, maxlength=1000) }}</p>
+       {{ form_relation_properties.relation_description_latex(size=50, 
+                                                              maxlength=1000) }}</p>
 
     <P>{{ form_relation_properties.relation_reference_latex.label }} (<small><em>optional</em></small>): 
-       {{ form_relation_properties.relation_reference_latex(size=100) }}</p>
+       {{ form_relation_properties.relation_reference_latex(size=100,
+                                                            maxlength=1000) }}</p>
 
       <input type="submit" name="new relation" value="add relation">
     </P>

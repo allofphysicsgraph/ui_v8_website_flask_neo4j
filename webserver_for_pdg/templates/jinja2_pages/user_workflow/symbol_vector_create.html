@@ -35,23 +35,32 @@
     <P>{{ form_vector_properties.vector_name_latex.label }} (<small><em>optional</em></small>): 
        {{ form_vector_properties.vector_name_latex(size=50, 
                                 type="text",
+                        class_="latex-input", 
+                        data_target="vector_name_latex_image",
                                 pattern="^[\x20-\x7F]+$", 
                                 oninput="validateASCII(this)", 
      maxlength=1000) }}</p>
+<P><img id="vector_name_latex_image" src="" alt="Latex input">
     
     <P>{{ form_vector_properties.vector_description_latex.label }} (<small><em>optional</em></small>): 
        {{ form_vector_properties.vector_description_latex(size=50, 
                                 type="text",
+                        class_="latex-input", 
+                        data_target="vector_description_latex_image",
                                 pattern="^[\x20-\x7F]+$", 
                                 oninput="validateASCII(this)", 
      maxlength=1000) }}</p>
+<P><img id="vector_description_latex_image" src="" alt="Latex input">
 
     <P>{{ form_vector_properties.vector_reference_latex.label }} (<small><em>optional</em></small>): 
        {{ form_vector_properties.vector_reference_latex(size=50, 
                                 type="text",
+                        class_="latex-input", 
+                        data_target="vector_reference_latex_image",
                                 pattern="^[\x20-\x7F]+$", 
                                 oninput="validateASCII(this)", 
      maxlength=1000) }}</p>
+<P><img id="vector_reference_latex_image" src="" alt="Latex input">
 
 <table>
 <table border="0" id="scope_table" class="sortable">

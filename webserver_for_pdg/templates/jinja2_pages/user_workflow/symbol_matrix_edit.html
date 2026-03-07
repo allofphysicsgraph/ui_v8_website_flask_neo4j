@@ -19,11 +19,20 @@
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_matrix_properties.csrf_token }}
     <P>
-      {{ form_matrix_properties.matrix_latex.label}}: {{ form_matrix_properties.matrix_latex(size=50, maxlength=1000, value=matrix_dict['latex']|e) }} <BR/>
+      {{ form_matrix_properties.matrix_latex.label}}: 
+           {{ form_matrix_properties.matrix_latex(size=50, 
+                                                   maxlength=1000, 
+                                                   value=matrix_dict['latex']|e) }} <BR/>
       &nbsp;<BR/>
-      {{form_matrix_properties.matrix_name_latex.label }}: {{ form_matrix_properties.matrix_name_latex(size=50, maxlength=1000, value=matrix_dict['name_latex']|e) }}<BR/>
+      {{form_matrix_properties.matrix_name_latex.label }}: 
+           {{ form_matrix_properties.matrix_name_latex(size=50, 
+                                                      maxlength=1000, 
+                                                      value=matrix_dict['name_latex']|e) }}<BR/>
       &nbsp;<BR/>
-      {{form_matrix_properties.matrix_description_latex.label }}: {{ form_matrix_properties.matrix_description_latex(size=50, maxlength=1000, value=matrix_dict['description_latex']|e) }}<BR/>
+      {{form_matrix_properties.matrix_description_latex.label }}: 
+           {{ form_matrix_properties.matrix_description_latex(size=50, 
+                                                              maxlength=1000, 
+                                                              value=matrix_dict['description_latex']|e) }}<BR/>
       &nbsp;<BR/>
       <input type="submit" value="Edit matrix">
     </P>

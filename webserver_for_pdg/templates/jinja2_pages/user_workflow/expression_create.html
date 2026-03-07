@@ -143,24 +143,32 @@ Latex:
     <P>{{ form.expression_name_latex.label }} (optional): 
        {{ form.expression_name_latex(size=50, 
                                      type="text",
+                              class_="latex-input", 
+                              data_target="expression_name_latex_image",
                                      pattern="^[\x20-\x7F]+$", 
                                      oninput="validateASCII(this)", 
                                      maxlength=1000) }}
+<img id="expression_name_latex_image" src="" alt="Latex input">
 
     <P>{{ form.expression_reference_latex.label }} (optional): 
        {{ form.expression_reference_latex(size=50, 
                                           type="text",
+                              class_="latex-input", 
+                              data_target="expression_reference_latex_image",
                                           pattern="^[\x20-\x7F]+$", 
                                           oninput="validateASCII(this)", 
                                           maxlength=1000) }}
-
+<img id="expression_reference_latex_image" src="" alt="Latex input">
 
     <P>{{ form.expression_description_latex.label }} (optional): 
        {{ form.expression_description_latex(size=50, 
                                             type="text",
+                              class_="latex-input", 
+                              data_target="expression_description_latex_image",
                                             pattern="^[\x20-\x7F]+$", 
                                             oninput="validateASCII(this)", 
                                             maxlength=1000) }}
+<img id="expression_description_latex_image" src="" alt="Latex input">
 
     <P><input type="submit" name="new expression" value="add expression">
     </P>

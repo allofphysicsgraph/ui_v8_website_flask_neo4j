@@ -16,23 +16,37 @@
     <P>{{ form.derivation_name_latex.label}} (<B>required</B>): 
        {{ form.derivation_name_latex(size=50, 
                                     type="text",
+                                    class_="latex-input", 
+                                    data_target="derivation_name_latex_image",
                                     pattern="^[\x20-\x7F]+$", 
                                     oninput="validateASCII(this)", 
                                      minlength=5, maxlength=1000) }}
+
+    <img id="derivation_name_latex_image" src="" alt="Latex input">
+
     <P>{{ form.derivation_reference_latex.label}} (<i>optional</i>): 
        {{ form.derivation_reference_latex(size=50, 
                                           type="text",
+                                          class_="latex-input", 
+                                          data_target="derivation_reference_latex_image",
                                           pattern="^[\x20-\x7F]+$", 
                                           oninput="validateASCII(this)", 
                                           minlength=5, maxlength=1000) }}
+
+    <img id="derivation_reference_latex_image" src="" alt="Latex input">
+
     <P>{{ form.abstract_latex.label }} (<B>required</B>): 
        {{ form.abstract_latex(size=50, 
                               type="text",
+                              class_="latex-input", 
+                              data_target="derivation_abstract_latex_image",
                               pattern="^[\x20-\x7F]+$", 
                               oninput="validateASCII(this)", 
-                              minlength=5, maxlength=1000) }}<BR/>
-      &nbsp;<BR/>
-      <input type="submit" name="new derivation" value="add derivation">
+                              minlength=5, maxlength=1000) }}
+    <img id="derivation_abstract_latex_image" src="" alt="Latex input">
+
+      
+     <P><input type="submit" name="new derivation" value="add derivation">
     </P>
   </form>
 </fieldset>

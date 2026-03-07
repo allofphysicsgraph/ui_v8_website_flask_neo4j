@@ -19,11 +19,34 @@
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_vector_properties.csrf_token }}
     <P>
-      {{ form_vector_properties.vector_latex.label}}: {{ form_vector_properties.vector_latex(size=50, maxlength=1000, value=vector_dict['latex']|e) }} <BR/>
+      {{ form_vector_properties.vector_latex.label}}: 
+                {{ form_vector_properties.vector_latex(size=50, 
+                                                       maxlength=1000, 
+                                                       value=vector_dict['latex']|e) }} <BR/>
       &nbsp;<BR/>
-      {{form_vector_properties.vector_name_latex.label }}: {{ form_vector_properties.vector_name_latex(size=50, maxlength=1000, value=vector_dict['name_latex']|e) }}<BR/>
+      {{form_vector_properties.vector_name_latex.label }}: 
+                {{ form_vector_properties.vector_name_latex(size=50, 
+                                                            maxlength=1000, 
+                        class_="latex-input", 
+                        data_target="vector_name_latex_image",
+                                                            value=vector_dict['name_latex']|e) }}<BR/>
+<P><img id="vector_name_latex_image" src="" alt="Latex input">
       &nbsp;<BR/>
-      {{form_vector_properties.vector_description_latex.label }}: {{ form_vector_properties.vector_description_latex(size=50, maxlength=1000, value=vector_dict['description_latex']|e) }}<BR/>
+      {{form_vector_properties.vector_description_latex.label }}: 
+               {{ form_vector_properties.vector_description_latex(size=50, 
+                                                                  maxlength=1000, 
+                        class_="latex-input", 
+                        data_target="vector_description_latex_image",
+                                                                  value=vector_dict['description_latex']|e) }}<BR/>
+<P><img id="vector_description_latex_image" src="" alt="Latex input">
+      &nbsp;<BR/>
+      {{form_vector_properties.vector_reference_latex.label }}: 
+               {{ form_vector_properties.vector_reference_latex(size=50, 
+                                                                  maxlength=1000, 
+                        class_="latex-input", 
+                        data_target="vector_reference_latex_image",
+                                                                  value=vector_dict['reference_latex']|e) }}<BR/>
+<P><img id="vector_reference_latex_image" src="" alt="Latex input">
       &nbsp;<BR/>
       <input type="submit" value="Edit vector">
     </P>

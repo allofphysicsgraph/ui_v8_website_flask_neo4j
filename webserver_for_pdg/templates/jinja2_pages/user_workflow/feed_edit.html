@@ -142,6 +142,8 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     <P>{{ form_edit_feed.feed_latex.label}} (<B>required</B>): 
        {{ form_edit_feed.feed_latex(size=50, 
                     maxlength=1000, 
+                                    pattern="^[\x20-\x7F]+$", 
+                                    oninput="validateASCII(this)", 
                     value=feed_dict['latex'],
                     id="input_latex") }} 
 
@@ -150,12 +152,16 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     <P>{{ form_edit_feed.feed_sympy.label}} (<B>required</B>): 
        {{ form_edit_feed.feed_sympy(size=50, 
                     maxlength=1000, 
+                                    pattern="^[\x20-\x7F]+$", 
+                                    oninput="validateASCII(this)", 
                     value=feed_dict['sympy'],
                     id="input_sympy") }} 
 
     <P>{{ form_edit_feed.feed_lean.label}} (<i>optional</i>): 
        {{ form_edit_feed.feed_lean(size=50, 
                     maxlength=1000, 
+                                    pattern="^[\x20-\x7F]+$", 
+                                    oninput="validateASCII(this)", 
                     value=feed_dict['lean'],
                     id="input_lean") }} 
 

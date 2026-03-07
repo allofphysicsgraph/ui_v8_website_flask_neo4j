@@ -2,9 +2,11 @@
 {% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 {% block content %}
 
+<!--
 <P>
   Return to <a href="{{ url_for('to_navigation') }}?referrer=inference_rule_create">navigation page</a>
 </P>
+-->
 
 <fieldset>
   <legend>
@@ -16,16 +18,22 @@
     <P>{{ form.inference_rule_name.label}} (<B>required</B>): 
        {{ form.inference_rule_name(size=50, 
                                    type="text",
+                              class_="latex-input", 
+                              data_target="infrule_name_latex_image",
                                    pattern="^[\x20-\x7F]+$", 
                                    oninput="validateASCII(this)", 
                                    minlength=5, maxlength=1000) }}</P>
+<P><img id="infrule_name_latex_image" src="" alt="Latex input">
 
     <P>{{ form.inference_rule_latex.label }} (<B>required</B>): 
        {{ form.inference_rule_latex(size=50, 
                                     type="text",
+                              class_="latex-input", 
+                              data_target="infrule_as_latex_latex_image",
                                     pattern="^[\x20-\x7F]+$", 
                                     oninput="validateASCII(this)", 
                                     minlength=5, maxlength=1000) }}</P>
+<P><img id="infrule_as_latex_latex_image" src="" alt="Latex input">
 
     <P>{{form.inference_rule_number_of_inputs.label }} (<B>required</B>): {{ form.inference_rule_number_of_inputs() }}</P>
 
