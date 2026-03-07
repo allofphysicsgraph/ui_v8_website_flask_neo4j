@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+</head>
+
+<body>
+
+<P>Derivation list as JSON:</P>
+  <pre id="png_location"></pre>
+
+  <script type="text/javascript">
+    let url = '/api/v1/resources/png_from_latex/hello';
+
+
+    fetch(url)
+      .then(res => res.json())
+      .then(out => {
+        const outputElement = document.getElementById('derivation_list_as_json');
+        outputElement.textContent = JSON.stringify(out, null, 2);
+      })
+      .catch(err => console.log(err));
+  </script>
+
+
+
+
+</body>  

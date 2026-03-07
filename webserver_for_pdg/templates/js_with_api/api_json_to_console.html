@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+</head>
+
+<body>
+
+
+
+<!-- from https://reqbin.com/code/javascript/wc3qbk0b/javascript-fetch-json-example -->
+<script type="text/javascript">
+fetch('/api/v1/resources/inference_rule', {
+    method: 'GET',
+    headers: {'Accept': 'application/json'},
+})
+   .then(response => response.json())
+   .then(response => console.log('and ',JSON.stringify(response)))
+
+</script>
+
+</body>
