@@ -1,6 +1,6 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
-{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 {% block content %}
+{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 
 <!--
 <P>
@@ -23,7 +23,7 @@
                                    pattern="^[\x20-\x7F]+$", 
                                    oninput="validateASCII(this)", 
                                    minlength=5, maxlength=1000) }}</P>
-<P><img id="infrule_name_latex_image" src="" alt="Latex input">
+<P><img id="infrule_name_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form.inference_rule_latex.label }} (<B>required</B>): 
        {{ form.inference_rule_latex(size=50, 
@@ -33,7 +33,7 @@
                                     pattern="^[\x20-\x7F]+$", 
                                     oninput="validateASCII(this)", 
                                     minlength=5, maxlength=1000) }}</P>
-<P><img id="infrule_as_latex_latex_image" src="" alt="Latex input">
+<P><img id="infrule_as_latex_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{form.inference_rule_number_of_inputs.label }} (<B>required</B>): {{ form.inference_rule_number_of_inputs() }}</P>
 

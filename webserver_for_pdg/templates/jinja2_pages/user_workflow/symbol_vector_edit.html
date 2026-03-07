@@ -1,6 +1,6 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
-{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 {% block content %}
+{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 
 <P>
   Return to <a href="{{ url_for('to_navigation') }}?referrer=symbol_vector_edit">navigation page</a>
@@ -30,7 +30,7 @@
                         class_="latex-input", 
                         data_target="vector_name_latex_image",
                                                             value=vector_dict['name_latex']|e) }}<BR/>
-<P><img id="vector_name_latex_image" src="" alt="Latex input">
+<P><img id="vector_name_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
       {{form_vector_properties.vector_description_latex.label }}: 
                {{ form_vector_properties.vector_description_latex(size=50, 
@@ -38,7 +38,7 @@
                         class_="latex-input", 
                         data_target="vector_description_latex_image",
                                                                   value=vector_dict['description_latex']|e) }}<BR/>
-<P><img id="vector_description_latex_image" src="" alt="Latex input">
+<P><img id="vector_description_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
       {{form_vector_properties.vector_reference_latex.label }}: 
                {{ form_vector_properties.vector_reference_latex(size=50, 
@@ -46,7 +46,7 @@
                         class_="latex-input", 
                         data_target="vector_reference_latex_image",
                                                                   value=vector_dict['reference_latex']|e) }}<BR/>
-<P><img id="vector_reference_latex_image" src="" alt="Latex input">
+<P><img id="vector_reference_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
       <input type="submit" value="Edit vector">
     </P>

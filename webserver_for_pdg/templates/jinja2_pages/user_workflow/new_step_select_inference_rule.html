@@ -1,8 +1,6 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
-
-{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
-
 {% block content %}
+{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 
 <P>
   Return to <a href="{{ url_for('to_navigation') }}?referrer=new_step_select_inference_rule">navigation page</a>

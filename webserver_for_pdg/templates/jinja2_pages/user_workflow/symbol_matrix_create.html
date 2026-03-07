@@ -1,6 +1,6 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
-{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 {% block content %}
+{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 
 <P>
   Return to <a href="{{ url_for('to_navigation') }}?referrer=symbol_matrix_create">navigation page</a>
@@ -21,6 +21,8 @@
     <P>{{ form_matrix_properties.matrix_latex.label}} (<B>required</B>): 
        {{ form_matrix_properties.matrix_latex(size=50, 
                                 type="text",
+                                id="input_latex",
+                                livePreview('input_latex', null, null, 'render_input_latex');
                                 pattern="^[\x20-\x7F]+$", 
                                 oninput="validateASCII(this)", 
      minlength=1, maxlength=1000) }}</P>
@@ -34,15 +36,33 @@
     
     <P>{{ form_matrix_properties.matrix_name_latex.label }} (<small><em>optional</em></small>): 
        {{ form_matrix_properties.matrix_name_latex(size=50, 
+                                    class_="latex-input", 
+                                    data_target="matrix_name_latex_image",
+                                    pattern="^[\x20-\x7F]+$", 
+                                    oninput="validateASCII(this)", 
                                                   maxlength=1000) }}</p>
     
+<P><img id="matrix_name_latex_image" src="" alt="Latex input" style="display: none;">
+
     <P>{{ form_matrix_properties.matrix_description_latex.label }} (<small><em>optional</em></small>): 
        {{ form_matrix_properties.matrix_description_latex(size=50, 
+                                    class_="latex-input", 
+                                    data_target="matrix_description_latex_image",
+                                    pattern="^[\x20-\x7F]+$", 
+                                    oninput="validateASCII(this)", 
                                                           maxlength=1000) }}</p>
+
+<P><img id="matrix_description_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form_matrix_properties.matrix_reference_latex.label }} (<small><em>optional</em></small>): 
        {{ form_matrix_properties.matrix_reference_latex(size=50, 
+                                    class_="latex-input", 
+                                    data_target="matrix_reference_latex_image",
+                                    pattern="^[\x20-\x7F]+$", 
+                                    oninput="validateASCII(this)", 
                                                         maxlength=1000) }}</p>
+
+<P><img id="matrix_reference_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form_matrix_properties.matrix_size.label}} (<B>required</B>): 
        {{ form_matrix_properties.matrix_size }}

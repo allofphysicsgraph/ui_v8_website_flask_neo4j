@@ -1,6 +1,6 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
-{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 {% block content %}
+{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 
 <P>
   Return to <a href="{{ url_for('to_navigation') }}?referrer=derivation_edit_metadata">navigation page</a>
@@ -27,7 +27,7 @@
                                     pattern="^[\x20-\x7F]+$", 
                                     oninput="validateASCII(this)"
                                              value=derivation_dict['name_latex']) }} <BR/>
-<img id="derivation_name_latex_image" src="" alt="Latex input">
+<img id="derivation_name_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
       {{form.abstract_latex.label }}: was <BR>
       {{ derivation_dict['abstract_latex'] }}<BR>
@@ -38,7 +38,7 @@
                               pattern="^[\x20-\x7F]+$", 
                               oninput="validateASCII(this)", 
                                       value=derivation_dict['abstract_latex']) }}<BR/>
-<img id="derivation_abstract_latex_image" src="" alt="Latex input">
+<img id="derivation_abstract_latex_image" src="" alt="Latex input" style="display: none;">
 
       &nbsp;<BR/>
       {{ form.derivation_reference_latex.label}}: was <BR>
@@ -50,7 +50,7 @@
                                           pattern="^[\x20-\x7F]+$", 
                                           oninput="validateASCII(this)", 
                                                   value=derivation_dict['reference_latex']) }} <BR/>
-<img id="derivation_reference_latex_image" src="" alt="Latex input">
+<img id="derivation_reference_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
 
       <input type="submit" name="edit metadata" value="edit derivation metadata">

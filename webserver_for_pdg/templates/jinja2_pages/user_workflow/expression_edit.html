@@ -1,6 +1,6 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
-{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 {% block content %}
+{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 
 <P>
   Return to <a href="{{ url_for('to_navigation') }}?referrer=expession_edit">navigation page</a>
@@ -46,10 +46,6 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
 <P>{{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}
 -->
 
-<!--
-dict_of_nonoperation_symbol_dicts_in_expression: <BR>
-{ { dict_of_nonoperation_symbol_dicts_in_expression } }
--->
 
 <table border="1" id="symbols_used_table" class="sortable">
   <tr>
@@ -330,24 +326,6 @@ relations_not_in_expression<BR>
                     oninput="livePreview('input_latex_lhs', 'output_input_latex_lhs');",
                     onchange="onChangeFunction();") }} 
 
-<!--
-    <P><input type="checkbox" 
-              id="display_input_latex_lhs" 
-              checked="" 
-              onchange="convert('input_latex_lhs',
-                                'display_input_latex_lhs', 
-                                'preview_input_latex_lhs',
-                                'output_input_latex_lhs')">
-       <small><label id="display_input_latex_lhs">Display style</label></small>
-       <input type="button" 
-              value="optional preview of TeX before submitting form" 
-              id="preview_input_latex_lhs" 
-              onclick="convert('input_latex_lhs',
-                               'display_input_latex_lhs', 
-                               'preview_input_latex_lhs',
-                               'output_input_latex_lhs')">
-              <br clear="all">
-            -->
         <div id="output_input_latex_lhs"></div>
 
     <P>{{ form_new_expression.expression_latex_rhs.label}} (<B>required</B>): 
@@ -358,24 +336,6 @@ relations_not_in_expression<BR>
                     oninput="livePreview('input_latex_rhs', 'output_input_latex_rhs');",
                     onchange="onChangeFunction();") }} 
 
-<!--
-    <P><input type="checkbox" 
-              id="display_input_latex_rhs" 
-              checked="" 
-              onchange="convert('input_latex_rhs',
-                                'display_input_latex_rhs', 
-                                'preview_input_latex_rhs',
-                                'output_input_latex_rhs')">
-       <small><label id="display_input_latex_rhs">Display style</label></small>
-       <input type="button" 
-              value="optional preview of TeX before submitting form" 
-              id="preview_input_latex_rhs" 
-              onclick="convert('input_latex_rhs',
-                               'display_input_latex_rhs', 
-                               'preview_input_latex_rhs',
-                               'output_input_latex_rhs')">
-              <br clear="all">
-            -->
         <div id="output_input_latex_rhs"></div>
 
 
@@ -387,7 +347,7 @@ relations_not_in_expression<BR>
                                     pattern="^[\x20-\x7F]+$", 
                                     oninput="validateASCII(this)", 
                                                     value=expression_dict['name_latex']) }}
-<img id="expression_name_latex_image" src="" alt="Latex input">
+<img id="expression_name_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form_new_expression.expression_reference_latex.label }} (optional): 
        {{ form_new_expression.expression_reference_latex(size=50, 
@@ -397,7 +357,7 @@ relations_not_in_expression<BR>
                                     pattern="^[\x20-\x7F]+$", 
                                     oninput="validateASCII(this)", 
                                                          value=expression_dict['reference_latex']) }}
-<img id="expression_name_latex_image" src="" alt="Latex input">
+<img id="expression_name_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form_new_expression.expression_description_latex.label }} (optional): 
        {{ form_new_expression.expression_description_latex(size=50, 
@@ -407,7 +367,7 @@ relations_not_in_expression<BR>
                                     pattern="^[\x20-\x7F]+$", 
                                     oninput="validateASCII(this)", 
                                                            value=expression_dict['description_latex']) }}
-<img id="expression_name_latex_image" src="" alt="Latex input">
+<img id="expression_name_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
       <input type="submit" name="edit expression latex" value="Edit expression">
     </P>

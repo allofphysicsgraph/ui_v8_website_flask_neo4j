@@ -34,7 +34,7 @@
                                     pattern="^[\x20-\x7F]+$", 
                                     oninput="validateASCII(this)", 
                                                 value=step_dict['note_before_step_latex']) }} 
-<P><img id="note_before_latex_image" src="" alt="Latex input">
+<P><img id="note_before_latex_image" src="" alt="Latex input" style="display: none;">
     <P>{{ form_edit_step.note_after_step_latex.label }}: 
        {{ form_edit_step.note_after_step_latex(size=50, 
                                                maxlength=1000, 
@@ -43,7 +43,7 @@
                                     pattern="^[\x20-\x7F]+$", 
                                     oninput="validateASCII(this)", 
                                                value=step_dict['note_after_step_latex']) }}<BR/>
-<P><img id="note_after_latex_image" src="" alt="Latex input">
+<P><img id="note_after_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
 <P>      <input type="submit" name="edit" value="Edit step">
     </P>

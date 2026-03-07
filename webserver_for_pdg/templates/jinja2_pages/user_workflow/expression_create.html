@@ -1,6 +1,6 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
-{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 {% block content %}
+{% include "jinja2_pages/reusable_components/_login_toptable.html" %}
 
 <P>
   Return to <a href="{{ url_for('to_navigation') }}?referrer=expression_create">navigation page</a>
@@ -30,12 +30,7 @@ Latex:
     <td>
 
 <!--
-  2025-01-01: BHP wasn't able to figue out how to dynamically set the tuples in the class
-{ { form.expression_relation() } }
--->
-
-<!--
-  {{list_of_relation_dicts}}
+  {{list_of_relations}}
 -->
 
     <select name="symbol_relation_id_to_add" class="selectpicker form-control" id="relation_select">
@@ -72,68 +67,14 @@ Latex:
   </tr>
   <tr>
     <td>
-      <!--
-      <input type="checkbox" 
-              id="display_input_latex_lhs" 
-              checked="" 
-              onchange="convert('input_latex_lhs',
-                                'display_input_latex_lhs', 
-                                'preview_input_latex_lhs',
-                                'output_input_latex_lhs')">
-       <small><label id="display_input_latex_lhs">Display style</label></small>
-       <input type="button" 
-              value="optional preview of TeX before submitting" 
-              id="preview_input_latex_lhs" 
-              onclick="convert('input_latex_lhs',
-                               'display_input_latex_lhs', 
-                               'preview_input_latex_lhs',
-                               'output_input_latex_lhs')">
-              <br clear="all">
-        -->
         <div id="output_input_latex_lhs"></div>
       </td> <!-- LHS -->
     <td></td> <!-- relation -->
     <td>   
-      <!--
-     <P><input type="checkbox" 
-              id="display_input_latex_rhs" 
-              checked="" 
-              onchange="convert('input_latex_rhs',
-                                'display_input_latex_rhs', 
-                                'preview_input_latex_rhs',
-                                'output_input_latex_rhs')">
-       <small><label id="display_input_latex_rhs">Display style</label></small>
-       <input type="button" 
-              value="optional preview of TeX before submitting" 
-              id="preview_input_latex_rhs" 
-              onclick="convert('input_latex_rhs',
-                               'display_input_latex_rhs', 
-                               'preview_input_latex_rhs',
-                               'output_input_latex_rhs')">
-              <br clear="all">
-            -->
         <div id="output_input_latex_rhs"></div>
     </td> <!-- RHS -->
     <td></td> <!-- when -->
     <td>
-<!--
-      <input type="checkbox" 
-              id="display_input_latex_condition" 
-              checked="" 
-              onchange="convert('input_latex_condition',
-                                'display_input_latex_condition', 
-                                'preview_input_latex_condition',
-                                'output_input_latex_condition')">
-       <small><label id="display_input_latex_condition">Display style</label></small>
-       <input type="button" 
-              value="optional preview of TeX before submitting" 
-              id="preview_input_latex_condition" 
-              onclick="convert('input_latex_condition',
-                               'display_input_latex_condition', 
-                               'preview_input_latex_condition',
-                               'output_input_latex_condition')">
-              <br clear="all">
-            -->
         <div id="output_input_latex_condition"></div>
       </td> <!-- condition -->
   </tr>
@@ -148,7 +89,7 @@ Latex:
                                      pattern="^[\x20-\x7F]+$", 
                                      oninput="validateASCII(this)", 
                                      maxlength=1000) }}
-<img id="expression_name_latex_image" src="" alt="Latex input">
+<img id="expression_name_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form.expression_reference_latex.label }} (optional): 
        {{ form.expression_reference_latex(size=50, 
@@ -158,7 +99,7 @@ Latex:
                                           pattern="^[\x20-\x7F]+$", 
                                           oninput="validateASCII(this)", 
                                           maxlength=1000) }}
-<img id="expression_reference_latex_image" src="" alt="Latex input">
+<img id="expression_reference_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form.expression_description_latex.label }} (optional): 
        {{ form.expression_description_latex(size=50, 
@@ -168,7 +109,7 @@ Latex:
                                             pattern="^[\x20-\x7F]+$", 
                                             oninput="validateASCII(this)", 
                                             maxlength=1000) }}
-<img id="expression_description_latex_image" src="" alt="Latex input">
+<img id="expression_description_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P><input type="submit" name="new expression" value="add expression">
     </P>
