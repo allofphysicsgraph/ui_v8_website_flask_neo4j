@@ -31,6 +31,7 @@ RUN apt-get update && \
 # text editing
                vim \
                curl \
+               msmtp \
                python3 \
                python3-pip \
                python3-dev \ 
@@ -51,7 +52,12 @@ RUN apt-get update && \
     if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi
 
 
-################# end apt packages; start Lean 4 #################################
+################# end apt packages; start msmtp ##############
+
+# to set up a Gmail AppPassword see https://myaccount.google.com/apppasswords
+COPY msmtp.config /root/.msmtprc
+
+################## start Lean 4 #################################
 
 # The following doesn't work 
 #RUN curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
