@@ -13,15 +13,6 @@ Delete the manual `trace_id` and `query_time_dict`; replace it with Flask's `@ap
 
 ---
 
-MyPy type hints:
-
-Some functions have `-> werkzeug.Response:`, some have `-> str:`, and over half have no return type hint at all. You import `Union, Tuple` but rarely use them in function signatures. 
-
----
-
-in `def to_add_sympy_and_lean_for_expression` 
-there's an `eval` to eliminate
-
 in `sympy_validate_expression/dimensional_consistency`
 there's an `eval` to eliminate
 
