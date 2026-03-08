@@ -1,4 +1,22 @@
 
+\propto means dimensional consistency does not apply 
+example: 
+F \propto m
+
+--- 
+
+In derivation review show condition 
+
+--- 
+
+Does derivation review include step notes?
+
+---
+
+Add note that kepler third law is observation 
+
+---
+
 https://github.com/allofphysicsgraph/task-tracker/issues/163
 De Moivre's Formula; proof by induction
 
