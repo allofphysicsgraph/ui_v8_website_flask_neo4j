@@ -14,9 +14,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set Architecture Tag
         id: vars
-        run: >
+        run: |
           # GitHub returns 'X64', 'ARM64', etc. 
           # map 'X64' to 'amd64' and lowercase others.
           RAW_ARCH="${{ runner.arch }}"
