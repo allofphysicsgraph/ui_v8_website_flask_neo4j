@@ -1,20 +1,38 @@
+---
 name: Docker Image flask
-
 on:
   push:
-    branches: [ "gh-pages" ]
+    branches:
+      - gh-pages
   pull_request:
-    branches: [ "gh-pages" ]
-  workflow_dispatch: # This enables the manual trigger
-
+    branches:
+      - gh-pages
+  workflow_dispatch: null
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-          working-directory: webserver_for_pdg
-          run: docker build . --file Dockerfile --tag ui_v8_flask_webserver:$(date +%s)
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set Architecture Tag
+        id: vars
+        run: >
+          # GitHub returns 'X64', 'ARM64', etc. 
+          # map 'X64' to 'amd64' and lowercase others.
+          RAW_ARCH="${{ runner.arch }}"
+          if [ "$RAW_ARCH" = "X64" ]; then
+            echo "arch=amd64" >> $GITHUB_OUTPUT
+          else
+            echo "arch=$(echo $RAW_ARCH | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          fi
+      - name: Build the Docker image
+        working-directory: webserver_for_pdg
+        run: |
+          docker build . \
+            --file Dockerfile \
+            --tag ui_v8_flask_webserver:latest-${{ steps.vars.outputs.arch }}
+
+# check syntax using https://www.yamllint.com/
+
+# If you later add a step to Push the image to a registry (like Docker Hub), 
+# you can use ${{ steps.vars.outputs.arch }} to ensure the tags match.
