@@ -15,13 +15,13 @@ The website and back-end work. The Docker images are not currently in use for <h
 
 # Quickstart
 
-Launching locally will require generating the certificates for https. See <certs/README.md>
+Launching locally will require generating the certificates for https. See `certs/README.md`
 
 To start the containers, run
 ```bash
-make up
+make launch_webserver
 ```
-and then, in a web browser, go to <http://localhost:5000>
+and then, in a web browser, go to <http://localhost>
 
 
 Some pages require Google authentication. You can either
@@ -47,7 +47,9 @@ data structure to allow "properties" for both the nodes and the edges.
 
 In general, nodes in Neo4j are described using the following jargon:
 
-    :label {key1:'value1', key2:'value2'}
+```
+:label {key1:'value1', key2:'value2'}
+```
 
 where the key-value pairs are properties. 
 
@@ -55,9 +57,9 @@ where the key-value pairs are properties.
 
 # Goals
 
-[x] Document Derivations. Provide a structured way to represent mathematical derivations by breaking them into steps, expressions, and symbols.
-[x] Facilitate Collaboration and Sharing by using open source and publicly accessible information.
-[x] Enable programmatic interaction with the data using both a web interface and API.
+- [x] Document Derivations. Provide a structured way to represent mathematical derivations by breaking them into steps, expressions, and symbols.
+- [x] Facilitate Collaboration and Sharing by using open source and publicly accessible information.
+- [x] Enable programmatic interaction with the data using both a web interface and API.
 
 
 # Licensing
