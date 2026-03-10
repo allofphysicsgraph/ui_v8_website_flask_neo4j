@@ -8,12 +8,25 @@ on:
     branches:
       - gh-pages
   workflow_dispatch: null
+
+# Add permissions to allow the action to write to the registry
+permissions:
+  packages: write
+  contents: read
+  
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set Architecture Tag
         id: vars
@@ -26,12 +39,17 @@ jobs:
           else
             echo "arch=$(echo $RAW_ARCH | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
           fi
-      - name: Build the Docker image
+      - name: Build and Push the Docker image
         working-directory: webserver_for_pdg
         run: |
-          docker build . \
-            --file Dockerfile \
-            --tag ui_v8_flask_webserver:latest-${{ steps.vars.outputs.arch }}
+          # Use the lowercase repository name as the image name
+          IMAGE_NAME=ghcr.io/${{ github.repository }}/ui_v8_flask_webserver
+          IMAGE_NAME=$(echo $IMAGE_NAME | tr '[:upper:]' '[:lower:]')
+          TAG=latest-${{ steps.vars.outputs.arch }}
+
+          docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG
+          docker push $IMAGE_NAME:$TAG
+
 
 # check syntax using https://www.yamllint.com/
 
