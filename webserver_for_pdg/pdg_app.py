@@ -7982,30 +7982,32 @@ def to_survey_of_named_expressions():
 def to_blog_list():
     """ """
     logger.info("[TRACE] ")
-    return render_template("blog_from_blogger/blog_list.html")
+    return render_template(
+        "blog_from_blogger/blog_list.html", title="Blog for Physics Derivation Graph"
+    )
 
 
 @web_app.route("/blog/<YYYY>/<MM>/<blog_title>", methods=["GET"])
 def to_blog(YYYY: str, MM: str, blog_title: str):
     """
-    blog/YYYY/MM/blog-title
+    exported pages from blogger.com's https://physicsderivationgraph.blogspot.com/
 
     blog()
     """
     logger.info("[TRACE] ")
-    return render_template("blog_from_blogger/" + YYYY + "/" + MM + "/" + blog_title)
+    return render_template("blog_from_blogger/" + YYYY + "/" + MM + "/" + blog_title, title=blog_title)
 
 
-@web_app.route("/blog/page", methods=["GET"])
-@web_app.route("/blog/page/", methods=["GET"])
-def to_blog_manual():
-    return render_template("blog_manual/index.html")
+# @web_app.route("/blog/page", methods=["GET"])
+# @web_app.route("/blog/page/", methods=["GET"])
+# def to_blog_manual():
+#     return render_template("blog_manual/index.html")
 
 
 @web_app.route("/blog/page/<YYYY>/<MM>/<blog_title>", methods=["GET"])
 def to_blog_manual_page(YYYY: str, MM: str, blog_title: str):
     return render_template(
-        "blog_manual/" + YYYY + "/" + MM + "/" + blog_title + ".html", title=blog_title
+        "blog_manual/" + YYYY + "/" + MM + "/" + blog_title, title=blog_title
     )
 
 
