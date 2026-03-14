@@ -11,7 +11,7 @@
   </p><pre>  $ ssh root@SERVERIPHERE
   </pre>
 
-On the droplet, create a new user and group
+<P>On the droplet, create a new user and group
 <pre># sudo adduser pdg
 # sudo adduser pdg sudo
 # sudo addgroup pdg_grp
@@ -27,7 +27,7 @@ uid=1000(pdg) gid=1000(pdg) groups=1000(pdg),27(sudo),100(users),1001(pdg_grp)
 <p>Copy my public cert from my laptop to the server
 </p><pre>$ ssh-copy-id pdg@SERVERIPHERE
 </pre>
-On the server I exited the root SSH session and logged back in as pdg:
+<P>On the server I exited the root SSH session and logged back in as pdg:
 <pre>$ ssh -i ~/.ssh/KEYNAMEHERE pdg@SERVERIPHERE
 $ sudo vi /etc/ssh/sshd_config
      PermitRootLogin no
@@ -53,7 +53,7 @@ alias ll="ls -hal"
 alias ..="cd .."
 alias grin="grep -R -i -n --color"
 </pre>
-and to ~/.bashrc
+<P>and to ~/.bashrc
  <pre># HISTSIZE determines the number of commands remembered in memory during the current session.
 # HISTFILESIZE determines the maximum number of lines allowed in the history file
 export HISTSIZE=100000
