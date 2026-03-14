@@ -8011,7 +8011,7 @@ def to_blog(YYYY: str, MM: str, blog_title: str):
 @web_app.route("/blog/page/<YYYY>/<MM>/<blog_title>", methods=["GET"])
 def to_blog_manual_page(YYYY: str, MM: str, blog_title: str):
     return render_template(
-        "blog_manual/" + YYYY + "/" + MM + "/" + blog_title, title=blog_title
+        "blog_manual/" + YYYY + "/" + MM + "/" + blog_title + ".html", title=blog_title
     )
 
 
