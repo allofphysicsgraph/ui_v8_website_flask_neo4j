@@ -14,6 +14,23 @@ wget --spider --append-output=spider_log_2026-03-14.log --recursive --level=0 lo
 ```
 
 
+To allow `wget` to access protected routes within your Docker container, 
+
+If you can log in once using a standard browser, you can "steal" the session cookie and give it to `wget`.
+
+1.  Open your website in a browser and log in via Google.
+2.  Open **Developer Tools** (F12) -> **Application** (or Storage) -> **Cookies**.
+3.  Find the session cookie for your Flask app (usually named `session`).
+4.  Copy its value.
+5.  Run `wget` inside the container using the `--header` flag:
+
+```bash
+wget --header="Cookie: session=YOUR_SESSION_COOKIE_VALUE_HERE" http://localhost:5000/protected-route
+```
+
+This will work until the session expires.
+
+
 # Analysis
 
 ```
