@@ -31,6 +31,8 @@ RUN apt-get update && \
 # text editing
                vim \
                curl \
+# use spider to find dead links
+               wget \
                msmtp \
                python3 \
                python3-pip \
