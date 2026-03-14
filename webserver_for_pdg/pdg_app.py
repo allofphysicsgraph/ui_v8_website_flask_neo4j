@@ -7979,6 +7979,8 @@ def to_survey_of_named_expressions():
 
 @web_app.route("/blog", methods=["GET"])
 @web_app.route("/blog/", methods=["GET"])
+@web_app.route("/blog/page", methods=["GET"])
+@web_app.route("/blog/page/", methods=["GET"])
 def to_blog_list():
     """ """
     logger.info("[TRACE] ")
@@ -7995,7 +7997,9 @@ def to_blog(YYYY: str, MM: str, blog_title: str):
     blog()
     """
     logger.info("[TRACE] ")
-    return render_template("blog_from_blogger/" + YYYY + "/" + MM + "/" + blog_title, title=blog_title)
+    return render_template(
+        "blog_from_blogger/" + YYYY + "/" + MM + "/" + blog_title, title=blog_title
+    )
 
 
 # @web_app.route("/blog/page", methods=["GET"])
