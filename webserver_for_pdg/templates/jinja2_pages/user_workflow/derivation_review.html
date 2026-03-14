@@ -29,9 +29,9 @@
   </tr>
   {% for step_id, step_dict in all_steps.items() %}
 
-  {% if step_dict['note_before_step_latex'] %}
+  {% if step_dict['step dict']['note_before_step_latex'] %}
   <tr>
-    <td colspan="6">step_dict['note_before_step_latex']</td>
+    <td colspan="6">Note about step {{ step_dict['sequence index'] }}: {{ step_dict['step dict']['note_before_step_latex'] }}</td>
   </tr>
   {% endif %}
   <tr>
@@ -75,9 +75,9 @@
     </td>
     <td>{{ derivation_step_validity_dict[step_id] }}</td> <!-- valid -->
   </tr>
-  {% if step_dict['note_before_step_latex'] %}
+  {% if step_dict['step dict']['note_after_step_latex'] %}
   <tr>
-    <td colspan="6">step_dict['note_before_step_latex']</td>
+    <td colspan="6">Note about step {{ step_dict['sequence index'] }}: {{ step_dict['step dict']['note_after_step_latex'] }}</td>
   </tr>
   {% endif %}
 
