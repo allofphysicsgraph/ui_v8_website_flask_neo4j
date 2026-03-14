@@ -5,25 +5,11 @@ F \propto m
 
 --- 
 
-In derivation review show condition 
+In derivation review show condition for expressions
 
 --- 
 
-Does derivation review include step notes?
-
----
-
 Add note that kepler third law is observation 
-
----
-
-https://github.com/allofphysicsgraph/task-tracker/issues/163
-De Moivre's Formula; proof by induction
-
-
-https://github.com/allofphysicsgraph/task-tracker/issues/46
-Euler by MacLaurin; infinite series
-
 
 ---
 
@@ -67,10 +53,6 @@ Update symbols and operators
 https://en.wikipedia.org/wiki/List_of_common_physics_notations
 
 ---
-
-Submit neo4j query Python file to Gemini for a code review of suggestions and criticism
-
-Same for the API file
 
 Prompt:
 What inconsistencies are there? Bad coding implementation, or naming conventions, or design flaws for example.
