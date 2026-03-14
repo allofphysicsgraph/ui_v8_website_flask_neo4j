@@ -1,0 +1,71 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
+
+<fieldset>
+	<legend>Initial conversion to Latex</legend>
+Wikipedia uses MediaWiki syntax. Convert the following MediaWiki content to a single Latex document.
+
+Equations should be separated from the text rather than inline.
+
+Use ASCII rather than Unicode characters.
+
+Where single variables are currently inline those can remain inline.
+
+Equation blocks should include a label field so the block can be referenced within the document. The label that is added should be descriptive of the equation and contain no spaces, only underscores.
+Equations labels should be unique within the Latex file.
+</fieldset>
+
+<!--
+<fieldset>
+	<legend>Add equation labels</legend>
+For the following Latex file, write out the file and insert a label for each equation. The label that is added should be descriptive of the equation and contain no spaces, only underscores.
+
+Don't provide any commentary. Just write the revised Latex file content as your answer.
+</fieldset>
+-->
+
+
+<fieldset>
+	<legend>more steps</legend>
+A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
+
+Sometimes a previous expression is referenced implicitly. Edit the text to manually insert references where appropriate. Reference the relevant equation labels so that Latex can compile the document.
+
+Modify the Latex file below by adding explanatory text about each step of the derivation. Document the mathematical transformations that relate each equation in the file to other equations in the file.
+
+Use the Latex equation labels to reference equations.
+</fieldset>
+
+<fieldset>
+	<legend>(optional) Split grouped expressions</legend>
+A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
+
+In the Latex file below, for equations that have multiple instances of the equals sign, separate those into multiple equations such that each equation only has one use of the equals sign.
+
+Write out the modified content as a single Latex file.
+</fieldset>
+
+<fieldset>
+	<legend>(optional) more explanations</legend>
+A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
+
+In the Latex file below, where there are two equations with no explanatory text between them, modify the Latex file by adding explanatory text to document the mathematical transformations that relate each equation in the file to other equations in the file.
+
+Use the Latex equation labels to reference equations.
+</fieldset>
+
+
+
+<fieldset>
+	<legend>list of variables</legend>
+The following latex file contains equations and variables. Provide a list, formatted as Latex, of every unique variable and a description of that variable.
+
+For each entry in the list include a reference to the labeled equations where each variable is used. 
+
+Write out just the Latex list as your answer.
+</fieldset>
+
+{% endblock %}
