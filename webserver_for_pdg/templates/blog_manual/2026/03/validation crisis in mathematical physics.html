@@ -1,4 +1,9 @@
-Not sure if the problem is that I'm not a mathematician, but proofs are too short to be understandable to me. As an example,
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
+<P>Not sure if the problem is that I'm not a mathematician, but proofs are too short to be understandable to me. As an example,
 <pre>De Moivre's Formula
 (cos x + isin x)n = cos(nx) + isin(nx)
 
@@ -64,3 +69,6 @@ source: <a href="https://fermatslasttheorem.blogspot.com/2006/02/eulers-formula.
     <p>
         for <span class="texhtml"><i>z</i> = cos <i>nx</i> + <i>i</i> sin <i>nx</i></span>. Hence, <span class="texhtml"><i>S</i>(<i>n</i>)</span> holds for all integers <i class="texhtml">n</i>.
     </p>
+
+
+{% endblock %}

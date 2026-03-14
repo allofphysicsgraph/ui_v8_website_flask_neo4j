@@ -1,3 +1,8 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
 <P>List below is from "derivations backlog" column on <a href="https://github.com/orgs/allofphysicsgraph/projects/2/views/1">project tracker</a>
 
 <P>None of <a href="https://allofphysics.com/list_derivations">the current derivations</a> bridge two domains.
@@ -59,6 +64,7 @@ Results in
 <LI><a href="https://github.com/allofphysicsgraph/task-tracker/issues/10">Stiffness (Young’s Modulus) from Interatomic Potentials</a>
 <LI><a href="https://github.com/allofphysicsgraph/task-tracker/issues/76">latent heat from atomic scale interactions</a>
 <LI><a href="https://github.com/allofphysicsgraph/task-tracker/issues/11">opacity from atomic-scale phenomena</a>
+</UL>
 
 <H3>quantum mech to QFT</H3>
 
@@ -182,3 +188,4 @@ This involves chemistry notation
 from wikipedia.<BR>
 TODO: migrate wiki content to Latex
 
+{% endblock %}

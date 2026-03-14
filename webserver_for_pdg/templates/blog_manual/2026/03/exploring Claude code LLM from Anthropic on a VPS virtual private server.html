@@ -1,3 +1,8 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
 <p>See instructions on&nbsp;<a href="https://code.claude.com/docs/en/quickstart">https://code.claude.com/docs/en/quickstart</a></p>
 
 <p>Created an account</p>
@@ -46,3 +51,4 @@ Claude Code can be used with your Claude subscription or billed based on API usa
 <P>Claude "Pro" is $17 per month with annual subscription discount ($200 billed up front). $20 if billed monthly.
 
 
+{% endblock %}
