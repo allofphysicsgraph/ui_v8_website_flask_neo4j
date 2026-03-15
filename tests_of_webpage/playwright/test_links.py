@@ -10,9 +10,16 @@ import re
 import json
 import os
 from playwright.sync_api import Page, expect
+import pytest
 
 # this is what is exposed inside the Docker container
 URL = "http://localhost:5000"
+
+
+# this test should fail since the page requires being logged in
+def edit_specific_relation(page: Page):
+    page.goto(URL + "/edit_relation/0001247576")
+    expect(page.get_by_role("heading", name="Edit relation")).to_be_visible()
 
 
 def test_has_title(page: Page):
@@ -572,3 +579,12 @@ def test_get_query_list_derivation_IDs(page: Page):
 
         # Verify the page didn't navigate away
         expect(page).to_have_url(URL + "/review_derivation/" + dev_id)
+
+
+# # This test comes first so that we can "log in"
+# @pytest.fixture
+# def logged_in_page(page: Page):
+#     # Visit the backdoor route to establish the session cookie
+#     page.goto(f"{URL}/login-test-user")
+#     # Verify we are logged in
+#     return page
