@@ -1438,44 +1438,44 @@ def edit_node_property(
     return
 
 
-@trace_execution
-def edit_derivation_metadata(
-    tx,
-    derivation_id: str,
-    derivation_name_latex: str,
-    derivation_reference_latex: str,
-    abstract_latex: str,
-    author_name_latex: str,
-) -> None:
-    """
-    TODO: deprecate this in favor of modify node properties
+# @trace_execution
+# def edit_derivation_metadata(
+#     tx,
+#     derivation_id: str,
+#     derivation_name_latex: str,
+#     derivation_reference_latex: str,
+#     abstract_latex: str,
+#     author_name_latex: str,
+# ) -> None:
+#     """
+#     TODO: deprecate this in favor of modify node properties
 
-    `SET d += {map}` updates the properties listed in the map without deleting
-    other existing properties on the node. If you want to delete all other
-    properties and only keep these five, use `SET d = {map}`.
+#     `SET d += {map}` updates the properties listed in the map without deleting
+#     other existing properties on the node. If you want to delete all other
+#     properties and only keep these five, use `SET d = {map}`.
 
-    """
+#     """
 
-    query = """
-    MERGE (d:derivation {id: $id})
-    SET d = {
-        name_latex: $name,
-        reference_latex: $ref,
-        author_name_latex: $author,
-        abstract_latex: $abstract
-    }
-    """
+#     query = """
+#     MERGE (d:derivation {id: $id})
+#     SET d = {
+#         name_latex: $name,
+#         reference_latex: $ref,
+#         author_name_latex: $author,
+#         abstract_latex: $abstract
+#     }
+#     """
 
-    tx.run(
-        query,
-        id=derivation_id,
-        name=derivation_name_latex,
-        ref=derivation_reference_latex,
-        author=author_name_latex,
-        abstract=abstract_latex,
-    ).consume()
+#     tx.run(
+#         query,
+#         id=derivation_id,
+#         name=derivation_name_latex,
+#         ref=derivation_reference_latex,
+#         author=author_name_latex,
+#         abstract=abstract_latex,
+#     ).consume()
 
-    return
+#     return
 
 
 @trace_execution
