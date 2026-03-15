@@ -2,16 +2,21 @@
 <!-- if inclusion of Mathjax on pages which don't have latex becomes a significant source of latency, see
      http://docs.mathjax.org/en/latest/web/typeset.html#loading-mathjax-only-on-pages-with-math -->
 <!-- http://docs.mathjax.org/en/latest/input/tex/eqnumbers.html -->
-<script type="text/x-mathjax-config;executed=true">
-  MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "AMS"} } });
-</script>
+
+<!-- 1. Configuration object MUST come BEFORE the script load -->
 <script type="text/javascript">
   window.MathJax = {
     tex: {
-      tags: 'ams'
+      tags: 'ams' // This replaces the old equationNumbers: {autoNumber: "AMS"}
+    },
+    svg: {
+      fontCache: 'global'
     }
   };
 </script>
-    <script id="MathJax-script" async
-    src="{{ url_for('static', filename='javascript/mathjax/es5/tex-chtml.js') }}"></script>
 
+<!--
+  `tex-chtml.js` was installed with the Dockerfile and copied into static
+-->
+    <script id="MathJax-script" async
+    src="{{ url_for('static', filename='mathjax/es5/tex-chtml.js') }}"></script>
