@@ -91,6 +91,7 @@ from flask import (
     g,  # request timing; also for login
     redirect,
     render_template,
+    current_app,
     make_response,
     request,
     url_for,
@@ -494,6 +495,18 @@ def to_logout():
 
 
 ################################## END what was in "pdg_login.py" ###############################
+
+
+@web_app.route("/login-test-user")
+def login_test_user():
+    # Only allow this route if in testing mode
+    if not current_app.config.get("TESTING"):
+        return "Unauthorized", 403
+
+    # Simulate what Google Auth callback does
+    session["user_id"] = "test-123"
+    session["email"] = "test@example.com"
+    return "Logged in as test user"
 
 
 ######################## BEGIN importing blueprints (aka routes in other files) ##################
@@ -1948,63 +1961,45 @@ def to_edit_derivation_metadata(
                 derivation_name_latex = latex.make_string_safe_for_latex(
                     str(web_form_edit_derivation.derivation_name_latex.data).strip()
                 )
-                # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-                # if not derivation_name_latex.isascii():
-                #     logger.error(
-                #         "Non-ascii derivation_name_latex: " + str(derivation_name_latex)
-                #     )
-                #     flash(f"Input must be ASCII only{escape(derivation_name_latex)}")
-                #     return redirect(url_for("to_review_derivation"))
-
                 derivation_reference_latex = latex.make_string_safe_for_latex(
                     str(
                         web_form_edit_derivation.derivation_reference_latex.data
                     ).strip()
                 )
-                # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-                # if not derivation_reference_latex.isascii():
-                #     logger.error(
-                #         "Non-ascii derivation_reference_latex: "
-                #         + str(derivation_reference_latex)
-                #     )
-                #     flash(
-                #         "pdg_app/to_add_expression: Input must be ASCII only: "
-                #         + str(derivation_reference_latex)
-                #     )
-                #     logger.info("[TRACE] end " + trace_id)
-                #     return redirect(url_for("to_add_expression"))
-
                 abstract_latex = latex.make_string_safe_for_latex(
                     str(web_form_edit_derivation.abstract_latex.data).strip()
                 )
-                # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/84
-                # if not abstract_latex.isascii():
-                #     logger.error("Non-ascii abstract_latex: " + str(abstract_latex))
-                #     flash(f"Input must be ASCII only: {escape(abstract_latex)}")
-                #     return redirect(url_for("to_add_expression"))
-
-                # as per https://strftime.org/
-                # %f = Microsecond as a decimal number, zero-padded on the left.
-                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                author_name_latex = compute.encode_user_identifier(current_user.email)
 
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/ " + trace_id
                 ):
-                    # query_start_time = time.time()
-                    session.write_transaction(
-                        neo4j_query.edit_derivation_metadata,
-                        derivation_id,
-                        derivation_name_latex,
-                        derivation_reference_latex,
-                        abstract_latex,
-                        author_name_latex,
-                    )
-                    # query_time_dict[
-                    #     "pdg_app/to_edit_derivation_metadata: edit_derivation_metadata"
-                    #     + trace_id
-                    # ] = round(time.time() - query_start_time, 3)
+                    if abstract_latex != derivation_dict["abstract_latex"]:
+                        session.write_transaction(
+                            neo4j_query.edit_node_property,
+                            "derivation",
+                            derivation_id,
+                            "abstract_latex",
+                            abstract_latex,
+                        )
+
+                    if derivation_reference_latex != derivation_dict["reference_latex"]:
+                        session.write_transaction(
+                            neo4j_query.edit_node_property,
+                            "derivation",
+                            derivation_id,
+                            "reference_latex",
+                            derivation_reference_latex,
+                        )
+
+                    if derivation_name_latex != derivation_dict["name_latex"]:
+                        session.write_transaction(
+                            neo4j_query.edit_node_property,
+                            "derivation",
+                            derivation_id,
+                            "name_latex",
+                            derivation_name_latex,
+                        )
+
                 logger.info("[TRACE] end " + trace_id)
                 return redirect(
                     url_for("to_review_derivation", derivation_id=derivation_id)
@@ -2035,6 +2030,7 @@ def to_edit_derivation_metadata(
 @web_app.route(
     "/new_step_select_inference_rule/<derivation_id>/", methods=["GET", "POST"]
 )
+@login_required
 def to_add_step_select_inference_rule(
     derivation_id: unique_numeric_id_as_str,
 ) -> ResponseReturnValue:
@@ -4719,12 +4715,12 @@ def to_add_step_select_expressions(
 
         logger.info("list_of_expressions= " + str(list_of_expressions))
 
-        # with graphDB_Driver.session() as session, track_time(query_time_dict, "pdg_app/ " + trace_id):
-        # query_start_time = time.time()
-        list_of_feeds = session.read_transaction(neo4j_query.get_nodes_of_type, "feed")
-        # query_time_dict[
-        #     "pdg_app/to_add_step_select_expressions: get_nodes_of_type feed " + trace_id
-        # ] = round(time.time() - query_start_time, 3)
+
+        list_of_feeds = session.read_transaction(
+            neo4j_query.get_feeds_not_connected_to_any_step
+        )
+
+        # list_of_feeds = session.read_transaction(neo4j_query.get_nodes_of_type, "feed")
 
     logger.info("list_of_feeds=" + str(list_of_feeds))
 
@@ -4847,7 +4843,7 @@ def to_add_symbols_and_operations_for_expression(
             request.form["submit_button"]
             == "continue anyways; also skip SymPy and Lean"
         ):
-            return redirect(url_for("to_list_expressions"))
+            return redirect(url_for("to_list_expressions", _anchor=f"{expression_id}"))
         elif (
             request.form["submit_button"]
             == "update expression and enter SymPy and Lean"
@@ -4893,7 +4889,7 @@ def to_add_symbols_and_operations_for_expression(
             )
         else:
             logger.info("[TRACE] end " + trace_id)
-            return redirect(url_for("to_list_expressions"))
+            return redirect(url_for("to_list_expressions", _anchor=f"{expression_id}"))
 
     # get the Latex for this expression_id
     with graphDB_Driver.session() as session, track_time(
@@ -7442,12 +7438,13 @@ def static_file_from_root():
 def static_dir():
     """
     "static_dir" is a directory listing
+
     This route is not intended to be linked to
-    >>> static_dir()
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     # https://stackoverflow.com/a/3207973/1164295
+    # get a list of all filenames located inside a folder while ignoring subfolders
     _, _, filenames = next(os.walk("static"))
     filenames.sort()
     logger.info("[TRACE] end " + trace_id)
