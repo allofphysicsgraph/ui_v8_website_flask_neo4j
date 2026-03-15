@@ -34,8 +34,9 @@ Latex:
 -->
 
     <select name="symbol_relation_id_to_add" class="selectpicker form-control" id="relation_select">
+      <!-- use of `\(\large {{ relation_dict['latex'] }} \)` didn't help make the font bigger -->
       {% for relation_dict in list_of_relations %}
-      <option value="{{ relation_dict['id'] }}">\({{ relation_dict['latex'] }}\)</option>
+      <option value="{{ relation_dict['id'] }}">\( {{ relation_dict['latex'] }} \)</option>
       {% endfor %}
     </select>
 
