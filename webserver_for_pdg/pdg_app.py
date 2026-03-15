@@ -2170,11 +2170,24 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseRetur
         elif "remove symbol from expr" in request.form:
             logger.info("request.form = " + str(request.form))
 
-            # TODO
+            if "symbol_select_id_to_disconnect" in request.form.keys():
+                id_to_disconnect = request.form["symbol_select_id_to_disconnect"]
 
-            flash(
-                "pdg_app/to_edit_expression: Not enacted 'remove symbol from expr' yet"
-            )
+                with graphDB_Driver.session() as session, track_time(
+                    query_time_dict, "pdg_app/ " + trace_id
+                ):
+                    session.write_transaction(
+                        neo4j_query.disconnect_symbol_from_expression,
+                        id_to_disconnect,
+                        expression_id,
+                    )
+
+            else:
+                flash("pdg_app/to_edit_expression: missing ID selection")
+
+            # flash(
+            #     "pdg_app/to_edit_expression: Not enacted 'remove symbol from expr' yet"
+            # )
             return redirect(url_for("to_edit_expression", expression_id=expression_id))
 
         elif "add operation to expr" in request.form:
@@ -4588,6 +4601,12 @@ def to_add_symbols_and_operations_for_expression(
 
     query_time_dict, potential_symbols_found_in_Latex_expression = (
         compute.guess_symbols_from_latex(
+            graphDB_Driver, query_time_dict, expression_dict
+        )
+    )
+
+    query_time_dict, potential_operations_found_in_Latex_expression = (
+        compute.guess_operations_from_latex(
             graphDB_Driver, query_time_dict, expression_dict
         )
     )
@@ -7398,6 +7417,15 @@ def to_survey_of_named_expressions():
     return render_template(
         "jinja2_pages/named_expressions_survey.html", title="central expressions"
     )
+
+
+###########################################################################
+
+
+@web_app.route("/from_llm", methods=["GET"])
+def to_llm_page():
+    logger.info("[TRACE] ")
+    return render_template("from_LLM/SHO_from_Gemini_3_flash.html")
 
 
 ###########################################################################
