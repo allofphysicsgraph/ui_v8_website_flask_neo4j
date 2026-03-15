@@ -6,10 +6,14 @@
 <!-- 1. Configuration object MUST come BEFORE the script load -->
 <script type="text/javascript">
   window.MathJax = {
+    chtml: {
+      scale: 1.2, // Increases overall size to 120%
+    },
     tex: {
       tags: 'ams' // This replaces the old equationNumbers: {autoNumber: "AMS"}
     },
     svg: {
+      scale: 1.2,
       fontCache: 'global'
     }
   };
