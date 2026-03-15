@@ -1543,6 +1543,26 @@ def disconnect_symbol_from_feed(tx, symbol_id: str, feed_id: str) -> None:
 
 
 @trace_execution
+def disconnect_symbol_from_expression(tx, symbol_id: str, expression_id: str) -> None:
+    """
+    called by "edit expression"
+
+    https://neo4j.com/docs/cypher-manual/current/clauses/delete/
+    """
+
+    tx.run(
+        "MATCH (e:expression)-[r:IS_COMPRISED_OF]->(s)"
+        + 'WHERE e.id="'
+        + str(expression_id)
+        + '" AND s.id="'
+        + str(symbol_id)
+        + '"  DELETE r'
+    ).consume()
+
+    return
+
+
+@trace_execution
 def get_symbols(tx: Transaction):
     """ """
 
