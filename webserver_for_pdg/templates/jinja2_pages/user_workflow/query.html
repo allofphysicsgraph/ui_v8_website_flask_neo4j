@@ -151,7 +151,20 @@ MATCH (s:step) WHERE NOT (s)-[:HAS_INFERENCE_RULE]->(:inference_rule) RETURN s</
 MATCH (s:step) WHERE NOT EXISTS { MATCH (s)-[:HAS_INPUT|HAS_OUTPUT]->(e:expression)<-[:HAS_INPUT|HAS_OUTPUT]-(other:step)   WHERE s &lt;&gt; other } RETURN s</a></td>
     <td>find :step nodes that are not connected to any other :step nodes through an intermediate :expression.</td>
   </tr>
-
+  <tr>
+    <td id="duplicate edges, ignoring properties">duplicate edges, ignoring properties
+      <a href="#duplicate edges, ignoring properties">#</a></td>
+      <td><a href="{{ url_for('to_query') }}?cypher=MATCH (a)-[r]->(b) WITH a, b, type(r) AS rel_type, collect(r) AS rels WHERE size(rels) > 1 RETURN a, b, rel_type, size(rels) AS duplicate_count">
+MATCH (a)-[r]->(b) WITH a, b, type(r) AS rel_type, collect(r) AS rels WHERE size(rels) > 1 RETURN a, b, rel_type, size(rels) AS duplicate_count</a></td>
+      <td>There are multiple derivations that intentionally use the same input twice.</td>
+  </tr>
+  <tr>
+    <td id="nodes that have the same property value for property key id">nodes that have the same property value for property key id
+      <a href="#nodes that have the same property value for property key id">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (n) WHERE n.id IS NOT NULL WITH n.id AS propertyId, collect(n) AS nodes, count(*) AS occurrenceCount WHERE occurrenceCount > 1 RETURN propertyId, occurrenceCount, nodes">
+MATCH (n) WHERE n.id IS NOT NULL WITH n.id AS propertyId, collect(n) AS nodes, count(*) AS occurrenceCount WHERE occurrenceCount > 1 RETURN propertyId, occurrenceCount, nodes</a></td>
+    <td></td>
+  </tr>
   <tr>
     <td id="all distinct node labels and the unique property keys used within each label">
             all distinct node labels and the unique property keys used within each label.
@@ -276,6 +289,12 @@ MATCH (f:feed)--(s:step) WITH f, count(s) AS stepCount WHERE stepCount &gt; 1 RE
 MATCH (s:step)-[r]->(e) WHERE s.id='{{step_id}}' RETURN e</a></td>
     <td>all input expressions, feeds, and output expressions</td>
   </tr>
+  <tr>
+    <td id="list every symbol that an expression connects to">list every symbol that an expression connects to
+      <a href="#list every symbol that an expression connects to">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (e:expression)-[r]->(s) WHERE e.id='5272284986' RETURN s">
+MATCH (e:expression)-[r]->(s) WHERE e.id='5272284986' RETURN s</a></td>
+    <td></td>
   <tr>
     <td id="all named expressions">all named expressions
       <a href="#all named expressions">#</a></td>
