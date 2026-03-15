@@ -62,7 +62,7 @@ launch_webserver:
 	$(DOCKER_OR_PODMAN) ps
 	$(DOCKER_OR_PODMAN) run --rm -t -e PYTHONUNBUFFERED=1  \
 	        --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) \
-	        -c 'black -v --workers 1 /scratch/webserver_for_pdg/*.py /scratch/webserver_for_pdg/library/*.py'
+	        -c 'black -v --workers 1 /scratch/webserver_for_pdg/*.py /scratch/tests_of_webpage/playwright/*.py /scratch/webserver_for_pdg/library/*.py'
 	# https://docs.docker.com/compose/reference/up/
 	$(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans $(COMPOSE_FLAGS)
 
