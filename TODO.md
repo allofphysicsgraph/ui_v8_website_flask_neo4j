@@ -1,4 +1,51 @@
 
+Is there a constraint I can introduce such that the property ID is unique across all nodes
+
+---
+
+There was no selection of operations for expression 
+--> see `expression_create_symbols_and_operations.html`
+
+---
+
+Larger font for relation dropdown, specifically propto
+- `\large` didn't help
+
+see `expression_create.html`
+
+---
+
+Associating expressions with step is awkward - looking through the dropdown is tedious 
+--> Need a fuzzy search: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/18
+
+---
+
+Figuring out whether the expression (or symbol) already exists is difficult 
+--> Need a fuzzy search: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/18
+
+---
+
+Getting from a detailed latex document to step input is awkward 
+- Does "Latex to HTML table" help?
+
+SHO - https://github.com/allofphysicsgraph/task-tracker/issues/2
+See https://localhost/from_llm
+
+---
+
+Entering sympy for expression is awkward 
+--> to try: https://pypi.org/project/latex2sympy2/
+
+---
+
+list of valid links to create sitemap for Google
+
+---
+
+pytest for logged in pages
+
+---
+
 \propto means dimensional consistency does not apply 
 example: 
 F \propto m
@@ -31,23 +78,6 @@ to verify:
 
 ---
 
-Goal is to enter a novel derivation
-e.g., https://github.com/allofphysicsgraph/task-tracker/issues/162 (F=ma)
-
-What's preventing me from entering a derivation right now?
-
-bug categories:
-1) no page should trigger a gunicorn error (which prevents rendering HTML)
-2) pages that do render HTML should not have errors (including flash messages)
-   - BUG verified 2026-02-16 11:50: on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
-   - no derivation has all steps valid. There are many errors in the step validation for most derivations
-
-3) pages that claim a feature but do not enact that feature (e.g., editing a variable or expression or step or infrule or derivation)
-4) pages that lack a necessary feature for the workflow (e.g., editing)
-   - verified 2026-02-16 11:18 need for missing feature: https://localhost/new_symbol_vector is missing dimensions (length, time, mass)
-   - New function in compute: List of all non-operation symbols. Used by new feed when promoting existing symbol
-
----
 
 Update symbols and operators
 https://en.wikipedia.org/wiki/List_of_common_physics_notations
