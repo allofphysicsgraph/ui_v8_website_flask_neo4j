@@ -1,0 +1,183 @@
+
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Step</th>
+      <th>Input Expression(s)</th>
+      <th>Output Expression(s)</th>
+      <th>Transform / Relation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>\( F_{\text{net}} = m\frac{d^2 x}{dt^2} \) label:force_newton<br>
+          \( F_{\text{restorative}} = -kx \) label:force_hooke</td>
+      <td>\( m\frac{d^2 x}{dt^2} = -kx \) label:newton_hooke</td>
+      <td>Equate net force to restorative force.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>label:newton_hooke</td>
+      <td>\( \frac{d^2 x}{dt^2} = -\frac{k}{m}x \) label:acceleration_differential_equation</td>
+      <td>Divide both sides by mass \( m \).</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>label:acceleration_differential_equation</td>
+      <td>\( x(t) = c_1\cos(\omega t) + c_2\sin(\omega t) \) label:sinusoidal_general_solution<br>
+          \( \omega = \sqrt{\frac{k}{m}} \) label:angular_frequency_definition</td>
+      <td>Solve second-order linear ODE with constant coefficients.</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>label:sinusoidal_general_solution</td>
+      <td>\( x(0) = c_1 \cos(0) + c_2 \sin(0) = c_1 \) label:initial_position</td>
+      <td>Evaluate position at initial time \( t=0 \).</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>label:sinusoidal_general_solution</td>
+      <td>\( \dot{x}(t) = -c_1 \omega \sin(\omega t) + c_2 \omega \cos(\omega t) \) label:velocity_derivation_general</td>
+      <td>Differentiate position with respect to time.</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>label:velocity_derivation_general</td>
+      <td>\( \dot{x}(t=0) = \omega c_2 \) label:derivative_of_position</td>
+      <td>Evaluate velocity at initial time \( t=0 \).</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>label:derivative_of_position</td>
+      <td>\( \dot{x}(t=0) = v_0 \) label:initial_velociy</td>
+      <td>Define constant for initial velocity.</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>label:derivative_of_position,<BR> label:initial_velociy</td>
+      <td>\( c_2 = \frac{v_0}{\omega} \) label:boundary_condition</td>
+      <td>Isolate constant \( c_2 \).</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>label:sinusoidal_general_solution,<BR> label:angular_frequency_definition,<BR> label:initial_position,<BR> label:boundary_condition</td>
+      <td>\( x(t) = x_0 \cos\left(\sqrt{\frac{k}{m}} t\right) + \frac{v_0}{\sqrt{\frac{k}{m}}}\sin\left(\sqrt{\frac{k}{m}} t\right) \) label:solution_with_initial_conditions</td>
+      <td>Substitute constants and frequency definition into general solution.</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>\( \cos(\alpha - \beta) = \cos \alpha \cos \beta + \sin \alpha \sin \beta \) label:Cosine_Difference_Identity<br>
+          \( \cos^2 \varphi + \sin^2 \varphi = 1 \) label:Pythagorean_Identity</td>
+      <td>(Declarations)</td>
+      <td>Establish trigonometric identities for subsequent steps.</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>\( x(t) = A\cos(\omega t - \varphi) \) label:amplitude_phase_form<br>
+          label:Cosine_Difference_Identity</td>
+      <td>\( x(t) = (A \cos \varphi) \cos(\omega t) + (A \sin \varphi) \sin(\omega t) \)</td>
+      <td>Expand phase-shifted form using cosine difference identity.</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>label:sinusoidal_general_solution, Output of Step 11</td>
+      <td>\( c_1 = A \cos \varphi \)<br>
+          \( c_2 = A \sin \varphi \)</td>
+      <td>Equate coefficients of \(\cos(\omega t)\) and \(\sin(\omega t)\).</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>Output of Step 12,<BR> label:Pythagorean_Identity</td>
+      <td>\( A = \sqrt{c_1^2 + c_2^2} \) label:amplitude_calculation</td>
+      <td>Square coefficients, sum them, and apply Pythagorean identity.</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>Output of Step 12,<BR> label:amplitude_calculation</td>
+      <td>\( \tan \varphi = \frac{c_2}{c_1} \) label:phase_calculation_tan<br>
+          \( \sin \varphi = \frac{c_2}{A} \) label:phase_calculation_sin<br>
+          \( \cos \varphi = \frac{c_1}{A} \) label:phase_calculation_cos</td>
+      <td>Solve for trigonometric components of the phase angle.</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>label:amplitude_calculation,<BR> label:phase_calculation_tan</td>
+      <td>\( A = |c_1 + c_2i| \) label:amplitude_complex_modulus<br>
+          \( \varphi = \arg(c_1 + c_2i) \) label:phase_complex_argument</td>
+      <td>Convert amplitude and phase to complex number notation.</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>label:amplitude_phase_form</td>
+      <td>\( v(t) = \frac{dx}{dt} = - A\omega \sin(\omega t-\varphi) \) label:velocity_function_time</td>
+      <td>Differentiate position function with respect to time.</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>label:amplitude_phase_form,<BR> label:velocity_function_time,<BR> label:Pythagorean_Identity</td>
+      <td>\( v = \omega \sqrt{A^2 - x^2} \) label:speed_function_displacement</td>
+      <td>Substitute trig functions to express velocity in terms of displacement.</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>label:speed_function_displacement</td>
+      <td>\( v_{\text{max}} = \omega A \) label:maximum_speed_at_equilibrium</td>
+      <td>Evaluate speed at equilibrium (\(x = 0\)).</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>label:velocity_function_time</td>
+      <td>\( a(t) = \frac{d^2 x}{dt^2} = - A \omega^2 \cos( \omega t-\varphi) \) label:acceleration_function_time</td>
+      <td>Differentiate velocity function with respect to time.</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>label:acceleration_function_time</td>
+      <td>\( a_{\text{max}} = A\omega^2 \) label:maximum_acceleration_at_extremes</td>
+      <td>Evaluate acceleration at extremes (\(x = \pm A\)).</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>label:amplitude_phase_form,<BR> label:acceleration_function_time</td>
+      <td>\( a(x) = -\omega^2 x \) label:acceleration_proportional_to_displacement</td>
+      <td>Substitute position equation into acceleration equation.</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>label:angular_frequency_definition</td>
+      <td>\( \omega^2 = \frac{k}{m} \) label:angular_frequency_squared_relation</td>
+      <td>Square the angular frequency definition.</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>(None/Definition)</td>
+      <td>\( \omega = 2\pi f \) label:angular_frequency_linear_frequency</td>
+      <td>Define relationship between angular and linear frequency.</td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td>label:angular_frequency_definition,<BR> label:angular_frequency_linear_frequency</td>
+      <td>\( f = \frac{1}{2\pi}\sqrt{\frac{k}{m}} \) label:frequency_calculation</td>
+      <td>Substitute frequency into angular frequency definition and solve for \( f \).</td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>(None/Definition)</td>
+      <td>\( T = \frac{1}{f} \) label:period_and_frequency</td>
+      <td>Define period as the reciprocal of linear frequency.</td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td>label:frequency_calculation,<BR> label:period_and_frequency</td>
+      <td>\( T = 2\pi \sqrt{\frac{m}{k}} \) label:period_calculation</td>
+      <td>Substitute linear frequency into period definition.</td>
+    </tr>
+  </tbody>
+</table>
+
+{% endblock %}

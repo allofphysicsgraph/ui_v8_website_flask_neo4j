@@ -1,0 +1,19 @@
+
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
+Explaining the Physics Derivation Graph to an LLM is an important aspect of getting a relevant answer. Here's the context I provide in prompts:
+
+<HR>
+
+<P>I run a website using docker compose. There are three containers: nginx, neo4j, and flask. The flask container has both a web interface and provides an API. The web interface displays content from the neo4j database. The nodes and edges in the property graph database are aspects of mathematical derivations. 
+
+<P>The node types in the graph include derivation, step, expression, symbol, operation, relation. Symbols can be scalar or vector or matrix. Examples of operations include integration, addition, multiplication, sine, cosine. Examples of relations include equals, not equal to, proportional to, greater than, greater than or equal to, less than, less than or equal to. 
+
+<P>The purpose of the web interface is to display content from the graph and also serve as a way to constrain users to put in content such that the schema is adhered to. 
+
+<P>A challenge that I'm currently encountering is that entering all aspects of a derivation through the webinar face can be tedious. In addition to entering the latex representations, the user has to identify whether the back end database already contains the intended expressions, operations, and symbols.
+
+{% endblock %}

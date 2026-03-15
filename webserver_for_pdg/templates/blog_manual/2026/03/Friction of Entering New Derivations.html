@@ -1,0 +1,43 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
+
+<P>Goal is to enter a novel derivation
+e.g., <a href="https://github.com/allofphysicsgraph/task-tracker/issues/2">Simple Harmonic Oscillator</a>
+
+<P>What's preventing me from entering a derivation right now?
+
+<H3>bug categories</H3>
+<OL>
+   <LI>no page should trigger a gunicorn error (which prevents rendering HTML)
+   <LI>pages that do render HTML should not have errors (including flash messages)
+      <UL>
+         <LI>BUG verified 2026-02-16 11:50: on page https://localhost/review_derivation/387954 the validation reports "list index out of range"
+         <LI>no derivation has all steps valid. There are many errors in the step validation for most derivations
+      </UL>
+   </LI>
+   <LI>pages that claim a feature but do not enact that feature (e.g., editing a variable or expression or step or infrule or derivation)
+   <LI>pages that lack a necessary feature for the workflow (e.g., editing)
+      <UL>
+         <LI>verified 2026-02-16 11:18 need for missing feature: https://localhost/new_symbol_vector is missing dimensions (length, time, mass)
+         <LI>New function in compute: List of all non-operation symbols. Used by new feed when promoting existing symbol
+      </UL>
+   </LI>
+</OL>
+
+<H3>Getting from Latex to Neo4j schema via web UI</H3>
+
+<P>See <a href="{{ url_for('to_blog_manual_page', YYYY='2026', MM='03', blog_title='Sequence of Prompts for LLM to convert wikipedia or PDF content to Latex for Physics Derivation Graph') }}">
+
+<H3>UI friction</H3>
+
+<UL>
+   <LI>Associating expressions with step is awkward - looking through the dropdown is tedious </LI>
+   <LI>Figuring out whether the expression (or symbol) already exists is difficult </LI>
+   <LI>Entering sympy for expression is awkward </LI>
+</UL>
+
+
+{% endblock %}
