@@ -16,7 +16,7 @@
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form.csrf_token }}
     <P>{{ form.derivation_name_latex.label}} (<B>required</B>): 
-       {{ form.derivation_name_latex(size=50, 
+       {{ form.derivation_name_latex(size=150, 
                                     type="text",
                                     class_="latex-input", 
                                     data_target="derivation_name_latex_image",
@@ -27,7 +27,7 @@
     <img id="derivation_name_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form.derivation_reference_latex.label}} (<i>optional</i>): 
-       {{ form.derivation_reference_latex(size=50, 
+       {{ form.derivation_reference_latex(size=150, 
                                           type="text",
                                           class_="latex-input", 
                                           data_target="derivation_reference_latex_image",
@@ -38,7 +38,7 @@
     <img id="derivation_reference_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form.abstract_latex.label }} (<B>required</B>): 
-       {{ form.abstract_latex(size=50, 
+       {{ form.abstract_latex(size=150, 
                               type="text",
                               class_="latex-input", 
                               data_target="derivation_abstract_latex_image",
