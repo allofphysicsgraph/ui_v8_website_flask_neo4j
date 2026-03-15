@@ -222,6 +222,53 @@ def guess_sympy_from_expression(graphDB_Driver, query_time_dict, expression_dict
     return query_time_dict, revised_expr_lhs_with_str, revised_expr_rhs_with_str
 
 
+def guess_operations_from_latex(graphDB_Driver, query_time_dict, expression_dict):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+
+    with graphDB_Driver.session() as session:
+        query_start_time = time.time()
+        list_of_operation_dicts = session.read_transaction(
+            neo4j_query.get_nodes_of_type, "operation"
+        )
+        query_time_dict[
+            "pdg_app/to_add_symbols_and_operations_for_expression, get_nodes_of_type operation "
+            + trace_id
+        ] = round(time.time() - query_start_time, 3)
+
+    cleaned_latex_str_lhs = remove_latex_presention_markings(
+        expression_dict["latex_lhs"]
+    )
+    cleaned_latex_str_relation = remove_latex_presention_markings(
+        expression_dict["latex_relation"]
+    )
+    cleaned_latex_str_rhs = remove_latex_presention_markings(
+        expression_dict["latex_rhs"]
+    )
+    logger.info("cleaned_latex_str_lhs=" + str(cleaned_latex_str_lhs))
+    logger.info("cleaned_latex_str_relation=" + str(cleaned_latex_str_relation))
+    logger.info("cleaned_latex_str_rhs=" + str(cleaned_latex_str_rhs))
+
+    # TODO
+    potential_operations_found_in_Latex_expression = list_of_operation_dicts
+
+    # Prompt used:
+    # I have a list of dictionaries in Python and one of the keys in each dictionary is latex.
+    # How do I sort that list of dictionaries by the values for the key latex?
+    potential_operations_found_in_Latex_expression = sorted(
+        potential_operations_found_in_Latex_expression,
+        key=lambda x: x["latex"].lower(),
+    )
+
+    logger.info(
+        "potential_operations_found_in_Latex_expression="
+        + str(potential_operations_found_in_Latex_expression)
+    )
+
+    logger.info("[TRACE] end " + trace_id)
+    return query_time_dict, potential_operations_found_in_Latex_expression
+
+
 def guess_symbols_from_latex(graphDB_Driver, query_time_dict, expression_dict):
     """
     after users enter latex, guess which symbols they want to associate with expression
@@ -369,6 +416,14 @@ def guess_symbols_from_latex(graphDB_Driver, query_time_dict, expression_dict):
             potential_symbols_found_in_Latex_expression.append(this_symbol_dict)
 
             # symbol_id_dict[this_symbol_dict["latex"]] = this_symbol_dict["id"]
+
+    # Prompt used:
+    # I have a list of dictionaries in Python and one of the keys in each dictionary is latex.
+    # How do I sort that list of dictionaries by the values for the key latex?
+    potential_symbols_found_in_Latex_expression = sorted(
+        potential_symbols_found_in_Latex_expression,
+        key=lambda x: x["latex"].lower(),
+    )
 
     logger.info(
         "potential_symbols_found_in_Latex_expression="
@@ -913,7 +968,8 @@ def get_symbols_not_in_expression(
                 symbols_not_in_expression_but_might_be_relevant.append(this_symbol)
 
     # Prompt used:
-    # I have a list of dictionaries in Python and one of the keys in each dictionary is latex. How do I sort that list of dictionaries by the values for the key latex?
+    # I have a list of dictionaries in Python and one of the keys in each dictionary is latex.
+    # How do I sort that list of dictionaries by the values for the key latex?
     symbols_not_in_expression_but_might_be_relevant = sorted(
         symbols_not_in_expression_but_might_be_relevant,
         key=lambda x: x["latex"].lower(),
