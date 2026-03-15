@@ -52,26 +52,38 @@
         <LI><span class="mathjax_ignore">{{ step_dict['inference rule dict']['latex'] }}</span></LI>
       </ul>
     </td> <!-- inference rule -->
-    <td>{% for m_dict in step_dict['list of input dicts'] %}
+    <td>
       <OL>
+        {% for m_dict in step_dict['list of input dicts'] %}
+        <!--
+          {{m_dict}}
+        -->
         <LI><a href="{{ url_for('to_edit_expression', expression_id=m_dict['id']) }}">{{m_dict['id']}}</a><BR>
         \({{ m_dict['latex_lhs'] }} {{ m_dict['latex_relation'] }} {{ m_dict['latex_rhs'] }}\)</LI>
-      </OL>
         {% endfor %}
+      </OL>
     </td>
-    <td>{% for m_dict in step_dict['list of feed dicts'] %}
+    <td>
       <OL>
+        {% for m_dict in step_dict['list of feed dicts'] %}
+        <!--
+          {{m_dict}}
+        -->
         <LI><a href="{{ url_for('to_edit_feed', feed_id=m_dict['id']) }}">{{m_dict['id']}}</a><BR>
         \({{ m_dict['latex'] }}\)</LI>
-      </OL>
         {% endfor %}
+      </OL>
     </td>
-    <td>{% for m_dict in step_dict['list of output dicts'] %}
+    <td>
       <OL>
+      {% for m_dict in step_dict['list of output dicts'] %}
+        <!--
+          {{m_dict}}
+        -->
         <LI><a href="{{ url_for('to_edit_expression', expression_id=m_dict['id']) }}">{{m_dict['id']}}</a><BR>
         \({{ m_dict['latex_lhs'] }} {{ m_dict['latex_relation'] }} {{ m_dict['latex_rhs'] }}\)</LI>
-      </OL>
         {% endfor %}
+      </OL>
     </td>
     <td>{{ derivation_step_validity_dict[step_id] }}</td> <!-- valid -->
   </tr>
