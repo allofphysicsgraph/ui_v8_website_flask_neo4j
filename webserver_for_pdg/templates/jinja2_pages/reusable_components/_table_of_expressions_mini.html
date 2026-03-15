@@ -1,6 +1,6 @@
 <!--
-<P>list_of_expression_dicts:<BR>
-  { { list_of_expression_dicts } }
+<P>list_of_expressions:<BR>
+  {{ list_of_expressions }}
 -->
 
 <table border="1" id="expression_table" class="sortable">
@@ -8,7 +8,7 @@
     <th>ID</th>
     <th>latex</th>
   </tr>
-  {% for expression_dict in list_of_expression_dicts %}
+  {% for expression_dict in list_of_expressions %}
   <tr>
     <td id="{{ expression_dict['id'] }}">
       <a href="{{ url_for('to_edit_expression', expression_id=expression_dict['id'] ) }}" title="see more about this expression">
