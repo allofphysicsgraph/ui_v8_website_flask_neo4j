@@ -273,13 +273,13 @@ def api_list_derivations():
     query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "derivation"
         )
-        query_time_dict[
-            "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
-        ] = (time.time() - query_start_time)
+        # query_time_dict[
+        #     "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
+        # ] = (time.time() - query_start_time)
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -2000,6 +2000,17 @@ def api_derivation_metadata(derivation_id: str):
     "/v1/resources/inference_rule/<string:infrule_id>/metadata", methods=["GET"]
 )
 def api_inference_rule_metadata(expression_id: str):
+    """
+    What can be done:
+    - get: read current
+    - set: change existing values
+    """
+
+    # with graphDB_Driver.session() as session:
+    #     OUTPUT = session.read_transaction(
+    #         neo4j_query.FUNCTION_NAME
+    #     )
+
     return jsonify({"STATUS": "TODO"})
 
 
@@ -2007,6 +2018,17 @@ def api_inference_rule_metadata(expression_id: str):
     "/v1/resources/expression/<string:expression_id>/metadata", methods=["GET"]
 )
 def api_expression_metadata(expression_id: str):
+    """
+    What can be done:
+    - get: read current
+    - set: change existing values
+    """
+
+    # with graphDB_Driver.session() as session:
+    #     OUTPUT = session.read_transaction(
+    #         neo4j_query.FUNCTION_NAME
+    #     )
+
     return jsonify({"STATUS": "TODO"})
 
 
@@ -2014,6 +2036,17 @@ def api_expression_metadata(expression_id: str):
     "/v1/resources/symbol/scalar/<string:symbol_id>/metadata", methods=["GET"]
 )
 def api_scalar_metadata(symbol_id: str):
+    """
+    What can be done:
+    - get: read current
+    - set: change existing values
+    """
+
+    # with graphDB_Driver.session() as session:
+    #     OUTPUT = session.read_transaction(
+    #         neo4j_query.FUNCTION_NAME
+    #     )
+
     return jsonify({"STATUS": "TODO"})
 
 
@@ -2021,6 +2054,17 @@ def api_scalar_metadata(symbol_id: str):
     "/v1/resources/symbol/vector/<string:symbol_id>/metadata", methods=["GET"]
 )
 def api_vector_metadata(symbol_id: str):
+    """
+    What can be done:
+    - get: read current
+    - set: change existing values
+    """
+
+    # with graphDB_Driver.session() as session:
+    #     OUTPUT = session.read_transaction(
+    #         neo4j_query.FUNCTION_NAME
+    #     )
+
     return jsonify({"STATUS": "TODO"})
 
 
@@ -2028,20 +2072,97 @@ def api_vector_metadata(symbol_id: str):
     "/v1/resources/symbol/matrix/<string:symbol_id>/metadata", methods=["GET"]
 )
 def api_matrix_metadata(symbol_id: str):
+    """
+    What can be done:
+    - get: read current
+    - set: change existing values
+    """
+
+    # with graphDB_Driver.session() as session:
+    #     OUTPUT = session.read_transaction(
+    #         neo4j_query.FUNCTION_NAME
+    #     )
+
     return jsonify({"STATUS": "TODO"})
 
 
 @api_bp.route(
-    "/v1/resources/symbol/operation/<string:symbol_id>/metadata", methods=["GET"]
+    "/v1/resources/symbol/operation/<string:operation_id>/metadata", methods=["GET"]
 )
-def api_operation_metadata(symbol_id: str):
-    return jsonify({"STATUS": "TODO"})
+def api_operation_metadata(operation_id: str):
+    """
+    What can be done:
+    - get: read current
+    - set: change existing values
+    - list expressions that use this operation
+    """
+
+    with graphDB_Driver.session() as session:
+        operation_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "operation", operation_id
+        )
+
+    if operation_dict is None:
+        return jsonify({
+            "error": "Not Found",
+            "message": f"Operation {operation_id} does not exist",
+            "_links": {
+                "index": {"href": url_for("api_bp.some_index_route", _external=True)}
+            }
+        }), 404
+
+    response = {
+        "metadata": operation_dict,
+        
+        "_links": {
+            "self": {
+                "href": url_for("api_bp.api_operation_metadata", operation_id=operation_id, _external=True),
+                "method": "GET"
+            },
+            "update": {
+                "href": url_for("api_bp.api_operation_metadata", operation_id=operation_id, _external=True),
+                "method": "PATCH",
+                "description": "Update specific metadata fields"
+            },
+            "replace": {
+                "href": url_for("api_bp.api_operation_metadata", operation_id=operation_id, _external=True),
+                "method": "PUT",
+                "description": "Replace the entire metadata object"
+            },
+            "expressions": {
+                "href": url_for("api_bp.api_list_operation_expressions", operation_id=operation_id, _external=True),
+                "method": "GET",
+                "description": "List all expressions that use this operation"
+            },
+            "parent_operation": {
+                "href": url_for("api_bp.api_operation_detail", operation_id=operation_id, _external=True),
+                "method": "GET"
+            }
+        }
+    }
+
+    return jsonify(response), 200
 
 
 @api_bp.route(
-    "/v1/resources/symbol/relation/<string:symbol_id>/metadata", methods=["GET"]
+    "/v1/resources/symbol/relation/<string:relation_id>/metadata", methods=["GET"]
 )
-def api_relation_metadata(symbol_id: str):
+def api_relation_metadata(relation_id: str):
+    """
+    What can be done:
+    - get: read current
+    - set: change existing values
+    - list expressions that use this relation
+    """
+
+    with graphDB_Driver.session() as session:
+        operation_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "relation", relation_id
+        )
+
+    if operation_dict is None:
+        jsonify({"STATUS": relation_id+" does not exist in the database"})
+
     return jsonify({"STATUS": "TODO"})
 
 
