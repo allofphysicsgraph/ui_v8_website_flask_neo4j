@@ -1,5 +1,16 @@
 
-Is there a constraint I can introduce such that the property ID is unique across all nodes
+
+BUG: Duplicate ID values: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/131
+
+---
+
+On the Sympy-for-expression page it would be helpful to have a live conversion box where I put in a simplified latex and get back the Sympy version 
+
+--> Create an API endpoint facilitate this
+
+---
+
+When returning the list of potential variables in an expression, use the list of variables in the derivation to check those boxes by default
 
 ---
 
@@ -22,6 +33,14 @@ Associating expressions with step is awkward - looking through the dropdown is t
 
 Figuring out whether the expression (or symbol) already exists is difficult 
 --> Need a fuzzy search: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/18
+
+Once the latex has the list of variables and symbols and operations and expressions, the next step is to discover whether those already exist in the databaseIn a typical latex document each expression only appears once
+Need to figure out whether those unique list of expressions are already in the database
+- Generate a list (JSON?) of the symbols that could be then checked against the list of symbols in a lot of document. Don't compare every symbol from PDG; use fuzzy search to reduce the list.
+- Generate a list (JSON?) of the expressions to be matched against the table. Don't compare every expression from PDG; use fuzzy search to reduce the list.
+- Generate a list (JSON?) of the inference rules to be compared against the HTML table produced from the latex
+
+The comparison can be piecewise - for each symbol, and for each expression
 
 ---
 
