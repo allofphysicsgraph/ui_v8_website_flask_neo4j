@@ -53,7 +53,7 @@ In general, nodes in Neo4j are described using the following jargon:
 
 where the key-value pairs are properties. 
 
-"Node labels, relationship types, and properties (the key part) are case sensitive." [citation](https://neo4j.com/docs/getting-started/current/appendix/graphdb-concepts/)
+Node labels, relationship types, and properties (the key part) are case sensitive. [citation](https://neo4j.com/docs/getting-started/current/appendix/graphdb-concepts/)
 
 # Goals
 
@@ -89,6 +89,11 @@ The Docker images include the software needed for the webserver (Python Flask)
 See VERSIONS.md for details.
 
 ## Debugging
+
+The `Makefile` contains targets that are relevant for validating modifications:
+- `make black_out`
+- `make mypy_out`
+- `make pytest_out`
 
 To enter the container for debugging purposes,
 ```bash
