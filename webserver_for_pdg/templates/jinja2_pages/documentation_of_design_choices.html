@@ -532,6 +532,38 @@ Similarly, HAS_INPUT, HAS_OUTPUT, HAS_FEED are right and each also should have a
 <HR/>
 <P>&nbsp;</P>
 
+<H2 id="unique id per node"><I>Decision</I>: Node IDs should be unique</H2>
+
+<P>When I started using Neo4j I enacted
+<pre>
+:begin
+CREATE CONSTRAINT ON (node:derivation) ASSERT (node.id) IS UNIQUE;
+CREATE CONSTRAINT ON (node:step) ASSERT (node.id) IS UNIQUE;
+CREATE CONSTRAINT ON (node:inference_rule) ASSERT (node.id) IS UNIQUE;
+CREATE CONSTRAINT ON (node:feed) ASSERT (node.id) IS UNIQUE;
+CREATE CONSTRAINT ON (node:expression) ASSERT (node.id) IS UNIQUE;
+CREATE CONSTRAINT ON (node:value_with_units) ASSERT (node.id) IS UNIQUE;
+CREATE CONSTRAINT ON (node:operation) ASSERT (node.id) IS UNIQUE;
+CREATE CONSTRAINT ON (node:relation) ASSERT (node.id) IS UNIQUE;
+CREATE CONSTRAINT ON (node:scalar) ASSERT (node.id) IS UNIQUE;
+CREATE CONSTRAINT ON (node:vector) ASSERT (node.id) IS UNIQUE;
+CREATE CONSTRAINT ON (node:matrix) ASSERT (node.id) IS UNIQUE;
+:commit
+</pre>
+<P>However, I learned that merely means the <code>id</code> property is unique within that label. 
+
+<P>To enact globally-unique values I had to add a new label
+<pre>
+CREATE CONSTRAINT ON (node:a_node) ASSERT (node.id) IS UNIQUE;
+</pre>
+
+<P>This is <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/131">bug 131</a>.
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
 <H2 id="latex for expressions">\(\rm\LaTeX\) representation of expressions</a></H2>
 <P>
   There are multiple choices of how to represent a mathematical expression.
