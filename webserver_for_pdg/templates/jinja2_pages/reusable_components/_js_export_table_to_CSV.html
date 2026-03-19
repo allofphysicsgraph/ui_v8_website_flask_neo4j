@@ -1,0 +1,51 @@
+<!-- originally from https://www.codexworld.com/export-html-table-data-to-csv-using-javascript
+                 and https://www.codexworld.com/export-html-table-data-to-excel-using-javascript/
+
+but then with significant improvements made by Gemini 3 Flash
+-->
+
+
+<script>
+  function downloadCSV(csv, filename) {
+      var csvFile;
+      var downloadLink;
+      csvFile = new Blob([csv], {type: "text/csv;charset=utf-8;"}); 
+      downloadLink = document.createElement("a");
+      downloadLink.download = filename;
+      downloadLink.href = window.URL.createObjectURL(csvFile);
+      downloadLink.style.display = "none";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink); 
+  }
+
+  function exportTableToCSV(tableID, filename) {
+    var csv = [];
+    // Select rows specifically from the provided tableID
+    var rows = document.querySelectorAll("#" + tableID + " tr");
+    
+    for (var i = 0; i < rows.length; i++) {
+        var rowData = [];
+        var cols = rows[i].querySelectorAll("td, th");
+
+        for (var j = 0; j < cols.length; j++) {
+            // 1. Get text content
+            let data = cols[j].innerText;
+
+            // 2. Escape double quotes: change " to ""
+            // This is the standard way to handle quotes inside a CSV cell
+            data = data.replace(/"/g, '""');
+
+            // 3. Wrap the data in double quotes
+            // This allows the cell to contain newlines and commas without breaking the format
+            rowData.push('"' + data + '"');
+        }
+
+        // Join each cell in the row with a comma
+        csv.push(rowData.join(","));
+    }
+
+    // Join all rows with a newline and download
+    downloadCSV(csv.join("\n"), filename);
+  }
+</script>
