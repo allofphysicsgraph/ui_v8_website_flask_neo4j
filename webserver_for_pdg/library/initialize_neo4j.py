@@ -23,7 +23,6 @@ uri = "bolt://neo4j_docker:7687"
 # password        = "test"
 
 
-# ORDERING: must come after constrain_id_to_be_unique
 # Connect to the neo4j database server
 neo4j_available = False
 while not neo4j_available:
@@ -39,13 +38,7 @@ while not neo4j_available:
 try:
     with graphDB_Driver.session() as session:
         # NO TIMING NEEDED HERE
-        list_of_derivation_IDs = session.write_transaction(
-            neo4j_query.constrain_unique_id
-        )
-        if list_of_derivation_IDs:
-            number_of_derivations = len(list_of_derivation_IDs)
-        else:  # list_of_derivation_IDs was "None"
-            number_of_derivations = 0
+        session.write_transaction(neo4j_query.constrain_unique_id)
 
 except neo4j.exceptions.ClientError as er:
     logger.info("Neo4j exception: " + str(er))
