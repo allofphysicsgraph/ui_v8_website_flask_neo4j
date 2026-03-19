@@ -69,7 +69,8 @@
   });
 
 
-  // search a dropdown menu. This is similar to https://developer.snapappointments.com/bootstrap-select/examples/#live-search_1 but not as elegant
+  // search a dropdown menu. 
+  // This is similar to https://developer.snapappointments.com/bootstrap-select/examples/#live-search_1 but not as elegant
   document.getElementById('searchbox').addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
     const select = document.getElementById('dropdown_menu_id');
@@ -125,4 +126,46 @@
         // select.value = ""; // Uncomment this if you want to clear selection on hide
     }
   });
+
+
+  // search a UL or OL list
+  document.getElementById('searchbox').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    
+    const items = document.querySelectorAll('#searchList li');
+    
+    if (!searchTerm) {
+      items.forEach(item => item.style.display = '');
+      return;
+    }
+
+    items.forEach(item => {
+      const itemText = item.textContent.toLowerCase();
+      const words = itemText.split(/[\s,\\\(\)\{\}]+/); // Split by space, commas, and LaTeX chars
+      
+      // Check for exact match first
+      if (itemText.includes(searchTerm)) {
+        item.style.display = '';
+        return;
+      }
+
+      let isMatch = false;
+      const threshold = searchTerm.length > 4 ? 2 : 1;
+
+      for (const word of words) {
+        // Only compare if lengths are similar to save processing power
+        if (Math.abs(word.length - searchTerm.length) <= threshold) {
+          // This checks if the search term matches the start of the word fuzzily
+          if (levenshtein(searchTerm, word.substring(0, searchTerm.length)) <= threshold) {
+            isMatch = true;
+            break;
+          }
+        }
+      }
+
+      item.style.display = isMatch ? '' : 'none';
+    });
+  });
+
+
 </script>
