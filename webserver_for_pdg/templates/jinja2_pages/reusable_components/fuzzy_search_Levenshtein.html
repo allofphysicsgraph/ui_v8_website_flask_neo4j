@@ -1,0 +1,128 @@
+<script>
+  /**
+   * Calculates the Levenshtein distance between two strings.
+   * Lower number = more similar. 0 = exact match.
+   */
+  function levenshtein(a, b) {
+    const tmp = [];
+    for (let i = 0; i <= a.length; i++) {
+      tmp[i] = [i];
+    }
+    for (let j = 0; j <= b.length; j++) {
+      tmp[0][j] = j;
+    }
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        tmp[i][j] = Math.min(
+          tmp[i - 1][j] + 1,
+          tmp[i][j - 1] + 1,
+          tmp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+        );
+      }
+    }
+    return tmp[a.length][b.length];
+  }
+
+  // search a table
+  document.getElementById('searchbox').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#table_to_search tr:not(:first-child)');
+    
+    // If search is empty, show all rows and exit
+    if (!searchTerm) {
+      rows.forEach(row => row.style.display = '');
+      return;
+    }
+
+    rows.forEach(row => {
+      const rowText = row.innerText.toLowerCase();
+      //const words = rowText.split(/\s+/); // Split row content into words
+      const words = rowText.split(/[\s,\\\(\)\{\}]+/); // Split row content into words
+      
+      
+      // 1. Try exact inclusion first (standard search)
+      if (rowText.includes(searchTerm)) {
+        row.style.display = '';
+        return;
+      }
+
+      // 2. Perform Fuzzy Search using Levenshtein
+      // We check if the search term is close to ANY word in the row
+      let isMatch = false;
+      
+      // Define a threshold: allow 1 typo for every 3-4 characters
+      // "Grmany" (dist 1) vs "Germany" should match.
+      const threshold = searchTerm.length > 4 ? 2 : 1;
+
+      for (const word of words) {
+        // Only check words of similar length to the search term
+        if (Math.abs(word.length - searchTerm.length) <= threshold) {
+          if (levenshtein(searchTerm, word.substring(0, searchTerm.length)) <= threshold) {
+            isMatch = true;
+            break;
+          }
+        }
+      }
+
+      row.style.display = isMatch ? '' : 'none';
+    });
+  });
+
+
+  // search a dropdown menu. This is similar to https://developer.snapappointments.com/bootstrap-select/examples/#live-search_1 but not as elegant
+  document.getElementById('searchbox').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const select = document.getElementById('dropdown_menu_id');
+    const options = select.querySelectorAll('option');
+
+    if (!searchTerm) {
+      for (const opt of options) {
+        opt.style.display = '';
+        opt.disabled = false;
+      }
+      return;
+    }
+
+    options.forEach(opt => {
+      const optText = opt.innerText.toLowerCase();
+      const words = optText.split(/[\s,\\\(\)\{\}]+/); // Split by space, commas, and LaTeX chars
+
+      // 1. Direct match
+      if (optText.includes(searchTerm)) {
+        opt.style.display = '';
+        opt.disabled = false;
+        return;
+      }
+
+      // 2. Fuzzy match
+      let isMatch = false;
+      const threshold = searchTerm.length > 4 ? 2 : 1;
+
+      for (const word of words) {
+        if (word.length === 0) continue;
+        
+        if (Math.abs(word.length - searchTerm.length) <= threshold) {
+          // Use your existing levenshtein function
+          if (levenshtein(searchTerm, word.substring(0, searchTerm.length)) <= threshold) {
+            isMatch = true;
+            break;
+          }
+        }
+      }
+
+      if (isMatch) {
+        opt.style.display = '';
+        opt.disabled = false;
+      } else {
+        opt.style.display = 'none';
+        opt.disabled = true; // Disabled ensures it can't be selected via keyboard while hidden
+      }
+    });
+    
+    // Optional: If the currently selected item is now hidden, 
+    // you might want to reset the select value:
+    if (select.selectedOptions.length > 0 && select.selectedOptions[0].style.display === 'none') {
+        // select.value = ""; // Uncomment this if you want to clear selection on hide
+    }
+  });
+</script>
