@@ -202,19 +202,12 @@ def apoc_export_cypher(tx: Transaction, output_filename: str):
 def constrain_unique_id(tx: Transaction) -> None:
     """
     https://neo4j.com/docs/getting-started/current/cypher-intro/schema/#cypher-intro-constraints
+
+    unique constraints are limited to labels. You cannot create a "global" constraint
+    that applies to every node in the database regardless of its label with a single command.
     """
 
-    for node_type in list_of_valid.node_types:
-        # try:
-        tx.run(
-            "CREATE CONSTRAINT constrain_"
-            + node_type
-            + "_id FOR (n:"
-            + node_type
-            + ") REQUIRE n.id IS UNIQUE"
-        )
-        # except Exception as err:
-        #     print("neo4j/constrain_unique_id: WARNING:", err)
+    tx.run("CREATE CONSTRAINT constrain_node_id FOR (n:a_node) REQUIRE n.id IS UNIQUE")
 
     return
 
@@ -1257,7 +1250,7 @@ def edit_step_input(
     MATCH (new_e:expression {id: $new_input_id})
     WITH s, old_rel, old_rel.sequence_index AS saved_index, new_e
     DELETE old_rel
-    CREATE (s)-[new_rel:HAS_INPUT]->(new_e)
+    MERGE (s)-[new_rel:HAS_INPUT]->(new_e)
     SET new_rel.sequence_index = saved_index
     RETURN s.id AS step_id, new_e.id AS input_id, new_rel.sequence_index AS sequence_index
     """
@@ -1291,7 +1284,7 @@ def edit_step_feed(
     MATCH (new_f:feed {id: $new_feed_id})
     WITH s, old_rel, old_rel.sequence_index AS saved_index, new_f
     DELETE old_rel
-    CREATE (s)-[new_rel:HAS_FEED]->(new_f)
+    MERGE (s)-[new_rel:HAS_FEED]->(new_f)
     SET new_rel.sequence_index = saved_index
     RETURN s.id AS step_id, new_f.id AS feed_id, new_rel.sequence_index AS sequence_index
     """
@@ -1325,7 +1318,7 @@ def edit_step_output(
     MATCH (new_e:expression {id: $new_output_id})
     WITH s, old_rel, old_rel.sequence_index AS saved_index, new_e
     DELETE old_rel
-    CREATE (s)-[new_rel:HAS_OUTPUT]->(new_e)
+    MERGE (s)-[new_rel:HAS_OUTPUT]->(new_e)
     SET new_rel.sequence_index = saved_index
     RETURN s.id AS step_id, new_e.id AS output_id, new_rel.sequence_index AS sequence_index
     """
