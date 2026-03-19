@@ -2103,42 +2103,68 @@ def api_operation_metadata(operation_id: str):
         )
 
     if operation_dict is None:
-        return jsonify({
-            "error": "Not Found",
-            "message": f"Operation {operation_id} does not exist",
-            "_links": {
-                "index": {"href": url_for("api_bp.some_index_route", _external=True)}
-            }
-        }), 404
+        return (
+            jsonify(
+                {
+                    "error": "Not Found",
+                    "message": f"Operation {operation_id} does not exist",
+                    "_links": {
+                        "index": {
+                            "href": url_for("api_bp.some_index_route", _external=True)
+                        }
+                    },
+                }
+            ),
+            404,
+        )
 
     response = {
         "metadata": operation_dict,
-        
         "_links": {
             "self": {
-                "href": url_for("api_bp.api_operation_metadata", operation_id=operation_id, _external=True),
-                "method": "GET"
+                "href": url_for(
+                    "api_bp.api_operation_metadata",
+                    operation_id=operation_id,
+                    _external=True,
+                ),
+                "method": "GET",
             },
             "update": {
-                "href": url_for("api_bp.api_operation_metadata", operation_id=operation_id, _external=True),
+                "href": url_for(
+                    "api_bp.api_operation_metadata",
+                    operation_id=operation_id,
+                    _external=True,
+                ),
                 "method": "PATCH",
-                "description": "Update specific metadata fields"
+                "description": "Update specific metadata fields",
             },
             "replace": {
-                "href": url_for("api_bp.api_operation_metadata", operation_id=operation_id, _external=True),
+                "href": url_for(
+                    "api_bp.api_operation_metadata",
+                    operation_id=operation_id,
+                    _external=True,
+                ),
                 "method": "PUT",
-                "description": "Replace the entire metadata object"
+                "description": "Replace the entire metadata object",
             },
             "expressions": {
-                "href": url_for("api_bp.api_list_operation_expressions", operation_id=operation_id, _external=True),
+                "href": url_for(
+                    "api_bp.api_list_operation_expressions",
+                    operation_id=operation_id,
+                    _external=True,
+                ),
                 "method": "GET",
-                "description": "List all expressions that use this operation"
+                "description": "List all expressions that use this operation",
             },
             "parent_operation": {
-                "href": url_for("api_bp.api_operation_detail", operation_id=operation_id, _external=True),
-                "method": "GET"
-            }
-        }
+                "href": url_for(
+                    "api_bp.api_operation_detail",
+                    operation_id=operation_id,
+                    _external=True,
+                ),
+                "method": "GET",
+            },
+        },
     }
 
     return jsonify(response), 200
@@ -2161,7 +2187,7 @@ def api_relation_metadata(relation_id: str):
         )
 
     if operation_dict is None:
-        jsonify({"STATUS": relation_id+" does not exist in the database"})
+        jsonify({"STATUS": relation_id + " does not exist in the database"})
 
     return jsonify({"STATUS": "TODO"})
 
