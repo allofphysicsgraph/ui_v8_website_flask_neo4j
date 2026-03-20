@@ -1,16 +1,19 @@
 
 
-BUG: Duplicate ID values: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/131
-
----
+Entering sympy for expression is awkward 
+--> to try: https://pypi.org/project/latex2sympy2/
 
 On the Sympy-for-expression page it would be helpful to have a live conversion box where I put in a simplified latex and get back the Sympy version 
 
 --> Create an API endpoint facilitate this
 
+https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/134
+
 ---
 
 When returning the list of potential variables in an expression, use the list of variables in the derivation to check those boxes by default
+
+https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/135
 
 ---
 
@@ -45,19 +48,17 @@ The comparison can be piecewise - for each symbol, and for each expression
 ---
 
 Getting from a detailed latex document to step input is awkward 
-- Does "Latex to HTML table" help?
+- Does "Latex to HTML table" help? See https://localhost/from_llm
 
 SHO - https://github.com/allofphysicsgraph/task-tracker/issues/2
-See https://localhost/from_llm
 
----
 
-Entering sympy for expression is awkward 
---> to try: https://pypi.org/project/latex2sympy2/
+https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/133
 
 ---
 
 list of valid links to create sitemap for Google
+https://github.com/allofphysicsgraph/task-tracker/issues/111
 
 ---
 
