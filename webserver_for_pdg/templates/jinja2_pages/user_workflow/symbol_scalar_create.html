@@ -25,7 +25,7 @@
                                            id="inputID_symbol_latex",
                                 type="text",
                                 pattern="^[\x20-\x7F]+$", 
-                                oninput="validateASCII(this);") }}</P>
+                                oninput="validateASCII(this); livePreview('inputID_symbol_latex', 'display_input_latex_rhs', 'preview_input_latex_rhs', 'outputID_symbol_latex');") }}</P>
     
         <div id="outputID_symbol_latex"></div>
 
@@ -113,27 +113,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <P>{% include 'jinja2_pages/reusable_components/_table_of_symbols_scalar.html' %}
 {% endif %}
 
-<script>
-function select_symbol() {
-  // Declare variables
-  var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('scalar_input');
-  filter = input.value.toUpperCase();
-  ul = document.getElementById("scalar_UL");
-  li = ul.getElementsByTagName('li');
-
-  // Loop through all list items, and hide those who don't match the search query
-  for (i = 0; i < li.length; i++) {
-    a = li[i].getElementsByTagName("a")[0];
-    txtValue = a.textContent || a.innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      li[i].style.display = "";
-    } else {
-      li[i].style.display = "none";
-    }
-  }
-}
-</script>
 
 
 
