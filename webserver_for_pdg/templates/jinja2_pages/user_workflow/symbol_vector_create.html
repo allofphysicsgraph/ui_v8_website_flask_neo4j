@@ -20,9 +20,10 @@
 
     <P>{{ form_vector_properties.vector_latex.label}} (<B>required</B>): 
        {{ form_vector_properties.vector_latex(size=50, 
+                                id="inputID_symbol_latex",
                                 type="text",
                                 pattern="^[\x20-\x7F]+$", 
-                                oninput="validateASCII(this)", 
+                                oninput="validateASCII(this); livePreview('inputID_symbol_latex', null, null, 'render_input_latex');", 
      minlength=1, maxlength=1000) }}</P>
 
 

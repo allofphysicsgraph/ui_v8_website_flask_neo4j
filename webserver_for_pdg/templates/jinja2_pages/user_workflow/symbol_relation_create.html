@@ -22,7 +22,7 @@
        {{ form_relation_properties.relation_latex(size=50, 
                                 type="text",
                                 pattern="^[\x20-\x7F]+$", 
-                                oninput="validateASCII(this)", 
+                                oninput="validateASCII(this); livePreview('input_latex', null, null, 'output_input_latex');", 
                       minlength=1, 
                       maxlength=1000,
                       id="input_latex;") }}</P>
@@ -33,15 +33,30 @@
 
     <P>{{ form_relation_properties.relation_name_latex.label }} (<B>required</B>): 
        {{ form_relation_properties.relation_name_latex(size=50, 
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
+                        class_="latex-input", 
+                        data_target="relation_name_latex_image",
                                                        maxlength=1000) }}</p>
-    
+    <P><img id="relation_name_latex_image" src="" alt="Latex input" style="display: none;">
+
     <P>{{form_relation_properties.relation_description_latex.label }} (<small><em>optional</em></small>):  
        {{ form_relation_properties.relation_description_latex(size=50, 
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
+                        class_="latex-input", 
+                        data_target="relation_description_latex_image",
                                                               maxlength=1000) }}</p>
+<P><img id="relation_description_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form_relation_properties.relation_reference_latex.label }} (<small><em>optional</em></small>): 
        {{ form_relation_properties.relation_reference_latex(size=100,
+                                pattern="^[\x20-\x7F]+$", 
+                                oninput="validateASCII(this)", 
+                        class_="latex-input", 
+                        data_target="relation_reference_latex_image",
                                                             maxlength=1000) }}</p>
+<P><img id="relation_reference_latex_image" src="" alt="Latex input" style="display: none;">
 
       <input type="submit" name="new relation" value="add relation">
     </P>
