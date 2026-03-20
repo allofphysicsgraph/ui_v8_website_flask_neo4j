@@ -23,55 +23,12 @@
 
   <!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
 
-Case-insensitive dynamic search of latex and name as plain text: <input type="text" id="inf_rule_input" onkeyup="latex_filter()" placeholder="Search latex or name as plain text" size="50">
 
-<script>
-function latex_filter() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("inf_rule_input");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("inference_rule_table");
-  tr = table.getElementsByTagName("tr");
-
-  // Loop through all table rows (except header); then hide those who don't match the search query
-  for (i = 1; i < tr.length; i++) {
-    // td = tr[i].getElementsByTagName("td")[1]; // just "latex" column
-    // console.log(td)
-    // if (td) {
-    //   txtValue = td.textContent || td.innerText;
-    //   if (txtValue.toUpperCase().indexOf(filter) > -1) {
-    //     tr[i].style.display = "";
-    //   } else {
-    //     tr[i].style.display = "none";
-    //   }
-    // }
-
-    var tdName = tr[i].getElementsByTagName("td")[0];
-    var tdLatex = tr[i].getElementsByTagName("td")[1];
-    
-    if (tdName || tdLatex) {
-      // Get text from both cells (using empty string if cell is missing)
-      var nameValue = tdName ? (tdName.textContent || tdName.innerText) : "";
-      var latexValue = tdLatex ? (tdLatex.textContent || tdLatex.innerText) : "";
-      
-      // Check if the filter matches either the name OR the latex
-      if (nameValue.toUpperCase().indexOf(filter) > -1 || 
-          latexValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-
-  }
-}
-</script>
-
-
+  <P><label for="searchbox">Case-insensitive fuzzy Search:</label>
+  <input type="text" id="searchbox" name="search" placeholder="Look for" size="100">
 
   <P>Clicking on the inference rule ID selects that inference rule for the step<BR>
-  <table border="1" id="inference_rule_table" class="sortable">
+  <table border="1" id="table_to_search" class="sortable">
     <tr>
       <th>name</th>
       <th>latex</th>
