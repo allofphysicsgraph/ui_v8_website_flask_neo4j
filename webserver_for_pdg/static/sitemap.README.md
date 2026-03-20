@@ -11,6 +11,11 @@ $ docker exec -it bc2c929fdaae /bin/bash
 # cd crawled_`date +%F`/
 wget --spider --append-output=spider_log_`date +%F`.log --recursive --level=0 localhost:5000
 ```
+As of 2026-03-19 duration was
+```
+Total wall clock time: 55m 15s
+Downloaded: 3711 files, 2.3G in 16m 9s (2.41 MB/s)
+```
 
 # from Docker file against the live site (less optimal)
 
@@ -51,7 +56,26 @@ This will work until the session expires.
 # Analysis
 
 ```
-cat spider_log_2026-03-07.log | grep "\--  https://allofphysics.com/" | sed 's/?.*//' | cut -d' ' -f4 | sort | uniq
+cat spider_log_2026-03-07.log | grep "\--  https://allofphysics.com/" | sed 's/?.*//' | cut -d' ' -f4 | sort | uniq > file_list.log
+```
+aka
+```
+cat spider_log_2026-03-20.log  | grep "\--  http://localhost:5000" | sed 's/?.*//' | cut -d' ' -f4 | sort | uniq 
 ```
 looks promising but includes URLs that are not valid like
 https://allofphysics.com/documentation/from_scratch_tutorial/docker_and_make
+
+
+As of 2026-03-19,
+```
+$ cat file_list.log | wc -l
+    6556
+
+$ cat file_list.log | grep -v "/edit_" | grep -v "/new_" | wc -l
+    4113
+
+$ cat file_list.log | grep -v "/edit_" | grep -v "/new_" | grep -v "/static/expression_" > files_no_login_less_static.log
+```
+
+
+EOF
