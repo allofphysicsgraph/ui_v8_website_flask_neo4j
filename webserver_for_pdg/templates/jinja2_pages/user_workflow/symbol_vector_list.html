@@ -19,61 +19,36 @@
 
 
 <fieldset>
-<legend>
-  <H2 id="vector">There are {{ list_of_vector_dicts|length }} Vectors, aka symbols of dimension 1</h2>
-</legend>
+  <legend>
+    <H2 id="vector">There are {{ list_of_vector_dicts|length }} Vectors, aka symbols of dimension 1</h2>
+  </legend>
 
-<P>The symbol ID links to a page where you can edit the symbol<BR>
-
-<!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
-(TODO) this box doesn't actually search yet: <input type="text" id="symbol_input" onkeyup="select_symbol()" placeholder="Select symbol to review">
+  <P>The symbol ID links to a page where you can edit the symbol<BR>
 
 
-{% include 'jinja2_pages/reusable_components/_table_of_symbols_vector.html' %}
+
+  {% include 'jinja2_pages/reusable_components/_table_of_symbols_vector.html' %}
 
 </fieldset>
 
 {% endif %}
 
 <fieldset>
-<legend>
-  <H2 id="action">Actions for Vectors</h2>
-</legend>
+  <legend>
+    <H2 id="action">Actions for Vectors</h2>
+  </legend>
 
-<P><a href="{{ url_for('to_add_symbol_vector') }}?referrer=list_symbols">add new vector symbol</a> (e.g., 1xn or nx1 or arbitrary size)
+  <P><a href="{{ url_for('to_add_symbol_vector') }}?referrer=list_symbols">add new vector symbol</a> (e.g., 1xn or nx1 or arbitrary size)
 
-<!--
-  <P><a href="{ { url_for('to_add_symbol') }}?referrer=list_symbols">add new symbol</a> -- not clear which categorey; guide needed</P>
--->
-</UL>
-
-
+  <!--
+    <P><a href="{ { url_for('to_add_symbol') }}?referrer=list_symbols">add new symbol</a> -- not clear which categorey; guide needed</P>
+  -->
+  </UL>
 
 </fieldset>
 
 <P>See also Wikipedia's <a href="https://en.wikipedia.org/wiki/Glossary_of_mathematical_symbols">list of symbols</a></P>
 
 
-<script>
-function select_symbol() {
-  // Declare variables
-  var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('symbol_input');
-  filter = input.value.toUpperCase();
-  ul = document.getElementById("symbol_UL");
-  li = ul.getElementsByTagName('li');
-
-  // Loop through all list items, and hide those who don't match the search query
-  for (i = 0; i < li.length; i++) {
-    a = li[i].getElementsByTagName("a")[0];
-    txtValue = a.textContent || a.innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      li[i].style.display = "";
-    } else {
-      li[i].style.display = "none";
-    }
-  }
-}
-</script>
 
 {% endblock %}

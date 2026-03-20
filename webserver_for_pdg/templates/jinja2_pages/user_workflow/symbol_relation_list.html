@@ -15,80 +15,10 @@
 <!-- https://www.w3schools.com/howto/howto_js_filter_lists.asp -->
 Case-insensitive dynamic search of latex as plain text: <input type="text" id="latex_input" onkeyup="latex_filter()" placeholder="Search latex (plain text)" size="50">
 
-<script>
-function latex_filter() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("latex_input");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("relation_table");
-  tr = table.getElementsByTagName("tr");
-
-  // Loop through all table rows, and hide those who don't match the search query
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[1];
-    console.log(td)
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
-</script>
-
-
-<!-- from https://www.codexworld.com/export-html-table-data-to-csv-using-javascript
-      and https://www.codexworld.com/export-html-table-data-to-excel-using-javascript/
--->
-<script>
-  function downloadCSV(csv, filename) {
-      var csvFile;
-      var downloadLink;
-      // CSV file
-      csvFile = new Blob([csv], {type: "text/csv"});
-      // Download link
-      downloadLink = document.createElement("a");
-      // File name
-      downloadLink.download = filename;
-      // Create a link to the file
-      downloadLink.href = window.URL.createObjectURL(csvFile);
-      // Hide download link
-      downloadLink.style.display = "none";
-      // Add the link to DOM
-      document.body.appendChild(downloadLink);
-      // Click download link
-      downloadLink.click();
-  }
-
-  function exportTableToCSV(tableID, filename) {
-    var csv = [];
-    // TODO:
-    // ideally I'd getElementById(tableID) and then extract rows,
-    // but I don't know how to do that
-    var rows = document.querySelectorAll("table tr");
-    //var rows = document.getElementById(tableID)
-
-    for (var i = 0; i < rows.length; i++) {
-        var row = [], cols = rows[i].querySelectorAll("td, th");
-
-        for (var j = 0; j < cols.length; j++)
-            row.push(cols[j].innerText);
-
-        csv.push('"' + row.join(",") + '"');
-    }
-
-    // Download CSV file
-    downloadCSV(csv.join("\n"), filename);
-  }
-</script>
 
 <P>The relation ID links to a page where you can edit the relation<BR>
 
-<button onclick="exportTableToCSV(&#39;relation_table&#39;, &#39;relations.csv&#39;)">Export HTML Table To CSV File</button>
+<button onclick="exportTableToCSV(&#39;table_to_search&#39;, &#39;relations.csv&#39;)">Export HTML Table To CSV File</button>
 
 
 <P>{% include 'jinja2_pages/reusable_components/_table_of_symbols_relation.html' %}
