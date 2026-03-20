@@ -53,6 +53,7 @@ import time
 import random
 import datetime
 import uuid
+import tokenize
 import os
 
 from flask import (
@@ -2380,8 +2381,26 @@ def api_delete_operation(symbol_id: str):
 def api_delete_relation(symbol_id: str):
     return jsonify({"STATUS": "TODO"})
 
+@api_bp.route("/v1/resources/sympy_check", methods=["GET", "POST"])
+def api_sympy_check():
+    """
+    <https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/134>
 
-@api_bp.route("/v1/resources/png_from_latex/", methods=["GET", "POST"])
+    """
+    user_input = request.args.get("sympy")
+
+    try:
+        expr = parse_expr(user_input)
+    except tokenize.TokenError as err:
+        return jsonify({"INVALID": str(err)})
+
+    var_names = [str(s) for s in expr.free_symbols]
+
+    return jsonify({"canonical": str(expr.canonical), 
+        "variables": str(var_names)})
+    
+
+@api_bp.route("/v1/resources/png_from_latex", methods=["GET", "POST"])
 def api_png_from_latex():
     """
     `GET` method is necessary; otherwise user can't explore this endpoint from the browswer.
@@ -2417,10 +2436,10 @@ def api_png_from_latex():
     return jsonify({"png_location": path_to_png_with_filename_no_prefix_directory})
 
 
-@api_bp.route("/v1/resources/cypher/", methods=["GET"])
+@api_bp.route("/v1/resources/cypher", methods=["GET"])
 def api_cypher_query():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/cypher/?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
+    curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
