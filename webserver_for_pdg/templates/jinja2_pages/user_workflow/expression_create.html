@@ -125,7 +125,7 @@ function latex_filter() {
   var input, filter, table, tr, td, i, txtValue;
   input = document.getElementById("input_latex_lhs");
   filter = input.value.toUpperCase();
-  table = document.getElementById("expression_table");
+  table = document.getElementById("table_to_search");
   tr = table.getElementsByTagName("tr");
 
   // Loop through all table rows (except header); then hide those who don't match the search query
@@ -164,27 +164,6 @@ function latex_filter() {
 {% include 'jinja2_pages/reusable_components/_table_of_expressions_mini.html' %}
 {% endif %}
 
-<script>
-function select_expression() {
-  // Declare variables
-  var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('expression_input');
-  filter = input.value.toUpperCase();
-  ul = document.getElementById("expression_UL");
-  li = ul.getElementsByTagName('li');
-
-  // Loop through all list items, and hide those who don't match the search query
-  for (i = 0; i < li.length; i++) {
-    a = li[i].getElementsByTagName("a")[0];
-    txtValue = a.textContent || a.innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      li[i].style.display = "";
-    } else {
-      li[i].style.display = "none";
-    }
-  }
-}
-</script>
 
 
 
