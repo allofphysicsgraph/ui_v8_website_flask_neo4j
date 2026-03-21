@@ -161,9 +161,7 @@ def create_d3js_json(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
-    destination_folder += "/"
-
-    d3js_json_filename = derivation_id + ".json"
+    d3js_json_filename = "generated_" + derivation_id + ".json"
 
     json_str = "{\n"
     json_str += '  "nodes": [\n'
@@ -192,6 +190,7 @@ def create_d3js_json(
         png_name = "".join(
             filter(str.isalnum, step_dict["inference rule dict"]["name_latex"])
         )
+        png_name = "generated_" + png_name
         logger.info("PNG name = " + png_name)
 
         if not os.path.isfile(destination_folder + png_name + ".png"):
@@ -262,7 +261,7 @@ def create_d3js_json(
                     + " "
                 )
                 png_name = (
-                    "expression_"
+                    "generated_expression_"
                     + this_expression_dict["id"]
                     + "_"
                     + hash_of_string(expression_latex)
@@ -270,13 +269,13 @@ def create_d3js_json(
             elif this_expression_dict["type of math"] == "feed":
                 expression_latex = this_expression_dict["latex"]
                 png_name = (
-                    "feed_"
+                    "generated_feed_"
                     + this_expression_dict["id"]
                     + "_"
                     + hash_of_string(expression_latex)
                 )
 
-            logger.info("png_name" + str(png_name))
+            logger.info("png_name:" + str(png_name))
 
             if not os.path.isfile(destination_folder + png_name + ".png"):
                 create_png_from_latex(
@@ -379,7 +378,7 @@ def create_tex_file_for_derivation(
     all_steps: dict,
     derivation_dict: dict,
     path_to_tex_file: str,
-) -> None:
+) -> str:
     """
     This is called from `create_pdf_for_derivation` and from `pdg_app/review_derivation`
 
@@ -396,7 +395,7 @@ def create_tex_file_for_derivation(
 
     logger.info("path_to_tex_file=" + path_to_tex_file)
 
-    tex_filename = derivation_dict["id"]
+    tex_filename = "generated_" + derivation_dict["id"]
 
     list_of_step_dicts = []
     list_of_inference_rule_dicts = []
@@ -695,7 +694,7 @@ def create_tex_file_for_derivation(
     # logger.info("[trace end " + trace_id + " " + str(time.time()))
 
     logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
-    return
+    return tex_filename
 
 
 def create_pdf_for_derivation(
@@ -715,8 +714,6 @@ def create_pdf_for_derivation(
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
-    path_to_pdf += "/"
-
     logger.info("path_to_pdf=" + path_to_pdf)
 
     # to isolate the build process, create a temporary folder
@@ -726,11 +723,9 @@ def create_pdf_for_derivation(
 
     # destination for the PDF once file is built
 
-    pdf_filename = derivation_dict["id"]
+    pdf_filename = "generated_" + derivation_dict["id"]
 
-    tex_filename_without_extension = derivation_dict["id"]
-
-    create_tex_file_for_derivation(
+    tex_filename_without_extension = create_tex_file_for_derivation(
         all_steps,
         derivation_dict,
         path_to_pdf,
@@ -882,9 +877,7 @@ def create_png_from_latex(
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     logger.info("latex = " + str(user_provided_latex))
-    logger.info("filename_no_extension" + str(filename_no_extension))
-
-    destination_folder += "/"
+    logger.info("filename_no_extension:" + str(filename_no_extension))
 
     if os.path.exists(destination_folder + filename_no_extension + ".png"):
         logger.info("PNG already exists; do not recreate")
@@ -1092,11 +1085,9 @@ def create_derivation_png(
     # logger.info("[trace start " + trace_id + " " + str(time.time()))
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
-    path_to_output_png += "/"
-
     logger.info("path_to_output_png=" + path_to_output_png)
 
-    dot_filename = path_to_output_png + "derivation_" + derivation_id + ".dot"
+    dot_filename = path_to_output_png + "generated_derivation_" + derivation_id + ".dot"
     with open(dot_filename, "w") as file_handle:
         file_handle.write("digraph physicsDerivation { \n")
         file_handle.write("overlap = false;\n")
@@ -1124,10 +1115,18 @@ def create_derivation_png(
 
     # name the PNG file referencing the hash of the .dot so we can detect changes
     output_filename_png = (
-        "derivation_" + derivation_id + "_" + hash_of_file(dot_filename) + ".png"
+        "generated_derivation_"
+        + derivation_id
+        + "_"
+        + hash_of_file(dot_filename)
+        + ".png"
     )
     output_filename_svg = (
-        "derivation_" + derivation_id + "_" + hash_of_file(dot_filename) + ".svg"
+        "generated_derivation_"
+        + derivation_id
+        + "_"
+        + hash_of_file(dot_filename)
+        + ".svg"
     )
     # neato -Tpng graphviz.dot > /code/static/graphviz.png
     #    process = Popen(['neato','-Tpng','graphviz.dot','>','/code/static/graphviz.png'], stdout=PIPE, stderr=PIPE)
@@ -1325,6 +1324,7 @@ def write_step_to_graphviz_file(
     filename_no_extension = "".join(
         filter(str.isalnum, inference_rule_dict["name_latex"])
     )
+    filename_no_extension = "generated_" + filename_no_extension
     if not os.path.isfile(path_to_output_png + filename_no_extension + ".png"):
         create_png_from_latex(
             inference_rule_dict["name_latex"],
@@ -1352,7 +1352,10 @@ def write_step_to_graphviz_file(
             + input_dict["latex_rhs"]
         )
         filename_no_extension = (
-            "expression_" + input_dict["id"] + "_" + hash_of_string(input_latex)
+            "generated_expression_"
+            + input_dict["id"]
+            + "_"
+            + hash_of_string(input_latex)
         )
         if not os.path.isfile(path_to_output_png + filename_no_extension + ".png"):
             create_png_from_latex(
@@ -1380,7 +1383,10 @@ def write_step_to_graphviz_file(
         )
 
         filename_no_extension = (
-            "expression_" + output_dict["id"] + "_" + hash_of_string(output_latex)
+            "generated_expression_"
+            + output_dict["id"]
+            + "_"
+            + hash_of_string(output_latex)
         )
         if not os.path.isfile(path_to_output_png + filename_no_extension + ".png"):
             create_png_from_latex(
@@ -1399,7 +1405,10 @@ def write_step_to_graphviz_file(
     # feed expressions
     for feed_dict in list_of_feed_dicts:
         filename_no_extension = (
-            "feed_" + feed_dict["id"] + "_" + hash_of_string(feed_dict["latex"])
+            "generated_feed_"
+            + feed_dict["id"]
+            + "_"
+            + hash_of_string(feed_dict["latex"])
         )
         if not os.path.isfile(path_to_output_png + filename_no_extension + ".png"):
             create_png_from_latex(
