@@ -1,4 +1,13 @@
 
+---
+
+On the page
+https://localhost/list_constant_values/0000001370
+there should be options to
+- delete existing value
+- edit existing value
+
+---
 
 Entering sympy for expression is awkward 
 --> to try: https://pypi.org/project/latex2sympy2/
