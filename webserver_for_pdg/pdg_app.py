@@ -1175,8 +1175,10 @@ def to_index():
         graphDB_Driver, T_and_f_derivation_ID, query_time_dict
     )
     try:
-        latex.create_d3js_json(T_and_f_derivation_ID, all_steps, web_app.static_folder)
-        d3js_json_filename = T_and_f_derivation_ID + ".json"
+        latex.create_d3js_json(
+            T_and_f_derivation_ID, all_steps, web_app.static_folder + "/"
+        )
+        d3js_json_filename = "generated_" + T_and_f_derivation_ID + ".json"
     except Exception as err:
         logger.error(str(type(err).__name__) + ": " + str(err))
         flash("pdg_app/to_index: " + str(type(err).__name__) + ": " + str(err))
@@ -1628,7 +1630,7 @@ def to_review_derivation(
                 pdf_filename = latex.create_pdf_for_derivation(
                     all_steps,
                     derivation_dict,
-                    web_app.static_folder,
+                    web_app.static_folder + "/",
                 )
             except Exception as err:
                 # logger.error(str(err))
@@ -1656,12 +1658,11 @@ def to_review_derivation(
             # path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
 
             try:
-                latex.create_tex_file_for_derivation(
+                tex_filename = latex.create_tex_file_for_derivation(
                     all_steps,
                     derivation_dict,
-                    web_app.static_folder,
+                    web_app.static_folder + "/",
                 )
-                tex_filename = str(derivation_id)
             except Exception as err:
                 # logger.error(str(err))
                 flash(
@@ -1722,7 +1723,7 @@ def to_review_derivation(
 
     # only create d3js JSON if the HTML page is going to be rendered
     try:
-        latex.create_d3js_json(derivation_id, all_steps, web_app.static_folder)
+        latex.create_d3js_json(derivation_id, all_steps, web_app.static_folder + "/")
         # if that function fails then there's no JSON file for d3js
     except Exception as err:
         flash(
@@ -1742,7 +1743,7 @@ def to_review_derivation(
         derivation_id,
         derivation_name_latex,
         all_steps,
-        web_app.static_folder,
+        web_app.static_folder + "/",
     )
 
     logger.info(
@@ -3545,6 +3546,7 @@ def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> ResponseReturnValue:
 @web_app.route(
     "/new_symbol_scalar_constant_value_and_units/<scalar_id>/", methods=["GET", "POST"]
 )
+@login_required
 def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -6876,7 +6878,7 @@ def static_file_from_root():
     """
     https://stackoverflow.com/a/14625619/1164295
     """
-    return send_from_directory(web_app.static_folder, request.path[1:])
+    return send_from_directory(web_app.static_folder + "/", request.path[1:])
 
 
 ###########################################################################
@@ -7288,7 +7290,7 @@ def common_errors_in_college_math():
         title="Errors",
     )
     # return send_from_directory(
-    #     web_app.static_folder + "webpage_snapshots/",
+    #     web_app.static_folder + "/webpage_snapshots/",
     #     "common_errors_in_college_math.html",
     # )
     # TODO: elsewhere in this file I've hardcoded to "/code/static" which breaks the abstraction
