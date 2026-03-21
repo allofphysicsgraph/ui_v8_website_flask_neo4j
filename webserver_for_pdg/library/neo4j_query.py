@@ -1853,7 +1853,7 @@ def add_expression(
     }
 
     query = """
-        MERGE (e:expression {id: $id})
+        MERGE (e:expression:a_node {id: $id})
         ON CREATE SET 
             e.created_datetime = $created,
             e.name_latex = $name,
@@ -1901,7 +1901,7 @@ def add_feed(
     }
 
     query = """
-        MERGE (f:feed {id: $id})
+        MERGE (f:feed:a_node {id: $id})
         ON CREATE SET 
             f.created_datetime = $created,
             f.latex = $latex,
@@ -1945,7 +1945,7 @@ def add_quantum_operator_symbol(
     }
 
     query = """
-        MERGE (qo:quantum_operator {id: $id})
+        MERGE (qo:quantum_operator:a_node {id: $id})
         ON CREATE SET 
             qo.created_datetime = $created,
             qo.name_latex = $name,
@@ -1992,7 +1992,7 @@ def add_constant_value_with_units(
 
     # create new node for value
     tx.run(
-        "merge (:value_with_units "
+        "merge (:value_with_units:a_node "
         "{number_decimal:" + str(number_decimal) + ", "
         " number_power: " + str(number_power) + ", "
         ' created_datetime:"' + now_str + '",'
@@ -2100,7 +2100,7 @@ def add_scalar_symbol(
     }
 
     query = """
-        MERGE (s:symbol:scalar {id: $id})
+        MERGE (s:symbol:scalar:a_node {id: $id})
         ON CREATE SET 
             s.created_datetime = $created,
             s.name_latex = $name,
@@ -2176,7 +2176,7 @@ def add_vector_symbol(
         }
 
         query = """
-            MERGE (s:symbol:vector {id: $id})
+            MERGE (s:symbol:vector:a_node {id: $id})
             ON CREATE SET 
                 s.created_datetime = $created,
                 s.name_latex = $name,
@@ -2215,7 +2215,7 @@ def add_vector_symbol(
         }
 
         query = """
-            MERGE (s:symbol:vector {id: $id})
+            MERGE (s:symbol:vector:a_node {id: $id})
             ON CREATE SET 
                 s.created_datetime = $created,
                 s.name_latex = $name,
@@ -2265,7 +2265,7 @@ def add_matrix_symbol(
 
     if symbol_size == "arbitrary":
         query = """
-            MERGE (m:symbol:matrix {id: $id})
+            MERGE (m:symbol:matrix:a_node {id: $id})
             ON CREATE SET
                 m.created_datetime = $created_datetime,
                 m.name_latex = $name_latex,
@@ -2300,7 +2300,7 @@ def add_matrix_symbol(
 
     else:  # fixed size
         query = """
-            MERGE (m:matrix:symbol {id: $id})
+            MERGE (m:matrix:symbol:a_node {id: $id})
             ON CREATE SET
                 m.created_datetime = $created_datetime,
                 m.name_latex = $name_latex,
@@ -2365,7 +2365,7 @@ def add_operation_symbol(
     assert int(operation_argument_count) > 0
 
     query = """
-        MERGE (o:operation {id: $id})
+        MERGE (o:operation:a_node {id: $id})
         ON CREATE SET 
             o.created_datetime = $created,
             o.name_latex = $name,
@@ -2420,7 +2420,7 @@ def add_relation_symbol(
     assert len(relation_latex) > 0
 
     query = """
-        MERGE (o:relation {id: $id})
+        MERGE (o:relation:a_node {id: $id})
         ON CREATE SET 
             o.created_datetime = $created,
             o.name_latex = $name,
