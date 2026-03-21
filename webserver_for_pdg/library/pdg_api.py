@@ -56,6 +56,8 @@ import uuid
 import tokenize
 import os
 
+from sympy.parsing.sympy_parser import parse_expr
+
 from flask import (
     Blueprint,
     flash,
@@ -2381,6 +2383,7 @@ def api_delete_operation(symbol_id: str):
 def api_delete_relation(symbol_id: str):
     return jsonify({"STATUS": "TODO"})
 
+
 @api_bp.route("/v1/resources/sympy_check", methods=["GET", "POST"])
 def api_sympy_check():
     """
@@ -2396,9 +2399,8 @@ def api_sympy_check():
 
     var_names = [str(s) for s in expr.free_symbols]
 
-    return jsonify({"canonical": str(expr.canonical), 
-        "variables": str(var_names)})
-    
+    return jsonify({"canonical": str(expr.canonical), "variables": str(var_names)})
+
 
 @api_bp.route("/v1/resources/png_from_latex", methods=["GET", "POST"])
 def api_png_from_latex():
