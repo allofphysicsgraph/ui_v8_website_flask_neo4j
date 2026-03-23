@@ -11,23 +11,23 @@
 
 <P>Assuming the initial material is on Wikipedia,
 <fieldset>
-	<legend>Initial conversion to Latex</legend>
-<P>Wikipedia uses MediaWiki syntax. Convert the following MediaWiki content to a single Latex document.
+	<legend>Prompt for Initial conversion to Latex</legend>
+  <P>Wikipedia uses MediaWiki syntax. Convert the following MediaWiki content to a single Latex document.
 
-<P>Equations should be separated from the text rather than inline.
+  <P>Equations should be separated from the text rather than inline.
 
-<P>Use ASCII rather than Unicode characters.
+  <P>Use ASCII rather than Unicode characters.
 
-<P>Where single variables are currently inline those can remain inline.
+  <P>Where single variables are currently inline those can remain inline.
 
-<P>Equation blocks should include a label field so the block can be referenced within the document. The label that is added should be descriptive of the equation and contain no spaces, only underscores.
+  <P>Equation blocks should include a label field so the block can be referenced within the document. The label that is added should be descriptive of the equation and contain no spaces, only underscores.
 
-<P>Equations labels should be unique within the Latex file.
+  <P>Equations labels should be unique within the Latex file.
 </fieldset>
 
 <!--
 <fieldset>
-	<legend>Add equation labels</legend>
+	<legend>Prompt for Add equation labels</legend>
 For the following Latex file, write out the file and insert a label for each equation. The label that is added should be descriptive of the equation and contain no spaces, only underscores.
 
 Don't provide any commentary. Just write the revised Latex file content as your answer.
@@ -36,56 +36,56 @@ Don't provide any commentary. Just write the revised Latex file content as your 
 
 
 <fieldset>
-	<legend>more steps</legend>
-<P>A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
+	<legend>Prompt for more steps</legend>
+  <P>A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
 
-<P>Every equation should have a label that is descriptive.
+  <P>Every equation should have a label that is descriptive.
 
-<P>Sometimes a previous expression is referenced implicitly. Edit the text to include references to labels where appropriate. Reference the relevant equation labels so that Latex can compile the document.
+  <P>Sometimes a previous expression is referenced implicitly. Edit the text to include references to labels where appropriate. Reference the relevant equation labels so that Latex can compile the document.
 
-<P>Modify the Latex content by adding explanatory text about each step of the derivation. Document the mathematical transformations that relate each equation in the file to other equations in the file.
+  <P>Modify the Latex content by adding explanatory text about each step of the derivation. Document the mathematical transformations that relate each equation in the file to other equations in the file.
 </fieldset>
 
 <P>Optional (as needed):
 <fieldset>
-	<legend>(optional) Split grouped expressions</legend>
-<P>A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
+	<legend>(optional) Prompt for Splitting grouped expressions</legend>
+  <P>A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
 
-<P>In the Latex file below, for equations that have multiple instances of the equals sign, separate those into multiple equations such that each equation only has one use of the equals sign.
+  <P>In the Latex file below, for equations that have multiple instances of the equals sign, separate those into multiple equations such that each equation only has one use of the equals sign.
 
-<P>Write out the modified content as a single Latex file.
+  <P>Write out the modified content as a single Latex file.
 </fieldset>
 
 <fieldset>
-	<legend>(optional) more explanations</legend>
-<P>A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
+	<legend>(optional) Prompt for more explanations</legend>
+  <P>A derivation in mathematical Physics consists of a sequence of steps. Each step relates mathematical equations.
 
-<P>In the Latex file below, where there are two equations with no explanatory text between them, modify the Latex file by adding explanatory text to document the mathematical transformations that relate each equation in the file to other equations in the file.
+  <P>In the Latex file below, where there are two equations with no explanatory text between them, modify the Latex file by adding explanatory text to document the mathematical transformations that relate each equation in the file to other equations in the file.
 
-<P>Use the Latex equation labels to reference equations.
+  <P>Use the Latex equation labels to reference equations.
 </fieldset>
 
 <P>Occasionally manual review identifies gaps in explanation. Then additional prompting might be necessary. For example,
 <fieldset>
-	<legend>more details</legend>
-<P>In the following text, which trigonometric identities were used? Explain the missing steps.
+	<legend>(optional) Prompt for more details</legend>
+  <P>In the following text, which trigonometric identities were used? Explain the missing steps.
 </fieldset>
 
 <fieldset>
-	<legend>more details</legend>
-<P>what does this latex expression mean by `arg`?
-<pre>
+	<legend>(optional) Prompt for more details</legend>
+  <P>what does this latex expression mean by `arg`?
+  <pre>
 ```
 \varphi = \arg(c_1 + c_2i)
 ```
-</pre>
+  </pre>
 </fieldset>
 
 <P>Now the .tex file should be as complete and as detailed as possible.
 
 <P>There are four actions to take with this .tex file:
 <UL>
-    <LI>compile the .tex to .pdf to ensure validity and no duplicate labels</LI>
+    <LI>compile the .tex to .pdf to ensure validity and no duplicate labels (e.g., <a href="https://www.overleaf.com/project">Overleaf</a>)</LI>
     <LI><a href="#tex to symbols">Convert derivation tex to symbols JSON</a></LI>
     <LI><a href="#tex to expr">Convert derivation tex to expressions JSON</a></LI>
     <LI><a href="#tex to steps">Convert derivation tex to steps JSON</a></LI>
@@ -96,27 +96,27 @@ Don't provide any commentary. Just write the revised Latex file content as your 
 <P>Example: <a href="https://github.com/allofphysicsgraph/task-tracker/issues/168">symbols for Simple Harmonic Oscillator</a>
 
 <fieldset>
-	<legend>list of symbols</legend>
-<P>The following latex file contains equations and symbols. Provide a list, formatted as JSON, of every unique symbol and a description of that symbol.
+	<legend>Prompt for list of symbols</legend>
+  <P>The latex file contains equations and symbols. Provide a list, formatted as JSON, of every unique symbol and a description of that symbol.
 
-<P>For each entry in the JSON list include a list of references to the labeled equations where each symbol is used.
+  <P>For each entry in the JSON list include a list of references to the labeled equations where each symbol is used.
 
-<P>For each symbol categorize the symbol as scalar, vector, or matrix
+  <P>For each symbol categorize the symbol as scalar, vector, or matrix
 
-<P>For each scalar symbol, categorize the symbol as variable or a constant.
+  <P>For each scalar symbol, categorize the symbol as variable or a constant.
 
-<P>For each scalar symbol, categorize the values the scalar can take as "real", "complex", "integer", or "arbitrary"
+  <P>For each scalar symbol, categorize the values the scalar can take as "real", "complex", "integer", or "arbitrary"
 
-<P>For each scalar symbol, categorieze the scalar as "positive", "negative", "non-negative", or "any"
+  <P>For each scalar symbol, categorieze the scalar as "positive", "negative", "non-negative", or "any"
 
-<P>For each scalar symbol there are 7 dimensionality measurements: mass, time, length, temperature, electric charge, amount of substance, luminous intensity.<BR>
-If the scalar is dimensionless, then the value for each of the 7 measures is zero.<BR>
-If the scalar has non-zero dimensions, explicitly state the integer value of the dimensions.
+  <P>For each scalar symbol there are 7 dimensionality measurements: mass, time, length, temperature, electric charge, amount of substance, luminous intensity.<BR>
+  If the scalar is dimensionless, then the value for each of the 7 measures is zero.<BR>
+  If the scalar has non-zero dimensions, explicitly state the integer value of the dimensions.
 
-<P>Write out just the JSON list as your answer.
+  <P>Write out just the JSON list as your answer.
 
-<P>The output should comply with this schema:
-<pre>
+  <P>The output should comply with this schema:
+  <pre>
 ```
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -195,7 +195,7 @@ If the scalar has non-zero dimensions, explicitly state the integer value of the
   }
 }
 ```
-</pre>
+  </pre>
 </fieldset>
 
 
@@ -215,8 +215,15 @@ print(json.dumps(data, indent=2))
 
 
 <fieldset>
-	<legend>symbol comparison</legend>
-<P>I have a database that has the attached symbols. Do any of those symbols align with symbols in this JSON?
+	<legend>Prompt for symbol comparison</legend>
+  <P>I have a database of attached symbols with associated IDs. Do any of those symbols align with symbols in this JSON?
+
+  <P>Create a JSON that captures the matches. For each match, indicate
+  - the symbol Latex<BR>
+  - the ID from the database<BR>
+  - the description <BR>
+  - explanation of why the symbol is a match<BR>
+  - confidence level of the match<BR>
 </fieldset>
 
 
@@ -225,17 +232,17 @@ print(json.dumps(data, indent=2))
 <P>Example: <a href="https://github.com/allofphysicsgraph/task-tracker/issues/170">expressions in Simple Harmonic Oscillator</a>
 
 <fieldset>
-	<legend>tex to JSON</legend>
-<P>Identify each expression in this document. 
+	<legend>Prompt for tex to JSON</legend>
+  <P>Identify each expression in this document. 
 
-<P>For each expression, identify the left-hand site (LHS), right-hand size (RHS), and the relation (e.g., =). 
+  <P>For each expression, identify the left-hand site (LHS), right-hand size (RHS), and the relation (e.g., =). 
 
-<P>Sometime expressions have conditional applicability, like `v << c`. If there is a condition on the expression, determine what that is.
+  <P>Sometime expressions have conditional applicability, like `v << c`. If there is a condition on the expression, determine what that is.
 
-<P>Write out the LHS, relation, RHS, a condition if applicable, and the expression's label as JSON.
+  <P>Write out the LHS, relation, RHS, a condition if applicable, and the expression's label as JSON.
 
-<P>The output should comply with this schema:
-<pre>
+  <P>The output should comply with this schema:
+  <pre>
 ```
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -261,7 +268,7 @@ print(json.dumps(data, indent=2))
   }
 }
 ```
-</pre>
+  </pre>
 </fieldset>
 
 <P>To validate output JSON against the schema,
@@ -277,14 +284,15 @@ validate(instance=data, schema=schema)
 print("JSON is valid!")
 </pre>
 
+
 <fieldset>
-	<legend></legend>
-<P>For each LHS and RHS in this JSON, what would the SymPy representation be?
+	<legend>Prompt for JSON: add Sympy</legend>
+  <P>For each LHS and RHS in this JSON, what would the SymPy representation be?
 
-<P>Add the SymPy for each to the JSON
+  <P>Add the SymPy for each to the JSON
 
-<P>Output
-<pre>
+  <P>The output should comply with this schema:
+  <pre>
 ```
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -340,28 +348,33 @@ print("JSON is valid!")
   }
 }
 ```
-</pre>
+  </pre>
 </fieldset>
 
 <fieldset>
-	<legend>comparison</legend>
-<P>I have a database that has the attached expressions. Do any of those expressions align with expressions associated with the simple harmonic oscillator?
+	<legend>Prompt for comparison of expr with PDG</legend>
+  <P>I have a database that has expressions with ID numbers. Do any of those expressions align with expressions associated with the simple harmonic oscillator?
 
-<P>Respond with a JSON file that, for each matching expression,<BR>
-- label for Latex expression<BR>
-- original Latex expression<BR>
-- Latex expression from database<BR>
-- database's id number for the expression<BR>
-- comments about the reason for the expected similarity<BR>
-- degree of confidence
-</fieldset>
+  <P>Respond with a JSON file that, for each matching expression,<BR>
+  - label for Latex expression<BR>
+  - original Latex expression<BR>
+  - Latex expression from database<BR>
+  - database's id number for the expression<BR>
+  - comments about the reason for the expected similarity<BR>
+  - degree of confidence
+  </fieldset>
+
+  <P>TODO: associate symbol IDs with each expression
+
+  <P>TODO: for each expression rewrite SymPy using PDG IDs
 
 <H3 id="tex to steps">Convert derivation tex to steps JSON</H3>
 
 <P>Example: <a href="https://github.com/allofphysicsgraph/task-tracker/issues/169">steps in Simple Harmonic Oscillator</a>
 
+<!--
 <fieldset>
-	<legend>convert from Latex to HTML table</legend>
+	<legend>Prompt for convert from Latex to HTML table</legend>
 <P>Create an HTML table with one row per step. Columns are<BR>
 - input expression(s),<BR>
 - output expression(s)<BR>
@@ -369,20 +382,20 @@ print("JSON is valid!")
 
 <P>The first time an expression is used in the table show both the latex and the equation label. When later steps use that same expression show just the equation label.
 </fieldset>
-
+-->
 
 <fieldset>
-	<legend>JSON</legend>
+	<legend>Prompt for JSON</legend>
 
-<P>Create JSON describing each step in the derivation. Specify<BR>
-- input expression(s),<BR>
-- output expression(s)<BR>
-- transform being applied that relates the inputs and outputs
+  <P>Create JSON describing each step in the derivation. Specify<BR>
+  - input expression(s),<BR>
+  - output expression(s)<BR>
+  - transform being applied that relates the inputs and outputs</P>
 
- <P>The first time an expression is used in the table show both the latex and the equation label. When later steps use that same expression show just the equation label.
+   <P>The first time an expression is used in the table show both the latex and the equation label. When later steps use that same expression show just the equation label.</P>
 
-The output should comply with this schema:
-<pre>
+  The output should comply with this schema:
+  <pre>
 ```
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -426,7 +439,9 @@ The output should comply with this schema:
   }
 }
 ```
-</pre>
+  </pre>
 </fieldset>
+
+<P>TODO: replace labels with PDG IDs for expressions.</P>
 
 {% endblock %}
