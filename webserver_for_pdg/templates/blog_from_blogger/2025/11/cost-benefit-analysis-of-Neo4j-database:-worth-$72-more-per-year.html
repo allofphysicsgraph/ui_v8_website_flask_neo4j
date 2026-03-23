@@ -5,6 +5,17 @@
 
 <P><small>Published 2025-11-03T01:45:00Z by Physics Derivation Graph</small></P>
 
-<p>I recently reverted away from using Neo4j as the database because a DigitalOcean droplet with enough memory costs $12/month (for 2GB of RAM), whereas without Neo4j I can use the $6/month VPS with 1 GB of RAM. The Neo4j database enables arbitrary user-specified Cypher queries, whereas the non-Neo4j site isn't as interactive: users are constrained to pre-defined queries.</p><p>I considered <a href="https://physicsderivationgraph.blogspot.com/2025/11/finding-alternative-neo4j.html">finding another database option, including SQL</a>, but a relational database has a higher query complexity.</p><p>I could continue to use Neo4j locally (on my computer) and have a non-Neo4j website. I'm interested to see how many people have logged into my site. Using the instructions on&nbsp;<br /><a href="https://physicsderivationgraph.blogspot.com/2020/05/inspecting-list-of-users-who-have.html">https://physicsderivationgraph.blogspot.com/2020/05/inspecting-list-of-users-who-have.html</a><br />in the repo allofphysics.com I found 3 novel-to-me users: a Chinese student, a 77 year old man from California, and a person who's name and email isn't on Google.</p><p>The window of when Neo4j was running was about 8 months.&nbsp;</p><span><!--more--></span><p>Is there value in continuing to locally use Neo4j if that isn't what users see on the public website?<br />(The Neo4j would be available via Github and DockerHub, but that incurs a significant burden on users.)</p><p><br /></p>
+<p>I recently reverted away from using Neo4j as the database because a DigitalOcean droplet with enough memory costs $12/month (for 2GB of RAM), whereas without Neo4j I can use the $6/month VPS with 1 GB of RAM. The Neo4j database enables arbitrary user-specified Cypher queries, whereas the non-Neo4j site isn't as interactive: users are constrained to pre-defined queries.</p>
+
+<p>I considered <a href="https://physicsderivationgraph.blogspot.com/2025/11/finding-alternative-neo4j.html">finding another database option, including SQL</a>, but a relational database has a higher query complexity.</p>
+
+<p>I could continue to use Neo4j locally (on my computer) and have a non-Neo4j website. I'm interested to see how many people have logged into my site. Using the instructions on&nbsp;<br />
+	<a href="https://physicsderivationgraph.blogspot.com/2020/05/inspecting-list-of-users-who-have.html">https://physicsderivationgraph.blogspot.com/2020/05/inspecting-list-of-users-who-have.html</a><br />
+in the repo allofphysics.com I found 3 novel-to-me users: a Chinese student, a 77 year old man from California, and a person who's name and email isn't on Google.</p>
+
+<p>The window of when Neo4j was running was about 8 months.&nbsp;</p><span><!--more--></span>
+
+<p>Is there value in continuing to locally use Neo4j if that isn't what users see on the public website?<br />
+(The Neo4j would be available via Github and DockerHub, but that incurs a significant burden on users.)</p>
 
 {% endblock %}
