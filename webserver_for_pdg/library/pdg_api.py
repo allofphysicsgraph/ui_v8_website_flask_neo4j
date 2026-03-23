@@ -452,16 +452,19 @@ def api_list_inference_rules():
 @api_bp.route("/v1/resources/expressions", methods=["GET"])
 def api_list_expressions():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/expression/list | python3 -m json.tool
-    [
-        {
-            "author_name_latex": "ben",
-            "description_latex": "",
-            "id": "1852486",
-            "latex": "a+b=2",
-            "name_latex": ""
-        },
-    ]
+curl --silent --insecure https://localhost/api/v1/resources/expressions | python3 -c "
+import sys, json
+
+data = json.load(sys.stdin)
+data.pop('_links', None)
+if '_embedded' in data and 'expressions' in data['_embedded']:
+    for entry in data['_embedded']['expressions']:
+        entry.pop('_links', None)
+        entry.pop('author_name_latex', None)
+
+print(json.dumps(data, indent=2))
+" 
+
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -727,18 +730,18 @@ def api_list_relation_symbols():
 @api_bp.route("/v1/resources/symbol/scalars", methods=["GET"])
 def api_list_scalar_symbols():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/scalar/list | python3 -m json.tool
-    [
-        {
-            "argument_count": 2,
-            "author_name_latex": "ben",
-            "description_latex": "",
-            "id": "7052411",
-            "latex": "=",
-            "name_latex": "equals",
-            "requires_arguments": true
-        }
-    ]
+curl --silent --insecure https://localhost/api/v1/resources/symbol/scalars | python3 -c "
+import sys, json
+
+data = json.load(sys.stdin)
+data.pop('_links', None)
+if '_embedded' in data and 'scalar_symbols' in data['_embedded']:
+    for entry in data['_embedded']['scalar_symbols']:
+        entry.pop('_links', None)
+        entry.pop('author_name_latex', None)
+
+print(json.dumps(data, indent=2))
+"
 
     """
     trace_id = str(uuid.uuid4())
