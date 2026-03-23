@@ -26,7 +26,7 @@ https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/135
 
 ---
 
-There was no selection of operations for expression 
+There was no selection of operations when entering an expression 
 --> see `expression_create_symbols_and_operations.html`
 
 ---
@@ -63,11 +63,6 @@ SHO - https://github.com/allofphysicsgraph/task-tracker/issues/2
 
 
 https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/133
-
----
-
-list of valid links to create sitemap for Google
-https://github.com/allofphysicsgraph/task-tracker/issues/111
 
 ---
 
