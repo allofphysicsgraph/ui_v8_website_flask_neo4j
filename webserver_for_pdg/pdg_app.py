@@ -87,6 +87,7 @@ import neo4j  # type: ignore
 
 # https://hplgit.github.io/web4sciapps/doc/pub/._web4sa_flask004.html
 from flask import (
+    abort,
     Flask,
     g,  # request timing; also for login
     redirect,
@@ -1174,6 +1175,7 @@ def to_index():
     all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
         graphDB_Driver, T_and_f_derivation_ID, query_time_dict
     )
+    assert web_app.static_folder is not None
     try:
         latex.create_d3js_json(
             T_and_f_derivation_ID, all_steps, web_app.static_folder + "/"
@@ -1247,6 +1249,8 @@ def to_navigation():
             raise Exception("unrecognized button")
 
         if file_obj and allowed_bool:
+            assert file_obj.filename is not None
+
             logger.info("file_obj.filename=" + str(file_obj.filename))
             filename = secure_filename(file_obj.filename)
             logger.info("to_navigation: filename = " + str(filename))
@@ -1626,6 +1630,7 @@ def to_review_derivation(
 
             # path_to_pdf = "/code/static/dumping_grounds/"  # should end with slash
 
+            assert web_app.static_folder is not None
             try:
                 pdf_filename = latex.create_pdf_for_derivation(
                     all_steps,
@@ -1657,6 +1662,7 @@ def to_review_derivation(
 
             # path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
 
+            assert web_app.static_folder is not None
             try:
                 tex_filename = latex.create_tex_file_for_derivation(
                     all_steps,
@@ -1721,6 +1727,7 @@ def to_review_derivation(
             neo4j_query.get_symbols_for_derivation, derivation_id
         )
 
+    assert web_app.static_folder is not None
     # only create d3js JSON if the HTML page is going to be rendered
     try:
         latex.create_d3js_json(derivation_id, all_steps, web_app.static_folder + "/")
@@ -1738,6 +1745,7 @@ def to_review_derivation(
     # only create graphviz PNG if the HTML page is going to be rendered
     # SVG isn't available yet; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/14
 
+    assert web_app.static_folder is not None
     derivation_name_latex = derivation_dict["name_latex"]
     derivation_graphviz_png_filename = latex.create_derivation_png(
         derivation_id,
@@ -3583,6 +3591,10 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> ResponseRetur
 
         if "new value and dimension" in request.form:
             if web_form_constant_properties.validate():
+
+                assert web_form_constant_properties.number_decimal.data is not None
+                assert web_form_constant_properties.number_power.data is not None
+
                 number_decimal = float(web_form_constant_properties.number_decimal.data)
                 number_power = float(web_form_constant_properties.number_power.data)
 
@@ -4095,7 +4107,7 @@ def to_add_operation() -> ResponseReturnValue:
                     web_form_add_operation.operation_reference_latex.data
                 ).strip()
                 operation_argument_count = int(
-                    web_form_add_operation.operation_argument_count.data
+                    web_form_add_operation.operation_argument_count.data or -1
                 )
 
                 logger.info("operation_latex:" + str(operation_latex))
@@ -6878,7 +6890,10 @@ def static_file_from_root():
     """
     https://stackoverflow.com/a/14625619/1164295
     """
-    return send_from_directory(web_app.static_folder + "/", request.path[1:])
+    if web_app.static_folder is None:
+        logger.error("static folder does not seem to be set!")
+        abort(404)
+    return send_from_directory(web_app.static_folder, request.path[1:])
 
 
 ###########################################################################
