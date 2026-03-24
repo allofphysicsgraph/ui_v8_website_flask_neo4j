@@ -1,0 +1,54 @@
+<style>
+  .snippet-container {
+    position: relative; /* Essential for positioning the button */
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    /* Add desired styling */
+    cursor: pointer;
+    padding: 5px 10px;
+    font-size: 0.8em;
+}
+
+.copy-btn.copied {
+    background-color: #28a745; /* Style for the 'Copied!' state */
+}
+</style>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+    const copyButtons = document.querySelectorAll('.copy-btn');
+
+    copyButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const snippetContainer = button.closest('.snippet-container');
+            // FIX: Target the .code-snippet div directly, not a 'code' tag inside it
+            const codeSnippet = snippetContainer.querySelector('.code-snippet');
+            
+            if (!codeSnippet) return; // Safety check
+
+            const textToCopy = codeSnippet.innerText;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy text.');
+            });
+        });
+    });
+});
+</script>
