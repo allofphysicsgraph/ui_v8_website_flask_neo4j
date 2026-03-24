@@ -452,18 +452,18 @@ def api_list_inference_rules():
 @api_bp.route("/v1/resources/expressions", methods=["GET"])
 def api_list_expressions():
     """
-curl --silent --insecure https://localhost/api/v1/resources/expressions | python3 -c "
-import sys, json
+    curl --silent --insecure https://localhost/api/v1/resources/expressions | python3 -c "
+    import sys, json
 
-data = json.load(sys.stdin)
-data.pop('_links', None)
-if '_embedded' in data and 'expressions' in data['_embedded']:
-    for entry in data['_embedded']['expressions']:
-        entry.pop('_links', None)
-        entry.pop('author_name_latex', None)
+    data = json.load(sys.stdin)
+    data.pop('_links', None)
+    if '_embedded' in data and 'expressions' in data['_embedded']:
+        for entry in data['_embedded']['expressions']:
+            entry.pop('_links', None)
+            entry.pop('author_name_latex', None)
 
-print(json.dumps(data, indent=2))
-" 
+    print(json.dumps(data, indent=2))
+    "
 
     """
     trace_id = str(uuid.uuid4())
@@ -730,18 +730,19 @@ def api_list_relation_symbols():
 @api_bp.route("/v1/resources/symbol/scalars", methods=["GET"])
 def api_list_scalar_symbols():
     """
-curl --silent --insecure https://localhost/api/v1/resources/symbol/scalars | python3 -c "
-import sys, json
 
-data = json.load(sys.stdin)
-data.pop('_links', None)
-if '_embedded' in data and 'scalar_symbols' in data['_embedded']:
-    for entry in data['_embedded']['scalar_symbols']:
-        entry.pop('_links', None)
-        entry.pop('author_name_latex', None)
+    curl --silent --insecure https://localhost/api/v1/resources/symbol/scalars | python3 -c "
+    import sys, json
 
-print(json.dumps(data, indent=2))
-"
+    data = json.load(sys.stdin)
+    data.pop('_links', None)
+    if '_embedded' in data and 'scalar_symbols' in data['_embedded']:
+        for entry in data['_embedded']['scalar_symbols']:
+            entry.pop('_links', None)
+            entry.pop('author_name_latex', None)
+
+    print(json.dumps(data, indent=2))
+    "
 
     """
     trace_id = str(uuid.uuid4())
