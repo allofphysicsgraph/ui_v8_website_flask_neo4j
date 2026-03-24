@@ -31,6 +31,13 @@
 - In addition to explicitly stating the transformations being applied between equations, guide the reader through the derivation.
 
 
+  <P>Style<BR>
+- focus on the mathematical and physical veracity<BR>
+- uses declarative statements<BR>
+- guide the reader through a logical sequence of ideas to reach a conclusion.<BR>
+- use Scientific Impersonal Style, also known as Technical Expository Prose. Use Mathematical Imperatives to direct the reader's attention. The Impersonal Imperative should be used.<BR>
+- be methodical and explicit<BR>
+- be Precise and Technical
 
   <P>Document Specifications:<BR>
 - use the document class and preamble provided below<BR>
@@ -294,7 +301,7 @@ if '_embedded' in data and 'scalar_symbols' in data['_embedded']:
 print(json.dumps(data, indent=2))
 "</pre>
 
-
+<!--
 <fieldset>
   <legend>Prompt for symbol comparison: matches</legend>
   <div class="snippet-container">
@@ -321,6 +328,125 @@ print(json.dumps(data, indent=2))
   - the symbol Latex<BR>
   - the description <BR>
 </fieldset>
+-->
+
+<fieldset>
+  <legend>Prompt for symbol comparison: missing and matching</legend>
+  <div class="snippet-container">
+  <button class="copy-btn">Copy</button>
+  <div class="code-snippet">
+
+<P>I have two input data sets: <BR>
+- a set of symbols found in the derivation of the simple harmonic oscillator.<BR>
+- a set of symbols in a database for physics derivations. Each symbol has a unique ID number.
+
+<P>The task is to create two JSON files: one for matches where symbols are in both inputs, and another JSON file for symbols in the simple harmonic oscillator derivation that are not in the physics derivations database. All symbols in the simple harmonic oscillator derivation should end up in one of the two JSON output files.
+
+<P>For the JSON that captures the matches (`matches.json`), for each match indicate<BR>
+- the symbol Latex<BR>
+- the ID from the database<BR>
+- the list of equation labels from the derivation<BR>
+- the description<BR>
+- explanation of why the symbol is a match<BR>
+- confidence level of the match
+
+<P>Here is the schema for `matches.json`:
+<pre>
+```
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Physics Symbol Matches Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "symbol_latex",
+      "db_id",
+      "description",
+      "explanation",
+      "confidence"
+    ],
+    "properties": {
+      "symbol_latex": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The LaTeX representation of the symbol from the derivation."
+      },
+      "db_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$",
+        "minLength": 8,
+        "description": "The unique numerical ID from the physics database."
+      },
+      "equation_labels": {
+        "type": "array",
+        "description": "equations in the derivation that use the symbol"
+      }
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "description": "A description of the symbol's role in the derivation."
+      },
+      "explanation": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Justification for why this derivation symbol matches the database entry."
+      },
+      "confidence": {
+        "type": "string",
+        "enum": ["high", "medium", "low"],
+        "description": "The certainty level of the match."
+      }
+    }
+  }
+}
+```
+</pre>
+
+<P>For the JSON that captures the missing symbols (`missing.json`), for each symbol indicate<BR>
+- the symbol Latex<BR>
+- the description<BR>
+- comments about symbols in the database that might be considered adjacent and what the ID number is
+
+<P>Here is the schema for `missing.json`:
+<pre>
+```
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Missing Physics Symbols Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "symbol_latex",
+      "description",
+      "comments"
+    ],
+    "properties": {
+      "symbol_latex": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The LaTeX representation of the symbol used in the derivation."
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "description": "A description of what the symbol represents in the derivation."
+      },
+      "comments": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Notes regarding nearby symbols in the database or why a match was omitted."
+      }
+    }
+  }
+}
+```
+</pre>
+</div>
+</div>
+</fieldset>
+
 
 <P>(Manually) input symbols that didn't match using web UI to generate new IDs; then re-run search for matches.
 
@@ -665,59 +791,6 @@ print("JSON is valid!")
 
 <P>TODO: replace labels with PDG IDs for expressions.</P>
 
-<style>
-  .snippet-container {
-    position: relative; /* Essential for positioning the button */
-    padding: 10px;
-    border: 1px solid #ccc;
-    margin-bottom: 15px;
-}
 
-.copy-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    /* Add desired styling */
-    cursor: pointer;
-    padding: 5px 10px;
-    font-size: 0.8em;
-}
-
-.copy-btn.copied {
-    background-color: #28a745; /* Style for the 'Copied!' state */
-}
-</style>
-
-<script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', () => {
-    const copyButtons = document.querySelectorAll('.copy-btn');
-
-    copyButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const snippetContainer = button.closest('.snippet-container');
-            // FIX: Target the .code-snippet div directly, not a 'code' tag inside it
-            const codeSnippet = snippetContainer.querySelector('.code-snippet');
-            
-            if (!codeSnippet) return; // Safety check
-
-            const textToCopy = codeSnippet.innerText;
-
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                const originalText = button.textContent;
-                button.textContent = 'Copied!';
-                button.classList.add('copied');
-
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.classList.remove('copied');
-                }, 1500);
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-                alert('Failed to copy text.');
-            });
-        });
-    });
-});
-</script>
 
 {% endblock %}
