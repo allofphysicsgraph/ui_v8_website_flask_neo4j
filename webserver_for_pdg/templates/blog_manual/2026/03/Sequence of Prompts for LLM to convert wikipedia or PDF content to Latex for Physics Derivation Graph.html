@@ -14,7 +14,8 @@
 <P>Assuming the initial material is on Wikipedia,
 
 <fieldset>
-  <legend>Prompt for Initial conversion to Latex</legend>
+  <legend id="initial conversion to latex"><H2>Prompt for Initial conversion to Latex
+   (<a href="#initial conversion to latex">#</a>)</H2> </legend>
   <div class="snippet-container">
   <button class="copy-btn">Copy</button>
   <div class="code-snippet">
@@ -178,7 +179,8 @@ Don't provide any commentary. Just write the revised Latex file content as your 
 <P>Example: <a href="https://github.com/allofphysicsgraph/task-tracker/issues/168">symbols for Simple Harmonic Oscillator</a>
 
 <fieldset>
-	<legend>Prompt for list of symbols</legend>
+	<legend id="list of symbols"><H2>Prompt for list of symbols 
+   (<a href="#list of symbols">#</a>)</H2></legend>
   <div class="snippet-container">
   <button class="copy-btn">Copy</button>
   <div class="code-snippet">
@@ -331,16 +333,17 @@ print(json.dumps(data, indent=2))
 -->
 
 <fieldset>
-  <legend>Prompt for symbol comparison: missing and matching</legend>
+  <legend id="symbol comparison"><H2>Prompt for scalar symbol comparison: missing and matching 
+   (<a href="#symbol comparison">#</a>)</H2></legend>
   <div class="snippet-container">
   <button class="copy-btn">Copy</button>
   <div class="code-snippet">
 
 <P>I have two input data sets: <BR>
-- a set of symbols found in the derivation of the simple harmonic oscillator.<BR>
+- a set of symbols found in the derivation of the DERIVATION_NAME_HERE.<BR>
 - a set of symbols in a database for physics derivations. Each symbol has a unique ID number.
 
-<P>The task is to create two JSON files: one for matches where symbols are in both inputs, and another JSON file for symbols in the simple harmonic oscillator derivation that are not in the physics derivations database. All symbols in the simple harmonic oscillator derivation should end up in one of the two JSON output files.
+<P>The task is to create two JSON files: one for matches where symbols are in both inputs, and another JSON file for symbols in the DERIVATION_NAME_HERE derivation that are not in the physics derivations database. All symbols in the DERIVATION_NAME_HERE derivation should end up in one of the two JSON output files.
 
 <P>For the JSON that captures the matches (`matches.json`), for each match indicate<BR>
 - the symbol Latex<BR>
@@ -450,30 +453,73 @@ print(json.dumps(data, indent=2))
 
 <P>(Manually) input symbols that didn't match using web UI to generate new IDs; then re-run search for matches.
 
+<P>TODO: Vectors - extract from derivation
+
+<P>TODO: Vectors: compare extracted to PDG DB
+
+<P>TODO: matrices - extract from derivation
+
+<P>TODO: matrices: compare extracted to PDG DB
+
 <H3 id="tex to operations">Convert <code>DERIVATION_FILE.tex</code> to <code>operations.json</code></H3>
 
 <P>Example: <a href="">operations in Simple Harmonic Oscillator</a></P>
 
 <fieldset>
-  <legend>Prompt for tex to <code>operations.json</code></legend>
-    <div class="snippet-container">
+  <legend id="list operations"><H2>Prompt for tex to <code>operations.json</code>
+   (<a href="#list operations">#</a>)</H2> </legend>
+  <div class="snippet-container">
   <button class="copy-btn">Copy</button>
   <div class="code-snippet">
   <P>An operator exists on the left-hand size (LHS) or right-hand side (RHS) of a mathematical expression.
 
   <P>An operator acts on variables and constants.
 
-  <P>Examples include addition (`+`), subtraction (`-`), multiplication, division, integration, summation. 
+  <P>Examples include addition (`+`), subtraction (`-`), multiplication, division, integration, summation, trig functions. 
 
   <P>For each expression identify operations used. 
 
   <P>Write the result as a single JSON file with the following entries per operation:<BR>
     - latex for operator. (Can be null if the operator is implicit)<BR>
-    - name of operator as text
+    - name of operator as text<BR>
+    - number of arguments for the operation<BR>
+    - equation labels in which the operation is used
 
   <P>The output should comply with this schema:
   <pre>
 ```
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Mathematical Operators List",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["latex", "name", "number_of_arguments", "labels"],
+    "properties": {
+      "latex": {
+        "description": "The LaTeX representation of the operator. Can be null for implicit operations.",
+        "type": ["string", "null"]
+      },
+      "name": {
+        "description": "The human-readable name of the operation.",
+        "type": "string"
+      },
+      "number_of_arguments": {
+        "description": "The number of arguments the operator takes.",
+        "type": "integer",
+        "minimum": 0
+      },
+      "labels": {
+        "description": "A list of equation identifiers where this operator is used.",
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "additionalProperties": false
+  }
+}
 ```
   </pre>
 </div>
@@ -483,10 +529,146 @@ print(json.dumps(data, indent=2))
 
 <P>Output is <code>operations.json</code>
 
+<P>To get operation symbols in PDG use
+<pre>
+curl --silent --insecure https://localhost/api/v1/resources/symbol/operations | python3 -c "
+import sys, json
+
+data = json.load(sys.stdin)
+data.pop('_links', None)
+if '_embedded' in data and 'operation_symbols' in data['_embedded']:
+    for entry in data['_embedded']['operation_symbols']:
+        entry.pop('_links', None)
+        entry.pop('author_name_latex', None)
+
+print(json.dumps(data, indent=2))
+"
+</pre>
+
+<fieldset>
+  <legend id="compare operations"><H2>Prompt for comparing operations in PDG DB 
+   (<a href="#compare operations">#</a>)</H2></legend>
+  <div class="snippet-container">
+  <button class="copy-btn">Copy</button>
+  <div class="code-snippet">
+
+<P>I have two input data sets:<BR>
+- a set of operations found in the derivation of the DERIVATION_NAME_HERE. Each operation is associated with one or more labels.<BR>
+- a set of operations in a database for physics derivations. Each operation has a unique ID number.
+
+<P>The task is to create two JSON files: one for matches where operations are in both inputs, and another JSON file for operations in the DERIVATION_NAME_HERE derivation that are not in the physics derivations database. All operations in the DERIVATION_NAME_HERE derivation should end up in one of the two JSON output files.
+
+<P>For the JSON that captures the matches (`matches.json`), for each match indicate<BR>
+- the operation Latex<BR>
+- the ID from the database<BR>
+- the list of equation labels from the derivation<BR>
+- the description<BR>
+- explanation of why the operation is a match<BR>
+- confidence level of the match
+
+<P>Here is the schema for `matches.json`:
+<pre>
+```
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Physics operation Matches Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "operation_latex",
+      "db_id",
+      "description",
+      "explanation",
+      "confidence"
+    ],
+    "properties": {
+      "operation_latex": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The LaTeX representation of the operation from the derivation."
+      },
+      "db_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$",
+        "minLength": 8,
+        "description": "The unique numerical ID from the physics database."
+      },
+      "equation_labels": {
+        "type": "array",
+        "description": "equations in the derivation that use the operation"
+      }
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "description": "A description of the operation's role in the derivation."
+      },
+      "explanation": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Justification for why this derivation operation matches the database entry."
+      },
+      "confidence": {
+        "type": "string",
+        "enum": ["high", "medium", "low"],
+        "description": "The certainty level of the match."
+      }
+    }
+  }
+}
+```
+</pre>
+
+
+<P>For the JSON that captures the missing operations (`missing.json`), for each operation indicate<BR>
+- the operation Latex<BR>
+- the description<BR>
+- comments about operations in the database that might be considered adjacent and what the ID number is
+
+<P>Here is the schema for `missing.json`:
+<pre>
+```
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Missing Physics operations Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "operation_latex",
+      "description",
+      "comments"
+    ],
+    "properties": {
+      "operation_latex": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The LaTeX representation of the operation used in the derivation."
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "description": "A description of what the operation represents in the derivation."
+      },
+      "comments": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Notes regarding nearby operations in the database or why a match was omitted."
+      }
+    }
+  }
+}
+```
+</pre>
+</div>
+</div>
+</fieldset>
+
 <H3 id="tex to expr">Convert <code>DERIVATION_FILE.tex</code> to <code>expressions.json</code></H3>
 
 <P>Example: <a href="https://github.com/allofphysicsgraph/task-tracker/issues/170">expressions in Simple Harmonic Oscillator</a>
 
+<!--
 <fieldset>
 	<legend>Prompt for tex to <code>expressions.json</code></legend>
     <div class="snippet-container">
@@ -530,28 +712,28 @@ print(json.dumps(data, indent=2))
   </pre>
 </div>
 </div>
-
 </fieldset>
+-->
 
-<P>To validate output <code>expressions.json</code> against the schema,
-<pre>
-import json
-from jsonschema import validate
-
-schema = { ... } # The schema
-data = [ ... ]   # JSON data
-
-# This will raise a ValidationError if the data is inconsistent
-validate(instance=data, schema=schema)
-print("JSON is valid!")
-</pre>
 
 
 <fieldset>
-	<legend>Prompt for <code>expressions.json</code>: add Sympy</legend>
+	<legend id="expressions list split and sympy"><H2>Prompt for <code>expressions.json</code>: split LHS, RHS; add Sympy 
+   (<a href="#expressions list split and sympy">#</a>)</H2></legend>
+  <div class="snippet-container">
+  <button class="copy-btn">Copy</button>
+  <div class="code-snippet">
+  <P>Identify each expression in this document. 
+
+  <P>For each expression, identify the left-hand site (LHS), right-hand size (RHS), and the relation (e.g., `=`). 
+
+  <P>Sometime expressions have conditional applicability, like `v << c`. If there is a condition on the expression, determine what that is.
+
+  <P>Write out the LHS, relation, RHS, a condition if applicable, and the expression's label as JSON.
+
   <P>For each LHS and RHS in this JSON, what would the SymPy representation be?
 
-  <P>Add the SymPy for each to the JSON
+  <P>Add the SymPy for each side of every expression to the JSON.
 
   <P>The output should comply with this schema:
   <pre>
@@ -612,21 +794,62 @@ print("JSON is valid!")
 }
 ```
   </pre>
+</div>
+</div>
 </fieldset>
 
-<fieldset>
-	<legend>Prompt for comparison of expr with PDG: matches</legend>
-  <P>I have a database that has expressions with ID numbers. Do any of those expressions align with expressions associated with the DERIVATION_NAME_HERE?
+<P>To validate output <code>expressions.json</code> against the schema,
+<pre>
+import json
+from jsonschema import validate
 
-  <P>Respond with a JSON file that, for each matching expression,<BR>
-  - label for Latex expression<BR>
-  - original Latex expression<BR>
+schema = { ... } # The schema
+data = [ ... ]   # JSON data
+
+# This will raise a ValidationError if the data is inconsistent
+validate(instance=data, schema=schema)
+print("JSON is valid!")
+</pre>
+
+
+<P>To get expressions in PDG use
+<pre>
+curl --silent --insecure https://localhost/api/v1/resources/expressions | python3 -c "
+import sys, json
+
+data = json.load(sys.stdin)
+data.pop('_links', None)
+if '_embedded' in data and 'expressions' in data['_embedded']:
+    for entry in data['_embedded']['expressions']:
+        entry.pop('_links', None)
+        entry.pop('author_name_latex', None)
+
+print(json.dumps(data, indent=2))
+"
+</pre>
+
+
+<fieldset>
+	<legend id="compare expressions"><H2>Prompt for comparison of expressions with PDG: matches and missing 
+    (<a href="#compare expressions">#</a>)</H2></legend>
+  <div class="snippet-container">
+  <button class="copy-btn">Copy</button>
+  <div class="code-snippet">
+<P>I have two input data sets: <BR>
+- a set of expressions used in the derivation of the DERIVATION_NAME_HERE. Each expression has a unique label.<BR>
+- a set of expressions in a database for physics derivations. Each expression has a unique ID number.
+
+<P>The task is to create two JSON files: one for matches where expressions are in both input JSON files, and another JSON file for expressions in the DERIVATION_NAME_HERE derivation that are not in the physics derivations database. All expressions in the DERIVATION_NAME_HERE derivation should end up in one of the two JSON output files.
+
+<P>For the JSON that captures the matches (`matches.json`), for each matching expression indicate<BR>
+  - label for Latex expression from derivation<BR>
+  - Latex expression from derivation<BR>
   - Latex expression from database<BR>
-  - database's id number for the expression<BR>
+  - database's ID number for the expression<BR>
   - comments about the reason for the expected similarity<BR>
   - degree of confidence
 
-  <P>The output should comply with this schema:
+  <P>The `matches.json` should comply with this schema:
   <pre>
 ```
   {
@@ -678,7 +901,21 @@ print("JSON is valid!")
 }
 ```
   </pre>
+
+<P>For the JSON that captures the missing expressions (`missing.json`), for each expression indicate<BR>
+  - latex for the expression<BR>
+  - label of the equation
+
+  <P>The `missing.json` should comply with this schema:
+  <pre>
+```
+```
+</pre>
+</div>
+</div>
   </fieldset>
+
+  <!--
 <P>Maybe try combining these two into a single prompt?
 <fieldset>
   <legend>Prompt for comparison of expr with PDG: missing</legend>
@@ -688,7 +925,7 @@ print("JSON is valid!")
   - latex for the expression<BR>
   - label 
 </fieldset>
-
+-->
   <P>Output is <code>expressions.json</code>
 
   <P>(Manually) input expressions that didn't match using web UI to generate new IDs; then re-run search for matches.
@@ -696,20 +933,41 @@ print("JSON is valid!")
   <P>TODO: associate symbol IDs with each expression 
 
 <fieldset>
-  <legend>Prompt for associating symbols with expressions</legend>
+  <legend id=""><H2>Prompt for associating symbols with expressions
+    <a href="#">#</a></H2> </legend>
+  <div class="snippet-container">
+    <button class="copy-btn">Copy</button>
+    <div class="code-snippet">
+
+    </div>
+  </div>
 </fieldset>
 
 
   <P>TODO: associate operation IDs with each expression
 
 <fieldset>
-  <legend>Prompt for associating operators with expressions</legend>
+  <legend><H2>Prompt for associating operators with expressions
+    <a href="#">#</a></H2> </legend>
+  <div class="snippet-container">
+    <button class="copy-btn">Copy</button>
+    <div class="code-snippet">
+
+    </div>
+  </div>
 </fieldset>
 
   <P>TODO: for each expression rewrite SymPy using PDG IDs
 
 <fieldset>
-  <legend>Prompt for rewriting expression SymPy using PDG IDs</legend>
+  <legend><H2>Prompt for rewriting expression SymPy using PDG IDs
+    <a href="#">#</a></H2> </legend>
+  <div class="snippet-container">
+    <button class="copy-btn">Copy</button>
+    <div class="code-snippet">
+
+    </div>
+  </div>
 </fieldset>
 
 
@@ -730,7 +988,13 @@ print("JSON is valid!")
 -->
 
 <fieldset>
-	<legend>Prompt for <code>steps.json</code></legend>
+	<legend id="create steps JSON"><H2>Prompt for <code>steps.json</code></H2> 
+   (<a href="#create steps JSON">#</a>)</legend>
+
+  <div class="snippet-container">
+    <button class="copy-btn">Copy</button>
+    <div class="code-snippet">
+
 
   <P>Create JSON describing each step in the derivation. Specify<BR>
   - input expression(s),<BR>
@@ -784,7 +1048,10 @@ print("JSON is valid!")
   }
 }
 ```
-  </pre>
+</pre>
+  </div>
+</div>
+
 </fieldset>
 
 <P>Output: <code>steps.json</code>
