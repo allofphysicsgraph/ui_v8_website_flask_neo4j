@@ -589,21 +589,21 @@ def api_list_operation_symbols():
         resource["_links"] = {
             "self": {
                 "href": url_for(
-                    ".api_operation_metadata", symbol_id=item_id, _external=True
+                    ".api_operation_metadata", operation_id=item_id, _external=True
                 ),
                 "title": "Get operation metadata",
                 "type": "GET",
             },
             "edit": {
                 "href": url_for(
-                    ".api_edit_operation", symbol_id=item_id, _external=True
+                    ".api_edit_operation", operation_id=item_id, _external=True
                 ),
                 "title": "Edit this operation",
                 "method": "POST",
             },
             "delete": {
                 "href": url_for(
-                    ".api_delete_operation", symbol_id=item_id, _external=True
+                    ".api_delete_operation", operation_id=item_id, _external=True
                 ),
                 "title": "Delete operation",
                 "method": "DELETE",
@@ -675,21 +675,21 @@ def api_list_relation_symbols():
         resource["_links"] = {
             "self": {
                 "href": url_for(
-                    ".api_relation_metadata", symbol_id=item_id, _external=True
+                    ".api_relation_metadata", relation_id=item_id, _external=True
                 ),
                 "title": "Get relation metadata",
                 "type": "GET",
             },
             "edit": {
                 "href": url_for(
-                    ".api_edit_relation", symbol_id=item_id, _external=True
+                    ".api_edit_relation", relation_id=item_id, _external=True
                 ),
                 "title": "Edit this relation",
                 "method": "POST",
             },
             "delete": {
                 "href": url_for(
-                    ".api_delete_relation", symbol_id=item_id, _external=True
+                    ".api_delete_relation", relation_id=item_id, _external=True
                 ),
                 "title": "Delete relation",
                 "method": "DELETE",
@@ -1953,14 +1953,16 @@ def api_edit_matrix(symbol_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/symbol/operation/<string:symbol_id>/edit", methods=["POST"]
+    "/v1/resources/symbol/operation/<string:operation_id>/edit", methods=["POST"]
 )
-def api_edit_operation(symbol_id: str):
+def api_edit_operation(operation_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
-@api_bp.route("/v1/resources/symbol/relation/<string:symbol_id>/edit", methods=["POST"])
-def api_edit_relation(symbol_id: str):
+@api_bp.route(
+    "/v1/resources/symbol/relation/<string:relation_id>/edit", methods=["POST"]
+)
+def api_edit_relation(relation_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
@@ -2006,7 +2008,7 @@ def api_derivation_metadata(derivation_id: str):
 @api_bp.route(
     "/v1/resources/inference_rule/<string:infrule_id>/metadata", methods=["GET"]
 )
-def api_inference_rule_metadata(expression_id: str):
+def api_inference_rule_metadata(infrule_id: str):
     """
     What can be done:
     - get: read current
@@ -2375,16 +2377,16 @@ def api_delete_matrix(symbol_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/symbol/operation/<string:symbol_id>/delete", methods=["DELETE"]
+    "/v1/resources/symbol/operation/<string:operation_id>/delete", methods=["DELETE"]
 )
-def api_delete_operation(symbol_id: str):
+def api_delete_operation(operation_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
 @api_bp.route(
-    "/v1/resources/symbol/relation/<string:symbol_id>/delete", methods=["DELETE"]
+    "/v1/resources/symbol/relation/<string:relation_id>/delete", methods=["DELETE"]
 )
-def api_delete_relation(symbol_id: str):
+def api_delete_relation(relation_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
