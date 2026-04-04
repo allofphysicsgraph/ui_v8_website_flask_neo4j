@@ -1,0 +1,52 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
+<P>First published 2026-03-14</P>
+
+<P>Currently content is entered into the database and there's attribution (authorship) but no mechanism for review. 
+
+<P>Review is necessary because the correlation between Latex and SymPy is manual. The following is brainstorming and hasn't been enacted.
+
+<P>The review process would be randomized to present a similarity question. For example, a latex expression and a Sympy expression. Another example would be a latex expression and a symbol. The user then provides a vote as to whether these are likely matched or mismatched.
+
+<P>Because the node content of expressions and symbols is mutable and not versioned, the "this has been reviewed" needs to indicate what specifically was reviewed. An expression node has properties
+<UL>
+  <LI>latex_lhs
+  <LI>relation
+  <LI>latex_rhs
+  <LI>sympy_lhs
+  <LI>sympy_rhs
+  <LI>author
+  <LI>date
+  <LI>ID
+</UL>
+<P>For reviews of expressions, a new node is needed: ":a_node:review" with properties
+<UL>
+  <LI>reviewer_name
+  <LI>date
+  <LI>attestation that latex_lhs is same as sympy_lhs
+  <LI>attestation that latex_rhs is same as sympy_rhs
+  <LI>ID  	
+</UL>
+
+<P>If the latex or sympy of an expression is edited then the associated attestations should be deleted.
+
+<P>Symbols, Relations, and Operations nodes have
+<UL>
+  <LI>latex
+  <LI>author
+  <LI>date
+  <LI>ID
+</UL>
+<P>and are connected to expression nodes by "IS_COMPRISED_OF". The attestation would be a property of the edge.
+<UL>
+  <LI>attestation that (latex_lhs or latex_rhs) does contain symbol_latex
+  <LI>author
+  <LI>date
+</UL>
+
+<P>If the latex of a symbol/relation/operation is edited then the associated attestations should be deleted
+
+{% endblock %}
