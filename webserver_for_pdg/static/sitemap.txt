@@ -1,3 +1,4 @@
+https://www.allofphysics.com/
 https://allofphysics.com/
 https://allofphysics.com/api_display_png
 https://allofphysics.com/api_json_to_console
