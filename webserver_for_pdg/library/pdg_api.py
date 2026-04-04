@@ -150,8 +150,7 @@ api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 #     return jsonify({"csrf token": csrf_token})
 
 
-@api_bp.route("/v1", methods=["GET"])
-@api_bp.route("/v1/", methods=["GET"])
+@api_bp.route("/", methods=["GET"])
 def api_start_here():
     """
     Entry point for the API using HATEOAS (HAL format).
@@ -255,7 +254,7 @@ def api_start_here():
     return response
 
 
-@api_bp.route("/v1/resources/derivations", methods=["GET"])
+@api_bp.route("/resources/derivations", methods=["GET"])
 def api_list_derivations():
     """
     curl --silent --insecure https://localhost/api/v1/resources/derivation/list | python3 -m json.tool
@@ -360,7 +359,7 @@ def api_list_derivations():
     return response
 
 
-@api_bp.route("/v1/resources/inference_rules", methods=["GET"])
+@api_bp.route("/resources/inference_rules", methods=["GET"])
 def api_list_inference_rules():
     """
     curl --silent --insecure https://localhost/api/v1/resources/inference_rule/list | python3 -m json.tool
@@ -449,7 +448,7 @@ def api_list_inference_rules():
     return response
 
 
-@api_bp.route("/v1/resources/expressions", methods=["GET"])
+@api_bp.route("/resources/expressions", methods=["GET"])
 def api_list_expressions():
     """
     curl --silent --insecure https://localhost/api/v1/resources/expressions | python3 -c "
@@ -544,7 +543,7 @@ def api_list_expressions():
     return response
 
 
-@api_bp.route("/v1/resources/symbol/operations", methods=["GET"])
+@api_bp.route("/resources/symbol/operations", methods=["GET"])
 def api_list_operation_symbols():
     """
     curl --silent --insecure https://localhost/api/v1/resources/operation/list | python3 -m json.tool
@@ -641,7 +640,7 @@ def api_list_operation_symbols():
     return response
 
 
-@api_bp.route("/v1/resources/symbol/relations", methods=["GET"])
+@api_bp.route("/resources/symbol/relations", methods=["GET"])
 def api_list_relation_symbols():
     """
     curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/list | python3 -m json.tool
@@ -727,7 +726,7 @@ def api_list_relation_symbols():
     return response
 
 
-@api_bp.route("/v1/resources/symbol/scalars", methods=["GET"])
+@api_bp.route("/resources/symbol/scalars", methods=["GET"])
 def api_list_scalar_symbols():
     """
 
@@ -821,7 +820,7 @@ def api_list_scalar_symbols():
     return response
 
 
-@api_bp.route("/v1/resources/symbol/vectors", methods=["GET"])
+@api_bp.route("/resources/symbol/vectors", methods=["GET"])
 def api_list_vector_symbols():
     """
     curl --silent --insecure https://localhost/api/v1/resources/vector/list | python3 -m json.tool
@@ -914,7 +913,7 @@ def api_list_vector_symbols():
     return response
 
 
-@api_bp.route("/v1/resources/symbol/matrices", methods=["GET"])
+@api_bp.route("/resources/symbol/matrices", methods=["GET"])
 def api_list_matrix_symbols():
     """
     curl --silent --insecure https://localhost/api/v1/resources/matrix/list | python3 -m json.tool
@@ -1007,7 +1006,7 @@ def api_list_matrix_symbols():
     return response
 
 
-@api_bp.route("/v1/resources/derivation", methods=["POST"])
+@api_bp.route("/resources/derivation", methods=["POST"])
 def api_create_derivation():
     """
     required inputs:
@@ -1141,7 +1140,7 @@ def api_create_derivation():
     )
 
 
-@api_bp.route("/v1/resources/inference_rule", methods=["POST"])
+@api_bp.route("/resources/inference_rule", methods=["POST"])
 def api_create_inference_rule():
     """
     curl --silent --insecure https://localhost/api/v1/resources/inference_rule/create
@@ -1176,7 +1175,7 @@ def api_create_inference_rule():
     )
 
 
-@api_bp.route("/v1/resources/expression", methods=["POST"])
+@api_bp.route("/resources/expression", methods=["POST"])
 def api_create_expression():
     """
 
@@ -1369,7 +1368,7 @@ def api_create_expression():
     )
 
 
-@api_bp.route("/v1/resources/symbol/scalar", methods=["POST"])
+@api_bp.route("/resources/symbol/scalar", methods=["POST"])
 def api_create_scalar_symbol():
     """
 
@@ -1676,7 +1675,7 @@ def api_create_scalar_symbol():
     )
 
 
-@api_bp.route("/v1/resources/symbol/vector", methods=["POST"])
+@api_bp.route("/resources/symbol/vector", methods=["POST"])
 def api_create_vector_symbol():
     """
     curl --silent --insecure https://localhost/api/v1/resources/symbol/vector/create
@@ -1692,7 +1691,7 @@ def api_create_vector_symbol():
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route("/v1/resources/symbol/matrix", methods=["POST"])
+@api_bp.route("/resources/symbol/matrix", methods=["POST"])
 def api_create_matrix_symbol():
     """
     curl --silent --insecure https://localhost/api/v1/resources/symbol/matrix/create
@@ -1708,7 +1707,7 @@ def api_create_matrix_symbol():
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route("/v1/resources/symbol/operation", methods=["POST"])
+@api_bp.route("/resources/symbol/operation", methods=["POST"])
 def api_create_operation_symbol():
     """
     curl --silent --insecure https://localhost/api/v1/resources/symbol/operation/create
@@ -1824,7 +1823,7 @@ def api_create_operation_symbol():
     )
 
 
-@api_bp.route("/v1/resources/symbol/relation", methods=["POST"])
+@api_bp.route("/resources/symbol/relation", methods=["POST"])
 def api_create_relation_symbol():
     """
     curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/create
@@ -1922,52 +1921,52 @@ def api_create_relation_symbol():
     )
 
 
-@api_bp.route("/v1/resources/derivation/<string:derivation_id>/edit", methods=["POST"])
+@api_bp.route("/resources/derivation/<string:derivation_id>/edit", methods=["POST"])
 def api_edit_derivation(derivation_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
-@api_bp.route("/v1/resources/inference_rule/<string:infrule_id>/edit", methods=["POST"])
+@api_bp.route("/resources/inference_rule/<string:infrule_id>/edit", methods=["POST"])
 def api_edit_inference_rule(infrule_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
-@api_bp.route("/v1/resources/expression/<string:expression_id>/edit", methods=["POST"])
+@api_bp.route("/resources/expression/<string:expression_id>/edit", methods=["POST"])
 def api_edit_expression(expression_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
-@api_bp.route("/v1/resources/symbol/scalar/<string:symbol_id>/edit", methods=["POST"])
+@api_bp.route("/resources/symbol/scalar/<string:symbol_id>/edit", methods=["POST"])
 def api_edit_scalar(symbol_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
-@api_bp.route("/v1/resources/symbol/vector/<string:symbol_id>/edit", methods=["POST"])
+@api_bp.route("/resources/symbol/vector/<string:symbol_id>/edit", methods=["POST"])
 def api_edit_vector(symbol_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
-@api_bp.route("/v1/resources/symbol/matrix/<string:symbol_id>/edit", methods=["POST"])
+@api_bp.route("/resources/symbol/matrix/<string:symbol_id>/edit", methods=["POST"])
 def api_edit_matrix(symbol_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
 @api_bp.route(
-    "/v1/resources/symbol/operation/<string:operation_id>/edit", methods=["POST"]
+    "/resources/symbol/operation/<string:operation_id>/edit", methods=["POST"]
 )
 def api_edit_operation(operation_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
 @api_bp.route(
-    "/v1/resources/symbol/relation/<string:relation_id>/edit", methods=["POST"]
+    "/resources/symbol/relation/<string:relation_id>/edit", methods=["POST"]
 )
 def api_edit_relation(relation_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
 @api_bp.route(
-    "/v1/resources/derivation/<string:derivation_id>/metadata", methods=["GET"]
+    "/resources/derivation/<string:derivation_id>/metadata", methods=["GET"]
 )
 def api_derivation_metadata(derivation_id: str):
     """
@@ -2006,7 +2005,7 @@ def api_derivation_metadata(derivation_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/inference_rule/<string:infrule_id>/metadata", methods=["GET"]
+    "/resources/inference_rule/<string:infrule_id>/metadata", methods=["GET"]
 )
 def api_inference_rule_metadata(infrule_id: str):
     """
@@ -2024,7 +2023,7 @@ def api_inference_rule_metadata(infrule_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/expression/<string:expression_id>/metadata", methods=["GET"]
+    "/resources/expression/<string:expression_id>/metadata", methods=["GET"]
 )
 def api_expression_metadata(expression_id: str):
     """
@@ -2042,7 +2041,7 @@ def api_expression_metadata(expression_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/symbol/scalar/<string:symbol_id>/metadata", methods=["GET"]
+    "/resources/symbol/scalar/<string:symbol_id>/metadata", methods=["GET"]
 )
 def api_scalar_metadata(symbol_id: str):
     """
@@ -2060,7 +2059,7 @@ def api_scalar_metadata(symbol_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/symbol/vector/<string:symbol_id>/metadata", methods=["GET"]
+    "/resources/symbol/vector/<string:symbol_id>/metadata", methods=["GET"]
 )
 def api_vector_metadata(symbol_id: str):
     """
@@ -2078,7 +2077,7 @@ def api_vector_metadata(symbol_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/symbol/matrix/<string:symbol_id>/metadata", methods=["GET"]
+    "/resources/symbol/matrix/<string:symbol_id>/metadata", methods=["GET"]
 )
 def api_matrix_metadata(symbol_id: str):
     """
@@ -2096,7 +2095,7 @@ def api_matrix_metadata(symbol_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/symbol/operation/<string:operation_id>/metadata", methods=["GET"]
+    "/resources/symbol/operation/<string:operation_id>/metadata", methods=["GET"]
 )
 def api_operation_metadata(operation_id: str):
     """
@@ -2180,7 +2179,7 @@ def api_operation_metadata(operation_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/symbol/relation/<string:relation_id>/metadata", methods=["GET"]
+    "/resources/symbol/relation/<string:relation_id>/metadata", methods=["GET"]
 )
 def api_relation_metadata(relation_id: str):
     """
@@ -2201,7 +2200,7 @@ def api_relation_metadata(relation_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route("/v1/resources/derivation/<string:derivation_id>/steps", methods=["GET"])
+@api_bp.route("/resources/derivation/<string:derivation_id>/steps", methods=["GET"])
 def api_derivation_steps(derivation_id: str):
     """
     curl --silent --insecure https://localhost/api/v1/resources/derivation/3445848/step/list | python3 -m json.tool
@@ -2241,7 +2240,7 @@ def api_derivation_steps(derivation_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/derivation/<string:derivation_id>/delete", methods=["DELETE"]
+    "/resources/derivation/<string:derivation_id>/delete", methods=["DELETE"]
 )
 def api_delete_derivation(derivation_id: str):
     """
@@ -2336,7 +2335,7 @@ def api_delete_derivation(derivation_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/inference_rule/<string:infrule_id>/delete", methods=["DELETE"]
+    "/resources/inference_rule/<string:infrule_id>/delete", methods=["DELETE"]
 )
 def api_delete_inference_rule(infrule_id: str):
     """
@@ -2346,7 +2345,7 @@ def api_delete_inference_rule(infrule_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/expression/<string:expression_id>/delete", methods=["DELETE"]
+    "/resources/expression/<string:expression_id>/delete", methods=["DELETE"]
 )
 def api_delete_expression(expression_id: str):
     """
@@ -2356,35 +2355,35 @@ def api_delete_expression(expression_id: str):
 
 
 @api_bp.route(
-    "/v1/resources/symbol/scalar/<string:symbol_id>/delete", methods=["DELETE"]
+    "/resources/symbol/scalar/<string:symbol_id>/delete", methods=["DELETE"]
 )
 def api_delete_scalar(symbol_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
 @api_bp.route(
-    "/v1/resources/symbol/vector/<string:symbol_id>/delete", methods=["DELETE"]
+    "/resources/symbol/vector/<string:symbol_id>/delete", methods=["DELETE"]
 )
 def api_delete_vector(symbol_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
 @api_bp.route(
-    "/v1/resources/symbol/matrix/<string:symbol_id>/delete", methods=["DELETE"]
+    "/resources/symbol/matrix/<string:symbol_id>/delete", methods=["DELETE"]
 )
 def api_delete_matrix(symbol_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
 @api_bp.route(
-    "/v1/resources/symbol/operation/<string:operation_id>/delete", methods=["DELETE"]
+    "/resources/symbol/operation/<string:operation_id>/delete", methods=["DELETE"]
 )
 def api_delete_operation(operation_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
 @api_bp.route(
-    "/v1/resources/symbol/relation/<string:relation_id>/delete", methods=["DELETE"]
+    "/resources/symbol/relation/<string:relation_id>/delete", methods=["DELETE"]
 )
 def api_delete_relation(relation_id: str):
     return jsonify({"STATUS": "TODO"})
