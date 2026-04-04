@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Mathematical Operators List",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["latex", "name", "number_of_arguments", "labels"],
+    "properties": {
+      "latex": {
+        "description": "The LaTeX representation of the operator. Can be null for implicit operations.",
+        "type": ["string", "null"]
+      },
+      "name": {
+        "description": "The human-readable name of the operation.",
+        "type": "string"
+      },
+      "number_of_arguments": {
+        "description": "The number of arguments the operator takes.",
+        "type": "integer",
+        "minimum": 0
+      },
+      "labels": {
+        "description": "A list of equation identifiers where this operator is used.",
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "additionalProperties": false
+  }
+}

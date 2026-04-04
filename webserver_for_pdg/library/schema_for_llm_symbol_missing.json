@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Missing Physics Symbols Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "symbol_latex",
+      "description",
+      "comments"
+    ],
+    "properties": {
+      "symbol_latex": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The LaTeX representation of the symbol used in the derivation."
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "description": "A description of what the symbol represents in the derivation."
+      },
+      "comments": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Notes regarding nearby symbols in the database or why a match was omitted."
+      }
+    }
+  }
+}

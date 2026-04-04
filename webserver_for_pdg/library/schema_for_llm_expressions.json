@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EquationSet",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "LHS",
+      "relation",
+      "RHS",
+      "condition",
+      "label",
+      "sympy_LHS",
+      "sympy_RHS"
+    ],
+    "properties": {
+      "LHS": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The Left Hand Side of the equation in LaTeX."
+      },
+      "relation": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The mathematical operator connecting LHS and RHS (usually '=')."
+      },
+      "RHS": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The Right Hand Side of the equation in LaTeX."
+      },
+      "condition": {
+        "type": ["string", "null"],
+        "description": "Specific constraints or values (e.g., t=0) under which the equation holds."
+      },
+      "label": {
+        "type": "string", 
+        "minLength": 1,
+        "description": "A unique identifier or name for the physics/math law."
+      },
+      "sympy_LHS": {
+        "type": "string",
+        "minLength": 1,
+        "description": "SymPy-compatible string representation of the LHS."
+      },
+      "sympy_RHS": {
+        "type": "string",
+        "minLength": 1,
+        "description": "SymPy-compatible string representation of the RHS."
+      }
+    },
+    "additionalProperties": false
+  }
+}

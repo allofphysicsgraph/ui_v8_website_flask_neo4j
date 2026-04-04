@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Physics operation Matches Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "operation_latex",
+      "db_id",
+      "description",
+      "explanation",
+      "confidence"
+    ],
+    "properties": {
+      "operation_latex": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The LaTeX representation of the operation from the derivation."
+      },
+      "db_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$",
+        "minLength": 8,
+        "description": "The unique numerical ID from the physics database."
+      },
+      "equation_labels": {
+        "type": "array",
+        "description": "equations in the derivation that use the operation"
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "description": "A description of the operation's role in the derivation."
+      },
+      "explanation": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Justification for why this derivation operation matches the database entry."
+      },
+      "confidence": {
+        "type": "string",
+        "enum": ["high", "medium", "low"],
+        "description": "The certainty level of the match."
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Mathematical Derivation Steps",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "step",
+      "input_expressions",
+      "output_expressions",
+      "transform_relation"
+    ],
+    "properties": {
+      "step": {
+        "type": "integer",
+        "description": "The sequential number of the derivation step.",
+        "minimum": 1
+      },
+      "input_expressions": {
+        "type": "array",
+        "description": "A list of prerequisite expressions or labels used in this step.",
+        "items": {
+          "type": "string"
+        }
+      },
+      "output_expressions": {
+        "type": "array",
+        "description": "A list of expressions resulting from this step, often including a label.",
+        "items": {
+          "type": "string"
+        }
+      },
+      "transform_relation": {
+        "type": "string",
+        "minLength": 1,
+        "description": "A description of the mathematical operation or logical transformation performed."
+      }
+    }
+  }
+}

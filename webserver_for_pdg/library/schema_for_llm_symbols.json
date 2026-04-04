@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Physics Symbol Definition Set",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "variable",
+      "description",
+      "references",
+      "category_type",
+      "scalar_type",
+      "value_type",
+      "sign_type",
+      "dimensionality"
+    ],
+    "properties": {
+      "variable": {
+        "type": "string",
+        "description": "The LaTeX representation of the physical variable."
+      },
+      "description": {
+        "type": "string",
+        "description": "A human-readable explanation of the variable."
+      },
+      "references": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "List of internal IDs or equation slugs where this variable is used."
+      },
+      "category_type": {
+        "type": "string",
+        "enum": ["scalar", "vector", "tensor"],
+        "description": "The mathematical nature of the quantity."
+      },
+      "scalar_type": {
+        "type": "string",
+        "enum": ["variable", "constant"],
+        "description": "Whether the value changes within the system context."
+      },
+      "value_type": {
+        "type": "string",
+        "enum": ["real", "complex", "integer"],
+        "description": "the numerical set the value belongs to."
+      },
+      "sign_type": {
+        "type": "string",
+        "enum": ["any", "positive", "negative", "non-negative", "non-positive"],
+        "description": "The physical constraints on the sign of the value."
+      },
+      "dimensionality": {
+        "type": "object",
+        "description": "The SI base dimensions exponents.",
+        "additionalProperties": false,
+        "required": [
+          "mass",
+          "time",
+          "length",
+          "temperature",
+          "electric_charge",
+          "amount_of_substance",
+          "luminous_intensity"
+        ],
+        "properties": {
+          "mass": { "type": "integer" },
+          "time": { "type": "integer" },
+          "length": { "type": "integer" },
+          "temperature": { "type": "integer" },
+          "electric_charge": { "type": "integer" },
+          "amount_of_substance": { "type": "integer" },
+          "luminous_intensity": { "type": "integer" }
+        }
+      }
+    }
+  }
+}
