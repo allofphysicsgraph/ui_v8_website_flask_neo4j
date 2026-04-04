@@ -3,6 +3,8 @@
 {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
 <H1>{{ title }}</H1>
 
+<P>First published 2026-0</P>
+
 
 
 
