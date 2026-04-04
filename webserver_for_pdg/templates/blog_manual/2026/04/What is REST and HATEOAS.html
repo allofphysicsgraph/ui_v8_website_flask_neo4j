@@ -1,0 +1,111 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
+<P>First published 2026-0</P>
+
+<H2>REST</H2>
+
+<P>The following is from <a href="http://www.theapiblog.com/2014/12/restful-api-design.html">http://www.theapiblog.com/2014/12/restful-api-design.html</a>:
+
+<blockquote>
+<P>The genesis of REST can be found in Roy Fielding's <a href="https://roy.gbiv.com/pubs/dissertation/fielding_dissertation.pdf">thesis</a>. 
+
+<P>RESTful API Design involves breaking the system into resources, and providing access to those resources through endpoints (also called operations) defined on the web service's base URIs. Access is uses standard HTTP Methods controlled by an <code>auth</code> mechanism. Configuration for the resource is provided and obtained through <code>request</code> and <code>response</code> with HTTP status codes communicating the status. 
+
+<P><em>Resources</em> are the entities that exist in the system being made RESTful. For instance, in case of a blogging website, these can be the blogs, posts and comments.For an online shopping portal, the resources are customers, products and orders. 
+
+<P><em>EndPoints</em> (or operations) provide a mechanism through which these resources can be accessed. For instance, the endpoint to list all the blog posts on a particular blog would be a GET on /blogs/{blogId}/posts. To create a new order in the shopping portal, one would do a POST on /orders endpoint. 
+
+<P><em>Base URIs</em> define the web uri location where the resources are available through the endpoints. To take a real example, for Google blogger the base_uri is https://www.googleapis.com/blogger/v3. To perform operations on resources, simply append the endpoint to the base_uri. 
+
+<P><em>HTTP Methods</em> are where the simplicity of REST lies. In RESTful API design, operations on resources are  done through the standard HTTP methods, primarily GET, POST, PUT and DELETE . Other HTTP methods - OPTIONS, HEAD, PATCH are also used in some cases. 
+
+<P><em>Auth</em> collectively represents both authentication (identifying yourself to the system) and authorization (level of access based on your identity). There are multiple auth mechanisms that REST APIs use.  For instance, below we are requesting for an OAuth access token which allows an admin to view details of a user in her account. 
+
+<P><em>Request and Response</em> are same as in standard client-server communication. Request, provides a way to specify details for creating/updating a resource or filters for getting to a specific resource. Response in turn returns the specific resource id or it's details. Most systems use JSON format for the request body and response though one can also use XML. 
+
+<P><em>HTTP Status codes</em> are returned with the response to convey back the status of your request. Some common ones are : 200 - Success, 201 - Created, 400 - Bad Request, 401 - Unauthorized,  404 - Not Found and 500 - Internal Server Error
+</blockquote>
+
+<P>There are various levels of implementation; see <a href="https://martinfowler.com/articles/richardsonMaturityModel.html">https://martinfowler.com/articles/richardsonMaturityModel.html</a>. The purpose of the 3 levels is summarized as
+<blockquote>
+	<UL>
+		<LI>Level 1 tackles the question of handling complexity by using divide and conquer, breaking a large service endpoint down into multiple resources.
+		<LI>Level 2 introduces a standard set of verbs so that we handle similar situations in the same way, removing unnecessary variation.
+		<LI>Level 3 introduces discoverability, providing a way of making a protocol more self-documenting.
+	</UL>
+</blockquote>
+
+<P>Most APIs are enacted at Level 2. 
+
+<blockquote><a href="https://en.wikipedia.org/wiki/HATEOAS">HATEOAS</a> (level 3) adds discovery to APIs and provide links to the next steps. As a comparison, a typical (non-HATEOAS) REST API for listing the items of an order would just return ids of the items. A HATEOAS based API in the same case would provide additionally links in the response to cancel an item or to provide a review rating on it. HATEOAS based APIs can be self-documenting/discovering and are workflow-oriented.</blockquote>
+<a href="https://www.quora.com/Why-dont-any-of-the-big-tech-companies-like-Facebook-Google-Github-use-HATEOAS-on-their-RESTful-APIs">source</a>
+
+<P>At level 3, 
+<blockquote>"the client should only know the root URI and can browse and use the entire interface by following links if it knows all the media-types that the server uses for the representations."</blockquote>
+<a href="https://medium.com/@andreasreiser94/why-hateoas-is-useless-and-what-that-means-for-rest-a65194471bc8">source</a>
+
+<P>See also <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">Fielding's blog post</a> for more detail.
+
+
+<table><thead>
+  <tr>
+    <th>downsides of level 2 REST API</th>
+    <th>downsides of HATEOAS level 3 REST API</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td>API has to be versioned; API changes break hard-coded URIs</td>
+    <td>Client complexity: fully hypermedia-driven clients must interpret media types, link relations, and state transitions. That increases client-side parsing, error handling and test surface across many SDKs and languages.</td>
+  </tr>
+  <tr>
+    <td>server and client are tightly coupled. Any change to one requires adaption by the other</td>
+    <td>Including hypermedia controls increases response size and complicates caching.&nbsp;&nbsp;If a client caches a response containing links, those links might represent a state that is no longer valid by the time the client clicks them, leading to confusing "State Conflict" errors that are harder to debug than simple 404s.</td>
+  </tr>
+  <tr>
+    <td>separates API from documentation. Any change to the resource structure or available actions requires a manual update to external documentation (like Swagger/OpenAPI) and a manual notification to all client developers. Clients often rely on "out-of-band" information (knowledge gained from a PDF or website rather than the API itself), making the integration fragile to any server-side structural reorganization.</td>
+    <td>Requires client to send multiple queries to discover the relevant endpoint</td>
+  </tr>
+  <tr>
+    <td>The client must contain business logic to know when an action is valid. For example, the client needs to know: "If the order status is 'SHIPPED', I should hide the 'Cancel' button."  If the business rules change on the server, the client logic breaks or becomes obsolete.<br><br>Client must "know" the business rules (e.g., "Don't show Delete if status is Locked").</td>
+    <td>Creation of tooling or libraries around loosely-coupled interfaces is harder than incremented versions<br><br>Client developers often find it easier to hard-code well-documented URL patterns (e.g., /users/{id}) rather than writing complex logic to parse responses for "rel" links before making the next request.</td>
+  </tr>
+  <tr>
+    <td>The client doesn't know if a user has permission to perform an action until they try it and receive a "403 Forbidden" . (Level 3 can omit links the user isn't authorized to use.)</td>
+    <td>Practical use: clients don't consume REST APIs in a HATEOAS manner, even if you do add support it from the server side.</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Additional burden for server-side developer: significant logic compared to simply returning data</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>many popular development tools and client-side libraries do not provide robust, native support for hypermedia navigation. Modern frameworks (React, Vue, Angular) are often built around "Route-based" architectures. Mapping a dynamic state-machine response from a HATEOAS API to a static frontend routing system is architecturally painful and often requires a "translator" layer.</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>There is no single, globally accepted format for hypermedia links (options include HAL, JSON-LD, or Siren)</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>modern APIs are private or used by a single controlled client (like a specific mobile app). In these cases, the "looser coupling" HATEOAS provides is unnecessary because the same team controls both ends of the connection.</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Mastering HATEOAS requires a shift in mindset from "RPC-style" calls to "state machine" navigation, which many developers find daunting.</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Level 2 REST (using HTTP verbs and resources) solves the majority of practical problems for most developers, making the jump to Level 3 (HATEOAS) feel like "over-engineering".</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>While HATEOAS decouples the URL, it often tightly couples the UI to the link relation (rel). If the server changes a link relation name from "edit" to "modify", the client’s logic for finding that button still breaks.</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>The server must dynamically calculate which links are valid for the specific resource state and user permissions for every single request, which can add significant CPU overhead at high scale.</td>
+  </tr>
+</tbody></table>
