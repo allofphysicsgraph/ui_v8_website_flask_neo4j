@@ -1,6 +1,27 @@
 
 ---
 
+Schema specification for LLM inputs should be in the static folder so that it can be referenced by both the blog page and the script that checks the consistency of the JSON files
+
+---
+
+Once the expressions have been identified with PDG ID, mechanically update the latex derivation before working on steps and inference rules
+
+---
+
+Joining the symbols, operations, and expressions is mechanical, so a Python script can
+1) validate the schema of each file
+2) execute neo4j to add the data to the database
+
+---
+
+Enact a review web page where the user is presented a random similarity question. For example, a latex expression and a sympy expression. Another example would be a lot of tech expression and a symbol. The user then provides a vote as to whether these are likely matched or mismatched.
+The vote tally could then be recorded as a property for the edge
+
+added a blog post exploring this
+
+---
+
 On the page
 https://localhost/list_constant_values/0000001370
 there should be options to
