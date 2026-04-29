@@ -1,0 +1,125 @@
+<P>The website was responding slowly so I checked the dashboard and saw the CPU was saturated (200%)
+
+<pre>
+$ sudo du -xhd 1 / | sort -rh
+[sudo] password for pdg: 
+37G	/
+34G	/var
+1.8G	/usr
+1.5G	/home
+</pre>
+<P>and then
+<pre>
+var$ sudo du -xhd 1 /var | sort -rh
+34G	/var
+33G	/var/lib
+924M	/var/log
+129M	/var/cache
+</pre>
+<P>and then
+<pre>
+$ sudo du -xhd 1 /var/lib | sort -rh
+33G	/var/lib/containerd
+33G	/var/lib
+232M	/var/lib/apt
+</pre>
+<P>and then
+<pre>
+$ sudo du -xhd 1 /var/lib/containerd | sort -rh
+33G	/var/lib/containerd
+28G	/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs
+4.4G	/var/lib/containerd/io.containerd.content.v1.content
+3.0M	/var/lib/containerd/io.containerd.metadata.v1.bolt
+</pre>
+<P>Corrective action taken:
+<pre>
+$ docker system prune -a --volumes
+WARNING! This will remove:
+  - all stopped containers
+  - all networks not used by at least one container
+  - all anonymous volumes not used by at least one container
+  - all images without at least one container associated to them
+  - all build cache
+
+Are you sure you want to continue? [y/N] y
+Deleted Volumes:
+89cf68d884ad39e4d05900046d2d30a909e00d45a4008d5ebce73c8a0699b10d
+4f162f04bb892e89d82426826cadee1f2204bab62cdfd3cb161e33530f77aaf8
+...snipped...
+
+Deleted Images:
+untagged: ui_v8_flask_webserver:latest-amd64
+deleted: sha256:68046aa182c6ae743dac66c3b2d1bb797744aed39ca4edf7df3cb0c4b191c13e
+...snipped...
+
+Deleted build cache objects:
+0pofyopkr5zi6g5qacjjyhveu
+...snipped...
+
+Total reclaimed space: 17.14GB
+</pre>
+<P>so now the disk isn't full:
+<pre>
+$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           382M  1.3M  381M   1% /run
+/dev/sda1        38G   21G   16G  58% /
+tmpfs           1.9G     0  1.9G   0% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+/dev/sda15      253M  146K  252M   1% /boot/efi
+tmpfs           382M   12K  382M   1% /run/user/1000
+</pre>
+<P>Also, CPU load dropped from a consistent 200% to about 75%.
+
+<P>After recovering space, the usage is
+<pre>
+$ sudo du -xhd 1 / | sort -rh
+21G	/
+17G	/var
+1.8G	/usr
+1.5G	/home
+116M	/boot
+</pre>
+<P>and
+<pre>
+$ sudo du -xhd 1 /var | sort -rh
+17G	/var
+16G	/var/lib
+906M	/var/log
+</pre>
+<P>and
+<pre>
+$ sudo du -xhd 1 /var/lib | sort -rh
+16G	/var/lib/containerd
+16G	/var/lib
+232M	/var/lib/apt
+</pre>
+<P>and
+<pre>
+$ sudo du -xhd 1 /var/lib/containerd | sort -rh
+16G	/var/lib/containerd
+14G	/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs
+1.8G	/var/lib/containerd/io.containerd.content.v1.content
+</pre>
+
+<P>Diagnosis of the cause (from Gemini 3 Flash): If your webserver is writing logs to /var/log/nginx/access.log inside the container (rather than to a Volume), that data is stored in the overlayfs directory. Do not write large amounts of data to the container's internal filesystem. Ensure logs, uploads, and databases are mapped to volumes.
+<pre>
+$ docker system df
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          3         3         16.76GB   16.76GB (100%)
+Containers      3         3         9.841GB   0B (0%)
+Local Volumes   2         2         0B        0B
+Build Cache     0         0         0B        0B
+</pre>
+<P>I confirmed that the log files are being written to host, not the container.
+
+<P>I found that the are lots of dynamically-generated .tex and .png files:
+<pre>
+$ docker diff ec7498c95afa | grep "generated" | wc -l
+3574
+<pre>
+<P>The rest of the 7599 files are from Lean:
+<pre>
+$ docker diff ec7498c95afa | grep "elan" | wc -l
+4017
+</pre>
