@@ -17,7 +17,11 @@ Python code is formatted using Black.
 
 Development is done in Docker containers. Changes to the code should run in a Docker container. Novel architecture suggestions should run in a container.  If you can create a minimal Dockerfile and Makefile that shows what your demo does, then I can reliably recreate the demo.
 
+# Skills relevant for Contributors
 
+The Physics Derivation graph relies on a lot of different technologies: git, HTML, Javascript, Jinja2, Flask, Python, SymPy, Docker, Nginx, Lean, Neo4j. To contribute changes requires awareness of how each of these interact, in addition to having college-level familiarity with Physics and Math.
+
+# Logistics
 
 Having multiple developers working on independent (but coordinated)
 aspects would be beneficial, both because I don't have the capacity to
@@ -47,16 +51,16 @@ workflow.
 * Long-term durability of the code and website. No browser-specific hacks. Minimize reliance on version-specific features
 * Implement the code and website at a level below the maintainer's competency. 
 
-# Current Blockers
+# Current Blockers that could benefit from attention
 
-* adding new content is a tedius process even before the content is ready to enter into the database
-* the website provides a labourous process for adding content to the database
+* UI design, workflow: adding new content is a tedius process even before the content is ready to enter into the database
+* UI design, workflow: the website UI is a labourous process for adding content to the database
 * identifying which derivations are most relevant to invest in is tough
 * how to check math that SymPy doesn't support
-* domain expertise in Physics and Math is relevant, as is knowledge of Latex. 
-* The relation between the visual representation (Latex) and Computer Algebra System (Sympy) is manual and unchecked
+* high barrier to entry: domain expertise in Physics and Math is relevant, as is knowledge of Latex. 
+* design flaw: The relation between the visual representation (Latex) and Computer Algebra System (Sympy) is manual and unchecked
 * how relevant is the CAS compared to the visual representation? If a step is wrong but the derivation's outcome is correct, what's the impact?
 * irrelevance of graph visualizations for individual derivations and the complete graph and simplifications of the complete graph
-* what graph queries would be useful? Is that worth supporting?
+
 * what threshold of content is necessary for usefulness to various audiences? (Students, researchers, lay people)
 * A lot of MathJax on a webpage makes pages slower to render; https://github.com/allofphysicsgraph/proofofconcept/issues/173
