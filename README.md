@@ -1,4 +1,10 @@
-# What: making the "trivial" explicit
+In mathematical physics we use certain words that have specific meanings:
+- *Trivial*: The instructor knows the answer and assumes you should too.
+- *Obvious*: The instructor has seen the proof before, but can't remember it right now.
+- *Non-trivial*: The instructor doesn't know the answer.
+- *Left as an exercise to the reader*: The instructor doesn't know how to solve it.
+
+# What the Physics Derivation Graph project does: make the "trivial" explicit
 
 The Physics Derivation Graph provides a web server for building, managing, and exploring mathematical derivations in physics (and potentially other fields). Knowledge management software tailored for structured mathematical reasoning. The Physics Derivation Graph combines a user-friendly interface with rigorous mathematical capabilities. The intended audience includes physicists, mathematicians, and other researchers who need to create, manage, and validate derivations. For additional documentation see [https://allofphysics.com/documentation/overview](https://allofphysics.com/documentation/overview?referrer=github-allofphysicsgraph-ui_v8_website_flask_neo4j-README.md)
 
