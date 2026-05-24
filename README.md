@@ -83,7 +83,7 @@ Node labels, relationship types, and properties (the key part) are case sensitiv
 - [x] Demonstrate use of SymPy to validate dimensional consistency of expressions.
 - [x] Demonstrate use of SymPy to validate derivation steps.
 - [ ] Check a step using Lean Theorem Prover.
-
+- [ ] Validate the claim that all expressions in mathematical physics are related by a finite number of inference rules.
 
 # Licensing
 
@@ -140,6 +140,9 @@ Unless otherwise noted, all source code is covered by the [Creative Commons Attr
 The "why" for this project of documenting mathematical physics is merely intellectual curiosity. 
 There's no competition, no leaderboard, and no potential for profit. The author of this project gets to be a dilettante!
 
+# Benefits
 
+- There is educational value in explicitly identifying the inference rules and assumptions for a derivation.
+- Formalization can reduce the incidence of mistakes in derivations.
 
 #EOF
