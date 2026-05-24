@@ -7,7 +7,7 @@ In mathematical physics there a certain words that have specific meanings:
 # What the Physics Derivation Graph project does: make the "trivial" explicit
 
 The Physics Derivation Graph provides a web server for building, managing, and exploring mathematical derivations in physics (and potentially other fields). 
-The Physics Derivation Graph is an interface for knowledge management software tailored for structured mathematical reasoning. The intended audience includes physicists, mathematicians, and other researchers who need to create, manage, and validate derivations. For additional documentation see [https://allofphysics.com/documentation/overview](https://allofphysics.com/documentation/overview?referrer=github-allofphysicsgraph-ui_v8_website_flask_neo4j-README.md)
+The Physics Derivation Graph is an interface for knowledge management software tailored for structured mathematical reasoning. The intended audience includes physicists, mathematicians, and other researchers who need to create, manage, and validate derivations. For additional documentation see [https://allofphysics.com/documentation/overview](https://allofphysics.com/documentation/overview?referrer=github-allofphysicsgraph-ui_v8_website_flask_neo4j-README)
 
 The questions motivating this project are
 1) Is every expression in physics related to all other expressions in physics? 
@@ -17,8 +17,8 @@ The questions motivating this project are
 A claim to validate is that a directed graph exists which describes all of mathematical Physics.
 
 There are a couple consequences of framing mathematical physics expressions as a directed graph:
-- This graph-centric approach to expressions does not include geometric aspects of physics. Force diagrams, optics diagrams, electromagnetic diagrams are not in scope.
-- Inference rules (the things that connect expressions in the form of a derivation step) can be a subject of study.
+- This graph-centric approach to expressions does not include geometric aspects of physics. Force diagrams, optics diagrams, electromagnetic diagrams are [not in scope](https://allofphysics.com/documentation/design_choices?referrer=github-allofphysicsgraph-ui_v8_website_flask_neo4j-README#not%20in%20scope).
+- [Inference rules](https://allofphysics.com/documentation/user?referrer=github-allofphysicsgraph-ui_v8_website_flask_neo4j-README#inference%20rules) (the things that connect expressions in the form of a derivation step) can be a subject of study.
 
 One could stop the analysis at this point. Or another question might be tempting:<BR>
 3) could the analysis be done using a computer?<BR>
@@ -30,14 +30,13 @@ Once a computer is introduced, new questions arise:<BR>
 4) Can steps be checked?<BR>
 5) How formal can the check be?
 
-Machine-parsable representations of mathematical physics can be checked by Computer Algebra Systems (CAS). Steps involving an inference rule and two or more expressions could be checked using Lean Theorem Prover.
-
+Machine-parsable representations of mathematical physics can be checked by a Computer Algebra Systems (CAS). Steps involving an inference rule and two or more expressions could be checked using Lean Theorem Prover.
 
 This repo is an evolution from previous attempts to investigate the above questions. This repo contains a new web interface, new APIs, and a new backend: Neo4j property graph. The previous version that is currently used for <https://allofphysics.com/> is <https://github.com/allofphysicsgraph/ui_v7_website_flask_json>.
 
 # Status
 
-The website and back-end work. Some APIs are operational. The Docker images in this repo are used for <https://allofphysics.com/>
+The website and back-end work. Some [APIs](https://allofphysics.com/documentation/api?referrer=github-allofphysicsgraph-ui_v8_website_flask_neo4j-README) are operational. The Docker images in this repo are used for <https://allofphysics.com/>.
 
 # Quickstart
 
@@ -65,7 +64,7 @@ See <https://docs.docker.com/compose/compose-file/compose-versioning/> for compa
 
 ## Project contents
 
-Two containers managed using docker compose: Neo4j (port 7474) and a Flask-based Python web server (port 5000)
+Two containers are managed using [docker compose](https://docs.docker.com/compose/): [Neo4j](https://hub.docker.com/_/neo4j) (port 7474) and a Flask-based Python web server (port 5000).
 
 ## Neo4j for newbies
 
@@ -104,41 +103,41 @@ The content of this repo is covered by the
 # Software Requirements
 
 Software has been run on Mac and Linux. 
-* Docker
-* `git`
-* `make`
-* a web browser
+* Docker containers
+* `git` version control
+* `make` for building software
+* a web browser to view HTML pages.
 
 ## Key features
 
 The architecture is Neo4j-Flask-Gunicorn-Nginx all inside a Docker container on an Ubuntu VPS that includes UFW.
 
 The Docker images include the software needed for the webserver (Python Flask):
-* Latex for rendering equations as PNG and PDF
-* SymPy for validating steps in derivations
-* Lean
-* Graphviz for static visualization of graphs
-* d3js for interactive visualizations of graphs
+* [Latex](https://en.wikipedia.org/wiki/LaTeX) for rendering equations as PNG and PDF
+* [SymPy](https://www.sympy.org/) for validating steps in derivations
+* [Lean](https://en.wikipedia.org/wiki/Lean_(proof_assistant)) for Theorm Proving
+* [Graphviz](https://graphviz.org/) for static visualization of graphs
+* [d3js](https://d3js.org/) for interactive visualizations of graphs
 
 See VERSIONS.md for details.
 
 ## Debugging
 
 The `Makefile` contains targets that are relevant for validating modifications:
-- `make black_out`
-- `make mypy_out`
-- `make pytest_out`
+- `make black_out` checks formatting and syntax
+- `make mypy_out` check type hints
+- `make pytest_out` runs tests
 
 To enter the container for debugging purposes,
 ```bash
 docker exec -it `docker ps | grep ui_v8_website_flask_neo4j_webserver | cut -d' ' -f1` /bin/bash
 ```
 
-Stuck? Contact the author for help! (See the bottom of <https://allofphysics.com/>.)
+Stuck? Contact the author for help! (See the bottom of <https://allofphysics.com/> and the "contact" link.)
 
 ## Contributing
 
-See CONTRIBUTING.md for guidance.
+See CONTRIBUTING.md in this repo for guidance.
 
 
 # Licensing
