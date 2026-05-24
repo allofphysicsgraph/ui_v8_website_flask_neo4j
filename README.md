@@ -84,6 +84,7 @@ Node labels, relationship types, and properties (the key part) are case sensitiv
 - [x] Demonstrate use of SymPy to validate derivation steps.
 - [ ] Check a step using Lean Theorem Prover.
 - [ ] Validate the claim that all expressions in mathematical physics are related by a finite number of inference rules.
+- [ ] Determine what inference rules are necesssary to document all derivations in mathematical physics.
 
 # Licensing
 
