@@ -62,7 +62,7 @@ Two containers managed using docker compose: Neo4j (port 7474) and a Flask-based
 
 ## Neo4j for newbies
 
-A graph has "nodes" and "edges". A property graph extends that
+A graph has "nodes" and "edges". A [property graph](https://en.wikipedia.org/wiki/Property_graph) extends that
 data structure to allow "properties" for both the nodes and the edges.
 
 In general, nodes in Neo4j are described using the following jargon:
@@ -72,6 +72,8 @@ In general, nodes in Neo4j are described using the following jargon:
 ```
 
 where the key-value pairs are properties. 
+
+For examples of queries, see <https://allofphysics.com/query>
 
 Node labels, relationship types, and properties (the key part) are case sensitive. [citation](https://neo4j.com/docs/getting-started/current/appendix/graphdb-concepts/)
 
