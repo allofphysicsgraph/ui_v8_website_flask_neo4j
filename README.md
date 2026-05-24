@@ -1,6 +1,6 @@
 # What
 
-The Physics Derivation Graph provides a web server for building, managing, and exploring mathematical derivations in physics (and potentially other fields). Knowledge management software tailored for structured mathematical reasoning. The Physics Derivation Graph combines a user-friendly interface with rigorous mathematical capabilities. The intended audience includes physicists, mathematicians, and other researchers who need to create, manage, and validate derivations.
+The Physics Derivation Graph provides a web server for building, managing, and exploring mathematical derivations in physics (and potentially other fields). Knowledge management software tailored for structured mathematical reasoning. The Physics Derivation Graph combines a user-friendly interface with rigorous mathematical capabilities. The intended audience includes physicists, mathematicians, and other researchers who need to create, manage, and validate derivations. For additional documentation see [https://allofphysics.com/documentation/overview](https://allofphysics.com/documentation/overview?referrer=github-allofphysicsgraph-ui_v8_website_flask_neo4j-README.md)
 
 The questions motivating this project are
 1) Is every expression in physics related to all other expressions in physics? 
