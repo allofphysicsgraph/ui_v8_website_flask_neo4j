@@ -32,7 +32,7 @@ Once a computer is introduced, new questions arise:<BR>
 
 Machine-parsable representations of mathematical physics can be checked by a Computer Algebra Systems (CAS). Steps involving an inference rule and two or more expressions could be checked using Lean Theorem Prover.
 
-This repo is an evolution from previous attempts to investigate the above questions. This repo contains a new web interface, new APIs, and a new backend: Neo4j property graph. The previous version that is currently used for <https://allofphysics.com/> is <https://github.com/allofphysicsgraph/ui_v7_website_flask_json>.
+This repo is an evolution from previous attempts to investigate the above questions. This repo (which is  the code used for <https://allofphysics.com/>) contains a new web interface, new APIs, and a new backend: Neo4j property graph. The previous version of PDG is <https://github.com/allofphysicsgraph/ui_v7_website_flask_json>.
 
 # Status
 
