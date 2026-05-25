@@ -1958,16 +1958,12 @@ def api_edit_operation(operation_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
-@api_bp.route(
-    "/resources/symbol/relation/<string:relation_id>/edit", methods=["POST"]
-)
+@api_bp.route("/resources/symbol/relation/<string:relation_id>/edit", methods=["POST"])
 def api_edit_relation(relation_id: str):
     return jsonify({"STATUS": "Nothing here yet"})
 
 
-@api_bp.route(
-    "/resources/derivation/<string:derivation_id>/metadata", methods=["GET"]
-)
+@api_bp.route("/resources/derivation/<string:derivation_id>/metadata", methods=["GET"])
 def api_derivation_metadata(derivation_id: str):
     """
     curl --silent --insecure https://localhost/api/v1/resources/derivation/3445848/metadata | python3 -m json.tool
@@ -2004,9 +2000,7 @@ def api_derivation_metadata(derivation_id: str):
     return jsonify(derivation_dict)
 
 
-@api_bp.route(
-    "/resources/inference_rule/<string:infrule_id>/metadata", methods=["GET"]
-)
+@api_bp.route("/resources/inference_rule/<string:infrule_id>/metadata", methods=["GET"])
 def api_inference_rule_metadata(infrule_id: str):
     """
     What can be done:
@@ -2022,9 +2016,7 @@ def api_inference_rule_metadata(infrule_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route(
-    "/resources/expression/<string:expression_id>/metadata", methods=["GET"]
-)
+@api_bp.route("/resources/expression/<string:expression_id>/metadata", methods=["GET"])
 def api_expression_metadata(expression_id: str):
     """
     What can be done:
@@ -2040,9 +2032,7 @@ def api_expression_metadata(expression_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route(
-    "/resources/symbol/scalar/<string:symbol_id>/metadata", methods=["GET"]
-)
+@api_bp.route("/resources/symbol/scalar/<string:symbol_id>/metadata", methods=["GET"])
 def api_scalar_metadata(symbol_id: str):
     """
     What can be done:
@@ -2058,9 +2048,7 @@ def api_scalar_metadata(symbol_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route(
-    "/resources/symbol/vector/<string:symbol_id>/metadata", methods=["GET"]
-)
+@api_bp.route("/resources/symbol/vector/<string:symbol_id>/metadata", methods=["GET"])
 def api_vector_metadata(symbol_id: str):
     """
     What can be done:
@@ -2076,9 +2064,7 @@ def api_vector_metadata(symbol_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route(
-    "/resources/symbol/matrix/<string:symbol_id>/metadata", methods=["GET"]
-)
+@api_bp.route("/resources/symbol/matrix/<string:symbol_id>/metadata", methods=["GET"])
 def api_matrix_metadata(symbol_id: str):
     """
     What can be done:
@@ -2239,9 +2225,7 @@ def api_derivation_steps(derivation_id: str):
     return jsonify(list_of_steps)
 
 
-@api_bp.route(
-    "/resources/derivation/<string:derivation_id>/delete", methods=["DELETE"]
-)
+@api_bp.route("/resources/derivation/<string:derivation_id>/delete", methods=["DELETE"])
 def api_delete_derivation(derivation_id: str):
     """
     derivation and all steps
@@ -2344,9 +2328,7 @@ def api_delete_inference_rule(infrule_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route(
-    "/resources/expression/<string:expression_id>/delete", methods=["DELETE"]
-)
+@api_bp.route("/resources/expression/<string:expression_id>/delete", methods=["DELETE"])
 def api_delete_expression(expression_id: str):
     """
     delete expression
@@ -2354,23 +2336,17 @@ def api_delete_expression(expression_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route(
-    "/resources/symbol/scalar/<string:symbol_id>/delete", methods=["DELETE"]
-)
+@api_bp.route("/resources/symbol/scalar/<string:symbol_id>/delete", methods=["DELETE"])
 def api_delete_scalar(symbol_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route(
-    "/resources/symbol/vector/<string:symbol_id>/delete", methods=["DELETE"]
-)
+@api_bp.route("/resources/symbol/vector/<string:symbol_id>/delete", methods=["DELETE"])
 def api_delete_vector(symbol_id: str):
     return jsonify({"STATUS": "TODO"})
 
 
-@api_bp.route(
-    "/resources/symbol/matrix/<string:symbol_id>/delete", methods=["DELETE"]
-)
+@api_bp.route("/resources/symbol/matrix/<string:symbol_id>/delete", methods=["DELETE"])
 def api_delete_matrix(symbol_id: str):
     return jsonify({"STATUS": "TODO"})
 
