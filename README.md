@@ -38,7 +38,9 @@ This repo is an evolution from previous attempts to investigate the above questi
 
 The website and back-end work. Some [APIs](https://allofphysics.com/documentation/api?referrer=github-allofphysicsgraph-ui_v8_website_flask_neo4j-README) are operational. The Docker images in this repo are used for <https://allofphysics.com/>.
 
-# Quickstart
+# Quickstart to Run the Server
+
+Normal users access <https://allofphysics.com/> to view and update the Physics Derivation Graph. If you're looking to alter the back-end source code (e.g., Neo4j), front-end source code (web UI, API), or restructure the documentation, then you'll need to review those changes by running an instance of the web server locally. 
 
 Launching locally will require generating the certificates for https. See `certs/README.md`
 
