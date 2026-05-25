@@ -42,7 +42,7 @@ The website and back-end work. Some [APIs](https://allofphysics.com/documentatio
 
 Launching locally will require generating the certificates for https. See `certs/README.md`
 
-Assuming Docker is running, to start the containers use
+Assuming [Docker](https://en.wikipedia.org/wiki/Docker_(software)) is running, to start the containers use
 ```bash
 make container_build
 make launch_webserver
@@ -50,7 +50,7 @@ make launch_webserver
 and then, in a web browser, go to <http://localhost>
 
 
-Some pages require Google authentication. You can either
+Some pages require [Google authentication](https://www.google.com/account/about/sign-in-with-google/). To configure this for running your webserver locally you can either
 - edit your Google Auth Platform Clients on <https://console.cloud.google.com/>
 or 
 - remove the `@login_required` decorator in `pdg_app.py`
