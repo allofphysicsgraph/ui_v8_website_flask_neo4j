@@ -1,0 +1,66 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
+<H1>Instructor's Use of the Physics Derivation Graph</H1>
+
+<P><a href="{{ url_for('to_navigation') }}?referrer=faq">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=faq">documentation overview</a> / 
+   Instructor's Use
+
+<P>
+
+<P>
+  
+  The method of presentation varies, but the pedagogic story is often historically driven.
+  Algebra is old, calculus is newer, and topology is recent.
+  Classical mechanics is old, thermodynamics is newer, and quantum mechanics is recent.
+  When teaching, these subjects are taught by building on previous content --
+  calculus leverages algebra, thermodynamics leverages classical mechanics.
+</P>
+<P>
+  The Physics Derivation Graph can show the relevance to Physics of what math technique is being taught.
+  The focus for students in mathematics classes is on the technique, e.g.,
+  "integrate both sides with respect to \(Y\)," and application is of secondary importance.
+  Physics students are expected to know the mathematical techniques and teaching is focused on application.
+  The Physics Derivation Graph can assist both scenarios.
+  The student in a math class can see where the inference rules they learn are applied in Physics.
+  The student in the Physics class can see which inference rules are required in their field.
+</P>
+
+<P>
+For Physics teachers, the Physics Derivation Graph could address questions like
+<UL>
+  <LI>"What Physics knowledge is expected of students prior to taking this course?"</LI>
+  <LI>"What mathematical skills are expected of students prior to taking this course?"</LI>
+  <LI>"What specific mathematical skills will be used in this course?"</LI>
+  <LI>"What specific Physics knowledge will be gained in this course?"</LI>
+</UL>
+<P>For Math teachers, the Physics Derivation Graph could address questions like
+<UL>
+  <LI>"What mathematical skills are expected of students prior to taking the course I am teaching?"</LI>
+  <LI>"What mathematical skills are gained in this course?"</LI>
+</UL>
+</P>
+
+<P>See
+  <a href="https://www.physicsforums.com/threads/fundamental-rules-for-physics-mathematical-derivations.86019/">
+    Fundamental rules for physics mathematical derivations?</a>
+</P>
+
+
+<H4 id="use case:education curriculum design">Use case: Education Curriculum Design 
+   (<a href="#use case:education curriculum design">#</a>)</H4>
+<P>
+  By measuring the frequency of a specific inference rule in the Physics Derivation Graph,
+  the question "What is the relative importance of this math skill?" can be addressed.
+</P>
+<P>
+  In the Physics Derivation Graph, it is simple to count utilization of inference rules.
+  Thus, we are able to measure the ratio of how often "multiply both
+  sides by X" is used relative to "integrate both sides with respect to \(Y\)."
+</P>
+
+
+{% endblock %}

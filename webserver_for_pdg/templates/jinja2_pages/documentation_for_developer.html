@@ -3,6 +3,11 @@
 
 {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
 
+<P><a href="{{ url_for('to_navigation') }}?referrer=faq">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=faq">documentation overview</a> / 
+   Developer Documentation
+
+
 <h1>Developer Documentation for the Physics Derivation Graph</h1>
 
 <P><a href="{{ url_for('to_navigation') }}">navigation</a> / 
@@ -42,6 +47,7 @@ cat developer_documentation.html |\
     <LI><a href="#python">Python</a></LI>
     <LI><a href="#mvc">Model-view-controller in Flask</a></LI>
     <LI><a href="#containerization">Docker</a></LI>
+    <LI><a href="#Neo4j">Neo4j</a> property graph database</LI>
     <LI><a href="#web stack">Web stack</a></LI>
     <LI><a href="#software:rendering">Latex</a></LI>
     <LI><a href="#software:version control">git</a></LI>
@@ -68,7 +74,7 @@ cat developer_documentation.html |\
 <P>
   The complexity supporting a technology is proportional to the number of abstraction layers required to enable it.
 </P>
-<H3><a name="python">Python</a></H3>
+<H3 id="python">Python</H3>
 <P>
   Python as a "glue" language is leveraged to connect existing tools like \(\rm\LaTeX\), <a href="https://flask.palletsprojects.com/">Flask</a>, logging, manipulation of data.
   Also, Python is the language the project owner is most comfortable with.
@@ -79,7 +85,7 @@ cat developer_documentation.html |\
   Python libraries: matplotlib, black, mypy, pycallgraph, gunicorn, prospector, pandas, jsonschema, sympy, antlr4-python3-runtime, flask-wft, graphviz
 
 
-<H3><a name="mvc">Model-view-controller in Flask</a></H3>
+<H3 id="mvc">Model-view-controller in Flask</H3>
 <P>
   The <a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">model-view-controller</a> (MVC) is a way to separate presentation from the backend computation and data transformation.
 </P>
@@ -87,7 +93,7 @@ cat developer_documentation.html |\
   Note on using MVC with Flask and <a href="https://wtforms.readthedocs.io/">WTForms</a>: For webpages with forms, the form submission should return to controller.py rather than linking to next page.
 </p>
 
-<H3><a name="containerization">Docker</a></H3>
+<H3 id="containerization">Docker</H3>
 <P>
   Containerization provides documentation of software dependencies and shows the installation process, enabling reproducibility and platform independence.
 
@@ -98,7 +104,13 @@ cat developer_documentation.html |\
   Ubuntu provides necessary packages.
 </P>
 
-<H3><a name="web stack">Web stack</a></H3>
+<H3 id="Neo4j">Neo4j</H3>
+
+<P>Neo4j is used as a property graph database.
+
+<P>See the <a href="{{ url_for('to_comparison_of_design_options_database') }}">comparison of database options</a>.
+
+<H3 id="web stack">Web stack</H3>
 <P>
   To provide a web interface, <a href="https://flask.palletsprojects.com/">Flask</a> is used.
   HTML (with Javascript) pages are rendered using Jinja2.
@@ -109,11 +121,11 @@ cat developer_documentation.html |\
 <P>
   Why this complexity is relevant is addressed in <a href="https://serverfault.com/a/331263">this StackOverflow answer</a>.
 
-<H3><a name="software:rendering">Rendering</a></H3>
+<H3 id="software:rendering">Rendering</H3>
 
 <P>Latex, dvipng, texlive
 
-<H3><a name="software:version control">Version control</a></H3>
+<H3 id="software:version control">Version control</H3>
 <P>git, github
 
 <!--
@@ -147,7 +159,7 @@ Figure 2.
 </center>
 
 
-<H3><a name="run flask container">Run Flask container</a></H3>
+<H3 id="run flask container">Run Flask container</H3>
 <P>
   Quick start on the command line:
   <pre>
@@ -178,7 +190,7 @@ Figure 2.
   make
   </pre>
 </p>
-<H3><a name="run gunicorn container">Run gunicorn container</a></H3>
+<H3 id="run gunicorn container">Run gunicorn container</H3>
 <P>
   Quick start on the command line:
   <pre>
@@ -272,7 +284,7 @@ Figure 3. State diagram for the web interface.
   
 <img src="{{ url_for('static', filename='tutorial_sequence.png') }}">
 
-<H3><a name="Docker and Make">Initial infrastructure: Docker and Make</a></H3>
+<H3 id="Docker and Make">Initial infrastructure: Docker and Make</H3>
 
 <P>Before running any project-specific code, investing in reproducibility enables future success.<BR/>
 Docker containers make software dependencies explicit.
@@ -288,7 +300,7 @@ The <a href="{{ url_for('static', filename='from_scratch_tutorial/docker_and_mak
 </pre>
 <P>See <a href="https://github.com/allofphysicsgraph/pdg_essential_demo_docker">https://github.com/allofphysicsgraph/pdg_essential_demo_docker</a>
 
-<H3><a name="Python and Flask">Initial infrastructure: Python and Flask</a></H3>
+<H3 id="Python and Flask">Initial infrastructure: Python and Flask</H3>
 
 <P>See <a href="https://github.com/allofphysicsgraph/pdg_essential_demo_flask_website">https://github.com/allofphysicsgraph/pdg_essential_demo_flask_website</a>
 
@@ -490,6 +502,118 @@ Build Cache         0                   0                   0B                  
 </pre>
 
 <P>For an explanation of RECLAIMABLE, see <a href="https://stackoverflow.com/a/51520627/1164295">https://stackoverflow.com/a/51520627/1164295</a>
+
+
+<H2 id="roles">Roles each stakeholder can have in the Physics Derivation Graph</H2>
+
+<UL>
+<LI>Viewer: sees content on web UI, reads PDF versions. Uses either the web UI or the API. 
+<LI>Editor: adds equations, inference rules, and derivations. Uses either the web UI or the API
+<LI>Developer: uses the API to build an alternative web UI or runs a service that leverages the PDG
+<LI>Contributor: edits documentation and source code, fixes bugs. Uses github issue tracker. 
+</UL>
+<P>Actions per role:
+<ul>
+<li>Viewer</li>
+<ul>
+<li>reads documentation about PDG</li>
+<li>sees the number of derivations</li>
+<ul>
+<li>on the navigation page</li>
+</ul>
+<li>sees the number of symbols</li>
+<ul>
+<li>on the navigation page</li>
+</ul>
+<li>sees the number of inference rules</li>
+<ul>
+<li>on the navigation page</li>
+</ul>
+<li>sees the number of expressions</li>
+<ul>
+<li>on the navigation page</li>
+</ul>
+<li>sees a list of derivations</li>
+<ul>
+<li>accessed from the navigation page</li>
+</ul>
+<li>sees a list of expressions</li>
+<ul>
+<li>accessed from the navigation page</li>
+</ul>
+<li>sees a list of inference rules</li>
+<ul>
+<li>accessed from the navigation page</li>
+</ul>
+<li>sees a list of symbols</li>
+<ul>
+<li>accessed from the navigation page</li>
+</ul>
+<li>see a list of derivations that use a specific symbol</li>
+<li>see a list of derivations that use a specific inference rule</li>
+<li>see a list of derivations that use a specific expression</li>
+<li>see the steps of a specific derivation</li>
+<ul>
+<li>accessed from the list of derivations</li>
+</ul>
+</ul>
+<li>Editor has same as Viewer, plus:<br />(the following actions require being logged in)</li>
+<ul>
+<li>adds a new derivation</li>
+<ul>
+<li>accessed from the navigation page</li>
+<li>next page is create new step</li>
+</ul>
+<li>edits an existing derivation</li>
+<ul>
+<li>accessed from the list of derivations</li>
+<li>after edit is submitted, return to viewing that derivation</li>
+</ul>
+<li>deletes an derivation</li>
+<ul>
+<li>accessed from the list of derivations</li>
+<li>after delete is confirmed, return to list of derivations</li>
+</ul>
+<li>adds a new step</li>
+<ul>
+<li>return to derivation</li>
+</ul>
+<li>edits an existing step</li>
+<li>deletes a step</li>
+<ul>
+<li>return to derivation</li>
+</ul>
+<li>adds a new expression</li>
+<ul>
+<li>return to derivation step</li>
+</ul>
+<li>edits an existing expression</li>
+<ul>
+<li>change Latex</li>
+<li>change relation (e.g., = to &gt;)</li>
+<li>change label</li>
+</ul>
+<li>deletes an expression</li>
+<li>adds a new inference rule</li>
+<li>edits an existing inference rule</li>
+<ul>
+<li>change number of arguments</li>
+</ul>
+<li>deletes an inference rule. (What happens to all the instances of use in various derivations?)</li>
+<li>adds a new symbol</li>
+<li>edits an existing symbol</li>
+<ul>
+<li>change the latex</li>
+<li>change the sympy</li>
+</ul>
+<li>deletes a symbol. (What happens to all the instances of use in various expressions?)</li>
+<li>delete all database content</li>
+<ul>
+<li>return to navigation page</li>
+</ul>
+</ul>
+</ul>
+
 
 
 
