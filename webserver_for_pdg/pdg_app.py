@@ -7026,6 +7026,42 @@ def to_documentation_overview():
     )
 
 
+@web_app.route("/documentation/student", methods=["GET", "POST"])
+def to_student_documentation():
+    """
+    a static page with documentation aimed at students
+    """
+    logger.info("[TRACE] to_student_documentation ")
+    return render_template(
+        "jinja2_pages/documentation_for_student.html",
+        title="Documentation for Students",
+    )
+
+
+@web_app.route("/documentation/instructor", methods=["GET", "POST"])
+def to_instructor_documentation():
+    """
+    a static page with documentation aimed at instructors
+    """
+    logger.info("[TRACE] to_instructor_documentation ")
+    return render_template(
+        "jinja2_pages/documentation_for_instructor.html",
+        title="Documentation for instructors",
+    )
+
+
+@web_app.route("/documentation/researcher", methods=["GET", "POST"])
+def to_researcher_documentation():
+    """
+    a static page with documentation aimed at researchers
+    """
+    logger.info("[TRACE] to_researcher_documentation ")
+    return render_template(
+        "jinja2_pages/documentation_for_researcher.html",
+        title="Documentation for researchers",
+    )
+
+
 @web_app.route(
     "/user_documentation", methods=["GET", "POST"]
 )  # backwards compatibility with previous versions of the site
