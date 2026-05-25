@@ -147,7 +147,7 @@ Unless otherwise noted, all source code is covered by the [Creative Commons Attr
 # Why
 
 The "why" for this project of documenting mathematical physics is merely intellectual curiosity. 
-There's no competition, [no leaderboard](https://github.com/allofphysicsgraph/task-tracker/issues/52), and no potential for profit. The author of this project gets to be a dilettante!
+There's [no competition](https://allofphysics.com/documentation/other_projects?referrer=github-allofphysicsgraph-ui_v8_website_flask_neo4j-README), [no leaderboard](https://github.com/allofphysicsgraph/task-tracker/issues/52), and no potential for profit. The author of this project gets to be a dilettante!
 
 # Benefits
 
