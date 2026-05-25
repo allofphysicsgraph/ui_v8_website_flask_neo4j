@@ -4,7 +4,7 @@ In mathematical physics there a certain words that have specific meanings:
 - *Non-trivial*: The instructor doesn't know the answer.
 - *Left as an exercise to the reader*: The instructor doesn't know how to solve it.
 
-# What the Physics Derivation Graph project does: make the "trivial" explicit
+# The Physics Derivation Graph project makes the "trivial" explicit
 
 The Physics Derivation Graph provides a web server for building, managing, and exploring mathematical derivations in physics (and potentially other fields). 
 The Physics Derivation Graph is an interface for knowledge management software tailored for structured mathematical reasoning. The intended audience includes physicists, mathematicians, and other researchers who need to create, manage, and validate derivations. For additional documentation see [https://allofphysics.com/documentation/overview](https://allofphysics.com/documentation/overview?referrer=github-allofphysicsgraph-ui_v8_website_flask_neo4j-README)
