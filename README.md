@@ -12,7 +12,7 @@ The Physics Derivation Graph is an interface for knowledge management software t
 The questions motivating this project are
 1) Is every expression in physics related to all other expressions in physics? 
 2) Naively the expected answer is yes, but then how are expressions in physics related?
-(I'm using "expression" to include equations and inequalities.)
+(The concept of "expression" includes equations and inequalities.)
 
 A claim to validate is that a directed graph exists which describes all of mathematical Physics.
 
