@@ -42,8 +42,9 @@ The website and back-end work. Some [APIs](https://allofphysics.com/documentatio
 
 Launching locally will require generating the certificates for https. See `certs/README.md`
 
-To start the containers, run
+Assuming Docker is running, to start the containers use
 ```bash
+make container_build
 make launch_webserver
 ```
 and then, in a web browser, go to <http://localhost>
