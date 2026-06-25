@@ -1,0 +1,44 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
+<H1>Researcher's Use of the Physics Derivation Graph</H1>
+
+<P><a href="{{ url_for('to_navigation') }}?referrer=faq">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=faq">documentation overview</a> / 
+   Researcher's Use
+
+<P>use PDG for derivation in paper appendix
+
+<P>
+The Physics Derivation Graph provides a very detailed explanation of how
+complicated derivations are carried out.
+It also explicitly enumerates the assumptions necessary to perform derivations.
+Imposing these requirements on researchers would require clear and significant
+benefit to both the individual researchers and the community.
+</P>
+
+<P>
+  Peer-reviewed journal articles are one of the current methods of
+  demonstrating value in the scientific community.
+  Conciseness is a feature of this writing style, and the mathematics
+  presented is correspondingly sparse -- just sufficient to covey the
+  author's intention.
+  This results in a burden on the reader of the article, either to take
+  the author's claims on faith, or to re-derive the mathematical expressions.
+  A reader's derivation is complicated by implicit assumptions made by
+  the author and unintentional mistakes in calculation.
+</P>
+
+<P>
+  With journals allowing supplemental materials for articles,
+  calculations could be included.
+  However, it is not clear what the appropriate level of detail is in
+  supplied calculations.
+  The intention is to be able to reproduce the work, but validation via computer.
+</P>
+
+
+
+{% endblock %}

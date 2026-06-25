@@ -34,6 +34,19 @@
 </UL>
 
 <H2>Jargon, Definitions, Dictionary</H2>
+
+<P>"Inference rules", "expressions", and "feeds" are words specific to the Physics Derivation Graph.
+  Represented graphically, their relation is
+
+<img src="{{ url_for('static', filename='single_step.png') }}" width=300>
+
+<P>Read this directed graph as, "The inference rule acts on the input expression and, combined with the feed, produces the output expression." Inference rules can be considered as functions; the above picture would be
+
+<pre>
+def inference_rule(input_expression, feed):
+    return output_expression
+</pre>
+
 <div align="center">
 <table border="1" id="definitions_table" class="sortable">
   <thead>
@@ -75,21 +88,25 @@
     <td id="Expression">Expression
       <a href="#Expression">#</a></td>
     <td>An expression is comprised of a <a href="#LHS">LHS</a>, <a href="#Relation">relation</a>, <a href="#RHS">RHS</a>
+      Expressions include both equations (the relation operator is equality) and inequalities (the relation operator is an inequality).
       <br>Each expression appears only once in the Physics Derivation Graph.</td>
+<!--An expression is, by default, composed of (LHS, relation operator, RHS).-->
     <td><a href="{{ url_for('to_list_expressions') }}?referrer=convention_documentation">list of expressions</a></td>
   </tr>
   <tr>
     <td id="Feed">Feed
       <a href="#Feed">#</a></td>
-    <td>A feed may appear more than once in the Physics Derivation Graph. <br>
+    <td>An <a href="#Inference Rule">inference rule</a> may require one or more "feed" values.
+      A feed may appear more than once in the Physics Derivation Graph. <br>
     A feed does not have a <a href="#Relation">relation</a> (e.g., equality or inequality).</td>
     <td></td>
   </tr>
   <tr>
-    <td id="Inference Rule">Inference Rule
+    <td id="Inference Rule"><a href="{{ url_for('to_user_documentation') }}?referrer=index#inference rules">Inference Rule</a>
       <a href="#Inference Rule">#</a></td>
     <td>Acts on one or more <a href="#Expression">Expressions</a>. <br>
     Inference rule is the defining feature of a <a href="#Step">Step</a>.</td>
+    <!-- An inference rule relates one or more math expressions. -->
     <td><a href="{{ url_for('to_user_documentation') }}?referrer=convention_documentation#inference%20rules">Inference rules</a></td>
   </tr>
   <tr>
@@ -114,6 +131,7 @@
     <td id="Derivation">Derivation
       <a href="#Derivation">#</a></td>
     <td>A derivation is comprised of <a href="#Step">steps</a>.</td>
+    <!-- A derivation is a sequence of steps. -->
     <td><a href="{{ url_for('to_list_derivations') }}?referrer=convention_documentation">list of derivations</a></td>
   </tr>
   <tr>

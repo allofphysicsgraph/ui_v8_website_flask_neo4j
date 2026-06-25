@@ -1,0 +1,39 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
+<H1>Student's Use of the Physics Derivation Graph</H1>
+
+<P><a href="{{ url_for('to_navigation') }}?referrer=faq">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=faq">documentation overview</a> / 
+   Student's Use
+
+<P>You learn Math and Physics content using lectures, textbooks, and homework.
+
+<P>You can use the Physics Derivation Graph to figure out the relevance of what is being taught.
+	- what concepts in relativity depend on what was learned in classical mechanics? <!-- TODO: show this -->
+	- what areas of physics rely on integration and what relies on differentiation? <!-- TODO: show this -->
+
+<P>The mechanics of mathematical physics is the application of inference rules taught in math classes.
+In addition the <a href="#audience:teachers">questions relevant for instructors</a>,
+for physics students the Physics Derivation Graph could address questions like
+<UL>
+  <LI>"How much of what is known in Physics have I learned?"</LI>
+  <LI>"What else in Physics is there to learn?"</LI>
+  <LI>"What portion of Physics does the course I'm taking represent?"</LI>
+</UL>
+
+<P>Math classes essentially teach a set of inference rules.
+For math students, the Physics Derivation Graph could address questions like
+<UL>
+  <LI>"What are example applications of the techniques I am learning?"</LI>
+  <LI>"How frequently is this technique used?"</LI>
+</UL>
+</P>
+<P>See <a href="https://github.com/allofphysicsgraph/task-tracker/issues/92">https://github.com/allofphysicsgraph/task-tracker/issues/92</a>
+
+
+validate homework derivation
+
+{% endblock %}

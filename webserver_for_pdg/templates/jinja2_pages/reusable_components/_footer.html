@@ -12,8 +12,10 @@
        <a href="{{ url_for('to_documentation_overview', referrer='_footer.html') }}" data-testid="footer-doc">documentation</a> 
 
     <P>
-      <a href="https://physicsderivationgraph.blogspot.com/" data-testid="footer-blog">blog</a> |
-      <a href="{{ url_for('to_index', referrer='_footer.html') }}">website</a> |
+      <a href="{{ url_for('to_blog_list', referrer='_footer.html') }}" data-testid="footer-blog">blog</a> 
+      <!-- previously https://physicsderivationgraph.blogspot.com/ -->
+      |
+      <!--<a href="{{ url_for('to_index', referrer='_footer.html') }}">website</a> |-->
       <!--<a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/wiki">wiki</a> | --> <!-- not in use -->
       <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues">issues</a> |
       <a href="https://app.gitter.im/#/room/#allofphysicsgraph_Lobby:gitter.im">discuss on Gitter</a> or
@@ -21,7 +23,7 @@
     <!--
       <a href="https://creativecommons.org/licenses/by/4.0/">License</a> |
     -->
-      <a href="mailto:ben.is.located@gmail.com?subject=Physics Derivation Graph">Contact</a>
+      <a href="mailto:ben.is.located@gmail.com?subject=Physics Derivation Graph">Contact</a><a name="contact">
     </P>
     <P>
       <table>
