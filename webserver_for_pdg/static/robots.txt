@@ -1,5 +1,20 @@
+
+# the following were all observed by BHP 2026-07-03
+User-agent: meta-externalagent # https://developers.facebook.com/docs/sharing/webmasters/crawler
+User-agent: Amazonbot # https://developer.amazon.com/support/amazonbot
+User-agent: Baiduspider # http://www.baidu.com/search/spider.html
+User-agent: Sogou web spider # http://www.sogou.com/docs/help/webmasters.htm#07
+User-agent: Bytespider # https://zhanzhang.toutiao.com/
+User-agent: TikTokSpider # ttspider-feedback@tiktok.com
+User-agent: everyfeed-spider # http://www.everyfeed.com
+User-agent: PetalBot # https://webmaster.petalsearch.com/site/petalbot
+User-agent: SemrushBot # https://www.semrush.com/bot.html
+User-agent: Blekkobot # http://www.blekko.com/help/crawl
+Disallow: /
+
 User-agent: *
 Allow: /
 
 Sitemap: https://allofphysiscs.com/sitemap.txt
+
 
