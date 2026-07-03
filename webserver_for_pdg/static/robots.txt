@@ -1,20 +1,31 @@
 
 # the following were all observed by BHP 2026-07-03
-User-agent: meta-externalagent # https://developers.facebook.com/docs/sharing/webmasters/crawler
-User-agent: Amazonbot # https://developer.amazon.com/support/amazonbot
-User-agent: Baiduspider # http://www.baidu.com/search/spider.html
-User-agent: Sogou web spider # http://www.sogou.com/docs/help/webmasters.htm#07
-User-agent: Bytespider # https://zhanzhang.toutiao.com/
-User-agent: TikTokSpider # ttspider-feedback@tiktok.com
-User-agent: everyfeed-spider # http://www.everyfeed.com
-User-agent: PetalBot # https://webmaster.petalsearch.com/site/petalbot
-User-agent: SemrushBot # https://www.semrush.com/bot.html
-User-agent: Blekkobot # http://www.blekko.com/help/crawl
+# https://developers.facebook.com/docs/sharing/webmasters/crawler
+# https://developer.amazon.com/support/amazonbot
+# http://www.baidu.com/search/spider.html
+# http://www.sogou.com/docs/help/webmasters.htm#07
+# https://zhanzhang.toutiao.com/
+# ttspider-feedback@tiktok.com
+# http://www.everyfeed.com
+# https://webmaster.petalsearch.com/site/petalbot
+# https://www.semrush.com/bot.html
+# http://www.blekko.com/help/crawl
+
+User-agent: meta-externalagent
+User-agent: Amazonbot
+User-agent: Baiduspider
+User-agent: Sogou
+User-agent: Bytespider
+User-agent: TikTokSpider
+User-agent: everyfeed-spider
+User-agent: PetalBot
+User-agent: SemrushBot
+User-agent: Blekkobot
 Disallow: /
 
 User-agent: *
 Allow: /
 
-Sitemap: https://allofphysiscs.com/sitemap.txt
+Sitemap: https://allofphysics.com/sitemap.txt
 
 
