@@ -1,13 +1,15 @@
-# VM on Digital Ocean
+<h1 id="vm-on-digital-ocean">VM on Digital Ocean</h1>
 
-Log into digitalocean.com
+<p>Log into digitalocean.com</p>
 
-I have an existing project and no droplets, so create a new Droplet.
-- OS: Ubuntu 24.04
-- "basic" with regular SSD, $24/mo for 2 vCPU and 4GB of RAM
+<p>I have an existing project and no droplets, so create a new Droplet.</p>
+<ul>
+<li>OS: Ubuntu 24.04</li>
+<li>&quot;basic&quot; with regular SSD, $24/mo for 2 vCPU and 4GB of RAM</li>
+</ul>
 
 
-```
+<pre>
 #cloud-config
 users:
   - name: pdg
@@ -18,6 +20,20 @@ users:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA+xeB2gvQLgFUOPrsKy0j75KXvOkjIfrOfDV/eNeack bhp@Bens-Laptop.local
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCZKF2jbX/6rhYBhZN/fV4uaQXKG/oM/lNX5ZYaDEs9ZR6tFmdy08RRZ9SXKlzdBjNYqN2Sa73XmMrTK40vAm0g+QsR5reTFKpqvUDT8BCY4S6XdjiDhtoN0fu0BzSwgSlW6yHoJQdBXo+/DtBQXtkoBmjHmbg2DVFwU2xTTcolog8Np8QnYPAsBS/Ll2BHUWV/vcHagBObpbnlBSeY2IRyZW026QYo/h3GnScINHT+0ilBS+xBc0OrwPJAkbNSQ1rVv1TdkRBmuj0/DJwpe0w0TQk4jrxkAsOGWtdOlK2mCBebTFekY++WCMTgmdj1ebHIB8mij/CsjNn1GdVHXBRwOn+2+BaY7gF1w9DBirQsF5x/DHn+x4IugP/QS+4beWAjZ+/XunJhz+PJrJK1QNcZo0dBvICFdesnOmcxhQ4aT9uGLJKW9ONTDYOrm4XRSiXP/Ww2tPfyn23BVDQV6Iu2nxyfp+82QkfJIfgerDlLRcTcahiUaxYqILufe+b7xfk= ben.is.located@gmail.com
 
+write_files:
+  # Pre-create the directory and place the non-interactive configuration
+  - path: /etc/needrestart/conf.d/99-noninteractive.conf
+    owner: root:root
+    permissions: '0644'
+    content: |
+      # Set restart mode: 'a' (automatic restarts) or 'l' (list only). 
+      # 'l' is safer if you want to avoid unintended daemon restarts during setup.
+      $nrconf{restart} = 'a';
+      
+      # Disable interactive prompts for kernel/microcode upgrades
+      $nrconf{kernelhints} = -1;
+      $nrconf{ucodehints} = 0;
+
 package_upgrade: true
 
 packages:
@@ -26,6 +42,7 @@ packages:
   - ca-certificates
   - curl
   - gnupg
+  - make
   - ufw
 
 runcmd:
@@ -38,11 +55,215 @@ runcmd:
   - ufw allow 80/tcp
   - ufw --force enable
 
+  - snap install glab
+  - snap install gh --classic
+
+
+  - gh skill install cli/cli gh --scope user
+  - gh skill update gh
+
+  - echo "alias ll='ls -hal'" >> /etc/bashrc 
+  - echo "alias s='git status'" >> /etc/bashrc
+
+
   # Set up Docker repository and install Docker
   - install -m 0755 -d /etc/apt/keyrings
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
   - chmod a+r /etc/apt/keyrings/docker.gpg
   - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" |  tee /etc/apt/sources.list.d/docker.list > /dev/null
-  - apt update
-  - apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-```
+
+
+  # Running apt steps non-interactively ensures they won't stall the shell script
+  - DEBIAN_FRONTEND=noninteractive apt-get update
+  - DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  - systemctl enable --now docker 
+
+</pre>
+
+Output logs are in
+<pre>
+sudo vim /var/log/cloud-init-output.log
+<pre>
+
+<pre>
+gh auth login
+gh auth status
+<pre>
+
+<pre>
+glab auth login
+<pre>
+
+Prepare for random loss of connection
+<pre>
+screen
+<pre>
+
+<pre>
+echo "alias ll='ls -hal'"
+echo "alias s='git status'" >>
+<pre>
+
+
+
+# initial config of git
+
+
+generate a key pair and then get content of public key
+<pre>
+ssh-keygen -t ed25519 -C "ben.is.located@gmail.com"
+cat ~/.ssh/id_ed25519.pub
+<pre>
+
+In a browser visit <https://github.com/settings/keys>
+
+Once the public key is uploaded, validate access using
+<pre>
+ssh -T git@github.com
+<pre>
+which should yield
+<pre>
+Hi bhpayne! You've successfully authenticated, but GitHub does not provide shell access.
+<pre>
+
+Commits need an author name and email
+<pre>
+git config --global user.email "ben.is.located@gmail.com"
+git config --global user.name "Ben Payne's agent"
+<pre>
+
+<pre>
+git clone git@github.com:allofphysicsgraph/ui_v8_website_flask_neo4j.git
+<pre>
+
+
+# initialize Physics Derivation Graph
+
+
+
+<pre>
+make container_build
+mkdir logs
+<pre>
+
+<pre>
+cd certs
+openssl genrsa > privkey.pem
+openssl req -new -x509 -key privkey.pem -subj "/C=US/ST=WI/O=PDG/CN=Ben/emailAddress=ben.is.located@gmail.com" -out fullchain.pem
+openssl dhparam -out dhparam.pem 2048
+<pre>
+
+<pre>
+echo "UID=1000" >  /home/pdg/ui_v8_website_flask_neo4j/.env
+echo "GID=1000" >> /home/pdg/ui_v8_website_flask_neo4j/.env
+echo "GOOGLE_CLIENT_ID=AVERYLONGSTRINGFROMGOOGLE" >  /home/pdg/ui_v8_website_flask_neo4j/.env.google
+echo "GOOGLE_CLIENT_SECRET=ANOTHERVERYLONGSTRING" >> /home/pdg/ui_v8_website_flask_neo4j/.env.google
+echo "SECRET_KEY=ASECRETSTRINGFROMGOOGLEASDFASDF" >> /home/pdg/ui_v8_website_flask_neo4j/.env.google
+<pre>
+
+<pre>
+make launch_webserver COMPOSE_FLAGS=--detach
+<pre>
+
+And to end the containers use
+<pre>
+make down
+<pre>
+
+# nginx prevents docker compose
+
+<pre>
+sudo lsof -i tcp:80
+COMMAND   PID     USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+nginx   12198     root    5u  IPv4  23508      0t0  TCP *:http (LISTEN)
+nginx   12198     root    6u  IPv6  23509      0t0  TCP *:http (LISTEN)
+nginx   12201 www-data    5u  IPv4  23508      0t0  TCP *:http (LISTEN)
+nginx   12201 www-data    6u  IPv6  23509      0t0  TCP *:http (LISTEN)
+nginx   12202 www-data    5u  IPv4  23508      0t0  TCP *:http (LISTEN)
+nginx   12202 www-data    6u  IPv6  23509      0t0  TCP *:http (LISTEN)
+<pre>
+
+<pre>
+sudo systemctl disable nginx
+sudo service nginx stop
+<pre>
+
+
+
+# configure Antigravity CLI for agentic coding
+
+documentation: <https://antigravity.google/docs/cli/overview>
+
+<https://antigravity.google/docs/faq>
+<https://antigravity.google/docs/plans>
+
+Gemini  Token usage: <https://aistudio.google.com/usage>
+
+Antigravity credits: <https://one.google.com/ai/activity>
+
+
+Antigravity CLI was announced May 2026: https://antigravity.google/blog/introducing-google-antigravity-cli
+
+<pre>
+curl -fsSL https://antigravity.google/cli/install.sh | bash
+<pre>
+and then add binary to path
+<pre>
+echo 'export PATH="/home/pdg/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
+<pre>
+To launch use
+<pre>
+agy
+<pre>
+
+# Use agy
+
+<pre>
+read `ui_v8_website_flask_neo4j/AGENTS.md` and the run the Python tests
+<pre>
+
+
+In the file `.gemini/antigravity-cli/settings.json`
+<pre>
+{
+  "permissions": {
+    "allow": [
+      "command(find)",
+      "command(docker ps)",
+      "command(make pytest_out)",
+      "command(tail)",
+      "command(grep)",
+      "command(head)",
+      "command(sed)",
+      "command(curl -k https://localhost/api/v1/)",
+      "command(curl http://localhost:5000/api/v1/)"
+    ]
+  },
+  "trustedWorkspaces": [
+    "/home/pdg"
+  ]
+}
+<pre>
+
+
+# Limits on use of Antigravity
+
+From <https://discuss.ai.google.dev/t/navigating-antigravity-pro-quota-limits/130212>
+
+
+- The 5-Hour Cycle: This is your immediate pool of "work done.” Once you exhaust this, it typically resets 5 hours after your first request in that session.
+- The 7-Day Baseline: This is a weekly hard cap. If you hit this weekly limit, the system overrides your 5-hour refresh and locks you out until the start of the next 7-day period.
+
+Agent-heavy tasks (like "Refactor this entire repository”) drain your weekly baseline much faster than simple "Fix this function” prompts.
+
+One common cause for hitting the 7-day limit is leaving an agent running on a task that gets stuck. If an agent is making dozens of small edits without progress, stop it immediately to save your quota.
+
+
+Activity         | Quota Weight |  Why?
+--------------------------------------------------
+Tab Completion   | Zero         | Usually unlimited and doesn't hit the Pro quota.
+Simple Chat      | Low          | Minimal context and no file writes.
+Planning Mode    | Medium       | The agent "thinks” and lists steps before acting.
+Multi-File Edits | High         | Requires scanning the repo and rewriting multiple buffers.
+Browser/Terminal | Very High    | Running tests or browsing the web uses significant "compute units."
+
