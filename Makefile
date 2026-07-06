@@ -70,6 +70,8 @@ launch_webserver:
 down:
 	# https://docs.docker.com/compose/reference/down/
 	$(DOCKER_OR_PODMAN) compose down --volumes --remove-orphans
+
+prune:
 	$(DOCKER_OR_PODMAN) system prune -f
 
 
