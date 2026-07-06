@@ -76,6 +76,8 @@ try:
     logger.info("elan: " + str(stdout))
 except subprocess.TimeoutExpired as e:
     logger.error("elan timed out")
+except FileNotFoundError as e:
+    logger.error("elan not found")
 
 # subprocess.TimeoutExpired: Command '['lean', '--version']' timed out after 20 seconds
 try:
@@ -87,6 +89,8 @@ try:
     logger.info("lean: " + str(stdout))
 except subprocess.TimeoutExpired as e:
     logger.error("lean timed out")
+except FileNotFoundError as e:
+    logger.error("lean not found")
 
 try:
     process = subprocess.run(
@@ -97,6 +101,8 @@ try:
     logger.info("leanc: " + str(stdout))
 except subprocess.TimeoutExpired as e:
     logger.error("leanc timed out")
+except FileNotFoundError as e:
+    logger.error("leanc not found")
 
 try:
     process = subprocess.run(
@@ -107,3 +113,5 @@ try:
     logger.info("lake: " + str(stdout))
 except subprocess.TimeoutExpired as e:
     logger.error("lake timed out")
+except FileNotFoundError as e:
+    logger.error("lake not found")
