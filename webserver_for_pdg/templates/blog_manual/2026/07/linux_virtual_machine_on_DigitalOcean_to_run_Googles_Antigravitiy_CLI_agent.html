@@ -1,0 +1,48 @@
+# VM on Digital Ocean
+
+Log into digitalocean.com
+
+I have an existing project and no droplets, so create a new Droplet.
+- OS: Ubuntu 24.04
+- "basic" with regular SSD, $24/mo for 2 vCPU and 4GB of RAM
+
+
+```
+#cloud-config
+users:
+  - name: pdg
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    groups: sudo, docker
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA+xeB2gvQLgFUOPrsKy0j75KXvOkjIfrOfDV/eNeack bhp@Bens-Laptop.local
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCZKF2jbX/6rhYBhZN/fV4uaQXKG/oM/lNX5ZYaDEs9ZR6tFmdy08RRZ9SXKlzdBjNYqN2Sa73XmMrTK40vAm0g+QsR5reTFKpqvUDT8BCY4S6XdjiDhtoN0fu0BzSwgSlW6yHoJQdBXo+/DtBQXtkoBmjHmbg2DVFwU2xTTcolog8Np8QnYPAsBS/Ll2BHUWV/vcHagBObpbnlBSeY2IRyZW026QYo/h3GnScINHT+0ilBS+xBc0OrwPJAkbNSQ1rVv1TdkRBmuj0/DJwpe0w0TQk4jrxkAsOGWtdOlK2mCBebTFekY++WCMTgmdj1ebHIB8mij/CsjNn1GdVHXBRwOn+2+BaY7gF1w9DBirQsF5x/DHn+x4IugP/QS+4beWAjZ+/XunJhz+PJrJK1QNcZo0dBvICFdesnOmcxhQ4aT9uGLJKW9ONTDYOrm4XRSiXP/Ww2tPfyn23BVDQV6Iu2nxyfp+82QkfJIfgerDlLRcTcahiUaxYqILufe+b7xfk= ben.is.located@gmail.com
+
+package_upgrade: true
+
+packages:
+  - certbot
+  - python3-certbot-nginx
+  - ca-certificates
+  - curl
+  - gnupg
+  - ufw
+
+runcmd:
+  - sed -i -e '/^PermitRootLogin/s/^.*$/PermitRootLogin no/' /etc/ssh/sshd_config
+  - grep -qxF 'AllowUsers pdg' /etc/ssh/sshd_config || echo 'AllowUsers pdg' >> /etc/ssh/sshd_config
+  - systemctl restart ssh
+
+  - ufw allow OpenSSH
+  - ufw allow 443/tcp
+  - ufw allow 80/tcp
+  - ufw --force enable
+
+  # Set up Docker repository and install Docker
+  - install -m 0755 -d /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  - chmod a+r /etc/apt/keyrings/docker.gpg
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" |  tee /etc/apt/sources.list.d/docker.list > /dev/null
+  - apt update
+  - apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+```

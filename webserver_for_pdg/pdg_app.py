@@ -1385,6 +1385,7 @@ def to_navigation():
     return render_template(
         "jinja2_pages/navigation.html",
         title="site map",
+        canonical_URL="navigation",
         query_time_dict=query_time_dict,
         number_of_derivations=number_of_derivations,
         number_of_inference_rules=number_of_inference_rules,
@@ -1780,10 +1781,12 @@ def to_review_derivation(
             )
             logger.error(str(type(err).__name__) + ": " + str(err))
 
+    canonical_URL="review_derivation/"+str(derivation_id)
     logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/derivation_review.html",
         title="Review Derivation",
+        canonical_URL=canonical_URL,
         query_time_dict=query_time_dict,
         derivation_dict=derivation_dict,
         symbols_in_derivation=symbols_in_derivation,
@@ -4073,7 +4076,8 @@ def to_add_symbol() -> ResponseReturnValue:
     """
     novel symbol
     """
-    return render_template("jinja2_pages/user_workflow/symbol_create_pick_type.html")
+    return render_template("jinja2_pages/user_workflow/symbol_create_pick_type.html",
+        canonical_URL="new_symbol")
 
 
 @web_app.route("/new_operation", methods=["GET", "POST"])
@@ -4487,11 +4491,13 @@ def to_add_step_select_expressions(
 
     logger.info("inference_rule_dict is " + str(inference_rule_dict))
 
+    canonical_URL="new_step_expressions/"+str(derivation_id)+"/"+str(inference_rule_id)
     # first visit to this page
     logger.info("[trace] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/new_step_select_expressions_for_inference_rule.html",
         title="Add Step: Select Expressions",
+        canonical_URL=canonical_URL,
         query_time_dict=query_time_dict,
         form_new_step=web_form_new_step,
         list_of_expression_IDs=list_of_expression_IDs,
@@ -4625,10 +4631,12 @@ def to_add_symbols_and_operations_for_expression(
         )
     )
 
+    canonical_URL="symbols_and_operations_for_expression/"+str(expression_id)
     logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/expression_create_symbols_and_operations.html",
         title="Create Expression: Add Symbols",
+        canonical_URL=canonical_URL,
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
         expression_dict=expression_dict,
@@ -4752,9 +4760,11 @@ def to_add_sympy_and_lean_for_expression(
 
     symbol_id_dict = {"latex symbol": "symbol ID"}
 
+    canonical_URL="sympy_and_lean_for_expression/"+str(expression_id)
     return render_template(
         "jinja2_pages/user_workflow/expression_create_sympy_and_lean.html",
         title="Create SymPy and Lean for new expression",
+        canonical_URL=canonical_URL,
         query_time_dict=query_time_dict,
         # sympy_expr_lhs=sympy_expr_lhs,
         # sympy_expr_rhs=sympy_expr_rhs,
@@ -4931,9 +4941,12 @@ def to_add_symbols_and_operations_for_feed(
         )
 
     logger.info("[TRACE] end " + trace_id)
+
+    canonical_URL="symbols_and_operations_for_feed/"+str(feed_id)
     return render_template(
         "jinja2_pages/user_workflow/feed_create_symbols_and_operations.html",
         title="Create Feed: Add Symbols",
+        canonical_URL=canonical_URL,
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
         form_new_feed=web_form_new_feed,
