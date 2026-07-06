@@ -1,0 +1,193 @@
+
+based on prior experience https://physicsderivationgraph.blogspot.com/2025/12/website-unresponsive-diagnostic-steps.html
+and the logs in 
+
+http://www.apple.com/go/applebot
+
+http://www.semrush.com/bot.html
+
+
+{"ip":"216.73.216.95", "user":"-", "time":"24/Jun/2026:01:22:13 +0000", "req":"GET /review_derivation/0000000011 HTTP/1.1", "stat":"200", "bsnt":"85008", "reqt":"2.647", "ref":"-", "ua":"Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; ClaudeBot/1.0; +claudebot@anthropic.com)", "gz":"-"}
+
+
+{"ip":"17.246.23.224", "user":"-", "time":"24/Jun/2026:01:22:14 +0000", "req":"GET /login?next=https://derivationmap.net/edit_step/207210/3408108 HTTP/1.1", "stat":"302", "bsnt":"685", "reqt":"0.192", "ref":"-", "ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15 (Applebot/0.1; +http://www.apple.com/go/applebot)", "gz":"-"}
+
+
+{"ip":"85.208.96.211", "user":"-", "time":"24/Jun/2026:01:22:18 +0000", "req":"GET /new_step_expressions/0000000003/0000111732 HTTP/1.1", "stat":"200", "bsnt":"373203", "reqt":"0.529", "ref":"-", "ua":"Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)", "gz":"-"}
+{"ip":"85.208.96.210", "user":"-", "time":"24/Jun/2026:01:22:12 +0000", "req":"GET /new_step_expressions/0000332170/0000111246 HTTP/1.1", "stat":"200", "bsnt":"373263", "reqt":"1.038", "ref":"-", "ua":"Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)", "gz":"-"}
+
+
+
+{"ip":"145.239.69.153", "user":"-", "time":"24/Jun/2026:01:22:12 +0000", "req":"GET /blog/page/2026/03/DigitalOcean%20initial%20configuration HTTP/1.1", "stat":"200", "bsnt":"25859", "reqt":"0.083", "ref":"-", "ua":"Mozilla/5.0 (compatible; MJ12bot/v1.4.8; http://mj12bot.com/)", "gz":"-"}
+
+
+Then I looked at top
+
+<fieldset><legend>prompt</legend>
+using `top` in linux shows my CPU is spiked:
+<pre>
+```
+2325666 syslog    20   0  361776  95016   3584 S 127.3   2.4     32,39 rsyslogd                                                                        
+2234162 root      19  -1   66796  13300  12172 S  61.3   0.3     16,58 systemd-journal  
+```
+</pre>
+</fieldset>
+Gemini 3.5 Pro suggested trying `sudo tail -f /var/log/syslog` which showed
+<pre>
+2026-06-24T01:28:53.177943+00:00 ubuntu-4gb-hel1-4 rsyslogd[2325666]: rsyslogd: file '/var/log/auth.log'[9] write error - see https://www.rsyslog.com/solving-rsyslog-write-errors/ for help OS error: No space left on device [v8.2312.0 try https://www.rsyslog.com/e/2027 ]
+</pre>
+
+
+<pre>
+$ sudo du -hxd 1 / | sort -hr
+37G	/
+32G	/var
+2.7G	/home
+1.8G	/usr
+116M	/boot
+41M	/opt
+11M	/root
+
+<pre>
+$ sudo du -hxd 1 /var | sort -hr
+32G	/var
+31G	/var/lib
+883M	/var/log
+114M	/var/cache
+1.9M	/var/backups
+332K	/var/crash
+
+<pre>
+$ sudo du -hxd 1 /var/lib | sort -hr
+31G	/var/lib/containerd
+31G	/var/lib
+177M	/var/lib/apt
+28M	/var/lib/docker
+23M	/var/lib/dpkg
+
+
+<pre>
+$ sudo du -hxd 1 /var/lib/containerd | sort -hr
+31G	/var/lib/containerd
+29G	/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs
+1.9G	/var/lib/containerd/io.containerd.content.v1.content
+3.0M	/var/lib/containerd/io.containerd.metadata.v1.bolt
+
+
+
+
+
+sudo docker system prune -a --volumes
+which resulted in
+Total reclaimed space: 5.802GB
+
+That's an improvement, but 
+
+$ sudo du -hxd 1 /var/lib/containerd | sort -hr
+27G	/var/lib/containerd
+25G	/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs
+1.8G	/var/lib/containerd/io.containerd.content.v1.content
+3.0M	/var/lib/containerd/io.containerd.metadata.v1.bolt
+
+
+
+
+$ docker images
+ i Info →   U  In Use
+IMAGE                          ID             DISK USAGE   CONTENT SIZE   EXTRA
+neo4j:4.4.45-community         4322925e2e86        892MB          330MB    U   
+ui_v8-flask-webserver:latest   c847dcc46538       6.01GB         1.56GB    U   
+
+
+
+$ docker ps
+CONTAINER ID   IMAGE                    COMMAND                  CREATED       STATUS                  PORTS                                                                                                          NAMES
+0d53d4dab9e7   ui_v8-flask-webserver    "gunicorn --reload -…"   7 weeks ago   Up 33 hours             5000/tcp                                                                                                       ui_v8-flask-webserver-1
+f3646f991c05   neo4j:4.4.45-community   "tini -g -- /startup…"   7 weeks ago   Up 33 hours (healthy)   0.0.0.0:7473-7474->7473-7474/tcp, [::]:7473-7474->7473-7474/tcp, 0.0.0.0:7687->7687/tcp, [::]:7687->7687/tcp   ui_v8-neo4j_docker-1
+
+
+
+<fieldset><legend>prompt</legend>
+<pre>
+I use the command 
+```
+docker build -t ui_v8_flask_webserver:latest-amd64 .
+```
+to build an image. I then use
+```
+docker compose up --build --force-recreate --remove-orphans
+```
+to run the containers.
+
+When I want to stop I use
+```
+compose down --volumes --remove-orphans
+```
+</pre>
+I've been using these commands for months and now my disk is full, specifically in the folder `/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs`
+</fieldset>
+
+
+
+<HR>
+
+<p>This issue occurs because frequent builds using <code>docker build</code> and <code>docker compose up --build</code> generate dangling images (intermediate layers that are no longer associated with a tagged image) and accumulate build cache. </p>
+<p>While <code>docker compose down --volumes</code> successfully removes the containers, networks, and volumes defined in your compose file, it does not clean up the unused image layers or the build cache stored by Docker and its container runtime (containerd). Over time, these layers accumulate in <code>/var/lib/containerd/.../overlayfs</code>.</p>
+<p>Here is how you can safely clean up this disk space and prevent it from filling up again.</p>
+<hr>
+<h3 id="step-1-clean-up-the-build-cache">Step 1: Clean up the Build Cache</h3>
+<p>Modern versions of Docker use BuildKit, which caches build steps to make subsequent builds faster. This cache can grow quite large over several months.</p>
+<p>To remove the build cache, run:</p>
+<pre><code class="lang-bash"><span class="hljs-symbol">docker</span> <span class="hljs-keyword">builder </span>prune
+</code></pre>
+<p>To remove all build cache, including the cache for unused images:</p>
+<pre><code class="lang-bash"><span class="hljs-symbol">docker</span> <span class="hljs-keyword">builder </span>prune -a
+</code></pre>
+<h3 id="step-2-remove-dangling-and-unused-images">Step 2: Remove Dangling and Unused Images</h3>
+<p>Each time you rebuild <code>ui_v8_flask_webserver:latest-amd64</code>, the old version of that image loses its tag and becomes a &quot;dangling&quot; image. </p>
+<p>To remove only dangling images (those listed as <code>&lt;none&gt;:&lt;none&gt;</code>):</p>
+<pre><code class="lang-bash">docker <span class="hljs-built_in">image</span> prune
+</code></pre>
+<p>If you want to remove all images that are not currently associated with a running container (including older versions of other images you might have pulled):</p>
+<pre><code class="lang-bash">docker <span class="hljs-built_in">image</span> prune -a
+</code></pre>
+<p><em>Note: This will require Docker to re-download or rebuild images the next time you run them if they aren&#39;t currently running.</em></p>
+<h3 id="step-3-run-a-system-prune-comprehensive-cleanup-">Step 3: Run a System Prune (Comprehensive Cleanup)</h3>
+<p>If you want to clean up containers, networks, dangling images, and build cache all at once, you can run:</p>
+<pre><code class="lang-bash">docker <span class="hljs-keyword">system</span> prune
+</code></pre>
+<p>If you want to be more aggressive and remove all unused images (not just dangling ones) and the build cache, add the <code>-a</code> flag:</p>
+<pre><code class="lang-bash">docker <span class="hljs-keyword">system</span> prune -<span class="hljs-keyword">a</span>
+</code></pre>
+<hr>
+<h3 id="recommended-routine-going-forward">Recommended Routine Going Forward</h3>
+<p>To prevent your disk from filling up again, you can periodically run a cleanup command after stopping your containers. For example:</p>
+<pre><code class="lang-bash"># <span class="hljs-number">1</span>. Stop <span class="hljs-built_in">and</span> <span class="hljs-built_in">remove</span> containers/volumes
+docker compose down --volumes --<span class="hljs-built_in">remove</span>-orphans
+
+# <span class="hljs-number">2</span>. Clean <span class="hljs-keyword">up</span> dangling images <span class="hljs-built_in">and</span> build cache
+docker <span class="hljs-built_in">system</span> prune -<span class="hljs-keyword">f</span>
+</code></pre>
+<p>Adding <code>docker system prune -f</code> (the <code>-f</code> flag bypasses the confirmation prompt) to your development or deployment scripts once a week or once a month is usually sufficient to manage disk space.</p>
+
+<HR>
+
+
+$ docker builder prune
+WARNING! This will remove all dangling build cache. Are you sure you want to continue? [y/N] y
+ID						RECLAIMABLE	SIZE		LAST ACCESSED
+f45scwx1wsdjhw4qdqzrcpw00*              	true 		12.29kB   	39 seconds ago
+i587a0dgc4pfvn1b1bve06cwy*              	true 	23.28MB   	39 seconds ago
+n67s18ay8o6i0kd6iac3v9go4*              	true 	4.096kB   	39 seconds ago
+Total:	23.3MB
+
+
+$ docker builder prune -a
+WARNING! This will remove all build cache. Are you sure you want to continue? [y/N] y
+ID						RECLAIMABLE	SIZE		LAST ACCESSED
+441zs5ehw7knuozrey9jhll3y               	true 		36.78MB   	About a minute ago
+8zihbjs7jjmqhu43vbmbv5hc1               	true 	461.6MB   	About a minute ago
+brjy0s8b9p4naa6vt90merq47               	true 	1.788GB   	About a minute ago
+...
+Total:	5.817GB
+
