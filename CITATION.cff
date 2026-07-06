@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite."
+authors:
+- family-names: "Payne"
+  given-names: "Ben"
+  orcid: "https://orcid.org/0000-0002-7682-1265"
+title: "Physics Derivation Graph"
+version: 1.0.0
+date-released: 2026-06-09
+url: "https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/"

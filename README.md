@@ -65,6 +65,17 @@ Because software is in Docker containers (for reproducibility), the versions of 
 * `docker --version` yields "Docker version 28.0.4, build b8034c0" on a Mac Airbook arm64; "Docker version 20.10.11" on a Mac Airbook amd64
 See <https://docs.docker.com/compose/compose-file/compose-versioning/> for compatibility of versions.
 
+## Quickstart on the VPS (Virtual Private Server)
+
+```
+make launch_webserver COMPOSE_FLAGS=--detach
+```
+
+and to stop
+```
+make down
+```
+
 ## Project contents
 
 Two containers are managed using [docker compose](https://docs.docker.com/compose/): [Neo4j](https://hub.docker.com/_/neo4j) (port 7474) and a Flask-based Python web server (port 5000).
