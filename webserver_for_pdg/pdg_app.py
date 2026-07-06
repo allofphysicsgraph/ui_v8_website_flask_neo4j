@@ -1781,7 +1781,7 @@ def to_review_derivation(
             )
             logger.error(str(type(err).__name__) + ": " + str(err))
 
-    canonical_URL="review_derivation/"+str(derivation_id)
+    canonical_URL = "review_derivation/" + str(derivation_id)
     logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/derivation_review.html",
@@ -4076,8 +4076,10 @@ def to_add_symbol() -> ResponseReturnValue:
     """
     novel symbol
     """
-    return render_template("jinja2_pages/user_workflow/symbol_create_pick_type.html",
-        canonical_URL="new_symbol")
+    return render_template(
+        "jinja2_pages/user_workflow/symbol_create_pick_type.html",
+        canonical_URL="new_symbol",
+    )
 
 
 @web_app.route("/new_operation", methods=["GET", "POST"])
@@ -4491,7 +4493,9 @@ def to_add_step_select_expressions(
 
     logger.info("inference_rule_dict is " + str(inference_rule_dict))
 
-    canonical_URL="new_step_expressions/"+str(derivation_id)+"/"+str(inference_rule_id)
+    canonical_URL = (
+        "new_step_expressions/" + str(derivation_id) + "/" + str(inference_rule_id)
+    )
     # first visit to this page
     logger.info("[trace] end " + trace_id)
     return render_template(
@@ -4631,7 +4635,7 @@ def to_add_symbols_and_operations_for_expression(
         )
     )
 
-    canonical_URL="symbols_and_operations_for_expression/"+str(expression_id)
+    canonical_URL = "symbols_and_operations_for_expression/" + str(expression_id)
     logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/expression_create_symbols_and_operations.html",
@@ -4760,7 +4764,7 @@ def to_add_sympy_and_lean_for_expression(
 
     symbol_id_dict = {"latex symbol": "symbol ID"}
 
-    canonical_URL="sympy_and_lean_for_expression/"+str(expression_id)
+    canonical_URL = "sympy_and_lean_for_expression/" + str(expression_id)
     return render_template(
         "jinja2_pages/user_workflow/expression_create_sympy_and_lean.html",
         title="Create SymPy and Lean for new expression",
@@ -4942,7 +4946,7 @@ def to_add_symbols_and_operations_for_feed(
 
     logger.info("[TRACE] end " + trace_id)
 
-    canonical_URL="symbols_and_operations_for_feed/"+str(feed_id)
+    canonical_URL = "symbols_and_operations_for_feed/" + str(feed_id)
     return render_template(
         "jinja2_pages/user_workflow/feed_create_symbols_and_operations.html",
         title="Create Feed: Add Symbols",
