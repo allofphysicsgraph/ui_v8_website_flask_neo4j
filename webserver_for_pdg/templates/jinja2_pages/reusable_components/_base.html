@@ -16,6 +16,10 @@
     <!-- defines the default zoom for mobile devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    {% if canonical_URL %}
+    <link rel="canonical" href="https://allofphysics.com/{{ canonical_URL }}">
+    {% endif %}
+
   </head>
   <body>
 
