@@ -1,5 +1,6 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
+{% include "jinja2_pages/reusable_components/_blog_breadcrumbs.html" %}
 {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
 <H1>{{ title }}</H1>
 
@@ -268,7 +269,7 @@ read `ui_v8_website_flask_neo4j/AGENTS.md` and the run the Python tests
 <P>One common cause for hitting the 7-day limit is leaving an agent running on a task that gets stuck. If an agent is making dozens of small edits without progress, stop it immediately to save your quota.
 
 
-<table>
+<table border=1>
   <thead>
     <tr>
       <th>Activity</th>
