@@ -24,9 +24,9 @@
                                 pattern="^[\x20-\x7F]+$", 
                                 id="input_latex",
                                 oninput="validateASCII(this)", 
-                                                   maxlength=1000, 
-                                                   livePreview('input_latex', null, null, 'render_input_latex');
-                                                   value=matrix_dict['latex']|e) }} <BR/>
+                                maxlength=1000, 
+                                oninput="validateASCII(this); livePreview('input_latex', null, null, 'render_input_latex');", 
+                                value=matrix_dict['latex']|e) }} <BR/>
 <div id="render_input_latex"></div>
       &nbsp;<BR/>
       {{form_matrix_properties.matrix_name_latex.label }}: 
@@ -35,8 +35,8 @@
                                     data_target="matrix_name_latex_image",
                                     pattern="^[\x20-\x7F]+$", 
                                     oninput="validateASCII(this)",  
-                                                      maxlength=1000, 
-                                                      value=matrix_dict['name_latex']|e) }}<BR/>
+                                    maxlength=1000, 
+                                    value=matrix_dict['name_latex']|e) }}<BR/>
 <P><img id="matrix_name_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
       {{form_matrix_properties.matrix_description_latex.label }}: 
@@ -45,8 +45,8 @@
                                     data_target="matrix_description_latex_image",
                                     pattern="^[\x20-\x7F]+$", 
                                     oninput="validateASCII(this)", 
-                                                              maxlength=1000, 
-                                                              value=matrix_dict['description_latex']|e) }}<BR/>
+                                    maxlength=1000, 
+                                    value=matrix_dict['description_latex']|e) }}<BR/>
 <P><img id="matrix_description_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
       {{form_matrix_properties.matrix_reference_latex.label }}: 

@@ -22,10 +22,10 @@
        {{ form_matrix_properties.matrix_latex(size=50, 
                                 type="text",
                                 id="input_latex",
-                                livePreview('input_latex', null, null, 'render_input_latex');
+                                oninput="validateASCII(this); livePreview('input_latex', null, null, 'render_input_latex');", 
                                 pattern="^[\x20-\x7F]+$", 
                                 oninput="validateASCII(this)", 
-     minlength=1, maxlength=1000) }}</P>
+                                minlength=1, maxlength=1000) }}</P>
 
 
         <div id="render_input_latex"></div>
