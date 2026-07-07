@@ -3,8 +3,11 @@
 {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
 <H1>{{ title }}</H1>
 
+<meta http-equiv="refresh" content="5; url={{ url_for('to_llm_workflow_documenation') }}?referrer=redirect">
+
+
 <P>First published 2026-03-14</P>
 
-<P>Content has been moved from this blog post to <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=documentation_overview">Sequence of LLM Prompts for new content</a>
+<P>Content has been moved from this blog post to <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=blog_post">Sequence of LLM Prompts for new content</a>
 
 {% endblock %}
