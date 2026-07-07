@@ -6848,6 +6848,8 @@ def to_rss():
     """
     TODO: also publish updates to derivations (not just blog posts)
 
+    TODO: validate https://allofphysics.com/rss.xml using  https://validator.w3.org/feed/
+
     See https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/43
     """
     logger.info("[TRACE]")
@@ -6877,7 +6879,9 @@ def to_rss():
 
     # Pass the generated list directly to the Jinja template
     response = make_response(
-        render_template("jinja2_pages/rss.xml", list_of_dictionaries=list_of_dictionaries)
+        render_template(
+            "jinja2_pages/rss.xml", list_of_dictionaries=list_of_dictionaries
+        )
     )
     response.headers["Content-Type"] = "application/rss+xml"
     return response
