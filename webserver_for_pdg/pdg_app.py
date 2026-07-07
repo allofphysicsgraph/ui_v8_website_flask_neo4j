@@ -63,6 +63,7 @@ import sys
 import json
 import time
 import random
+import glob
 import datetime
 import uuid
 import xmltodict
@@ -7583,6 +7584,8 @@ def to_llm_page():
 def to_blog_list():
     """ """
     logger.info("[TRACE] ")
+    list_of_files = glob.glob("blog_manual/**/*.html")
+    logger.info(list_of_files)
     return render_template(
         "blog_from_blogger/blog_list.html", title="Blog for Physics Derivation Graph"
     )
@@ -7609,6 +7612,9 @@ def to_blog(YYYY: str, MM: str, blog_title: str):
 
 @web_app.route("/blog/page/<YYYY>/<MM>/<blog_title>", methods=["GET"])
 def to_blog_manual_page(YYYY: str, MM: str, blog_title: str):
+    """
+    manually-crafted pages
+    """
     return render_template(
         "blog_manual/" + YYYY + "/" + MM + "/" + blog_title + ".html", title=blog_title
     )
