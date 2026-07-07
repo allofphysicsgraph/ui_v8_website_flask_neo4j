@@ -47,7 +47,7 @@ packages:
 
 runcmd:
   - sed -i -e '/^PermitRootLogin/s/^.*$/PermitRootLogin no/' /etc/ssh/sshd_config
-  - grep -qxF 'AllowUsers pdg' /etc/ssh/sshd_config || echo 'AllowUsers pdg' >> /etc/ssh/sshd_config
+  - grep -qxF 'AllowUsers pdg' /etc/ssh/sshd_config || echo 'AllowUsers pdg' &gt;&gt; /etc/ssh/sshd_config
   - systemctl restart ssh
 
   - ufw allow OpenSSH
@@ -62,15 +62,15 @@ runcmd:
   - gh skill install cli/cli gh --scope user
   - gh skill update gh
 
-  - echo "alias ll='ls -hal'" >> /etc/bashrc 
-  - echo "alias s='git status'" >> /etc/bashrc
+  - echo "alias ll='ls -hal'" &gt;&gt; /etc/bashrc 
+  - echo "alias s='git status'" &gt;&gt; /etc/bashrc
 
 
   # Set up Docker repository and install Docker
   - install -m 0755 -d /etc/apt/keyrings
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
   - chmod a+r /etc/apt/keyrings/docker.gpg
-  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" |  tee /etc/apt/sources.list.d/docker.list > /dev/null
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" |  tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
 
 
   # Running apt steps non-interactively ensures they won't stall the shell script
@@ -80,97 +80,97 @@ runcmd:
 
 </pre>
 
-Output logs are in
+<P>Output logs are in
 <pre>
 sudo vim /var/log/cloud-init-output.log
-<pre>
+</pre>
 
 <pre>
 gh auth login
 gh auth status
-<pre>
+</pre>
 
 <pre>
 glab auth login
-<pre>
+</pre>
 
-Prepare for random loss of connection
+<P>Prepare for random loss of connection
 <pre>
 screen
-<pre>
+</pre>
 
 <pre>
 echo "alias ll='ls -hal'"
 echo "alias s='git status'" >>
-<pre>
+</pre>
 
 
 
-# initial config of git
+<h2>initial config of git</h2>
 
 
-generate a key pair and then get content of public key
+<P>generate a key pair and then get content of public key
 <pre>
 ssh-keygen -t ed25519 -C "ben.is.located@gmail.com"
 cat ~/.ssh/id_ed25519.pub
-<pre>
+</pre>
 
-In a browser visit <https://github.com/settings/keys>
+<P>In a browser visit <a href="https://github.com/settings/keys">https://github.com/settings/keys</a>
 
-Once the public key is uploaded, validate access using
+<P>Once the public key is uploaded, validate access using
 <pre>
 ssh -T git@github.com
-<pre>
-which should yield
+</pre>
+<P>which should yield
 <pre>
 Hi bhpayne! You've successfully authenticated, but GitHub does not provide shell access.
-<pre>
+</pre>
 
-Commits need an author name and email
+<P>Commits need an author name and email
 <pre>
 git config --global user.email "ben.is.located@gmail.com"
 git config --global user.name "Ben Payne's agent"
-<pre>
+</pre>
 
 <pre>
 git clone git@github.com:allofphysicsgraph/ui_v8_website_flask_neo4j.git
-<pre>
+</pre>
 
 
-# initialize Physics Derivation Graph
+<h2>initialize Physics Derivation Graph</h2>
 
 
 
 <pre>
 make container_build
 mkdir logs
-<pre>
+</pre>
 
 <pre>
 cd certs
-openssl genrsa > privkey.pem
+openssl genrsa &gt; privkey.pem
 openssl req -new -x509 -key privkey.pem -subj "/C=US/ST=WI/O=PDG/CN=Ben/emailAddress=ben.is.located@gmail.com" -out fullchain.pem
 openssl dhparam -out dhparam.pem 2048
-<pre>
+</pre>
 
 <pre>
-echo "UID=1000" >  /home/pdg/ui_v8_website_flask_neo4j/.env
-echo "GID=1000" >> /home/pdg/ui_v8_website_flask_neo4j/.env
-echo "GOOGLE_CLIENT_ID=AVERYLONGSTRINGFROMGOOGLE" >  /home/pdg/ui_v8_website_flask_neo4j/.env.google
-echo "GOOGLE_CLIENT_SECRET=ANOTHERVERYLONGSTRING" >> /home/pdg/ui_v8_website_flask_neo4j/.env.google
-echo "SECRET_KEY=ASECRETSTRINGFROMGOOGLEASDFASDF" >> /home/pdg/ui_v8_website_flask_neo4j/.env.google
-<pre>
+echo "UID=1000" &gt;  /home/pdg/ui_v8_website_flask_neo4j/.env
+echo "GID=1000" &gt;&gt; /home/pdg/ui_v8_website_flask_neo4j/.env
+echo "GOOGLE_CLIENT_ID=AVERYLONGSTRINGFROMGOOGLE" &gt;  /home/pdg/ui_v8_website_flask_neo4j/.env.google
+echo "GOOGLE_CLIENT_SECRET=ANOTHERVERYLONGSTRING" &gt;&gt; /home/pdg/ui_v8_website_flask_neo4j/.env.google
+echo "SECRET_KEY=ASECRETSTRINGFROMGOOGLEASDFASDF" &gt;&gt; /home/pdg/ui_v8_website_flask_neo4j/.env.google
+</pre>
 
 <pre>
 make launch_webserver COMPOSE_FLAGS=--detach
-<pre>
+</pre>
 
-And to end the containers use
+<P>And to end the containers use
 <pre>
 make down
-<pre>
+</pre>
 
-# nginx prevents docker compose
+<h2>nginx prevents docker compose</h2>
 
 <pre>
 sudo lsof -i tcp:80
@@ -181,46 +181,46 @@ nginx   12201 www-data    5u  IPv4  23508      0t0  TCP *:http (LISTEN)
 nginx   12201 www-data    6u  IPv6  23509      0t0  TCP *:http (LISTEN)
 nginx   12202 www-data    5u  IPv4  23508      0t0  TCP *:http (LISTEN)
 nginx   12202 www-data    6u  IPv6  23509      0t0  TCP *:http (LISTEN)
-<pre>
+</pre>
 
 <pre>
 sudo systemctl disable nginx
 sudo service nginx stop
-<pre>
+</pre>
 
 
 
-# configure Antigravity CLI for agentic coding
+<H2>configure Antigravity CLI for agentic coding</H2>
 
-documentation: <https://antigravity.google/docs/cli/overview>
+<P>documentation: <a href="https://antigravity.google/docs/cli/overview">https://antigravity.google/docs/cli/overview</a>
 
-<https://antigravity.google/docs/faq>
-<https://antigravity.google/docs/plans>
+<P><a href="https://antigravity.google/docs/faq">https://antigravity.google/docs/faq</a><BR>
+<a href="https://antigravity.google/docs/plans">https://antigravity.google/docs/plans</a>
 
-Gemini  Token usage: <https://aistudio.google.com/usage>
+<P>Gemini  Token usage: <a href="https://aistudio.google.com/usage>
 
-Antigravity credits: <https://one.google.com/ai/activity>
+<P>Antigravity credits: <a href="https://one.google.com/ai/activity>
 
 
-Antigravity CLI was announced May 2026: https://antigravity.google/blog/introducing-google-antigravity-cli
+<P>Antigravity CLI was announced May 2026: https://antigravity.google/blog/introducing-google-antigravity-cli
 
 <pre>
 curl -fsSL https://antigravity.google/cli/install.sh | bash
+</pre>
+<P>and then add binary to path
 <pre>
-and then add binary to path
-<pre>
-echo 'export PATH="/home/pdg/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
-<pre>
-To launch use
+echo 'export PATH="/home/pdg/.local/bin:$PATH"' &gt;&gt; ~/.bashrc && source ~/.bashrc
+</pre>
+<P>To launch use
 <pre>
 agy
-<pre>
+</pre>
 
-# Use agy
+<h2>Use agy</h2>
 
 <pre>
 read `ui_v8_website_flask_neo4j/AGENTS.md` and the run the Python tests
-<pre>
+</pre>
 
 
 In the file `.gemini/antigravity-cli/settings.json`
@@ -246,24 +246,53 @@ In the file `.gemini/antigravity-cli/settings.json`
 <pre>
 
 
-# Limits on use of Antigravity
+<H2>Limits on use of Antigravity</H2>
 
-From <https://discuss.ai.google.dev/t/navigating-antigravity-pro-quota-limits/130212>
+<P>From <a href="https://discuss.ai.google.dev/t/navigating-antigravity-pro-quota-limits/130212">https://discuss.ai.google.dev/t/navigating-antigravity-pro-quota-limits/130212</a>
+
+<UL>
+<LI> The 5-Hour Cycle: This is your immediate pool of "work done.” Once you exhaust this, it typically resets 5 hours after your first request in that session.
+<LI> The 7-Day Baseline: This is a weekly hard cap. If you hit this weekly limit, the system overrides your 5-hour refresh and locks you out until the start of the next 7-day period.
+</UL>
+
+<P>Agent-heavy tasks (like "Refactor this entire repository”) drain your weekly baseline much faster than simple "Fix this function” prompts.
+
+<P>One common cause for hitting the 7-day limit is leaving an agent running on a task that gets stuck. If an agent is making dozens of small edits without progress, stop it immediately to save your quota.
 
 
-- The 5-Hour Cycle: This is your immediate pool of "work done.” Once you exhaust this, it typically resets 5 hours after your first request in that session.
-- The 7-Day Baseline: This is a weekly hard cap. If you hit this weekly limit, the system overrides your 5-hour refresh and locks you out until the start of the next 7-day period.
-
-Agent-heavy tasks (like "Refactor this entire repository”) drain your weekly baseline much faster than simple "Fix this function” prompts.
-
-One common cause for hitting the 7-day limit is leaving an agent running on a task that gets stuck. If an agent is making dozens of small edits without progress, stop it immediately to save your quota.
-
-
-Activity         | Quota Weight |  Why?
---------------------------------------------------
-Tab Completion   | Zero         | Usually unlimited and doesn't hit the Pro quota.
-Simple Chat      | Low          | Minimal context and no file writes.
-Planning Mode    | Medium       | The agent "thinks” and lists steps before acting.
-Multi-File Edits | High         | Requires scanning the repo and rewriting multiple buffers.
-Browser/Terminal | Very High    | Running tests or browsing the web uses significant "compute units."
-
+<table>
+  <thead>
+    <tr>
+      <th>Activity</th>
+      <th>Quota Weight</th>
+      <th>Why?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Tab Completion</td>
+      <td>Zero</td>
+      <td>Usually unlimited and doesn't hit the Pro quota.</td>
+    </tr>
+    <tr>
+      <td>Simple Chat</td>
+      <td>Low</td>
+      <td>Minimal context and no file writes.</td>
+    </tr>
+    <tr>
+      <td>Planning Mode</td>
+      <td>Medium</td>
+      <td>The agent &quot;thinks&rdquo; and lists steps before acting.</td>
+    </tr>
+    <tr>
+      <td>Multi-File Edits</td>
+      <td>High</td>
+      <td>Requires scanning the repo and rewriting multiple buffers.</td>
+    </tr>
+    <tr>
+      <td>Browser/Terminal</td>
+      <td>Very High</td>
+      <td>Running tests or browsing the web uses significant &quot;compute units.&quot;</td>
+    </tr>
+  </tbody>
+</table>
