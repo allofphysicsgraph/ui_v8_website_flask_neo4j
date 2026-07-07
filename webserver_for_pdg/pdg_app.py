@@ -65,6 +65,7 @@ import time
 import random
 import glob
 from pathlib import Path
+import urllib.parse
 import datetime
 import uuid
 import xmltodict
@@ -6842,15 +6843,42 @@ def to_llm_workflow_documenation() -> ResponseReturnValue:
 ###########################################################################
 
 
-@web_app.route("/rss/<path:path>")
-def to_rss(path):
+@web_app.route("/rss.xml")
+def to_rss():
     """
-    TODO
+    TODO: also publish updates to derivations (not just blog posts)
 
     See https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/43
     """
-    logger.info(path)
-    response = make_response(render_template("rss.xml"))
+    logger.info("[TRACE]")
+
+    base_dir = Path("templates/blog_manual")
+    list_of_files = base_dir.rglob("*.html")
+
+    list_of_dictionaries = []
+
+    for file_path in list_of_files:
+        # Get the path relative to 'templates/blog_manual' (e.g., '2026/07/file.html')
+        relative_path = file_path.relative_to(base_dir)
+        parts = relative_path.parts
+
+        # Ensure the path has the expected depth: year, month, filename
+        if len(parts) >= 3:
+            year, month, filename = parts[0], parts[1], parts[2]
+
+            # The title is the filename without the .html extension
+            title = file_path.stem
+
+            # URL-encode the filename to make sure spaces/special characters are valid in a URL
+            safe_filename = urllib.parse.quote(filename)
+            link = f"https://allofphysics.com/blog/{year}/{month}/{safe_filename}"
+
+            list_of_dictionaries.append({"title": title, "link": link})
+
+    # Pass the generated list directly to the Jinja template
+    response = make_response(
+        render_template("jinja2_pages/rss.xml", list_of_dictionaries=list_of_dictionaries)
+    )
     response.headers["Content-Type"] = "application/rss+xml"
     return response
 
