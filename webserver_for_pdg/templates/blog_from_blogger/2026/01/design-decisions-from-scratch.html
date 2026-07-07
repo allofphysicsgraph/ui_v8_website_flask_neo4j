@@ -46,11 +46,11 @@
 
 <p>Happily, Flask provides a way to separate routes into separate files (e.g., pdg_other_routes.py) using blueprints.&nbsp;</p>
 
-The file pdg_app.py contains
+<P>The file pdg_app.py contains
 <pre>from pdg_other_routes import other_routes_bp
 web_app.register_blueprint(other_routes_bp)
 </pre>
-and then pdg_other_routes.py contains
+<P>and then pdg_other_routes.py contains
 <pre>other_routes_bp = Blueprint("other_routes", __name__)
 
 @other_routes_bp.route("/api_via_js")
