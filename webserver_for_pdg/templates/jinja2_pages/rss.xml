@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <!-- https://www.rssboard.org/rss-specification -->
 
 <channel>
   <title>Physics Derivation Graph</title>
   <link>https://allofphysics.com</link>
   <description>Mathematical Physics as a Graph</description>
+  <atom:link href="https://allofphysics.com/rss.xml" rel="self" type="application/rss+xml" />
+
 
   {% for this_item in list_of_dictionaries %}
   <item>
     <title>{{ this_item['title'] }}</title>
     <link>{{ this_item['link'] }}</link>
+    <guid>{{ this_item['link'] }}</guid> <!-- https://www.rssboard.org/rss-specification#ltguidgtSubelementOfLtitemgt -->
     <description>{{ this_item['title'] }}</description>
   </item>
   {% endfor %}
