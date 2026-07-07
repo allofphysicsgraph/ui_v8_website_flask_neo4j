@@ -5,16 +5,15 @@
   <title>Physics Derivation Graph</title>
   <link>https://allofphysics.com</link>
   <description>Mathematical Physics as a Graph</description>
+
+  {% for this_item in list_of_dictionaries %}
   <item>
-    <title>what I though about</title>
-    <link>https://allofphysics.com/blog/1982/10/29</link>
-    <description>New idea</description>
+    <title>{{ this_item['title'] }}</title>
+    <link>{{ this_item['link'] }}</link>
+    <description>{{ this_item['title'] }}</description>
   </item>
-  <item>
-    <title>more stuff</title>
-    <link>https://allofphysics.com/blog/1982/11/02</link>
-    <description>another idea</description>
-  </item>
+  {% endfor %}
+
 </channel>
 
 </rss>
