@@ -1,3 +1,10 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
+<P>First published 2026-04</P>
+
 <P>The website was responding slowly so I checked the dashboard and saw the CPU was saturated (200%)
 
 <pre>
@@ -123,3 +130,5 @@ $ docker diff ec7498c95afa | grep "generated" | wc -l
 $ docker diff ec7498c95afa | grep "elan" | wc -l
 4017
 </pre>
+
+{% endblock %}

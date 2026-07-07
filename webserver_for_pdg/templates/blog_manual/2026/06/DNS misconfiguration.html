@@ -1,7 +1,15 @@
-<P>When I visit https://website.allofphysics.com/ Chrome warns me that "net::ERR_CERT_COMMON_NAME_INVALID" 
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
+<P>First published 2026-06</P>
+
+
+<P>When I visit <a href="https://website.allofphysics.com/">https://website.allofphysics.com/</a> Chrome warns me that <code>"net::ERR_CERT_COMMON_NAME_INVALID"</code>.<BR>
 I am not allowed to proceed because, "When Chrome tried to connect to website.allofphysics.com this time, the website sent back unusual and incorrect credentials."
 
-<P>Same error when I try to go to https://website.allofphysics.com/
+<P>Same error when I try to go to <a href="https://website.allofphysics.com/">https://website.allofphysics.com/</a>
 
 <P>Therefore I deleted
 <pre>
@@ -30,3 +38,6 @@ A problem I'm seeing is that Google Search Console is looking for a non-existent
 <fieldset><legend>Response from Gemini 3.5 Flash on 2026-06-01</legend>
 Based on the DNS settings shown in the image, the primary reason Google Search Console is finding and attempting to crawl non-existent subdomains is likely the wildcard A record (* .allofphysics.com).
 </fieldset>
+
+
+{% endblock %}

@@ -1,27 +1,25 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
 
-based on prior experience https://physicsderivationgraph.blogspot.com/2025/12/website-unresponsive-diagnostic-steps.html
-and the logs in 
+<P>First published 2026-07</P>
 
-http://www.apple.com/go/applebot
+<P>Based on <a href="https://physicsderivationgraph.blogspot.com/2025/12/website-unresponsive-diagnostic-steps.html">prior experience</a> and the logs entries like
 
-http://www.semrush.com/bot.html
-
-
+<pre>
 {"ip":"216.73.216.95", "user":"-", "time":"24/Jun/2026:01:22:13 +0000", "req":"GET /review_derivation/0000000011 HTTP/1.1", "stat":"200", "bsnt":"85008", "reqt":"2.647", "ref":"-", "ua":"Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; ClaudeBot/1.0; +claudebot@anthropic.com)", "gz":"-"}
 
-
 {"ip":"17.246.23.224", "user":"-", "time":"24/Jun/2026:01:22:14 +0000", "req":"GET /login?next=https://derivationmap.net/edit_step/207210/3408108 HTTP/1.1", "stat":"302", "bsnt":"685", "reqt":"0.192", "ref":"-", "ua":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15 (Applebot/0.1; +http://www.apple.com/go/applebot)", "gz":"-"}
-
 
 {"ip":"85.208.96.211", "user":"-", "time":"24/Jun/2026:01:22:18 +0000", "req":"GET /new_step_expressions/0000000003/0000111732 HTTP/1.1", "stat":"200", "bsnt":"373203", "reqt":"0.529", "ref":"-", "ua":"Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)", "gz":"-"}
 {"ip":"85.208.96.210", "user":"-", "time":"24/Jun/2026:01:22:12 +0000", "req":"GET /new_step_expressions/0000332170/0000111246 HTTP/1.1", "stat":"200", "bsnt":"373263", "reqt":"1.038", "ref":"-", "ua":"Mozilla/5.0 (compatible; SemrushBot/7~bl; +http://www.semrush.com/bot.html)", "gz":"-"}
 
-
-
 {"ip":"145.239.69.153", "user":"-", "time":"24/Jun/2026:01:22:12 +0000", "req":"GET /blog/page/2026/03/DigitalOcean%20initial%20configuration HTTP/1.1", "stat":"200", "bsnt":"25859", "reqt":"0.083", "ref":"-", "ua":"Mozilla/5.0 (compatible; MJ12bot/v1.4.8; http://mj12bot.com/)", "gz":"-"}
+</pre>
 
 
-Then I looked at top
+<P>I expected bots were overwhelming the CPU. I looked at <code>top</code>
 
 <fieldset><legend>prompt</legend>
 using `top` in linux shows my CPU is spiked:
@@ -47,7 +45,8 @@ $ sudo du -hxd 1 / | sort -hr
 116M	/boot
 41M	/opt
 11M	/root
-
+</pre>
+<P>and then
 <pre>
 $ sudo du -hxd 1 /var | sort -hr
 32G	/var
@@ -56,7 +55,8 @@ $ sudo du -hxd 1 /var | sort -hr
 114M	/var/cache
 1.9M	/var/backups
 332K	/var/crash
-
+</pre>
+<P>and then
 <pre>
 $ sudo du -hxd 1 /var/lib | sort -hr
 31G	/var/lib/containerd
@@ -64,7 +64,8 @@ $ sudo du -hxd 1 /var/lib | sort -hr
 177M	/var/lib/apt
 28M	/var/lib/docker
 23M	/var/lib/dpkg
-
+</pre>
+<P>and then
 
 <pre>
 $ sudo du -hxd 1 /var/lib/containerd | sort -hr
@@ -72,39 +73,42 @@ $ sudo du -hxd 1 /var/lib/containerd | sort -hr
 29G	/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs
 1.9G	/var/lib/containerd/io.containerd.content.v1.content
 3.0M	/var/lib/containerd/io.containerd.metadata.v1.bolt
+</pre>
 
 
 
-
-
+<pre>
 sudo docker system prune -a --volumes
-which resulted in
+</pre>
+<P>which resulted in
+<pre>
 Total reclaimed space: 5.802GB
+	</pre>
 
-That's an improvement, but 
-
+<P>That's an improvement, but 
+<pre>
 $ sudo du -hxd 1 /var/lib/containerd | sort -hr
 27G	/var/lib/containerd
 25G	/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs
 1.8G	/var/lib/containerd/io.containerd.content.v1.content
 3.0M	/var/lib/containerd/io.containerd.metadata.v1.bolt
+</pre>
 
 
-
-
+<pre>
 $ docker images
  i Info →   U  In Use
 IMAGE                          ID             DISK USAGE   CONTENT SIZE   EXTRA
 neo4j:4.4.45-community         4322925e2e86        892MB          330MB    U   
 ui_v8-flask-webserver:latest   c847dcc46538       6.01GB         1.56GB    U   
+</pre>
 
-
-
+<pre>
 $ docker ps
 CONTAINER ID   IMAGE                    COMMAND                  CREATED       STATUS                  PORTS                                                                                                          NAMES
 0d53d4dab9e7   ui_v8-flask-webserver    "gunicorn --reload -…"   7 weeks ago   Up 33 hours             5000/tcp                                                                                                       ui_v8-flask-webserver-1
 f3646f991c05   neo4j:4.4.45-community   "tini -g -- /startup…"   7 weeks ago   Up 33 hours (healthy)   0.0.0.0:7473-7474->7473-7474/tcp, [::]:7473-7474->7473-7474/tcp, 0.0.0.0:7687->7687/tcp, [::]:7687->7687/tcp   ui_v8-neo4j_docker-1
-
+</pre>
 
 
 <fieldset><legend>prompt</legend>
@@ -172,7 +176,7 @@ docker <span class="hljs-built_in">system</span> prune -<span class="hljs-keywor
 
 <HR>
 
-
+<pre>
 $ docker builder prune
 WARNING! This will remove all dangling build cache. Are you sure you want to continue? [y/N] y
 ID						RECLAIMABLE	SIZE		LAST ACCESSED
@@ -180,8 +184,9 @@ f45scwx1wsdjhw4qdqzrcpw00*              	true 		12.29kB   	39 seconds ago
 i587a0dgc4pfvn1b1bve06cwy*              	true 	23.28MB   	39 seconds ago
 n67s18ay8o6i0kd6iac3v9go4*              	true 	4.096kB   	39 seconds ago
 Total:	23.3MB
+</pre>
 
-
+<pre>
 $ docker builder prune -a
 WARNING! This will remove all build cache. Are you sure you want to continue? [y/N] y
 ID						RECLAIMABLE	SIZE		LAST ACCESSED
@@ -190,4 +195,6 @@ ID						RECLAIMABLE	SIZE		LAST ACCESSED
 brjy0s8b9p4naa6vt90merq47               	true 	1.788GB   	About a minute ago
 ...
 Total:	5.817GB
+</pre>
 
+{% endblock %}

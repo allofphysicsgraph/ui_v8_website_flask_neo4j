@@ -1,3 +1,11 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
+<P>First published 2026-06</P>
+
+
 <fieldset>
 	<legend>prompt</legend>
 <P>In mathematical physics derivations start from an expression or assumption and work step-by-step to end up with a result. The derivation involves mathematical transformations and reliance on assumptions. 
@@ -71,3 +79,6 @@
 <li><strong>Justification Tags on Equations:</strong> Instead of narrative paragraphs, label mathematical steps with formal justification tags (e.g., $\xrightarrow{\text{Taylor } (x \to 0), \text{ Order } 1}$).</li>
 <li><strong>An Action or Conservation Principle:</strong> State the fundamental variational principle or conservation law from which the entire system is derived, rather than introducing ad-hoc equations mid-way through.</li>
 </ol>
+
+
+{% endblock %}

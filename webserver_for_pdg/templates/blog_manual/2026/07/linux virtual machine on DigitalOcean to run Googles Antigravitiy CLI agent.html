@@ -1,4 +1,12 @@
-<h1 id="vm-on-digital-ocean">VM on Digital Ocean</h1>
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+<H1>{{ title }}</H1>
+
+<P>First published 2026-07-05</P>
+
+
+<h2 id="vm-on-digital-ocean">VM on Digital Ocean</h2>
 
 <p>Log into digitalocean.com</p>
 
@@ -296,3 +304,7 @@ In the file `.gemini/antigravity-cli/settings.json`
     </tr>
   </tbody>
 </table>
+
+
+
+{% endblock %}
