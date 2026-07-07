@@ -61,6 +61,8 @@ launch_webserver:
 	fi
 	$(DOCKER_OR_PODMAN) ps
 	$(DOCKER_OR_PODMAN) run --rm -t -e PYTHONUNBUFFERED=1  \
+	        --entrypoint python3 -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) /scratch/validate_jinja2.py
+	$(DOCKER_OR_PODMAN) run --rm -t -e PYTHONUNBUFFERED=1  \
 	        --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) \
 	        -c 'black -v --workers 1 /scratch/webserver_for_pdg/*.py /scratch/tests_of_webpage/playwright/*.py /scratch/webserver_for_pdg/library/*.py'
 	# https://docs.docker.com/compose/reference/up/
