@@ -64,6 +64,7 @@ import json
 import time
 import random
 import glob
+from pathlib import Path
 import datetime
 import uuid
 import xmltodict
@@ -7584,10 +7585,40 @@ def to_llm_page():
 def to_blog_list():
     """ """
     logger.info("[TRACE] ")
-    list_of_files = glob.glob("blog_manual/**/*.html")
-    logger.info(list_of_files)
+    # logger.info(str(os.getcwd())) # /code
+
+    base_dir = Path("templates/blog_manual")
+    # logger.info(str(glob.glob("templates/blog_manual/**/**/*.html")))
+    # return render_template(
+    #     "blog_from_blogger/blog_list.html", title="Blog for Physics Derivation Graph"
+    # )
+    # Recursively find all .html files in `templates/blog_manual/`
+    list_of_files = base_dir.rglob("*.html")
+
+    list_of_formated_links = []
+    for file_path in list_of_files:
+        # Get parts relative to 'templates/blog_manual' (e.g., ('2026', '07', 'filename.html'))
+        relative_parts = file_path.relative_to(base_dir).parts
+
+        # Ensure the structure matches YYYY/MM/title.html
+        if len(relative_parts) == 3:
+            yyyy, mm, filename = relative_parts
+
+            # Check that the subfolders are numeric years and months
+            if yyyy.isdigit() and mm.isdigit():
+                title = file_path.stem  # Extract filename without the .html extension
+
+                list_of_formated_links.append({"YYYY": yyyy, "MM": mm, "title": title})
+
+    # Sort: Year (descending), Month (descending), Title (ascending)
+    list_of_formated_links.sort(
+        key=lambda x: (-int(x["YYYY"]), -int(x["MM"]), x["title"])
+    )
+
     return render_template(
-        "blog_from_blogger/blog_list.html", title="Blog for Physics Derivation Graph"
+        "blog_from_blogger/blog_list.html",
+        title="Blog for Physics Derivation Graph",
+        blog_links=list_of_formated_links,
     )
 
 
