@@ -31,5 +31,15 @@ with
   <LI><a href="/\1.html">\1</a></LI>
 ```
 
+# Step 5: re-order date
+
+Replace
+```
+<LI>(<a href="/blog/.*">)([0-9][0-9][0-9][0-9]/[0-9][0-9])/
+```
+with
+```
+<LI>\2: \1
+```
 
 EOF
