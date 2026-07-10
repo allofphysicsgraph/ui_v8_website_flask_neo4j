@@ -279,6 +279,32 @@ RETURN f, stepCount
 <HR/>
 <P>&nbsp;</P>
 
+
+<H2 id="separate tests from implementation"><i>Decision</i>: separate tests from implementation or keep tests next to implemenation?
+
+<P>Based on a recommendation from Gemini 3.5 Flash, tests are separate from the implementation.
+
+<P>Justifications:
+  <UL>
+    <LI>Avoid Production Dependency Issues<BR>
+The tests rely on testing frameworks (like pytest and playwright). If test code is in the same file as routes, then the production environment will parse the test-related imports. This means you would have to install development-only testing tools on your production server, which increases your deployment size and security attack surface.
+
+    <LI>Automatic Test Discovery<BR>
+Testing tools like pytest are designed to automatically scan your project, find a directory named tests/, and run any file that starts with test_ (e.g., test_routes.py). Keeping them separate makes it easy to run all your tests with a single command (just typing pytest in your terminal).
+
+<LI>Cleaner Deployment<BR>
+When you package your application for production (such as building a Docker container or deploying to a cloud provider), you can easily exclude the tests/ directory. This keeps your production build lightweight and ensures you aren't deploying code to production that will never be executed there.
+
+<LI>Readability and Maintainability<BR>
+A route file can quickly grow to hundreds of lines of code as you add more endpoints. If you mix in 5 to 10 tests for every route, the file will quickly become bloated and difficult to navigate. Keeping them separate allows you to focus on writing routes in one file and testing them in another.
+</UL>
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+
+
 <H2 id="render graphs viz"><i>Decision</i>: How to render graphs visually?</H2>
 
 <P><em>current status</em>:  using d3js and graphviz.
