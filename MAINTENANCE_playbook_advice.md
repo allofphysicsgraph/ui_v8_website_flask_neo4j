@@ -23,6 +23,8 @@ and
 The `pdg.cypher` content must be sorted prior to comparison.
 
 
+There's also a script for comparing PDG CSV dumps: 
+`allofphysicsgraph/ui_v8_website_flask_neo4j/webserver_for_pdg/static/compare_pdg_CSV.py`
 
 
 # backlog, aka opportunities
@@ -33,6 +35,12 @@ highlights from ui_v8: <https://github.com/orgs/allofphysicsgraph/projects/4>
 
 
 The following is unordered
+
+
+coverage to track what gets runcoverage of tests
+
+Move `allofphysicsgraph/ui_v8_website_flask_neo4j/documentation_manual/design_decisions.log` to 
+`allofphysicsgraph/ui_v8_website_flask_neo4j/webserver_for_pdg/templates/jinja2_pages/documentation_of_design_choices.html`
 
 - more content - scope
    - DEPENDS ON automate ingest of papers; see https://allofphysics.com/llm_workflow_documentation
@@ -55,6 +63,7 @@ The following is unordered
 See also the "recurring" board on https://github.com/orgs/allofphysicsgraph/projects/2 for implementation agnostic recurring tasks.
 
 - pytests failures 
+- coverage
 
 
 Documentation:
