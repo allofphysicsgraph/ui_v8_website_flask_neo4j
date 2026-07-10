@@ -38,3 +38,8 @@ Server logs are useful for debugging. See
 ```
 /home/pdg/ui_v8_website_flask_neo4j/logs
 ```
+
+
+Design decisions are documented in 
+`ui_v8_website_flask_neo4j/webserver_for_pdg/templates/jinja2_pages/documentation_of_design_choices.html` 
+which is rendered as https://allofphysics.com/documentation/design_choices
