@@ -11,6 +11,8 @@ import json
 import os
 from playwright.sync_api import Page, expect
 import pytest
+import xml.etree.ElementTree as ET
+
 
 # this is what is exposed inside the Docker container
 URL = "http://localhost:5000"
@@ -29,6 +31,60 @@ def test_has_title(page: Page):
     expect(page).to_have_title(re.compile("Welcome"))
     # using a str would necessitate an exact match, whereas using `re` enables partial matches.
     # `.to_have_title` shows up in the HTML's <title> tag -- the browser tab
+
+
+def test_rss_feed(page: Page):
+    # Navigate to the RSS feed path
+    response = page.goto(URL + "/rss.xml")
+    
+    # Assert the response was successful
+    assert response is not None
+    assert response.status == 200
+    
+    # Assert that the content type is indeed XML
+    content_type = response.headers.get("content-type", "")
+    assert "xml" in content_type.lower()
+
+    # Parse the XML response
+    xml_content = response.text()
+    root = ET.fromstring(xml_content)
+
+    # 1. Assert the root element details
+    assert root.tag == "rss"
+    assert root.attrib.get("version") == "2.0"
+
+    # 2. Check the <channel> container
+    channel = root.find("channel")
+    assert channel is not None
+
+    # 3. Check Channel metadata
+    title = channel.find("title")
+    link = channel.find("link")
+    description = channel.find("description")
+
+    assert title is not None and title.text == "Physics Derivation Graph"
+    assert link is not None and link.text == "https://allofphysics.com"
+    assert description is not None and description.text == "Mathematical Physics as a Graph"
+
+    # 4. Check namespaced tags (like atom:link)
+    namespaces = {"atom": "http://www.w3.org/2005/Atom"}
+    atom_link = channel.find("atom:link", namespaces)
+    assert atom_link is not None
+    assert atom_link.attrib.get("href") == "https://allofphysics.com/rss.xml"
+    assert atom_link.attrib.get("rel") == "self"
+
+    # 5. Check RSS <item> entries
+    items = channel.findall("item")
+    assert len(items) >= 3  # Based on the provided file snippet, there should be at least 3
+
+    # Validate the first item's details as a sanity check
+    first_item = items[0]
+    first_title = first_item.find("title")
+    first_link = first_item.find("link")
+    first_guid = first_item.find("guid")
+
+    assert first_title is not None and "linux virtual machine on DigitalOcean" in first_title.text
+    assert first_guid is not None and first_guid.text == first_link.text
 
 
 def test_get_started_link(page: Page):
@@ -301,11 +357,11 @@ def test_get_api_page(page: Page):
 def test_get_workflow_page(page: Page):
     page.goto(URL + "/workflow_documentation")
 
-    expect(page).to_have_title(re.compile("Workflow"))
+    expect(page).to_have_title(re.compile("Webpage documentation"))
 
     # expect(page.get_by_role("heading", name="Workflow")).to_be_visible()
     expect(
-        page.get_by_role("heading", name=re.compile("Workflow Interface Documentation"))
+        page.get_by_role("heading", name=re.compile("Webpages used"))
     ).to_be_visible()
 
 
@@ -480,6 +536,55 @@ def test_get_spectrum_precision_overview_page(page: Page):
     page.goto(URL + "/spectrum_of_precision/overview")
 
 
+def test_validate_operations_api(page: Page):
+    # Perform a GET request to the API endpoint
+    response = page.request.get(f"{URL}/api/resources/symbol/operations")
+    
+    # Validate that the response is successful
+    assert response.ok
+    assert response.status == 200
+    
+    # Check the custom Content-Type header (Playwright normalizes keys to lowercase)
+    assert response.headers.get("content-type") == "application/hal+json"
+    
+    # Extract and parse the response body as JSON
+    data = response.json()
+    
+    # Validate the JSON structure
+    assert "_embedded" in data
+    assert "operation_symbols" in data["_embedded"]
+    
+    operation_symbols = data["_embedded"]["operation_symbols"]
+    assert isinstance(operation_symbols, list)
+    assert len(operation_symbols) > 0
+    
+    # Locate a specific item (e.g., 'multiplication') and assert its properties
+    multiplication = next(
+        (op for op in operation_symbols if op.get("name_latex") == "multiplication"), 
+        None
+    )
+    assert multiplication is not None, "The 'multiplication' operation was not found in the payload"
+    
+    # Assert field values on the multiplication symbol
+    #assert multiplication["id"] == "0001094924"
+    assert multiplication["latex"] == "\\cdot"
+    assert multiplication["argument_count"] == 2
+    #assert multiplication["description_latex"] == "multiply two terms"
+    
+    # Assert HAL links are present and correct
+    assert "_links" in multiplication
+    links = multiplication["_links"]
+    assert "delete" in links
+    assert "edit" in links
+    assert "self" in links
+    
+    assert links["delete"]["method"] == "DELETE"
+    assert links["edit"]["method"] == "POST"
+    assert "delete" in links["delete"]["href"]
+
+
+
+
 def test_get_review_derivation_instance(page: Page):
     page.on("console", lambda msg: print(f"Console: {msg.text}"))
     page.on("pageerror", lambda exc: print(f"JS Error: {exc}"))
@@ -506,7 +611,8 @@ def test_get_review_derivation_instance(page: Page):
 
         # ASSERT AGAINST THE DOWNLOAD URL, NOT THE PAGE
         expected_pdf_url = (
-            URL + "/static/0000201726.pdf?referrer=select_from_existing_derivations"
+            URL
+            + "/static/generated_0000201726.pdf?referrer=select_from_existing_derivations"
         )
         assert download.url == expected_pdf_url
 
@@ -517,7 +623,7 @@ def test_get_review_derivation_instance(page: Page):
         assert path is not None
 
         # Check the filename
-        assert download.suggested_filename == "0000201726.pdf"
+        assert download.suggested_filename == "generated_0000201726.pdf"
 
     # Verify the page didn't navigate away
     expect(page).to_have_url(URL + "/review_derivation/0000201726")
@@ -562,7 +668,7 @@ def test_get_query_list_derivation_IDs(page: Page):
             # ASSERT AGAINST THE DOWNLOAD URL, NOT THE PAGE
             expected_pdf_url = (
                 URL
-                + "/static/"
+                + "/static/generated_"
                 + dev_id
                 + ".pdf?referrer=select_from_existing_derivations"
             )
@@ -575,7 +681,7 @@ def test_get_query_list_derivation_IDs(page: Page):
             assert path is not None
 
             # Check the filename
-            assert download.suggested_filename == dev_id + ".pdf"
+            assert download.suggested_filename == "generated_" + dev_id + ".pdf"
 
         # Verify the page didn't navigate away
         expect(page).to_have_url(URL + "/review_derivation/" + dev_id)
