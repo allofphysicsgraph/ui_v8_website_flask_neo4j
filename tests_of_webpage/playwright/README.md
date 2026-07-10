@@ -6,3 +6,6 @@ To run a specific test,
 ```
 pytest path/to/test_file.py::test_function_name
 ```
+
+
+TODO: <https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138> - coverage measurement
