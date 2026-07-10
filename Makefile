@@ -108,6 +108,7 @@ pytest_out:
 pytest_out_create_html:
 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/tests_of_webpage/playwright/ $$(docker ps -qf "name=flask-webserver") pytest --html=pytest_report.html --self-contained-html
 
+# in https://www.youtube.com/watch?v=xjWjfRVTUHo the creator of coverage.py says use incurs 5% overhead. BHP hasn't measured this yet.
 coverage:
 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/tests_of_webpage/playwright/ $$(docker ps -qf "name=flask-webserver") pytest --cov=. --cov-report=html
 
