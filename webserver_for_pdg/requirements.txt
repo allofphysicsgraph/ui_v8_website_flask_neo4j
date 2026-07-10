@@ -41,15 +41,19 @@ flake8
 #pylint==4.0.4 as of 2026-01-24 on arm64
 pylint
 
-# browser tests
-pytest-playwright
-  
 
 # for RSS scraping
 xmltodict
 
+coverage
+
+# browser tests
+pytest-playwright
+  
 pytest
 pytest-flask
+pytest-html
+pytest-cov
 
 # step validation
 #sympy==1.14.0 as of 2026-01-24 on arm64
