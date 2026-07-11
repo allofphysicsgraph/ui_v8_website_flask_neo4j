@@ -160,25 +160,25 @@ def api_start_here():
     Hypermedia as the Engine of Application State (HATEOAS)
     https://en.wikipedia.org/wiki/HATEOAS
 
-    ```
-    $ curl --silent --insecure https://localhost/api/v1/ | python3 -m json.tool
+    .. code-block:: bash
 
-    {
-      "_links": {
-        "cypher_query": {
-          "href": "https://localhost/api/v1/resources/cypher/",
-          "title": "Cypher query",
-          "type": "GET"
-        },
-        "derivations": {
-          "href": "https://localhost/api/v1/resources/derivations,
-          "title": "List derivations",
-          "type": "GET"
+        $ curl --silent --insecure https://localhost/api/v1/ | python3 -m json.tool
+
+        {
+          "_links": {
+            "cypher_query": {
+              "href": "https://localhost/api/v1/resources/cypher/",
+              "title": "Cypher query",
+              "type": "GET"
+            },
+            "derivations": {
+              "href": "https://localhost/api/v1/resources/derivations,
+              "title": "List derivations",
+              "type": "GET"
+            }
+          }
+          "message": "Welcome to the Physics Derivation Graph API. Please explore the available resources."
         }
-      }
-      "message": "Welcome to the Physics Derivation Graph API. Please explore the available resources."
-    }
-    ```
 
     """
     # Construct the HAL payload
@@ -257,18 +257,21 @@ def api_start_here():
 @api_bp.route("/resources/derivations", methods=["GET"])
 def api_list_derivations():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/derivation/list | python3 -m json.tool
-    [
-        {
-            "abstract_latex": "my summary",
-            "author_name_latex": "ben",
-            "created_datetime": "2024-05-19_21-16-29-085813",
-            "id": "3445848",
-            "name_latex": "this is a new derivation"
-        }
-    ]
 
-    >>>
+    .. code-block:: bash
+
+
+        curl --silent --insecure https://localhost/api/v1/resources/derivation/list | python3 -m json.tool
+        [
+            {
+                "abstract_latex": "my summary",
+                "author_name_latex": "ben",
+                "created_datetime": "2024-05-19_21-16-29-085813",
+                "id": "3445848",
+                "name_latex": "this is a new derivation"
+            }
+        ]
+
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
@@ -362,18 +365,21 @@ def api_list_derivations():
 @api_bp.route("/resources/inference_rules", methods=["GET"])
 def api_list_inference_rules():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/inference_rule/list | python3 -m json.tool
-    [
-        {
-            "author_name_latex": "ben",
-            "id": "7681529",
-            "latex": "ADD _ to BOTH sides",
-            "name_latex": "add x to both sides",
-            "number_of_feeds": 1,
-            "number_of_inputs": 1,
-            "number_of_outputs": 1
-        }
-    ]
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/inference_rule/list | python3 -m json.tool
+        [
+            {
+                "author_name_latex": "ben",
+                "id": "7681529",
+                "latex": "ADD _ to BOTH sides",
+                "name_latex": "add x to both sides",
+                "number_of_feeds": 1,
+                "number_of_inputs": 1,
+                "number_of_outputs": 1
+            }
+        ]
 
     """
     trace_id = str(uuid.uuid4())
@@ -451,18 +457,21 @@ def api_list_inference_rules():
 @api_bp.route("/resources/expressions", methods=["GET"])
 def api_list_expressions():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/expressions | python3 -c "
-    import sys, json
 
-    data = json.load(sys.stdin)
-    data.pop('_links', None)
-    if '_embedded' in data and 'expressions' in data['_embedded']:
-        for entry in data['_embedded']['expressions']:
-            entry.pop('_links', None)
-            entry.pop('author_name_latex', None)
+    .. code-block:: bash
 
-    print(json.dumps(data, indent=2))
-    "
+        curl --silent --insecure https://localhost/api/v1/resources/expressions | python3 -c "
+        import sys, json
+
+        data = json.load(sys.stdin)
+        data.pop('_links', None)
+        if '_embedded' in data and 'expressions' in data['_embedded']:
+            for entry in data['_embedded']['expressions']:
+                entry.pop('_links', None)
+                entry.pop('author_name_latex', None)
+
+        print(json.dumps(data, indent=2))
+        "
 
     """
     trace_id = str(uuid.uuid4())
@@ -546,18 +555,21 @@ def api_list_expressions():
 @api_bp.route("/resources/symbol/operations", methods=["GET"])
 def api_list_operation_symbols():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/operation/list | python3 -m json.tool
-    [
-        {
-            "argument_count": 2,
-            "author_name_latex": "ben",
-            "description_latex": "",
-            "id": "7052411",
-            "latex": "=",
-            "name_latex": "equals",
-            "requires_arguments": true
-        }
-    ]
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/operation/list | python3 -m json.tool
+        [
+            {
+                "argument_count": 2,
+                "author_name_latex": "ben",
+                "description_latex": "",
+                "id": "7052411",
+                "latex": "=",
+                "name_latex": "equals",
+                "requires_arguments": true
+            }
+        ]
 
     """
     trace_id = str(uuid.uuid4())
@@ -643,7 +655,10 @@ def api_list_operation_symbols():
 @api_bp.route("/resources/symbol/relations", methods=["GET"])
 def api_list_relation_symbols():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/list | python3 -m json.tool
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/list | python3 -m json.tool
 
     """
     trace_id = str(uuid.uuid4())
@@ -730,18 +745,22 @@ def api_list_relation_symbols():
 def api_list_scalar_symbols():
     """
 
-    curl --silent --insecure https://localhost/api/v1/resources/symbol/scalars | python3 -c "
-    import sys, json
 
-    data = json.load(sys.stdin)
-    data.pop('_links', None)
-    if '_embedded' in data and 'scalar_symbols' in data['_embedded']:
-        for entry in data['_embedded']['scalar_symbols']:
-            entry.pop('_links', None)
-            entry.pop('author_name_latex', None)
+    .. code-block:: bash
 
-    print(json.dumps(data, indent=2))
-    "
+
+        curl --silent --insecure https://localhost/api/v1/resources/symbol/scalars | python3 -c "
+        import sys, json
+
+        data = json.load(sys.stdin)
+        data.pop('_links', None)
+        if '_embedded' in data and 'scalar_symbols' in data['_embedded']:
+            for entry in data['_embedded']['scalar_symbols']:
+                entry.pop('_links', None)
+                entry.pop('author_name_latex', None)
+
+        print(json.dumps(data, indent=2))
+        "
 
     """
     trace_id = str(uuid.uuid4())
@@ -823,18 +842,21 @@ def api_list_scalar_symbols():
 @api_bp.route("/resources/symbol/vectors", methods=["GET"])
 def api_list_vector_symbols():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/vector/list | python3 -m json.tool
-    [
-        {
-            "argument_count": 2,
-            "author_name_latex": "ben",
-            "description_latex": "",
-            "id": "7052411",
-            "latex": "=",
-            "name_latex": "equals",
-            "requires_arguments": true
-        }
-    ]
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/vector/list | python3 -m json.tool
+        [
+            {
+                "argument_count": 2,
+                "author_name_latex": "ben",
+                "description_latex": "",
+                "id": "7052411",
+                "latex": "=",
+                "name_latex": "equals",
+                "requires_arguments": true
+            }
+        ]
 
     """
     trace_id = str(uuid.uuid4())
@@ -916,18 +938,21 @@ def api_list_vector_symbols():
 @api_bp.route("/resources/symbol/matrices", methods=["GET"])
 def api_list_matrix_symbols():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/matrix/list | python3 -m json.tool
-    [
-        {
-            "argument_count": 2,
-            "author_name_latex": "ben",
-            "description_latex": "",
-            "id": "7052411",
-            "latex": "=",
-            "name_latex": "equals",
-            "requires_arguments": true
-        }
-    ]
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/matrix/list | python3 -m json.tool
+        [
+            {
+                "argument_count": 2,
+                "author_name_latex": "ben",
+                "description_latex": "",
+                "id": "7052411",
+                "latex": "=",
+                "name_latex": "equals",
+                "requires_arguments": true
+            }
+        ]
 
     """
     trace_id = str(uuid.uuid4())
@@ -1020,16 +1045,18 @@ def api_create_derivation():
 
     see `pdg_app/to_add_derivation` for the web UI implementation
 
-    curl --request POST \
-    --header "Content-Type: application/x-www-form-urlencoded" \
-    --show-error --silent \
-     https://localhost/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
+    .. code-block:: bash
 
-    curl --request POST \
-    --header "Content-Type: application/json" \
-    --show-error --silent \
-    --data '{"derivation_name_latex":"hello again", "derivation_reference_latex":"this was", "derivation_abstract_latex": "yes no"}' \
-     https://localhost/api/v1/resources/derivation/create
+        curl --request POST \
+        --header "Content-Type: application/x-www-form-urlencoded" \
+        --show-error --silent \
+         https://localhost/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
+
+        curl --request POST \
+        --header "Content-Type: application/json" \
+        --show-error --silent \
+        --data '{"derivation_name_latex":"hello again", "derivation_reference_latex":"this was", "derivation_abstract_latex": "yes no"}' \
+         https://localhost/api/v1/resources/derivation/create
 
 
     """
@@ -1143,9 +1170,11 @@ def api_create_derivation():
 @api_bp.route("/resources/inference_rule", methods=["POST"])
 def api_create_inference_rule():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/inference_rule/create
 
-    >>>
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/inference_rule/create
+
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
@@ -1179,18 +1208,20 @@ def api_create_inference_rule():
 def api_create_expression():
     """
 
-    curl --request POST \
-    --header "Content-Type: application/x-www-form-urlencoded" \
-    --show-error --silent \
-    https://localhost/api/v1/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9 \
-     | python3 -m json.tool
+    .. code-block:: bash
+
+        curl --request POST \
+        --header "Content-Type: application/x-www-form-urlencoded" \
+        --show-error --silent \
+        https://localhost/api/v1/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9 \
+         | python3 -m json.tool
 
 
-    curl --request POST \
-    --header "Content-Type: application/json" \
-    --show-error --silent \
-    --data '{"expression_latex_lhs": "4^3", "expression_relation_latex": "=", "expression_latex_rhs": "k"}' \
-     https://localhost/api/v1/resources/expression/create | python3 -m json.tool
+        curl --request POST \
+        --header "Content-Type: application/json" \
+        --show-error --silent \
+        --data '{"expression_latex_lhs": "4^3", "expression_relation_latex": "=", "expression_latex_rhs": "k"}' \
+         https://localhost/api/v1/resources/expression/create | python3 -m json.tool
 
     user-provided dictionary is required to have latex and name
 
@@ -1372,17 +1403,19 @@ def api_create_expression():
 def api_create_scalar_symbol():
     """
 
-    curl --request POST \
-    --header "Content-Type: application/x-www-form-urlencoded" \
-    --show-error --silent \
-    https://localhost/api/v1/resources/symbol/scalar/create?scalar_latex=a | python3 -m json.tool
+    .. code-block:: bash
+
+        curl --request POST \
+        --header "Content-Type: application/x-www-form-urlencoded" \
+        --show-error --silent \
+        https://localhost/api/v1/resources/symbol/scalar/create?scalar_latex=a | python3 -m json.tool
 
 
-    curl --request POST \
-    --header "Content-Type: application/json" \
-    --show-error --silent \
-    --data '{"scalar_latex": "b"}' \
-     https://localhost/api/v1/resources/symbol/scalar/create | python3 -m json.tool
+        curl --request POST \
+        --header "Content-Type: application/json" \
+        --show-error --silent \
+        --data '{"scalar_latex": "b"}' \
+         https://localhost/api/v1/resources/symbol/scalar/create | python3 -m json.tool
 
 
     see `to_add_symbol_scalar`
@@ -1678,7 +1711,10 @@ def api_create_scalar_symbol():
 @api_bp.route("/resources/symbol/vector", methods=["POST"])
 def api_create_vector_symbol():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/symbol/vector/create
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/symbol/vector/create
 
     """
     trace_id = str(uuid.uuid4())
@@ -1694,7 +1730,10 @@ def api_create_vector_symbol():
 @api_bp.route("/resources/symbol/matrix", methods=["POST"])
 def api_create_matrix_symbol():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/symbol/matrix/create
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/symbol/matrix/create
 
     """
     trace_id = str(uuid.uuid4())
@@ -1710,7 +1749,10 @@ def api_create_matrix_symbol():
 @api_bp.route("/resources/symbol/operation", methods=["POST"])
 def api_create_operation_symbol():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/symbol/operation/create
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/symbol/operation/create
 
     see `to_add_operation`
 
@@ -1826,7 +1868,10 @@ def api_create_operation_symbol():
 @api_bp.route("/resources/symbol/relation", methods=["POST"])
 def api_create_relation_symbol():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/create
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/create
 
     see `to_add_relation`
     """
@@ -1966,14 +2011,17 @@ def api_edit_relation(relation_id: str):
 @api_bp.route("/resources/derivation/<string:derivation_id>/metadata", methods=["GET"])
 def api_derivation_metadata(derivation_id: str):
     """
-    curl --silent --insecure https://localhost/api/v1/resources/derivation/3445848/metadata | python3 -m json.tool
-    {
-        "abstract_latex": "my summary",
-        "author_name_latex": "ben",
-        "created_datetime": "2024-05-19_21-16-29-085813",
-        "id": "3445848",
-        "name_latex": "this is a new derivation"
-    }
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/derivation/3445848/metadata | python3 -m json.tool
+        {
+            "abstract_latex": "my summary",
+            "author_name_latex": "ben",
+            "created_datetime": "2024-05-19_21-16-29-085813",
+            "id": "3445848",
+            "name_latex": "this is a new derivation"
+        }
 
     """
     trace_id = str(uuid.uuid4())
@@ -2189,16 +2237,19 @@ def api_relation_metadata(relation_id: str):
 @api_bp.route("/resources/derivation/<string:derivation_id>/steps", methods=["GET"])
 def api_derivation_steps(derivation_id: str):
     """
-    curl --silent --insecure https://localhost/api/v1/resources/derivation/3445848/step/list | python3 -m json.tool
-    [
-        {
-            "author_name_latex": "benno",
-            "created_datetime": "2024-05-19_23-23-11-337900",
-            "id": "1800596",
-            "note_after_step_latex": "",
-            "note_before_step_latex": ""
-        }
-    ]
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/derivation/3445848/step/list | python3 -m json.tool
+        [
+            {
+                "author_name_latex": "benno",
+                "created_datetime": "2024-05-19_23-23-11-337900",
+                "id": "1800596",
+                "note_after_step_latex": "",
+                "note_before_step_latex": ""
+            }
+        ]
 
     """
     trace_id = str(uuid.uuid4())
@@ -2230,7 +2281,9 @@ def api_delete_derivation(derivation_id: str):
     """
     derivation and all steps
 
-    curl --silent --insecure https://localhost/api/v1/resources/derivation/<string:derivation_id>/delete
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/derivation/<string:derivation_id>/delete
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
@@ -2390,6 +2443,9 @@ def api_png_from_latex():
 
     Originally <string:user_input> was passed as an argument.
     Gemini 3.1 Pro says
+
+    .. code-block:: bash
+
         LaTeX strings contain characters like backslashes \, curly braces {}, and
         sometimes forward slashes /. Even with encodeURIComponent, sending this
         much complex data as a URL Path will frequently cause your Flask backend
@@ -2422,7 +2478,11 @@ def api_png_from_latex():
 @api_bp.route("/v1/resources/cypher", methods=["GET"])
 def api_cypher_query():
     """
-    curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
+
+    .. code-block:: bash
+
+        curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
+
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)

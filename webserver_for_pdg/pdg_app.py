@@ -23,16 +23,20 @@ can be constructed using md5hash(<derivation_id>_<expression_id>).
 See https://allofphysics.com/documentation/conventions
 
 # convention: every Python function starts with
-```
+
+.. code-block:: bash
+
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
-```
+
 and exits with
-```
+
+.. code-block:: bash
+
     logger.info("[TRACE] start " + trace_id)
     return
-```
+
 # reason: This enables creation of a flamegraph <https://www.brendangregg.com/flamegraphs.html>
 
 ****************************
@@ -4523,7 +4527,7 @@ def to_add_step_select_expressions(
 def to_add_symbols_and_operations_for_expression(
     expression_id: unique_numeric_id_as_str,
 ) -> ResponseReturnValue:
-    """
+    r"""
     expression_id is the numeric ID of the expression
 
     This action comes immediately after the Latex expression is provided.
@@ -4533,6 +4537,10 @@ def to_add_symbols_and_operations_for_expression(
     For example,
     r_{\rm Earth} = 6
     """
+
+    # the "r" prepended to the docstring to make a raw string. This tells Python 
+    # to treat backslashes as literal characters and prevents \r from being parsed as a carriage return by Sphinx
+
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
@@ -4790,7 +4798,7 @@ def to_add_sympy_and_lean_for_expression(
 def to_add_symbols_and_operations_for_feed(
     feed_id: unique_numeric_id_as_str,
 ) -> ResponseReturnValue:
-    """
+    r"""
     feed_id is the numeric ID of the expression
 
     This step comes immediately after the Latex expression is provided.
@@ -4800,6 +4808,10 @@ def to_add_symbols_and_operations_for_feed(
     For example,
     r_{\rm Earth} = 6
     """
+
+    # the "r" prepended to the docstring to make a raw string. This tells Python 
+    # to treat backslashes as literal characters and prevents \r from being parsed as a carriage return by Sphinx
+
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
