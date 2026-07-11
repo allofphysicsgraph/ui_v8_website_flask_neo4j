@@ -69,7 +69,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Physics Derivation Graph'
-copyright = '2024, Ben Payne'
+copyright = '2026, Ben Payne'
 author = 'Ben Payne'
 
 # The version info for the project you're documenting, acts as replacement for
