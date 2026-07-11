@@ -1,29 +1,31 @@
 #!/usr/bin/env python3
 
+# Physics Derivation Graph
+# Ben Payne, 2026
+# http://creativecommons.org/licenses/by/4.0/
+# Attribution 4.0 International (CC BY 4.0)
+
+
 """
-Physics Derivation Graph
-Ben Payne, 2026
-http://creativecommons.org/licenses/by/4.0/
-Attribution 4.0 International (CC BY 4.0)
-
-
 this file separates the API routes from `pdg_app.py`
 
 http://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 
 HTTP methods supported by the APIs in this file:
-- GET is used to request data from a specified resource.
-- POST is used to send data to a server to create/update a resource.
+
+- `GET` is used to request data from a specified resource.
+- `POST` is used to send data to a server to create/update a resource.
 
 
 When sending data via a POST or PUT request, two common formats
 (specified via the Content-Type header) are:
-- application/json
-- application/x-www-form-urlencoded
+
+- `application/json`
+- `application/x-www-form-urlencoded`
 
 ---
 
-<https://www.google.com/search?q=how+flask+json+api+authentication+works>
+https://www.google.com/search?q=how+flask+json+api+authentication+works
 
 on 2026-02-07, Gemini 3 Pro says
 To require authentication for your API, you have two primary paths based
