@@ -161,53 +161,29 @@ Figure 2.
 
 <H3 id="run flask container">Run Flask container</H3>
 <P>
-  Quick start on the command line:
   <pre>
-  git clone https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j.git
-  cd ui_v8_website_flask_neo4j/flask/
-  docker build -t flask_ub .
-  docker run -it --rm -v`pwd`/data.json:/home/appuser/app/data.json \
-             -v`pwd`/logs/:/home/appuser/app/logs/ \
-             --publish 5000:5000 flask_ub
+git clone https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j.git
+cd ui_v8_website_flask_neo4j/
+
+make container_build
+mkdir logs
+cd certs
+openssl genrsa > privkey.pem
+openssl req -new -x509 -key privkey.pem -subj "/C=US/ST=WI/O=PDG/CN=Ben/emailAddress=ben.is.located@gmail.com" -out fullchain.pem
+openssl dhparam -out dhparam.pem 2048
+echo "UID=1000" >  /home/pdg/ui_v8_website_flask_neo4j/.env
+echo "GID=1000" >> /home/pdg/ui_v8_website_flask_neo4j/.env
+echo "GOOGLE_CLIENT_ID=AVERYLONGSTRINGFROMGOOGLE" >  /home/pdg/ui_v8_website_flask_neo4j/.env.google
+echo "GOOGLE_CLIENT_SECRET=ANOTHERVERYLONGSTRING" >> /home/pdg/ui_v8_website_flask_neo4j/.env.google
+echo "SECRET_KEY=ASECRETSTRINGFROMGOOGLEASDFASDF" >> /home/pdg/ui_v8_website_flask_neo4j/.env.google
+make launch_webserver COMPOSE_FLAGS=--detach
   </pre>
 
   <P>To enter the container, run the commands
   <pre>
-  docker run -it --rm -v`pwd`:/scratch \
-             -v`pwd`/data.json:/home/appuser/app/data.json \
-             -v`pwd`/logs/:/home/appuser/app/logs/ \
-             --entrypoint='' \
-             --publish 5000:5000 flask_ub /bin/bash
-  python controller.py
-  </pre>
-<P>  Inside the container there is also a Makefile with code maintenance tools
-  <pre>
-  docker run -it --rm -v`pwd`:/scratch \
-             -v`pwd`/data.json:/home/appuser/app/data.json \
-             -v`pwd`/logs/:/home/appuser/app/logs/ \
-             --entrypoint='' \
-             --publish 5000:5000 flask_ub /bin/bash
-  make
+docker exec --workdir /scratch/ $(docker ps -qf "name=flask-webserver") /bin/bash
   </pre>
 </p>
-<H3 id="run gunicorn container">Run gunicorn container</H3>
-<P>
-  Quick start on the command line:
-  <pre>
-  git clone https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j.git
-  cd ui_v8_website_flask_neo4j/flask/
-  docker build -t gunicorn_ub --file Dockerfile.gunicorn .
-  docker run -it --rm -v`pwd`:/scratch \
-             -v`pwd`/data.json:/home/appuser/app/data.json \
-             -v`pwd`/logs/:/home/appuser/app/logs/ \
-             --entrypoint='' \
-             --publish 5000:5000 gunicorn_ub /bin/bash
-  gunicorn --bind :5000 wsgi:app \
-           --log-level=debug \
-           --access-logfile logs/gunicorn_access.log \
-           --error-logfile logs/gunicorn_error.log
-  </pre>
-</P>
 
 <P>&nbsp;</P>
 <HR/>
@@ -218,28 +194,29 @@ Figure 2.
 <P>
   After checking out the github repo, navigate to
   <code>ui_v8_website_flask_neo4j/flask</code> and then run
-  <code>make dockerlive</code> and then open Firefox to <code>https://localhost:5000</code>.<BR/>
-  The purpose of this section is to address the question,  <em>What happened when that docker container ran and the webpage was opened?</em><BR/>
-  Understanding the answer relies on knowing Python, <a href="https://flask.palletsprojects.com/">Flask</a>, and the Model-View-Controller paradigm.
+  <code>make launch_webserver</code> and then open Firefox to <code>https://localhost</code>.
+
+<P>The purpose of this section is to address the question,  <em>What happened when that docker container ran and the webpage was opened?</em><BR/>
+  Understanding the answer relies on knowing Python, <a href="https://flask.palletsprojects.com/">Flask</a>, and the <a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">Model-View-Controller (MVC)</a> paradigm.
 
 <P>
-  The entry point for the program is <code>controller.py</code>.
-  That file primarily depends on <code>compute.py</code>.
-  The purpose of <code>compute.py</code> is to manage the Python dictionary of nested dictionaries in the variable <code>dat</code> that is read from the JSON file.
-  All the additions, edits, and transformations to <code>dat</code> are performed in <code>compute.py</code> and then provided to <code>controller.py</code> for use in dynamically generating the HTML+Javascript pages using Jinja2.
+  The entry point for the program is <code>pdg_app.py</code>.
+  That file depends on scripts in <code>library</code>.
+  The purpose of <code>library/neo4j_query.py</code> is to manage access to the data that is in the Neo4j database.
+  All the additions, edits, and transformations to data are performed in <code>library/neo4j_query.py</code> and then provided to <code>pdg_app.py</code> for use in dynamically generating the HTML+Javascript pages using Jinja2.
 
 <P>
-  The starting point of <code>controller.py</code> is at the bottom of the file with the line <code>if __name__ == "__main__"</code>.
-  That is where the Flask app is started. Once the app is running, the web browser requests use the function decorators like <code>@app.route("/",...)</code> to run corresponding functions like <code>def index():</code>.
-  Each of the decorated Python functions in <code>controller.py</code> rely on functions defined in <code>compute.py</code>.
-  All of the calls from <code>controller.py</code> to <code>compute.py</code> are wrapped in <code>try/except</code> clauses so that if the Python fails, the user is not exposed to the failure stack trace.
-  Each of the decorated Python functions in <code>controller.py</code> terminate with either <code>return render_template(...</code> or <code>return redirect(...</code> which results in the user's web browser getting a new page of content.
+  The starting point of <code>pdg_app.py</code> is the line <code>web_app = Flask(__name__, static_folder="static")</code>.
+  That is where the Flask app is started. Once the app is running, the web browser requests use function decorators like <code>@web_app.route("/",...)</code> to run corresponding functions like <code>def to_index():</code>.
+  Each of the decorated Python functions in <code>pdg_app.py</code> rely on functions defined in <code>compute.py</code>.
+  Many of the calls from <code>pdg_app.py</code> to <code>library/*.py</code> are wrapped in <code>try/except</code> clauses so that if the Python fails, the user is not exposed to the failure stack trace.
+  Each of the decorated Python functions in <code>pdg_app.py</code> terminate with either <code>return render_template(...</code> or <code>return redirect(...</code> which results in the user's web browser getting a new page of content.
 
 <P>
   When errors occur, there's a Flask function <code>flash</code> used to convey the error summary to the user (displayed at the bottom of the webpage).
 
 <P>
-  The website <a href="{{ url_for('to_index') }}">allofphysiscs.com</a> is run using docker-compose; see <code>ui_v8_website_flask_neo4j</code>
+  The website <a href="{{ url_for('to_index') }}">allofphysiscs.com</a> is run using docker-compose; see <code>ui_v8_website_flask_neo4j/compose.yaml</code>
 
 <center>
 <P>
