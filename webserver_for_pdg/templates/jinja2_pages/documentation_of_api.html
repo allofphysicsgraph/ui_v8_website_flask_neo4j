@@ -260,7 +260,7 @@ curl -b cookies.txt http://localhost/api/v1/resources/derivation/
     <pre>curl -s http://localhost{{ url_for('pdg_api.api_cypher_query') }} | python3 -m json.tool</pre>
 
 
-    <h3>POST <a href="http://localhost/api/v1/resources/derivation/create">http://localhost/api/v1/resources/derivation/create</a></h3>
+    <h3>POST <a href="http://localhost/api/v1/resources/derivation/create">/api/v1/resources/derivation/create</a></h3>
     <p>This endpoint creates a new derivation.</p>
      <p>Required parameters:</p>
         <ul>
@@ -293,7 +293,7 @@ curl -b cookies.txt http://localhost/api/v1/resources/derivation/
     }
     </pre>
 
-     <h3>POST <a href="http://localhost/api/v1/resources/expression/create">http://localhost/api/v1/resources/expression/create</a></h3>
+     <h3>POST <a href="http://localhost/api/v1/resources/expression/create">/api/v1/resources/expression/create</a></h3>
     <p>This endpoint creates a new expression.</p>
     <p>Required parameters:</p>
          <ul>
@@ -335,7 +335,7 @@ curl -b cookies.txt http://localhost/api/v1/resources/derivation/
     </pre>
 
 
-   <h3>POST <a href="http://localhost/api/v1/resources/symbol/scalar/create">http://localhost/api/v1/resources/symbol/scalar/create</a></h3>
+   <h3>POST <a href="http://localhost/api/v1/resources/symbol/scalar/create">/api/v1/resources/symbol/scalar/create</a></h3>
     <p>This endpoint creates a new scalar symbol.</p>
     <p>Required parameters:</p>
         <ul>
@@ -380,7 +380,7 @@ curl --request POST \
     }
      </pre>
 
-    <h3>POST <a href="http://localhost/api/v1/resources/symbol/vector/create">http://localhost/api/v1/resources/symbol/vector/create</a></h3>
+    <h3>POST <a href="http://localhost/api/v1/resources/symbol/vector/create">/api/v1/resources/symbol/vector/create</a></h3>
     <p>This endpoint creates a new vector symbol. Not implemented.</p>
     <p>Example usage:</p>
     <pre>curl -s http://localhost/api/v1/resources/symbol/vector/create</pre>
@@ -391,7 +391,7 @@ curl --request POST \
 }
     </pre>
 
-    <h3>POST <a href="http://localhost/api/v1/resources/symbol/matrix/create">http://localhost/api/v1/resources/symbol/matrix/create</a></h3>
+    <h3>POST <a href="http://localhost/api/v1/resources/symbol/matrix/create">/api/v1/resources/symbol/matrix/create</a></h3>
     <p>This endpoint creates a new matrix symbol. Not implemented.</p>
     <p>Example usage:</p>
     <pre>curl -s http://localhost/api/v1/resources/symbol/matrix/create</pre>
@@ -402,7 +402,7 @@ curl --request POST \
 }
     </pre>
 
-    <h3>POST <a href="http://localhost/api/v1/resources/symbol/operation/create">http://localhost/api/v1/resources/symbol/operation/create</a></h3>
+    <h3>POST <a href="http://localhost/api/v1/resources/symbol/operation/create">/api/v1/resources/symbol/operation/create</a></h3>
     <p>This endpoint creates a new operation symbol.</p>
     <p>Required parameters:</p>
          <ul>
@@ -438,7 +438,7 @@ curl --request POST \
     </pre>
 
 
-    <h3>POST <a href="http://localhost/api/v1/resources/symbol/relation/create">http://localhost/api/v1/resources/symbol/relation/create</a></h3>
+    <h3>POST <a href="http://localhost/api/v1/resources/symbol/relation/create">/api/v1/resources/symbol/relation/create</a></h3>
     <p>This endpoint creates a new relation symbol.</p>
     <p>Required parameters:</p>
        <ul>
@@ -473,7 +473,7 @@ curl --request POST \
     </pre>
 
 
-     <h3>POST <a href="http://localhost/api/v1/resources/inference_rule/create">http://localhost/api/v1/resources/inference_rule/create</a></h3>
+     <h3>POST <a href="http://localhost/api/v1/resources/inference_rule/create">/api/v1/resources/inference_rule/create</a></h3>
     <p>This endpoint creates a new inference rule. Not implemented.</p>
     <p>Example usage:</p>
     <pre>curl -s http://localhost/api/v1/resources/inference_rule/create</pre>
@@ -486,7 +486,7 @@ curl --request POST \
     </pre>
 
 
-    <h3>DELETE <a href="http://localhost/api/v1/resources/derivation/delete">http://localhost/api/v1/resources/derivation/delete</a></h3>
+    <h3>DELETE <a href="http://localhost/api/v1/resources/derivation/delete">/api/v1/resources/derivation/delete</a></h3>
     <p>This endpoint deletes a specified derivation and all its steps.</p>
     <p>Required parameters:</p>
         <ul>
@@ -513,7 +513,7 @@ curl --request POST \
 }
     </pre>
 
-    <h3>DELETE <a href="http://localhost/api/v1/resources/expression/delete">http://localhost/api/v1/resources/expression/delete</a></h3>
+    <h3>DELETE <a href="http://localhost/api/v1/resources/expression/delete">/api/v1/resources/expression/delete</a></h3>
     <p>This endpoint deletes an expression. Not implemented.</p>
      <p>Response:</p>
     <pre>
