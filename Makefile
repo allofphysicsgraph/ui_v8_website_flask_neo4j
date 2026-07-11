@@ -18,7 +18,8 @@ else
         @echo "Unknown architecture: $(ARCH). Cannot determine if Mac is new (arm64) or old (amd64)."
 endif
 
-WEBSERVER_IMAGE=ui_v8_flask_webserver
+# should be same as the `compose.yaml` fields `name: ui_v8` and `services:  flask-webserver`
+WEBSERVER_IMAGE=ui_v8-flask-webserver
 
 CONTAINER_TAG=latest-$(this_arch)
 
@@ -66,7 +67,7 @@ launch_webserver:
 	        --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) \
 	        -c 'black -v --workers 1 /scratch/webserver_for_pdg/*.py /scratch/tests_of_web_interface/playwright/*.py /scratch/webserver_for_pdg/library/*.py /scratch/tests_of_python/*.py validate_jinja2.py'
 	# https://docs.docker.com/compose/reference/up/
-	$(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans $(COMPOSE_FLAGS)
+	WEBSERVER_IMAGE_NAME=$(WEBSERVER_IMAGE) TAG_WITH_ARCH=$(CONTAINER_TAG)  $(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans $(COMPOSE_FLAGS)
 
 
 down:
