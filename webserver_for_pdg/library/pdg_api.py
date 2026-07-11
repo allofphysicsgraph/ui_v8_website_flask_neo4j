@@ -1132,14 +1132,30 @@ def api_create_derivation():
 
         if "derivation_name_latex" in data_from_user.keys():
             derivation_name_latex = data_from_user["derivation_name_latex"]
-        else:  # was not provided
-            return jsonify({"ERROR": "need to provide derivation_name_latex"})
-
+        else:
+            return hal_error(
+                "need to provide derivation_name_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         if "derivation_abstract_latex" in data_from_user.keys():
             derivation_abstract_latex = data_from_user["derivation_abstract_latex"]
         else:
-            return jsonify({"ERROR": "need to provide derivation_abstract_latex"})
-
+            return hal_error(
+                "need to provide derivation_abstract_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         if "derivation_reference_latex" in data_from_user.keys():
             derivation_reference_latex = data_from_user["derivation_reference_latex"]
         else:
@@ -1151,15 +1167,31 @@ def api_create_derivation():
         derivation_name_latex = request.args.get("derivation_name_latex")
         if derivation_name_latex:
             logger.info("derivation_name:" + str(derivation_name_latex))
-        else:  # was not provided
-            return jsonify({"ERROR": "need to provide derivation_name_latex"})
-
+        else:
+            return hal_error(
+                "need to provide derivation_name_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         derivation_abstract_latex = request.args.get("derivation_abstract_latex")
         if derivation_abstract_latex:
             logger.info("derivation_abstract_latex " + str(derivation_abstract_latex))
         else:
-            return jsonify({"ERROR": "need to provide derivation_abstract_latex"})
-
+            return hal_error(
+                "need to provide derivation_abstract_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         derivation_reference_latex = request.args.get("derivation_reference_latex")
         if derivation_reference_latex:
             logger.info("derivation_reference_latex " + str(derivation_reference_latex))
@@ -1182,12 +1214,15 @@ def api_create_derivation():
     # reject input if derivation name is already in the database
     for derivation_dict in list_of_derivation_dicts:
         if derivation_dict["name_latex"] == derivation_name_latex:
-            return jsonify(
-                {
-                    "ERROR:": "derivation name '"
-                    + str(derivation_name_latex)
-                    + "' already exists"
-                }
+            return hal_error(
+                "derivation name '" + str(derivation_name_latex) + "' already exists",
+                409,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Conflict",
             )
 
     # at this point the inputs are valid and we can proceed to add the content to the database
@@ -1248,17 +1283,32 @@ def api_create_inference_rule():
         if "_latex" in data_from_user.keys():
             _latex = data_from_user[""]
         else:
-            return jsonify({"ERROR": "need to provide _latex"})
-
-    else:  # "Content-Type: application/x-www-form-urlencoded"
-        logger.info("request.args=" + str(request.args))  # returns a dict
-        # required
+            return hal_error(
+                "need to provide _latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
+    else:
+        logger.info("request.args=" + str(request.args))
         _latex = request.args.get("_latex")
         if _latex:
             logger.info("_latex =" + _latex)
         else:
-            return jsonify({"ERROR": "need to provide _latex"})
-
+            return hal_error(
+                "need to provide _latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
     return jsonify({"STATUS": "inference rule added successfully"})
 
 
@@ -1291,150 +1341,137 @@ def api_create_expression():
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
-
-    if request.is_json:  # "Content-Type: application/json"
+    up_link = {
+        "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point")
+    }
+    if request.is_json:
         data_from_user = request.get_json()
         logger.info("data_from_user = " + str(data_from_user))
-
-        # required
         if "expression_latex_lhs" in data_from_user.keys():
             expression_latex_lhs = data_from_user["expression_latex_lhs"]
         else:
-            return jsonify({"ERROR": "need to provide expression_latex_lhs"})
-
-        # required
+            return hal_error(
+                "need to provide expression_latex_lhs",
+                400,
+                links=up_link,
+                title="Missing Field",
+            )
         if "expression_relation_latex" in data_from_user.keys():
             expression_relation_latex = data_from_user["expression_relation_latex"]
         else:
-            return jsonify({"ERROR": "need to provide expression_relation_latex"})
-
-        # required
+            return hal_error(
+                "need to provide expression_relation_latex",
+                400,
+                links=up_link,
+                title="Missing Field",
+            )
         if "expression_latex_rhs" in data_from_user.keys():
             expression_latex_rhs = data_from_user["expression_latex_rhs"]
         else:
-            return jsonify({"ERROR": "need to provide expression_latex_rhs"})
-
-        # optional
+            return hal_error(
+                "need to provide expression_latex_rhs",
+                400,
+                links=up_link,
+                title="Missing Field",
+            )
         if "expression_latex_condition" in data_from_user.keys():
             expression_latex_condition = data_from_user["expression_latex_condition"]
         else:
             expression_latex_condition = ""
-
-        # optional
         if "expression_name_latex" in data_from_user.keys():
             expression_name_latex = data_from_user["expression_name_latex"]
         else:
             expression_name_latex = ""
-
-        # optional
         if "expression_reference_latex" in data_from_user.keys():
             expression_reference_latex = data_from_user["expression_reference_latex"]
         else:
             expression_reference_latex = ""
-
-        # optional
         if "expression_description_latex" in data_from_user.keys():
             expression_description_latex = data_from_user[
                 "expression_description_latex"
             ]
         else:
             expression_description_latex = ""
-
-    else:  # "Content-Type: application/x-www-form-urlencoded"
-        logger.info("request.args=" + str(request.args))  # returns a dict
-
-        # required
+    else:
+        logger.info("request.args=" + str(request.args))
         expression_latex_lhs = request.args.get("expression_latex_lhs")
         if expression_latex_lhs:
             logger.info("expression_latex_lhs =" + expression_latex_lhs)
         else:
-            return jsonify({"ERROR": "need to provide expression_latex_lhs"})
-
-        # required
+            return hal_error(
+                "need to provide expression_latex_lhs",
+                400,
+                links=up_link,
+                title="Missing Field",
+            )
         expression_relation_latex = request.args.get("expression_relation_latex")
         if expression_relation_latex:
             logger.info("expression_relation_latex =" + expression_relation_latex)
         else:
-            return jsonify({"ERROR": "need to provide expression_relation_latex"})
-
-        # required
+            return hal_error(
+                "need to provide expression_relation_latex",
+                400,
+                links=up_link,
+                title="Missing Field",
+            )
         expression_latex_rhs = request.args.get("expression_latex_rhs")
         if expression_latex_rhs:
             logger.info("expression_latex_rhs =" + expression_latex_rhs)
         else:
-            return jsonify({"ERROR": "need to provide expression_latex_rhs"})
-
-        # optional
+            return hal_error(
+                "need to provide expression_latex_rhs",
+                400,
+                links=up_link,
+                title="Missing Field",
+            )
         expression_latex_condition = request.args.get("expression_latex_condition")
         if expression_latex_condition:
             logger.info("expression_latex_condition =" + expression_latex_condition)
         else:
             expression_latex_condition = ""
-
-        # optional
         expression_name_latex = request.args.get("expression_name_latex")
         if expression_name_latex:
             logger.info("expression_name_latex =" + expression_name_latex)
         else:
             expression_name_latex = ""
-
-        # optional
         expression_reference_latex = request.args.get("expression_reference_latex")
         if expression_reference_latex:
             logger.info("expression_reference_latex =" + expression_reference_latex)
         else:
             expression_reference_latex = ""
-
-        # optional
         expression_description_latex = request.args.get("expression_description_latex")
         if expression_description_latex:
             logger.info("expression_description_latex =" + expression_description_latex)
         else:
             expression_description_latex = ""
-
     list_of_expression_dicts = []
     with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
         list_of_expression_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "expression"
         )
-        # query_time_dict["to_add_expression: list_nodes_of_type"] = round(
-        #     time.time() - query_start_time, 3
-        # )
-
     logger.info("list_of_expression_dicts=" + str(list_of_expression_dicts))
-
-    # if lhs and relation and rhs are same, then reject
     for expression_dict in list_of_expression_dicts:
         if (
             expression_dict["latex_lhs"] == expression_latex_lhs
             and expression_dict["latex_relation"] == expression_relation_latex
-            and expression_dict["latex_rhs"] == expression_latex_rhs
+            and (expression_dict["latex_rhs"] == expression_latex_rhs)
         ):
-            return jsonify(
-                {
-                    "ERROR:": "expression '"
-                    + str(expression_latex_lhs)
-                    + str(expression_relation_latex)
-                    + str(expression_latex_rhs)
-                    + "' already exists"
-                }
+            return hal_error(
+                "expression '"
+                + str(expression_latex_lhs)
+                + str(expression_relation_latex)
+                + str(expression_latex_rhs)
+                + "' already exists",
+                409,
+                links=up_link,
+                title="Conflict",
             )
-
-    # at this point the inputs are valid and we can proceed to add the content to the database
-
     author_name_latex = "ben"
-
-    # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
     expression_id, query_time_dict = compute.generate_random_id(
         graphDB_Driver, query_time_dict
     )
-
-    # https://neo4j.com/docs/python-manual/current/session-api/
     with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
         session.write_transaction(
             neo4j_query.add_expression,
             expression_id,
@@ -1448,11 +1485,65 @@ def api_create_expression():
             now_str,
             author_name_latex,
         )
-        # query_time_dict["pdg_app/to_add_expression: add_expression"] = round(
-        #     time.time() - query_start_time, 3
-        # )
-
-    return jsonify({"STATUS": "expression added successfully"})
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "expression added successfully",
+            "id": expression_id,
+            "created": now_str,
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_expression_metadata",
+                    expression_id=expression_id,
+                    _external=True,
+                ),
+                "Get the new expression",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_expressions", _external=True), "List of Expressions"
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        templates={
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property("expression_name_latex", value=expression_name_latex),
+                    hal_property(
+                        "expression_latex_lhs",
+                        required=True,
+                        value=expression_latex_lhs,
+                    ),
+                    hal_property(
+                        "expression_relation_latex",
+                        required=True,
+                        value=expression_relation_latex,
+                    ),
+                    hal_property(
+                        "expression_latex_rhs",
+                        required=True,
+                        value=expression_latex_rhs,
+                    ),
+                    hal_property(
+                        "expression_latex_condition", value=expression_latex_condition
+                    ),
+                    hal_property(
+                        "expression_reference_latex", value=expression_reference_latex
+                    ),
+                    hal_property(
+                        "expression_description_latex",
+                        value=expression_description_latex,
+                    ),
+                ],
+                title="Edit this expression",
+            )
+        },
+        status=201,
+    )
 
 
 @api_bp.route("/resources/symbol/scalar", methods=["POST"])
@@ -1479,7 +1570,7 @@ def api_create_scalar_symbol():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
-    query_time_dict = {}
+    query_time_dict = {}  # type: query_timing_result_type
     collection_link = {
         "up": hal_link(
             url_for(".api_list_scalar_symbols", _external=True),
@@ -1801,21 +1892,42 @@ def api_create_operation_symbol():
         if "operation_name_latex" in data_from_user.keys():
             operation_name_latex = data_from_user["operation_name_latex"]
         else:
-            return jsonify({"ERROR": "need to provide operation_name_latex"})
-
-        # required
+            return hal_error(
+                "need to provide operation_name_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         if "operation_latex" in data_from_user.keys():
             operation_latex = data_from_user["operation_latex"]
         else:
-            return jsonify({"ERROR": "need to provide operation_latex"})
-
-        # required
+            return hal_error(
+                "need to provide operation_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         if "operation_description_latex" in data_from_user.keys():
             operation_description_latex = data_from_user["operation_description_latex"]
         else:
-            return jsonify({"ERROR": "need to provide operation_description_latex"})
-
-        # optional
+            return hal_error(
+                "need to provide operation_description_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         if "operation_reference_latex" in data_from_user.keys():
             operation_reference_latex = data_from_user["operation_reference_latex"]
         else:
@@ -1825,32 +1937,60 @@ def api_create_operation_symbol():
         if "operation_argument_count" in data_from_user.keys():
             operation_argument_count = data_from_user["operation_argument_count"]
         else:
-            return jsonify({"ERROR": "need to provide operation_argument_count"})
-
-    else:  # "Content-Type: application/x-www-form-urlencoded"
-        logger.info("request.args=" + str(request.args))  # returns a dict
-        # required
+            return hal_error(
+                "need to provide operation_argument_count",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
+    else:
+        logger.info("request.args=" + str(request.args))
         operation_name_latex = request.args.get("operation_name_latex")
         if operation_name_latex:
             logger.info("operation_name_latex =" + operation_name_latex)
         else:
-            return jsonify({"ERROR": "need to provide operation_name_latex"})
-
-        # required
+            return hal_error(
+                "need to provide operation_name_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         operation_latex = request.args.get("operation_latex")
         if operation_latex:
             logger.info("operation_latex =" + operation_latex)
         else:
-            return jsonify({"ERROR": "need to provide operation_latex"})
-
-        # required
+            return hal_error(
+                "need to provide operation_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         operation_description_latex = request.args.get("operation_description_latex")
         if operation_description_latex:
             logger.info("operation_description_latex =" + operation_description_latex)
         else:
-            return jsonify({"ERROR": "need to provide operation_description_latex"})
-
-        # optional
+            return hal_error(
+                "need to provide operation_description_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         operation_reference_latex = request.args.get("operation_reference_latex")
         if operation_reference_latex:
             logger.info("operation_reference_latex =" + operation_reference_latex)
@@ -1862,8 +2002,16 @@ def api_create_operation_symbol():
         if operation_argument_count:
             logger.info("operation_argument_count =" + operation_argument_count)
         else:
-            return jsonify({"ERROR": "need to provide operation_argument_count"})
-
+            return hal_error(
+                "need to provide operation_argument_count",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
     author_name_latex = "ben"
 
     # %f = Microsecond as a decimal number, zero-padded on the left.
@@ -1918,21 +2066,42 @@ def api_create_relation_symbol():
         if "relation_name_latex" in data_from_user.keys():
             relation_name_latex = data_from_user["relation_name_latex"]
         else:
-            return jsonify({"ERROR": "need to provide relation_name_latex"})
-
-        # required
+            return hal_error(
+                "need to provide relation_name_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         if "relation_latex" in data_from_user.keys():
             relation_latex = data_from_user["relation_latex"]
         else:
-            return jsonify({"ERROR": "need to provide relation_latex"})
-
-        # required
+            return hal_error(
+                "need to provide relation_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         if "relation_description_latex" in data_from_user.keys():
             relation_description_latex = data_from_user["relation_description_latex"]
         else:
-            return jsonify({"ERROR": "need to provide relation_description_latex"})
-
-        # optional
+            return hal_error(
+                "need to provide relation_description_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         if "relation_reference_latex" in data_from_user.keys():
             relation_reference_latex = data_from_user["relation_reference_latex"]
         else:
@@ -1945,23 +2114,44 @@ def api_create_relation_symbol():
         if relation_name_latex:
             logger.info("relation_name_latex =" + relation_name_latex)
         else:
-            return jsonify({"ERROR": "need to provide relation_name_latex"})
-
-        # required
+            return hal_error(
+                "need to provide relation_name_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         relation_latex = request.args.get("relation_latex")
         if relation_latex:
             logger.info("relation_latex =" + relation_latex)
         else:
-            return jsonify({"ERROR": "need to provide relation_latex"})
-
-        # required
+            return hal_error(
+                "need to provide relation_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         relation_description_latex = request.args.get("relation_description_latex")
         if relation_description_latex:
             logger.info("relation_description_latex =" + relation_description_latex)
         else:
-            return jsonify({"ERROR": "need to provide relation_description_latex"})
-
-        # optional
+            return hal_error(
+                "need to provide relation_description_latex",
+                400,
+                links={
+                    "up": hal_link(
+                        url_for(".api_start_here", _external=True), "API Entry Point"
+                    )
+                },
+                title="Missing Field",
+            )
         relation_reference_latex = request.args.get("relation_reference_latex")
         if relation_reference_latex:
             logger.info("relation_reference_latex =" + relation_reference_latex)
@@ -2060,8 +2250,16 @@ def api_derivation_metadata(derivation_id: str):
     if "derivation_id" in request.args:
         derivation_id = str(request.args["derivation_id"])
     else:
-        return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
-
+        return hal_error(
+            "expecting 'derivation_id' parameter",
+            400,
+            links={
+                "up": hal_link(
+                    url_for(".api_start_here", _external=True), "API Entry Point"
+                )
+            },
+            title="Missing Field",
+        )
     logger.info("derivation_id=" + derivation_id)
 
     # try provided derivation_id; might not be a valid ID
@@ -2091,7 +2289,7 @@ def api_inference_rule_metadata(infrule_id: str):
     #     )
 
     return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
+        f"{infrule_id}: this endpoint is not yet implemented",
         501,
         links={
             "up": hal_link(
@@ -2116,7 +2314,7 @@ def api_expression_metadata(expression_id: str):
     #     )
 
     return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
+        f"{expression_id}: this endpoint is not yet implemented",
         501,
         links={
             "up": hal_link(
@@ -2219,17 +2417,15 @@ def api_operation_metadata(operation_id: str):
         )
 
     if operation_dict is None:
-        return (
-            jsonify(
-                {
-                    "error": "Not Found",
-                    "message": f"Operation {operation_id} does not exist",
-                    "_links": {
-                        "index": {"href": url_for(".api_start_here", _external=True)}
-                    },
-                }
-            ),
+        return hal_error(
+            f"Operation {operation_id} does not exist",
             404,
+            links={
+                "up": hal_link(
+                    url_for(".api_start_here", _external=True), "API Entry Point"
+                )
+            },
+            title="Not Found",
         )
 
     response = {
@@ -2301,10 +2497,18 @@ def api_relation_metadata(relation_id: str):
         )
 
     if operation_dict is None:
-        jsonify({"STATUS": relation_id + " does not exist in the database"})
-
+        return hal_error(
+            f"Relation {relation_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_start_here", _external=True), "API Entry Point"
+                )
+            },
+            title="Not Found",
+        )
     return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
+        f"{relation_id}: this endpoint is not yet implemented",
         501,
         links={
             "up": hal_link(
@@ -2369,7 +2573,7 @@ def api_delete_derivation(derivation_id: str):
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
-    # query_time_dict = {}
+    # query_time_dict = {} # type: query_timing_result_type
     with graphDB_Driver.session() as session:
         # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
@@ -2451,7 +2655,7 @@ def api_delete_inference_rule(infrule_id: str):
     delete inference rule
     """
     return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
+        f"{infrule_id}: this endpoint is not yet implemented",
         501,
         links={
             "up": hal_link(
@@ -2468,7 +2672,7 @@ def api_delete_expression(expression_id: str):
     delete expression
     """
     return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
+        f"{expression_id}: this endpoint is not yet implemented",
         501,
         links={
             "up": hal_link(
@@ -2526,7 +2730,7 @@ def api_delete_matrix(symbol_id: str):
 )
 def api_delete_operation(operation_id: str):
     return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
+        f"{operation_id}: this endpoint is not yet implemented",
         501,
         links={
             "up": hal_link(
@@ -2542,7 +2746,7 @@ def api_delete_operation(operation_id: str):
 )
 def api_delete_relation(relation_id: str):
     return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
+        f"{relation_id}: this endpoint is not yet implemented",
         501,
         links={
             "up": hal_link(
@@ -2645,7 +2849,7 @@ def api_cypher_query():
             list_of_records = ["not a valid Cypher query (TransactionError)"]
     else:
         list_of_records = [
-            "use: curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\)"
+            "use: curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\\(n\\)%20RETURN%20DISTINCT%20labels\\(n\\)"
         ]
 
     logger.info("[TRACE] end " + trace_id)
