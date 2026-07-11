@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+
+# The gunicorn.conf.py file is the default configuration file for Gunicorn, 
+# and it is automatically loaded if it exists in the current working directory where you execute Gunicorn.
+
+# This file is only relevant if coverage.py is being used.
+# Then you also need to adjust `compose.yaml`
+
 import os
 import coverage
 
