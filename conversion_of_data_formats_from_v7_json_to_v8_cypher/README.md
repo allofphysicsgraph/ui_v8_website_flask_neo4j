@@ -13,7 +13,7 @@ ran `v7_json_to_cypher.ipynb` to generate
 - symbols.cypher
 
 # step 3
-inside a running `ui_v8-flask-webserver` container I ran
+inside a running `ui_v8_flask_webserver` container I ran
 ```
 cd /scratch/conversion_of_data_formats/
 python3 v7_json_to_cypher_expressions.py
