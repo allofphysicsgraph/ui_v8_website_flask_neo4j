@@ -11,18 +11,7 @@ Welcome to Physics Derivation Graph's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
-.. automodule:: pdg_app
-    :members:
-    :undoc-members:
-    :show-inheritance:
-.. this adds bunch of content that isn't useful:    :inherited-members:
-
-.. automodule:: library.pdg_api
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   modules
 
 
 
