@@ -14,7 +14,7 @@ services:
     build:
       context: ./webserver_for_pdg
       dockerfile: Dockerfile
-    image: ${WEBSERVER_IMAGE_NAME}:latest-${ARCH}
+    image: ${WEBSERVER_IMAGE_NAME}:${TAG_WITH_ARCH}
 
     # gunicorn is a production-grade WSGI HTTP Server for Python
     # https://docs.gunicorn.org/en/stable/settings.html
