@@ -6,7 +6,7 @@
 # Attribution 4.0 International (CC BY 4.0)
 
 """
-The purpose of this file is to transform between Latex to SymPy. 
+The purpose of this file is to transform between Latex to SymPy.
 The reason this scope has been isolated is to facilitate changing the Computer Algebra System (CAS) to something other than SymPy if that becomes relevant.
 For example, two different Computer Algebra Systems could be used with the Physics Derivation Graph (e.g., Sympy and Sage) to either duplicate a given validation or to extend coverage to inference rules one of the CAS cannot address.
 
@@ -38,12 +38,12 @@ proc_timeout = 10
 def sympy_to_latex_str(sympy_expr: str) -> str:
     """Converts a string representation of a SymPy expression into a LaTeX string.
 
-    Parses a string representation of a SymPy expression and 
+    Parses a string representation of a SymPy expression and
     uses SymPy's printing utilities to generate the corresponding LaTeX code.
 
     :param sympy_expr: The string containing the SymPy expression to convert.
     :type sympy_expr: str
-    :return: The resulting LaTeX representation of the parsed expression, 
+    :return: The resulting LaTeX representation of the parsed expression,
              or a fallback error message if the input is empty.
     :rtype: str
 
@@ -51,13 +51,13 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
 
     .. code-block:: python
 
-        sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))
+        Eq(Symbol('pdg1881666'),Symbol('pdg3882725'))
 
-    desired output: 
+    desired output:
 
     .. code-block:: python
 
-        latex_str= \mathtt{\text{sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))}}
+        pdg_{1881666} = pdg_{3882725}
 
     """
     trace_id = str(uuid.uuid4())
@@ -82,16 +82,39 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
 
 
 def cleaned_latex_str_to_sympy_expression(expr_latex: str):
-    """
-    see compute.remove_latex_presention_markings()
+    """Convert a cleaned LaTeX string into a SymPy expression.
+
+    This function wraps :func:`sympy.parsing.latex.parse_latex`, logging the
+    input LaTeX string before parsing and re-raising any parsing failures as
+    a generic :class:`Exception` with a descriptive message, so callers do
+    not need to depend on SymPy's internal exception hierarchy.
 
     input: latex expression as string
     for input, assume the latex string has had presentation-related syntax removed
 
     returns sympy representation
 
+    :param expr_latex: The (pre-cleaned) LaTeX string to convert.
+    :type expr_latex: str
+
+    :raises Exception: If SymPy fails to parse the LaTeX string, due to a
+        :class:`sympy.SympifyError`, :class:`sympy.parsing.latex.errors.LaTeXParsingError`,
+        or :class:`sympy.core.sympify.SympifyError`.
+
+    :return: The parsed SymPy expression corresponding to ``expr_latex``.
+    :rtype: sympy.core.expr.Expr
+
+    .. note::
+       The input string is expected to already be "cleaned" (e.g. stripped
+       of any surrounding delimiters or formatting) prior to being passed
+       to this function.
+
+
+    see also `compute.remove_latex_presention_markings()`
+
     >>> cleaned_latex_str_to_sympy_expression('a = b')
     Eq(a, b)
+
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -112,6 +135,14 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
         logger.error(str(err))
         raise Exception("Sympy unable to parse latex (3): " + expr_latex)
 
+    # on 2026-07-11, Claude's Sonnet 5 on "medium" says
+    # parse_latex builds Add/Mul with evaluate=False internally, which preserves
+    # the written argument order instead of SymPy's canonical order. This makes
+    # the result compare unequal (==) to a normally-constructed equivalent
+    # expression even though they print identically. Round-tripping through
+    # sympify(str(...)) rebuilds the tree with normal evaluation, fixing this.
+    symp_expr = sympy.sympify(str(symp_expr))
+
     logger.info("[TRACE] end " + trace_id)
     return symp_expr
     # >>> type(symp_expr)
@@ -119,7 +150,23 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
 
 
 def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
-    """
+    """Extracts all unique SymPy symbols contained in a SymPy expression.
+
+    Traverses the given SymPy expression and collects every distinct
+    `sympy.Symbol` atom it contains. If the input does not support the
+    `atoms` method (e.g., it is not a valid SymPy expression), the error
+    is logged and an empty list is returned instead of raising.
+
+    Args:
+        sympy_expr: A SymPy expression (or object implementing the SymPy
+            `atoms` interface) to search for symbols.
+
+    Returns:
+        list: A list of unique `sympy.Symbol` objects found in the
+            expression. Returns an empty list if `sympy_expr` does not
+            support the `atoms` method.
+
+
     >>> from sympy.parsing.latex import parse_latex
     >>> sympy_expr = parse_latex('a = b')
     >>> list_of_sympy_symbols_in_sympy_expression(sympy_expr)
