@@ -1,4 +1,17 @@
 
+# Use of LLMs
+
+https://aistudio.google.com/usage
+https://aistudio.google.com/rate-limit
+
+Is aistudio up? https://aistudio.google.com/status
+
+2026-07-11: Google's API rate limit and the aistudio rate limit may be separate?
+https://ai.google.dev/gemini-api/docs/rate-limits
+
+aistudio with Gemini Pro models may be limited to 25 requests per day
+
+Requests Per Day (RPD) which reset at midnight Pacific time.
 
 # multiple databases 
 
