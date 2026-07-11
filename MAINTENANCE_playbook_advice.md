@@ -42,18 +42,16 @@ There's also a script for comparing PDG CSV dumps:
 
 # backlog, aka opportunities
 
-implementation agnostic tasks: https://github.com/orgs/allofphysicsgraph/projects/2
+implementation agnostic tasks: <https://github.com/orgs/allofphysicsgraph/projects/2>
 
 highlights from ui_v8: <https://github.com/orgs/allofphysicsgraph/projects/4>
 
 
 The following is unordered
 
+- api auth: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/56
 
-coverage to track what gets runcoverage of tests
-
-Move `allofphysicsgraph/ui_v8_website_flask_neo4j/documentation_manual/design_decisions.log` to 
-`allofphysicsgraph/ui_v8_website_flask_neo4j/webserver_for_pdg/templates/jinja2_pages/documentation_of_design_choices.html`
+- enact pytests per function on scripts in `library` to evaluate whether I've unintentionally made breaking changes
 
 - more content - scope
    - DEPENDS ON automate ingest of papers; see https://allofphysics.com/llm_workflow_documentation
@@ -63,12 +61,8 @@ Move `allofphysicsgraph/ui_v8_website_flask_neo4j/documentation_manual/design_de
 - checking of steps --  inference rules, dimensionality, lean; https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/21
 
 
-- revise https://allofphysics.com/navigation to have the dependency graph visualization
+- revise https://allofphysics.com/navigation to have the (old) dependency graph visualization PNG
 
-- generate sphinx documentation: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/tree/gh-pages/documentation_generated_sphinx
-
-
-- review https://github.com/orgs/allofphysicsgraph/projects/4
 
 
 ## Recurring
@@ -76,9 +70,10 @@ Move `allofphysicsgraph/ui_v8_website_flask_neo4j/documentation_manual/design_de
 See also the "recurring" board on https://github.com/orgs/allofphysicsgraph/projects/2 for implementation agnostic recurring tasks.
 
 - pytests failures 
-- coverage
+- coverage evaluation; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138
+- sphinx documentation
 
 
-Documentation:
+Documentation to be refreshed:
 - update https://allofphysics.com/documentation/api 
 - update https://allofphysics.com/workflow_documentation
