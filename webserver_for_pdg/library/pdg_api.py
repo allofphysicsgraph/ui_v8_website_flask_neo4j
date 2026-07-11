@@ -148,6 +148,81 @@ api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 #     return jsonify({"csrf token": csrf_token})
 
 
+# The following `def hal_` were suggested 2026-07-11 by Claude Sonnet 5 on "medium"
+# https://claude.ai/share/4331b79a-6794-4c68-b95d-82b0c4e47e75
+
+
+def hal_link(href, title=None, name=None):
+    link = {"href": href}
+    if title:
+        link["title"] = title
+    if name:
+        link["name"] = name
+    return link
+
+
+def hal_property(
+    name,
+    type_="text",
+    required=False,
+    read_only=False,
+    options=None,
+    regex=None,
+    prompt=None,
+    value=None,
+):
+    prop = {"name": name, "type": type_, "required": required, "readOnly": read_only}
+    if prompt:
+        prop["prompt"] = prompt
+    if value is not None:
+        prop["value"] = value
+    if regex:
+        prop["regex"] = regex
+    if options:
+        # HAL-FORMS "options" block for enumerated values
+        prop["options"] = {
+            "inline": options,
+            "promptField": "prompt",
+            "valueField": "value",
+        }
+    return prop
+
+
+def hal_template(method, properties, title=None, content_type="application/json"):
+    template = {"method": method, "contentType": content_type, "properties": properties}
+    if title:
+        template["title"] = title
+    return template
+
+
+def hal_response(data=None, links=None, embedded=None, templates=None, status=200):
+    payload = {}
+    if data:
+        payload.update(data)
+    payload["_links"] = links or {}
+    if embedded:
+        payload["_embedded"] = embedded
+    if templates:
+        payload["_templates"] = templates
+    resp = jsonify(payload)
+    resp.status_code = status
+    resp.headers["Content-Type"] = "application/prs.hal-forms+json"
+    return resp
+
+
+def hal_error(message, status, links=None, title="Error"):
+    payload = {
+        "title": title,
+        "status": status,
+        "detail": message,
+        "_links": links or {},
+    }
+    resp = jsonify(payload)
+    resp.status_code = status
+    resp.headers["Content-Type"] = "application/prs.hal-forms+json"
+    return resp
+
+
 @api_bp.route("/", methods=["GET"])
 def api_start_here():
     """
@@ -273,89 +348,78 @@ def api_list_derivations():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
-    query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "derivation"
         )
-        # query_time_dict[
-        #     "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
-        # ] = (time.time() - query_start_time)
 
-    # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
     for item in list_of_dicts:
-        # Create a copy to avoid mutating the original database result
         resource = item.copy()
         item_id = resource.get("id")
-
         if not item_id:
             logger.critical("Found derivation without ID")
             raise Exception("Found derivation without ID")
-
-        # Add links specific to this individual resource
         resource["_links"] = {
-            "self": {
-                "href": url_for(
+            "self": hal_link(
+                url_for(
                     ".api_derivation_metadata", derivation_id=item_id, _external=True
                 ),
-                "title": "Get derivation metadata",
-                "type": "GET",
-            },
-            "edit": {
-                "href": url_for(
-                    ".api_edit_derivation", derivation_id=item_id, _external=True
-                ),
-                "title": "Edit derivation",
-                "type": "GET",
-            },
-            "steps": {
-                "href": url_for(
-                    ".api_derivation_steps", derivation_id=item_id, _external=True
-                ),
-                "title": "View derivation steps",
-                "type": "GET",
-            },
-            "delete": {
-                "href": url_for(
-                    ".api_delete_derivation", derivation_id=item_id, _external=True
-                ),
-                "title": "Delete derivation",
-                "method": "DELETE",
-            },
+                "Get derivation metadata",
+            ),
+            "steps": hal_link(
+                url_for(".api_derivation_steps", derivation_id=item_id, _external=True),
+                "View derivation steps",
+            ),
+        }
+        resource["_templates"] = {
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property("derivation_name_latex", required=True),
+                    hal_property("derivation_abstract_latex", required=True),
+                ],
+                title="Edit derivation",
+            ),
+            "delete": hal_template("DELETE", [], title="Delete derivation"),
         }
         embedded_items.append(resource)
 
-    # For HATEOAS, Construct the Collection-level HAL payload
-    payload = {
-        "count": len(embedded_items),
-        "_links": {
-            "self": {
-                "href": url_for(".api_list_derivations", _external=True),
-                "title": "List of Derivations",
-                "type": "GET",
-            },
-            "up": {
-                "href": url_for(".api_start_here", _external=True),
-                "title": "API Entry Point",
-                "type": "GET",
-            },
-            "create": {
-                "href": url_for(".api_create_derivation", _external=True),
-                "title": "Create a new derivation",
-                "method": "POST",
-            },
-        },
-        "_embedded": {"derivations": embedded_items},
-    }
-
-    response = make_response(jsonify(payload))
-    response.headers["Content-Type"] = "application/hal+json"
-
     logger.info("[TRACE] end " + trace_id)
-    return response
+    return hal_response(
+        data={"count": len(embedded_items)},
+        links={
+            "self": hal_link(
+                url_for(".api_list_derivations", _external=True), "List of Derivations"
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        embedded={"derivations": embedded_items},
+        templates={
+            "default": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "derivation_name_latex", required=True, prompt="Name (LaTeX)"
+                    ),
+                    hal_property(
+                        "derivation_abstract_latex",
+                        required=True,
+                        prompt="Abstract (LaTeX)",
+                    ),
+                    hal_property(
+                        "derivation_reference_latex",
+                        required=False,
+                        prompt="Reference (LaTeX)",
+                    ),
+                ],
+                title="Create a new derivation",
+            ),
+        },
+    )
 
 
 @api_bp.route("/resources/inference_rules", methods=["GET"])
@@ -380,16 +444,16 @@ def api_list_inference_rules():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "inference_rule"
         )
-        query_time_dict["pdg_api/api_list_inference_rules: get_nodes_of_type"] = (
-            time.time() - query_start_time
-        )
+        # query_time_dict["pdg_api/api_list_inference_rules: get_nodes_of_type"] = (
+        #     time.time() - query_start_time
+        # )
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -472,16 +536,16 @@ def api_list_expressions():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "expression"
         )
-        query_time_dict["pdg_api/api_list_expressions: get_nodes_of_type"] = (
-            time.time() - query_start_time
-        )
+        # query_time_dict["pdg_api/api_list_expressions: get_nodes_of_type"] = (
+        #     time.time() - query_start_time
+        # )
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -570,16 +634,16 @@ def api_list_operation_symbols():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "operation"
         )
-        query_time_dict["pdg_api/api_list_operation_symbols: get_nodes_of_type"] = (
-            time.time() - query_start_time
-        )
+        # query_time_dict["pdg_api/api_list_operation_symbols: get_nodes_of_type"] = (
+        #     time.time() - query_start_time
+        # )
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -659,16 +723,16 @@ def api_list_relation_symbols():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "relation"
         )
-        query_time_dict[
-            "pdg_api/api_list_relation_symbols: api_list_relation_symbols"
-        ] = (time.time() - query_start_time)
+        # query_time_dict[
+        #     "pdg_api/api_list_relation_symbols: api_list_relation_symbols"
+        # ] = (time.time() - query_start_time)
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -761,16 +825,16 @@ def api_list_scalar_symbols():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "scalar"
         )
-        query_time_dict["pdg_api/api_list_scalar_symbols: get_nodes_of_type"] = (
-            time.time() - query_start_time
-        )
+        # query_time_dict["pdg_api/api_list_scalar_symbols: get_nodes_of_type"] = (
+        #     time.time() - query_start_time
+        # )
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -857,16 +921,16 @@ def api_list_vector_symbols():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "vector"
         )
-        query_time_dict["pdg_api/api_list_vector_symbols: get_nodes_of_type"] = (
-            time.time() - query_start_time
-        )
+        # query_time_dict["pdg_api/api_list_vector_symbols: get_nodes_of_type"] = (
+        #     time.time() - query_start_time
+        # )
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -953,16 +1017,16 @@ def api_list_matrix_symbols():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "matrix"
         )
-        query_time_dict["pdg_api/api_list_matrix_symbols: get_nodes_of_type"] = (
-            time.time() - query_start_time
-        )
+        # query_time_dict["pdg_api/api_list_matrix_symbols: get_nodes_of_type"] = (
+        #     time.time() - query_start_time
+        # )
 
     # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
@@ -1105,13 +1169,13 @@ def api_create_derivation():
     # additional reasons to reject user's input: derivation name is already in use
     list_of_derivation_dicts = []
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_derivation_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "derivation"
         )
-        query_time_dict[
-            "pdg_api/api_create_derivation: get_nodes_of_type derivation"
-        ] = round(time.time() - query_start_time, 3)
+        # query_time_dict[
+        #     "pdg_api/api_create_derivation: get_nodes_of_type derivation"
+        # ] = round(time.time() - query_start_time, 3)
 
     # print("list_of_derivation_dicts=", list_of_derivation_dicts)
 
@@ -1143,7 +1207,7 @@ def api_create_derivation():
 
     # https://neo4j.com/docs/python-manual/current/session-api/
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         session.write_transaction(
             neo4j_query.add_derivation,
             derivation_id,
@@ -1154,9 +1218,9 @@ def api_create_derivation():
             now_str,
             author_name_latex,
         )
-        query_time_dict["pdg_api/api_create_derivation: add_derivation"] = round(
-            time.time() - query_start_time, 3
-        )
+        # query_time_dict["pdg_api/api_create_derivation: add_derivation"] = round(
+        #     time.time() - query_start_time, 3
+        # )
 
     return jsonify(
         {"STATUS": "derivation " + str(derivation_name_latex) + " added successfully"}
@@ -1174,7 +1238,7 @@ def api_create_inference_rule():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     if request.is_json:  # "Content-Type: application/json"
         data_from_user = request.get_json()
@@ -1195,9 +1259,7 @@ def api_create_inference_rule():
         else:
             return jsonify({"ERROR": "need to provide _latex"})
 
-    return jsonify(
-        {"STATUS": "inference rule added successfully", "query times": query_time_dict}
-    )
+    return jsonify({"STATUS": "inference rule added successfully"})
 
 
 @api_bp.route("/resources/expression", methods=["POST"])
@@ -1332,13 +1394,13 @@ def api_create_expression():
 
     list_of_expression_dicts = []
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_expression_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "expression"
         )
-        query_time_dict["to_add_expression: list_nodes_of_type"] = round(
-            time.time() - query_start_time, 3
-        )
+        # query_time_dict["to_add_expression: list_nodes_of_type"] = round(
+        #     time.time() - query_start_time, 3
+        # )
 
     logger.info("list_of_expression_dicts=" + str(list_of_expression_dicts))
 
@@ -1372,7 +1434,7 @@ def api_create_expression():
 
     # https://neo4j.com/docs/python-manual/current/session-api/
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         session.write_transaction(
             neo4j_query.add_expression,
             expression_id,
@@ -1386,13 +1448,11 @@ def api_create_expression():
             now_str,
             author_name_latex,
         )
-        query_time_dict["pdg_app/to_add_expression: add_expression"] = round(
-            time.time() - query_start_time, 3
-        )
+        # query_time_dict["pdg_app/to_add_expression: add_expression"] = round(
+        #     time.time() - query_start_time, 3
+        # )
 
-    return jsonify(
-        {"STATUS": "expression added successfully", "query times": query_time_dict}
-    )
+    return jsonify({"STATUS": "expression added successfully"})
 
 
 @api_bp.route("/resources/symbol/scalar", methods=["POST"])
@@ -1419,236 +1479,184 @@ def api_create_scalar_symbol():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
-
-    if request.is_json:  # "Content-Type: application/json"
+    query_time_dict = {}
+    collection_link = {
+        "up": hal_link(
+            url_for(".api_list_scalar_symbols", _external=True),
+            "List of Scalar Symbols",
+        )
+    }
+    if request.is_json:
         data_from_user = request.get_json()
         logger.info("data_from_user = " + str(data_from_user))
-
-        # required
         if "scalar_latex" in data_from_user.keys():
             scalar_latex = data_from_user["scalar_latex"]
         else:
-            return jsonify({"ERROR": "need to provide scalar_latex"})
-
-        # optional
+            return hal_error("need to provide scalar_latex", 400, links=collection_link)
         if "scalar_name_latex" in data_from_user.keys():
             scalar_name_latex = data_from_user["scalar_name_latex"]
         else:
             scalar_name_latex = ""
-
-        # optional
         if "scalar_description_latex" in data_from_user.keys():
             scalar_description_latex = data_from_user["scalar_description_latex"]
         else:
             scalar_description_latex = ""
-
-        # optional
         if "scalar_reference_latex" in data_from_user.keys():
             scalar_reference_latex = data_from_user["scalar_reference_latex"]
         else:
             scalar_reference_latex = ""
-
-        # optional
         if "scalar_scope" in data_from_user.keys():
             scalar_scope = data_from_user["scalar_scope"]
             if scalar_scope not in list_of_valid.scalar_scope:
-                return jsonify(
-                    {
-                        "ERROR": scalar_scope
-                        + " is not a valid scalar_scope; choose from "
-                        + str(list_of_valid.scalar_scope)
-                    }
+                return hal_error(
+                    scalar_scope
+                    + " is not a valid scalar_scope; choose from "
+                    + str(list_of_valid.scalar_scope),
+                    400,
+                    links=collection_link,
                 )
-
         else:
-            return jsonify({"ERROR": "need to provide scalar_scope"})
-
-        # optional
+            return hal_error("need to provide scalar_scope", 400, links=collection_link)
         if "scalar_variable_or_constant" in data_from_user.keys():
             scalar_variable_or_constant = data_from_user["scalar_variable_or_constant"]
             if scalar_variable_or_constant not in ["variable", "constant"]:
-                return jsonify(
-                    {
-                        "ERROR": scalar_variable_or_constant
-                        + " is not valid for scalar_variable_or_constant"
-                    }
+                return hal_error(
+                    scalar_variable_or_constant
+                    + " is not valid for scalar_variable_or_constant",
+                    400,
+                    links=collection_link,
                 )
         else:
             scalar_variable_or_constant = "variable"
-
-        # optional
         if "scalar_domain" in data_from_user.keys():
             scalar_domain = data_from_user["scalar_domain"]
             if scalar_domain not in list_of_valid.scalar_domain:
-                return jsonify(
-                    {
-                        "ERROR": scalar_domain
-                        + " is not a valid scalar_domain; choose from "
-                        + str(list_of_valid.scalar_domain)
-                    }
+                return hal_error(
+                    scalar_domain
+                    + " is not a valid scalar_domain; choose from "
+                    + str(list_of_valid.scalar_domain),
+                    400,
+                    links=collection_link,
                 )
         else:
             scalar_domain = "any"
-
-        # optional
         if "dimension_length" in data_from_user.keys():
             dimension_length = data_from_user["dimension_length"]
         else:
             dimension_length = 0
-
-        # optional
         if "dimension_time" in data_from_user.keys():
             dimension_time = data_from_user["dimension_time"]
         else:
             dimension_time = 0
-
-        # optional
         if "dimension_mass" in data_from_user.keys():
             dimension_mass = data_from_user["dimension_mass"]
         else:
             dimension_mass = 0
-
-        # optional
         if "dimension_temperature" in data_from_user.keys():
             dimension_temperature = data_from_user["dimension_temperature"]
         else:
             dimension_temperature = 0
-
-        # optional
         if "dimension_electric_charge" in data_from_user.keys():
             dimension_electric_charge = data_from_user["dimension_electric_charge"]
         else:
             dimension_electric_charge = 0
-
-        # optional
         if "dimension_amount_of_substance" in data_from_user.keys():
             dimension_amount_of_substance = data_from_user[
                 "dimension_amount_of_substance"
             ]
         else:
             dimension_amount_of_substance = 0
-
-        # optional
         if "dimension_luminous_intensity" in data_from_user.keys():
             dimension_luminous_intensity = data_from_user[
                 "dimension_luminous_intensity"
             ]
         else:
             dimension_luminous_intensity = 0
-
-    else:  # "Content-Type: application/x-www-form-urlencoded"
-        logger.info("request.args=" + str(request.args))  # returns a dict
-
-        # required
+    else:
+        logger.info("request.args=" + str(request.args))
         scalar_latex = request.args.get("scalar_latex")
         if scalar_latex:
             logger.info("scalar_latex =" + scalar_latex)
         else:
-            return jsonify({"ERROR": "need to provide scalar_latex"})
-
-        # optional
+            return hal_error("need to provide scalar_latex", 400, links=collection_link)
         scalar_name_latex = request.args.get("scalar_name_latex")
         if scalar_name_latex:
             logger.info("scalar_name_latex =" + scalar_name_latex)
         else:
             scalar_name_latex = ""
-
-        # optional
         scalar_description_latex = request.args.get("scalar_description_latex")
         if scalar_description_latex:
             logger.info("scalar_description_latex =" + scalar_description_latex)
         else:
             scalar_description_latex = ""
-
-        # optional
         scalar_reference_latex = request.args.get("scalar_reference_latex")
         if scalar_reference_latex:
             logger.info("scalar_reference_latex =" + scalar_reference_latex)
         else:
             scalar_reference_latex = ""
-
-        # optional
         scalar_scope = request.args.get("scalar_scope")
         if scalar_scope:
             logger.info("scalar_scope =" + scalar_scope)
             if scalar_scope not in list_of_valid.scalar_scope:
-                return jsonify(
-                    {
-                        "ERROR": scalar_scope
-                        + " is not a valid scalar_scope; choose from "
-                        + str(list_of_valid.scalar_scope)
-                    }
+                return hal_error(
+                    scalar_scope
+                    + " is not a valid scalar_scope; choose from "
+                    + str(list_of_valid.scalar_scope),
+                    400,
+                    links=collection_link,
                 )
-
         else:
             scalar_scope = "arbitrary"
-
-        # optional
         scalar_variable_or_constant = request.args.get("scalar_variable_or_constant")
         if scalar_variable_or_constant:
             logger.info("scalar_variable_or_constant =" + scalar_variable_or_constant)
             if scalar_variable_or_constant not in ["variable", "constant"]:
-                return jsonify(
-                    {
-                        "ERROR": scalar_variable_or_constant
-                        + " is not valid for scalar_variable_or_constant"
-                    }
+                return hal_error(
+                    scalar_variable_or_constant
+                    + " is not valid for scalar_variable_or_constant",
+                    400,
+                    links=collection_link,
                 )
         else:
             scalar_variable_or_constant = "variable"
-
-        # optional
         scalar_domain = request.args.get("scalar_domain")
         if scalar_domain:
             logger.info("scalar_domain =" + scalar_domain)
             if scalar_domain not in list_of_valid.scalar_domain:
-                return jsonify(
-                    {
-                        "ERROR": scalar_domain
-                        + " is not a valid scalar_domain; choose from "
-                        + str(list_of_valid.scalar_domain)
-                    }
+                return hal_error(
+                    scalar_domain
+                    + " is not a valid scalar_domain; choose from "
+                    + str(list_of_valid.scalar_domain),
+                    400,
+                    links=collection_link,
                 )
         else:
             scalar_domain = "any"
-
-        # optional
         dimension_length = request.args.get("dimension_length")
         if dimension_length:
             logger.info("dimension_length =" + dimension_length)
         else:
             dimension_length = 0
-
-        # optional
         dimension_time = request.args.get("dimension_time")
         if dimension_time:
             logger.info("dimension_time =" + dimension_time)
         else:
             dimension_time = 0
-
-        # optional
         dimension_mass = request.args.get("dimension_mass")
         if dimension_mass:
             logger.info("dimension_mass =" + dimension_mass)
         else:
             dimension_mass = 0
-
-        # optional
         dimension_temperature = request.args.get("dimension_temperature")
         if dimension_temperature:
             logger.info("dimension_temperature =" + dimension_temperature)
         else:
             dimension_temperature = 0
-
-        # optional
         dimension_electric_charge = request.args.get("dimension_electric_charge")
         if dimension_electric_charge:
             logger.info("dimension_electric_charge =" + dimension_electric_charge)
         else:
             dimension_electric_charge = 0
-
-        # optional
         dimension_amount_of_substance = request.args.get(
             "dimension_amount_of_substance"
         )
@@ -1658,26 +1666,17 @@ def api_create_scalar_symbol():
             )
         else:
             dimension_amount_of_substance = 0
-
-        # optional
         dimension_luminous_intensity = request.args.get("dimension_luminous_intensity")
         if dimension_luminous_intensity:
             logger.info("dimension_luminous_intensity =" + dimension_luminous_intensity)
         else:
             dimension_luminous_intensity = 0
-
     author_name_latex = "ben"
-
-    # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
     scalar_id, query_time_dict = compute.generate_random_id(
         graphDB_Driver, query_time_dict
     )
-
-    # https://neo4j.com/docs/python-manual/current/session-api/
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
         session.write_transaction(
             neo4j_query.add_scalar_symbol,
             scalar_id,
@@ -1698,9 +1697,28 @@ def api_create_scalar_symbol():
             now_str,
             author_name_latex,
         )
-
-    return jsonify(
-        {"STATUS": "scalar symbol added successfully", "query times": query_time_dict}
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={"status": "scalar symbol added successfully", "scalar_id": scalar_id},
+        links={
+            "self": hal_link(
+                url_for(".api_scalar_metadata", symbol_id=scalar_id, _external=True),
+                "Get scalar metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_scalar_symbols", _external=True),
+                "List of Scalar Symbols",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_scalar", symbol_id=scalar_id, _external=True),
+                "Edit this scalar",
+            ),
+            "delete": hal_link(
+                url_for(".api_delete_scalar", symbol_id=scalar_id, _external=True),
+                "Delete this scalar",
+            ),
+        },
+        status=201,
     )
 
 
@@ -1715,12 +1733,21 @@ def api_create_vector_symbol():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/resources/symbol/matrix", methods=["POST"])
@@ -1734,12 +1761,21 @@ def api_create_matrix_symbol():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/resources/symbol/operation", methods=["POST"])
@@ -1839,7 +1875,7 @@ def api_create_operation_symbol():
 
     # https://neo4j.com/docs/python-manual/current/session-api/
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         session.write_transaction(
             neo4j_query.add_operation_symbol,
             operation_id,
@@ -1856,7 +1892,6 @@ def api_create_operation_symbol():
     return jsonify(
         {
             "STATUS": "operation symbol added successfully",
-            "query times": query_time_dict,
         }
     )
 
@@ -1944,7 +1979,7 @@ def api_create_relation_symbol():
 
     # https://neo4j.com/docs/python-manual/current/session-api/
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         session.write_transaction(
             neo4j_query.add_relation_symbol,
             relation_id,
@@ -1957,9 +1992,7 @@ def api_create_relation_symbol():
         )
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
 
-    return jsonify(
-        {"STATUS": "relation symbol added successfully", "query times": query_time_dict}
-    )
+    return jsonify({"STATUS": "relation symbol added successfully"})
 
 
 @api_bp.route("/resources/derivation/<string:derivation_id>/edit", methods=["POST"])
@@ -2022,7 +2055,7 @@ def api_derivation_metadata(derivation_id: str):
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     if "derivation_id" in request.args:
         derivation_id = str(request.args["derivation_id"])
@@ -2033,11 +2066,11 @@ def api_derivation_metadata(derivation_id: str):
 
     # try provided derivation_id; might not be a valid ID
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "derivation", derivation_id
         )
-        query_time_dict["pdg_api/: "] = time.time() - query_start_time
+        # query_time_dict["pdg_api/: "] = time.time() - query_start_time
     logger.info("derivation_dict=" + str(derivation_dict))
 
     logger.info("[TRACE] end " + trace_id)
@@ -2057,7 +2090,16 @@ def api_inference_rule_metadata(infrule_id: str):
     #         neo4j_query.FUNCTION_NAME
     #     )
 
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/resources/expression/<string:expression_id>/metadata", methods=["GET"])
@@ -2073,7 +2115,16 @@ def api_expression_metadata(expression_id: str):
     #         neo4j_query.FUNCTION_NAME
     #     )
 
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/resources/symbol/scalar/<string:symbol_id>/metadata", methods=["GET"])
@@ -2089,7 +2140,16 @@ def api_scalar_metadata(symbol_id: str):
     #         neo4j_query.FUNCTION_NAME
     #     )
 
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/resources/symbol/vector/<string:symbol_id>/metadata", methods=["GET"])
@@ -2105,7 +2165,16 @@ def api_vector_metadata(symbol_id: str):
     #         neo4j_query.FUNCTION_NAME
     #     )
 
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/resources/symbol/matrix/<string:symbol_id>/metadata", methods=["GET"])
@@ -2121,7 +2190,16 @@ def api_matrix_metadata(symbol_id: str):
     #         neo4j_query.FUNCTION_NAME
     #     )
 
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route(
@@ -2147,9 +2225,7 @@ def api_operation_metadata(operation_id: str):
                     "error": "Not Found",
                     "message": f"Operation {operation_id} does not exist",
                     "_links": {
-                        "index": {
-                            "href": url_for("api_bp.some_index_route", _external=True)
-                        }
+                        "index": {"href": url_for(".api_start_here", _external=True)}
                     },
                 }
             ),
@@ -2161,7 +2237,7 @@ def api_operation_metadata(operation_id: str):
         "_links": {
             "self": {
                 "href": url_for(
-                    "api_bp.api_operation_metadata",
+                    ".api_operation_metadata",
                     operation_id=operation_id,
                     _external=True,
                 ),
@@ -2169,7 +2245,7 @@ def api_operation_metadata(operation_id: str):
             },
             "update": {
                 "href": url_for(
-                    "api_bp.api_operation_metadata",
+                    ".api_operation_metadata",
                     operation_id=operation_id,
                     _external=True,
                 ),
@@ -2178,7 +2254,7 @@ def api_operation_metadata(operation_id: str):
             },
             "replace": {
                 "href": url_for(
-                    "api_bp.api_operation_metadata",
+                    ".api_operation_metadata",
                     operation_id=operation_id,
                     _external=True,
                 ),
@@ -2187,7 +2263,7 @@ def api_operation_metadata(operation_id: str):
             },
             "expressions": {
                 "href": url_for(
-                    "api_bp.api_list_operation_expressions",
+                    ".api_list_operation_expressions",
                     operation_id=operation_id,
                     _external=True,
                 ),
@@ -2196,7 +2272,7 @@ def api_operation_metadata(operation_id: str):
             },
             "parent_operation": {
                 "href": url_for(
-                    "api_bp.api_operation_detail",
+                    ".api_operation_detail",
                     operation_id=operation_id,
                     _external=True,
                 ),
@@ -2227,7 +2303,16 @@ def api_relation_metadata(relation_id: str):
     if operation_dict is None:
         jsonify({"STATUS": relation_id + " does not exist in the database"})
 
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/resources/derivation/<string:derivation_id>/steps", methods=["GET"])
@@ -2250,7 +2335,7 @@ def api_derivation_steps(derivation_id: str):
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     # if "derivation_id" in request.args:
     #     derivation_id = str(request.args["derivation_id"])
@@ -2261,11 +2346,11 @@ def api_derivation_steps(derivation_id: str):
 
     # try provided derivation_id; might not be a valid ID
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_steps = session.read_transaction(
             neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
-        query_time_dict["pdg_api/: "] = time.time() - query_start_time
+        # query_time_dict["pdg_api/: "] = time.time() - query_start_time
     # logger.info("list_of_steps=" + str(list_of_steps))
 
     logger.info("[TRACE] end " + trace_id)
@@ -2280,91 +2365,82 @@ def api_delete_derivation(derivation_id: str):
     .. code-block:: bash
 
         curl --silent --insecure https://localhost/api/v1/resources/derivation/<string:derivation_id>/delete
+
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
-
-    # if request.is_json:  # "Content-Type: application/json"
-    #     data_from_user = request.get_json()
-    #     logger.info("data_from_user = " + str(data_from_user))
-
-    #     # required
-    #     if "derivation_id" in data_from_user.keys():
-    #         derivation_id = data_from_user["derivation_id"]
-    #     else:
-    #         return jsonify({"ERROR": "need to provide derivation_id"})
-
-    # else:  # "Content-Type: application/x-www-form-urlencoded"
-    #     logger.info("request.args=" + str(request.args))  # returns a dict
-    #     # required
-    #     derivation_id = request.args.get("derivation_id")
-    #     if derivation_id:
-    #         logger.info("derivation_id =" + derivation_id)
-    #     else:
-    #         return jsonify({"ERROR": "need to provide derivation_id"})
-
-    # does this derivation_id exist?
-
+    # query_time_dict = {}
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "derivation"
         )
-        query_time_dict[
-            "pdg_api/api_list_derivations: list_nodes_of_type, derivation"
-        ] = (time.time() - query_start_time)
-
+        # query_time_dict['pdg_api/api_list_derivations: list_nodes_of_type, derivation'] = time.time() - query_start_time
     list_of_id = []
     for derivation_dict in list_of_dicts:
         list_of_id.append(derivation_dict["id"])
     if derivation_id not in list_of_id:
-        return jsonify(
-            {"ERROR": derivation_id + " not found in list of derivation IDs"}
+        return hal_error(
+            derivation_id + " not found in list of derivation IDs",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_derivations", _external=True),
+                    "List of Derivations",
+                )
+            },
+            title="Derivation Not Found",
         )
-
-    # at this point inputs have been validated
-
     list_of_step_dicts = []
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         list_of_step_dicts = session.read_transaction(
             neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
-        query_time_dict[
-            "pdg_app/to_review_derivation: get_list_of_steps_in_this_derivation"
-        ] = round(time.time() - query_start_time, 3)
-
+        # query_time_dict['pdg_app/to_review_derivation: get_list_of_steps_in_this_derivation'] = round(time.time() - query_start_time, 3)
     for this_step_dict in list_of_step_dicts:
         with graphDB_Driver.session() as session:
-            query_start_time = time.time()
+            # query_start_time = time.time()
             session.write_transaction(
                 neo4j_query.delete_node, this_step_dict["id"], "step"
             )
-            query_time_dict["pdg_app/to_review_derivation: delete_node step"] = round(
-                time.time() - query_start_time, 3
-            )
-
+            # query_time_dict['pdg_app/to_review_derivation: delete_node step'] = round(time.time() - query_start_time, 3)
     derivation_dict = {}
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "derivation", derivation_id
         )
-        query_time_dict["to_review_derivation: node_properties, derivation"] = round(
-            time.time() - query_start_time, 3
-        )
+        # query_time_dict['to_review_derivation: node_properties, derivation'] = round(time.time() - query_start_time, 3)
     logger.info("derivation_dict:" + str(derivation_dict))
-
     with graphDB_Driver.session() as session:
-        query_start_time = time.time()
+        # query_start_time = time.time()
         session.write_transaction(neo4j_query.delete_node, derivation_id, "derivation")
-        query_time_dict["pdg_app/to_review_derivation: delete_node derivation"] = round(
-            time.time() - query_start_time, 3
-        )
+        # query_time_dict['pdg_app/to_review_derivation: delete_node derivation'] = round(time.time() - query_start_time, 3)
     logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
-
-    return jsonify({"STATUS": "successfully deleted" + derivation_id})
+    return hal_response(
+        data={
+            "status": "successfully deleted " + derivation_id,
+            "deleted_derivation_id": derivation_id,
+            "deleted_step_count": len(list_of_step_dicts),
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_delete_derivation",
+                    derivation_id=derivation_id,
+                    _external=True,
+                ),
+                "Delete derivation",
+            ),
+            "up": hal_link(
+                url_for(".api_list_derivations", _external=True), "List of Derivations"
+            ),
+            "collection": hal_link(
+                url_for(".api_list_derivations", _external=True), "Derivations"
+            ),
+        },
+    )
 
 
 @api_bp.route(
@@ -2374,7 +2450,16 @@ def api_delete_inference_rule(infrule_id: str):
     """
     delete inference rule
     """
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/resources/expression/<string:expression_id>/delete", methods=["DELETE"])
@@ -2382,36 +2467,90 @@ def api_delete_expression(expression_id: str):
     """
     delete expression
     """
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/resources/symbol/scalar/<string:symbol_id>/delete", methods=["DELETE"])
 def api_delete_scalar(symbol_id: str):
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/resources/symbol/vector/<string:symbol_id>/delete", methods=["DELETE"])
 def api_delete_vector(symbol_id: str):
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/resources/symbol/matrix/<string:symbol_id>/delete", methods=["DELETE"])
 def api_delete_matrix(symbol_id: str):
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route(
     "/resources/symbol/operation/<string:operation_id>/delete", methods=["DELETE"]
 )
 def api_delete_operation(operation_id: str):
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route(
     "/resources/symbol/relation/<string:relation_id>/delete", methods=["DELETE"]
 )
 def api_delete_relation(relation_id: str):
-    return jsonify({"STATUS": "TODO"})
+    return hal_error(
+        f"{symbol_id}: this endpoint is not yet implemented",
+        501,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Not Implemented",
+    )
 
 
 @api_bp.route("/v1/resources/sympy_check", methods=["GET", "POST"])
@@ -2482,7 +2621,7 @@ def api_cypher_query():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
+    # query_time_dict = {}  # type: query_timing_result_type
 
     user_query = request.args.get("query")
 
@@ -2493,13 +2632,13 @@ def api_cypher_query():
         try:
             # https://neo4j.com/docs/python-manual/current/session-api/
             with graphDB_Driver.session() as session:
-                query_start_time = time.time()
+                # query_start_time = time.time()
                 list_of_records = session.read_transaction(
                     neo4j_query.user_query, user_query
                 )
-                query_time_dict["api_cypher_query: user_query"] = round(
-                    time.time() - query_start_time, 3
-                )
+                # query_time_dict["api_cypher_query: user_query"] = round(
+                #     time.time() - query_start_time, 3
+                # )
         except neo4j.exceptions.ClientError:
             list_of_records = ["WRITE OPERATIONS NOT ALLOWED (ClientError)"]
         except neo4j.exceptions.TransactionError:
