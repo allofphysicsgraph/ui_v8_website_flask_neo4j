@@ -6,12 +6,7 @@ docker exec -it --workdir /scratch/documentation_generated_sphinx $(docker ps -q
 
 Inside the container 
 ```
+make clean
 make html
 ```
-
-To reset use
-```
-make clean
-```
-
 
