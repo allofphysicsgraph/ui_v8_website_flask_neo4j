@@ -6,7 +6,7 @@
 # Attribution 4.0 International (CC BY 4.0)
 
 """
-The purpose of this file is to transform between Latex to SymPy
+The purpose of this file is to transform between Latex to SymPy. 
 The reason this scope has been isolated is to facilitate changing the Computer Algebra System (CAS) to something other than SymPy if that becomes relevant.
 For example, two different Computer Algebra Systems could be used with the Physics Derivation Graph (e.g., Sympy and Sage) to either duplicate a given validation or to extend coverage to inference rules one of the CAS cannot address.
 
@@ -36,12 +36,28 @@ proc_timeout = 10
 
 
 def sympy_to_latex_str(sympy_expr: str) -> str:
-    """
-        TODO: this isn't working as desired.
-        https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/19
+    """Converts a string representation of a SymPy expression into a LaTeX string.
 
-    sympy_to_latex_str: SymPy to be converted to Latex: sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))
-    sympy_to_latex_str: latex_str= \mathtt{\text{sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))}}
+    Parses a string representation of a SymPy expression and 
+    uses SymPy's printing utilities to generate the corresponding LaTeX code.
+
+    :param sympy_expr: The string containing the SymPy expression to convert.
+    :type sympy_expr: str
+    :return: The resulting LaTeX representation of the parsed expression, 
+             or a fallback error message if the input is empty.
+    :rtype: str
+
+    example input: SymPy to be converted to Latex:
+
+    .. code-block:: python
+
+        sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))
+
+    desired output: 
+
+    .. code-block:: python
+
+        latex_str= \mathtt{\text{sympy.Eq(sympy.Symbol('pdg1881666'),sympy.Symbol('pdg3882725'))}}
 
     """
     trace_id = str(uuid.uuid4())
@@ -56,7 +72,7 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
 
     latex_str = sympy.latex(expr)
 
-    # TODO: sometimes the above files, like on a string with no SymPy formatting:
+    # TODO: sometimes the above fails, like on a string with no SymPy formatting:
     #    NameError: name 'b' is not defined
 
     logger.info("latex_str=" + latex_str)
