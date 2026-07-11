@@ -7,22 +7,27 @@
 # https://creativecommons.org/licenses/by/4.0/
 
 """
-This iteration is based on a property graph (specifically Neo4j)
+This iteration (v8) of the Physics Derivation Graph is based on a property graph (specifically Neo4j)
 with cleaner separation between the MVC and the database.
 
 Previous versions had a "local ID" which is needed when including
 more than one derivation in the same Latex document.
 For this version, the specific-to-Latex "local ID" (for expression labels)
-can be constructed using md5hash(<derivation_id>_<expression_id>).
+can be constructed using `md5hash(<derivation_id>_<expression_id>)`.
 
 ****************************
 
-# convention: every call to flash must be either a string or the content must be wrapped in str()
-# reason: when content is passed to flash() that cannot be serialized, the Flask error and the website crashes
+Conventions
+------------
 
-See https://allofphysics.com/documentation/conventions
+See also https://allofphysics.com/documentation/conventions
 
-# convention: every Python function starts with
+Convention: every call to flash must be either a string or the content must be wrapped in str()
+
+Reason: when content is passed to flash() that cannot be serialized, the Flask error and the website crashes
+
+
+Convention: every Python function starts with
 
 .. code-block:: bash
 
@@ -37,26 +42,35 @@ and exits with
     logger.info("[TRACE] start " + trace_id)
     return
 
-# reason: This enables creation of a flamegraph <https://www.brendangregg.com/flamegraphs.html>
+Reason: This enables creation of a flamegraph https://www.brendangregg.com/flamegraphs.html
 
 ****************************
 
-# options for connecting to Neo4j from Python
+options for connecting to Neo4j from Python
+--------------------------------------------
+
 - native driver
 - py2neo
 - neomodel
+
 See https://neo4j.com/developer/python/
 
-# Python native driver
+Python native driver
+---------------------
+
 - https://neo4j.com/docs/api/python-driver/current/api.html
 - https://pypi.org/project/neo4j/
 - https://github.com/neo4j/neo4j-python-driver
 
-# demo of a local Flask app connecting to a remote Neo4j server
+demo of a local Flask app connecting to a remote Neo4j server
+--------------------------------------------------------------
+
 - https://neo4j.com/developer/python-movie-app/
 - https://github.com/neo4j-examples/neo4j-movies-template/blob/master/flask-api/app.py
 
-# Tips on using Cypher from Python
+Tips on using Cypher from Python
+---------------------------------
+
 - https://neo4j.com/docs/python-manual/current/cypher-workflow/
 
 
@@ -1067,6 +1081,32 @@ class SpecifyNewSymbolMatrixForm(FlaskForm):
 
 
 class SpecifyNewSymbolOperationForm(FlaskForm):
+    """
+    Form for defining a new symbol or mathematical operation.
+
+    This form collects configuration data for new operators, including their 
+    LaTeX representation, expected number of arguments, and descriptive metadata.
+
+    :ivar operation_latex: The LaTeX markup representing the symbol/operator. 
+        Must be ASCII, between 1 and 1000 characters, and is required.
+    :vartype operation_latex: wtforms.fields.StringField
+
+    :ivar operation_argument_count: The number of arguments the operation takes. 
+        Must be an integer between 1 and 20. Defaults to 1.
+    :vartype operation_argument_count: wtforms.fields.IntegerField
+
+    :ivar operation_name_latex: The name of the operation formatted in LaTeX. 
+        Must be ASCII, up to 1000 characters, and is required.
+    :vartype operation_name_latex: wtforms.fields.StringField
+
+    :ivar operation_description_latex: A LaTeX-formatted description of the operation. 
+        Must be ASCII and up to 1000 characters. Optional.
+    :vartype operation_description_latex: wtforms.fields.StringField
+
+    :ivar operation_reference_latex: An optional LaTeX-formatted reference or 
+        citation source for the operation.
+    :vartype operation_reference_latex: wtforms.fields.StringField
+    """
     operation_latex = StringField(
         "LaTeX symbol",
         validators=[
@@ -1101,6 +1141,26 @@ class SpecifyNewSymbolOperationForm(FlaskForm):
 
 
 class SpecifyNewSymbolRelationForm(FlaskForm):
+    """
+    A Flask form for specifying a new relation for a symbol.
+
+    This form collects and validates information about a LaTeX symbol relation,
+    including its LaTeX representation, name, description, and reference. All text
+    fields except the reference require ASCII input.
+
+    :ivar relation_latex: The LaTeX representation of the relation. 
+        Must be ASCII, required, and between 1 and 1000 characters.
+    :type relation_latex: StringField
+    :ivar relation_name_latex: The name of the relation in LaTeX format. 
+        Must be ASCII, required, and up to 1000 characters.
+    :type relation_name_latex: StringField
+    :ivar relation_description_latex: A LaTeX-formatted description of the relation. 
+        Must be ASCII and up to 1000 characters.
+    :type relation_description_latex: StringField
+    :ivar relation_reference_latex: A LaTeX-formatted reference or citation for the relation. 
+        Optional.
+    :type relation_reference_latex: StringField
+    """
     relation_latex = StringField(
         "LaTeX symbol",
         validators=[
@@ -1129,13 +1189,15 @@ class SpecifyNewSymbolRelationForm(FlaskForm):
 
 
 class CypherQueryForm(FlaskForm):
-    """
-    web form for user to provide Cypher query for Neo4j database
+    """Web form for submitting a Cypher query to a Neo4j database.
 
-    although a minimum input length of 1 sounds reasonable,
-    that causes the empty form to fail
+    :ivar query: The Cypher query input field. Must be non-empty and ASCII-only.
+    :vartype query: StringField
+
     """
 
+    # avoid using `Length(min=1)` because it causes validation
+    # to fail on empty/unsubmitted forms. `InputRequired` is sufficient.
     query = StringField(
         "Cypher query",
         validators=[
@@ -1158,6 +1220,7 @@ def before_request():
 
     https://stackoverflow.com/questions/12273889/calculate-execution-time-for-every-page-in-pythons-flask
     actually, https://gist.github.com/lost-theory/4521102
+
     >>> before_request():
     """
     g.start = time.time()
