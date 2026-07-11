@@ -275,12 +275,212 @@ WHERE stepCount > 1
 RETURN f, stepCount
 </pre>
 
+
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id=""><i>Decision</i>: What parts of an expression are required to be specified?</H2>
+
+<P>Made 2024-05-28 
+
+<P>design decision: Constrain user input of expressions to separately provide <code>lhs, relation, rhs, when</code>.
+
+<P>For example:
+<pre>
+F = m a when v<<c
+</pre>
+
+<P>(Previously (in v7) I accepted arbitrary Latex as input.)
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id=""><i>Decision</i>: Should user have to review existing content before adding new?</H2>
+
+<P>Made 2024-05-28
+
+<P>design decision: force user to see all expressions before adding new
+
+<P>The landing page intentionally does not have links to "create new expression" and "create new symbol" and "create new inference rule.
+<P>The user is forced to see all existing symbols (and expressions and inference rules) before creating a new instance.
+
+<P>The same reasoning applies to where "create new symbol" is placed on the page -- at the bottom, which forces the user to scroll past all existing symbols. 
+<P>Same for expressions and inference rules.
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id=""><i>Decision</i>: Neo4j schema for nodes?</H2>
+
+<P>Made 2024-05-28
+
+<P>design decision: treat "symbol" as a node type, rather than have separate node types for subcategories like 
+"symbol_operation", "symbol_scalar", "symbol_vector", "symbol_matrix", "symbol_quantum_operator"
+
+<P>Each of these subcategories have distinct properties
+
+<P>https://physicsderivationgraph.blogspot.com/2024/05/distinguishing-scalars-vectors-and.html
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id=""><i>Decision</i>: Neo4j schema for nodes?</H2>
+
+<P>Made 2024-05-28
+
+<P>design decision: feed is a distinct node type
+
+<P>in v7 JSON each step has zero or more feeds, and each feed was in the same category as expressions. 
+
+<P>Feeds do not have the same attributes as symbols, nor do feeds have the same attributes as expressions. 
+<P>The category of symbols includes operators, scalars, vectors, matrices. 
+<P>Feeds can be composed of symbols, e.g., "x/a".
+<P>Feeds should not have equality or inequality and cannot be checked for dimensional consistency.
+
+<P>Feeds are specific to a step: "multiply both sides by" with the feed "x/a" used in two different steps refers to distinct feeds. 
+<P>However, a step could feature multiple feeds, and each feed has separate properties.
+
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id=""><i>Decision</i>: Should the server cache results or only serve live content?</H2>
+
+<P>Made 2024-05-28
+
+<P>design decision: live assessments are preferred over caching.
+
+<P>I don't care much about performance of page loads since page loads are less than 5 seconds. Therefore I see no value in caching results.
+
+<P>Also, caching could give a false response if the cache isn't refreshed appropriately.
+
+<P>Live assessments provide immediate indicators of failure (rather than obfuscating).
+
+<P>Caching would be additional complexity for the design and implementation.
+
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id=""><i>Decision</i>: validate expressions and steps at page-load time or off-line?</H2>
+
+<P>Made 2024-05-28
+
+<P>design decision: validate content at page-load time 
+
+<P>The cost of validating expressions and steps at page-load time is  longer page-load durations. 
+
+<P>The cost of validating expressions and steps off-line (e.g., at time of entry or modification) is lower certainty that nothing has changed (e.g., to a symbol)
+
+<P>I'm going to do validation at page-load time because validity isn't an intrinsic property of the node.
+
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id=""><i>Decision</i>: Should the sequence order number for steps be a property of the edge or node for steps?</H2>
+
+<P>Made 2024-05-28
+
+<P>design decision: property of edge.
+
+<P>Steps in a derivation are ordered. Two options for specifying the order:
+<UL>
+<LI>as a property of the edge connected "derivation" node to each "step" node<BR>
+xor
+<LI>as a property of the "step" node
+</UL>
+<P>I'm not currently clear which is correct, so I've chosen the edge property.
+
+
+<P>Sequence order also matters for arguments of an inference rule: there may be multiple input expressions. In this case sequence order must be an edge property since order isn't a property of either the inference rule or the expressions.
+
+<P>Sequence order matters for Abstract Syntax Trees for an expression. For example, <BR>
+"integrate <INTEGRAND> from <LOWERBOUND> to <UPPERBOUND> over <DIFFERENTIAL>"<BR>
+requires a sequence of symbols -- they cannot be unordered. 
+<P>Again, in this case case sequence order must be an edge property since order isn't a property of either the expression or the symbol.
+
+<P>Based on the order number being an edge property for the two cases of inference rule and ASTs, I'm going with edge property between derivations and steps.
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id=""><i>Decision</i>: symbols in new expressions </H2>
+
+<P>Made 2024-05-24
+
+<P>design decision: ordering symbols versus SymPy for new expressions
+
+<P>In v7 JSON the workflow for new expressions is
+1) user provides Latex expression
+2) user provides SymPy expression
+3) user provides symbols
+
+<P>The reason for that order was that the symbol detection was coming from SymPy's parsing of the Latex.
+
+<P>In v8 Neo4j the workflow is
+1) user provides Latex expression
+2) user provides symbols
+3) user provides SymPy expression
+
+<P>The new sequence (symbols from latex-as-string first, then send to sympy) might be 
+advantageous: if the symbols are identified first, that might make SymPy's parsing more likely to be right. For example, parsing
+<pre>
+a = b
+</pre>
+<P>using SymPy is more likely to succeed than
+<pre>
+a = r_{\rm Earth}
+</pre>
+<P>which fails in SymPy. 
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id=""><i>Decision</i>: creating new expressions in isolation versus part of derivation </H2>
+
+<P>Made 2024-05-24
+
+design decision: creating new expressions as part of derivation.
+
+<P>In the v7 JSON implementation, the only way to create a new expression was to have the expression be associated with a specific derivation in a (new) step. The intent of this was to ensure there were no unconnected expressions. As a positive side-effect, associating a new expression with a derivation helped with guessing the symbols.
+
+<P>In the new (as of 2024) v8 Neo4j design, expressions can not be created during the specification of a derivation step. 
+<P>Now an expression has to be created prior to being referenced in a step. The value of separating these actions is that the interaction with the user is easier when processing one expression (rather than a bunch concurrently all related to the step).
+<P>Two consequences from this approach:
+<UL>
+<LI>guessing the symbols lacks context of a derivation
+<LI>expressions may be unconnected to a derivation step
+</uL>
+
+<P>Interestingly, in the v7 JSON implementation a user could add new symbols that were not referenced by any expression.
+
+
+
 <P>&nbsp;</P>
 <HR/>
 <P>&nbsp;</P>
 
 
-<H2 id="separate tests from implementation"><i>Decision</i>: separate tests from implementation or keep tests next to implemenation?
+<H2 id="separate tests from implementation"><i>Decision</i>: separate tests from implementation or keep tests next to implementation?
 
 <P>Based on a recommendation from Gemini 3.5 Flash, tests are separate from the implementation.
 
@@ -352,7 +552,7 @@ A route file can quickly grow to hundreds of lines of code as you add more endpo
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id="naming of repo"><i>Decision</i>: Naming of repo</H2>
+<H2 id="naming of repo"><i>Decision</i>: Naming of git repository</H2>
   
 <p>I decided to name the repo "allofphysics.com" to make it clear which repo hosted the website on the Internet. Also, the alternative repo name "a mashup of v7 and v8" wasn't a good name, though it would have been more descriptive.
 </p>
