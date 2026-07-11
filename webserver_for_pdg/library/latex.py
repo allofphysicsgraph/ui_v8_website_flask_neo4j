@@ -137,16 +137,19 @@ def create_d3js_json(
 ) -> None:
     """
     Produce a JSON file that contains something like
-    {
-      "nodes": [
-        {"id": "Myriel", "group": 1, "img": "/static/test.png", "width": 138, "height": 39, "linear index": 1},
-        {"id": "Napoleon", "group": 1, "img": "/static/test.png", "width": 138, "height": 39, "linear index": 2}
-      ],
-      "links": [
-        {"source": "Napoleon", "target": "Myriel", "value": 1},
-        {"source": "Mlle.Baptistine", "target": "Myriel", "value": 8}
-      ]
-    }
+
+    .. code-block:: json
+
+        {
+          "nodes": [
+            {"id": "Myriel", "group": 1, "img": "/static/test.png", "width": 138, "height": 39, "linear index": 1},
+            {"id": "Napoleon", "group": 1, "img": "/static/test.png", "width": 138, "height": 39, "linear index": 2}
+          ],
+          "links": [
+            {"source": "Napoleon", "target": "Myriel", "value": 1},
+            {"source": "Mlle.Baptistine", "target": "Myriel", "value": 8}
+          ]
+        }
 
     for inspiration based on the last time I implemented this, see
     `v3_CSV/bin/create_json_per_derivation_from_connectionsDB.py`
@@ -343,6 +346,7 @@ def create_d3js_json(
 def edges_in_derivation_for_d3js(all_steps: dict) -> List[Tuple[str, str]]:
     """
     str in the Tuples:
+
     - step_id
     - expression_dict["id"]
 

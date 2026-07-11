@@ -277,15 +277,18 @@ def guess_symbols_from_latex(graphDB_Driver, query_time_dict, expression_dict):
     symbols and then ask the user to select relevant symbols.
 
     There are multiple tactics to enact that are more clever:
-      * given a Latex expression, use SymPy to identify possible symbols.
+
+    - given a Latex expression, use SymPy to identify possible symbols.
+
       and, separately
-      * given a Latex expression, and given all existing symbols, return a list of matching symbols
+
+    - given a Latex expression, and given all existing symbols, return a list of matching symbols
 
     The first tactic is likely to result in an undercount,
     the second tactic will result in an overcount.
 
-    I'll use keyword SYMBOL_SEARCH_SYMPY for the first tactic and
-                     SYMBOL_SEARCH_LATEX for the second tactic.
+    I'll use keyword `SYMBOL_SEARCH_SYMPY` for the first tactic and
+                     `SYMBOL_SEARCH_LATEX` for the second tactic.
     Order doesn't matter for the two tactics since they are independent.
 
     """

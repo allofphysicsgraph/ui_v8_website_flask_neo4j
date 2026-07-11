@@ -77,10 +77,11 @@ def validate_step(
 ) -> str:
     """
     The possible return strings from this function include:
-    * "no validation is available..." (e.g., for declarations)
-    * "no check performed" (the check is not implemented yet)
-    * "valid"
-    * "diff is ..."
+
+    - "no validation is available..." (e.g., for declarations)
+    - "no check performed" (the check is not implemented yet)
+    - "valid"
+    - "diff is ..."
 
     """
     trace_id = str(uuid.uuid4())
@@ -598,7 +599,7 @@ def add_X_to_both_sides(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     https://docs.sympy.org/latest/gotchas.html#double-equals-signs
     https://stackoverflow.com/questions/37112738/sympy-comparing-expressions
 
@@ -606,8 +607,7 @@ def add_X_to_both_sides(
     add c to both sides
     get a + c = b + c
 
-    latex_expansion
-        Add $#1$ to both sides of Eq.~\ref{eq:#2}.
+    latex_expansion:  Add $#1$ to both sides of Eq.~\ref{eq:#2}.
 
 
     >>> input_expr = parse_latex("a = b")
@@ -663,9 +663,8 @@ def subtract_X_from_both_sides(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
-        Subtract $#1$ from both sides of Eq.~\ref{eq:#2}.
+    r"""
+    latex_expansion:  Subtract $#1$ from both sides of Eq.~\ref{eq:#2}.
 
     https://docs.sympy.org/latest/tutorial/manipulation.html
 
@@ -728,18 +727,19 @@ def multiply_both_sides_by(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
-        Multiply both sides of Eq.~\ref{eq:#2} by $#1$.
+    r"""
+    latex_expansion: Multiply both sides of Eq.~\ref{eq:#2} by $#1$.
 
-    see also dividebothsidesby
+    see also `dividebothsidesby`
 
     x*y = Mul(x,y)
 
     Example:
+
         given "A*x=B", multbothsidesby(feed=2) yields "A*x*2=B*2"
 
     another example:
+
         given 'a + b = c'
         multiply both sides by d
         to get '(a + b)*d = c*d'
@@ -957,15 +957,16 @@ def divide_both_sides_by(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
-    latex_expansion
-        Divide both sides of Eq.~\ref{eq:#2} by $#1$.
+    latex_expansion: Divide both sides of Eq.~\ref{eq:#2} by $#1$.
 
     see also multiply_both_sides_by
 
     Example:
+
         given "A*x=B", dividebothsidesby(feed=2) yields "(A*x)/2=B/2"
 
     another example:
+
         given 'a + b = c'
         divide both sides by d
         to get '(a + b)/d = c/d'
@@ -1119,17 +1120,19 @@ def change_variable_X_to_Y(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
-    latex_expansion
-        Substitute $#1$ for $#2$ in Eq.~\ref{eq:#3}.
+    latex_expansion: Substitute $#1$ for $#2$ in Eq.~\ref{eq:#3}.
 
     given 'a + b = c',
     substitute b --> d
     to get 'a + d = c'
 
-    # to run the doctest below, use
-    import doctest
-    from validate_steps_sympy import *
-    doctest.run_docstring_examples(change_variable_X_to_Y, globals(), verbose=True)
+    to run the doctest below, use
+
+    .. code-block:: python
+
+        import doctest
+        from validate_steps_sympy import *
+        doctest.run_docstring_examples(change_variable_X_to_Y, globals(), verbose=True)
 
     >>> latex_dict = {}
     >>> latex_dict['input'] = [{'LHS': parse_latex('a + b'), 'RHS': parse_latex('c')}]
@@ -1176,8 +1179,7 @@ def multiply_LHS_by_unity(
     """
     see also multRHSbyUnity
 
-    latex_expansion
-        Multiply LHS of Eq.~\ref{eq:#2} by 1, which in this case is $#1$
+    latex_expansion: Multiply LHS of Eq.~\ref{eq:#2} by 1, which in this case is $#1$
 
     Given a = b
     mult LHS by (c/c)
@@ -1241,8 +1243,7 @@ def multiply_RHS_by_unity(
     """
     see also multLHSbyUnity
 
-    latex_expansion
-        Multiply RHS of Eq.~\ref{eq:#2} by 1, which in this case is $#1$
+    latex_expansion: Multiply RHS of Eq.~\ref{eq:#2} by 1, which in this case is $#1$
 
     Given a = b
     mult by (c/c)
@@ -1303,10 +1304,12 @@ def add_zero_to_LHS(
     ((feed==0) and (out_lhs0 == (in_lhs0+zero)) and (out_rhs0 == in_rhs0))
 
     Example:
+
         given "A*x=B", addZerotoLHS(feed=C-C) yields "A*x+C-C=B"
 
 
     latex_expansion:
+
         Add zero to LHS of Eq.~\ref{eq:#2}, where $0=#1$.
 
     >>> latex_dict = {}
@@ -1360,12 +1363,14 @@ def add_zero_to_RHS(
 ) -> str:
     """
     Example:
+
         given "A*x=B", addZerotoRHS(feed=C-C) yields "A*x=B+C-C"
 
 
     ((feed==0) and (out_rhs0 == (in_rhs0+zero)) and (out_lhs0 == in_lhs0))
 
     latex_expansion:
+
         Add zero to RHS of Eq.~\ref{eq:#2}, where $0=#1$.
 
     >>> latex_dict = {}
@@ -1418,8 +1423,7 @@ def take_curl_of_both_sides(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
-    latex_expansion
-        Apply curl to both sides of Eq.~\ref{eq:#1}.
+    latex_expansion: Apply curl to both sides of Eq.~\ref{eq:#1}.
 
     ((out_lhs0 == (\nabla \times in_lhs0)) and (out_rhs0 == \nabla \times in_rhs0))
     """
@@ -1445,8 +1449,7 @@ def indefinite_integral_over(
     """
     CATEGORY: calculus
 
-    latex_expansion
-        Indefinite integral of both sides of Eq.~\ref{eq:#2} over $#1$.
+    latex_expansion: Indefinite integral of both sides of Eq.~\ref{eq:#2} over $#1$.
 
     ((out_lhs0 == (\int in_lhs0 feed0)) and (out_rhs0 == \int in_rhs0 feed0))
 
@@ -1463,8 +1466,7 @@ def indefinite_integration(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
-    latex_expansion
-        Indefinite integral of both sides of Eq.~\ref{eq:#1}.
+    latex_expansion: Indefinite integral of both sides of Eq.~\ref{eq:#1}.
 
     CATEGORY: calculus
 
@@ -1481,8 +1483,7 @@ def indefinite_integrate_LHS_over(
     """
     CATEGORY: calculus
 
-    latex_expansion
-        Indefinite integral of LHS of Eq.~\ref{eq:#2} over $#1$.
+    latex_expansion: Indefinite integral of LHS of Eq.~\ref{eq:#2} over $#1$.
 
     ((out_lhs0 == (\int in_lhs0 feed0)) and (out_rhs0 == in_rhs0))
     """
@@ -1495,8 +1496,7 @@ def indefinite_integrate_RHS_over(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
-    latex_expansion
-        Indefinite integral of RHS of Eq.~\ref{eq:#2} over $#1$.
+    latex_expansion: Indefinite integral of RHS of Eq.~\ref{eq:#2} over $#1$.
 
     CATEGORY: calculus
 
@@ -1519,8 +1519,7 @@ def integrate_over_from_to(
     ((out_lhs0 == (\int_{feed1}^{feed2} in_lhs0 feed0)) and (out_rhs0 == \int_{feed1}^{feed2} in_rhs0 feed0))
 
 
-    latex_expansion
-        Integrate Eq.~\ref{eq:#4} over $#1$ from lower limit $#2$ to upper limit $#3$.</latex_expansion
+    latex_expansion: Integrate Eq.~\ref{eq:#4} over $#1$ from lower limit $#2$ to upper limit $#3$.</latex_expansion
 
     comment
         $\int_{#2}^{#3}\ d #1$
@@ -1596,8 +1595,7 @@ def make_expr_power(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
-    latex_expansion
-        Make Eq.~\ref{eq:#2} the power of $#1$.
+    latex_expansion: Make Eq.~\ref{eq:#2} the power of $#1$.
 
     ((out_lhs0 == (feed0)**(in_lhs0)) and (out_rhs0 == (feed0)**(in_rhs0)))
     """
@@ -1644,8 +1642,7 @@ def select_real_parts(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
-    latex_expansion
-        Select real parts of Eq.~\ref{eq:#1}.
+    latex_expansion: Select real parts of Eq.~\ref{eq:#1}.
 
     sympy.re(2+3*sympy.I)==2
 
@@ -1688,11 +1685,12 @@ def select_imag_parts(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
-        Select imaginary parts of Eq.~\ref{eq:#1}.
+    r"""
+    latex_expansion: Select imaginary parts of Eq.~\ref{eq:#1}.
 
-    sympy.im(2+3*sympy.I)==3
+    .. code-block:: python
+
+        sympy.im(2+3*sympy.I)==3
 
     Given a+i*b = c+i*d
     get b = d
@@ -1733,9 +1731,8 @@ def swap_LHS_with_RHS(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
-        Swap LHS of Eq.~\ref{eq:#1} with RHS.
+    r"""
+    latex_expansion: Swap LHS of Eq.~\ref{eq:#1} with RHS.
 
     ((in_lhs0 == out_rhs0) and (in_rhs0 == out_lhs0))
 
@@ -1782,11 +1779,11 @@ def sum_exponents_LHS(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
-        Sum exponents on LHS of Eq.~\ref{eq:#1}.
+    r"""
+    latex_expansion: Sum exponents on LHS of Eq.~\ref{eq:#1}.
 
     Example:
+
         given "(A^x)*(A^y)=(C^3)*(C^r)+2", sumExponents_LHS yields "A^(x+y)=(C^3)*(C^r)+2"
 
 
@@ -1801,11 +1798,11 @@ def sum_exponents_RHS(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
-        Sum exponents on RHS of Eq.~\ref{eq:#1}.
+    r"""
+    latex_expansion: Sum exponents on RHS of Eq.~\ref{eq:#1}.
 
     Example:
+
         given "(A^x)*(A^y)=(C^3)*(C^r)+2", sumExponents_RHS yields "(A^x)*(A^y)=(C^(3+r))+2"
 
 
@@ -1820,16 +1817,18 @@ def add_expr_1_to_expr_2(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     assumes result form LHS(X)+LHS(Y)=RHS(X)+RHS(Y)
 
     Example:
+
         given "A*x=B" and "C*y=F", add_expr_1_to_expr_2 yields "A*x+C*y=B+F"
 
 
     (((in_lhs0+in_lhs1)==out_lhs0) and ((in_rhs0+in_rhs1)==out_rhs0))
 
     latex_expansion:
+
         Add Eq.~\ref{eq:#1} to Eq.~\ref{eq:#2}.
 
     """
@@ -1885,6 +1884,7 @@ def substitute_RHS_of_expr_1_into_expr_2(
     get c = a*d
 
     Another example:
+
         given "A*x=B" and "C*y=A*x", subRHSofEqXintoEqY yields "C*y=B"
 
     """
@@ -1964,6 +1964,7 @@ def substitute_LHS_of_expr_1_into_expr_2(
     get   c = b*d
 
     another example:
+
         given "A*x=B" and "C*y=B", subLHSofEqXintoEqY yields "C*y=A*x"
 
     """
@@ -2018,9 +2019,8 @@ def mult_expr_1_by_expr_2(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
-        Multiply Eq.~\ref{eq:#1} by Eq.~\ref{eq:#2}.
+    r"""
+    latex_expansion: Multiply Eq.~\ref{eq:#1} by Eq.~\ref{eq:#2}.
 
     Given a = b
     and   c = d
@@ -2080,7 +2080,7 @@ def LHS_of_expr_1_eq_LHS_of_expr_2(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     Given a = b
     and   a = d
     get   b = d
@@ -2090,6 +2090,7 @@ def LHS_of_expr_1_eq_LHS_of_expr_2(
     description: combine 2 expressions
 
     latex_expansion:
+
         LHS of Eq.~\ref{eq:#1} is equal to LHS of Eq.~\ref{eq:#2}.
 
     TODO: issue detected by Gemini 3 Pro on 2026-02-02:
@@ -2171,13 +2172,15 @@ def RHS_of_expr_1_eq_RHS_of_expr_2(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     ((in_rhs0 == in_rhs1) and (out_lhs0 == in_lhs0) and (out_rhs0 == in_lhs1))
 
     latex_expansion:
+
         RHS of Eq.~\ref{eq:#1} is equal to RHS of Eq.~\ref{eq:#2}.
 
     Example:
+
         given "A*x=B" and "C=B", RHSofEqXeqRHSofEqY yields "A*x=C"
 
     """
@@ -2236,9 +2239,8 @@ def raise_both_sides_to_power(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
-        Raise both sides of Eq.~\ref{eq:#2} to $#1$.
+    r"""
+    latex_expansion: Raise both sides of Eq.~\ref{eq:#2} to $#1$.
 
     ((out_lhs0 == (in_lhs0)**(feed0)) and (out_rhs0 == (in_rhs0)**(feed0)))
     """
@@ -2250,7 +2252,7 @@ def claim_expr_1_equals_expr_2(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     ((in_lhs0 == in_lhs1) and (in_rhs0 == in_rhs1))
 
     latex_expansion:
@@ -2308,11 +2310,10 @@ def claim_LHS_equals_RHS(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     (in_lhs0 == in_rhs0)
 
-    latex_expansion
-        Thus we see that LHS of Eq.~\ref{eq:#1} is equal to RHS.
+    latex_expansion: Thus we see that LHS of Eq.~\ref{eq:#1} is equal to RHS.
 
     Note: this infrule terminates a derivation.
 
@@ -2355,16 +2356,20 @@ def function_is_even(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
+    r"""
+    latex_expansion:
+
         $#1$ is even with respect to $#2$, so replace $#1$ with $#3$ in Eq.~\ref{eq:#4}.
 
     f(x)=f(-x)
 
     colloquially,
-    sympy.cos(x)==sympy.cos(-x)
 
-    sympy.cos(x) - sympy.cos(-x) == 0
+    .. code-block::
+
+        sympy.cos(x)==sympy.cos(-x)
+        sympy.cos(x) - sympy.cos(-x) == 0
+
     """
     assert len(list_of_feed_dicts) == 0
 
@@ -2376,9 +2381,8 @@ def function_is_odd(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
-        $#1$ is odd with respect to $#2$, so replace $#1$ with $#3$ in Eq.~\ref{eq:#4}.
+    r"""
+    latex_expansion: $#1$ is odd with respect to $#2$, so replace $#1$ with $#3$ in Eq.~\ref{eq:#4}.
 
     -f(x) = f(-x)
 
@@ -2397,9 +2401,8 @@ def conjugate_function_X(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
-        Conjugate $#1$ in Eq.~\ref{eq:#2}.
+    r"""
+    latex_expansion: Conjugate $#1$ in Eq.~\ref{eq:#2}.
 
     colloquially,
     sympy.conjugate(sympy.I)==-sympy.I
@@ -2414,9 +2417,8 @@ def conjugate_both_sides(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    latex_expansion
-        Conjugate both sides of Eq.~\ref{eq:#1}.
+    r"""
+    latex_expansion: Conjugate both sides of Eq.~\ref{eq:#1}.
 
     colloquially,
     sympy.conjugate(sympy.I)==-sympy.I
@@ -2434,8 +2436,7 @@ def conjugate_transpose_both_sides(
     list_of_output_dicts: List[dict],
 ) -> str:
     """
-    latex_expansion
-        Conjugate transpose of both sides of Eq.~\ref{eq:#1}.
+    latex_expansion: Conjugate transpose of both sides of Eq.~\ref{eq:#1}.
 
     Apply ^+; replace $i$ with $-i$ and transpose matrices
     """
