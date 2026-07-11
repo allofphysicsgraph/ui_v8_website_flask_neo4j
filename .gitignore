@@ -6,6 +6,8 @@ tests_of_webpage/playwright/.coverage
 tests_of_webpage/playwright/htmlcov/
 tests_of_webpage/playwright/pytest_report.html
 tests_of_webpage/playwright/.pytest_cache
+documentation_generated_sphinx/_build/
+documentation_generated_sphinx/logs/
 .coverage
 .env
 .env.google

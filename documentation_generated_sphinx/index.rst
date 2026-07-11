@@ -12,13 +12,13 @@ Welcome to Physics Derivation Graph's documentation!
    :caption: Contents:
 
 
-.. automodule:: app
+.. automodule:: pdg_app
     :members:
     :undoc-members:
     :show-inheritance:
 .. this adds bunch of content that isn't useful:    :inherited-members:
 
-.. automodule:: pdg_api
+.. automodule:: library.pdg_api
     :members:
     :undoc-members:
     :show-inheritance:

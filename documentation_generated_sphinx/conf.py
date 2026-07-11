@@ -19,17 +19,29 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
-# https://macgregor.gitbooks.io/developer-notes/content/python/autodoc-import.html
-#sys.path.append(os.path.abspath('../..'))
 
-#sys.setrecursionlimit(150)
+# Ensure logs directory exists so pdg_app can safely initialize logging on import
+os.makedirs('logs', exist_ok=True)
+
+sys.path.insert(0, os.path.abspath('../webserver_for_pdg'))
+#sys.path.insert(0, os.path.abspath('../webserver_for_pdg/library'))
+# https://macgregor.gitbooks.io/developer-notes/content/python/autodoc-import.html
 
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
+
+
+# on 2026-07-11 Gemini 3.5 Flash says
+# Sphinx imports your code to extract the docstrings via the autodoc extension. 
+# If the system running the build does not have the project's dependencies 
+# (such as flask, neo4j, or sympy) installed, the build will fail with an ImportError.
+# To bypass this without installing all dependencies, you can mock 
+# them by adding the following line somewhere in conf.py:
+
+#autodoc_mock_imports = ["flask", "neo4j", "sympy", "google", "msmtp"]
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -104,7 +116,7 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
