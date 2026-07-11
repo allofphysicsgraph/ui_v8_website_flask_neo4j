@@ -5,7 +5,6 @@ These two CSV files are similar but
 
 the index in the first column is not the same
 and
-
 one of the files has additional content
 
 Write a Python script that reads both files and alters the index in the file that is missing content, then writes that to a third output file.

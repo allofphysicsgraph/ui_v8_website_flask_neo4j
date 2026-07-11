@@ -4,10 +4,10 @@ import sympy
 from sympy import *
 from webserver_for_pdg.library.latex_and_sympy import *
 
-
 logger = logging.getLogger(__name__)
 
-#************************************************************************
+# ************************************************************************
+
 
 # Test standard/expected input
 def test_sympy_to_latex_str_expected():
@@ -67,8 +67,7 @@ def test_sympy_to_latex_str_logging(caplog):
     assert any("[TRACE] end" in record.message for record in caplog.records)
 
 
-
-#************************************************************************
+# ************************************************************************
 
 
 def test_cleaned_latex_str_to_sympy_expression_simple_equation():
@@ -77,10 +76,12 @@ def test_cleaned_latex_str_to_sympy_expression_simple_equation():
     a, b = symbols("a b")
     assert result == Eq(a, b)
 
+
 def test_cleaned_latex_str_to_sympy_expression_returns_a_sympy_object():
     """test of Valid Latex"""
     result = cleaned_latex_str_to_sympy_expression("a = b")
     assert isinstance(result, sympy.Basic)
+
 
 def test_cleaned_latex_str_to_sympy_expression_polynomial_expression():
     """test of Valid Latex"""
@@ -88,10 +89,12 @@ def test_cleaned_latex_str_to_sympy_expression_polynomial_expression():
     x = symbols("x")
     assert result == x**2 + 1
 
+
 def test_cleaned_latex_str_to_sympy_expression_fraction_expression():
     """test of Valid Latex"""
     result = cleaned_latex_str_to_sympy_expression(r"\frac{1}{2}")
     assert result == Rational(1, 2)
+
 
 def test_cleaned_latex_str_to_sympy_expression_equation_with_expression_on_both_sides():
     """test of Valid Latex"""
@@ -105,15 +108,18 @@ def test_cleaned_latex_str_to_sympy_expression_integer_input_raises():
     with pytest.raises(Exception):
         cleaned_latex_str_to_sympy_expression(12345)
 
+
 def test_cleaned_latex_str_to_sympy_expression_float_input_raises():
     """non-string input should not silently succeed with a bogus result -- it should raise."""
     with pytest.raises(Exception):
         cleaned_latex_str_to_sympy_expression(3.14)
 
+
 def test_cleaned_latex_str_to_sympy_expression_none_input_raises():
     """non-string input should not silently succeed with a bogus result -- it should raise."""
     with pytest.raises(Exception):
         cleaned_latex_str_to_sympy_expression(None)
+
 
 def test_cleaned_latex_str_to_sympy_expression_list_input_raises():
     """non-string input should not silently succeed with a bogus result -- it should raise."""
@@ -127,6 +133,7 @@ def test_cleaned_latex_str_to_sympy_expression_unbalanced_braces_raises_custom_e
         cleaned_latex_str_to_sympy_expression(r"\frac{1}{")
     assert "Sympy unable to parse latex" in str(exc_info.value)
 
+
 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/140
 # def test_cleaned_latex_str_to_sympy_expression_unknown_command_raises_custom_exception():
 #     """Malformed Latex should be caught by the except clauses and re-raised as a plain Exception with a 'Sympy unable to parse latex' message."""
@@ -134,16 +141,19 @@ def test_cleaned_latex_str_to_sympy_expression_unbalanced_braces_raises_custom_e
 #         cleaned_latex_str_to_sympy_expression(r"\notarealcommand{x}")
 #     assert "Sympy unable to parse latex" in str(exc_info.value)
 
+
 def test_cleaned_latex_str_to_sympy_expression_random_gibberish_raises_custom_exception():
     """Malformed Latex should be caught by the except clauses and re-raised as a plain Exception with a 'Sympy unable to parse latex' message."""
     with pytest.raises(Exception) as exc_info:
         cleaned_latex_str_to_sympy_expression("@#$%^&*(")
     assert "Sympy unable to parse latex" in str(exc_info.value)
 
+
 def test_cleaned_latex_str_to_sympy_expression_empty_string_raises():
     """Malformed Latex should be caught by the except clauses and re-raised as a plain Exception with a 'Sympy unable to parse latex' message."""
     with pytest.raises(Exception):
         cleaned_latex_str_to_sympy_expression("")
+
 
 def test_cleaned_latex_str_to_sympy_expression_exception_message_contains_original_input():
     bad_input = r"\frac{1}{"
@@ -161,6 +171,7 @@ def test_cleaned_latex_str_to_sympy_expression_logs_start_and_end_trace_markers(
     assert len(start_logs) == 1
     assert len(end_logs) == 1
 
+
 def test_cleaned_latex_str_to_sympy_expression_logs_error_on_malformed_input(caplog):
     """test logging"""
     with caplog.at_level("ERROR"):
@@ -168,16 +179,15 @@ def test_cleaned_latex_str_to_sympy_expression_logs_error_on_malformed_input(cap
             cleaned_latex_str_to_sympy_expression(r"\frac{1}{")
     assert any(r.levelname == "ERROR" for r in caplog.records)
 
-    
 
-#************************************************************************
-
+# ************************************************************************
 
 
 def test_list_of_sympy_symbols_in_sympy_expression_single_symbol():
     x = Symbol("x")
     result = list_of_sympy_symbols_in_sympy_expression(x)
     assert result == [x]
+
 
 def test_list_of_sympy_symbols_in_sympy_expression_multiple_symbols():
     x, y, z = symbols("x y z")
@@ -186,21 +196,25 @@ def test_list_of_sympy_symbols_in_sympy_expression_multiple_symbols():
     assert set(result) == {x, y, z}
     assert len(result) == 3
 
+
 def test_list_of_sympy_symbols_in_sympy_expression_repeated_symbol_returns_unique():
     x = Symbol("x")
     expr = x * x + x + 3
     result = list_of_sympy_symbols_in_sympy_expression(expr)
     assert result == [x]
 
+
 def test_list_of_sympy_symbols_in_sympy_expression_no_symbols_numeric_expression():
     expr = sympy.Integer(5) + sympy.Integer(3)
     result = list_of_sympy_symbols_in_sympy_expression(expr)
     assert result == []
 
+
 def test_list_of_sympy_symbols_in_sympy_expression_expression_with_constants_and_functions_no_free_symbols():
     expr = sin(pi) + cos(0)
     result = list_of_sympy_symbols_in_sympy_expression(expr)
     assert result == []
+
 
 def test_list_of_sympy_symbols_in_sympy_expression_expression_with_functions_and_symbols():
     x, y = symbols("x y")
@@ -208,30 +222,38 @@ def test_list_of_sympy_symbols_in_sympy_expression_expression_with_functions_and
     result = list_of_sympy_symbols_in_sympy_expression(expr)
     assert set(result) == {x, y}
 
+
 def test_list_of_sympy_symbols_in_sympy_expression_non_sympy_input_returns_empty_list():
     result = list_of_sympy_symbols_in_sympy_expression("not a sympy expr")
     assert result == []
 
+
 def test_list_of_sympy_symbols_in_sympy_expression_none_input_returns_empty_list():
     result = list_of_sympy_symbols_in_sympy_expression(None)
     assert result == []
+
 
 def test_list_of_sympy_symbols_in_sympy_expression_integer_input_returns_empty_list():
     # plain python int has no .atoms method -> AttributeError -> []
     result = list_of_sympy_symbols_in_sympy_expression(5)
     assert result == []
 
+
 def test_list_of_sympy_symbols_in_sympy_expression_result_is_list_type():
     x = Symbol("x")
     result = list_of_sympy_symbols_in_sympy_expression(x)
     assert isinstance(result, list)
 
+
 def test_list_of_sympy_symbols_in_sympy_expression_attribute_error_is_logged(caplog):
     with caplog.at_level(logging.ERROR):
         result = list_of_sympy_symbols_in_sympy_expression(42)
     assert result == []
-    assert any("has no attribute" in record.message or "atoms" in record.message
-                for record in caplog.records)
+    assert any(
+        "has no attribute" in record.message or "atoms" in record.message
+        for record in caplog.records
+    )
+
 
 def test_list_of_sympy_symbols_in_sympy_expression_trace_logs_present(caplog):
     x = Symbol("x")
@@ -241,17 +263,18 @@ def test_list_of_sympy_symbols_in_sympy_expression_trace_logs_present(caplog):
     assert any("start" in m for m in trace_messages)
     assert any("end" in m for m in trace_messages)
 
+
 def test_list_of_sympy_symbols_in_sympy_expression_expression_with_negative_and_fractional_symbols():
     x, y = symbols("x y")
-    expr = -x / 2 + y ** 2
+    expr = -x / 2 + y**2
     result = list_of_sympy_symbols_in_sympy_expression(expr)
     assert set(result) == {x, y}
 
 
-#************************************************************************
+# ************************************************************************
 
 
-#************************************************************************
+# ************************************************************************
 
 
-#EOF
+# EOF

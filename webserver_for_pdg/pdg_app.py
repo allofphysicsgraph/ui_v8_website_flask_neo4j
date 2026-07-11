@@ -1084,29 +1084,30 @@ class SpecifyNewSymbolOperationForm(FlaskForm):
     """
     Form for defining a new symbol or mathematical operation.
 
-    This form collects configuration data for new operators, including their 
+    This form collects configuration data for new operators, including their
     LaTeX representation, expected number of arguments, and descriptive metadata.
 
-    :ivar operation_latex: The LaTeX markup representing the symbol/operator. 
+    :ivar operation_latex: The LaTeX markup representing the symbol/operator.
         Must be ASCII, between 1 and 1000 characters, and is required.
     :vartype operation_latex: wtforms.fields.StringField
 
-    :ivar operation_argument_count: The number of arguments the operation takes. 
+    :ivar operation_argument_count: The number of arguments the operation takes.
         Must be an integer between 1 and 20. Defaults to 1.
     :vartype operation_argument_count: wtforms.fields.IntegerField
 
-    :ivar operation_name_latex: The name of the operation formatted in LaTeX. 
+    :ivar operation_name_latex: The name of the operation formatted in LaTeX.
         Must be ASCII, up to 1000 characters, and is required.
     :vartype operation_name_latex: wtforms.fields.StringField
 
-    :ivar operation_description_latex: A LaTeX-formatted description of the operation. 
+    :ivar operation_description_latex: A LaTeX-formatted description of the operation.
         Must be ASCII and up to 1000 characters. Optional.
     :vartype operation_description_latex: wtforms.fields.StringField
 
-    :ivar operation_reference_latex: An optional LaTeX-formatted reference or 
+    :ivar operation_reference_latex: An optional LaTeX-formatted reference or
         citation source for the operation.
     :vartype operation_reference_latex: wtforms.fields.StringField
     """
+
     operation_latex = StringField(
         "LaTeX symbol",
         validators=[
@@ -1148,19 +1149,20 @@ class SpecifyNewSymbolRelationForm(FlaskForm):
     including its LaTeX representation, name, description, and reference. All text
     fields except the reference require ASCII input.
 
-    :ivar relation_latex: The LaTeX representation of the relation. 
+    :ivar relation_latex: The LaTeX representation of the relation.
         Must be ASCII, required, and between 1 and 1000 characters.
     :type relation_latex: StringField
-    :ivar relation_name_latex: The name of the relation in LaTeX format. 
+    :ivar relation_name_latex: The name of the relation in LaTeX format.
         Must be ASCII, required, and up to 1000 characters.
     :type relation_name_latex: StringField
-    :ivar relation_description_latex: A LaTeX-formatted description of the relation. 
+    :ivar relation_description_latex: A LaTeX-formatted description of the relation.
         Must be ASCII and up to 1000 characters.
     :type relation_description_latex: StringField
-    :ivar relation_reference_latex: A LaTeX-formatted reference or citation for the relation. 
+    :ivar relation_reference_latex: A LaTeX-formatted reference or citation for the relation.
         Optional.
     :type relation_reference_latex: StringField
     """
+
     relation_latex = StringField(
         "LaTeX symbol",
         validators=[
@@ -4601,7 +4603,7 @@ def to_add_symbols_and_operations_for_expression(
     r_{\rm Earth} = 6
     """
 
-    # the "r" prepended to the docstring to make a raw string. This tells Python 
+    # the "r" prepended to the docstring to make a raw string. This tells Python
     # to treat backslashes as literal characters and prevents \r from being parsed as a carriage return by Sphinx
 
     trace_id = str(uuid.uuid4())
@@ -4872,7 +4874,7 @@ def to_add_symbols_and_operations_for_feed(
     r_{\rm Earth} = 6
     """
 
-    # the "r" prepended to the docstring to make a raw string. This tells Python 
+    # the "r" prepended to the docstring to make a raw string. This tells Python
     # to treat backslashes as literal characters and prevents \r from being parsed as a carriage return by Sphinx
 
     trace_id = str(uuid.uuid4())
