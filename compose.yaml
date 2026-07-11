@@ -19,9 +19,12 @@ services:
     # https://docs.gunicorn.org/en/stable/settings.html
     # https://pythonspeed.com/articles/gunicorn-in-docker/
 
-    # enable the `-c gunicorn.conf.py` to let `coverage.py` handle the threaded gunicorn server
-    # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138
+
+    # Coverage.py:
+    # enable `-c gunicorn.conf.py` as part of the `gunicorn` flags to let `coverage.py` handle the threaded gunicorn server
     #      -c gunicorn.conf.py
+    # See https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138
+    # also need to have `webserver_for_pdg/gunicorn.conf.py` 
 
     command: >
       gunicorn
