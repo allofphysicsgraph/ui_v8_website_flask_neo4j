@@ -13,40 +13,35 @@ http://programminghistorian.org/en/lessons/creating-apis-with-python-and-flask
 
 HTTP methods supported by the APIs in this file:
 
-- `GET` is used to request data from a specified resource.
-- `POST` is used to send data to a server to create/update a resource.
+- `GET`: request data from a specified resource.
+- `DELETE`
+- `POST`
+- `PUT`
+- `PATCH`: If you only want to change a single field (like updating just the email address without sending the name),
 
+Both `POST` and `PUT` send data to a server to create/update a resource.
 
-When sending data via a POST or PUT request, two common formats
-(specified via the Content-Type header) are:
++---------------------------------------------------------------+--------------------------------------------------------------+
+|                      `PUT`                                    |                `POST`                                         |
++===============================================================+==============================================================+
+| Idempotent                                                    | Not Idempotent
++---------------------------------------------------------------+--------------------------------------------------------------+
+| Multiple identical requests result in the same server state.  | Multiple identical requests will create duplicate resources. |
++---------------------------------------------------------------+--------------------------------------------------------------+
+| Points to a specific resource, e.g., `/users/123`             | Points to a collection or action                             |
++---------------------------------------------------------------+--------------------------------------------------------------+
+| Client specifies the resource ID in the URL.                  | Server generates the ID and returns it.                      |
++---------------------------------------------------------------+--------------------------------------------------------------+
+| Must send the entire object payload; missing fields           | Sends only the necessary data to initialize the resource.    |
+| are overwritten/deleted.                                      |                                                              |
++---------------------------------------------------------------+--------------------------------------------------------------+
+| Success Status is `200 OK` or `204 No Content`.               | Success Status is `201 Created` with a `Location` header.    |
++---------------------------------------------------------------+--------------------------------------------------------------+
+
+When sending data via a `POST` or `PUT` request, two common formats (specified via the Content-Type header) are:
 
 - `application/json`
 - `application/x-www-form-urlencoded`
-
----
-
-https://www.google.com/search?q=how+flask+json+api+authentication+works
-
-on 2026-02-07, Gemini 3 Pro says
-To require authentication for your API, you have two primary paths based
-on your specific question: API Keys or Google Auth Cookies.
-
-Given that you are designing a RESTful API (/api/v1/...) intended to be
-accessed via methods like curl, API Keys (or Bearer Tokens) are the correct choice.
-
-- The server verifies the API key for every call.
-- With API Keys the identity is proven by the X-API-KEY header.
-- For API keys CSRF Status is Disabled (Exempt).
-
-https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221Yd8spj4XZd5UvzITMJL-ndwxeWtGh5uS%22%5D,%22action%22:%22open%22,%22userId%22:%22101193243042884231058%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing, https://drive.google.com/file/d/1db9dcvjqzTAIyieLzOMvxmOrS3bslSyw/view?usp=sharing
-
-IN CONTRAST,
-CSRF token relies on Google Authentiation. To use curl with CSRF,
-the script must first "log in" to get a cookie, save the cookie to a "cookie jar,"
-extract the CSRF token from the HTML, and then send both the
-cookie and the token with the POST request.
-
-Instead of the `@require_api_key` decorator you would use Flask-Login's `@login_required`.
 
 
 """
@@ -99,6 +94,7 @@ from .initialize_neo4j import graphDB_Driver
 api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 
 
+# https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/56
 # BHP, 2025-01-09: I am not dealing with log-in requirements,
 # so I am disabling csrf for the APIs as per
 # https://flask-wtf.readthedocs.io/en/0.15.x/csrf/#exclude-views-from-protection
@@ -323,8 +319,6 @@ def api_list_derivations():
                 "type": "GET",
             },
             "delete": {
-                # Note: This API uses POST for delete, not the standard HTTP DELETE verb.
-                # Explicitly stating the method helps the client know how to interact.
                 "href": url_for(
                     ".api_delete_derivation", derivation_id=item_id, _external=True
                 ),
@@ -2440,8 +2434,8 @@ def api_sympy_check():
 
 @api_bp.route("/v1/resources/png_from_latex", methods=["GET", "POST"])
 def api_png_from_latex():
-    """
-    `GET` method is necessary; otherwise user can't explore this endpoint from the browswer.
+    r"""
+    `GET` method is necessary; otherwise user can't explore this endpoint from the browser.
 
     Originally <string:user_input> was passed as an argument.
     Gemini 3.1 Pro says
@@ -2479,7 +2473,7 @@ def api_png_from_latex():
 
 @api_bp.route("/v1/resources/cypher", methods=["GET"])
 def api_cypher_query():
-    """
+    r"""
 
     .. code-block:: bash
 
