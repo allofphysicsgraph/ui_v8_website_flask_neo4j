@@ -1,6 +1,8 @@
 
 # Use of LLMs
 
+## Google
+
 https://aistudio.google.com/usage
 https://aistudio.google.com/rate-limit
 
@@ -12,6 +14,10 @@ https://ai.google.dev/gemini-api/docs/rate-limits
 aistudio with Gemini Pro models may be limited to 25 requests per day
 
 Requests Per Day (RPD) which reset at midnight Pacific time.
+
+## Claude from Anthropic
+
+<https://platform.claude.com/usage>
 
 # multiple databases 
 
@@ -49,13 +55,16 @@ highlights from ui_v8: <https://github.com/orgs/allofphysicsgraph/projects/4>
 
 The following is unordered
 
-- api auth: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/56
+- GOAL: better coverage; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138
+  - DEPENDS ON enact pytests per function on scripts in `library` to evaluate whether I've unintentionally made breaking changes
 
-- enact pytests per function on scripts in `library` to evaluate whether I've unintentionally made breaking changes
 
 - more content - scope
-   - DEPENDS ON automate ingest of papers; see https://allofphysics.com/llm_workflow_documentation
-      - DEPENDS ON API functionality. Is that complete?
+  - DEPENDS ON automate ingest of papers; see https://allofphysics.com/llm_workflow_documentation
+    - DEPENDS ON API functionality. Is that complete?
+      - DEPENDS ON api auth: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/56
+        - DEPENDS ON enact API endpoints: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/141
+          - DEPENDS ON move all compute out of pdg_app to support API use https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/69
 
 
 - checking of steps --  inference rules, dimensionality, lean; https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/21
