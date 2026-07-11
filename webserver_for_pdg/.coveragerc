@@ -1,0 +1,12 @@
+[run]
+branch = True
+parallel = True
+concurrency = thread
+data_file = /scratch/.coverage
+source = /code
+
+[report]
+show_missing = True
+
+[html]
+directory = /scratch/coverage_html

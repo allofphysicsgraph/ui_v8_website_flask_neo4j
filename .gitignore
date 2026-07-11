@@ -6,6 +6,7 @@ tests_of_webpage/playwright/.coverage
 tests_of_webpage/playwright/htmlcov/
 tests_of_webpage/playwright/pytest_report.html
 tests_of_webpage/playwright/.pytest_cache
+.coverage
 .env
 .env.google
 certs/*.pem

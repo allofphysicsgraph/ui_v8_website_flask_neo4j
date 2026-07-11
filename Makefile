@@ -109,8 +109,9 @@ pytest_out_create_html:
 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/tests_of_webpage/playwright/ $$(docker ps -qf "name=flask-webserver") pytest --html=pytest_report.html --self-contained-html
 
 # in https://www.youtube.com/watch?v=xjWjfRVTUHo the creator of coverage.py says use incurs 5% overhead. BHP hasn't measured this yet.
-coverage:
-	$(DOCKER_OR_PODMAN) exec --workdir /scratch/tests_of_webpage/playwright/ $$(docker ps -qf "name=flask-webserver") pytest --cov=. --cov-report=html
+# see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138
+#coverage:
+#	$(DOCKER_OR_PODMAN) exec --workdir /scratch/tests_of_webpage/playwright/ $$(docker ps -qf "name=flask-webserver") pytest --cov=. --cov-report=html
 
 # keep the conf folder since that has the configuration
 # keep plugin folder since that has apocalypse

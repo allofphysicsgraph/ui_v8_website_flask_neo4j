@@ -20,6 +20,9 @@ services:
     # https://pythonspeed.com/articles/gunicorn-in-docker/
     command: >
       gunicorn
+# enable the `-c gunicorn.conf.py` to let `coverage.py` handle the threaded gunicorn server
+# https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138
+#      -c gunicorn.conf.py
       --reload
       --bind 0.0.0.0:5000
       --forwarded-allow-ips="*"
