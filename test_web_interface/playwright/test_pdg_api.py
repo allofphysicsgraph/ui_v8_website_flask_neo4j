@@ -61,4 +61,4 @@ def test_validate_operations_api(page: Page):
     assert "delete" in links["delete"]["href"]
 
 
-#EOF
+# EOF

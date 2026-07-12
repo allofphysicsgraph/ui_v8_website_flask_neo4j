@@ -543,7 +543,6 @@ def test_get_spectrum_precision_overview_page(page: Page):
     page.goto(URL + "/spectrum_of_precision/overview")
 
 
-
 def test_get_review_derivation_instance(page: Page):
     page.on("console", lambda msg: print(f"Console: {msg.text}"))
     page.on("pageerror", lambda exc: print(f"JS Error: {exc}"))
