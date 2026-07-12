@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAL API Explorer for Physics Derivation Graph</title>
+    <style>
+        /* Minimal layout rules to make a 3-column view without external CSS */
+        body {
+            font-family: monospace, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .header {
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header-controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .input-field {
+            padding: 4px;
+            font-family: monospace;
+        }
+        .url-input {
+            width: 400px;
+        }
+        .columns-container {
+            display: flex;
+            gap: 20px;
+        }
+        .column {
+            flex: 1;
+            border: 1px solid #000;
+            padding: 15px;
+            min-height: 500px;
+            overflow-y: auto;
+        }
+        .column-title {
+            margin-top: 0;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .card {
+            border: 1px dashed #666;
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: #fafafa;
+        }
+        .error-box {
+            border: 2px solid red;
+            background-color: #ffe6e6;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 8px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        details {
+            margin-top: 10px;
+        }
+        summary {
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2><a href="{{ url_for('to_api_explorer') }}?referrer=api_hal_explorer">HAL API Explorer</a> for the 
+            <a href="{{ url_for('to_index') }}?referrer=api_hal_explorer">Physics Derivation Graph</a></h2>
+        <div class="header-controls">
+            <button id="btn-back" disabled>&larr; Back</button>
+            <button id="btn-forward" disabled>Forward &rarr;</button>
+            
+            <input id="input-url" type="text" class="input-field url-input" value="/api" placeholder="URI Path" />
+            <button id="btn-go">Go</button>
+            
+            <label for="input-auth">Auth Header:</label>
+            <input id="input-auth" type="text" class="input-field" placeholder="Bearer <token>" />
+        </div>
+    </div>
+
+    <!-- Error Box -->
+    <div id="error-box" class="error-box">
+        <strong style="color: red;">Error:</strong> <span id="error-message"></span>
+        <button onclick="document.getElementById('error-box').style.display = 'none'" style="float: right;">Dismiss</button>
+    </div>
+
+    <!-- Workspace Columns -->
+    <div class="columns-container">
+        
+        <!-- Left: Properties -->
+        <div class="column">
+            <h2 class="column-title">Properties (State)</h2>
+            <div id="properties-container">
+                <p>No properties loaded yet.</p>
+            </div>
+        </div>
+
+        <!-- Middle: Links -->
+        <div class="column">
+            <h2 class="column-title">Transitions (_links)</h2>
+            <div id="links-container">
+                <p>No transition links available.</p>
+            </div>
+        </div>
+
+        <!-- Right: Embedded -->
+        <div class="column">
+            <h2 class="column-title">Embedded Resources (_embedded)</h2>
+            <div id="embedded-container">
+                <p>No embedded resources.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let historyStack = [];
+        let historyIndex = -1;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const startingUrl = document.getElementById('input-url').value;
+            navigateTo(startingUrl, true);
+
+            document.getElementById('btn-go').addEventListener('click', () => {
+                navigateTo(document.getElementById('input-url').value);
+            });
+
+            document.getElementById('input-url').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    navigateTo(e.target.value);
+                }
+            });
+
+            document.getElementById('btn-back').addEventListener('click', () => {
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    navigateTo(historyStack[historyIndex], false, true);
+                }
+            });
+
+            document.getElementById('btn-forward').addEventListener('click', () => {
+                if (historyIndex < historyStack.length - 1) {
+                    historyIndex++;
+                    navigateTo(historyStack[historyIndex], false, true);
+                }
+            });
+        });
+
+        async function navigateTo(url, isInitial = false, isHistoryNav = false) {
+            if (!url) return;
+
+            showLoading();
+            hideError();
+
+            const headers = new Headers({
+                'Accept': 'application/hal+json, application/json'
+            });
+
+            const authToken = document.getElementById('input-auth').value.trim();
+            if (authToken) {
+                headers.append('Authorization', authToken);
+            }
+
+            try {
+                const response = await fetch(url, { headers });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.includes('json')) {
+                    throw new Error('Response is not application/json or application/hal+json');
+                }
+
+                const data = await response.json();
+                
+                if (!isHistoryNav) {
+                    if (historyIndex < historyStack.length - 1) {
+                        historyStack = historyStack.slice(0, historyIndex + 1);
+                    }
+                    historyStack.push(url);
+                    historyIndex = historyStack.length - 1;
+                }
+                updateHistoryButtons();
+
+                document.getElementById('input-url').value = url;
+                renderResource(data);
+
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function updateHistoryButtons() {
+            document.getElementById('btn-back').disabled = historyIndex <= 0;
+            document.getElementById('btn-forward').disabled = historyIndex >= historyStack.length - 1;
+        }
+
+        function renderResource(data) {
+            const propertiesContainer = document.getElementById('properties-container');
+            const linksContainer = document.getElementById('links-container');
+            const embeddedContainer = document.getElementById('embedded-container');
+
+            const { _links, _embedded, ...properties } = data;
+
+            // 1. Render Properties Panel
+            if (Object.keys(properties).length === 0) {
+                propertiesContainer.innerHTML = `<p>No data properties present on this resource.</p>`;
+            } else {
+                let tableHtml = `<table>
+                    <thead>
+                        <tr><th>Key</th><th>Value</th></tr>
+                    </thead>
+                    <tbody>`;
+                for (const [key, val] of Object.entries(properties)) {
+                    const displayValue = typeof val === 'object' ? JSON.stringify(val) : val;
+                    tableHtml += `<tr><td><strong>${key}</strong></td><td>${displayValue}</td></tr>`;
+                }
+                tableHtml += `</tbody></table>`;
+                
+                tableHtml += `
+                    <details>
+                        <summary>Raw JSON State</summary>
+                        <pre>${JSON.stringify(properties, null, 2)}</pre>
+                    </details>
+                `;
+                propertiesContainer.innerHTML = tableHtml;
+            }
+
+            // 2. Render Links Panel
+            if (!_links || Object.keys(_links).length === 0) {
+                linksContainer.innerHTML = `<p>No transition links found.</p>`;
+            } else {
+                linksContainer.innerHTML = '';
+                
+                for (const [rel, linkObj] of Object.entries(_links)) {
+                    const links = Array.isArray(linkObj) ? linkObj : [linkObj];
+                    
+                    links.forEach((link, index) => {
+                        const linkCard = document.createElement('div');
+                        linkCard.className = 'card';
+
+                        const relText = Array.isArray(linkObj) ? `${rel} [${index}]` : rel;
+                        const titleText = link.title ? ` (${link.title})` : '';
+
+                        let innerContent = `
+                            <div>
+                                <strong>Relation:</strong> ${relText}${titleText}
+                                ${link.templated ? ' <span style="background-color: #ffeb3b; padding: 2px; font-size: 11px;">TEMPLATED</span>' : ''}
+                            </div>
+                            <div style="font-size: 12px; color: #555; word-break: break-all; margin: 4px 0;"><strong>HREF:</strong> ${link.href}</div>
+                        `;
+
+                        if (link.templated) {
+                            const params = getTemplateVariables(link.href);
+                            innerContent += `
+                                <form style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 8px;" onsubmit="handleTemplateSubmit(event, '${link.href}')">
+                                    <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px;">Fill Parameters:</div>
+                                    ${params.map(p => `
+                                        <div style="margin-bottom: 4px;">
+                                            <label style="font-size: 11px;">${p}: </label>
+                                            <input required type="text" name="${p}" style="font-size: 11px; padding: 2px;" />
+                                        </div>
+                                    `).join('')}
+                                    <button type="submit" style="font-size: 11px; margin-top: 4px;">Submit &rarr;</button>
+                                </form>
+                            `;
+                        } else {
+                            innerContent += `
+                                <button onclick="navigateTo('${link.href}')" style="margin-top: 6px;">Follow Link &rarr;</button>
+                            `;
+                        }
+
+                        linkCard.innerHTML = innerContent;
+                        linksContainer.appendChild(linkCard);
+                    });
+                }
+            }
+
+            // 3. Render Embedded Resources Panel
+            if (!_embedded || Object.keys(_embedded).length === 0) {
+                embeddedContainer.innerHTML = `<p>No inline embedded resources found.</p>`;
+            } else {
+                embeddedContainer.innerHTML = '';
+                
+                for (const [rel, embedVal] of Object.entries(_embedded)) {
+                    const embeds = Array.isArray(embedVal) ? embedVal : [embedVal];
+                    
+                    const relSection = document.createElement('div');
+                    relSection.innerHTML = `<h3 style="border-bottom: 1px dashed #000; margin-top: 15px;">Relation: ${rel} (${embeds.length})</h3>`;
+                    
+                    embeds.forEach((resource, index) => {
+                        const embedCard = document.createElement('div');
+                        embedCard.className = 'card';
+                        
+                        const selfHref = resource._links && resource._links.self ? resource._links.self.href : null;
+                        const displayName = resource.name || resource.title || resource.id || `Item #${index + 1}`;
+                        
+                        let cardContent = `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <strong>${displayName}</strong>
+                                ${selfHref ? `<button onclick="navigateTo('${selfHref}')" style="font-size: 11px;">Inspect &rarr;</button>` : ''}
+                            </div>
+                        `;
+                        
+                        const { _links: el, _embedded: ee, ...embedProps } = resource;
+                        cardContent += `<pre style="font-size: 11px; margin: 0;">${JSON.stringify(embedProps, null, 2)}</pre>`;
+                        
+                        embedCard.innerHTML = cardContent;
+                        relSection.appendChild(embedCard);
+                    });
+                    
+                    embeddedContainer.appendChild(relSection);
+                }
+            }
+        }
+
+        function getTemplateVariables(href) {
+            const matches = href.match(/\{([^}]+)\}/g) || [];
+            let variables = [];
+            matches.forEach(m => {
+                let inner = m.slice(1, -1);
+                if (inner.startsWith('?') || inner.startsWith('&')) {
+                    inner = inner.substring(1);
+                }
+                variables = variables.concat(inner.split(','));
+            });
+            return variables;
+        }
+
+        function handleTemplateSubmit(event, hrefTemplate) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const values = {};
+            formData.forEach((val, key) => { values[key] = val; });
+
+            let resolvedUrl = hrefTemplate;
+            const matches = hrefTemplate.match(/\{([^}]+)\}/g) || [];
+            
+            matches.forEach(m => {
+                let inner = m.slice(1, -1);
+                if (inner.startsWith('?') || inner.startsWith('&')) {
+                    const prefix = inner[0];
+                    const vars = inner.substring(1).split(',');
+                    const activeQueries = vars
+                        .filter(v => values[v] !== undefined && values[v] !== '')
+                        .map(v => `${v}=${encodeURIComponent(values[v])}`);
+                    
+                    if (activeQueries.length > 0) {
+                        resolvedUrl = resolvedUrl.replace(m, prefix + activeQueries.join('&'));
+                    } else {
+                        resolvedUrl = resolvedUrl.replace(m, '');
+                    }
+                } else {
+                    const vars = inner.split(',');
+                    vars.forEach(v => {
+                        resolvedUrl = resolvedUrl.replace(m, encodeURIComponent(values[v] || ''));
+                    });
+                }
+            });
+
+            navigateTo(resolvedUrl);
+        }
+
+        function showLoading() {
+            document.getElementById('btn-go').textContent = 'Loading...';
+            document.getElementById('btn-go').disabled = true;
+        }
+
+        function hideLoading() {
+            document.getElementById('btn-go').textContent = 'Go';
+            document.getElementById('btn-go').disabled = false;
+        }
+
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+            document.getElementById('error-box').style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error-box').style.display = 'none';
+        }
+    </script>
+
+    {% include 'jinja2_pages/reusable_components/_footer.html' %}
+    
+</body>
+</html>

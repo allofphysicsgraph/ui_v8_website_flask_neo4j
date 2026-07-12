@@ -7780,6 +7780,19 @@ def to_clickable_layers():
 ###########################################################################
 
 
+@web_app.route("/api_hal_explorer")
+def to_api_explorer():
+    """
+    Renders the custom HAL API Explorer page.
+    This page requests 'application/hal+json' endpoints
+    and lets you navigate the API visually.
+    """
+    return render_template("jinja2_pages/api_HATEOAS_explorer.html")
+
+
+###########################################################################
+
+
 @web_app.route("/class_notes", methods=["GET", "POST"])
 def to_class_notes_overview():
     """
