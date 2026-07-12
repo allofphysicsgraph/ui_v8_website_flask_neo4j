@@ -22,7 +22,7 @@ from sympy.physics.units import (
     luminous_intensity,
     amount_of_substance,
     charge,
-)  # type: ignore
+)  # type: ignore[import-untyped]
 from sympy.physics.units.systems.si import dimsys_SI  # type: ignore
 from sympy.parsing.sympy_parser import parse_expr  # type: ignore
 
