@@ -3584,36 +3584,38 @@ def api_expression_metadata(expression_id: str):
             title="Not Found",
         )
     logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={"metadata": expression_dict},
-        links={
-            "self": hal_link(
-                url_for(
-                    ".api_expression_metadata",
-                    expression_id=expression_id,
-                    _external=True,
-                ),
-                "Get expression metadata",
+    links = {
+        "self": hal_link(
+            url_for(
+                ".api_expression_metadata", expression_id=expression_id, _external=True
             ),
-            "edit": hal_link(
-                url_for(
-                    ".api_edit_expression", expression_id=expression_id, _external=True
-                ),
-                "Edit this expression",
+            "Get expression metadata",
+        ),
+        "edit": hal_link(
+            url_for(
+                ".api_edit_expression", expression_id=expression_id, _external=True
             ),
-            "delete": hal_link(
-                url_for(
-                    ".api_delete_expression",
-                    expression_id=expression_id,
-                    _external=True,
-                ),
-                "Delete this expression",
+            "Edit this expression",
+        ),
+        "delete": hal_link(
+            url_for(
+                ".api_delete_expression", expression_id=expression_id, _external=True
             ),
-            "up": hal_link(
-                url_for(".api_list_expressions", _external=True), "List of Expressions"
+            "Delete this expression",
+        ),
+        "up": hal_link(
+            url_for(".api_list_expressions", _external=True), "List of Expressions"
+        ),
+        "associate-symbol": hal_link(
+            url_for(
+                ".api_associate_symbol_with_expression",
+                expression_id=expression_id,
+                _external=True,
             ),
-        },
-    )
+            "Associate symbol with this expression",
+        ),
+    }
+    return hal_response(data={"metadata": expression_dict}, links=links)
 
 
 @api_bp.route("/resources/symbol/scalar/<string:symbol_id>/metadata", methods=["GET"])
@@ -3903,12 +3905,61 @@ def api_derivation_steps(derivation_id: str):
         list_of_steps = session.read_transaction(
             neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
-        # query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    # logger.info("list_of_steps=" + str(list_of_steps))
-
+    formatted_steps = []
+    for step in list_of_steps:
+        step_copy = step.copy()
+        step_id = step.get("id")
+        step_copy["_links"] = {
+            "self": hal_link(
+                url_for(
+                    ".api_get_step",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+                "View step details",
+            ),
+            "delete": hal_link(
+                url_for(
+                    ".api_delete_step",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+                "Delete step",
+            ),
+        }
+        formatted_steps.append(step_copy)
     logger.info("[TRACE] end " + trace_id)
+    templates = {
+        "default": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "inference_rule_id", required=True, prompt="Inference Rule ID"
+                ),
+                hal_property(
+                    "sequence_index",
+                    type_="number",
+                    required=False,
+                    prompt="Sequence Index (Auto if omitted)",
+                ),
+                hal_property(
+                    "note_before_step_latex",
+                    required=False,
+                    prompt="Note Before Step (LaTeX)",
+                ),
+                hal_property(
+                    "note_after_step_latex",
+                    required=False,
+                    prompt="Note After Step (LaTeX)",
+                ),
+            ],
+            title="Create step in this derivation",
+        )
+    }
     return hal_response(
-        data={"count": len(list_of_steps)},
+        data={"count": len(formatted_steps)},
         links={
             "self": hal_link(
                 url_for(
@@ -3928,7 +3979,711 @@ def api_derivation_steps(derivation_id: str):
                 url_for(".api_list_derivations", _external=True), "List of Derivations"
             ),
         },
-        embedded={"steps": list_of_steps},
+        embedded={"steps": formatted_steps},
+        templates=templates,
+    )
+
+
+@api_bp.route("/resources/derivation/<string:derivation_id>/steps", methods=["POST"])
+@require_auth
+def api_create_step(derivation_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        derivation_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
+        )
+    if derivation_dict is None:
+        return hal_error(
+            f"Derivation {derivation_id} does not exist", 404, title="Not Found"
+        )
+    data_from_user = request.get_json() if request.is_json else request.args
+    inference_rule_id = data_from_user.get("inference_rule_id")
+    if not inference_rule_id:
+        return hal_error(
+            "need to provide inference_rule_id", 400, title="Missing Field"
+        )
+    with graphDB_Driver.session() as session:
+        rule_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "inference_rule", inference_rule_id
+        )
+    if rule_dict is None:
+        return hal_error(
+            f"Inference rule {inference_rule_id} does not exist", 404, title="Not Found"
+        )
+    note_before_step_latex = data_from_user.get("note_before_step_latex", "")
+    note_after_step_latex = data_from_user.get("note_after_step_latex", "")
+    list_of_input_expression_IDs = data_from_user.get("inputs", [])
+    list_of_feed_data = data_from_user.get("feeds", [])
+    list_of_output_expression_IDs = data_from_user.get("outputs", [])
+    query_time_dict = {}
+    step_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+    with graphDB_Driver.session() as session:
+        seq_values = session.read_transaction(
+            neo4j_query.get_list_of_sequence_values_for_derivation_id, derivation_id
+        )
+    new_sequence_value = data_from_user.get("sequence_index")
+    if new_sequence_value is None:
+        new_sequence_value = max(seq_values) + 1 if seq_values else 0
+    else:
+        try:
+            new_sequence_value = int(new_sequence_value)
+        except ValueError:
+            return hal_error(
+                "sequence_index must be an integer", 400, title="Invalid Field"
+            )
+    author_name_latex = g.current_author["author_name_latex"]
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+    list_of_feed_IDs = []
+    with graphDB_Driver.session() as session:
+        for feed_item in list_of_feed_data:
+            if isinstance(feed_item, dict):
+                feed_latex = feed_item.get("feed_latex") or feed_item.get("latex")
+                if not feed_latex:
+                    return hal_error(
+                        "feed object must contain feed_latex",
+                        400,
+                        title="Invalid Field",
+                    )
+                feed_id, query_time_dict = generate_random_id(
+                    graphDB_Driver, query_time_dict
+                )
+                session.write_transaction(
+                    neo4j_query.add_feed,
+                    feed_id,
+                    feed_latex,
+                    now_str,
+                    author_name_latex,
+                )
+                list_of_feed_IDs.append(feed_id)
+            else:
+                list_of_feed_IDs.append(str(feed_item))
+    with graphDB_Driver.session() as session:
+        session.write_transaction(
+            neo4j_query.connect_step_to_derivation,
+            step_id,
+            derivation_id,
+            inference_rule_id,
+            new_sequence_value,
+            now_str,
+            note_before_step_latex,
+            note_after_step_latex,
+            author_name_latex,
+        )
+        if (
+            len(list_of_input_expression_IDs) > 0
+            or len(list_of_feed_IDs) > 0
+            or len(list_of_output_expression_IDs) > 0
+        ):
+            session.write_transaction(
+                neo4j_query.connect_expressions_to_step,
+                step_id,
+                now_str,
+                list_of_input_expression_IDs,
+                list_of_feed_IDs,
+                list_of_output_expression_IDs,
+                author_name_latex,
+            )
+    return hal_response(
+        data={
+            "status": "step added successfully",
+            "step_id": step_id,
+            "sequence_index": new_sequence_value,
+            "created": now_str,
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_get_step",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+                "Get Step",
+            ),
+            "derivation": hal_link(
+                url_for(
+                    ".api_derivation_metadata",
+                    derivation_id=derivation_id,
+                    _external=True,
+                ),
+                "Get Derivations",
+            ),
+            "steps": hal_link(
+                url_for(
+                    ".api_derivation_steps", derivation_id=derivation_id, _external=True
+                ),
+                "View steps",
+            ),
+        },
+        status=201,
+    )
+
+
+@api_bp.route(
+    "/resources/derivation/<string:derivation_id>/steps/<string:step_id>",
+    methods=["GET"],
+)
+def api_get_step(derivation_id: str, step_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        step_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "step", step_id
+        )
+    if step_dict is None:
+        return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
+    with graphDB_Driver.session() as session:
+        inputs = session.read_transaction(
+            neo4j_query.get_list_of_input_expressions_used_in_step, step_id
+        )
+        feeds = session.read_transaction(neo4j_query.get_feeds_used_in_step, step_id)
+        outputs = session.read_transaction(
+            neo4j_query.get_list_of_output_expressions_used_in_step, step_id
+        )
+        inf_rule = session.read_transaction(
+            neo4j_query.get_inference_rule_connected_to_step_ID, step_id
+        )
+        seq_idx = session.read_transaction(
+            neo4j_query.get_sequence_index_for_step, step_id
+        )
+    step_dict["inputs"] = inputs
+    step_dict["feeds"] = feeds
+    step_dict["outputs"] = outputs
+    step_dict["inference_rule"] = inf_rule
+    step_dict["sequence_index"] = seq_idx
+    links = {
+        "self": hal_link(
+            url_for(
+                ".api_get_step",
+                derivation_id=derivation_id,
+                step_id=step_id,
+                _external=True,
+            ),
+            "Get Step",
+        ),
+        "derivation": hal_link(
+            url_for(
+                ".api_derivation_metadata", derivation_id=derivation_id, _external=True
+            ),
+            "Get Derivations",
+        ),
+        "steps": hal_link(
+            url_for(
+                ".api_derivation_steps", derivation_id=derivation_id, _external=True
+            ),
+            "View steps",
+        ),
+        "edit-notes": hal_link(
+            url_for(
+                ".api_edit_step_notes",
+                derivation_id=derivation_id,
+                step_id=step_id,
+                _external=True,
+            ),
+            "Edit step notes",
+        ),
+        "swap-input": hal_link(
+            url_for(
+                ".api_swap_step_input",
+                derivation_id=derivation_id,
+                step_id=step_id,
+                _external=True,
+            ),
+            "Swap input",
+        ),
+        "swap-feed": hal_link(
+            url_for(
+                ".api_swap_step_feed",
+                derivation_id=derivation_id,
+                step_id=step_id,
+                _external=True,
+            ),
+            "Swap feed",
+        ),
+        "swap-output": hal_link(
+            url_for(
+                ".api_swap_step_output",
+                derivation_id=derivation_id,
+                step_id=step_id,
+                _external=True,
+            ),
+            "Swap output",
+        ),
+        "add-feed": hal_link(
+            url_for(
+                ".api_add_step_feed",
+                derivation_id=derivation_id,
+                step_id=step_id,
+                _external=True,
+            ),
+            "Add inline feed to step",
+        ),
+        "delete": hal_link(
+            url_for(
+                ".api_delete_step",
+                derivation_id=derivation_id,
+                step_id=step_id,
+                _external=True,
+            ),
+            "Delete step",
+        ),
+    }
+    return hal_response(data=step_dict, links=links)
+
+
+@api_bp.route(
+    "/resources/derivation/<string:derivation_id>/steps/<string:step_id>/edit-notes",
+    methods=["POST"],
+)
+@require_auth
+def api_edit_step_notes(derivation_id: str, step_id: str):
+    data_from_user = request.get_json() if request.is_json else request.args
+    before = data_from_user.get("note_before_step_latex", "")
+    after = data_from_user.get("note_after_step_latex", "")
+    with graphDB_Driver.session() as session:
+        step_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "step", step_id
+        )
+        if step_dict is None:
+            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
+        session.write_transaction(neo4j_query.edit_step_notes, step_id, before, after)
+        _stamp_last_modified(session, "step", step_id)
+    return hal_response(
+        data={"status": "step notes updated successfully"},
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_get_step",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+                "Get Step",
+            )
+        },
+    )
+
+
+@api_bp.route(
+    "/resources/derivation/<string:derivation_id>/steps/<string:step_id>/inputs/swap",
+    methods=["POST"],
+)
+@require_auth
+def api_swap_step_input(derivation_id: str, step_id: str):
+    data_from_user = request.get_json() if request.is_json else request.args
+    old_input_id = data_from_user.get("old_input_id")
+    new_input_id = data_from_user.get("new_input_id")
+    if not old_input_id or not new_input_id:
+        return hal_error(
+            "need to provide old_input_id and new_input_id", 400, title="Missing Fields"
+        )
+    with graphDB_Driver.session() as session:
+        step_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "step", step_id
+        )
+        if step_dict is None:
+            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
+        session.write_transaction(
+            neo4j_query.edit_step_input, step_id, old_input_id, new_input_id
+        )
+        _stamp_last_modified(session, "step", step_id)
+    return hal_response(
+        data={"status": "step input swapped successfully"},
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_get_step",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+                "Get Step",
+            )
+        },
+    )
+
+
+@api_bp.route(
+    "/resources/derivation/<string:derivation_id>/steps/<string:step_id>/feeds/swap",
+    methods=["POST"],
+)
+@require_auth
+def api_swap_step_feed(derivation_id: str, step_id: str):
+    data_from_user = request.get_json() if request.is_json else request.args
+    old_feed_id = data_from_user.get("old_feed_id")
+    new_feed_id = data_from_user.get("new_feed_id")
+    if not old_feed_id or not new_feed_id:
+        return hal_error(
+            "need to provide old_feed_id and new_feed_id", 400, title="Missing Fields"
+        )
+    with graphDB_Driver.session() as session:
+        step_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "step", step_id
+        )
+        if step_dict is None:
+            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
+        session.write_transaction(
+            neo4j_query.edit_step_feed, step_id, old_feed_id, new_feed_id
+        )
+        _stamp_last_modified(session, "step", step_id)
+    return hal_response(
+        data={"status": "step feed swapped successfully"},
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_get_step",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+                "Get Step",
+            )
+        },
+    )
+
+
+@api_bp.route(
+    "/resources/derivation/<string:derivation_id>/steps/<string:step_id>/outputs/swap",
+    methods=["POST"],
+)
+@require_auth
+def api_swap_step_output(derivation_id: str, step_id: str):
+    data_from_user = request.get_json() if request.is_json else request.args
+    old_output_id = data_from_user.get("old_output_id")
+    new_output_id = data_from_user.get("new_output_id")
+    if not old_output_id or not new_output_id:
+        return hal_error(
+            "need to provide old_output_id and new_output_id",
+            400,
+            title="Missing Fields",
+        )
+    with graphDB_Driver.session() as session:
+        step_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "step", step_id
+        )
+        if step_dict is None:
+            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
+        session.write_transaction(
+            neo4j_query.edit_step_output, step_id, old_output_id, new_output_id
+        )
+        _stamp_last_modified(session, "step", step_id)
+    return hal_response(
+        data={"status": "step output swapped successfully"},
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_get_step",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+                "Get Step",
+            )
+        },
+    )
+
+
+@api_bp.route(
+    "/resources/derivation/<string:derivation_id>/steps/<string:step_id>/feeds/<string:feed_id>",
+    methods=["DELETE"],
+)
+@require_auth
+def api_remove_step_feed(derivation_id: str, step_id: str, feed_id: str):
+    with graphDB_Driver.session() as session:
+        step_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "step", step_id
+        )
+        if step_dict is None:
+            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
+
+        def _detach_feed(tx: neo4j.Transaction):
+            tx.run(
+                "MATCH (s:step {id: $sid})-[r:HAS_FEED]->(f:feed {id: $fid}) DELETE r",
+                sid=step_id,
+                fid=feed_id,
+            )
+
+        session.write_transaction(_detach_feed)
+        _stamp_last_modified(session, "step", step_id)
+    return hal_response(
+        data={
+            "status": f"feed {feed_id} disconnected from step {step_id} successfully"
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_get_step",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+                "Get Step",
+            )
+        },
+    )
+
+
+@api_bp.route(
+    "/resources/derivation/<string:derivation_id>/steps/<string:step_id>/feeds",
+    methods=["POST"],
+)
+@require_auth
+def api_add_step_feed(derivation_id: str, step_id: str):
+    data_from_user = request.get_json() if request.is_json else request.args
+    feed_latex = data_from_user.get("feed_latex") or data_from_user.get("latex")
+    if not feed_latex:
+        return hal_error("need to provide feed_latex", 400, title="Missing Field")
+    author_name_latex = g.current_author["author_name_latex"]
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+    query_time_dict = {}
+    feed_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+    with graphDB_Driver.session() as session:
+        step_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "step", step_id
+        )
+        if step_dict is None:
+            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
+        session.write_transaction(
+            neo4j_query.add_feed, feed_id, feed_latex, now_str, author_name_latex
+        )
+        existing_feeds = session.read_transaction(
+            neo4j_query.get_feeds_used_in_step, step_id
+        )
+        existing_feed_ids = [f["id"] for f in existing_feeds]
+        existing_feed_ids.append(feed_id)
+        existing_inputs = session.read_transaction(
+            neo4j_query.get_list_of_input_expressions_used_in_step, step_id
+        )
+        existing_input_ids = [e["id"] for e in existing_inputs]
+        existing_outputs = session.read_transaction(
+            neo4j_query.get_list_of_output_expressions_used_in_step, step_id
+        )
+        existing_output_ids = [e["id"] for e in existing_outputs]
+        session.write_transaction(
+            neo4j_query.connect_expressions_to_step,
+            step_id,
+            now_str,
+            existing_input_ids,
+            existing_feed_ids,
+            existing_output_ids,
+            author_name_latex,
+        )
+        _stamp_last_modified(session, "step", step_id)
+    return hal_response(
+        data={"status": "feed added successfully to step", "feed_id": feed_id},
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_get_step",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+                "Get Step",
+            )
+        },
+        status=201,
+    )
+
+
+@api_bp.route(
+    "/resources/derivation/<string:derivation_id>/steps/<string:step_id>",
+    methods=["DELETE"],
+)
+@require_auth
+def api_delete_step(derivation_id: str, step_id: str):
+    with graphDB_Driver.session() as session:
+        step_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "step", step_id
+        )
+        if step_dict is None:
+            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
+        session.write_transaction(neo4j_query.delete_node, step_id, "step")
+        _stamp_last_modified(session, "derivation", derivation_id)
+    return hal_response(
+        data={"status": f"step {step_id} deleted successfully"},
+        links={
+            "steps": hal_link(
+                url_for(
+                    ".api_derivation_steps", derivation_id=derivation_id, _external=True
+                ),
+                "View steps",
+            )
+        },
+    )
+
+
+@api_bp.route("/resources/expressions/<string:expression_id>/symbols", methods=["POST"])
+@require_auth
+def api_associate_symbol_with_expression(expression_id: str):
+    data_from_user = request.get_json() if request.is_json else request.args
+    symbol_id = data_from_user.get("symbol_id")
+    if not symbol_id:
+        return hal_error("need to provide symbol_id", 400, title="Missing Field")
+    with graphDB_Driver.session() as session:
+        expr_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "expression", expression_id
+        )
+        if expr_dict is None:
+            return hal_error(
+                f"Expression {expression_id} does not exist", 404, title="Not Found"
+            )
+
+        def _check_symbol_exists(tx: neo4j.Transaction):
+            result = tx.run(
+                'MATCH (s) WHERE s.id = $sid AND "symbol" IN labels(s) RETURN s',
+                sid=symbol_id,
+            )
+            return result.single() is not None
+
+        if not session.read_transaction(_check_symbol_exists):
+            return hal_error(
+                f"Symbol {symbol_id} does not exist", 404, title="Not Found"
+            )
+        session.write_transaction(
+            neo4j_query.connect_symbol_to_expression, symbol_id, expression_id
+        )
+        _stamp_last_modified(session, "expression", expression_id)
+    return hal_response(
+        data={
+            "status": f"symbol {symbol_id} successfully associated with expression {expression_id}"
+        },
+        links={
+            "expression": hal_link(
+                url_for(
+                    ".api_expression_metadata",
+                    expression_id=expression_id,
+                    _external=True,
+                ),
+                "Get expression metadata",
+            )
+        },
+    )
+
+
+@api_bp.route(
+    "/resources/expressions/<string:expression_id>/symbols/<string:symbol_id>",
+    methods=["DELETE"],
+)
+@require_auth
+def api_dissociate_symbol_from_expression(expression_id: str, symbol_id: str):
+    with graphDB_Driver.session() as session:
+        expr_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "expression", expression_id
+        )
+        if expr_dict is None:
+            return hal_error(
+                f"Expression {expression_id} does not exist", 404, title="Not Found"
+            )
+        session.write_transaction(
+            neo4j_query.disconnect_symbol_from_expression, symbol_id, expression_id
+        )
+        _stamp_last_modified(session, "expression", expression_id)
+    return hal_response(
+        data={
+            "status": f"symbol {symbol_id} successfully dissociated from expression {expression_id}"
+        },
+        links={
+            "expression": hal_link(
+                url_for(
+                    ".api_expression_metadata",
+                    expression_id=expression_id,
+                    _external=True,
+                ),
+                "Get expression metadata",
+            )
+        },
+    )
+
+
+@api_bp.route(
+    "/resources/derivation/<string:derivation_id>/steps/<string:step_id>/feeds/<string:feed_id>/symbols",
+    methods=["POST"],
+)
+@require_auth
+def api_associate_symbol_with_feed(derivation_id: str, step_id: str, feed_id: str):
+    data_from_user = request.get_json() if request.is_json else request.args
+    symbol_id = data_from_user.get("symbol_id")
+    if not symbol_id:
+        return hal_error("need to provide symbol_id", 400, title="Missing Field")
+    with graphDB_Driver.session() as session:
+
+        def _check_feed_exists(tx: neo4j.Transaction):
+            res = tx.run("MATCH (f:feed {id: $fid}) RETURN f", fid=feed_id)
+            return res.single() is not None
+
+        if not session.read_transaction(_check_feed_exists):
+            return hal_error(f"Feed {feed_id} does not exist", 404, title="Not Found")
+
+        def _check_symbol_exists(tx: neo4j.Transaction):
+            result = tx.run(
+                'MATCH (s) WHERE s.id = $sid AND "symbol" IN labels(s) RETURN s',
+                sid=symbol_id,
+            )
+            return result.single() is not None
+
+        if not session.read_transaction(_check_symbol_exists):
+            return hal_error(
+                f"Symbol {symbol_id} does not exist", 404, title="Not Found"
+            )
+        session.write_transaction(
+            neo4j_query.connect_symbol_to_feed, symbol_id, feed_id
+        )
+        _stamp_last_modified(session, "step", step_id)
+    return hal_response(
+        data={
+            "status": f"symbol {symbol_id} successfully associated with feed {feed_id}"
+        },
+        links={
+            "step": hal_link(
+                url_for(
+                    ".api_get_step",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+                "Get Step",
+            )
+        },
+    )
+
+
+@api_bp.route(
+    "/resources/derivation/<string:derivation_id>/steps/<string:step_id>/feeds/<string:feed_id>/symbols/<string:symbol_id>",
+    methods=["DELETE"],
+)
+@require_auth
+def api_dissociate_symbol_from_feed(
+    derivation_id: str, step_id: str, feed_id: str, symbol_id: str
+):
+    with graphDB_Driver.session() as session:
+
+        def _check_feed_exists(tx: neo4j.Transaction):
+            res = tx.run("MATCH (f:feed {id: $fid}) RETURN f", fid=feed_id)
+            return res.single() is not None
+
+        if not session.read_transaction(_check_feed_exists):
+            return hal_error(f"Feed {feed_id} does not exist", 404, title="Not Found")
+        session.write_transaction(
+            neo4j_query.disconnect_symbol_from_feed, symbol_id, feed_id
+        )
+        _stamp_last_modified(session, "step", step_id)
+    return hal_response(
+        data={
+            "status": f"symbol {symbol_id} successfully dissociated from feed {feed_id}"
+        },
+        links={
+            "step": hal_link(
+                url_for(
+                    ".api_get_step",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+                "Get Step",
+            )
+        },
     )
 
 
