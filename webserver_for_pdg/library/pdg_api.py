@@ -52,7 +52,8 @@ import datetime
 import uuid
 import tokenize
 import os
-
+import secrets
+import functools
 from sympy.parsing.sympy_parser import parse_expr
 
 from flask import (
@@ -221,6 +222,56 @@ def hal_error(message, status, links=None, title="Error"):
     resp.status_code = status
     resp.headers["Content-Type"] = "application/prs.hal-forms+json"
     return resp
+
+
+def _get_configured_api_key():
+    # Loaded lazily (rather than at import time) so tests/deployments can set
+    # or change PDG_API_KEY without needing to reimport this module.
+    return os.environ.get("PDG_API_KEY")
+
+
+def _extract_bearer_token(auth_header):
+    if not auth_header:
+        return None
+    parts = auth_header.split(None, 1)
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        return None
+    return parts[1].strip()
+
+
+def require_auth(view_func):
+    """Require a valid `Authorization: Bearer <token>` header.
+
+    Intended for routes that write to Neo4j (create/edit/delete). Read-only
+    routes should not use this decorator.
+    """
+
+    @functools.wraps(view_func)
+    def wrapped_view(*args, **kwargs):
+        configured_key = _get_configured_api_key()
+        if not configured_key:
+            logger.critical("PDG_API_KEY is not configured; refusing write request")
+            resp = hal_error(
+                "Server is not configured for authentication",
+                500,
+                title="Server Misconfiguration",
+            )
+            resp.headers["WWW-Authenticate"] = 'Bearer realm="pdg_api"'
+            return resp
+        supplied_token = _extract_bearer_token(request.headers.get("Authorization"))
+        if not supplied_token or not secrets.compare_digest(
+            supplied_token, configured_key
+        ):
+            resp = hal_error(
+                "A valid Authorization: Bearer <token> header is required for this operation",
+                401,
+                title="Unauthorized",
+            )
+            resp.headers["WWW-Authenticate"] = 'Bearer realm="pdg_api"'
+            return resp
+        return view_func(*args, **kwargs)
+
+    return wrapped_view
 
 
 @api_bp.route("/", methods=["GET"])
@@ -417,7 +468,7 @@ def api_list_derivations():
                     ),
                 ],
                 title="Create a new derivation",
-            ),
+            )
         },
     )
 
@@ -1092,6 +1143,7 @@ def api_list_matrix_symbols():
 
 
 @api_bp.route("/resources/derivation", methods=["POST"])
+@require_auth
 def api_create_derivation():
     """
     required inputs:
@@ -1263,6 +1315,7 @@ def api_create_derivation():
 
 
 @api_bp.route("/resources/inference_rule", methods=["POST"])
+@require_auth
 def api_create_inference_rule():
     """
 
@@ -1313,6 +1366,7 @@ def api_create_inference_rule():
 
 
 @api_bp.route("/resources/expression", methods=["POST"])
+@require_auth
 def api_create_expression():
     """
 
@@ -1547,6 +1601,7 @@ def api_create_expression():
 
 
 @api_bp.route("/resources/symbol/scalar", methods=["POST"])
+@require_auth
 def api_create_scalar_symbol():
     """
 
@@ -1814,6 +1869,7 @@ def api_create_scalar_symbol():
 
 
 @api_bp.route("/resources/symbol/vector", methods=["POST"])
+@require_auth
 def api_create_vector_symbol():
     """
 
@@ -1960,6 +2016,7 @@ def api_create_vector_symbol():
 
 
 @api_bp.route("/resources/symbol/matrix", methods=["POST"])
+@require_auth
 def api_create_matrix_symbol():
     """
 
@@ -2106,6 +2163,7 @@ def api_create_matrix_symbol():
 
 
 @api_bp.route("/resources/symbol/operation", methods=["POST"])
+@require_auth
 def api_create_operation_symbol():
     """
 
@@ -2272,15 +2330,11 @@ def api_create_operation_symbol():
             author_name_latex,
         )
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
-
-    return jsonify(
-        {
-            "STATUS": "operation symbol added successfully",
-        }
-    )
+    return jsonify({"STATUS": "operation symbol added successfully"})
 
 
 @api_bp.route("/resources/symbol/relation", methods=["POST"])
+@require_auth
 def api_create_relation_symbol():
     """
 
@@ -2422,6 +2476,7 @@ def api_create_relation_symbol():
 
 
 @api_bp.route("/resources/derivation/<string:derivation_id>/edit", methods=["POST"])
+@require_auth
 def api_edit_derivation(derivation_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -2489,6 +2544,7 @@ def api_edit_derivation(derivation_id: str):
 
 
 @api_bp.route("/resources/inference_rule/<string:infrule_id>/edit", methods=["POST"])
+@require_auth
 def api_edit_inference_rule(infrule_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -2559,6 +2615,7 @@ def api_edit_inference_rule(infrule_id: str):
 
 
 @api_bp.route("/resources/expression/<string:expression_id>/edit", methods=["POST"])
+@require_auth
 def api_edit_expression(expression_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -2640,6 +2697,7 @@ def api_edit_expression(expression_id: str):
 
 
 @api_bp.route("/resources/symbol/scalar/<string:symbol_id>/edit", methods=["POST"])
+@require_auth
 def api_edit_scalar(symbol_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -2713,6 +2771,7 @@ def api_edit_scalar(symbol_id: str):
 
 
 @api_bp.route("/resources/symbol/vector/<string:symbol_id>/edit", methods=["POST"])
+@require_auth
 def api_edit_vector(symbol_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -2780,6 +2839,7 @@ def api_edit_vector(symbol_id: str):
 
 
 @api_bp.route("/resources/symbol/matrix/<string:symbol_id>/edit", methods=["POST"])
+@require_auth
 def api_edit_matrix(symbol_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -2849,6 +2909,7 @@ def api_edit_matrix(symbol_id: str):
 @api_bp.route(
     "/resources/symbol/operation/<string:operation_id>/edit", methods=["POST"]
 )
+@require_auth
 def api_edit_operation(operation_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -2917,6 +2978,7 @@ def api_edit_operation(operation_id: str):
 
 
 @api_bp.route("/resources/symbol/relation/<string:relation_id>/edit", methods=["POST"])
+@require_auth
 def api_edit_relation(relation_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -3319,26 +3381,20 @@ def api_operation_metadata(operation_id: str):
         "_links": {
             "self": {
                 "href": url_for(
-                    ".api_operation_metadata",
-                    operation_id=operation_id,
-                    _external=True,
+                    ".api_operation_metadata", operation_id=operation_id, _external=True
                 ),
                 "method": "GET",
             },
             "update": {
                 "href": url_for(
-                    ".api_operation_metadata",
-                    operation_id=operation_id,
-                    _external=True,
+                    ".api_operation_metadata", operation_id=operation_id, _external=True
                 ),
                 "method": "PATCH",
                 "description": "Update specific metadata fields",
             },
             "replace": {
                 "href": url_for(
-                    ".api_operation_metadata",
-                    operation_id=operation_id,
-                    _external=True,
+                    ".api_operation_metadata", operation_id=operation_id, _external=True
                 ),
                 "method": "PUT",
                 "description": "Replace the entire metadata object",
@@ -3354,9 +3410,7 @@ def api_operation_metadata(operation_id: str):
             },
             "parent_operation": {
                 "href": url_for(
-                    ".api_operation_detail",
-                    operation_id=operation_id,
-                    _external=True,
+                    ".api_operation_detail", operation_id=operation_id, _external=True
                 ),
                 "method": "GET",
             },
@@ -3462,6 +3516,7 @@ def api_derivation_steps(derivation_id: str):
 
 
 @api_bp.route("/resources/derivation/<string:derivation_id>/delete", methods=["DELETE"])
+@require_auth
 def api_delete_derivation(derivation_id: str):
     """
     derivation and all steps
@@ -3550,6 +3605,7 @@ def api_delete_derivation(derivation_id: str):
 @api_bp.route(
     "/resources/inference_rule/<string:infrule_id>/delete", methods=["DELETE"]
 )
+@require_auth
 def api_delete_inference_rule(infrule_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -3596,6 +3652,7 @@ def api_delete_inference_rule(infrule_id: str):
 
 
 @api_bp.route("/resources/expression/<string:expression_id>/delete", methods=["DELETE"])
+@require_auth
 def api_delete_expression(expression_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -3643,6 +3700,7 @@ def api_delete_expression(expression_id: str):
 
 
 @api_bp.route("/resources/symbol/scalar/<string:symbol_id>/delete", methods=["DELETE"])
+@require_auth
 def api_delete_scalar(symbol_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -3687,6 +3745,7 @@ def api_delete_scalar(symbol_id: str):
 
 
 @api_bp.route("/resources/symbol/vector/<string:symbol_id>/delete", methods=["DELETE"])
+@require_auth
 def api_delete_vector(symbol_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -3731,6 +3790,7 @@ def api_delete_vector(symbol_id: str):
 
 
 @api_bp.route("/resources/symbol/matrix/<string:symbol_id>/delete", methods=["DELETE"])
+@require_auth
 def api_delete_matrix(symbol_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -3777,6 +3837,7 @@ def api_delete_matrix(symbol_id: str):
 @api_bp.route(
     "/resources/symbol/operation/<string:operation_id>/delete", methods=["DELETE"]
 )
+@require_auth
 def api_delete_operation(operation_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -3826,6 +3887,7 @@ def api_delete_operation(operation_id: str):
 @api_bp.route(
     "/resources/symbol/relation/<string:relation_id>/delete", methods=["DELETE"]
 )
+@require_auth
 def api_delete_relation(relation_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
