@@ -135,8 +135,7 @@ def create_d3js_json(
     all_steps: dict,
     destination_folder: str,
 ) -> None:
-    """
-    Produce a JSON file that contains something like
+    """Produce a JSON file that contains something like
 
     .. code-block:: json
 
@@ -344,8 +343,7 @@ def create_d3js_json(
 
 
 def edges_in_derivation_for_d3js(all_steps: dict) -> List[Tuple[str, str]]:
-    """
-    str in the Tuples:
+    """str in the Tuples:
 
     - step_id
     - expression_dict["id"]
