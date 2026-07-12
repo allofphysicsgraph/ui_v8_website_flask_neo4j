@@ -86,12 +86,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 from . import neo4j_query
-from . import compute
-from . import latex
+#from . import compute
+# from . import latex
 from . import list_of_valid
 
 
 from .compute import query_timing_result_type
+from .compute import generate_random_id
 
 from .initialize_neo4j import graphDB_Driver
 
@@ -1395,7 +1396,7 @@ def api_create_derivation():
     # author_name_latex = latex.make_string_safe_for_latex(current_user.email)
     author_name_latex = g.current_author["author_name_latex"]
 
-    derivation_id, query_time_dict = compute.generate_random_id(
+    derivation_id, query_time_dict = generate_random_id(
         graphDB_Driver, query_time_dict
     )
     logger.info("pdg_app/api_create_derivation: derivation_id=" + derivation_id)
@@ -1692,7 +1693,7 @@ def api_create_expression():
             )
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    expression_id, query_time_dict = compute.generate_random_id(
+    expression_id, query_time_dict = generate_random_id(
         graphDB_Driver, query_time_dict
     )
     with graphDB_Driver.session() as session:
@@ -1989,7 +1990,7 @@ def api_create_scalar_symbol():
             dimension_luminous_intensity = 0
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    scalar_id, query_time_dict = compute.generate_random_id(
+    scalar_id, query_time_dict = generate_random_id(
         graphDB_Driver, query_time_dict
     )
     with graphDB_Driver.session() as session:
@@ -2142,7 +2143,7 @@ def api_create_vector_symbol():
     author_name_latex = g.current_author["author_name_latex"]
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    symbol_id, query_time_dict = compute.generate_random_id(
+    symbol_id, query_time_dict = generate_random_id(
         graphDB_Driver, query_time_dict
     )
     with graphDB_Driver.session() as session:
@@ -2289,7 +2290,7 @@ def api_create_matrix_symbol():
     author_name_latex = g.current_author["author_name_latex"]
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    symbol_id, query_time_dict = compute.generate_random_id(
+    symbol_id, query_time_dict = generate_random_id(
         graphDB_Driver, query_time_dict
     )
     with graphDB_Driver.session() as session:
@@ -2481,7 +2482,7 @@ def api_create_operation_symbol():
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    operation_id, query_time_dict = compute.generate_random_id(
+    operation_id, query_time_dict = generate_random_id(
         graphDB_Driver, query_time_dict
     )
 
@@ -2657,7 +2658,7 @@ def api_create_relation_symbol():
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    relation_id, query_time_dict = compute.generate_random_id(
+    relation_id, query_time_dict = generate_random_id(
         graphDB_Driver, query_time_dict
     )
 
