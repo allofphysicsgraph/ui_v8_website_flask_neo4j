@@ -56,8 +56,6 @@ highlights from ui_v8: <https://github.com/orgs/allofphysicsgraph/projects/4>
 The following is unordered
 
 - log file analysis: https://github.com/allofphysicsgraph/task-tracker/issues/41
-  - figure out how to distinguish bots from human users
-  - for human users, write a script that generates a 
 
 - GOAL: better coverage; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138
   - DEPENDS ON enact pytests per function on scripts in `library` to evaluate whether I've unintentionally made breaking changes
