@@ -83,6 +83,7 @@ See also the "recurring" board on https://github.com/orgs/allofphysicsgraph/proj
 - pytests failures 
 - coverage evaluation; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138
 - sphinx documentation
+- mypy
 
 
 Documentation to be refreshed:
