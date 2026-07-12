@@ -1,5 +1,5 @@
 ```
-docker exec --workdir /scratch/tests_of_webpage/playwright/ -it `docker ps | grep flask-webserver | cut -d' ' -f1` pytest
+docker exec --workdir /scratch/test_web_interfae/playwright/ -it `docker ps | grep flask-webserver | cut -d' ' -f1` pytest
 ```
 
 To run a specific test,
