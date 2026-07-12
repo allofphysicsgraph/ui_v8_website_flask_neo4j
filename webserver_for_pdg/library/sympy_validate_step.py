@@ -20,28 +20,6 @@ Observations:
 - there are pairs which undo each other -- "divide both sides by" versus "multiply both sides by"
 - there are triplets -- "add X to LHS" and "add X to RHS" and "add X to both sides"
 
-TODO: although some functions have doctests, these doctests rely on the previous argument structures
-rather than the current "list of dicts"x3.
-        # Implementation expects:
-        input_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
-
-        # Doctest provides:
-        input_expr = parse_latex("a = b") # Returns an Equality object
-
-
-https://pymotw.com/3/doctest/
-how to use doctest for the entire file:
-python -m doctest -v validate_inference_rules_sympy.py
-
-testing per function on the command line:
-import doctest
-from validate_steps_sympy import *
-doctest.run_docstring_examples(split_expr_into_lhs_rhs, globals(), verbose=True)
-
-I wasn't able to get the following to work:
-from doctest import testmod
-from validate_inference_rules_sympy import *
-testmod(name ='split_expr_into_lhs_rhs', verbose = True)
 
 """
 
@@ -193,7 +171,9 @@ def validate_step(
         )
     elif name_latex == "apply function to both sides of expression":
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
+        return apply_function_to_both_sides_of_expr(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
     elif name_latex == "apply gradient to scalar function":
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return apply_gradient_to_scalar_function(
@@ -261,7 +241,9 @@ def validate_step(
         )
     elif name_latex == "combine like terms":
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
+        return combine_like_terms(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
     elif name_latex == "conjugate both sides":
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return conjugate_both_sides(
@@ -418,7 +400,9 @@ def validate_step(
         )
     elif name_latex == "replace constant with value":
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
-        return "recognized infrule but not yet supported"
+        return replace_constant_with_value(
+            list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+        )
     elif name_latex == "replace curl with LeviCevita summation contravariant":
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
@@ -1542,7 +1526,32 @@ def partially_differentiate_with_respect_to(
 
     \frac{\partial}{\partial #1}
     """
-    return "recognized infrule but not yet supported"
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    res = validate_that_content_exists(
+        1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    # sympy.diff(expr, var) already differentiates with all other symbols
+    # held fixed, i.e. it computes the partial derivative directly.
+    d1 = sympy.simplify(
+        sympy.diff(input_expr_sympy_lhs, feed_sympy) - output_expr_sympy_lhs
+    )
+    d2 = sympy.simplify(
+        sympy.diff(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
+    )
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
 def X_cross_both_sides_by(
@@ -1790,7 +1799,25 @@ def sum_exponents_LHS(
     see also sum_exponents_RHS
     (in_rhs0 == out_rhs0)
     """
-    return "recognized infrule but not yet supported"
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    res = validate_that_content_exists(
+        1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
 def sum_exponents_RHS(
@@ -1809,7 +1836,25 @@ def sum_exponents_RHS(
     see also sum_exponents_LHS
     (in_lhs0 == out_lhs0)
     """
-    return "recognized infrule but not yet supported"
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    res = validate_that_content_exists(
+        1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
 def add_expr_1_to_expr_2(
@@ -2244,7 +2289,30 @@ def raise_both_sides_to_power(
 
     ((out_lhs0 == (in_lhs0)**(feed0)) and (out_rhs0 == (in_rhs0)**(feed0)))
     """
-    return "recognized infrule but not yet supported"
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    res = validate_that_content_exists(
+        1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    d1 = sympy.simplify(
+        sympy.Pow(input_expr_sympy_lhs, feed_sympy) - output_expr_sympy_lhs
+    )
+    d2 = sympy.simplify(
+        sympy.Pow(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
+    )
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
 def claim_expr_1_equals_expr_2(
@@ -2425,9 +2493,26 @@ def conjugate_both_sides(
 
     Apply ^*; replace $i$ with $-i$
     """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
     assert len(list_of_feed_dicts) == 0
-
-    return "recognized infrule but not yet supported"
+    res = validate_that_content_exists(
+        1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    d1 = sympy.simplify(sympy.conjugate(input_expr_sympy_lhs) - output_expr_sympy_lhs)
+    d2 = sympy.simplify(sympy.conjugate(input_expr_sympy_rhs) - output_expr_sympy_rhs)
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
 def conjugate_transpose_both_sides(
@@ -2440,9 +2525,28 @@ def conjugate_transpose_both_sides(
 
     Apply ^+; replace $i$ with $-i$ and transpose matrices
     """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
     assert len(list_of_feed_dicts) == 0
-
-    return "recognized infrule but not yet supported"
+    res = validate_that_content_exists(
+        1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    # sympy.adjoint() reduces to plain conjugation for scalars and to the
+    # conjugate transpose for matrices/operators, so it is safe either way.
+    d1 = sympy.simplify(sympy.adjoint(input_expr_sympy_lhs) - output_expr_sympy_lhs)
+    d2 = sympy.simplify(sympy.adjoint(input_expr_sympy_rhs) - output_expr_sympy_rhs)
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
 def distribute_conjugate_transpose_to_factors(
@@ -2454,9 +2558,28 @@ def distribute_conjugate_transpose_to_factors(
     Apply ^+; replace $i$ with $-i$ and transpose matrices, rotate bra-ket.
     this is a combination of "distribute conjugate" and then "distribute transpose"
     """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
     assert len(list_of_feed_dicts) == 0
-
-    return "recognized infrule but not yet supported"
+    res = validate_that_content_exists(
+        1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    # (A*B)^dagger == B^dagger * A^dagger is an identity SymPy already
+    # recognizes under simplify, for both scalar and matrix/operator factors.
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
 def distribute_conjugate_to_factors(
@@ -2467,9 +2590,28 @@ def distribute_conjugate_to_factors(
     """
     Apply ^*; replace $i$ with $-i$
     """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
     assert len(list_of_feed_dicts) == 0
-
-    return "recognized infrule but not yet supported"
+    res = validate_that_content_exists(
+        1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    # conjugate(a*b) == conjugate(a)*conjugate(b) is recognized automatically
+    # by SymPy's simplify, so a direct diff check is sufficient here.
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
 def expand_magnitude_to_conjugate(
@@ -2480,9 +2622,31 @@ def expand_magnitude_to_conjugate(
     """
     replace |f|^2 with ff^*
     """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
     assert len(list_of_feed_dicts) == 0
-
-    return "recognized infrule but not yet supported"
+    res = validate_that_content_exists(
+        1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    # Rewrites any Abs(z) magnitude terms as sqrt(z * conjugate(z)) before comparing.
+    d1 = sympy.simplify(
+        input_expr_sympy_lhs.rewrite(sympy.conjugate) - output_expr_sympy_lhs
+    )
+    d2 = sympy.simplify(
+        input_expr_sympy_rhs.rewrite(sympy.conjugate) - output_expr_sympy_rhs
+    )
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
 def replace_scalar_with_vector(
@@ -2705,7 +2869,30 @@ def differentiate_with_respect_to(
     wrt t
     get \frac{d}{dt}a = \frac{d}{dt}b
     """
-    return "recognized infrule but not yet supported"
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    res = validate_that_content_exists(
+        1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    d1 = sympy.simplify(
+        sympy.diff(input_expr_sympy_lhs, feed_sympy) - output_expr_sympy_lhs
+    )
+    d2 = sympy.simplify(
+        sympy.diff(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
+    )
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
 def substitute_LHS_of_two_expressions_into_expr(
@@ -3089,7 +3276,25 @@ def square_root_both_sides(
     >>> square_root_both_sides(latex_dict)
     'valid'
     """
-    return "recognized infrule but not yet supported"
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    res = validate_that_content_exists(
+        1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    d1 = sympy.simplify(sympy.sqrt(input_expr_sympy_lhs) - output_expr_sympy_lhs)
+    d2 = sympy.simplify(sympy.sqrt(input_expr_sympy_rhs) - output_expr_sympy_rhs)
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
 def divide_expr_by_expr(
@@ -3109,7 +3314,38 @@ def divide_expr_by_expr(
     >>> divide_expr_by_expr(latex_dict)
     'valid'
     """
-    return "recognized infrule but not yet supported"
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    res = validate_that_content_exists(
+        2, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs_0 = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    input_expr_sympy_lhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_lhs"])
+    input_expr_sympy_rhs_1 = parse_to_sympy(list_of_input_dicts[1]["sympy_rhs"])
+    output_expr_sympy_lhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    if input_expr_sympy_lhs_1 == 0 or input_expr_sympy_rhs_1 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "Invalid derivation: Division by zero is undefined."
+    try:
+        d1 = sympy.simplify(
+            input_expr_sympy_lhs_0 / input_expr_sympy_lhs_1 - output_expr_sympy_lhs_0
+        )
+        d2 = sympy.simplify(
+            input_expr_sympy_rhs_0 / input_expr_sympy_rhs_1 - output_expr_sympy_rhs_0
+        )
+    except Exception as err:
+        logger.error(str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy")
+        return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
 def separate_two_vector_components(
@@ -3279,12 +3515,7 @@ def drop_nondominant_term(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    given
-    x = \\langle\\psi_{\\alpha}| \\hat{A} |\\psi_{\\beta}\\rangle
-    return
-    x = \\langle\\psi_{\\alpha}| a_{\\beta} |\psi_{\\beta} \\rangle
-    """
+    """ """
     return "recognized infrule but not yet supported"
 
 
@@ -3293,13 +3524,104 @@ def apply_gradient_to_scalar_function(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
-    given
-    x = \\langle\\psi_{\\alpha}| \\hat{A} |\\psi_{\\beta}\\rangle
-    return
-    x = \\langle\\psi_{\\alpha}| a_{\\beta} |\psi_{\\beta} \\rangle
-    """
+    """ """
     return "recognized infrule but not yet supported"
+
+
+def apply_function_to_both_sides_of_expr(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    res = validate_that_content_exists(
+        1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    # feed_sympy is expected to be a callable (an UndefinedFunction like f, or
+    # a Lambda), so feed_sympy(expr) applies it the same way f(x) would.
+    try:
+        d1 = sympy.simplify(feed_sympy(input_expr_sympy_lhs) - output_expr_sympy_lhs)
+        d2 = sympy.simplify(feed_sympy(input_expr_sympy_rhs) - output_expr_sympy_rhs)
+    except TypeError as err:
+        logger.error(
+            str(type(err).__name__)
+            + ": "
+            + str(err)
+            + " : feed term is not a callable function"
+        )
+        return "feed term is not a callable function: " + str(feed_sympy)
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
+
+
+def combine_like_terms(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    res = validate_that_content_exists(
+        1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
+    d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
+
+
+def replace_constant_with_value(
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
+) -> str:
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    res = validate_that_content_exists(
+        1, 2, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
+    )
+    if res is not None:
+        return res
+    input_expr_sympy_lhs = parse_to_sympy(list_of_input_dicts[0]["sympy_lhs"])
+    input_expr_sympy_rhs = parse_to_sympy(list_of_input_dicts[0]["sympy_rhs"])
+    feed_sympy_0 = parse_to_sympy(list_of_feed_dicts[0]["sympy"])
+    feed_sympy_1 = parse_to_sympy(list_of_feed_dicts[1]["sympy"])
+    output_expr_sympy_lhs = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
+    output_expr_sympy_rhs = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
+    d1 = sympy.simplify(
+        input_expr_sympy_lhs.subs(feed_sympy_0, feed_sympy_1) - output_expr_sympy_lhs
+    )
+    d2 = sympy.simplify(
+        input_expr_sympy_rhs.subs(feed_sympy_0, feed_sympy_1) - output_expr_sympy_rhs
+    )
+    if d1 == 0 and d2 == 0:
+        logger.info("[TRACE] end " + trace_id)
+        return "valid"
+    else:
+        logger.info("[TRACE] end " + trace_id)
+        return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
 # EOF
