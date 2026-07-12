@@ -1824,20 +1824,138 @@ def api_create_vector_symbol():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
-    # query_time_dict = {}  # type: query_timing_result_type
-
+    query_time_dict = {}  # type: query_timing_result_type
+    collection_link = {
+        "up": hal_link(
+            url_for(".api_list_vector_symbols", _external=True),
+            "List of Vector Symbols",
+        )
+    }
+    if request.is_json:
+        data_from_user = request.get_json()
+        logger.info("data_from_user = " + str(data_from_user))
+        if "vector_latex" in data_from_user.keys():
+            vector_latex = data_from_user["vector_latex"]
+        else:
+            return hal_error("need to provide vector_latex", 400, links=collection_link)
+        if "vector_name_latex" in data_from_user.keys():
+            vector_name_latex = data_from_user["vector_name_latex"]
+        else:
+            vector_name_latex = ""
+        if "vector_description_latex" in data_from_user.keys():
+            vector_description_latex = data_from_user["vector_description_latex"]
+        else:
+            vector_description_latex = ""
+        if "vector_reference_latex" in data_from_user.keys():
+            vector_reference_latex = data_from_user["vector_reference_latex"]
+        else:
+            vector_reference_latex = ""
+        if "vector_is_composite" in data_from_user.keys():
+            _raw_is_composite = data_from_user["vector_is_composite"]
+            vector_is_composite = (
+                _raw_is_composite
+                if isinstance(_raw_is_composite, bool)
+                else str(_raw_is_composite).lower() == "true"
+            )
+        else:
+            vector_is_composite = False
+        if "vector_size" in data_from_user.keys():
+            vector_size = data_from_user["vector_size"]
+        else:
+            vector_size = "arbitrary"
+        if "vector_orientation" in data_from_user.keys():
+            vector_orientation = data_from_user["vector_orientation"]
+        else:
+            vector_orientation = "column"
+        if "vector_number_of_entries" in data_from_user.keys():
+            vector_number_of_entries = data_from_user["vector_number_of_entries"]
+        else:
+            vector_number_of_entries = ""
+    else:
+        logger.info("request.args=" + str(request.args))
+        vector_latex = request.args.get("vector_latex")
+        if vector_latex:
+            logger.info("vector_latex =" + vector_latex)
+        else:
+            return hal_error("need to provide vector_latex", 400, links=collection_link)
+        vector_name_latex = request.args.get("vector_name_latex")
+        if vector_name_latex:
+            logger.info("vector_name_latex =" + vector_name_latex)
+        else:
+            vector_name_latex = ""
+        vector_description_latex = request.args.get("vector_description_latex")
+        if vector_description_latex:
+            logger.info("vector_description_latex =" + vector_description_latex)
+        else:
+            vector_description_latex = ""
+        vector_reference_latex = request.args.get("vector_reference_latex")
+        if vector_reference_latex:
+            logger.info("vector_reference_latex =" + vector_reference_latex)
+        else:
+            vector_reference_latex = ""
+        _raw_is_composite = request.args.get("vector_is_composite")
+        if _raw_is_composite:
+            vector_is_composite = _raw_is_composite.lower() == "true"
+        else:
+            vector_is_composite = False
+        vector_size = request.args.get("vector_size")
+        if vector_size:
+            logger.info("vector_size =" + vector_size)
+        else:
+            vector_size = "arbitrary"
+        vector_orientation = request.args.get("vector_orientation")
+        if vector_orientation:
+            logger.info("vector_orientation =" + vector_orientation)
+        else:
+            vector_orientation = "column"
+        vector_number_of_entries = request.args.get("vector_number_of_entries")
+        if vector_number_of_entries:
+            logger.info("vector_number_of_entries =" + vector_number_of_entries)
+        else:
+            vector_number_of_entries = ""
+    author_name_latex = "ben"
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-    return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
-        501,
+    symbol_id, query_time_dict = compute.generate_random_id(
+        graphDB_Driver, query_time_dict
+    )
+    with graphDB_Driver.session() as session:
+        session.write_transaction(
+            neo4j_query.add_vector_symbol,
+            symbol_id,
+            vector_name_latex,
+            vector_latex,
+            vector_description_latex,
+            vector_reference_latex,
+            vector_is_composite,
+            vector_size,
+            vector_orientation,
+            vector_number_of_entries,
+            now_str,
+            author_name_latex,
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={"status": "vector symbol added successfully", "symbol_id": symbol_id},
         links={
+            "self": hal_link(
+                url_for(".api_vector_metadata", symbol_id=symbol_id, _external=True),
+                "Get vector metadata",
+            ),
             "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+                url_for(".api_list_vector_symbols", _external=True),
+                "List of Vector Symbols",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_vector", symbol_id=symbol_id, _external=True),
+                "Edit this vector",
+            ),
+            "delete": hal_link(
+                url_for(".api_delete_vector", symbol_id=symbol_id, _external=True),
+                "Delete this vector",
+            ),
         },
-        title="Not Implemented",
+        status=201,
     )
 
 
@@ -1852,20 +1970,138 @@ def api_create_matrix_symbol():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
-    # query_time_dict = {}  # type: query_timing_result_type
-
+    query_time_dict = {}  # type: query_timing_result_type
+    collection_link = {
+        "up": hal_link(
+            url_for(".api_list_matrix_symbols", _external=True),
+            "List of Matrix Symbols",
+        )
+    }
+    if request.is_json:
+        data_from_user = request.get_json()
+        logger.info("data_from_user = " + str(data_from_user))
+        if "matrix_latex" in data_from_user.keys():
+            matrix_latex = data_from_user["matrix_latex"]
+        else:
+            return hal_error("need to provide matrix_latex", 400, links=collection_link)
+        if "matrix_name_latex" in data_from_user.keys():
+            matrix_name_latex = data_from_user["matrix_name_latex"]
+        else:
+            matrix_name_latex = ""
+        if "matrix_description_latex" in data_from_user.keys():
+            matrix_description_latex = data_from_user["matrix_description_latex"]
+        else:
+            matrix_description_latex = ""
+        if "matrix_reference_latex" in data_from_user.keys():
+            matrix_reference_latex = data_from_user["matrix_reference_latex"]
+        else:
+            matrix_reference_latex = ""
+        if "matrix_is_composite" in data_from_user.keys():
+            _raw_is_composite = data_from_user["matrix_is_composite"]
+            matrix_is_composite = (
+                _raw_is_composite
+                if isinstance(_raw_is_composite, bool)
+                else str(_raw_is_composite).lower() == "true"
+            )
+        else:
+            matrix_is_composite = False
+        if "matrix_size" in data_from_user.keys():
+            matrix_size = data_from_user["matrix_size"]
+        else:
+            matrix_size = "arbitrary"
+        if "matrix_number_of_rows" in data_from_user.keys():
+            matrix_number_of_rows = data_from_user["matrix_number_of_rows"]
+        else:
+            matrix_number_of_rows = ""
+        if "matrix_number_of_columns" in data_from_user.keys():
+            matrix_number_of_columns = data_from_user["matrix_number_of_columns"]
+        else:
+            matrix_number_of_columns = ""
+    else:
+        logger.info("request.args=" + str(request.args))
+        matrix_latex = request.args.get("matrix_latex")
+        if matrix_latex:
+            logger.info("matrix_latex =" + matrix_latex)
+        else:
+            return hal_error("need to provide matrix_latex", 400, links=collection_link)
+        matrix_name_latex = request.args.get("matrix_name_latex")
+        if matrix_name_latex:
+            logger.info("matrix_name_latex =" + matrix_name_latex)
+        else:
+            matrix_name_latex = ""
+        matrix_description_latex = request.args.get("matrix_description_latex")
+        if matrix_description_latex:
+            logger.info("matrix_description_latex =" + matrix_description_latex)
+        else:
+            matrix_description_latex = ""
+        matrix_reference_latex = request.args.get("matrix_reference_latex")
+        if matrix_reference_latex:
+            logger.info("matrix_reference_latex =" + matrix_reference_latex)
+        else:
+            matrix_reference_latex = ""
+        _raw_is_composite = request.args.get("matrix_is_composite")
+        if _raw_is_composite:
+            matrix_is_composite = _raw_is_composite.lower() == "true"
+        else:
+            matrix_is_composite = False
+        matrix_size = request.args.get("matrix_size")
+        if matrix_size:
+            logger.info("matrix_size =" + matrix_size)
+        else:
+            matrix_size = "arbitrary"
+        matrix_number_of_rows = request.args.get("matrix_number_of_rows")
+        if matrix_number_of_rows:
+            logger.info("matrix_number_of_rows =" + matrix_number_of_rows)
+        else:
+            matrix_number_of_rows = ""
+        matrix_number_of_columns = request.args.get("matrix_number_of_columns")
+        if matrix_number_of_columns:
+            logger.info("matrix_number_of_columns =" + matrix_number_of_columns)
+        else:
+            matrix_number_of_columns = ""
+    author_name_latex = "ben"
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-    return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
-        501,
+    symbol_id, query_time_dict = compute.generate_random_id(
+        graphDB_Driver, query_time_dict
+    )
+    with graphDB_Driver.session() as session:
+        session.write_transaction(
+            neo4j_query.add_matrix_symbol,
+            symbol_id,
+            matrix_name_latex,
+            matrix_latex,
+            matrix_description_latex,
+            matrix_reference_latex,
+            matrix_is_composite,
+            matrix_size,
+            matrix_number_of_rows,
+            matrix_number_of_columns,
+            now_str,
+            author_name_latex,
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={"status": "matrix symbol added successfully", "symbol_id": symbol_id},
         links={
+            "self": hal_link(
+                url_for(".api_matrix_metadata", symbol_id=symbol_id, _external=True),
+                "Get matrix metadata",
+            ),
             "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+                url_for(".api_list_matrix_symbols", _external=True),
+                "List of Matrix Symbols",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_matrix", symbol_id=symbol_id, _external=True),
+                "Edit this matrix",
+            ),
+            "delete": hal_link(
+                url_for(".api_delete_matrix", symbol_id=symbol_id, _external=True),
+                "Delete this matrix",
+            ),
         },
-        title="Not Implemented",
+        status=201,
     )
 
 
@@ -2187,44 +2423,562 @@ def api_create_relation_symbol():
 
 @api_bp.route("/resources/derivation/<string:derivation_id>/edit", methods=["POST"])
 def api_edit_derivation(derivation_id: str):
-    return jsonify({"STATUS": "Nothing here yet"})
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        derivation_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
+        )
+    if derivation_dict is None:
+        return hal_error(
+            f"Derivation {derivation_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_derivations", _external=True),
+                    "List of Derivations",
+                )
+            },
+            title="Not Found",
+        )
+    data_from_user = request.get_json() if request.is_json else request.args
+    editable_fields = {
+        "derivation_name_latex": "name_latex",
+        "derivation_abstract_latex": "abstract_latex",
+        "derivation_reference_latex": "reference_latex",
+    }
+    updated_fields = []
+    with graphDB_Driver.session() as session:
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key):
+                session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "derivation",
+                    derivation_id,
+                    node_property,
+                    data_from_user.get(form_key),
+                )
+                updated_fields.append(node_property)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "derivation updated successfully",
+            "id": derivation_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_edit_derivation", derivation_id=derivation_id, _external=True
+                ),
+                "Edit derivation",
+            ),
+            "derivation": hal_link(
+                url_for(
+                    ".api_derivation_metadata",
+                    derivation_id=derivation_id,
+                    _external=True,
+                ),
+                "Get derivation metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_derivations", _external=True), "List of Derivations"
+            ),
+        },
+    )
 
 
 @api_bp.route("/resources/inference_rule/<string:infrule_id>/edit", methods=["POST"])
 def api_edit_inference_rule(infrule_id: str):
-    return jsonify({"STATUS": "Nothing here yet"})
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        inference_rule_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "inference_rule", infrule_id
+        )
+    if inference_rule_dict is None:
+        return hal_error(
+            f"Inference rule {infrule_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_inference_rules", _external=True),
+                    "List of Inference Rules",
+                )
+            },
+            title="Not Found",
+        )
+    data_from_user = request.get_json() if request.is_json else request.args
+    editable_fields = {
+        "inference_rule_name_latex": "name_latex",
+        "inference_rule_latex": "latex",
+        "number_of_inputs": "number_of_inputs",
+        "number_of_feeds": "number_of_feeds",
+        "number_of_outputs": "number_of_outputs",
+    }
+    updated_fields = []
+    with graphDB_Driver.session() as session:
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key):
+                session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "inference_rule",
+                    infrule_id,
+                    node_property,
+                    data_from_user.get(form_key),
+                )
+                updated_fields.append(node_property)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "inference rule updated successfully",
+            "id": infrule_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_edit_inference_rule", infrule_id=infrule_id, _external=True
+                ),
+                "Edit inference rule",
+            ),
+            "inference_rule": hal_link(
+                url_for(
+                    ".api_inference_rule_metadata",
+                    infrule_id=infrule_id,
+                    _external=True,
+                ),
+                "Get inference rule metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_inference_rules", _external=True),
+                "List of Inference Rules",
+            ),
+        },
+    )
 
 
 @api_bp.route("/resources/expression/<string:expression_id>/edit", methods=["POST"])
 def api_edit_expression(expression_id: str):
-    return jsonify({"STATUS": "Nothing here yet"})
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        existing_expression_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "expression", expression_id
+        )
+    if existing_expression_dict is None:
+        return hal_error(
+            f"Expression {expression_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_expressions", _external=True),
+                    "List of Expressions",
+                )
+            },
+            title="Not Found",
+        )
+    data_from_user = request.get_json() if request.is_json else request.args
+    expression_latex_lhs = data_from_user.get(
+        "expression_latex_lhs"
+    ) or existing_expression_dict.get("latex_lhs", "")
+    expression_relation_latex = data_from_user.get(
+        "expression_relation_latex"
+    ) or existing_expression_dict.get("latex_relation", "")
+    expression_latex_rhs = data_from_user.get(
+        "expression_latex_rhs"
+    ) or existing_expression_dict.get("latex_rhs", "")
+    expression_latex_condition = data_from_user.get(
+        "expression_latex_condition"
+    ) or existing_expression_dict.get("latex_condition", "")
+    expression_name_latex = data_from_user.get(
+        "expression_name_latex"
+    ) or existing_expression_dict.get("name_latex", "")
+    expression_description_latex = data_from_user.get(
+        "expression_description_latex"
+    ) or existing_expression_dict.get("description_latex", "")
+    expression_reference_latex = data_from_user.get(
+        "expression_reference_latex"
+    ) or existing_expression_dict.get("reference_latex", "")
+    author_name_latex = existing_expression_dict.get("author_name_latex", "ben")
+    with graphDB_Driver.session() as session:
+        session.write_transaction(
+            neo4j_query.edit_expression,
+            expression_id,
+            expression_latex_lhs,
+            expression_relation_latex,
+            expression_latex_rhs,
+            expression_latex_condition,
+            expression_name_latex,
+            expression_description_latex,
+            expression_reference_latex,
+            author_name_latex,
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={"status": "expression updated successfully", "id": expression_id},
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_edit_expression", expression_id=expression_id, _external=True
+                ),
+                "Edit expression",
+            ),
+            "expression": hal_link(
+                url_for(
+                    ".api_expression_metadata",
+                    expression_id=expression_id,
+                    _external=True,
+                ),
+                "Get expression metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_expressions", _external=True), "List of Expressions"
+            ),
+        },
+    )
 
 
 @api_bp.route("/resources/symbol/scalar/<string:symbol_id>/edit", methods=["POST"])
 def api_edit_scalar(symbol_id: str):
-    return jsonify({"STATUS": "Nothing here yet"})
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        scalar_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "scalar", symbol_id
+        )
+    if scalar_dict is None:
+        return hal_error(
+            f"Scalar {symbol_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_scalar_symbols", _external=True),
+                    "List of Scalar Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    data_from_user = request.get_json() if request.is_json else request.args
+    editable_fields = {
+        "scalar_latex": "latex",
+        "scalar_name_latex": "name_latex",
+        "scalar_description_latex": "description_latex",
+        "scalar_reference_latex": "reference_latex",
+        "scalar_scope": "scope",
+        "scalar_variable_or_constant": "variable_or_constant",
+        "scalar_domain": "domain",
+        "dimension_length": "dimension_length",
+        "dimension_time": "dimension_time",
+        "dimension_mass": "dimension_mass",
+        "dimension_temperature": "dimension_temperature",
+        "dimension_electric_charge": "dimension_electric_charge",
+        "dimension_amount_of_substance": "dimension_amount_of_substance",
+        "dimension_luminous_intensity": "dimension_luminous_intensity",
+    }
+    updated_fields = []
+    with graphDB_Driver.session() as session:
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key):
+                session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "scalar",
+                    symbol_id,
+                    node_property,
+                    data_from_user.get(form_key),
+                )
+                updated_fields.append(node_property)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "scalar updated successfully",
+            "id": symbol_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_edit_scalar", symbol_id=symbol_id, _external=True),
+                "Edit scalar",
+            ),
+            "scalar": hal_link(
+                url_for(".api_scalar_metadata", symbol_id=symbol_id, _external=True),
+                "Get scalar metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_scalar_symbols", _external=True),
+                "List of Scalar Symbols",
+            ),
+        },
+    )
 
 
 @api_bp.route("/resources/symbol/vector/<string:symbol_id>/edit", methods=["POST"])
 def api_edit_vector(symbol_id: str):
-    return jsonify({"STATUS": "Nothing here yet"})
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        vector_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "vector", symbol_id
+        )
+    if vector_dict is None:
+        return hal_error(
+            f"Vector {symbol_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_vector_symbols", _external=True),
+                    "List of Vector Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    data_from_user = request.get_json() if request.is_json else request.args
+    editable_fields = {
+        "vector_latex": "latex",
+        "vector_name_latex": "name_latex",
+        "vector_description_latex": "description_latex",
+        "vector_reference_latex": "reference_latex",
+        "vector_orientation": "orientation",
+        "vector_size": "size",
+        "vector_number_of_entries": "number_of_entries",
+        "vector_is_composite": "is_composite",
+    }
+    updated_fields = []
+    with graphDB_Driver.session() as session:
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key):
+                session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "vector",
+                    symbol_id,
+                    node_property,
+                    data_from_user.get(form_key),
+                )
+                updated_fields.append(node_property)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "vector updated successfully",
+            "id": symbol_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_edit_vector", symbol_id=symbol_id, _external=True),
+                "Edit vector",
+            ),
+            "vector": hal_link(
+                url_for(".api_vector_metadata", symbol_id=symbol_id, _external=True),
+                "Get vector metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_vector_symbols", _external=True),
+                "List of Vector Symbols",
+            ),
+        },
+    )
 
 
 @api_bp.route("/resources/symbol/matrix/<string:symbol_id>/edit", methods=["POST"])
 def api_edit_matrix(symbol_id: str):
-    return jsonify({"STATUS": "Nothing here yet"})
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        matrix_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "matrix", symbol_id
+        )
+    if matrix_dict is None:
+        return hal_error(
+            f"Matrix {symbol_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_matrix_symbols", _external=True),
+                    "List of Matrix Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    data_from_user = request.get_json() if request.is_json else request.args
+    editable_fields = {
+        "matrix_latex": "latex",
+        "matrix_name_latex": "name_latex",
+        "matrix_description_latex": "description_latex",
+        "matrix_reference_latex": "reference_latex",
+        "matrix_size": "size",
+        "matrix_number_of_rows": "number_of_rows",
+        "matrix_number_of_columns": "number_of_columns",
+        "matrix_is_composite": "is_composite",
+    }
+    updated_fields = []
+    with graphDB_Driver.session() as session:
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key):
+                session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "matrix",
+                    symbol_id,
+                    node_property,
+                    data_from_user.get(form_key),
+                )
+                updated_fields.append(node_property)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "matrix updated successfully",
+            "id": symbol_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_edit_matrix", symbol_id=symbol_id, _external=True),
+                "Edit matrix",
+            ),
+            "matrix": hal_link(
+                url_for(".api_matrix_metadata", symbol_id=symbol_id, _external=True),
+                "Get matrix metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_matrix_symbols", _external=True),
+                "List of Matrix Symbols",
+            ),
+        },
+    )
 
 
 @api_bp.route(
     "/resources/symbol/operation/<string:operation_id>/edit", methods=["POST"]
 )
 def api_edit_operation(operation_id: str):
-    return jsonify({"STATUS": "Nothing here yet"})
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        operation_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "operation", operation_id
+        )
+    if operation_dict is None:
+        return hal_error(
+            f"Operation {operation_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_operation_symbols", _external=True),
+                    "List of Operation Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    data_from_user = request.get_json() if request.is_json else request.args
+    editable_fields = {
+        "operation_latex": "latex",
+        "operation_name_latex": "name_latex",
+        "operation_description_latex": "description_latex",
+        "operation_reference_latex": "reference_latex",
+        "operation_argument_count": "argument_count",
+    }
+    updated_fields = []
+    with graphDB_Driver.session() as session:
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key):
+                session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "operation",
+                    operation_id,
+                    node_property,
+                    data_from_user.get(form_key),
+                )
+                updated_fields.append(node_property)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "operation updated successfully",
+            "id": operation_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_edit_operation", operation_id=operation_id, _external=True
+                ),
+                "Edit operation",
+            ),
+            "operation": hal_link(
+                url_for(
+                    ".api_operation_metadata", operation_id=operation_id, _external=True
+                ),
+                "Get operation metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_operation_symbols", _external=True),
+                "List of Operation Symbols",
+            ),
+        },
+    )
 
 
 @api_bp.route("/resources/symbol/relation/<string:relation_id>/edit", methods=["POST"])
 def api_edit_relation(relation_id: str):
-    return jsonify({"STATUS": "Nothing here yet"})
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        relation_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "relation", relation_id
+        )
+    if relation_dict is None:
+        return hal_error(
+            f"Relation {relation_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_relation_symbols", _external=True),
+                    "List of Relation Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    data_from_user = request.get_json() if request.is_json else request.args
+    editable_fields = {
+        "relation_latex": "latex",
+        "relation_name_latex": "name_latex",
+        "relation_description_latex": "description_latex",
+        "relation_reference_latex": "reference_latex",
+    }
+    updated_fields = []
+    with graphDB_Driver.session() as session:
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key):
+                session.write_transaction(
+                    neo4j_query.edit_node_property,
+                    "relation",
+                    relation_id,
+                    node_property,
+                    data_from_user.get(form_key),
+                )
+                updated_fields.append(node_property)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "relation updated successfully",
+            "id": relation_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_edit_relation", relation_id=relation_id, _external=True),
+                "Edit relation",
+            ),
+            "relation": hal_link(
+                url_for(
+                    ".api_relation_metadata", relation_id=relation_id, _external=True
+                ),
+                "Get relation metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_relation_symbols", _external=True),
+                "List of Relation Symbols",
+            ),
+        },
+    )
 
 
 @api_bp.route("/resources/derivation/<string:derivation_id>/metadata", methods=["GET"])
@@ -2282,21 +3036,53 @@ def api_inference_rule_metadata(infrule_id: str):
     - get: read current
     - set: change existing values
     """
-
-    # with graphDB_Driver.session() as session:
-    #     OUTPUT = session.read_transaction(
-    #         neo4j_query.FUNCTION_NAME
-    #     )
-
-    return hal_error(
-        f"{infrule_id}: this endpoint is not yet implemented",
-        501,
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        inference_rule_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "inference_rule", infrule_id
+        )
+    if inference_rule_dict is None:
+        return hal_error(
+            f"Inference rule {infrule_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_inference_rules", _external=True),
+                    "List of Inference Rules",
+                )
+            },
+            title="Not Found",
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={"metadata": inference_rule_dict},
         links={
+            "self": hal_link(
+                url_for(
+                    ".api_inference_rule_metadata",
+                    infrule_id=infrule_id,
+                    _external=True,
+                ),
+                "Get inference rule metadata",
+            ),
+            "edit": hal_link(
+                url_for(
+                    ".api_edit_inference_rule", infrule_id=infrule_id, _external=True
+                ),
+                "Edit this inference rule",
+            ),
+            "delete": hal_link(
+                url_for(
+                    ".api_delete_inference_rule", infrule_id=infrule_id, _external=True
+                ),
+                "Delete this inference rule",
+            ),
             "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+                url_for(".api_list_inference_rules", _external=True),
+                "List of Inference Rules",
+            ),
         },
-        title="Not Implemented",
     )
 
 
@@ -2307,21 +3093,54 @@ def api_expression_metadata(expression_id: str):
     - get: read current
     - set: change existing values
     """
-
-    # with graphDB_Driver.session() as session:
-    #     OUTPUT = session.read_transaction(
-    #         neo4j_query.FUNCTION_NAME
-    #     )
-
-    return hal_error(
-        f"{expression_id}: this endpoint is not yet implemented",
-        501,
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        expression_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "expression", expression_id
+        )
+    if expression_dict is None:
+        return hal_error(
+            f"Expression {expression_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_expressions", _external=True),
+                    "List of Expressions",
+                )
+            },
+            title="Not Found",
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={"metadata": expression_dict},
         links={
+            "self": hal_link(
+                url_for(
+                    ".api_expression_metadata",
+                    expression_id=expression_id,
+                    _external=True,
+                ),
+                "Get expression metadata",
+            ),
+            "edit": hal_link(
+                url_for(
+                    ".api_edit_expression", expression_id=expression_id, _external=True
+                ),
+                "Edit this expression",
+            ),
+            "delete": hal_link(
+                url_for(
+                    ".api_delete_expression",
+                    expression_id=expression_id,
+                    _external=True,
+                ),
+                "Delete this expression",
+            ),
             "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+                url_for(".api_list_expressions", _external=True), "List of Expressions"
+            ),
         },
-        title="Not Implemented",
     )
 
 
@@ -2332,21 +3151,45 @@ def api_scalar_metadata(symbol_id: str):
     - get: read current
     - set: change existing values
     """
-
-    # with graphDB_Driver.session() as session:
-    #     OUTPUT = session.read_transaction(
-    #         neo4j_query.FUNCTION_NAME
-    #     )
-
-    return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
-        501,
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        scalar_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "scalar", symbol_id
+        )
+    if scalar_dict is None:
+        return hal_error(
+            f"Scalar {symbol_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_scalar_symbols", _external=True),
+                    "List of Scalar Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={"metadata": scalar_dict},
         links={
+            "self": hal_link(
+                url_for(".api_scalar_metadata", symbol_id=symbol_id, _external=True),
+                "Get scalar metadata",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_scalar", symbol_id=symbol_id, _external=True),
+                "Edit this scalar",
+            ),
+            "delete": hal_link(
+                url_for(".api_delete_scalar", symbol_id=symbol_id, _external=True),
+                "Delete this scalar",
+            ),
             "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+                url_for(".api_list_scalar_symbols", _external=True),
+                "List of Scalar Symbols",
+            ),
         },
-        title="Not Implemented",
     )
 
 
@@ -2357,46 +3200,89 @@ def api_vector_metadata(symbol_id: str):
     - get: read current
     - set: change existing values
     """
-
-    # with graphDB_Driver.session() as session:
-    #     OUTPUT = session.read_transaction(
-    #         neo4j_query.FUNCTION_NAME
-    #     )
-
-    return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
-        501,
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        vector_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "vector", symbol_id
+        )
+    if vector_dict is None:
+        return hal_error(
+            f"Vector {symbol_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_vector_symbols", _external=True),
+                    "List of Vector Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={"metadata": vector_dict},
         links={
+            "self": hal_link(
+                url_for(".api_vector_metadata", symbol_id=symbol_id, _external=True),
+                "Get vector metadata",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_vector", symbol_id=symbol_id, _external=True),
+                "Edit this vector",
+            ),
+            "delete": hal_link(
+                url_for(".api_delete_vector", symbol_id=symbol_id, _external=True),
+                "Delete this vector",
+            ),
             "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+                url_for(".api_list_vector_symbols", _external=True),
+                "List of Vector Symbols",
+            ),
         },
-        title="Not Implemented",
     )
 
 
 @api_bp.route("/resources/symbol/matrix/<string:symbol_id>/metadata", methods=["GET"])
 def api_matrix_metadata(symbol_id: str):
-    """
-    What can be done:
-    - get: read current
-    - set: change existing values
-    """
-
-    # with graphDB_Driver.session() as session:
-    #     OUTPUT = session.read_transaction(
-    #         neo4j_query.FUNCTION_NAME
-    #     )
-
-    return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
-        501,
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        matrix_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "matrix", symbol_id
+        )
+    if matrix_dict is None:
+        return hal_error(
+            f"Matrix {symbol_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_matrix_symbols", _external=True),
+                    "List of Matrix Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={"metadata": matrix_dict},
         links={
+            "self": hal_link(
+                url_for(".api_matrix_metadata", symbol_id=symbol_id, _external=True),
+                "Get matrix metadata",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_matrix", symbol_id=symbol_id, _external=True),
+                "Edit this matrix",
+            ),
+            "delete": hal_link(
+                url_for(".api_delete_matrix", symbol_id=symbol_id, _external=True),
+                "Delete this matrix",
+            ),
             "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+                url_for(".api_list_matrix_symbols", _external=True),
+                "List of Matrix Symbols",
+            ),
         },
-        title="Not Implemented",
     )
 
 
@@ -2476,8 +3362,7 @@ def api_operation_metadata(operation_id: str):
             },
         },
     }
-
-    return jsonify(response), 200
+    return (jsonify(response), 200)
 
 
 @api_bp.route(
@@ -2507,15 +3392,30 @@ def api_relation_metadata(relation_id: str):
             },
             title="Not Found",
         )
-    return hal_error(
-        f"{relation_id}: this endpoint is not yet implemented",
-        501,
+    return hal_response(
+        data={"metadata": operation_dict},
         links={
+            "self": hal_link(
+                url_for(
+                    ".api_relation_metadata", relation_id=relation_id, _external=True
+                ),
+                "Get relation metadata",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_relation", relation_id=relation_id, _external=True),
+                "Edit this relation",
+            ),
+            "delete": hal_link(
+                url_for(
+                    ".api_delete_relation", relation_id=relation_id, _external=True
+                ),
+                "Delete this relation",
+            ),
             "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+                url_for(".api_list_relation_symbols", _external=True),
+                "List of Relation Symbols",
+            ),
         },
-        title="Not Implemented",
     )
 
 
@@ -2651,77 +3551,226 @@ def api_delete_derivation(derivation_id: str):
     "/resources/inference_rule/<string:infrule_id>/delete", methods=["DELETE"]
 )
 def api_delete_inference_rule(infrule_id: str):
-    """
-    delete inference rule
-    """
-    return hal_error(
-        f"{infrule_id}: this endpoint is not yet implemented",
-        501,
-        links={
-            "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        inference_rule_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "inference_rule", infrule_id
+        )
+    if inference_rule_dict is None:
+        return hal_error(
+            f"Inference rule {infrule_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_inference_rules", _external=True),
+                    "List of Inference Rules",
+                )
+            },
+            title="Not Found",
+        )
+    with graphDB_Driver.session() as session:
+        session.write_transaction(neo4j_query.delete_node, infrule_id, "inference_rule")
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + infrule_id,
+            "deleted_inference_rule_id": infrule_id,
         },
-        title="Not Implemented",
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_delete_inference_rule", infrule_id=infrule_id, _external=True
+                ),
+                "Delete inference rule",
+            ),
+            "up": hal_link(
+                url_for(".api_list_inference_rules", _external=True),
+                "List of Inference Rules",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_inference_rules", _external=True), "Inference Rules"
+            ),
+        },
     )
 
 
 @api_bp.route("/resources/expression/<string:expression_id>/delete", methods=["DELETE"])
 def api_delete_expression(expression_id: str):
-    """
-    delete expression
-    """
-    return hal_error(
-        f"{expression_id}: this endpoint is not yet implemented",
-        501,
-        links={
-            "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        expression_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "expression", expression_id
+        )
+    if expression_dict is None:
+        return hal_error(
+            f"Expression {expression_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_expressions", _external=True),
+                    "List of Expressions",
+                )
+            },
+            title="Not Found",
+        )
+    with graphDB_Driver.session() as session:
+        session.write_transaction(neo4j_query.delete_node, expression_id, "expression")
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + expression_id,
+            "deleted_expression_id": expression_id,
         },
-        title="Not Implemented",
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_delete_expression",
+                    expression_id=expression_id,
+                    _external=True,
+                ),
+                "Delete expression",
+            ),
+            "up": hal_link(
+                url_for(".api_list_expressions", _external=True), "List of Expressions"
+            ),
+            "collection": hal_link(
+                url_for(".api_list_expressions", _external=True), "Expressions"
+            ),
+        },
     )
 
 
 @api_bp.route("/resources/symbol/scalar/<string:symbol_id>/delete", methods=["DELETE"])
 def api_delete_scalar(symbol_id: str):
-    return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
-        501,
-        links={
-            "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        scalar_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "scalar", symbol_id
+        )
+    if scalar_dict is None:
+        return hal_error(
+            f"Scalar {symbol_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_scalar_symbols", _external=True),
+                    "List of Scalar Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    with graphDB_Driver.session() as session:
+        session.write_transaction(neo4j_query.delete_node, symbol_id, "scalar")
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + symbol_id,
+            "deleted_scalar_id": symbol_id,
         },
-        title="Not Implemented",
+        links={
+            "self": hal_link(
+                url_for(".api_delete_scalar", symbol_id=symbol_id, _external=True),
+                "Delete scalar",
+            ),
+            "up": hal_link(
+                url_for(".api_list_scalar_symbols", _external=True),
+                "List of Scalar Symbols",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_scalar_symbols", _external=True), "Scalar Symbols"
+            ),
+        },
     )
 
 
 @api_bp.route("/resources/symbol/vector/<string:symbol_id>/delete", methods=["DELETE"])
 def api_delete_vector(symbol_id: str):
-    return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
-        501,
-        links={
-            "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        vector_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "vector", symbol_id
+        )
+    if vector_dict is None:
+        return hal_error(
+            f"Vector {symbol_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_vector_symbols", _external=True),
+                    "List of Vector Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    with graphDB_Driver.session() as session:
+        session.write_transaction(neo4j_query.delete_node, symbol_id, "vector")
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + symbol_id,
+            "deleted_vector_id": symbol_id,
         },
-        title="Not Implemented",
+        links={
+            "self": hal_link(
+                url_for(".api_delete_vector", symbol_id=symbol_id, _external=True),
+                "Delete vector",
+            ),
+            "up": hal_link(
+                url_for(".api_list_vector_symbols", _external=True),
+                "List of Vector Symbols",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_vector_symbols", _external=True), "Vector Symbols"
+            ),
+        },
     )
 
 
 @api_bp.route("/resources/symbol/matrix/<string:symbol_id>/delete", methods=["DELETE"])
 def api_delete_matrix(symbol_id: str):
-    return hal_error(
-        f"{symbol_id}: this endpoint is not yet implemented",
-        501,
-        links={
-            "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        matrix_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "matrix", symbol_id
+        )
+    if matrix_dict is None:
+        return hal_error(
+            f"Matrix {symbol_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_matrix_symbols", _external=True),
+                    "List of Matrix Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    with graphDB_Driver.session() as session:
+        session.write_transaction(neo4j_query.delete_node, symbol_id, "matrix")
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + symbol_id,
+            "deleted_matrix_id": symbol_id,
         },
-        title="Not Implemented",
+        links={
+            "self": hal_link(
+                url_for(".api_delete_matrix", symbol_id=symbol_id, _external=True),
+                "Delete matrix",
+            ),
+            "up": hal_link(
+                url_for(".api_list_matrix_symbols", _external=True),
+                "List of Matrix Symbols",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_matrix_symbols", _external=True), "Matrix Symbols"
+            ),
+        },
     )
 
 
@@ -2729,15 +3778,48 @@ def api_delete_matrix(symbol_id: str):
     "/resources/symbol/operation/<string:operation_id>/delete", methods=["DELETE"]
 )
 def api_delete_operation(operation_id: str):
-    return hal_error(
-        f"{operation_id}: this endpoint is not yet implemented",
-        501,
-        links={
-            "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        operation_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "operation", operation_id
+        )
+    if operation_dict is None:
+        return hal_error(
+            f"Operation {operation_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_operation_symbols", _external=True),
+                    "List of Operation Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    with graphDB_Driver.session() as session:
+        session.write_transaction(neo4j_query.delete_node, operation_id, "operation")
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + operation_id,
+            "deleted_operation_id": operation_id,
         },
-        title="Not Implemented",
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_delete_operation", operation_id=operation_id, _external=True
+                ),
+                "Delete operation",
+            ),
+            "up": hal_link(
+                url_for(".api_list_operation_symbols", _external=True),
+                "List of Operation Symbols",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_operation_symbols", _external=True),
+                "Operation Symbols",
+            ),
+        },
     )
 
 
@@ -2745,15 +3827,48 @@ def api_delete_operation(operation_id: str):
     "/resources/symbol/relation/<string:relation_id>/delete", methods=["DELETE"]
 )
 def api_delete_relation(relation_id: str):
-    return hal_error(
-        f"{relation_id}: this endpoint is not yet implemented",
-        501,
-        links={
-            "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            )
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    with graphDB_Driver.session() as session:
+        relation_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "relation", relation_id
+        )
+    if relation_dict is None:
+        return hal_error(
+            f"Relation {relation_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_relation_symbols", _external=True),
+                    "List of Relation Symbols",
+                )
+            },
+            title="Not Found",
+        )
+    with graphDB_Driver.session() as session:
+        session.write_transaction(neo4j_query.delete_node, relation_id, "relation")
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + relation_id,
+            "deleted_relation_id": relation_id,
         },
-        title="Not Implemented",
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_delete_relation", relation_id=relation_id, _external=True
+                ),
+                "Delete relation",
+            ),
+            "up": hal_link(
+                url_for(".api_list_relation_symbols", _external=True),
+                "List of Relation Symbols",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_relation_symbols", _external=True),
+                "Relation Symbols",
+            ),
+        },
     )
 
 
