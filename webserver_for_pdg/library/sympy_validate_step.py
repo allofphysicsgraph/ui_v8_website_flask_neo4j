@@ -21,6 +21,13 @@ Observations:
 - there are triplets -- "add X to LHS" and "add X to RHS" and "add X to both sides"
 
 
+
+Prompt:
+
+You are a senior developer with decades of Python experience. You have deep knowledge of SymPy (a Python library for symbolic mathematics) and are recognized across the world for your quality software development.
+
+
+
 """
 
 import random
