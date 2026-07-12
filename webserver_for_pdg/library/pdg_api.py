@@ -59,6 +59,7 @@ import datetime
 import uuid
 import tokenize
 import os
+import json
 import secrets
 import functools
 from sympy.parsing.sympy_parser import parse_expr
@@ -227,10 +228,54 @@ def hal_error(message, status, links=None, title="Error"):
     return resp
 
 
-def _get_configured_api_key():
-    # Loaded lazily (rather than at import time) so tests/deployments can set
-    # or change PDG_API_KEY without needing to reimport this module.
-    return os.environ.get("PDG_API_KEY")
+def _load_configured_api_keys():
+    """Parse PDG_API_KEYS, a JSON array of records identifying each caller.
+
+    Expected shape:
+    PDG_API_KEYS='[
+        {"token": "long-random-string-1", "author_id": "ben", "author_name_latex": "Ben"},
+        {"token": "long-random-string-2", "author_id": "alice", "author_name_latex": "Alice"}
+    ]'
+
+    Falls back to the legacy single-key PDG_API_KEY var (attributed to
+    author_id "unknown") so existing deployments don't break on upgrade.
+    Returns a list of dicts, or [] if nothing is configured / the JSON is malformed.
+    """
+    raw = os.environ.get("PDG_API_KEYS")
+    if raw:
+        try:
+            records = json.loads(raw)
+        except json.JSONDecodeError as err:
+            logger.critical("PDG_API_KEYS is not valid JSON: " + str(err))
+            return []
+        valid_records = []
+        for record in records:
+            if (
+                not isinstance(record, dict)
+                or not record.get("token")
+                or not record.get("author_id")
+            ):
+                logger.critical(
+                    "Ignoring malformed PDG_API_KEYS entry (needs token + author_id): "
+                    + str(record)
+                )
+                continue
+            record.setdefault("author_name_latex", record["author_id"])
+            valid_records.append(record)
+        return valid_records
+    legacy_key = os.environ.get("PDG_API_KEY")
+    if legacy_key:
+        logger.warning(
+            "PDG_API_KEY is deprecated; migrate to PDG_API_KEYS with per-caller identities"
+        )
+        return [
+            {
+                "token": legacy_key,
+                "author_id": "unknown",
+                "author_name_latex": "unknown",
+            }
+        ]
+    return []
 
 
 def _extract_bearer_token(auth_header):
@@ -242,6 +287,41 @@ def _extract_bearer_token(auth_header):
     return parts[1].strip()
 
 
+def _match_caller(supplied_token, configured_keys):
+    """Constant-time-compare supplied_token against every configured token.
+
+    Checks every record rather than stopping at the first mismatch so the
+    response time doesn't leak which position in the list (if any) is close
+    to matching.
+    """
+    matched = None
+    for record in configured_keys:
+        if secrets.compare_digest(supplied_token, record["token"]):
+            matched = record
+    return matched
+
+
+def _stamp_last_modified(session, node_type, node_id):
+    """Record who last edited a node and when, using the same generic
+    property-setter the editable_fields loops already rely on. Called only
+    when an edit actually changed something, so untouched resources don't
+    pick up a modified timestamp for a no-op request."""
+    session.write_transaction(
+        neo4j_query.edit_node_property,
+        node_type,
+        node_id,
+        "last_modified_by_latex",
+        g.current_author["author_name_latex"],
+    )
+    session.write_transaction(
+        neo4j_query.edit_node_property,
+        node_type,
+        node_id,
+        "last_modified_date",
+        str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")),
+    )
+
+
 def require_auth(view_func):
     """Require a valid `Authorization: Bearer <token>` header.
 
@@ -251,9 +331,11 @@ def require_auth(view_func):
 
     @functools.wraps(view_func)
     def wrapped_view(*args, **kwargs):
-        configured_key = _get_configured_api_key()
-        if not configured_key:
-            logger.critical("PDG_API_KEY is not configured; refusing write request")
+        configured_keys = _load_configured_api_keys()
+        if not configured_keys:
+            logger.critical(
+                "No API keys configured (PDG_API_KEYS); refusing write request"
+            )
             resp = hal_error(
                 "Server is not configured for authentication",
                 500,
@@ -262,9 +344,10 @@ def require_auth(view_func):
             resp.headers["WWW-Authenticate"] = 'Bearer realm="pdg_api"'
             return resp
         supplied_token = _extract_bearer_token(request.headers.get("Authorization"))
-        if not supplied_token or not secrets.compare_digest(
-            supplied_token, configured_key
-        ):
+        caller = (
+            _match_caller(supplied_token, configured_keys) if supplied_token else None
+        )
+        if caller is None:
             resp = hal_error(
                 "A valid Authorization: Bearer <token> header is required for this operation",
                 401,
@@ -272,6 +355,7 @@ def require_auth(view_func):
             )
             resp.headers["WWW-Authenticate"] = 'Bearer realm="pdg_api"'
             return resp
+        g.current_author = caller
         return view_func(*args, **kwargs)
 
     return wrapped_view
@@ -364,7 +448,11 @@ def api_start_here():
                 "title": "Cypher query",
                 "type": "GET",
             },
-            # TODO: to add: export as {cypher, JSON, CSV, GraphML}
+            "whoami": {
+                "href": url_for(".api_whoami", _external=True),
+                "title": "Identify the current API caller",
+                "type": "GET",
+            },
         },
     }
     # The `.` prefix tells Flask to look for these functions within the current Blueprint.
@@ -379,6 +467,25 @@ def api_start_here():
     response.headers["Content-Type"] = "application/hal+json"
 
     return response
+
+
+@api_bp.route("/whoami", methods=["GET"])
+@require_auth
+def api_whoami():
+    return hal_response(
+        data={
+            "author_id": g.current_author["author_id"],
+            "author_name_latex": g.current_author["author_name_latex"],
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_whoami", _external=True), "Current caller identity"
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+    )
 
 
 @api_bp.route("/resources/derivations", methods=["GET"])
@@ -1284,7 +1391,7 @@ def api_create_derivation():
 
     # TODO
     # author_name_latex = latex.make_string_safe_for_latex(current_user.email)
-    author_name_latex = "ben"
+    author_name_latex = g.current_author["author_name_latex"]
 
     derivation_id, query_time_dict = compute.generate_random_id(
         graphDB_Driver, query_time_dict
@@ -1523,7 +1630,7 @@ def api_create_expression():
                 links=up_link,
                 title="Conflict",
             )
-    author_name_latex = "ben"
+    author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
     expression_id, query_time_dict = compute.generate_random_id(
         graphDB_Driver, query_time_dict
@@ -1820,7 +1927,7 @@ def api_create_scalar_symbol():
             logger.info("dimension_luminous_intensity =" + dimension_luminous_intensity)
         else:
             dimension_luminous_intensity = 0
-    author_name_latex = "ben"
+    author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
     scalar_id, query_time_dict = compute.generate_random_id(
         graphDB_Driver, query_time_dict
@@ -1972,7 +2079,7 @@ def api_create_vector_symbol():
             logger.info("vector_number_of_entries =" + vector_number_of_entries)
         else:
             vector_number_of_entries = ""
-    author_name_latex = "ben"
+    author_name_latex = g.current_author["author_name_latex"]
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
     symbol_id, query_time_dict = compute.generate_random_id(
@@ -2119,7 +2226,7 @@ def api_create_matrix_symbol():
             logger.info("matrix_number_of_columns =" + matrix_number_of_columns)
         else:
             matrix_number_of_columns = ""
-    author_name_latex = "ben"
+    author_name_latex = g.current_author["author_name_latex"]
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
     symbol_id, query_time_dict = compute.generate_random_id(
@@ -2309,7 +2416,7 @@ def api_create_operation_symbol():
                 },
                 title="Missing Field",
             )
-    author_name_latex = "ben"
+    author_name_latex = g.current_author["author_name_latex"]
 
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -2451,7 +2558,7 @@ def api_create_relation_symbol():
         else:
             relation_reference_latex = ""
 
-    author_name_latex = "ben"
+    author_name_latex = g.current_author["author_name_latex"]
 
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -2517,6 +2624,8 @@ def api_edit_derivation(derivation_id: str):
                     data_from_user.get(form_key),
                 )
                 updated_fields.append(node_property)
+        if updated_fields:
+            _stamp_last_modified(session, "derivation", derivation_id)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -2587,6 +2696,8 @@ def api_edit_inference_rule(infrule_id: str):
                     data_from_user.get(form_key),
                 )
                 updated_fields.append(node_property)
+        if updated_fields:
+            _stamp_last_modified(session, "inference_rule", infrule_id)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -2660,7 +2771,10 @@ def api_edit_expression(expression_id: str):
     expression_reference_latex = data_from_user.get(
         "expression_reference_latex"
     ) or existing_expression_dict.get("reference_latex", "")
-    author_name_latex = existing_expression_dict.get("author_name_latex", "ben")
+    # Preserve the original creator's identity on edits rather than overwriting it
+    # with whoever happens to be making this particular change.
+    author_name_latex = existing_expression_dict.get("author_name_latex", "unknown")
+    last_modified_by_latex = g.current_author["author_name_latex"]
     with graphDB_Driver.session() as session:
         session.write_transaction(
             neo4j_query.edit_expression,
@@ -2674,9 +2788,14 @@ def api_edit_expression(expression_id: str):
             expression_reference_latex,
             author_name_latex,
         )
+        _stamp_last_modified(session, "expression", expression_id)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
-        data={"status": "expression updated successfully", "id": expression_id},
+        data={
+            "status": "expression updated successfully",
+            "id": expression_id,
+            "last_modified_by_latex": last_modified_by_latex,
+        },
         links={
             "self": hal_link(
                 url_for(
@@ -2749,6 +2868,8 @@ def api_edit_scalar(symbol_id: str):
                     data_from_user.get(form_key),
                 )
                 updated_fields.append(node_property)
+        if updated_fields:
+            _stamp_last_modified(session, "scalar", symbol_id)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -2817,6 +2938,8 @@ def api_edit_vector(symbol_id: str):
                     data_from_user.get(form_key),
                 )
                 updated_fields.append(node_property)
+        if updated_fields:
+            _stamp_last_modified(session, "vector", symbol_id)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -2885,6 +3008,8 @@ def api_edit_matrix(symbol_id: str):
                     data_from_user.get(form_key),
                 )
                 updated_fields.append(node_property)
+        if updated_fields:
+            _stamp_last_modified(session, "matrix", symbol_id)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -2952,6 +3077,8 @@ def api_edit_operation(operation_id: str):
                     data_from_user.get(form_key),
                 )
                 updated_fields.append(node_property)
+        if updated_fields:
+            _stamp_last_modified(session, "operation", operation_id)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -3020,6 +3147,8 @@ def api_edit_relation(relation_id: str):
                     data_from_user.get(form_key),
                 )
                 updated_fields.append(node_property)
+        if updated_fields:
+            _stamp_last_modified(session, "relation", relation_id)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
