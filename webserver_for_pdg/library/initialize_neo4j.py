@@ -9,7 +9,8 @@
 import time
 import logging
 
-import neo4j  # for the exceptions
+# for the exceptions
+import neo4j  # type: ignore[import-untyped]
 from neo4j import GraphDatabase
 
 from . import neo4j_query
