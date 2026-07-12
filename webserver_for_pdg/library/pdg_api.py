@@ -86,7 +86,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 from . import neo4j_query
-#from . import compute
+
+# from . import compute
 # from . import latex
 from . import list_of_valid
 
@@ -1396,9 +1397,7 @@ def api_create_derivation():
     # author_name_latex = latex.make_string_safe_for_latex(current_user.email)
     author_name_latex = g.current_author["author_name_latex"]
 
-    derivation_id, query_time_dict = generate_random_id(
-        graphDB_Driver, query_time_dict
-    )
+    derivation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
     logger.info("pdg_app/api_create_derivation: derivation_id=" + derivation_id)
 
     # as per https://strftime.org/
@@ -1485,45 +1484,137 @@ def api_create_inference_rule():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE]  start " + trace_id)
-    # query_time_dict = {}  # type: query_timing_result_type
-
-    if request.is_json:  # "Content-Type: application/json"
+    up_link = {
+        "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point")
+    }
+    if request.is_json:
         data_from_user = request.get_json()
         logger.info("data_from_user = " + str(data_from_user))
-
-        # required
-        if "_latex" in data_from_user.keys():
-            _latex = data_from_user["_latex"]
+        if "inference_rule_name_latex" in data_from_user.keys():
+            inference_rule_name_latex = data_from_user["inference_rule_name_latex"]
         else:
             return hal_error(
-                "need to provide _latex",
+                "need to provide inference_rule_name_latex",
                 400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
+                links=up_link,
                 title="Missing Field",
             )
+        if "inference_rule_latex" in data_from_user.keys():
+            inference_rule_latex = data_from_user["inference_rule_latex"]
+        else:
+            return hal_error(
+                "need to provide inference_rule_latex",
+                400,
+                links=up_link,
+                title="Missing Field",
+            )
+        number_of_inputs = data_from_user.get("number_of_inputs", 0)
+        number_of_feeds = data_from_user.get("number_of_feeds", 0)
+        number_of_outputs = data_from_user.get("number_of_outputs", 0)
     else:
         logger.info("request.args=" + str(request.args))
-        _latex = request.args.get("_latex")
-        if _latex:
-            logger.info("_latex =" + _latex)
+        inference_rule_name_latex = request.args.get("inference_rule_name_latex")
+        if inference_rule_name_latex:
+            logger.info("inference_rule_name_latex =" + inference_rule_name_latex)
         else:
             return hal_error(
-                "need to provide _latex",
+                "need to provide inference_rule_name_latex",
                 400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
+                links=up_link,
                 title="Missing Field",
             )
+        inference_rule_latex = request.args.get("inference_rule_latex")
+        if inference_rule_latex:
+            logger.info("inference_rule_latex =" + inference_rule_latex)
+        else:
+            return hal_error(
+                "need to provide inference_rule_latex",
+                400,
+                links=up_link,
+                title="Missing Field",
+            )
+        number_of_inputs = request.args.get("number_of_inputs", 0)
+        number_of_feeds = request.args.get("number_of_feeds", 0)
+        number_of_outputs = request.args.get("number_of_outputs", 0)
+    try:
+        number_of_inputs = int(number_of_inputs)
+        number_of_feeds = int(number_of_feeds)
+        number_of_outputs = int(number_of_outputs)
+    except (TypeError, ValueError):
+        return hal_error(
+            "number_of_inputs, number_of_feeds, and number_of_outputs must be integers",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    if number_of_inputs < 0 or number_of_feeds < 0 or number_of_outputs < 0:
+        return hal_error(
+            "number_of_inputs, number_of_feeds, and number_of_outputs must not be negative",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    if number_of_inputs == 0 and number_of_feeds == 0 and (number_of_outputs == 0):
+        return hal_error(
+            "at least one of number_of_inputs, number_of_feeds, or number_of_outputs must be greater than 0",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    list_of_inference_rule_dicts = []
+    with graphDB_Driver.session() as session:
+        list_of_inference_rule_dicts = session.read_transaction(
+            neo4j_query.get_nodes_of_type, "inference_rule"
+        )
+    for inference_rule_dict in list_of_inference_rule_dicts:
+        if inference_rule_dict["name_latex"] == inference_rule_name_latex:
+            return hal_error(
+                "inference rule name '"
+                + str(inference_rule_name_latex)
+                + "' already exists",
+                409,
+                links=up_link,
+                title="Conflict",
+            )
+    author_name_latex = g.current_author["author_name_latex"]
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+    query_time_dict = {}
+    inference_rule_id, query_time_dict = generate_random_id(
+        graphDB_Driver, query_time_dict
+    )
+    logger.info(
+        "pdg_app/api_create_inference_rule: inference_rule_id=" + inference_rule_id
+    )
+    with graphDB_Driver.session() as session:
+        session.write_transaction(
+            neo4j_query.add_inference_rule,
+            inference_rule_id,
+            inference_rule_name_latex,
+            inference_rule_latex,
+            number_of_inputs,
+            number_of_feeds,
+            number_of_outputs,
+            now_str,
+            author_name_latex,
+        )
+    logger.info("[TRACE]  end " + trace_id)
     return hal_response(
-        data={"status": "inference rule added successfully"},
+        data={
+            "status": "inference rule "
+            + str(inference_rule_name_latex)
+            + " added successfully",
+            "id": inference_rule_id,
+            "created": now_str,
+        },
         links={
+            "self": hal_link(
+                url_for(
+                    ".api_inference_rule_metadata",
+                    infrule_id=inference_rule_id,
+                    _external=True,
+                ),
+                "Get the new inference rule",
+            ),
             "collection": hal_link(
                 url_for(".api_list_inference_rules", _external=True),
                 "List of Inference Rules",
@@ -1531,6 +1622,33 @@ def api_create_inference_rule():
             "up": hal_link(
                 url_for(".api_start_here", _external=True), "API Entry Point"
             ),
+        },
+        templates={
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "inference_rule_name_latex",
+                        required=True,
+                        value=inference_rule_name_latex,
+                    ),
+                    hal_property(
+                        "inference_rule_latex",
+                        required=True,
+                        value=inference_rule_latex,
+                    ),
+                    hal_property(
+                        "number_of_inputs", type_="number", value=number_of_inputs
+                    ),
+                    hal_property(
+                        "number_of_feeds", type_="number", value=number_of_feeds
+                    ),
+                    hal_property(
+                        "number_of_outputs", type_="number", value=number_of_outputs
+                    ),
+                ],
+                title="Edit this inference rule",
+            )
         },
         status=201,
     )
@@ -1693,9 +1811,7 @@ def api_create_expression():
             )
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    expression_id, query_time_dict = generate_random_id(
-        graphDB_Driver, query_time_dict
-    )
+    expression_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
     with graphDB_Driver.session() as session:
         session.write_transaction(
             neo4j_query.add_expression,
@@ -1990,9 +2106,7 @@ def api_create_scalar_symbol():
             dimension_luminous_intensity = 0
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    scalar_id, query_time_dict = generate_random_id(
-        graphDB_Driver, query_time_dict
-    )
+    scalar_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
     with graphDB_Driver.session() as session:
         session.write_transaction(
             neo4j_query.add_scalar_symbol,
@@ -2143,9 +2257,7 @@ def api_create_vector_symbol():
     author_name_latex = g.current_author["author_name_latex"]
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    symbol_id, query_time_dict = generate_random_id(
-        graphDB_Driver, query_time_dict
-    )
+    symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
     with graphDB_Driver.session() as session:
         session.write_transaction(
             neo4j_query.add_vector_symbol,
@@ -2290,9 +2402,7 @@ def api_create_matrix_symbol():
     author_name_latex = g.current_author["author_name_latex"]
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    symbol_id, query_time_dict = generate_random_id(
-        graphDB_Driver, query_time_dict
-    )
+    symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
     with graphDB_Driver.session() as session:
         session.write_transaction(
             neo4j_query.add_matrix_symbol,
@@ -2482,9 +2592,7 @@ def api_create_operation_symbol():
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    operation_id, query_time_dict = generate_random_id(
-        graphDB_Driver, query_time_dict
-    )
+    operation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
 
     # https://neo4j.com/docs/python-manual/current/session-api/
     with graphDB_Driver.session() as session:
@@ -2658,9 +2766,7 @@ def api_create_relation_symbol():
     # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    relation_id, query_time_dict = generate_random_id(
-        graphDB_Driver, query_time_dict
-    )
+    relation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
 
     # https://neo4j.com/docs/python-manual/current/session-api/
     with graphDB_Driver.session() as session:
