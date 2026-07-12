@@ -594,10 +594,10 @@ def add_X_to_both_sides(
     latex_expansion:  Add $#1$ to both sides of Eq.~\ref{eq:#2}.
 
 
-    >>> input_expr = parse_latex("a = b")
-    >>> feed = parse_latex("c")
-    >>> output_expr = parse_latex("a + c = b + c")
-    >>> add_X_to_both_sides(input_expr, feed, output_expr)
+    > > > input_expr = parse_latex("a = b")
+    > > > feed = parse_latex("c")
+    > > > output_expr = parse_latex("a + c = b + c")
+    > > > add_X_to_both_sides(input_expr, feed, output_expr)
     'valid'
     """
     trace_id = str(uuid.uuid4())
@@ -661,11 +661,13 @@ def subtract_X_from_both_sides(
     get a - c = b - c
 
 
-    >>> input_expr = parse_latex("a = b")
-    >>> feed = parse_latex("c")
-    >>> output_expr = parse_latex("a - c = b - c")
-    >>> subtract_X_from_both_sides(input_expr, feed, output_expr)
+    >>> input_dicts = [{"latex_relation": "=", "sympy_lhs": "a", "sympy_rhs": "b"}]
+    >>> feed_dicts = [{"sympy": "c"}]
+    >>> output_dicts = [{"latex_relation": "=", "sympy_lhs": "a - c", "sympy_rhs": "b - c"}]
+    >>> subtract_X_from_both_sides(input_dicts, feed_dicts, output_dicts)
     'valid'
+
+
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
@@ -981,10 +983,10 @@ def divide_both_sides_by(
 
 
 
-    >>> input_expr = parse_latex("a + b = c")
-    >>> feed = parse_latex("d")
-    >>> output_expr = parse_latex("(a + b)/d = c/d")
-    >>> divide_both_sides_by(input_expr, feed, output_expr)
+    > > > input_expr = parse_latex("a + b = c")
+    > > > feed = parse_latex("d")
+    > > > output_expr = parse_latex("(a + b)/d = c/d")
+    > > > divide_both_sides_by(input_expr, feed, output_expr)
     'valid'
     """
     trace_id = str(uuid.uuid4())
@@ -1118,11 +1120,10 @@ def change_variable_X_to_Y(
         from validate_steps_sympy import *
         doctest.run_docstring_examples(change_variable_X_to_Y, globals(), verbose=True)
 
-    >>> latex_dict = {}
-    >>> latex_dict['input'] = [{'LHS': parse_latex('a + b'), 'RHS': parse_latex('c')}]
-    >>> latex_dict['feed'] = [parse_latex('b'), parse_latex('d')]
-    >>> latex_dict['output'] = [{'LHS': parse_latex('a + d'), 'RHS': parse_latex('c')}]
-    >>> change_variable_X_to_Y(latex_dict)
+    >>> list_of_input_dicts = [{'LHS': parse_latex('a + b'), 'RHS': parse_latex('c')}]
+    >>> list_of_feed_dicts = [parse_latex('b'), parse_latex('d')]
+    >>> list_of_output_dicts = [{'LHS': parse_latex('a + d'), 'RHS': parse_latex('c')}]
+    >>> change_variable_X_to_Y(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
     trace_id = str(uuid.uuid4())
@@ -1175,11 +1176,10 @@ def multiply_LHS_by_unity(
     doctest.run_docstring_examples(multiply_LHS_by_unity, globals(), verbose=True)
 
 
-    >>> latex_dict = {}
-    >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')}]
-    >>> latex_dict['feed'] = [parse_latex('c/c')]
-    >>> latex_dict['output'] = [{'LHS': parse_latex('(a c)/c'), 'RHS': parse_latex('b')}]
-    >>> multiply_LHS_by_unity(latex_dict)
+    >>> list_of_input_dicts = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')}]
+    >>> list_of_feed_dicts = [parse_latex('c/c')]
+    >>> list_of_output_dicts = [{'LHS': parse_latex('(a c)/c'), 'RHS': parse_latex('b')}]
+    >>> multiply_LHS_by_unity(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
     trace_id = str(uuid.uuid4())
@@ -1233,11 +1233,10 @@ def multiply_RHS_by_unity(
     mult by (c/c)
     get a = (b*c)/c
 
-    >>> latex_dict = {}
-    >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')}]
-    >>> latex_dict['feed'] = [parse_latex('c/c')]
-    >>> latex_dict['output'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('(b c)/c')}]
-    >>> multiply_RHS_by_unity(latex_dict)
+    >>> list_of_input_dicts = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')}]
+    >>> list_of_feed_dicts = [parse_latex('c/c')]
+    >>> list_of_output_dicts = [{'LHS': parse_latex('a'), 'RHS': parse_latex('(b c)/c')}]
+    >>> multiply_RHS_by_unity(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
     trace_id = str(uuid.uuid4())
@@ -1296,11 +1295,10 @@ def add_zero_to_LHS(
 
         Add zero to LHS of Eq.~\ref{eq:#2}, where $0=#1$.
 
-    >>> latex_dict = {}
-    >>> latex_dict['input'] = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
-    >>> latex_dict['feed'] = [parse_latex('')]
-    >>> latex_dict['output'] = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
-    >>> add_zero_to_LHS(latex_dict)
+    >>> list_of_input_dicts = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
+    >>> list_of_feed_dicts = [parse_latex('')]
+    >>> list_of_output_dicts = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
+    >>> add_zero_to_LHS(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
     trace_id = str(uuid.uuid4())
@@ -1357,11 +1355,10 @@ def add_zero_to_RHS(
 
         Add zero to RHS of Eq.~\ref{eq:#2}, where $0=#1$.
 
-    >>> latex_dict = {}
-    >>> latex_dict['input'] = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
-    >>> latex_dict['feed'] = [parse_latex('')]
-    >>> latex_dict['output'] = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
-    >>> add_zero_to_RHS(latex_dict)
+    >>> list_of_input_dicts = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
+    >>> list_of_feed_dicts = [parse_latex('')]
+    >>> list_of_output_dicts = [{'LHS': parse_latex(''), 'RHS': parse_latex('')}]
+    >>> add_zero_to_RHS(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
     trace_id = str(uuid.uuid4())
@@ -2148,11 +2145,11 @@ def LHS_of_expr_1_eq_LHS_of_expr_2(
                    The validation is brittle regarding the order of the input list.
 
 
-    >>> latex_dict = {}
-    >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')},
-                               {'LHS': parse_latex('a'), 'RHS': parse_latex('d')}]
-    >>> latex_dict['output'] = [{'LHS': parse_latex('b'), 'RHS': parse_latex('d')}]
-    >>> LHS_of_expr_1_eq_LHS_of_expr_2(latex_dict)
+    >>> list_of_input_dicts = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')},
+    ...                        {'LHS': parse_latex('a'), 'RHS': parse_latex('d')}]
+    >>> list_of_feed_dicts = []
+    >>> list_of_output_dicts = [{'LHS': parse_latex('b'), 'RHS': parse_latex('d')}]
+    >>> LHS_of_expr_1_eq_LHS_of_expr_2(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
 
     """
@@ -2934,11 +2931,10 @@ def change_two_variables_in_expr(
     from validate_steps_sympy import *
     doctest.run_docstring_examples(change_two_variables_in_expr, globals(), verbose=True)
 
-    >>> latex_dict = {}
-    >>> latex_dict['input'] = [{'LHS': parse_latex('a + b'), 'RHS': parse_latex('c')}]
-    >>> latex_dict['feed'] = [parse_latex('b'), parse_latex('d'), parse_latex('a'), parse_latex('f')]
-    >>> latex_dict['output'] = [{'LHS': parse_latex('f + d'), 'RHS': parse_latex('c')}]
-    >>> change_two_variables_in_expr(latex_dict)
+    >>> list_of_input_dicts = [{'LHS': parse_latex('a + b'), 'RHS': parse_latex('c')}]
+    >>> list_of_feed_dicts = [parse_latex('b'), parse_latex('d'), parse_latex('a'), parse_latex('f')]
+    >>> list_of_output_dicts = [{'LHS': parse_latex('f + d'), 'RHS': parse_latex('c')}]
+    >>> change_two_variables_in_expr(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
     trace_id = str(uuid.uuid4())
@@ -3001,11 +2997,10 @@ def change_three_variables_in_expr(
     from validate_steps_sympy import *
     doctest.run_docstring_examples(change_three_variables_in_expr, globals(), verbose=True)
 
-    >>> latex_dict = {}
-    >>> latex_dict['input'] = [{'LHS': parse_latex('a + b'), 'RHS': parse_latex('c')}]
-    >>> latex_dict['feed'] = [parse_latex('b'), parse_latex('d'), parse_latex('a'), parse_latex('f'), parse_latex('c'), parse_latex('g')]
-    >>> latex_dict['output'] = [{'LHS': parse_latex('f + d'), 'RHS': parse_latex('g')}]
-    >>> change_three_variables_in_expr(latex_dict)
+    >>> list_of_input_dicts = [{'LHS': parse_latex('a + b'), 'RHS': parse_latex('c')}]
+    >>> list_of_feed_dicts = [parse_latex('b'), parse_latex('d'), parse_latex('a'), parse_latex('f'), parse_latex('c'), parse_latex('g')]
+    >>> list_of_output_dicts = [{'LHS': parse_latex('f + d'), 'RHS': parse_latex('g')}]
+    >>> change_three_variables_in_expr(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
     trace_id = str(uuid.uuid4())
@@ -3269,11 +3264,12 @@ def square_root_both_sides(
     get sqrt(a) = sqrt(b)
     and sqrt(a) = - sqrt(b)
 
-    >>> latex_dict = {}
-    >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')}]
-    >>> latex_dict['output'] = [{'LHS': parse_latex('\sqrt{a}'), 'RHS': parse_latex('\sqrt{b}')},
-                                {'LHS': parse_latex('\sqrt{a}'), 'RHS': parse_latex('-\sqrt{b}')}]
-    >>> square_root_both_sides(latex_dict)
+
+    >>> list_of_input_dicts = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')}]
+    >>> list_of_feed_dicts = []
+    >>> list_of_output_dicts = [{'LHS': parse_latex('\sqrt{a}'), 'RHS': parse_latex('\sqrt{b}')},
+    ...                         {'LHS': parse_latex('\sqrt{a}'), 'RHS': parse_latex('-\sqrt{b}')}]
+    >>> square_root_both_sides(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
     trace_id = str(uuid.uuid4())
@@ -3307,11 +3303,11 @@ def divide_expr_by_expr(
     and c = d
     get a/c = b/d
 
-    >>> latex_dict = {}
-    >>> latex_dict['input'] = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')},
-                               {'LHS': parse_latex('c'), 'RHS': parse_latex('d')}]
-    >>> latex_dict['output'] = [{'LHS': parse_latex('a/c'), 'RHS': parse_latex('b/d')}]
-    >>> divide_expr_by_expr(latex_dict)
+    >>> list_of_input_dicts = [{'LHS': parse_latex('a'), 'RHS': parse_latex('b')},
+    ...                        {'LHS': parse_latex('c'), 'RHS': parse_latex('d')}]
+    >>> list_of_feed_dicts = []
+    >>> list_of_output_dicts = [{'LHS': parse_latex('a/c'), 'RHS': parse_latex('b/d')}]
+    >>> divide_expr_by_expr(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
     trace_id = str(uuid.uuid4())
