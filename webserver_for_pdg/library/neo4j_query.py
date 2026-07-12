@@ -1916,56 +1916,58 @@ def add_feed(
     return
 
 
-@trace_execution
-def add_quantum_operator_symbol(
-    tx: Transaction,
-    symbol_id: str,
-    symbol_name: str,
-    symbol_latex: str,
-    symbol_description: str,
-    symbol_requires_arguments: bool,
-    symbol_reference: str,
-    now_str: str,
-    author_name_latex: str,
-) -> None:
-    """
-    nothing returned by function because action is to write change to Neo4j database
+# @trace_execution
+# def add_quantum_operator_symbol(
+#     tx: Transaction,
+#     symbol_id: str,
+#     symbol_name: str,
+#     symbol_latex: str,
+#     symbol_description: str,
+#     symbol_requires_arguments: bool,
+#     symbol_reference: str,
+#     now_str: str,
+#     author_name_latex: str,
+# ) -> None:
+#     """
+#     nothing returned by function because action is to write change to Neo4j database
 
-    """
+#     Note: 2026-07-12: Claude Sonnet 5 detected that this is an orphan function --
+#     not currently used by any web or API calls.
+#     """
 
-    params = {
-        "id": str(symbol_id),
-        "name": str(symbol_name),
-        "latex": str(symbol_latex),
-        "desc": str(symbol_description),
-        "created": now_str,
-        "author": str(author_name_latex),
-        "req_args": symbol_requires_arguments,
-        "ref": str(symbol_reference),
-    }
+#     params = {
+#         "id": str(symbol_id),
+#         "name": str(symbol_name),
+#         "latex": str(symbol_latex),
+#         "desc": str(symbol_description),
+#         "created": now_str,
+#         "author": str(author_name_latex),
+#         "req_args": symbol_requires_arguments,
+#         "ref": str(symbol_reference),
+#     }
 
-    query = """
-        MERGE (qo:quantum_operator:a_node {id: $id})
-        ON CREATE SET 
-            qo.created_datetime = $created,
-            qo.name_latex = $name,
-            qo.latex = $latex,
-            qo.description_latex = $desc,
-            qo.author_name_latex = $author,
-            qo.requires_arguments = $req_args,
-            qo.reference_latex = $ref
-        ON MATCH SET 
-            qo.name_latex = $name,
-            qo.latex = $latex,
-            qo.description_latex = $desc,
-            qo.author_name_latex = $author,
-            qo.requires_arguments = $req_args,
-            qo.reference_latex = $ref
-            // Note: created_datetime is NOT updated here
-    """
-    tx.run(query, params).consume()
+#     query = """
+#         MERGE (qo:quantum_operator:a_node {id: $id})
+#         ON CREATE SET
+#             qo.created_datetime = $created,
+#             qo.name_latex = $name,
+#             qo.latex = $latex,
+#             qo.description_latex = $desc,
+#             qo.author_name_latex = $author,
+#             qo.requires_arguments = $req_args,
+#             qo.reference_latex = $ref
+#         ON MATCH SET
+#             qo.name_latex = $name,
+#             qo.latex = $latex,
+#             qo.description_latex = $desc,
+#             qo.author_name_latex = $author,
+#             qo.requires_arguments = $req_args,
+#             qo.reference_latex = $ref
+#             // Note: created_datetime is NOT updated here
+#     """
+#     tx.run(query, params).consume()
 
-    return
+#     return
 
 
 @trace_execution
