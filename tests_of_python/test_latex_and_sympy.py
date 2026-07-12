@@ -1,7 +1,18 @@
+#!/usr/bin/env python3
+
+# Physics Derivation Graph
+# Ben Payne, 2025
+# https://creativecommons.org/licenses/by/4.0/
+# Attribution 4.0 International (CC BY 4.0)
+
 import logging
 import pytest
 import sympy
 from sympy import *
+
+# Remove these names so pytest does not try to collect them
+del test, doctest
+
 from webserver_for_pdg.library.latex_and_sympy import *
 
 logger = logging.getLogger(__name__)
