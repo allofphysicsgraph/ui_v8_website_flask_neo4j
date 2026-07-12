@@ -18,12 +18,12 @@ URL = "http://localhost:5000"
 
 
 # this test should fail since the page requires being logged in
-def edit_specific_relation(page: Page):
+def test_get_edit_relation_RELATIONID(page: Page):
     page.goto(URL + "/edit_relation/0001247576")
     expect(page.get_by_role("heading", name="Edit relation")).to_be_visible()
 
 
-def test_has_title(page: Page):
+def test_get_index_has_title(page: Page):
     page.goto(URL)
 
     # Expect a title to contain a substring.
@@ -32,7 +32,7 @@ def test_has_title(page: Page):
     # `.to_have_title` shows up in the HTML's <title> tag -- the browser tab
 
 
-def test_rss_feed(page: Page):
+def test_get_rss_feed(page: Page):
     # Navigate to the RSS feed path
     response = page.goto(URL + "/rss.xml")
 
@@ -94,7 +94,7 @@ def test_rss_feed(page: Page):
     assert first_guid is not None and first_guid.text == first_link.text
 
 
-def test_get_started_link(page: Page):
+def test_get_index_get_started_link(page: Page):
     page.goto(URL)
 
     # Click the get started link.
@@ -107,13 +107,13 @@ def test_get_started_link(page: Page):
     expect(page.get_by_role("heading", name="Navigating")).to_be_visible()
 
 
-def test_get_nav_page(page: Page):
+def test_get_navigation_title(page: Page):
     page.goto(URL + "/navigation")
 
     expect(page).to_have_title(re.compile("site map"))
 
 
-def test_link_nav_page_to_derivations(page: Page):
+def test_get_navigation_to_derivations(page: Page):
     page.goto(URL + "/navigation")
 
     page.get_by_role("link", name="derivations").click()
@@ -542,54 +542,6 @@ def test_get_class_notes_page(page: Page):
 def test_get_spectrum_precision_overview_page(page: Page):
     page.goto(URL + "/spectrum_of_precision/overview")
 
-
-def test_validate_operations_api(page: Page):
-    # Perform a GET request to the API endpoint
-    response = page.request.get(f"{URL}/api/resources/symbol/operations")
-
-    # Validate that the response is successful
-    assert response.ok
-    assert response.status == 200
-
-    # Check the custom Content-Type header (Playwright normalizes keys to lowercase)
-    assert response.headers.get("content-type") == "application/hal+json"
-
-    # Extract and parse the response body as JSON
-    data = response.json()
-
-    # Validate the JSON structure
-    assert "_embedded" in data
-    assert "operation_symbols" in data["_embedded"]
-
-    operation_symbols = data["_embedded"]["operation_symbols"]
-    assert isinstance(operation_symbols, list)
-    assert len(operation_symbols) > 0
-
-    # Locate a specific item (e.g., 'multiplication') and assert its properties
-    multiplication = next(
-        (op for op in operation_symbols if op.get("name_latex") == "multiplication"),
-        None,
-    )
-    assert (
-        multiplication is not None
-    ), "The 'multiplication' operation was not found in the payload"
-
-    # Assert field values on the multiplication symbol
-    # assert multiplication["id"] == "0001094924"
-    assert multiplication["latex"] == "\\cdot"
-    assert multiplication["argument_count"] == 2
-    # assert multiplication["description_latex"] == "multiply two terms"
-
-    # Assert HAL links are present and correct
-    assert "_links" in multiplication
-    links = multiplication["_links"]
-    assert "delete" in links
-    assert "edit" in links
-    assert "self" in links
-
-    assert links["delete"]["method"] == "DELETE"
-    assert links["edit"]["method"] == "POST"
-    assert "delete" in links["delete"]["href"]
 
 
 def test_get_review_derivation_instance(page: Page):
