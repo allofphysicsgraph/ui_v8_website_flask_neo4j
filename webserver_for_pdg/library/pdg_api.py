@@ -22,9 +22,9 @@ HTTP methods supported by the APIs in this file:
 Both `POST` and `PUT` send data to a server to create/update a resource.
 
 +---------------------------------------------------------------+--------------------------------------------------------------+
-|                      `PUT`                                    |                `POST`                                         |
+|                      `PUT`                                    |                `POST`                                        |
 +===============================================================+==============================================================+
-| Idempotent                                                    | Not Idempotent
+| Idempotent                                                    | Not Idempotent                                               |
 +---------------------------------------------------------------+--------------------------------------------------------------+
 | Multiple identical requests result in the same server state.  | Multiple identical requests will create duplicate resources. |
 +---------------------------------------------------------------+--------------------------------------------------------------+
