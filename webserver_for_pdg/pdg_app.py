@@ -542,6 +542,11 @@ from library.pdg_api import api_bp
 
 web_app.register_blueprint(api_bp)
 
+from library.pdg_api_not_HATEOAS import api_nohateoas_bp
+
+web_app.register_blueprint(api_nohateoas_bp)
+
+
 ######################## END importing blueprints (aka routes in other files) ##################
 
 
