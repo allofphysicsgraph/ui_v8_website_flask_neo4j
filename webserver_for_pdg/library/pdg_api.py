@@ -1281,7 +1281,7 @@ def api_create_inference_rule():
 
         # required
         if "_latex" in data_from_user.keys():
-            _latex = data_from_user[""]
+            _latex = data_from_user["_latex"]
         else:
             return hal_error(
                 "need to provide _latex",
