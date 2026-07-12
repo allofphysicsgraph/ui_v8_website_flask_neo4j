@@ -8,6 +8,7 @@ tests_of_web_interface/playwright/pytest_report.html
 tests_of_web_interface/playwright/.pytest_cache
 documentation_generated_sphinx/_build/
 documentation_generated_sphinx/logs/
+analysis_of_log_files/*.log
 .coverage*
 .env
 .env.google
