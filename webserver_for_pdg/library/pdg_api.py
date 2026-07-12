@@ -48,9 +48,11 @@ When sending data via a `POST` or `PUT` request, two common formats (specified v
 
 Prompt:
 You are a senior developer with decades of Python experience. You have deep knowledge of HATEOAS-compliant API and are recognized across the world for your quality software development.
+
 Review this file and identify areas that need improvement. If there are things that are missing identify the gap explicitly.
 I don't care about efficiency or latency.
 
+If you have questions, AskUserQuestion
 
 """
 
@@ -1415,12 +1417,58 @@ def api_create_derivation():
             now_str,
             author_name_latex,
         )
-        # query_time_dict["pdg_api/api_create_derivation: add_derivation"] = round(
-        #     time.time() - query_start_time, 3
-        # )
-
-    return jsonify(
-        {"STATUS": "derivation " + str(derivation_name_latex) + " added successfully"}
+    return hal_response(
+        data={
+            "status": "derivation "
+            + str(derivation_name_latex)
+            + " added successfully",
+            "id": derivation_id,
+            "created": now_str,
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_derivation_metadata",
+                    derivation_id=derivation_id,
+                    _external=True,
+                ),
+                "Get the new derivation",
+            ),
+            "steps": hal_link(
+                url_for(
+                    ".api_derivation_steps", derivation_id=derivation_id, _external=True
+                ),
+                "View derivation steps",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_derivations", _external=True), "List of Derivations"
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        templates={
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "derivation_name_latex",
+                        required=True,
+                        value=derivation_name_latex,
+                    ),
+                    hal_property(
+                        "derivation_abstract_latex",
+                        required=True,
+                        value=derivation_abstract_latex,
+                    ),
+                    hal_property(
+                        "derivation_reference_latex", value=derivation_reference_latex
+                    ),
+                ],
+                title="Edit this derivation",
+            )
+        },
+        status=201,
     )
 
 
@@ -1472,7 +1520,19 @@ def api_create_inference_rule():
                 },
                 title="Missing Field",
             )
-    return jsonify({"STATUS": "inference rule added successfully"})
+    return hal_response(
+        data={"status": "inference rule added successfully"},
+        links={
+            "collection": hal_link(
+                url_for(".api_list_inference_rules", _external=True),
+                "List of Inference Rules",
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        status=201,
+    )
 
 
 @api_bp.route("/resources/expression", methods=["POST"])
@@ -2440,7 +2500,41 @@ def api_create_operation_symbol():
             author_name_latex,
         )
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
-    return jsonify({"STATUS": "operation symbol added successfully"})
+    return hal_response(
+        data={
+            "status": "operation symbol added successfully",
+            "operation_id": operation_id,
+            "created": now_str,
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_operation_metadata", operation_id=operation_id, _external=True
+                ),
+                "Get operation metadata",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_operation_symbols", _external=True),
+                "List of Operation Symbols",
+            ),
+            "edit": hal_link(
+                url_for(
+                    ".api_edit_operation", operation_id=operation_id, _external=True
+                ),
+                "Edit this operation",
+            ),
+            "delete": hal_link(
+                url_for(
+                    ".api_delete_operation", operation_id=operation_id, _external=True
+                ),
+                "Delete this operation",
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        status=201,
+    )
 
 
 @api_bp.route("/resources/symbol/relation", methods=["POST"])
@@ -2581,8 +2675,39 @@ def api_create_relation_symbol():
             author_name_latex,
         )
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
-
-    return jsonify({"STATUS": "relation symbol added successfully"})
+    return hal_response(
+        data={
+            "status": "relation symbol added successfully",
+            "relation_id": relation_id,
+            "created": now_str,
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_relation_metadata", relation_id=relation_id, _external=True
+                ),
+                "Get relation metadata",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_relation_symbols", _external=True),
+                "List of Relation Symbols",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_relation", relation_id=relation_id, _external=True),
+                "Edit this relation",
+            ),
+            "delete": hal_link(
+                url_for(
+                    ".api_delete_relation", relation_id=relation_id, _external=True
+                ),
+                "Delete this relation",
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        status=201,
+    )
 
 
 @api_bp.route("/resources/derivation/<string:derivation_id>/edit", methods=["POST"])
@@ -3218,9 +3343,55 @@ def api_derivation_metadata(derivation_id: str):
         )
         # query_time_dict["pdg_api/: "] = time.time() - query_start_time
     logger.info("derivation_dict=" + str(derivation_dict))
-
+    if derivation_dict is None:
+        return hal_error(
+            f"Derivation {derivation_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_derivations", _external=True),
+                    "List of Derivations",
+                )
+            },
+            title="Not Found",
+        )
     logger.info("[TRACE] end " + trace_id)
-    return jsonify(derivation_dict)
+    return hal_response(
+        data={"metadata": derivation_dict},
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_derivation_metadata",
+                    derivation_id=derivation_id,
+                    _external=True,
+                ),
+                "Get derivation metadata",
+            ),
+            "steps": hal_link(
+                url_for(
+                    ".api_derivation_steps", derivation_id=derivation_id, _external=True
+                ),
+                "View derivation steps",
+            ),
+            "edit": hal_link(
+                url_for(
+                    ".api_edit_derivation", derivation_id=derivation_id, _external=True
+                ),
+                "Edit this derivation",
+            ),
+            "delete": hal_link(
+                url_for(
+                    ".api_delete_derivation",
+                    derivation_id=derivation_id,
+                    _external=True,
+                ),
+                "Delete this derivation",
+            ),
+            "up": hal_link(
+                url_for(".api_list_derivations", _external=True), "List of Derivations"
+            ),
+        },
+    )
 
 
 @api_bp.route("/resources/inference_rule/<string:infrule_id>/metadata", methods=["GET"])
@@ -3507,48 +3678,33 @@ def api_operation_metadata(operation_id: str):
             },
             title="Not Found",
         )
-
-    response = {
-        "metadata": operation_dict,
-        "_links": {
-            "self": {
-                "href": url_for(
+    return hal_response(
+        data={"metadata": operation_dict},
+        links={
+            "self": hal_link(
+                url_for(
                     ".api_operation_metadata", operation_id=operation_id, _external=True
                 ),
-                "method": "GET",
-            },
-            "update": {
-                "href": url_for(
-                    ".api_operation_metadata", operation_id=operation_id, _external=True
+                "Get operation metadata",
+            ),
+            "edit": hal_link(
+                url_for(
+                    ".api_edit_operation", operation_id=operation_id, _external=True
                 ),
-                "method": "PATCH",
-                "description": "Update specific metadata fields",
-            },
-            "replace": {
-                "href": url_for(
-                    ".api_operation_metadata", operation_id=operation_id, _external=True
+                "Edit this operation",
+            ),
+            "delete": hal_link(
+                url_for(
+                    ".api_delete_operation", operation_id=operation_id, _external=True
                 ),
-                "method": "PUT",
-                "description": "Replace the entire metadata object",
-            },
-            "expressions": {
-                "href": url_for(
-                    ".api_list_operation_expressions",
-                    operation_id=operation_id,
-                    _external=True,
-                ),
-                "method": "GET",
-                "description": "List all expressions that use this operation",
-            },
-            "parent_operation": {
-                "href": url_for(
-                    ".api_operation_detail", operation_id=operation_id, _external=True
-                ),
-                "method": "GET",
-            },
+                "Delete this operation",
+            ),
+            "up": hal_link(
+                url_for(".api_list_operation_symbols", _external=True),
+                "List of Operation Symbols",
+            ),
         },
-    }
-    return (jsonify(response), 200)
+    )
 
 
 @api_bp.route(
@@ -3644,7 +3800,29 @@ def api_derivation_steps(derivation_id: str):
     # logger.info("list_of_steps=" + str(list_of_steps))
 
     logger.info("[TRACE] end " + trace_id)
-    return jsonify(list_of_steps)
+    return hal_response(
+        data={"count": len(list_of_steps)},
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_derivation_steps", derivation_id=derivation_id, _external=True
+                ),
+                "Steps in this derivation",
+            ),
+            "derivation": hal_link(
+                url_for(
+                    ".api_derivation_metadata",
+                    derivation_id=derivation_id,
+                    _external=True,
+                ),
+                "Get derivation metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_derivations", _external=True), "List of Derivations"
+            ),
+        },
+        embedded={"steps": list_of_steps},
+    )
 
 
 @api_bp.route("/resources/derivation/<string:derivation_id>/delete", methods=["DELETE"])
