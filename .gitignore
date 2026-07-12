@@ -2,10 +2,10 @@ logs/*.log
 logs/*.log.1
 logs/*.log.2
 logs/*.log.3
-tests_of_web_interface/playwright/.coverage
-tests_of_web_interface/playwright/htmlcov/
-tests_of_web_interface/playwright/pytest_report.html
-tests_of_web_interface/playwright/.pytest_cache
+test_web_interface/playwright/.coverage
+test_web_interface/playwright/htmlcov/
+test_web_interface/playwright/pytest_report.html
+test_web_interface/playwright/.pytest_cache
 documentation_generated_sphinx/_build/
 documentation_generated_sphinx/logs/
 analysis_of_log_files/*.log
