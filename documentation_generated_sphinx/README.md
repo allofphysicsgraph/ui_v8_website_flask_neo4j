@@ -10,3 +10,8 @@ make clean
 make html
 ```
 
+If you're on a Mac, on the host use
+```
+open documentation_generated_sphinx/_build/html/index.html 
+```
+to view the content.

@@ -3,7 +3,8 @@ https://pymotw.com/3/doctest/
 
 To use doctest for the entire file,
 ```
-python3 -m doctest -v sympy_validate_step.py
+cd /code
+PYTHONPATH=. pytest --doctest-modules library/sympy_validate_step.py -v
 ```
 That has to run from within a container since the import statements need to be resolved.
 
