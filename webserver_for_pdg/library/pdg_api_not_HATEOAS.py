@@ -7,6 +7,8 @@
 
 
 import os
+import uuid
+import tokenize
 
 from sympy.parsing.sympy_parser import parse_expr
 
@@ -22,6 +24,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .initialize_neo4j import graphDB_Driver
+from . import compute
 
 api_nohateoas_bp = Blueprint("pdg_api_not_HATEOAS", __name__, url_prefix="/api")
 
@@ -81,7 +84,10 @@ def api_png_from_latex():
 
     os.makedirs(path_to_png, exist_ok=True)
 
-    hash_of_user_input = compute.hash_of_string(user_input)
+    if user_input:
+        hash_of_user_input = compute.hash_of_string(user_input)
+    else:
+        return jsonify({"error": "nothing passed in"})
 
     path_to_png_with_filename = path_to_png + hash_of_user_input + ".png"
 

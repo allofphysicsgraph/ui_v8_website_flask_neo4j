@@ -443,11 +443,11 @@ def api_start_here():
                 "title": "List matrices",
                 "type": "GET",
             },
-            "cypher_query": {
-                "href": url_for(".api_cypher_query", _external=True),
-                "title": "Cypher query",
-                "type": "GET",
-            },
+            # "cypher_query": {
+            #     "href": url_for(".api_cypher_query", _external=True),
+            #     "title": "Cypher query",
+            #     "type": "GET",
+            # },
             "whoami": {
                 "href": url_for(".api_whoami", _external=True),
                 "title": "Identify the current API caller",
