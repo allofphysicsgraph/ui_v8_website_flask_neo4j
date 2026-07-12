@@ -940,7 +940,7 @@ def divide_both_sides_by(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     latex_expansion: Divide both sides of Eq.~\ref{eq:#2} by $#1$.
 
     see also multiply_both_sides_by
@@ -1103,7 +1103,7 @@ def change_variable_X_to_Y(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     latex_expansion: Substitute $#1$ for $#2$ in Eq.~\ref{eq:#3}.
 
     given 'a + b = c',
@@ -1160,7 +1160,7 @@ def multiply_LHS_by_unity(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     see also multRHSbyUnity
 
     latex_expansion: Multiply LHS of Eq.~\ref{eq:#2} by 1, which in this case is $#1$
@@ -1224,7 +1224,7 @@ def multiply_RHS_by_unity(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     see also multLHSbyUnity
 
     latex_expansion: Multiply RHS of Eq.~\ref{eq:#2} by 1, which in this case is $#1$
@@ -1282,7 +1282,7 @@ def add_zero_to_LHS(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     see also add_zero_to_RHS
 
     ((feed==0) and (out_lhs0 == (in_lhs0+zero)) and (out_rhs0 == in_rhs0))
@@ -1345,7 +1345,7 @@ def add_zero_to_RHS(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     Example:
 
         given "A*x=B", addZerotoRHS(feed=C-C) yields "A*x=B+C-C"
@@ -1406,7 +1406,7 @@ def take_curl_of_both_sides(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     latex_expansion: Apply curl to both sides of Eq.~\ref{eq:#1}.
 
     ((out_lhs0 == (\nabla \times in_lhs0)) and (out_rhs0 == \nabla \times in_rhs0))
@@ -1419,7 +1419,7 @@ def apply_divergence(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     Curl: $\vec{\nabla} \cdot$
     """
     return "recognized infrule but not yet supported"
@@ -1430,7 +1430,7 @@ def indefinite_integral_over(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     CATEGORY: calculus
 
     latex_expansion: Indefinite integral of both sides of Eq.~\ref{eq:#2} over $#1$.
@@ -1449,7 +1449,7 @@ def indefinite_integration(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     latex_expansion: Indefinite integral of both sides of Eq.~\ref{eq:#1}.
 
     CATEGORY: calculus
@@ -1464,7 +1464,7 @@ def indefinite_integrate_LHS_over(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     CATEGORY: calculus
 
     latex_expansion: Indefinite integral of LHS of Eq.~\ref{eq:#2} over $#1$.
@@ -1479,7 +1479,7 @@ def indefinite_integrate_RHS_over(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     latex_expansion: Indefinite integral of RHS of Eq.~\ref{eq:#2} over $#1$.
 
     CATEGORY: calculus
@@ -1497,7 +1497,7 @@ def integrate_over_from_to(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     CATEGORY: calculus
 
     ((out_lhs0 == (\int_{feed1}^{feed2} in_lhs0 feed0)) and (out_rhs0 == \int_{feed1}^{feed2} in_rhs0 feed0))
@@ -1521,7 +1521,7 @@ def partially_differentiate_with_respect_to(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     CATEGORY: calculus
 
     \frac{\partial}{\partial #1}
@@ -1581,7 +1581,7 @@ def X_dot_both_sides(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     arg \cdot LHS = arg \cdot RHS
     """
     return "recognized infrule but not yet supported"
@@ -1592,7 +1592,7 @@ def both_sides_dot_X(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     LHS \cdot arg = RHS \cdot arg
     """
     return "recognized infrule but not yet supported"
@@ -3263,7 +3263,7 @@ def square_root_both_sides(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     Given a = b
     sqrt both side
     get sqrt(a) = sqrt(b)
@@ -3353,7 +3353,7 @@ def separate_two_vector_components(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     Given a_x \hat{x} + a_y \hat{y} = v_x \hat{x} + v_y \hat{y}
     get a_x = v_x
     and a_y = v_y
@@ -3366,7 +3366,7 @@ def separate_three_vector_components(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     Given a_x \hat{x} + a_y \hat{y} + a_z \hat{z} = v_x \hat{x} + v_y \hat{y} + v_z \hat{z}
     get a_x = v_x
     and a_y = v_y
@@ -3380,7 +3380,7 @@ def evaluate_definite_integral(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     CATEGORY: calculus
 
     Given   a = \int_0^x dx
@@ -3487,7 +3487,7 @@ def apply_operator_to_bra(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     given
     x = \\langle\\psi_{\\alpha}| \\hat{A} |\\psi_{\\beta}\\rangle
     return
@@ -3501,7 +3501,7 @@ def apply_operator_to_ket(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    """
+    r"""
     given
     x = \\langle\\psi_{\\alpha}| \\hat{A} |\\psi_{\\beta}\\rangle
     return
@@ -3571,6 +3571,29 @@ def combine_like_terms(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
+    """Verifies if the output expressions are algebraically equivalent to the input expressions.
+
+    This function parses the left-hand side (LHS) and right-hand side (RHS) of
+    mathematical equations from the input and output dictionaries into SymPy expressions.
+    It computes and simplifies the differences between the input and output sides
+    (LHS to LHS, and RHS to RHS) to determine equivalence.
+
+    Args:
+        list_of_input_dicts: A list of dictionaries representing the input equations.
+            The first element must contain the keys "sympy_lhs" and "sympy_rhs".
+        list_of_feed_dicts: A list of dictionaries representing feed datasets,
+            primarily used for structural validation.
+        list_of_output_dicts: A list of dictionaries representing the simplified/target
+            equations. The first element must contain the keys "sympy_lhs" and
+            "sympy_rhs".
+
+    Returns:
+        A string indicating the validation result:
+        - "valid" if both the LHS and RHS differences simplify to zero.
+        - A validation error message if the content validation check fails.
+        - A string detailing the calculated algebraic differences of the LHS and RHS
+          if they do not simplify to zero.
+    """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     res = validate_that_content_exists(
