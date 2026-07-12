@@ -594,10 +594,10 @@ def add_X_to_both_sides(
     latex_expansion:  Add $#1$ to both sides of Eq.~\ref{eq:#2}.
 
 
-    > > > input_expr = parse_latex("a = b")
-    > > > feed = parse_latex("c")
-    > > > output_expr = parse_latex("a + c = b + c")
-    > > > add_X_to_both_sides(input_expr, feed, output_expr)
+    > > > list_of_input_dicts = parse_latex("a = b")
+    > > > list_of_feed_dicts = parse_latex("c")
+    > > > list_of_output_dicts = parse_latex("a + c = b + c")
+    >>> add_X_to_both_sides(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
     trace_id = str(uuid.uuid4())
@@ -986,7 +986,7 @@ def divide_both_sides_by(
     > > > input_expr = parse_latex("a + b = c")
     > > > feed = parse_latex("d")
     > > > output_expr = parse_latex("(a + b)/d = c/d")
-    > > > divide_both_sides_by(input_expr, feed, output_expr)
+    >>> divide_both_sides_by(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
     trace_id = str(uuid.uuid4())
