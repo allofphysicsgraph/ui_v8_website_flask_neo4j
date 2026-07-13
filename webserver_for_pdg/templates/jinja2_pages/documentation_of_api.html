@@ -250,14 +250,14 @@ curl -b cookies.txt http://localhost/api/v1/resources/derivation/
         }
     ]
     </pre>
-    <h3>GET <a href="{{ url_for('pdg_api.api_cypher_query') }}">{{ url_for('pdg_api.api_cypher_query') }}</a></h3>
+    <h3>GET <a href="{{ url_for('pdg_api_not_HATEOAS.api_cypher_query') }}">{{ url_for('pdg_api_not_HATEOAS.api_cypher_query') }}</a></h3>
         <p>This endpoint allows users to send arbitrary Cypher queries. Use this endpoint with caution.</p>
     <p>Required parameter:</p>
       <ul>
         <li><code>query</code>: The Cypher query to run.</li>
       </ul>
     <p>Example usage:</p>
-    <pre>curl -s http://localhost{{ url_for('pdg_api.api_cypher_query') }} | python3 -m json.tool</pre>
+    <pre>curl -s http://localhost{{ url_for('pdg_api_not_HATEOAS.api_cypher_query') }} | python3 -m json.tool</pre>
 
 
     <h3>POST <a href="http://localhost/api/v1/resources/derivation/create">/api/v1/resources/derivation/create</a></h3>
