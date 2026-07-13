@@ -1252,7 +1252,8 @@ def to_index():
     all_steps, query_time_dict = compute.get_dict_of_steps_in_derivation(
         graphDB_Driver, T_and_f_derivation_ID, query_time_dict
     )
-    assert web_app.static_folder is not None
+    if web_app.static_folder is None:
+        raise ValueError("no static folder")
     try:
         latex.create_d3js_json(
             T_and_f_derivation_ID, all_steps, web_app.static_folder + "/"
@@ -1326,7 +1327,8 @@ def to_navigation():
             raise Exception("unrecognized button")
 
         if file_obj and allowed_bool:
-            assert file_obj.filename is not None
+            if file_obj.filename is None:
+                raise ValueError("missing file name")
 
             logger.info("file_obj.filename=" + str(file_obj.filename))
             filename = secure_filename(file_obj.filename)
@@ -1615,8 +1617,7 @@ def to_add_derivation() -> ResponseReturnValue:
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/to_add_derivation " + trace_id
                 ):
-
-                    session.write_transaction(
+                    was_created = session.write_transaction(
                         neo4j_query.add_derivation,
                         derivation_id,
                         now_str,
@@ -1625,12 +1626,19 @@ def to_add_derivation() -> ResponseReturnValue:
                         derivation_reference_latex,
                         author_name_latex,
                     )
-
+                if not was_created:
+                    flash(
+                        "pdg_app/to_add_derivation: a derivation with that name already exists"
+                    )
+                    logger.error(
+                        "pdg_app/to_add_derivation: duplicate derivation name: "
+                        + derivation_name_latex
+                    )
+                    return redirect(url_for("to_add_derivation"))
                 logger.info("[TRACE] end " + trace_id)
                 return redirect(
                     url_for(
-                        "to_add_step_select_inference_rule",
-                        derivation_id=derivation_id,
+                        "to_add_step_select_inference_rule", derivation_id=derivation_id
                     )
                 )
 
@@ -1708,7 +1716,8 @@ def to_review_derivation(
 
             # path_to_pdf = "/code/static/dumping_grounds/"  # should end with slash
 
-            assert web_app.static_folder is not None
+            if web_app.static_folder is None
+                raise ValueError("Missing static folder")
             try:
                 pdf_filename = latex.create_pdf_for_derivation(
                     all_steps,
@@ -1740,7 +1749,8 @@ def to_review_derivation(
 
             # path_to_tex_file = "/code/static/dumping_grounds/"  # should end with slash
 
-            assert web_app.static_folder is not None
+            if web_app.static_folder is None:
+                raise ValueError("missing static folder")
             try:
                 tex_filename = latex.create_tex_file_for_derivation(
                     all_steps,
@@ -1805,7 +1815,8 @@ def to_review_derivation(
             neo4j_query.get_symbols_for_derivation, derivation_id
         )
 
-    assert web_app.static_folder is not None
+    if web_app.static_folder is None:
+        raise ValueError("missing static folder")
     # only create d3js JSON if the HTML page is going to be rendered
     try:
         latex.create_d3js_json(derivation_id, all_steps, web_app.static_folder + "/")
@@ -1823,7 +1834,8 @@ def to_review_derivation(
     # only create graphviz PNG if the HTML page is going to be rendered
     # SVG isn't available yet; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/14
 
-    assert web_app.static_folder is not None
+    if web_app.static_folder is None:
+        raise ValueError("missing static folder")
     derivation_name_latex = derivation_dict["name_latex"]
     derivation_graphviz_png_filename = latex.create_derivation_png(
         derivation_id,
@@ -2289,7 +2301,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseRetur
                     if "operation_id_to_connect_to_expression" in key:
                         operation_id = val
 
-                        list_of_inference_rule_dicts = session.write_transaction(
+                        _ = session.write_transaction(
                             neo4j_query.connect_symbol_to_expression,
                             operation_id,
                             expression_id,
@@ -2330,74 +2342,46 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseRetur
         elif "edit expression latex" in request.form:
             if web_form_new_expression.validate():
                 logger.info("request.form = " + str(request.form))
-
-                # sanitize latex
-                # TODO: notify user if text was edited
-                # expression_latex_lhs = latex.make_string_safe_for_latex(
-                #     str(web_form_new_expression.expression_latex_lhs.data)
-                #     .strip()
-                #     .replace("\\", "\\\\"))  # due to Neo4j
-
                 expression_latex_lhs = latex.make_string_safe_for_latex(
                     str(web_form_new_expression.expression_latex_lhs.data).strip()
                 )
-
-                # the web UI dropdown returns the symbol ID (and not Latex string)
-                #'symbol_relation_id_to_add', '2222545'
                 expression_relation_id = request.form["symbol_relation_id_to_add"]
-
-                # look up the Latex string. (The other option is to change the schema to expr -> HAS_RELATION -> symbol)
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/ " + trace_id
                 ):
-
                     expression_relation = session.read_transaction(
                         neo4j_query.get_relation_latex, expression_relation_id
                     )
-
-                # expression_latex_rhs = latex.make_string_safe_for_latex(
-                #     str(web_form_new_expression.expression_latex_rhs.data)
-                #     .strip()
-                #     .replace("\\", "\\\\"))  # due to Neo4j
-
+                logger.info(str(expression_relation))
                 expression_latex_rhs = latex.make_string_safe_for_latex(
                     str(web_form_new_expression.expression_latex_rhs.data).strip()
                 )
-                # expression_latex_condition = latex.make_string_safe_for_latex(
-                #     str(web_form_new_expression.expression_latex_condition.data)
-                #     .strip()
-                #     .replace("\\", "\\\\"))  # due to Neo4j
-
                 expression_latex_condition = latex.make_string_safe_for_latex(
                     str(web_form_new_expression.expression_latex_condition.data).strip()
-                    # .replace("\\", "\\\\")  # due to Neo4j
                 )
                 expression_name_latex = latex.make_string_safe_for_latex(
                     str(web_form_new_expression.expression_name_latex.data).strip()
                 )
                 expression_reference_latex = latex.make_string_safe_for_latex(
-                    str(web_form_new_expression.expression_name_latex.data).strip()
+                    str(web_form_new_expression.expression_reference_latex.data).strip()
                 )
                 expression_description_latex = latex.make_string_safe_for_latex(
                     str(
                         web_form_new_expression.expression_description_latex.data
                     ).strip()
                 )
-
                 logger.info("expression_latex_lhs=" + str(expression_latex_lhs))
                 logger.info("expression_latex_rhs=" + str(expression_latex_rhs))
                 logger.info(
                     "expression_latex_condition=" + str(expression_latex_condition)
                 )
-
                 author_name_latex = compute.encode_user_identifier(current_user.email)
 
-                # https://neo4j.com/docs/python-manual/current/session-api/
+                # Check outcome of transaction edit execution
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/ " + trace_id
                 ):
-
-                    session.write_transaction(
+                    success = session.write_transaction(
                         neo4j_query.edit_expression,
                         expression_id,
                         expression_latex_lhs,
@@ -2410,10 +2394,22 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseRetur
                         author_name_latex,
                     )
 
+                if not success:
+                    flash(
+                        "pdg_app/to_edit_expression: an expression with that LHS/relation/RHS already exists"
+                    )
+                    logger.error(
+                        "pdg_app/to_edit_expression: duplicate expression update blocked: "
+                        + expression_latex_lhs
+                        + " "
+                        + expression_relation
+                        + " "
+                        + expression_latex_rhs
+                    )
+
                 return redirect(
                     url_for("to_edit_expression", expression_id=expression_id)
                 )
-
             else:
                 flash(
                     "pdg_app/to_edit_expression: " + str(web_form_new_expression.errors)
@@ -2901,8 +2897,7 @@ def to_add_expression() -> ResponseReturnValue:
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/ " + trace_id
                 ):
-
-                    session.write_transaction(
+                    was_created = session.write_transaction(
                         neo4j_query.add_expression,
                         expression_id,
                         expression_name_latex,
@@ -2915,8 +2910,19 @@ def to_add_expression() -> ResponseReturnValue:
                         now_str,
                         author_name_latex,
                     )
-
-                # after user provides latex for expression have them provide symbol count
+                if not was_created:
+                    flash(
+                        "pdg_app/to_add_expression: an expression with that LHS/relation/RHS already exists"
+                    )
+                    logger.error(
+                        "pdg_app/to_add_expression: duplicate expression: "
+                        + expression_latex_lhs
+                        + " "
+                        + expression_relation
+                        + " "
+                        + expression_latex_rhs
+                    )
+                    return redirect(url_for("to_add_expression"))
                 logger.info("[TRACE] end " + trace_id)
                 return redirect(
                     url_for(
@@ -3156,6 +3162,10 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     elif dict_of_symbol_id_and_type[node_id] == "inference_rule":
         logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_inference_rule", inference_rule_id=node_id))
+
+    elif dict_of_symbol_id_and_type[node_id] == "expression":
+        logger.info("[TRACE] end " + trace_id)
+        return redirect(url_for("to_edit_expression", expression_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "feed":
         logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_feed", feed_id=node_id))
@@ -3177,7 +3187,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     elif dict_of_symbol_id_and_type[node_id] == "value_with_units":
         logger.info("[TRACE] end " + trace_id)
         return redirect(
-            url_for("to_edit_constant_value_and_units", value_with_units=node_id)
+            url_for("to_edit_constant_value_and_units", value_with_units_id=node_id)
         )
     else:
         logger.error("shouldn't reach here")
@@ -3451,16 +3461,16 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> ResponseReturnValue:
         if "edit scalar" in request.form:
             if web_form_symbol_properties.validate():
                 symbol_latex = str(
-                    web_form_symbol_properties.symbol_latex.data
+                    web_form_symbol_properties.scalar_latex.data
                 ).strip()  # .replace("\\","\\\\")
                 symbol_name_latex = str(
-                    web_form_symbol_properties.symbol_name_latex.data
+                    web_form_symbol_properties.scalar_name_latex.data
                 ).strip()
                 symbol_description_latex = str(
-                    web_form_symbol_properties.symbol_description_latex.data
+                    web_form_symbol_properties.scalar_description_latex.data
                 ).strip()
                 symbol_reference_latex = str(
-                    web_form_symbol_properties.symbol_reference_latex.data
+                    web_form_symbol_properties.scalar_reference_latex.data
                 ).strip()
 
                 author_name_latex = compute.encode_user_identifier(current_user.email)
@@ -3672,8 +3682,10 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> ResponseRetur
         if "new value and dimension" in request.form:
             if web_form_constant_properties.validate():
 
-                assert web_form_constant_properties.number_decimal.data is not None
-                assert web_form_constant_properties.number_power.data is not None
+                if web_form_constant_properties.number_decimal.data is  None:
+                    raise ValueError("undefined number_decimal")
+                if web_form_constant_properties.number_power.data is None:
+                    raise ValueError("undefined number_power")
 
                 number_decimal = float(web_form_constant_properties.number_decimal.data)
                 number_power = float(web_form_constant_properties.number_power.data)
@@ -4423,25 +4435,6 @@ def to_add_step_select_expressions(
                 )
                 logger.info("generated step_id=" + str(step_id))
 
-                # for the derivation, determine the list of all sequence_index values,
-                #       then increment max to get the sequence_index for this step
-                list_of_sequence_values = []
-                # https://neo4j.com/docs/python-manual/current/session-api/
-                with graphDB_Driver.session() as session, track_time(
-                    query_time_dict, "pdg_app/ " + trace_id
-                ):
-
-                    list_of_sequence_values = session.read_transaction(
-                        neo4j_query.get_list_of_sequence_values_for_derivation_id,
-                        derivation_id,
-                    )
-
-                logger.info("list_of_sequence_values=" + str(list_of_sequence_values))
-                if len(list_of_sequence_values) > 0:
-                    new_sequence_value = int(max(list_of_sequence_values) + 1)
-                else:
-                    new_sequence_value = 0
-
                 # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
@@ -4467,19 +4460,31 @@ def to_add_step_select_expressions(
                     query_time_dict, "pdg_app/ " + trace_id
                 ):
 
-                    session.write_transaction(
+                    step_result = session.write_transaction(
                         neo4j_query.connect_step_to_derivation,
                         step_id,
                         derivation_id,
                         inference_rule_id,
-                        new_sequence_value,
+                        None,
                         now_str,
                         note_before_step_latex,
                         note_after_step_latex,
                         author_name_latex,
                     )
-
-                    # adding expressions can only be done after step exists
+                    if step_result is None:
+                        flash(
+                            "pdg_app/to_add_step_select_expressions: derivation or inference rule no longer exists"
+                        )
+                        logger.error(
+                            "pdg_app/to_add_step_select_expressions: connect_step_to_derivation found missing derivation_id or inference_rule_id"
+                        )
+                        return redirect(
+                            url_for(
+                                "to_add_step_select_expressions",
+                                derivation_id=derivation_id,
+                                inference_rule_id=inference_rule_id,
+                            )
+                        )
                     session.write_transaction(
                         neo4j_query.connect_expressions_to_step,
                         step_id,
@@ -4669,7 +4674,7 @@ def to_add_symbols_and_operations_for_expression(
             for ke, symbol_id in request.form.items():
                 if "symbol_id_to_connect_to_expression" in ke:
 
-                    list_of_inference_rule_dicts = session.write_transaction(
+                    _ = session.write_transaction(
                         neo4j_query.connect_symbol_to_expression,
                         symbol_id,
                         expression_id,
@@ -5115,7 +5120,7 @@ def to_add_sympy_and_lean_for_feed(
                 query_time_dict, "pdg_app/ " + trace_id
             ):
 
-                list_of_inference_rule_dicts = session.write_transaction(
+                _ = session.write_transaction(
                     neo4j_query.edit_node_property,
                     "feed",
                     feed_id,
@@ -5125,7 +5130,7 @@ def to_add_sympy_and_lean_for_feed(
 
                 # with graphDB_Driver.session() as session, track_time(query_time_dict, "pdg_app/ " + trace_id):
 
-                list_of_inference_rule_dicts = session.write_transaction(
+                _ = session.write_transaction(
                     neo4j_query.edit_node_property,
                     "feed",
                     feed_id,
@@ -5267,8 +5272,7 @@ def to_add_inference_rule() -> ResponseReturnValue:
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/ " + trace_id
                 ):
-
-                    session.write_transaction(
+                    was_created = session.write_transaction(
                         neo4j_query.add_inference_rule,
                         inference_rule_id=inference_rule_id,
                         inference_rule_name=inference_rule_name,
@@ -5279,6 +5283,15 @@ def to_add_inference_rule() -> ResponseReturnValue:
                         now_str=now_str,
                         author_name_latex=author_name_latex,
                     )
+                if not was_created:
+                    flash(
+                        "pdg_app/to_add_inference_rule: an inference rule with that name already exists"
+                    )
+                    logger.error(
+                        "pdg_app/to_add_inference_rule: duplicate inference rule name: "
+                        + inference_rule_name
+                    )
+                    return redirect(url_for("to_add_inference_rule"))
                 logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("to_list_inference_rules"))
             else:
@@ -5481,18 +5494,16 @@ def to_edit_step(
             ):
                 for index, old_value in enumerate(list_of_sequence_values):
                     if new_list[index] != old_value:
-
                         session.write_transaction(
-                            neo4j_query.edit_node_property,
-                            "step",
+                            neo4j_query.edit_step_sequence_index,
+                            derivation_id,
                             step_dict["id"],
-                            "sequence_index",
                             new_list[index],
                         )
 
-            return redirect(
-                url_for("to_review_derivation", derivation_id=derivation_id)
-            )
+                        return redirect(
+                            url_for("to_review_derivation", derivation_id=derivation_id)
+                        )
 
         elif "reorder indices of input expressions" in request.form:
             logger.info("reorder indices of input expressions")
@@ -5691,8 +5702,27 @@ def to_edit_inference_rule(
                     str(web_form_edit.inference_rule_number_of_outputs.data).strip()
                 )
                 author_name_latex = compute.encode_user_identifier(current_user.email)
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
+                try:
+                    assert number_of_inputs >= 0
+                    assert number_of_feeds >= 0
+                    assert number_of_outputs >= 0
+                    assert (
+                        number_of_inputs > 0
+                        or number_of_feeds > 0
+                        or number_of_outputs > 0
+                    )
+                except AssertionError as err:
+                    flash(
+                        "pdg_app/to_edit_inference_rule Assertion error regarding number of inputs,feeds,outputs; try again. "
+                        + str(err)
+                    )
+                    logger.error(str(err))
+                    return redirect(
+                        url_for(
+                            "to_edit_inference_rule",
+                            inference_rule_id=inference_rule_id,
+                        )
+                    )
                 list_of_inference_rule_dicts = []
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/ " + trace_id
@@ -5701,32 +5731,29 @@ def to_edit_inference_rule(
                     list_of_inference_rule_dicts = session.read_transaction(
                         neo4j_query.get_nodes_of_type, "inference_rule"
                     )
-
-                for inference_rule_dict in list_of_inference_rule_dicts:
+                for other_inference_rule_dict in list_of_inference_rule_dicts:
+                    if other_inference_rule_dict["id"] == inference_rule_id:
+                        continue
                     logger.info(
-                        "pdg_app/to_edit_inference_rule inference_rule_dict="
-                        + str(inference_rule_dict)
+                        "pdg_app/to_edit_inference_rule other_inference_rule_dict="
+                        + str(other_inference_rule_dict)
                     )
-                    logger.info("inference_rule_name " + str(inference_rule_name))
-                    logger.info(
-                        "inference_rule_dict['inference_rule_name'] "
-                        + str(inference_rule_dict["inference_rule_name"])
-                    )
-                    if (
-                        inference_rule_name
-                        == inference_rule_dict["inference_rule_name"]
-                    ):
+                    if inference_rule_name == other_inference_rule_dict["name_latex"]:
                         logger.error(
                             "INVALID INPUT: inference rule with that name already exists"
                         )
-                        # TODO: a notice should be provided to the user
                         flash(
                             "pdg_app/to_edit_inference_rule INVALID INPUT: inference rule with that name already exists"
                         )
 
                         logger.info("[TRACE] end " + trace_id)
-                        return redirect(url_for("to_add_inference_rule"))
-                    if inference_rule_latex == inference_rule_dict["latex"]:
+                        return redirect(
+                            url_for(
+                                "to_edit_inference_rule",
+                                inference_rule_id=inference_rule_id,
+                            )
+                        )
+                    if inference_rule_latex == other_inference_rule_dict["latex"]:
                         logger.error(
                             "INVALID INPUT: inference rule with that latex already exists"
                         )
@@ -5736,11 +5763,22 @@ def to_edit_inference_rule(
                         )
 
                         logger.info("[TRACE] end " + trace_id)
-                        return redirect(url_for("to_add_inference_rule"))
-
+                        return redirect(
+                            url_for(
+                                "to_edit_inference_rule",
+                                inference_rule_id=inference_rule_id,
+                            )
+                        )
                 logger.info(
                     "to_edit_inference_rule status: No conflicting name or latex detected"
                 )
+                # add_inference_rule is now a strict create guarded by an atomic dup-check on
+                # name_latex, so it can no longer double as an update for an existing node
+                # (a self-edit with an unchanged name would be rejected as a duplicate, and a
+                # changed name would create a stray second node with a duplicate id). Editing an
+                # existing inference_rule is done field-by-field with edit_node_property instead,
+                # the same pattern used for editing derivations/expressions/feeds elsewhere in
+                # this file. created_datetime is intentionally left untouched.
 
                 # https://neo4j.com/docs/python-manual/current/session-api/
                 with graphDB_Driver.session() as session, track_time(
@@ -5748,14 +5786,46 @@ def to_edit_inference_rule(
                 ):
 
                     session.write_transaction(
-                        neo4j_query.add_inference_rule,
-                        inference_rule_id=inference_rule_id,
-                        inference_rule_name=inference_rule_name,
-                        inference_rule_latex=inference_rule_latex,
-                        number_of_inputs=number_of_inputs,
-                        number_of_feeds=number_of_feeds,
-                        number_of_outputs=number_of_outputs,
-                        author_name_latex=author_name_latex,
+                        neo4j_query.edit_node_property,
+                        "inference_rule",
+                        inference_rule_id,
+                        "name_latex",
+                        inference_rule_name,
+                    )
+                    session.write_transaction(
+                        neo4j_query.edit_node_property,
+                        "inference_rule",
+                        inference_rule_id,
+                        "latex",
+                        inference_rule_latex,
+                    )
+                    session.write_transaction(
+                        neo4j_query.edit_node_property,
+                        "inference_rule",
+                        inference_rule_id,
+                        "number_of_inputs",
+                        number_of_inputs,
+                    )
+                    session.write_transaction(
+                        neo4j_query.edit_node_property,
+                        "inference_rule",
+                        inference_rule_id,
+                        "number_of_feeds",
+                        number_of_feeds,
+                    )
+                    session.write_transaction(
+                        neo4j_query.edit_node_property,
+                        "inference_rule",
+                        inference_rule_id,
+                        "number_of_outputs",
+                        number_of_outputs,
+                    )
+                    session.write_transaction(
+                        neo4j_query.edit_node_property,
+                        "inference_rule",
+                        inference_rule_id,
+                        "author_name_latex",
+                        author_name_latex,
                     )
 
             else:

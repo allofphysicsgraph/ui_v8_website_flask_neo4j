@@ -305,20 +305,20 @@ def _match_caller(supplied_token, configured_keys):
     return matched
 
 
-def _stamp_last_modified(session, node_type, node_id):
+def _stamp_last_modified(tx, node_type, node_id):
     """Record who last edited a node and when, using the same generic
     property-setter the editable_fields loops already rely on. Called only
     when an edit actually changed something, so untouched resources don't
     pick up a modified timestamp for a no-op request."""
-    session.write_transaction(
-        neo4j_query.edit_node_property,
+    neo4j_query.edit_node_property(
+        tx,
         node_type,
         node_id,
         "last_modified_by_latex",
         g.current_author["author_name_latex"],
     )
-    session.write_transaction(
-        neo4j_query.edit_node_property,
+    neo4j_query.edit_node_property(
+        tx,
         node_type,
         node_id,
         "last_modified_date",
@@ -447,11 +447,6 @@ def api_start_here():
                 "title": "List matrices",
                 "type": "GET",
             },
-            # "cypher_query": {
-            #     "href": url_for(".api_cypher_query", _external=True),
-            #     "title": "Cypher query",
-            #     "type": "GET",
-            # },
             "whoami": {
                 "href": url_for(".api_whoami", _external=True),
                 "title": "Identify the current API caller",
@@ -609,74 +604,76 @@ def api_list_inference_rules():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    # query_time_dict = {}  # type: query_timing_result_type
-
     with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "inference_rule"
         )
-        # query_time_dict["pdg_api/api_list_inference_rules: get_nodes_of_type"] = (
-        #     time.time() - query_start_time
-        # )
 
-    # For HATEOAS, Transform the raw data to include item-level links
     embedded_items = []
     for item in list_of_dicts:
         resource = item.copy()
         item_id = resource.get("id")
-
         resource["_links"] = {
-            "self": {
-                "href": url_for(
+            "self": hal_link(
+                url_for(
                     ".api_inference_rule_metadata", infrule_id=item_id, _external=True
                 ),
-                "title": "Get inference rule metadata",
-                "type": "GET",
-            },
-            "edit": {
-                "href": url_for(
-                    ".api_edit_inference_rule", infrule_id=item_id, _external=True
-                ),
-                "title": "Edit this inference rule",
-                "method": "POST",
-            },
-            "delete": {
-                "href": url_for(
+                "Get inference rule metadata",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_inference_rule", infrule_id=item_id, _external=True),
+                "Edit this inference rule",
+            ),
+            "delete": hal_link(
+                url_for(
                     ".api_delete_inference_rule", infrule_id=item_id, _external=True
                 ),
-                "title": "Delete inference rule",
-                "method": "DELETE",
-            },
+                "Delete inference rule",
+            ),
         }
         embedded_items.append(resource)
 
-    # For HATEOAS, Construct the Collection-level HAL payload
-    payload = {
-        "count": len(embedded_items),
-        "_links": {
-            "self": {
-                "href": url_for(".api_list_inference_rules", _external=True),
-                "title": "List of Inference Rules",
-            },
-            "up": {
-                "href": url_for(".api_start_here", _external=True),
-                "title": "API Home",
-            },
-            "create": {
-                "href": url_for(".api_create_inference_rule", _external=True),
-                "title": "Create a new inference rule",
-                "method": "POST",
-            },
-        },
-        "_embedded": {"inference_rules": embedded_items},
-    }
-
-    response = make_response(jsonify(payload))
-    response.headers["Content-Type"] = "application/hal+json"
-
     logger.info("[TRACE] end " + trace_id)
-    return response
+    return hal_response(
+        data={"count": len(embedded_items)},
+        links={
+            "self": hal_link(
+                url_for(".api_list_inference_rules", _external=True),
+                "List of Inference Rules",
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        embedded={"inference_rules": embedded_items},
+        templates={
+            "default": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "inference_rule_name_latex",
+                        required=True,
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "inference_rule_latex",
+                        required=True,
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "number_of_inputs", type_="number", prompt="Number of Inputs"
+                    ),
+                    hal_property(
+                        "number_of_feeds", type_="number", prompt="Number of Feeds"
+                    ),
+                    hal_property(
+                        "number_of_outputs", type_="number", prompt="Number of Outputs"
+                    ),
+                ],
+                title="Create a new inference rule",
+            )
+        },
+    )
 
 
 @api_bp.route("/resources/expressions", methods=["GET"])
@@ -700,81 +697,66 @@ def api_list_expressions():
 
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    # query_time_dict = {}  # type: query_timing_result_type
-
+    logger.info('[TRACE] start ' + trace_id)
     with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
-        list_of_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "expression"
-        )
-        # query_time_dict["pdg_api/api_list_expressions: get_nodes_of_type"] = (
-        #     time.time() - query_start_time
-        # )
-
-    # For HATEOAS, Transform the raw data to include item-level links
+        list_of_dicts = session.read_transaction(neo4j_query.get_nodes_of_type, 'expression')
+        
     embedded_items = []
     for item in list_of_dicts:
         resource = item.copy()
-        item_id = resource.get("id")
-
+        item_id = resource.get('id')
         if not item_id:
-            logger.warning("Found expression without ID during API list generation.")
+            logger.warning('Found expression without ID during API list generation.')
             continue
-
-        resource["_links"] = {
-            "self": {
-                "href": url_for(
-                    ".api_expression_metadata", expression_id=item_id, _external=True
-                ),
-                "title": "Get expression metadata",
-                "type": "GET",
-            },
-            "edit": {
-                "href": url_for(
-                    ".api_edit_expression", expression_id=item_id, _external=True
-                ),
-                "title": "Edit this expression",
-                "method": "POST",
-            },
-            "delete": {
-                "href": url_for(
-                    ".api_delete_expression", expression_id=item_id, _external=True
-                ),
-                "title": "Delete expression",
-                "method": "DELETE",
-            },
+            
+        # 1. Read-only actions (GET) go strictly inside _links
+        resource['_links'] = {
+            'self': hal_link(url_for('.api_expression_metadata', expression_id=item_id, _external=True), 'Get expression metadata')
+        }
+        
+        # 2. Non-safe actions (POST, DELETE) belong inside item-level _templates
+        resource['_templates'] = {
+            'edit': hal_template('POST', [
+                hal_property('expression_latex_lhs', value=resource.get('latex_lhs'), required=True, prompt='LHS (LaTeX)'),
+                hal_property('expression_relation_latex', value=resource.get('latex_relation'), required=True, prompt='Relation (LaTeX)'),
+                hal_property('expression_latex_rhs', value=resource.get('latex_rhs'), required=True, prompt='RHS (LaTeX)'),
+                hal_property('expression_latex_condition', value=resource.get('latex_condition'), prompt='Condition (LaTeX)'),
+                hal_property('expression_name_latex', value=resource.get('name_latex'), prompt='Name (LaTeX)'),
+                hal_property('expression_description_latex', value=resource.get('description_latex'), prompt='Description (LaTeX)'),
+                hal_property('expression_reference_latex', value=resource.get('reference_latex'), prompt='Reference (LaTeX)')
+            ], title='Edit this expression'),
+            'delete': hal_template('DELETE', [], title='Delete this expression')
         }
         embedded_items.append(resource)
-
-    # For HATEOAS, Construct the Collection-level HAL payload
-    payload = {
-        "count": len(embedded_items),
-        "_links": {
-            "self": {
-                "href": url_for(".api_list_expressions", _external=True),
-                "title": "List of Expressions",
-                "type": "GET",
-            },
-            "up": {
-                "href": url_for(".api_start_here", _external=True),
-                "title": "API Home",
-                "type": "GET",
-            },
-            "create": {
-                "href": url_for(".api_create_expression", _external=True),
-                "title": "Create a new expression",
-                "method": "POST",
-            },
-        },
-        "_embedded": {"expressions": embedded_items},
+        
+    # Collection-level read links
+    links = {
+        'self': hal_link(url_for('.api_list_expressions', _external=True), 'List of Expressions'),
+        'up': hal_link(url_for('.api_start_here', _external=True), 'API Entry Point')
     }
-
-    response = make_response(jsonify(payload))
-    response.headers["Content-Type"] = "application/hal+json"
-
-    logger.info("[TRACE] end " + trace_id)
-    return response
+    
+    # Collection-level write templates (e.g., adding an Expression)
+    templates = {
+        'default': hal_template('POST', [
+            hal_property('expression_latex_lhs', required=True, prompt='LHS (LaTeX)'),
+            hal_property('expression_relation_latex', required=True, prompt='Relation (LaTeX)'),
+            hal_property('expression_latex_rhs', required=True, prompt='RHS (LaTeX)'),
+            hal_property('expression_latex_condition', prompt='Condition (LaTeX)'),
+            hal_property('expression_name_latex', prompt='Name (LaTeX)'),
+            hal_property('expression_description_latex', prompt='Description (LaTeX)'),
+            hal_property('expression_reference_latex', prompt='Reference (LaTeX)')
+        ], title='Create a new expression')
+    }
+    
+    logger.info('[TRACE] end ' + trace_id)
+    # Serves the correct application/prs.hal-forms+json media type automatically
+    return hal_response(
+        data={'count': len(embedded_items)},
+        links=links,
+        embedded={'expressions': embedded_items},
+        templates=templates,
+        status=200
+    )
 
 
 @api_bp.route("/resources/symbol/operations", methods=["GET"])
@@ -1259,164 +1241,65 @@ def api_list_matrix_symbols():
 @api_bp.route("/resources/derivation", methods=["POST"])
 @require_auth
 def api_create_derivation():
-    """
-    required inputs:
-    - derivation name as latex
-    - derivation abstract as latex
-    optional input:
-    - derivation reference as latex
-    unexposed inputs:
-    - author name
-    - current time
-
-    see `pdg_app/to_add_derivation` for the web UI implementation
-
-    .. code-block:: bash
-
-        curl --request POST \
-        --header "Content-Type: application/x-www-form-urlencoded" \
-        --show-error --silent \
-         https://localhost/api/v1/resources/derivation/create?derivation_name_latex=hello%20again\&derivation_reference_latex=this%20is\&derivation_abstract_latex=mine%20yours
-
-        curl --request POST \
-        --header "Content-Type: application/json" \
-        --show-error --silent \
-        --data '{"derivation_name_latex":"hello again", "derivation_reference_latex":"this was", "derivation_abstract_latex": "yes no"}' \
-         https://localhost/api/v1/resources/derivation/create
-
-
-    """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
 
-    # print("request=" + str(request)) # shows the user-submitted URL and type (POST)
-    # print(request.method)
-
-    if request.is_json:  # "Content-Type: application/json"
+    if request.is_json:
         data_from_user = request.get_json()
-
-        if "derivation_name_latex" in data_from_user.keys():
-            derivation_name_latex = data_from_user["derivation_name_latex"]
-        else:
-            return hal_error(
-                "need to provide derivation_name_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        if "derivation_abstract_latex" in data_from_user.keys():
-            derivation_abstract_latex = data_from_user["derivation_abstract_latex"]
-        else:
-            return hal_error(
-                "need to provide derivation_abstract_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        if "derivation_reference_latex" in data_from_user.keys():
-            derivation_reference_latex = data_from_user["derivation_reference_latex"]
-        else:
-            derivation_reference_latex = ""
-
-    else:  # "Content-Type: application/x-www-form-urlencoded"
-        logger.info("request.args=" + str(request.args))  # returns a dict
-
-        derivation_name_latex = request.args.get("derivation_name_latex")
-        if derivation_name_latex:
-            logger.info("derivation_name:" + str(derivation_name_latex))
-        else:
-            return hal_error(
-                "need to provide derivation_name_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        derivation_abstract_latex = request.args.get("derivation_abstract_latex")
-        if derivation_abstract_latex:
-            logger.info("derivation_abstract_latex " + str(derivation_abstract_latex))
-        else:
-            return hal_error(
-                "need to provide derivation_abstract_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        derivation_reference_latex = request.args.get("derivation_reference_latex")
-        if derivation_reference_latex:
-            logger.info("derivation_reference_latex " + str(derivation_reference_latex))
-        else:
-            derivation_reference_latex = ""
-
-    # additional reasons to reject user's input: derivation name is already in use
-    list_of_derivation_dicts = []
-    with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
-        list_of_derivation_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "derivation"
+        derivation_name_latex = data_from_user.get("derivation_name_latex")
+        derivation_abstract_latex = data_from_user.get("derivation_abstract_latex")
+        derivation_reference_latex = data_from_user.get(
+            "derivation_reference_latex", ""
         )
-        # query_time_dict[
-        #     "pdg_api/api_create_derivation: get_nodes_of_type derivation"
-        # ] = round(time.time() - query_start_time, 3)
+    else:
+        derivation_name_latex = request.args.get("derivation_name_latex")
+        derivation_abstract_latex = request.args.get("derivation_abstract_latex")
+        derivation_reference_latex = request.args.get("derivation_reference_latex", "")
 
-    # print("list_of_derivation_dicts=", list_of_derivation_dicts)
+    if not derivation_name_latex or not derivation_abstract_latex:
+        return hal_error(
+            "Missing required fields (derivation_name_latex, derivation_abstract_latex)",
+            400,
+            links={
+                "up": hal_link(
+                    url_for(".api_start_here", _external=True), "API Entry Point"
+                )
+            },
+            title="Missing Field",
+        )
 
-    # reject input if derivation name is already in the database
-    for derivation_dict in list_of_derivation_dicts:
-        if derivation_dict["name_latex"] == derivation_name_latex:
-            return hal_error(
-                "derivation name '" + str(derivation_name_latex) + "' already exists",
-                409,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Conflict",
-            )
-
-    # at this point the inputs are valid and we can proceed to add the content to the database
-
-    # TODO
-    # author_name_latex = latex.make_string_safe_for_latex(current_user.email)
     author_name_latex = g.current_author["author_name_latex"]
-
-    derivation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
-    logger.info("pdg_app/api_create_derivation: derivation_id=" + derivation_id)
-
-    # as per https://strftime.org/
-    # %f = Microsecond as a decimal number, zero-padded on the left.
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    # https://neo4j.com/docs/python-manual/current/session-api/
-    with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
-        session.write_transaction(
-            neo4j_query.add_derivation,
+    query_time_dict = {}
+    derivation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+
+    def _create_atomic(tx):
+        return neo4j_query.add_derivation(
+            tx,
             derivation_id,
             now_str,
             derivation_name_latex,
             derivation_abstract_latex,
             derivation_reference_latex,
-            now_str,
             author_name_latex,
         )
+
+    with graphDB_Driver.session() as session:
+        success = session.write_transaction(_create_atomic)
+
+    if not success:
+        return hal_error(
+            f"derivation name '{derivation_name_latex}' already exists",
+            409,
+            links={
+                "up": hal_link(
+                    url_for(".api_start_here", _external=True), "API Entry Point"
+                )
+            },
+            title="Conflict",
+        )
+
     return hal_response(
         data={
             "status": "derivation "
@@ -1483,59 +1366,32 @@ def api_create_inference_rule():
 
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     up_link = {
         "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point")
     }
     if request.is_json:
         data_from_user = request.get_json()
-        logger.info("data_from_user = " + str(data_from_user))
-        if "inference_rule_name_latex" in data_from_user.keys():
-            inference_rule_name_latex = data_from_user["inference_rule_name_latex"]
-        else:
-            return hal_error(
-                "need to provide inference_rule_name_latex",
-                400,
-                links=up_link,
-                title="Missing Field",
-            )
-        if "inference_rule_latex" in data_from_user.keys():
-            inference_rule_latex = data_from_user["inference_rule_latex"]
-        else:
-            return hal_error(
-                "need to provide inference_rule_latex",
-                400,
-                links=up_link,
-                title="Missing Field",
-            )
+        inference_rule_name_latex = data_from_user.get("inference_rule_name_latex")
+        inference_rule_latex = data_from_user.get("inference_rule_latex")
         number_of_inputs = data_from_user.get("number_of_inputs", 0)
         number_of_feeds = data_from_user.get("number_of_feeds", 0)
         number_of_outputs = data_from_user.get("number_of_outputs", 0)
     else:
-        logger.info("request.args=" + str(request.args))
         inference_rule_name_latex = request.args.get("inference_rule_name_latex")
-        if inference_rule_name_latex:
-            logger.info("inference_rule_name_latex =" + inference_rule_name_latex)
-        else:
-            return hal_error(
-                "need to provide inference_rule_name_latex",
-                400,
-                links=up_link,
-                title="Missing Field",
-            )
         inference_rule_latex = request.args.get("inference_rule_latex")
-        if inference_rule_latex:
-            logger.info("inference_rule_latex =" + inference_rule_latex)
-        else:
-            return hal_error(
-                "need to provide inference_rule_latex",
-                400,
-                links=up_link,
-                title="Missing Field",
-            )
         number_of_inputs = request.args.get("number_of_inputs", 0)
         number_of_feeds = request.args.get("number_of_feeds", 0)
         number_of_outputs = request.args.get("number_of_outputs", 0)
+
+    if not inference_rule_name_latex or not inference_rule_latex:
+        return hal_error(
+            "Missing required fields (inference_rule_name_latex, inference_rule_latex)",
+            400,
+            links=up_link,
+            title="Missing Field",
+        )
+
     try:
         number_of_inputs = int(number_of_inputs)
         number_of_feeds = int(number_of_feeds)
@@ -1561,33 +1417,17 @@ def api_create_inference_rule():
             links=up_link,
             title="Invalid Field",
         )
-    list_of_inference_rule_dicts = []
-    with graphDB_Driver.session() as session:
-        list_of_inference_rule_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "inference_rule"
-        )
-    for inference_rule_dict in list_of_inference_rule_dicts:
-        if inference_rule_dict["name_latex"] == inference_rule_name_latex:
-            return hal_error(
-                "inference rule name '"
-                + str(inference_rule_name_latex)
-                + "' already exists",
-                409,
-                links=up_link,
-                title="Conflict",
-            )
+
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
     query_time_dict = {}
     inference_rule_id, query_time_dict = generate_random_id(
         graphDB_Driver, query_time_dict
     )
-    logger.info(
-        "pdg_app/api_create_inference_rule: inference_rule_id=" + inference_rule_id
-    )
-    with graphDB_Driver.session() as session:
-        session.write_transaction(
-            neo4j_query.add_inference_rule,
+
+    def _create_atomic(tx):
+        return neo4j_query.add_inference_rule(
+            tx,
             inference_rule_id,
             inference_rule_name_latex,
             inference_rule_latex,
@@ -1597,7 +1437,19 @@ def api_create_inference_rule():
             now_str,
             author_name_latex,
         )
-    logger.info("[TRACE]  end " + trace_id)
+
+    with graphDB_Driver.session() as session:
+        success = session.write_transaction(_create_atomic)
+
+    if not success:
+        return hal_error(
+            f"inference rule name '{inference_rule_name_latex}' already exists",
+            409,
+            links=up_link,
+            title="Conflict",
+        )
+
+    logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
             "status": "inference rule "
@@ -1689,132 +1541,51 @@ def api_create_expression():
     }
     if request.is_json:
         data_from_user = request.get_json()
-        logger.info("data_from_user = " + str(data_from_user))
-        if "expression_latex_lhs" in data_from_user.keys():
-            expression_latex_lhs = data_from_user["expression_latex_lhs"]
-        else:
-            return hal_error(
-                "need to provide expression_latex_lhs",
-                400,
-                links=up_link,
-                title="Missing Field",
-            )
-        if "expression_relation_latex" in data_from_user.keys():
-            expression_relation_latex = data_from_user["expression_relation_latex"]
-        else:
-            return hal_error(
-                "need to provide expression_relation_latex",
-                400,
-                links=up_link,
-                title="Missing Field",
-            )
-        if "expression_latex_rhs" in data_from_user.keys():
-            expression_latex_rhs = data_from_user["expression_latex_rhs"]
-        else:
-            return hal_error(
-                "need to provide expression_latex_rhs",
-                400,
-                links=up_link,
-                title="Missing Field",
-            )
-        if "expression_latex_condition" in data_from_user.keys():
-            expression_latex_condition = data_from_user["expression_latex_condition"]
-        else:
-            expression_latex_condition = ""
-        if "expression_name_latex" in data_from_user.keys():
-            expression_name_latex = data_from_user["expression_name_latex"]
-        else:
-            expression_name_latex = ""
-        if "expression_reference_latex" in data_from_user.keys():
-            expression_reference_latex = data_from_user["expression_reference_latex"]
-        else:
-            expression_reference_latex = ""
-        if "expression_description_latex" in data_from_user.keys():
-            expression_description_latex = data_from_user[
-                "expression_description_latex"
-            ]
-        else:
-            expression_description_latex = ""
-    else:
-        logger.info("request.args=" + str(request.args))
-        expression_latex_lhs = request.args.get("expression_latex_lhs")
-        if expression_latex_lhs:
-            logger.info("expression_latex_lhs =" + expression_latex_lhs)
-        else:
-            return hal_error(
-                "need to provide expression_latex_lhs",
-                400,
-                links=up_link,
-                title="Missing Field",
-            )
-        expression_relation_latex = request.args.get("expression_relation_latex")
-        if expression_relation_latex:
-            logger.info("expression_relation_latex =" + expression_relation_latex)
-        else:
-            return hal_error(
-                "need to provide expression_relation_latex",
-                400,
-                links=up_link,
-                title="Missing Field",
-            )
-        expression_latex_rhs = request.args.get("expression_latex_rhs")
-        if expression_latex_rhs:
-            logger.info("expression_latex_rhs =" + expression_latex_rhs)
-        else:
-            return hal_error(
-                "need to provide expression_latex_rhs",
-                400,
-                links=up_link,
-                title="Missing Field",
-            )
-        expression_latex_condition = request.args.get("expression_latex_condition")
-        if expression_latex_condition:
-            logger.info("expression_latex_condition =" + expression_latex_condition)
-        else:
-            expression_latex_condition = ""
-        expression_name_latex = request.args.get("expression_name_latex")
-        if expression_name_latex:
-            logger.info("expression_name_latex =" + expression_name_latex)
-        else:
-            expression_name_latex = ""
-        expression_reference_latex = request.args.get("expression_reference_latex")
-        if expression_reference_latex:
-            logger.info("expression_reference_latex =" + expression_reference_latex)
-        else:
-            expression_reference_latex = ""
-        expression_description_latex = request.args.get("expression_description_latex")
-        if expression_description_latex:
-            logger.info("expression_description_latex =" + expression_description_latex)
-        else:
-            expression_description_latex = ""
-    list_of_expression_dicts = []
-    with graphDB_Driver.session() as session:
-        list_of_expression_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "expression"
+        expression_latex_lhs = data_from_user.get("expression_latex_lhs")
+        expression_relation_latex = data_from_user.get("expression_relation_latex")
+        expression_latex_rhs = data_from_user.get("expression_latex_rhs")
+        expression_latex_condition = data_from_user.get(
+            "expression_latex_condition", ""
         )
-    logger.info("list_of_expression_dicts=" + str(list_of_expression_dicts))
-    for expression_dict in list_of_expression_dicts:
-        if (
-            expression_dict["latex_lhs"] == expression_latex_lhs
-            and expression_dict["latex_relation"] == expression_relation_latex
-            and (expression_dict["latex_rhs"] == expression_latex_rhs)
-        ):
-            return hal_error(
-                "expression '"
-                + str(expression_latex_lhs)
-                + str(expression_relation_latex)
-                + str(expression_latex_rhs)
-                + "' already exists",
-                409,
-                links=up_link,
-                title="Conflict",
-            )
+        expression_name_latex = data_from_user.get("expression_name_latex", "")
+        expression_reference_latex = data_from_user.get(
+            "expression_reference_latex", ""
+        )
+        expression_description_latex = data_from_user.get(
+            "expression_description_latex", ""
+        )
+    else:
+        expression_latex_lhs = request.args.get("expression_latex_lhs")
+        expression_relation_latex = request.args.get("expression_relation_latex")
+        expression_latex_rhs = request.args.get("expression_latex_rhs")
+        expression_latex_condition = request.args.get("expression_latex_condition", "")
+        expression_name_latex = request.args.get("expression_name_latex", "")
+        expression_reference_latex = request.args.get("expression_reference_latex", "")
+        expression_description_latex = request.args.get(
+            "expression_description_latex", ""
+        )
+
+    if (
+        not expression_latex_lhs
+        or not expression_relation_latex
+        or not expression_latex_rhs
+    ):
+        return hal_error(
+            "Missing required expression formula fields",
+            400,
+            links=up_link,
+            title="Missing Field",
+        )
+
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
+    query_time_dict = {}
     expression_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
-    with graphDB_Driver.session() as session:
-        session.write_transaction(
-            neo4j_query.add_expression,
+
+    def _create_atomic(tx):
+        return neo4j_query.add_expression(
+            tx,
             expression_id,
             expression_name_latex,
             expression_latex_lhs,
@@ -1826,6 +1597,18 @@ def api_create_expression():
             now_str,
             author_name_latex,
         )
+
+    with graphDB_Driver.session() as session:
+        success = session.write_transaction(_create_atomic)
+
+    if not success:
+        return hal_error(
+            f"expression '{expression_latex_lhs}{expression_relation_latex}{expression_latex_rhs}' already exists",
+            409,
+            links=up_link,
+            title="Conflict",
+        )
+
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -1887,946 +1670,45 @@ def api_create_expression():
     )
 
 
-@api_bp.route("/resources/symbol/scalar", methods=["POST"])
-@require_auth
-def api_create_scalar_symbol():
-    """
-
-    .. code-block:: bash
-
-        curl --request POST \
-        --header "Content-Type: application/x-www-form-urlencoded" \
-        --show-error --silent \
-        https://localhost/api/v1/resources/symbol/scalar/create?scalar_latex=a | python3 -m json.tool
-
-
-        curl --request POST \
-        --header "Content-Type: application/json" \
-        --show-error --silent \
-        --data '{"scalar_latex": "b"}' \
-         https://localhost/api/v1/resources/symbol/scalar/create | python3 -m json.tool
-
-
-    see `to_add_symbol_scalar`
-
-    """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
-    collection_link = {
-        "up": hal_link(
-            url_for(".api_list_scalar_symbols", _external=True),
-            "List of Scalar Symbols",
-        )
-    }
-    if request.is_json:
-        data_from_user = request.get_json()
-        logger.info("data_from_user = " + str(data_from_user))
-        if "scalar_latex" in data_from_user.keys():
-            scalar_latex = data_from_user["scalar_latex"]
-        else:
-            return hal_error("need to provide scalar_latex", 400, links=collection_link)
-        if "scalar_name_latex" in data_from_user.keys():
-            scalar_name_latex = data_from_user["scalar_name_latex"]
-        else:
-            scalar_name_latex = ""
-        if "scalar_description_latex" in data_from_user.keys():
-            scalar_description_latex = data_from_user["scalar_description_latex"]
-        else:
-            scalar_description_latex = ""
-        if "scalar_reference_latex" in data_from_user.keys():
-            scalar_reference_latex = data_from_user["scalar_reference_latex"]
-        else:
-            scalar_reference_latex = ""
-        if "scalar_scope" in data_from_user.keys():
-            scalar_scope = data_from_user["scalar_scope"]
-            if scalar_scope not in list_of_valid.scalar_scope:
-                return hal_error(
-                    scalar_scope
-                    + " is not a valid scalar_scope; choose from "
-                    + str(list_of_valid.scalar_scope),
-                    400,
-                    links=collection_link,
-                )
-        else:
-            return hal_error("need to provide scalar_scope", 400, links=collection_link)
-        if "scalar_variable_or_constant" in data_from_user.keys():
-            scalar_variable_or_constant = data_from_user["scalar_variable_or_constant"]
-            if scalar_variable_or_constant not in ["variable", "constant"]:
-                return hal_error(
-                    scalar_variable_or_constant
-                    + " is not valid for scalar_variable_or_constant",
-                    400,
-                    links=collection_link,
-                )
-        else:
-            scalar_variable_or_constant = "variable"
-        if "scalar_domain" in data_from_user.keys():
-            scalar_domain = data_from_user["scalar_domain"]
-            if scalar_domain not in list_of_valid.scalar_domain:
-                return hal_error(
-                    scalar_domain
-                    + " is not a valid scalar_domain; choose from "
-                    + str(list_of_valid.scalar_domain),
-                    400,
-                    links=collection_link,
-                )
-        else:
-            scalar_domain = "any"
-        if "dimension_length" in data_from_user.keys():
-            dimension_length = data_from_user["dimension_length"]
-        else:
-            dimension_length = 0
-        if "dimension_time" in data_from_user.keys():
-            dimension_time = data_from_user["dimension_time"]
-        else:
-            dimension_time = 0
-        if "dimension_mass" in data_from_user.keys():
-            dimension_mass = data_from_user["dimension_mass"]
-        else:
-            dimension_mass = 0
-        if "dimension_temperature" in data_from_user.keys():
-            dimension_temperature = data_from_user["dimension_temperature"]
-        else:
-            dimension_temperature = 0
-        if "dimension_electric_charge" in data_from_user.keys():
-            dimension_electric_charge = data_from_user["dimension_electric_charge"]
-        else:
-            dimension_electric_charge = 0
-        if "dimension_amount_of_substance" in data_from_user.keys():
-            dimension_amount_of_substance = data_from_user[
-                "dimension_amount_of_substance"
-            ]
-        else:
-            dimension_amount_of_substance = 0
-        if "dimension_luminous_intensity" in data_from_user.keys():
-            dimension_luminous_intensity = data_from_user[
-                "dimension_luminous_intensity"
-            ]
-        else:
-            dimension_luminous_intensity = 0
-    else:
-        logger.info("request.args=" + str(request.args))
-        scalar_latex = request.args.get("scalar_latex")
-        if scalar_latex:
-            logger.info("scalar_latex =" + scalar_latex)
-        else:
-            return hal_error("need to provide scalar_latex", 400, links=collection_link)
-        scalar_name_latex = request.args.get("scalar_name_latex")
-        if scalar_name_latex:
-            logger.info("scalar_name_latex =" + scalar_name_latex)
-        else:
-            scalar_name_latex = ""
-        scalar_description_latex = request.args.get("scalar_description_latex")
-        if scalar_description_latex:
-            logger.info("scalar_description_latex =" + scalar_description_latex)
-        else:
-            scalar_description_latex = ""
-        scalar_reference_latex = request.args.get("scalar_reference_latex")
-        if scalar_reference_latex:
-            logger.info("scalar_reference_latex =" + scalar_reference_latex)
-        else:
-            scalar_reference_latex = ""
-        scalar_scope = request.args.get("scalar_scope")
-        if scalar_scope:
-            logger.info("scalar_scope =" + scalar_scope)
-            if scalar_scope not in list_of_valid.scalar_scope:
-                return hal_error(
-                    scalar_scope
-                    + " is not a valid scalar_scope; choose from "
-                    + str(list_of_valid.scalar_scope),
-                    400,
-                    links=collection_link,
-                )
-        else:
-            scalar_scope = "arbitrary"
-        scalar_variable_or_constant = request.args.get("scalar_variable_or_constant")
-        if scalar_variable_or_constant:
-            logger.info("scalar_variable_or_constant =" + scalar_variable_or_constant)
-            if scalar_variable_or_constant not in ["variable", "constant"]:
-                return hal_error(
-                    scalar_variable_or_constant
-                    + " is not valid for scalar_variable_or_constant",
-                    400,
-                    links=collection_link,
-                )
-        else:
-            scalar_variable_or_constant = "variable"
-        scalar_domain = request.args.get("scalar_domain")
-        if scalar_domain:
-            logger.info("scalar_domain =" + scalar_domain)
-            if scalar_domain not in list_of_valid.scalar_domain:
-                return hal_error(
-                    scalar_domain
-                    + " is not a valid scalar_domain; choose from "
-                    + str(list_of_valid.scalar_domain),
-                    400,
-                    links=collection_link,
-                )
-        else:
-            scalar_domain = "any"
-        dimension_length = request.args.get("dimension_length")
-        if dimension_length:
-            logger.info("dimension_length =" + dimension_length)
-        else:
-            dimension_length = 0
-        dimension_time = request.args.get("dimension_time")
-        if dimension_time:
-            logger.info("dimension_time =" + dimension_time)
-        else:
-            dimension_time = 0
-        dimension_mass = request.args.get("dimension_mass")
-        if dimension_mass:
-            logger.info("dimension_mass =" + dimension_mass)
-        else:
-            dimension_mass = 0
-        dimension_temperature = request.args.get("dimension_temperature")
-        if dimension_temperature:
-            logger.info("dimension_temperature =" + dimension_temperature)
-        else:
-            dimension_temperature = 0
-        dimension_electric_charge = request.args.get("dimension_electric_charge")
-        if dimension_electric_charge:
-            logger.info("dimension_electric_charge =" + dimension_electric_charge)
-        else:
-            dimension_electric_charge = 0
-        dimension_amount_of_substance = request.args.get(
-            "dimension_amount_of_substance"
-        )
-        if dimension_amount_of_substance:
-            logger.info(
-                "dimension_amount_of_substance =" + dimension_amount_of_substance
-            )
-        else:
-            dimension_amount_of_substance = 0
-        dimension_luminous_intensity = request.args.get("dimension_luminous_intensity")
-        if dimension_luminous_intensity:
-            logger.info("dimension_luminous_intensity =" + dimension_luminous_intensity)
-        else:
-            dimension_luminous_intensity = 0
-    author_name_latex = g.current_author["author_name_latex"]
-    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    scalar_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
-    with graphDB_Driver.session() as session:
-        session.write_transaction(
-            neo4j_query.add_scalar_symbol,
-            scalar_id,
-            scalar_name_latex,
-            scalar_latex,
-            scalar_description_latex,
-            scalar_reference_latex,
-            scalar_scope,
-            scalar_variable_or_constant,
-            scalar_domain,
-            dimension_length,
-            dimension_time,
-            dimension_mass,
-            dimension_temperature,
-            dimension_electric_charge,
-            dimension_amount_of_substance,
-            dimension_luminous_intensity,
-            now_str,
-            author_name_latex,
-        )
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={"status": "scalar symbol added successfully", "scalar_id": scalar_id},
-        links={
-            "self": hal_link(
-                url_for(".api_scalar_metadata", symbol_id=scalar_id, _external=True),
-                "Get scalar metadata",
-            ),
-            "up": hal_link(
-                url_for(".api_list_scalar_symbols", _external=True),
-                "List of Scalar Symbols",
-            ),
-            "edit": hal_link(
-                url_for(".api_edit_scalar", symbol_id=scalar_id, _external=True),
-                "Edit this scalar",
-            ),
-            "delete": hal_link(
-                url_for(".api_delete_scalar", symbol_id=scalar_id, _external=True),
-                "Delete this scalar",
-            ),
-        },
-        status=201,
-    )
-
-
-@api_bp.route("/resources/symbol/vector", methods=["POST"])
-@require_auth
-def api_create_vector_symbol():
-    """
-
-    .. code-block:: bash
-
-        curl --silent --insecure https://localhost/api/v1/resources/symbol/vector/create
-
-    """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
-    collection_link = {
-        "up": hal_link(
-            url_for(".api_list_vector_symbols", _external=True),
-            "List of Vector Symbols",
-        )
-    }
-    if request.is_json:
-        data_from_user = request.get_json()
-        logger.info("data_from_user = " + str(data_from_user))
-        if "vector_latex" in data_from_user.keys():
-            vector_latex = data_from_user["vector_latex"]
-        else:
-            return hal_error("need to provide vector_latex", 400, links=collection_link)
-        if "vector_name_latex" in data_from_user.keys():
-            vector_name_latex = data_from_user["vector_name_latex"]
-        else:
-            vector_name_latex = ""
-        if "vector_description_latex" in data_from_user.keys():
-            vector_description_latex = data_from_user["vector_description_latex"]
-        else:
-            vector_description_latex = ""
-        if "vector_reference_latex" in data_from_user.keys():
-            vector_reference_latex = data_from_user["vector_reference_latex"]
-        else:
-            vector_reference_latex = ""
-        if "vector_is_composite" in data_from_user.keys():
-            _raw_is_composite = data_from_user["vector_is_composite"]
-            vector_is_composite = (
-                _raw_is_composite
-                if isinstance(_raw_is_composite, bool)
-                else str(_raw_is_composite).lower() == "true"
-            )
-        else:
-            vector_is_composite = False
-        if "vector_size" in data_from_user.keys():
-            vector_size = data_from_user["vector_size"]
-        else:
-            vector_size = "arbitrary"
-        if "vector_orientation" in data_from_user.keys():
-            vector_orientation = data_from_user["vector_orientation"]
-        else:
-            vector_orientation = "column"
-        if "vector_number_of_entries" in data_from_user.keys():
-            vector_number_of_entries = data_from_user["vector_number_of_entries"]
-        else:
-            vector_number_of_entries = ""
-    else:
-        logger.info("request.args=" + str(request.args))
-        vector_latex = request.args.get("vector_latex")
-        if vector_latex:
-            logger.info("vector_latex =" + vector_latex)
-        else:
-            return hal_error("need to provide vector_latex", 400, links=collection_link)
-        vector_name_latex = request.args.get("vector_name_latex")
-        if vector_name_latex:
-            logger.info("vector_name_latex =" + vector_name_latex)
-        else:
-            vector_name_latex = ""
-        vector_description_latex = request.args.get("vector_description_latex")
-        if vector_description_latex:
-            logger.info("vector_description_latex =" + vector_description_latex)
-        else:
-            vector_description_latex = ""
-        vector_reference_latex = request.args.get("vector_reference_latex")
-        if vector_reference_latex:
-            logger.info("vector_reference_latex =" + vector_reference_latex)
-        else:
-            vector_reference_latex = ""
-        _raw_is_composite = request.args.get("vector_is_composite")
-        if _raw_is_composite:
-            vector_is_composite = _raw_is_composite.lower() == "true"
-        else:
-            vector_is_composite = False
-        vector_size = request.args.get("vector_size")
-        if vector_size:
-            logger.info("vector_size =" + vector_size)
-        else:
-            vector_size = "arbitrary"
-        vector_orientation = request.args.get("vector_orientation")
-        if vector_orientation:
-            logger.info("vector_orientation =" + vector_orientation)
-        else:
-            vector_orientation = "column"
-        vector_number_of_entries = request.args.get("vector_number_of_entries")
-        if vector_number_of_entries:
-            logger.info("vector_number_of_entries =" + vector_number_of_entries)
-        else:
-            vector_number_of_entries = ""
-    author_name_latex = g.current_author["author_name_latex"]
-    # %f = Microsecond as a decimal number, zero-padded on the left.
-    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
-    with graphDB_Driver.session() as session:
-        session.write_transaction(
-            neo4j_query.add_vector_symbol,
-            symbol_id,
-            vector_name_latex,
-            vector_latex,
-            vector_description_latex,
-            vector_reference_latex,
-            vector_is_composite,
-            vector_size,
-            vector_orientation,
-            vector_number_of_entries,
-            now_str,
-            author_name_latex,
-        )
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={"status": "vector symbol added successfully", "symbol_id": symbol_id},
-        links={
-            "self": hal_link(
-                url_for(".api_vector_metadata", symbol_id=symbol_id, _external=True),
-                "Get vector metadata",
-            ),
-            "up": hal_link(
-                url_for(".api_list_vector_symbols", _external=True),
-                "List of Vector Symbols",
-            ),
-            "edit": hal_link(
-                url_for(".api_edit_vector", symbol_id=symbol_id, _external=True),
-                "Edit this vector",
-            ),
-            "delete": hal_link(
-                url_for(".api_delete_vector", symbol_id=symbol_id, _external=True),
-                "Delete this vector",
-            ),
-        },
-        status=201,
-    )
-
-
-@api_bp.route("/resources/symbol/matrix", methods=["POST"])
-@require_auth
-def api_create_matrix_symbol():
-    """
-
-    .. code-block:: bash
-
-        curl --silent --insecure https://localhost/api/v1/resources/symbol/matrix/create
-
-    """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
-    collection_link = {
-        "up": hal_link(
-            url_for(".api_list_matrix_symbols", _external=True),
-            "List of Matrix Symbols",
-        )
-    }
-    if request.is_json:
-        data_from_user = request.get_json()
-        logger.info("data_from_user = " + str(data_from_user))
-        if "matrix_latex" in data_from_user.keys():
-            matrix_latex = data_from_user["matrix_latex"]
-        else:
-            return hal_error("need to provide matrix_latex", 400, links=collection_link)
-        if "matrix_name_latex" in data_from_user.keys():
-            matrix_name_latex = data_from_user["matrix_name_latex"]
-        else:
-            matrix_name_latex = ""
-        if "matrix_description_latex" in data_from_user.keys():
-            matrix_description_latex = data_from_user["matrix_description_latex"]
-        else:
-            matrix_description_latex = ""
-        if "matrix_reference_latex" in data_from_user.keys():
-            matrix_reference_latex = data_from_user["matrix_reference_latex"]
-        else:
-            matrix_reference_latex = ""
-        if "matrix_is_composite" in data_from_user.keys():
-            _raw_is_composite = data_from_user["matrix_is_composite"]
-            matrix_is_composite = (
-                _raw_is_composite
-                if isinstance(_raw_is_composite, bool)
-                else str(_raw_is_composite).lower() == "true"
-            )
-        else:
-            matrix_is_composite = False
-        if "matrix_size" in data_from_user.keys():
-            matrix_size = data_from_user["matrix_size"]
-        else:
-            matrix_size = "arbitrary"
-        if "matrix_number_of_rows" in data_from_user.keys():
-            matrix_number_of_rows = data_from_user["matrix_number_of_rows"]
-        else:
-            matrix_number_of_rows = ""
-        if "matrix_number_of_columns" in data_from_user.keys():
-            matrix_number_of_columns = data_from_user["matrix_number_of_columns"]
-        else:
-            matrix_number_of_columns = ""
-    else:
-        logger.info("request.args=" + str(request.args))
-        matrix_latex = request.args.get("matrix_latex")
-        if matrix_latex:
-            logger.info("matrix_latex =" + matrix_latex)
-        else:
-            return hal_error("need to provide matrix_latex", 400, links=collection_link)
-        matrix_name_latex = request.args.get("matrix_name_latex")
-        if matrix_name_latex:
-            logger.info("matrix_name_latex =" + matrix_name_latex)
-        else:
-            matrix_name_latex = ""
-        matrix_description_latex = request.args.get("matrix_description_latex")
-        if matrix_description_latex:
-            logger.info("matrix_description_latex =" + matrix_description_latex)
-        else:
-            matrix_description_latex = ""
-        matrix_reference_latex = request.args.get("matrix_reference_latex")
-        if matrix_reference_latex:
-            logger.info("matrix_reference_latex =" + matrix_reference_latex)
-        else:
-            matrix_reference_latex = ""
-        _raw_is_composite = request.args.get("matrix_is_composite")
-        if _raw_is_composite:
-            matrix_is_composite = _raw_is_composite.lower() == "true"
-        else:
-            matrix_is_composite = False
-        matrix_size = request.args.get("matrix_size")
-        if matrix_size:
-            logger.info("matrix_size =" + matrix_size)
-        else:
-            matrix_size = "arbitrary"
-        matrix_number_of_rows = request.args.get("matrix_number_of_rows")
-        if matrix_number_of_rows:
-            logger.info("matrix_number_of_rows =" + matrix_number_of_rows)
-        else:
-            matrix_number_of_rows = ""
-        matrix_number_of_columns = request.args.get("matrix_number_of_columns")
-        if matrix_number_of_columns:
-            logger.info("matrix_number_of_columns =" + matrix_number_of_columns)
-        else:
-            matrix_number_of_columns = ""
-    author_name_latex = g.current_author["author_name_latex"]
-    # %f = Microsecond as a decimal number, zero-padded on the left.
-    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
-    with graphDB_Driver.session() as session:
-        session.write_transaction(
-            neo4j_query.add_matrix_symbol,
-            symbol_id,
-            matrix_name_latex,
-            matrix_latex,
-            matrix_description_latex,
-            matrix_reference_latex,
-            matrix_is_composite,
-            matrix_size,
-            matrix_number_of_rows,
-            matrix_number_of_columns,
-            now_str,
-            author_name_latex,
-        )
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={"status": "matrix symbol added successfully", "symbol_id": symbol_id},
-        links={
-            "self": hal_link(
-                url_for(".api_matrix_metadata", symbol_id=symbol_id, _external=True),
-                "Get matrix metadata",
-            ),
-            "up": hal_link(
-                url_for(".api_list_matrix_symbols", _external=True),
-                "List of Matrix Symbols",
-            ),
-            "edit": hal_link(
-                url_for(".api_edit_matrix", symbol_id=symbol_id, _external=True),
-                "Edit this matrix",
-            ),
-            "delete": hal_link(
-                url_for(".api_delete_matrix", symbol_id=symbol_id, _external=True),
-                "Delete this matrix",
-            ),
-        },
-        status=201,
-    )
-
-
-@api_bp.route("/resources/symbol/operation", methods=["POST"])
-@require_auth
-def api_create_operation_symbol():
-    """
-
-    .. code-block:: bash
-
-        curl --silent --insecure https://localhost/api/v1/resources/symbol/operation/create
-
-    see `to_add_operation`
-
-    """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
-
-    if request.is_json:  # "Content-Type: application/json"
-        data_from_user = request.get_json()
-        logger.info("data_from_user = " + str(data_from_user))
-
-        # required
-        if "operation_name_latex" in data_from_user.keys():
-            operation_name_latex = data_from_user["operation_name_latex"]
-        else:
-            return hal_error(
-                "need to provide operation_name_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        if "operation_latex" in data_from_user.keys():
-            operation_latex = data_from_user["operation_latex"]
-        else:
-            return hal_error(
-                "need to provide operation_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        if "operation_description_latex" in data_from_user.keys():
-            operation_description_latex = data_from_user["operation_description_latex"]
-        else:
-            return hal_error(
-                "need to provide operation_description_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        if "operation_reference_latex" in data_from_user.keys():
-            operation_reference_latex = data_from_user["operation_reference_latex"]
-        else:
-            operation_reference_latex = ""
-
-        # required
-        if "operation_argument_count" in data_from_user.keys():
-            operation_argument_count = data_from_user["operation_argument_count"]
-        else:
-            return hal_error(
-                "need to provide operation_argument_count",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-    else:
-        logger.info("request.args=" + str(request.args))
-        operation_name_latex = request.args.get("operation_name_latex")
-        if operation_name_latex:
-            logger.info("operation_name_latex =" + operation_name_latex)
-        else:
-            return hal_error(
-                "need to provide operation_name_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        operation_latex = request.args.get("operation_latex")
-        if operation_latex:
-            logger.info("operation_latex =" + operation_latex)
-        else:
-            return hal_error(
-                "need to provide operation_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        operation_description_latex = request.args.get("operation_description_latex")
-        if operation_description_latex:
-            logger.info("operation_description_latex =" + operation_description_latex)
-        else:
-            return hal_error(
-                "need to provide operation_description_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        operation_reference_latex = request.args.get("operation_reference_latex")
-        if operation_reference_latex:
-            logger.info("operation_reference_latex =" + operation_reference_latex)
-        else:
-            operation_reference_latex = ""
-
-        # required
-        operation_argument_count = request.args.get("operation_argument_count")
-        if operation_argument_count:
-            logger.info("operation_argument_count =" + operation_argument_count)
-        else:
-            return hal_error(
-                "need to provide operation_argument_count",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-    author_name_latex = g.current_author["author_name_latex"]
-
-    # %f = Microsecond as a decimal number, zero-padded on the left.
-    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-    operation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
-
-    # https://neo4j.com/docs/python-manual/current/session-api/
-    with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
-        session.write_transaction(
-            neo4j_query.add_operation_symbol,
-            operation_id,
-            operation_name_latex,
-            operation_latex,
-            operation_description_latex,
-            operation_reference_latex,
-            operation_argument_count,
-            now_str,
-            author_name_latex,
-        )
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
-    return hal_response(
-        data={
-            "status": "operation symbol added successfully",
-            "operation_id": operation_id,
-            "created": now_str,
-        },
-        links={
-            "self": hal_link(
-                url_for(
-                    ".api_operation_metadata", operation_id=operation_id, _external=True
-                ),
-                "Get operation metadata",
-            ),
-            "collection": hal_link(
-                url_for(".api_list_operation_symbols", _external=True),
-                "List of Operation Symbols",
-            ),
-            "edit": hal_link(
-                url_for(
-                    ".api_edit_operation", operation_id=operation_id, _external=True
-                ),
-                "Edit this operation",
-            ),
-            "delete": hal_link(
-                url_for(
-                    ".api_delete_operation", operation_id=operation_id, _external=True
-                ),
-                "Delete this operation",
-            ),
-            "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            ),
-        },
-        status=201,
-    )
-
-
-@api_bp.route("/resources/symbol/relation", methods=["POST"])
-@require_auth
-def api_create_relation_symbol():
-    """
-
-    .. code-block:: bash
-
-        curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/create
-
-    see `to_add_relation`
-    """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + trace_id)
-    query_time_dict = {}  # type: query_timing_result_type
-
-    if request.is_json:  # "Content-Type: application/json"
-        data_from_user = request.get_json()
-        logger.info("data_from_user = " + str(data_from_user))
-
-        # required
-        if "relation_name_latex" in data_from_user.keys():
-            relation_name_latex = data_from_user["relation_name_latex"]
-        else:
-            return hal_error(
-                "need to provide relation_name_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        if "relation_latex" in data_from_user.keys():
-            relation_latex = data_from_user["relation_latex"]
-        else:
-            return hal_error(
-                "need to provide relation_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        if "relation_description_latex" in data_from_user.keys():
-            relation_description_latex = data_from_user["relation_description_latex"]
-        else:
-            return hal_error(
-                "need to provide relation_description_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        if "relation_reference_latex" in data_from_user.keys():
-            relation_reference_latex = data_from_user["relation_reference_latex"]
-        else:
-            relation_reference_latex = ""
-
-    else:  # "Content-Type: application/x-www-form-urlencoded"
-        logger.info("request.args=" + str(request.args))  # returns a dict
-        # required
-        relation_name_latex = request.args.get("relation_name_latex")
-        if relation_name_latex:
-            logger.info("relation_name_latex =" + relation_name_latex)
-        else:
-            return hal_error(
-                "need to provide relation_name_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        relation_latex = request.args.get("relation_latex")
-        if relation_latex:
-            logger.info("relation_latex =" + relation_latex)
-        else:
-            return hal_error(
-                "need to provide relation_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        relation_description_latex = request.args.get("relation_description_latex")
-        if relation_description_latex:
-            logger.info("relation_description_latex =" + relation_description_latex)
-        else:
-            return hal_error(
-                "need to provide relation_description_latex",
-                400,
-                links={
-                    "up": hal_link(
-                        url_for(".api_start_here", _external=True), "API Entry Point"
-                    )
-                },
-                title="Missing Field",
-            )
-        relation_reference_latex = request.args.get("relation_reference_latex")
-        if relation_reference_latex:
-            logger.info("relation_reference_latex =" + relation_reference_latex)
-        else:
-            relation_reference_latex = ""
-
-    author_name_latex = g.current_author["author_name_latex"]
-
-    # %f = Microsecond as a decimal number, zero-padded on the left.
-    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-    relation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
-
-    # https://neo4j.com/docs/python-manual/current/session-api/
-    with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
-        session.write_transaction(
-            neo4j_query.add_relation_symbol,
-            relation_id,
-            relation_name_latex,
-            relation_latex,
-            relation_description_latex,
-            relation_reference_latex,
-            now_str,
-            author_name_latex,
-        )
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
-    return hal_response(
-        data={
-            "status": "relation symbol added successfully",
-            "relation_id": relation_id,
-            "created": now_str,
-        },
-        links={
-            "self": hal_link(
-                url_for(
-                    ".api_relation_metadata", relation_id=relation_id, _external=True
-                ),
-                "Get relation metadata",
-            ),
-            "collection": hal_link(
-                url_for(".api_list_relation_symbols", _external=True),
-                "List of Relation Symbols",
-            ),
-            "edit": hal_link(
-                url_for(".api_edit_relation", relation_id=relation_id, _external=True),
-                "Edit this relation",
-            ),
-            "delete": hal_link(
-                url_for(
-                    ".api_delete_relation", relation_id=relation_id, _external=True
-                ),
-                "Delete this relation",
-            ),
-            "up": hal_link(
-                url_for(".api_start_here", _external=True), "API Entry Point"
-            ),
-        },
-        status=201,
-    )
-
-
 @api_bp.route("/resources/derivation/<string:derivation_id>/edit", methods=["POST"])
 @require_auth
 def api_edit_derivation(derivation_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        derivation_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
+    data_from_user = request.get_json() if request.is_json else request.args
+    editable_fields = {
+        "derivation_name_latex": "name_latex",
+        "derivation_abstract_latex": "abstract_latex",
+        "derivation_reference_latex": "reference_latex",
+    }
+    updated_fields = []
+
+    def _edit_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(
+            tx, "derivation", derivation_id
         )
-    if derivation_dict is None:
+        if existing is None:
+            return False
+
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key):
+                updated = neo4j_query.edit_node_property(
+                    tx,
+                    "derivation",
+                    derivation_id,
+                    node_property,
+                    data_from_user.get(form_key),
+                )
+                if updated:
+                    updated_fields.append(node_property)
+        if updated_fields:
+            _stamp_last_modified(tx, "derivation", derivation_id)
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_edit_atomic)
+
+    if not found:
         return hal_error(
             f"Derivation {derivation_id} does not exist",
             404,
@@ -2838,26 +1720,7 @@ def api_edit_derivation(derivation_id: str):
             },
             title="Not Found",
         )
-    data_from_user = request.get_json() if request.is_json else request.args
-    editable_fields = {
-        "derivation_name_latex": "name_latex",
-        "derivation_abstract_latex": "abstract_latex",
-        "derivation_reference_latex": "reference_latex",
-    }
-    updated_fields = []
-    with graphDB_Driver.session() as session:
-        for form_key, node_property in editable_fields.items():
-            if form_key in data_from_user and data_from_user.get(form_key):
-                session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "derivation",
-                    derivation_id,
-                    node_property,
-                    data_from_user.get(form_key),
-                )
-                updated_fields.append(node_property)
-        if updated_fields:
-            _stamp_last_modified(session, "derivation", derivation_id)
+
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -2892,11 +1755,42 @@ def api_edit_derivation(derivation_id: str):
 def api_edit_inference_rule(infrule_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        inference_rule_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "inference_rule", infrule_id
+    data_from_user = request.get_json() if request.is_json else request.args
+    editable_fields = {
+        "inference_rule_name_latex": "name_latex",
+        "inference_rule_latex": "latex",
+        "number_of_inputs": "number_of_inputs",
+        "number_of_feeds": "number_of_feeds",
+        "number_of_outputs": "number_of_outputs",
+    }
+    updated_fields = []
+
+    def _edit_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(
+            tx, "inference_rule", infrule_id
         )
-    if inference_rule_dict is None:
+        if existing is None:
+            return False
+
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key):
+                updated = neo4j_query.edit_node_property(
+                    tx,
+                    "inference_rule",
+                    infrule_id,
+                    node_property,
+                    data_from_user.get(form_key),
+                )
+                if updated:
+                    updated_fields.append(node_property)
+        if updated_fields:
+            _stamp_last_modified(tx, "inference_rule", infrule_id)
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_edit_atomic)
+
+    if not found:
         return hal_error(
             f"Inference rule {infrule_id} does not exist",
             404,
@@ -2908,28 +1802,7 @@ def api_edit_inference_rule(infrule_id: str):
             },
             title="Not Found",
         )
-    data_from_user = request.get_json() if request.is_json else request.args
-    editable_fields = {
-        "inference_rule_name_latex": "name_latex",
-        "inference_rule_latex": "latex",
-        "number_of_inputs": "number_of_inputs",
-        "number_of_feeds": "number_of_feeds",
-        "number_of_outputs": "number_of_outputs",
-    }
-    updated_fields = []
-    with graphDB_Driver.session() as session:
-        for form_key, node_property in editable_fields.items():
-            if form_key in data_from_user and data_from_user.get(form_key):
-                session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "inference_rule",
-                    infrule_id,
-                    node_property,
-                    data_from_user.get(form_key),
-                )
-                updated_fields.append(node_property)
-        if updated_fields:
-            _stamp_last_modified(session, "inference_rule", infrule_id)
+
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -2965,11 +1838,62 @@ def api_edit_inference_rule(infrule_id: str):
 def api_edit_expression(expression_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        existing_expression_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "expression", expression_id
+    data_from_user = request.get_json() if request.is_json else request.args
+    last_modified_by_latex = g.current_author["author_name_latex"]
+
+    def _edit_atomic(tx):
+        existing_expression_dict = neo4j_query.get_node_properties_from_id(
+            tx, "expression", expression_id
         )
-    if existing_expression_dict is None:
+        if existing_expression_dict is None:
+            return "NOT_FOUND"
+
+        # Build payload fellback values
+        expression_latex_lhs = data_from_user.get(
+            "expression_latex_lhs"
+        ) or existing_expression_dict.get("latex_lhs", "")
+        expression_relation_latex = data_from_user.get(
+            "expression_relation_latex"
+        ) or existing_expression_dict.get("latex_relation", "")
+        expression_latex_rhs = data_from_user.get(
+            "expression_latex_rhs"
+        ) or existing_expression_dict.get("latex_rhs", "")
+        expression_latex_condition = data_from_user.get(
+            "expression_latex_condition"
+        ) or existing_expression_dict.get("latex_condition", "")
+        expression_name_latex = data_from_user.get(
+            "expression_name_latex"
+        ) or existing_expression_dict.get("name_latex", "")
+        expression_description_latex = data_from_user.get(
+            "expression_description_latex"
+        ) or existing_expression_dict.get("description_latex", "")
+        expression_reference_latex = data_from_user.get(
+            "expression_reference_latex"
+        ) or existing_expression_dict.get("reference_latex", "")
+        author_name_latex = existing_expression_dict.get("author_name_latex", "unknown")
+
+        success = neo4j_query.edit_expression(
+            tx,
+            expression_id,
+            expression_latex_lhs,
+            expression_relation_latex,
+            expression_latex_rhs,
+            expression_latex_condition,
+            expression_name_latex,
+            expression_description_latex,
+            expression_reference_latex,
+            author_name_latex,
+        )
+        if not success:
+            return "CONFLICT"
+
+        _stamp_last_modified(tx, "expression", expression_id)
+        return "SUCCESS"
+
+    with graphDB_Driver.session() as session:
+        status = session.write_transaction(_edit_atomic)
+
+    if status == "NOT_FOUND":
         return hal_error(
             f"Expression {expression_id} does not exist",
             404,
@@ -2981,46 +1905,19 @@ def api_edit_expression(expression_id: str):
             },
             title="Not Found",
         )
-    data_from_user = request.get_json() if request.is_json else request.args
-    expression_latex_lhs = data_from_user.get(
-        "expression_latex_lhs"
-    ) or existing_expression_dict.get("latex_lhs", "")
-    expression_relation_latex = data_from_user.get(
-        "expression_relation_latex"
-    ) or existing_expression_dict.get("latex_relation", "")
-    expression_latex_rhs = data_from_user.get(
-        "expression_latex_rhs"
-    ) or existing_expression_dict.get("latex_rhs", "")
-    expression_latex_condition = data_from_user.get(
-        "expression_latex_condition"
-    ) or existing_expression_dict.get("latex_condition", "")
-    expression_name_latex = data_from_user.get(
-        "expression_name_latex"
-    ) or existing_expression_dict.get("name_latex", "")
-    expression_description_latex = data_from_user.get(
-        "expression_description_latex"
-    ) or existing_expression_dict.get("description_latex", "")
-    expression_reference_latex = data_from_user.get(
-        "expression_reference_latex"
-    ) or existing_expression_dict.get("reference_latex", "")
-    # Preserve the original creator's identity on edits rather than overwriting it
-    # with whoever happens to be making this particular change.
-    author_name_latex = existing_expression_dict.get("author_name_latex", "unknown")
-    last_modified_by_latex = g.current_author["author_name_latex"]
-    with graphDB_Driver.session() as session:
-        session.write_transaction(
-            neo4j_query.edit_expression,
-            expression_id,
-            expression_latex_lhs,
-            expression_relation_latex,
-            expression_latex_rhs,
-            expression_latex_condition,
-            expression_name_latex,
-            expression_description_latex,
-            expression_reference_latex,
-            author_name_latex,
+    elif status == "CONFLICT":
+        return hal_error(
+            "An expression with that formula already exists",
+            409,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_expressions", _external=True),
+                    "List of Expressions",
+                )
+            },
+            title="Conflict",
         )
-        _stamp_last_modified(session, "expression", expression_id)
+
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -3050,406 +1947,15 @@ def api_edit_expression(expression_id: str):
     )
 
 
-@api_bp.route("/resources/symbol/scalar/<string:symbol_id>/edit", methods=["POST"])
-@require_auth
-def api_edit_scalar(symbol_id: str):
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        scalar_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "scalar", symbol_id
-        )
-    if scalar_dict is None:
-        return hal_error(
-            f"Scalar {symbol_id} does not exist",
-            404,
-            links={
-                "up": hal_link(
-                    url_for(".api_list_scalar_symbols", _external=True),
-                    "List of Scalar Symbols",
-                )
-            },
-            title="Not Found",
-        )
-    data_from_user = request.get_json() if request.is_json else request.args
-    editable_fields = {
-        "scalar_latex": "latex",
-        "scalar_name_latex": "name_latex",
-        "scalar_description_latex": "description_latex",
-        "scalar_reference_latex": "reference_latex",
-        "scalar_scope": "scope",
-        "scalar_variable_or_constant": "variable_or_constant",
-        "scalar_domain": "domain",
-        "dimension_length": "dimension_length",
-        "dimension_time": "dimension_time",
-        "dimension_mass": "dimension_mass",
-        "dimension_temperature": "dimension_temperature",
-        "dimension_electric_charge": "dimension_electric_charge",
-        "dimension_amount_of_substance": "dimension_amount_of_substance",
-        "dimension_luminous_intensity": "dimension_luminous_intensity",
-    }
-    updated_fields = []
-    with graphDB_Driver.session() as session:
-        for form_key, node_property in editable_fields.items():
-            if form_key in data_from_user and data_from_user.get(form_key):
-                session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "scalar",
-                    symbol_id,
-                    node_property,
-                    data_from_user.get(form_key),
-                )
-                updated_fields.append(node_property)
-        if updated_fields:
-            _stamp_last_modified(session, "scalar", symbol_id)
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={
-            "status": "scalar updated successfully",
-            "id": symbol_id,
-            "updated_fields": updated_fields,
-        },
-        links={
-            "self": hal_link(
-                url_for(".api_edit_scalar", symbol_id=symbol_id, _external=True),
-                "Edit scalar",
-            ),
-            "scalar": hal_link(
-                url_for(".api_scalar_metadata", symbol_id=symbol_id, _external=True),
-                "Get scalar metadata",
-            ),
-            "up": hal_link(
-                url_for(".api_list_scalar_symbols", _external=True),
-                "List of Scalar Symbols",
-            ),
-        },
-    )
-
-
-@api_bp.route("/resources/symbol/vector/<string:symbol_id>/edit", methods=["POST"])
-@require_auth
-def api_edit_vector(symbol_id: str):
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        vector_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "vector", symbol_id
-        )
-    if vector_dict is None:
-        return hal_error(
-            f"Vector {symbol_id} does not exist",
-            404,
-            links={
-                "up": hal_link(
-                    url_for(".api_list_vector_symbols", _external=True),
-                    "List of Vector Symbols",
-                )
-            },
-            title="Not Found",
-        )
-    data_from_user = request.get_json() if request.is_json else request.args
-    editable_fields = {
-        "vector_latex": "latex",
-        "vector_name_latex": "name_latex",
-        "vector_description_latex": "description_latex",
-        "vector_reference_latex": "reference_latex",
-        "vector_orientation": "orientation",
-        "vector_size": "size",
-        "vector_number_of_entries": "number_of_entries",
-        "vector_is_composite": "is_composite",
-    }
-    updated_fields = []
-    with graphDB_Driver.session() as session:
-        for form_key, node_property in editable_fields.items():
-            if form_key in data_from_user and data_from_user.get(form_key):
-                session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "vector",
-                    symbol_id,
-                    node_property,
-                    data_from_user.get(form_key),
-                )
-                updated_fields.append(node_property)
-        if updated_fields:
-            _stamp_last_modified(session, "vector", symbol_id)
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={
-            "status": "vector updated successfully",
-            "id": symbol_id,
-            "updated_fields": updated_fields,
-        },
-        links={
-            "self": hal_link(
-                url_for(".api_edit_vector", symbol_id=symbol_id, _external=True),
-                "Edit vector",
-            ),
-            "vector": hal_link(
-                url_for(".api_vector_metadata", symbol_id=symbol_id, _external=True),
-                "Get vector metadata",
-            ),
-            "up": hal_link(
-                url_for(".api_list_vector_symbols", _external=True),
-                "List of Vector Symbols",
-            ),
-        },
-    )
-
-
-@api_bp.route("/resources/symbol/matrix/<string:symbol_id>/edit", methods=["POST"])
-@require_auth
-def api_edit_matrix(symbol_id: str):
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        matrix_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "matrix", symbol_id
-        )
-    if matrix_dict is None:
-        return hal_error(
-            f"Matrix {symbol_id} does not exist",
-            404,
-            links={
-                "up": hal_link(
-                    url_for(".api_list_matrix_symbols", _external=True),
-                    "List of Matrix Symbols",
-                )
-            },
-            title="Not Found",
-        )
-    data_from_user = request.get_json() if request.is_json else request.args
-    editable_fields = {
-        "matrix_latex": "latex",
-        "matrix_name_latex": "name_latex",
-        "matrix_description_latex": "description_latex",
-        "matrix_reference_latex": "reference_latex",
-        "matrix_size": "size",
-        "matrix_number_of_rows": "number_of_rows",
-        "matrix_number_of_columns": "number_of_columns",
-        "matrix_is_composite": "is_composite",
-    }
-    updated_fields = []
-    with graphDB_Driver.session() as session:
-        for form_key, node_property in editable_fields.items():
-            if form_key in data_from_user and data_from_user.get(form_key):
-                session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "matrix",
-                    symbol_id,
-                    node_property,
-                    data_from_user.get(form_key),
-                )
-                updated_fields.append(node_property)
-        if updated_fields:
-            _stamp_last_modified(session, "matrix", symbol_id)
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={
-            "status": "matrix updated successfully",
-            "id": symbol_id,
-            "updated_fields": updated_fields,
-        },
-        links={
-            "self": hal_link(
-                url_for(".api_edit_matrix", symbol_id=symbol_id, _external=True),
-                "Edit matrix",
-            ),
-            "matrix": hal_link(
-                url_for(".api_matrix_metadata", symbol_id=symbol_id, _external=True),
-                "Get matrix metadata",
-            ),
-            "up": hal_link(
-                url_for(".api_list_matrix_symbols", _external=True),
-                "List of Matrix Symbols",
-            ),
-        },
-    )
-
-
-@api_bp.route(
-    "/resources/symbol/operation/<string:operation_id>/edit", methods=["POST"]
-)
-@require_auth
-def api_edit_operation(operation_id: str):
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        operation_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "operation", operation_id
-        )
-    if operation_dict is None:
-        return hal_error(
-            f"Operation {operation_id} does not exist",
-            404,
-            links={
-                "up": hal_link(
-                    url_for(".api_list_operation_symbols", _external=True),
-                    "List of Operation Symbols",
-                )
-            },
-            title="Not Found",
-        )
-    data_from_user = request.get_json() if request.is_json else request.args
-    editable_fields = {
-        "operation_latex": "latex",
-        "operation_name_latex": "name_latex",
-        "operation_description_latex": "description_latex",
-        "operation_reference_latex": "reference_latex",
-        "operation_argument_count": "argument_count",
-    }
-    updated_fields = []
-    with graphDB_Driver.session() as session:
-        for form_key, node_property in editable_fields.items():
-            if form_key in data_from_user and data_from_user.get(form_key):
-                session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "operation",
-                    operation_id,
-                    node_property,
-                    data_from_user.get(form_key),
-                )
-                updated_fields.append(node_property)
-        if updated_fields:
-            _stamp_last_modified(session, "operation", operation_id)
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={
-            "status": "operation updated successfully",
-            "id": operation_id,
-            "updated_fields": updated_fields,
-        },
-        links={
-            "self": hal_link(
-                url_for(
-                    ".api_edit_operation", operation_id=operation_id, _external=True
-                ),
-                "Edit operation",
-            ),
-            "operation": hal_link(
-                url_for(
-                    ".api_operation_metadata", operation_id=operation_id, _external=True
-                ),
-                "Get operation metadata",
-            ),
-            "up": hal_link(
-                url_for(".api_list_operation_symbols", _external=True),
-                "List of Operation Symbols",
-            ),
-        },
-    )
-
-
-@api_bp.route("/resources/symbol/relation/<string:relation_id>/edit", methods=["POST"])
-@require_auth
-def api_edit_relation(relation_id: str):
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        relation_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "relation", relation_id
-        )
-    if relation_dict is None:
-        return hal_error(
-            f"Relation {relation_id} does not exist",
-            404,
-            links={
-                "up": hal_link(
-                    url_for(".api_list_relation_symbols", _external=True),
-                    "List of Relation Symbols",
-                )
-            },
-            title="Not Found",
-        )
-    data_from_user = request.get_json() if request.is_json else request.args
-    editable_fields = {
-        "relation_latex": "latex",
-        "relation_name_latex": "name_latex",
-        "relation_description_latex": "description_latex",
-        "relation_reference_latex": "reference_latex",
-    }
-    updated_fields = []
-    with graphDB_Driver.session() as session:
-        for form_key, node_property in editable_fields.items():
-            if form_key in data_from_user and data_from_user.get(form_key):
-                session.write_transaction(
-                    neo4j_query.edit_node_property,
-                    "relation",
-                    relation_id,
-                    node_property,
-                    data_from_user.get(form_key),
-                )
-                updated_fields.append(node_property)
-        if updated_fields:
-            _stamp_last_modified(session, "relation", relation_id)
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={
-            "status": "relation updated successfully",
-            "id": relation_id,
-            "updated_fields": updated_fields,
-        },
-        links={
-            "self": hal_link(
-                url_for(".api_edit_relation", relation_id=relation_id, _external=True),
-                "Edit relation",
-            ),
-            "relation": hal_link(
-                url_for(
-                    ".api_relation_metadata", relation_id=relation_id, _external=True
-                ),
-                "Get relation metadata",
-            ),
-            "up": hal_link(
-                url_for(".api_list_relation_symbols", _external=True),
-                "List of Relation Symbols",
-            ),
-        },
-    )
-
-
 @api_bp.route("/resources/derivation/<string:derivation_id>/metadata", methods=["GET"])
 def api_derivation_metadata(derivation_id: str):
-    """
-
-    .. code-block:: bash
-
-        curl --silent --insecure https://localhost/api/v1/resources/derivation/3445848/metadata | python3 -m json.tool
-        {
-            "abstract_latex": "my summary",
-            "author_name_latex": "ben",
-            "created_datetime": "2024-05-19_21-16-29-085813",
-            "id": "3445848",
-            "name_latex": "this is a new derivation"
-        }
-
-    """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    # query_time_dict = {}  # type: query_timing_result_type
-
-    # if "derivation_id" in request.args:
-    #     derivation_id = str(request.args["derivation_id"])
-    # else:
-    #     return hal_error(
-    #         "expecting 'derivation_id' parameter",
-    #         400,
-    #         links={
-    #             "up": hal_link(
-    #                 url_for(".api_start_here", _external=True), "API Entry Point"
-    #             )
-    #         },
-    #         title="Missing Field",
-    #     )
     logger.info("derivation_id=" + derivation_id)
-
-    # try provided derivation_id; might not be a valid ID
     with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "derivation", derivation_id
         )
-        # query_time_dict["pdg_api/: "] = time.time() - query_start_time
-    logger.info("derivation_dict=" + str(derivation_dict))
     if derivation_dict is None:
         return hal_error(
             f"Derivation {derivation_id} does not exist",
@@ -3566,56 +2072,47 @@ def api_expression_metadata(expression_id: str):
     - set: change existing values
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    logger.info('[TRACE] start ' + trace_id)
     with graphDB_Driver.session() as session:
-        expression_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "expression", expression_id
-        )
+        expression_dict = session.read_transaction(neo4j_query.get_node_properties_from_id, 'expression', expression_id)
+        
     if expression_dict is None:
         return hal_error(
-            f"Expression {expression_id} does not exist",
-            404,
-            links={
-                "up": hal_link(
-                    url_for(".api_list_expressions", _external=True),
-                    "List of Expressions",
-                )
-            },
-            title="Not Found",
+            f'Expression {expression_id} does not exist', 
+            404, 
+            links={'up': hal_link(url_for('.api_list_expressions', _external=True), 'List of Expressions')}, 
+            title='Not Found'
         )
-    logger.info("[TRACE] end " + trace_id)
+        
+    # Safe link transitions
     links = {
-        "self": hal_link(
-            url_for(
-                ".api_expression_metadata", expression_id=expression_id, _external=True
-            ),
-            "Get expression metadata",
-        ),
-        "edit": hal_link(
-            url_for(
-                ".api_edit_expression", expression_id=expression_id, _external=True
-            ),
-            "Edit this expression",
-        ),
-        "delete": hal_link(
-            url_for(
-                ".api_delete_expression", expression_id=expression_id, _external=True
-            ),
-            "Delete this expression",
-        ),
-        "up": hal_link(
-            url_for(".api_list_expressions", _external=True), "List of Expressions"
-        ),
-        "associate-symbol": hal_link(
-            url_for(
-                ".api_associate_symbol_with_expression",
-                expression_id=expression_id,
-                _external=True,
-            ),
-            "Associate symbol with this expression",
-        ),
+        'self': hal_link(url_for('.api_expression_metadata', expression_id=expression_id, _external=True), 'Get expression metadata'),
+        'up': hal_link(url_for('.api_list_expressions', _external=True), 'List of Expressions')
     }
-    return hal_response(data={"metadata": expression_dict}, links=links)
+    
+    # State-changing operations formatted as templates
+    templates = {
+        'edit': hal_template('POST', [
+            hal_property('expression_latex_lhs', value=expression_dict.get('latex_lhs'), required=True, prompt='LHS (LaTeX)'),
+            hal_property('expression_relation_latex', value=expression_dict.get('latex_relation'), required=True, prompt='Relation (LaTeX)'),
+            hal_property('expression_latex_rhs', value=expression_dict.get('latex_rhs'), required=True, prompt='RHS (LaTeX)'),
+            hal_property('expression_latex_condition', value=expression_dict.get('latex_condition'), prompt='Condition (LaTeX)'),
+            hal_property('expression_name_latex', value=expression_dict.get('name_latex'), prompt='Name (LaTeX)'),
+            hal_property('expression_description_latex', value=expression_dict.get('description_latex'), prompt='Description (LaTeX)'),
+            hal_property('expression_reference_latex', value=expression_dict.get('reference_latex'), prompt='Reference (LaTeX)')
+        ], title='Edit this expression'),
+        'delete': hal_template('DELETE', [], title='Delete this expression'),
+        'associate-symbol': hal_template('POST', [
+            hal_property('symbol_id', required=True, prompt='Symbol ID to Associate')
+        ], title='Associate symbol with this expression')
+    }
+    
+    logger.info('[TRACE] end ' + trace_id)
+    return hal_response(
+        data={'metadata': expression_dict},
+        links=links,
+        templates=templates
+    )
 
 
 @api_bp.route("/resources/symbol/scalar/<string:symbol_id>/metadata", methods=["GET"])
@@ -3872,36 +2369,9 @@ def api_relation_metadata(relation_id: str):
 
 @api_bp.route("/resources/derivation/<string:derivation_id>/steps", methods=["GET"])
 def api_derivation_steps(derivation_id: str):
-    """
-
-    .. code-block:: bash
-
-        curl --silent --insecure https://localhost/api/v1/resources/derivation/3445848/step/list | python3 -m json.tool
-        [
-            {
-                "author_name_latex": "benno",
-                "created_datetime": "2024-05-19_23-23-11-337900",
-                "id": "1800596",
-                "note_after_step_latex": "",
-                "note_before_step_latex": ""
-            }
-        ]
-
-    """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    # query_time_dict = {}  # type: query_timing_result_type
-
-    # if "derivation_id" in request.args:
-    #     derivation_id = str(request.args["derivation_id"])
-    # else:
-    #     return jsonify({"ERROR": "expecting 'derivation_id' parameter"})
-
-    logger.info("derivation_id=" + derivation_id)
-
-    # try provided derivation_id; might not be a valid ID
     with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
         list_of_steps = session.read_transaction(
             neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
@@ -3989,106 +2459,109 @@ def api_derivation_steps(derivation_id: str):
 def api_create_step(derivation_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        derivation_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
-        )
-    if derivation_dict is None:
-        return hal_error(
-            f"Derivation {derivation_id} does not exist", 404, title="Not Found"
-        )
+
     data_from_user = request.get_json() if request.is_json else request.args
     inference_rule_id = data_from_user.get("inference_rule_id")
     if not inference_rule_id:
         return hal_error(
             "need to provide inference_rule_id", 400, title="Missing Field"
         )
-    with graphDB_Driver.session() as session:
-        rule_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "inference_rule", inference_rule_id
-        )
-    if rule_dict is None:
-        return hal_error(
-            f"Inference rule {inference_rule_id} does not exist", 404, title="Not Found"
-        )
+
     note_before_step_latex = data_from_user.get("note_before_step_latex", "")
     note_after_step_latex = data_from_user.get("note_after_step_latex", "")
     list_of_input_expression_IDs = data_from_user.get("inputs", [])
     list_of_feed_data = data_from_user.get("feeds", [])
     list_of_output_expression_IDs = data_from_user.get("outputs", [])
-    query_time_dict = {}
-    step_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
-    with graphDB_Driver.session() as session:
-        seq_values = session.read_transaction(
-            neo4j_query.get_list_of_sequence_values_for_derivation_id, derivation_id
-        )
-    new_sequence_value = data_from_user.get("sequence_index")
-    if new_sequence_value is None:
-        new_sequence_value = max(seq_values) + 1 if seq_values else 0
-    else:
+    sequence_index_req = data_from_user.get("sequence_index")
+
+    if sequence_index_req is not None:
         try:
-            new_sequence_value = int(new_sequence_value)
-        except ValueError:
+            sequence_index_req = int(sequence_index_req)
+        except (TypeError, ValueError):
             return hal_error(
                 "sequence_index must be an integer", 400, title="Invalid Field"
             )
+
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    list_of_feed_IDs = []
-    with graphDB_Driver.session() as session:
-        for feed_item in list_of_feed_data:
-            if isinstance(feed_item, dict):
-                feed_latex = feed_item.get("feed_latex") or feed_item.get("latex")
-                if not feed_latex:
-                    return hal_error(
-                        "feed object must contain feed_latex",
-                        400,
-                        title="Invalid Field",
-                    )
-                feed_id, query_time_dict = generate_random_id(
-                    graphDB_Driver, query_time_dict
+
+    # Pre-generate IDs for inline feed creations outside transaction to prevent nested session loops
+    list_of_feed_IDs_or_dicts = []
+    query_time_dict = {}
+    for feed_item in list_of_feed_data:
+        if isinstance(feed_item, dict):
+            feed_latex = feed_item.get("feed_latex") or feed_item.get("latex")
+            if not feed_latex:
+                return hal_error(
+                    "feed object must contain feed_latex", 400, title="Invalid Field"
                 )
-                session.write_transaction(
-                    neo4j_query.add_feed,
-                    feed_id,
-                    feed_latex,
-                    now_str,
-                    author_name_latex,
-                )
-                list_of_feed_IDs.append(feed_id)
-            else:
-                list_of_feed_IDs.append(str(feed_item))
-    with graphDB_Driver.session() as session:
-        session.write_transaction(
-            neo4j_query.connect_step_to_derivation,
+            feed_id, query_time_dict = generate_random_id(
+                graphDB_Driver, query_time_dict
+            )
+            list_of_feed_IDs_or_dicts.append({"id": feed_id, "latex": feed_latex})
+        else:
+            list_of_feed_IDs_or_dicts.append(str(feed_item))
+
+    step_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+
+    def _create_step_atomic(tx):
+        # Transactionally connects step with write lock ensuring atomic sequence index calculations
+        result_data = neo4j_query.connect_step_to_derivation(
+            tx,
             step_id,
             derivation_id,
             inference_rule_id,
-            new_sequence_value,
+            sequence_index_req,
             now_str,
             note_before_step_latex,
             note_after_step_latex,
             author_name_latex,
         )
+        if not result_data:
+            return None
+
+        final_feed_ids = []
+        for item in list_of_feed_IDs_or_dicts:
+            if isinstance(item, dict):
+                neo4j_query.add_feed(
+                    tx, item["id"], item["latex"], now_str, author_name_latex
+                )
+                final_feed_ids.append(item["id"])
+            else:
+                final_feed_ids.append(item)
+
         if (
             len(list_of_input_expression_IDs) > 0
-            or len(list_of_feed_IDs) > 0
+            or len(final_feed_ids) > 0
             or len(list_of_output_expression_IDs) > 0
         ):
-            session.write_transaction(
-                neo4j_query.connect_expressions_to_step,
+            neo4j_query.connect_expressions_to_step(
+                tx,
                 step_id,
                 now_str,
                 list_of_input_expression_IDs,
-                list_of_feed_IDs,
+                final_feed_ids,
                 list_of_output_expression_IDs,
                 author_name_latex,
             )
+
+        return result_data
+
+    with graphDB_Driver.session() as session:
+        step_res = session.write_transaction(_create_step_atomic)
+
+    if step_res is None:
+        return hal_error(
+            f"Derivation {derivation_id} or Inference Rule {inference_rule_id} does not exist",
+            404,
+            title="Not Found",
+        )
+
     return hal_response(
         data={
             "status": "step added successfully",
             "step_id": step_id,
-            "sequence_index": new_sequence_value,
+            "sequence_index": step_res["sequence_index"],
             "created": now_str,
         },
         links={
@@ -4127,31 +2600,33 @@ def api_create_step(derivation_id: str):
 def api_get_step(derivation_id: str, step_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        step_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "step", step_id
+
+    def _read_step_details_atomic(tx):
+        step_dict = neo4j_query.get_node_properties_from_id(tx, "step", step_id)
+        if step_dict is None:
+            return None
+
+        step_dict["inputs"] = neo4j_query.get_list_of_input_expressions_used_in_step(
+            tx, step_id
         )
-    if step_dict is None:
+        step_dict["feeds"] = neo4j_query.get_feeds_used_in_step(tx, step_id)
+        step_dict["outputs"] = neo4j_query.get_list_of_output_expressions_used_in_step(
+            tx, step_id
+        )
+        step_dict["inference_rule"] = (
+            neo4j_query.get_inference_rule_connected_to_step_ID(tx, step_id)
+        )
+        step_dict["sequence_index"] = neo4j_query.get_sequence_index_for_step(
+            tx, step_id
+        )
+        return step_dict
+
+    with graphDB_Driver.session() as session:
+        full_step_data = session.read_transaction(_read_step_details_atomic)
+
+    if full_step_data is None:
         return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
-    with graphDB_Driver.session() as session:
-        inputs = session.read_transaction(
-            neo4j_query.get_list_of_input_expressions_used_in_step, step_id
-        )
-        feeds = session.read_transaction(neo4j_query.get_feeds_used_in_step, step_id)
-        outputs = session.read_transaction(
-            neo4j_query.get_list_of_output_expressions_used_in_step, step_id
-        )
-        inf_rule = session.read_transaction(
-            neo4j_query.get_inference_rule_connected_to_step_ID, step_id
-        )
-        seq_idx = session.read_transaction(
-            neo4j_query.get_sequence_index_for_step, step_id
-        )
-    step_dict["inputs"] = inputs
-    step_dict["feeds"] = feeds
-    step_dict["outputs"] = outputs
-    step_dict["inference_rule"] = inf_rule
-    step_dict["sequence_index"] = seq_idx
+
     links = {
         "self": hal_link(
             url_for(
@@ -4229,7 +2704,7 @@ def api_get_step(derivation_id: str, step_id: str):
             "Delete step",
         ),
     }
-    return hal_response(data=step_dict, links=links)
+    return hal_response(data=full_step_data, links=links)
 
 
 @api_bp.route(
@@ -4241,14 +2716,20 @@ def api_edit_step_notes(derivation_id: str, step_id: str):
     data_from_user = request.get_json() if request.is_json else request.args
     before = data_from_user.get("note_before_step_latex", "")
     after = data_from_user.get("note_after_step_latex", "")
-    with graphDB_Driver.session() as session:
-        step_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "step", step_id
-        )
+
+    def _edit_notes_atomic(tx):
+        step_dict = neo4j_query.get_node_properties_from_id(tx, "step", step_id)
         if step_dict is None:
-            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
-        session.write_transaction(neo4j_query.edit_step_notes, step_id, before, after)
-        _stamp_last_modified(session, "step", step_id)
+            return False
+        neo4j_query.edit_step_notes(tx, step_id, before, after)
+        _stamp_last_modified(tx, "step", step_id)
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_edit_notes_atomic)
+
+    if not found:
+        return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
     return hal_response(
         data={"status": "step notes updated successfully"},
         links={
@@ -4278,16 +2759,20 @@ def api_swap_step_input(derivation_id: str, step_id: str):
         return hal_error(
             "need to provide old_input_id and new_input_id", 400, title="Missing Fields"
         )
-    with graphDB_Driver.session() as session:
-        step_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "step", step_id
-        )
+
+    def _swap_input_atomic(tx):
+        step_dict = neo4j_query.get_node_properties_from_id(tx, "step", step_id)
         if step_dict is None:
-            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
-        session.write_transaction(
-            neo4j_query.edit_step_input, step_id, old_input_id, new_input_id
-        )
-        _stamp_last_modified(session, "step", step_id)
+            return False
+        neo4j_query.edit_step_input(tx, step_id, old_input_id, new_input_id)
+        _stamp_last_modified(tx, "step", step_id)
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_swap_input_atomic)
+
+    if not found:
+        return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
     return hal_response(
         data={"status": "step input swapped successfully"},
         links={
@@ -4317,16 +2802,20 @@ def api_swap_step_feed(derivation_id: str, step_id: str):
         return hal_error(
             "need to provide old_feed_id and new_feed_id", 400, title="Missing Fields"
         )
-    with graphDB_Driver.session() as session:
-        step_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "step", step_id
-        )
+
+    def _swap_feed_atomic(tx):
+        step_dict = neo4j_query.get_node_properties_from_id(tx, "step", step_id)
         if step_dict is None:
-            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
-        session.write_transaction(
-            neo4j_query.edit_step_feed, step_id, old_feed_id, new_feed_id
-        )
-        _stamp_last_modified(session, "step", step_id)
+            return False
+        neo4j_query.edit_step_feed(tx, step_id, old_feed_id, new_feed_id)
+        _stamp_last_modified(tx, "step", step_id)
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_swap_feed_atomic)
+
+    if not found:
+        return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
     return hal_response(
         data={"status": "step feed swapped successfully"},
         links={
@@ -4358,16 +2847,20 @@ def api_swap_step_output(derivation_id: str, step_id: str):
             400,
             title="Missing Fields",
         )
-    with graphDB_Driver.session() as session:
-        step_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "step", step_id
-        )
+
+    def _swap_output_atomic(tx):
+        step_dict = neo4j_query.get_node_properties_from_id(tx, "step", step_id)
         if step_dict is None:
-            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
-        session.write_transaction(
-            neo4j_query.edit_step_output, step_id, old_output_id, new_output_id
-        )
-        _stamp_last_modified(session, "step", step_id)
+            return False
+        neo4j_query.edit_step_output(tx, step_id, old_output_id, new_output_id)
+        _stamp_last_modified(tx, "step", step_id)
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_swap_output_atomic)
+
+    if not found:
+        return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
     return hal_response(
         data={"status": "step output swapped successfully"},
         links={
@@ -4390,22 +2883,19 @@ def api_swap_step_output(derivation_id: str, step_id: str):
 )
 @require_auth
 def api_remove_step_feed(derivation_id: str, step_id: str, feed_id: str):
-    with graphDB_Driver.session() as session:
-        step_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "step", step_id
-        )
+    def _remove_feed_atomic(tx):
+        step_dict = neo4j_query.get_node_properties_from_id(tx, "step", step_id)
         if step_dict is None:
-            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
+            return False
+        neo4j_query.disconnect_feed_from_step(tx, step_id, feed_id)
+        _stamp_last_modified(tx, "step", step_id)
+        return True
 
-        def _detach_feed(tx: neo4j.Transaction):
-            tx.run(
-                "MATCH (s:step {id: $sid})-[r:HAS_FEED]->(f:feed {id: $fid}) DELETE r",
-                sid=step_id,
-                fid=feed_id,
-            )
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_remove_feed_atomic)
 
-        session.write_transaction(_detach_feed)
-        _stamp_last_modified(session, "step", step_id)
+    if not found:
+        return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
     return hal_response(
         data={
             "status": f"feed {feed_id} disconnected from step {step_id} successfully"
@@ -4434,34 +2924,35 @@ def api_add_step_feed(derivation_id: str, step_id: str):
     feed_latex = data_from_user.get("feed_latex") or data_from_user.get("latex")
     if not feed_latex:
         return hal_error("need to provide feed_latex", 400, title="Missing Field")
+
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+
     query_time_dict = {}
     feed_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
-    with graphDB_Driver.session() as session:
-        step_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "step", step_id
-        )
+
+    def _add_feed_atomic(tx):
+        step_dict = neo4j_query.get_node_properties_from_id(tx, "step", step_id)
         if step_dict is None:
-            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
-        session.write_transaction(
-            neo4j_query.add_feed, feed_id, feed_latex, now_str, author_name_latex
-        )
-        existing_feeds = session.read_transaction(
-            neo4j_query.get_feeds_used_in_step, step_id
-        )
+            return False
+
+        neo4j_query.add_feed(tx, feed_id, feed_latex, now_str, author_name_latex)
+        existing_feeds = neo4j_query.get_feeds_used_in_step(tx, step_id)
         existing_feed_ids = [f["id"] for f in existing_feeds]
         existing_feed_ids.append(feed_id)
-        existing_inputs = session.read_transaction(
-            neo4j_query.get_list_of_input_expressions_used_in_step, step_id
+
+        existing_inputs = neo4j_query.get_list_of_input_expressions_used_in_step(
+            tx, step_id
         )
         existing_input_ids = [e["id"] for e in existing_inputs]
-        existing_outputs = session.read_transaction(
-            neo4j_query.get_list_of_output_expressions_used_in_step, step_id
+
+        existing_outputs = neo4j_query.get_list_of_output_expressions_used_in_step(
+            tx, step_id
         )
         existing_output_ids = [e["id"] for e in existing_outputs]
-        session.write_transaction(
-            neo4j_query.connect_expressions_to_step,
+
+        neo4j_query.connect_expressions_to_step(
+            tx,
             step_id,
             now_str,
             existing_input_ids,
@@ -4469,7 +2960,14 @@ def api_add_step_feed(derivation_id: str, step_id: str):
             existing_output_ids,
             author_name_latex,
         )
-        _stamp_last_modified(session, "step", step_id)
+        _stamp_last_modified(tx, "step", step_id)
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_add_feed_atomic)
+
+    if not found:
+        return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
     return hal_response(
         data={"status": "feed added successfully to step", "feed_id": feed_id},
         links={
@@ -4493,14 +2991,19 @@ def api_add_step_feed(derivation_id: str, step_id: str):
 )
 @require_auth
 def api_delete_step(derivation_id: str, step_id: str):
-    with graphDB_Driver.session() as session:
-        step_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "step", step_id
-        )
+    def _delete_step_atomic(tx):
+        step_dict = neo4j_query.get_node_properties_from_id(tx, "step", step_id)
         if step_dict is None:
-            return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
-        session.write_transaction(neo4j_query.delete_node, step_id, "step")
-        _stamp_last_modified(session, "derivation", derivation_id)
+            return False
+        neo4j_query.delete_node(tx, step_id, "step")
+        _stamp_last_modified(tx, "derivation", derivation_id)
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_delete_step_atomic)
+
+    if not found:
+        return hal_error(f"Step {step_id} does not exist", 404, title="Not Found")
     return hal_response(
         data={"status": f"step {step_id} deleted successfully"},
         links={
@@ -4521,30 +3024,31 @@ def api_associate_symbol_with_expression(expression_id: str):
     symbol_id = data_from_user.get("symbol_id")
     if not symbol_id:
         return hal_error("need to provide symbol_id", 400, title="Missing Field")
-    with graphDB_Driver.session() as session:
-        expr_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "expression", expression_id
+
+    def _associate_symbol_atomic(tx):
+        expr_dict = neo4j_query.get_node_properties_from_id(
+            tx, "expression", expression_id
         )
         if expr_dict is None:
-            return hal_error(
-                f"Expression {expression_id} does not exist", 404, title="Not Found"
-            )
+            return "EXPR_NOT_FOUND"
+        symbol_exists = neo4j_query.symbol_exists(tx, symbol_id)
+        if not symbol_exists:
+            return "SYMBOL_NOT_FOUND"
 
-        def _check_symbol_exists(tx: neo4j.Transaction):
-            result = tx.run(
-                'MATCH (s) WHERE s.id = $sid AND "symbol" IN labels(s) RETURN s',
-                sid=symbol_id,
-            )
-            return result.single() is not None
+        neo4j_query.connect_symbol_to_expression(tx, symbol_id, expression_id)
+        _stamp_last_modified(tx, "expression", expression_id)
+        return "SUCCESS"
 
-        if not session.read_transaction(_check_symbol_exists):
-            return hal_error(
-                f"Symbol {symbol_id} does not exist", 404, title="Not Found"
-            )
-        session.write_transaction(
-            neo4j_query.connect_symbol_to_expression, symbol_id, expression_id
+    with graphDB_Driver.session() as session:
+        status = session.write_transaction(_associate_symbol_atomic)
+
+    if status == "EXPR_NOT_FOUND":
+        return hal_error(
+            f"Expression {expression_id} does not exist", 404, title="Not Found"
         )
-        _stamp_last_modified(session, "expression", expression_id)
+    elif status == "SYMBOL_NOT_FOUND":
+        return hal_error(f"Symbol {symbol_id} does not exist", 404, title="Not Found")
+
     return hal_response(
         data={
             "status": f"symbol {symbol_id} successfully associated with expression {expression_id}"
@@ -4568,18 +3072,23 @@ def api_associate_symbol_with_expression(expression_id: str):
 )
 @require_auth
 def api_dissociate_symbol_from_expression(expression_id: str, symbol_id: str):
-    with graphDB_Driver.session() as session:
-        expr_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "expression", expression_id
+    def _dissociate_symbol_atomic(tx):
+        expr_dict = neo4j_query.get_node_properties_from_id(
+            tx, "expression", expression_id
         )
         if expr_dict is None:
-            return hal_error(
-                f"Expression {expression_id} does not exist", 404, title="Not Found"
-            )
-        session.write_transaction(
-            neo4j_query.disconnect_symbol_from_expression, symbol_id, expression_id
+            return False
+        neo4j_query.disconnect_symbol_from_expression(tx, symbol_id, expression_id)
+        _stamp_last_modified(tx, "expression", expression_id)
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_dissociate_symbol_atomic)
+
+    if not found:
+        return hal_error(
+            f"Expression {expression_id} does not exist", 404, title="Not Found"
         )
-        _stamp_last_modified(session, "expression", expression_id)
     return hal_response(
         data={
             "status": f"symbol {symbol_id} successfully dissociated from expression {expression_id}"
@@ -4607,30 +3116,27 @@ def api_associate_symbol_with_feed(derivation_id: str, step_id: str, feed_id: st
     symbol_id = data_from_user.get("symbol_id")
     if not symbol_id:
         return hal_error("need to provide symbol_id", 400, title="Missing Field")
+
+    def _associate_feed_symbol_atomic(tx):
+        feed_exists = neo4j_query.feed_exists(tx, feed_id)
+        if not feed_exists:
+            return "FEED_NOT_FOUND"
+        symbol_exists = neo4j_query.symbol_exists(tx, symbol_id)
+        if not symbol_exists:
+            return "SYMBOL_NOT_FOUND"
+
+        neo4j_query.connect_symbol_to_feed(tx, symbol_id, feed_id)
+        _stamp_last_modified(tx, "step", step_id)
+        return "SUCCESS"
+
     with graphDB_Driver.session() as session:
+        status = session.write_transaction(_associate_feed_symbol_atomic)
 
-        def _check_feed_exists(tx: neo4j.Transaction):
-            res = tx.run("MATCH (f:feed {id: $fid}) RETURN f", fid=feed_id)
-            return res.single() is not None
+    if status == "FEED_NOT_FOUND":
+        return hal_error(f"Feed {feed_id} does not exist", 404, title="Not Found")
+    elif status == "SYMBOL_NOT_FOUND":
+        return hal_error(f"Symbol {symbol_id} does not exist", 404, title="Not Found")
 
-        if not session.read_transaction(_check_feed_exists):
-            return hal_error(f"Feed {feed_id} does not exist", 404, title="Not Found")
-
-        def _check_symbol_exists(tx: neo4j.Transaction):
-            result = tx.run(
-                'MATCH (s) WHERE s.id = $sid AND "symbol" IN labels(s) RETURN s',
-                sid=symbol_id,
-            )
-            return result.single() is not None
-
-        if not session.read_transaction(_check_symbol_exists):
-            return hal_error(
-                f"Symbol {symbol_id} does not exist", 404, title="Not Found"
-            )
-        session.write_transaction(
-            neo4j_query.connect_symbol_to_feed, symbol_id, feed_id
-        )
-        _stamp_last_modified(session, "step", step_id)
     return hal_response(
         data={
             "status": f"symbol {symbol_id} successfully associated with feed {feed_id}"
@@ -4657,18 +3163,19 @@ def api_associate_symbol_with_feed(derivation_id: str, step_id: str, feed_id: st
 def api_dissociate_symbol_from_feed(
     derivation_id: str, step_id: str, feed_id: str, symbol_id: str
 ):
+    def _dissociate_feed_symbol_atomic(tx):
+        feed_exists = neo4j_query.feed_exists(tx, feed_id)
+        if not feed_exists:
+            return False
+        neo4j_query.disconnect_symbol_from_feed(tx, symbol_id, feed_id)
+        _stamp_last_modified(tx, "step", step_id)
+        return True
+
     with graphDB_Driver.session() as session:
+        found = session.write_transaction(_dissociate_feed_symbol_atomic)
 
-        def _check_feed_exists(tx: neo4j.Transaction):
-            res = tx.run("MATCH (f:feed {id: $fid}) RETURN f", fid=feed_id)
-            return res.single() is not None
-
-        if not session.read_transaction(_check_feed_exists):
-            return hal_error(f"Feed {feed_id} does not exist", 404, title="Not Found")
-        session.write_transaction(
-            neo4j_query.disconnect_symbol_from_feed, symbol_id, feed_id
-        )
-        _stamp_last_modified(session, "step", step_id)
+    if not found:
+        return hal_error(f"Feed {feed_id} does not exist", 404, title="Not Found")
     return hal_response(
         data={
             "status": f"symbol {symbol_id} successfully dissociated from feed {feed_id}"
@@ -4690,27 +3197,29 @@ def api_dissociate_symbol_from_feed(
 @api_bp.route("/resources/derivation/<string:derivation_id>/delete", methods=["DELETE"])
 @require_auth
 def api_delete_derivation(derivation_id: str):
-    """
-    derivation and all steps
-
-    .. code-block:: bash
-
-        curl --silent --insecure https://localhost/api/v1/resources/derivation/<string:derivation_id>/delete
-
-    """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE]  start " + trace_id)
-    # query_time_dict = {} # type: query_timing_result_type
-    with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
-        list_of_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "derivation"
+    logger.info("[TRACE] start " + trace_id)
+
+    def _delete_derivation_atomic(tx):
+        derivation_dict = neo4j_query.get_node_properties_from_id(
+            tx, "derivation", derivation_id
         )
-        # query_time_dict['pdg_api/api_list_derivations: list_nodes_of_type, derivation'] = time.time() - query_start_time
-    list_of_id = []
-    for derivation_dict in list_of_dicts:
-        list_of_id.append(derivation_dict["id"])
-    if derivation_id not in list_of_id:
+        if derivation_dict is None:
+            return None
+
+        list_of_step_dicts = neo4j_query.get_list_of_steps_in_this_derivation(
+            tx, derivation_id
+        )
+        for this_step_dict in list_of_step_dicts:
+            neo4j_query.delete_node(tx, this_step_dict["id"], "step")
+
+        neo4j_query.delete_node(tx, derivation_id, "derivation")
+        return len(list_of_step_dicts)
+
+    with graphDB_Driver.session() as session:
+        deleted_steps_count = session.write_transaction(_delete_derivation_atomic)
+
+    if deleted_steps_count is None:
         return hal_error(
             derivation_id + " not found in list of derivation IDs",
             404,
@@ -4722,38 +3231,13 @@ def api_delete_derivation(derivation_id: str):
             },
             title="Derivation Not Found",
         )
-    list_of_step_dicts = []
-    with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
-        list_of_step_dicts = session.read_transaction(
-            neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
-        )
-        # query_time_dict['pdg_app/to_review_derivation: get_list_of_steps_in_this_derivation'] = round(time.time() - query_start_time, 3)
-    for this_step_dict in list_of_step_dicts:
-        with graphDB_Driver.session() as session:
-            # query_start_time = time.time()
-            session.write_transaction(
-                neo4j_query.delete_node, this_step_dict["id"], "step"
-            )
-            # query_time_dict['pdg_app/to_review_derivation: delete_node step'] = round(time.time() - query_start_time, 3)
-    derivation_dict = {}
-    with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
-        derivation_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "derivation", derivation_id
-        )
-        # query_time_dict['to_review_derivation: node_properties, derivation'] = round(time.time() - query_start_time, 3)
-    logger.info("derivation_dict:" + str(derivation_dict))
-    with graphDB_Driver.session() as session:
-        # query_start_time = time.time()
-        session.write_transaction(neo4j_query.delete_node, derivation_id, "derivation")
-        # query_time_dict['pdg_app/to_review_derivation: delete_node derivation'] = round(time.time() - query_start_time, 3)
+
     logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return hal_response(
         data={
             "status": "successfully deleted " + derivation_id,
             "deleted_derivation_id": derivation_id,
-            "deleted_step_count": len(list_of_step_dicts),
+            "deleted_step_count": deleted_steps_count,
         },
         links={
             "self": hal_link(
@@ -4781,11 +3265,20 @@ def api_delete_derivation(derivation_id: str):
 def api_delete_inference_rule(infrule_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        inference_rule_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "inference_rule", infrule_id
+
+    def _delete_infrule_atomic(tx):
+        inference_rule_dict = neo4j_query.get_node_properties_from_id(
+            tx, "inference_rule", infrule_id
         )
-    if inference_rule_dict is None:
+        if inference_rule_dict is None:
+            return False
+        neo4j_query.delete_node(tx, infrule_id, "inference_rule")
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_delete_infrule_atomic)
+
+    if not found:
         return hal_error(
             f"Inference rule {infrule_id} does not exist",
             404,
@@ -4797,8 +3290,7 @@ def api_delete_inference_rule(infrule_id: str):
             },
             title="Not Found",
         )
-    with graphDB_Driver.session() as session:
-        session.write_transaction(neo4j_query.delete_node, infrule_id, "inference_rule")
+
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -4828,11 +3320,20 @@ def api_delete_inference_rule(infrule_id: str):
 def api_delete_expression(expression_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        expression_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "expression", expression_id
+
+    def _delete_expression_atomic(tx):
+        expression_dict = neo4j_query.get_node_properties_from_id(
+            tx, "expression", expression_id
         )
-    if expression_dict is None:
+        if expression_dict is None:
+            return False
+        neo4j_query.delete_node(tx, expression_id, "expression")
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_delete_expression_atomic)
+
+    if not found:
         return hal_error(
             f"Expression {expression_id} does not exist",
             404,
@@ -4844,8 +3345,7 @@ def api_delete_expression(expression_id: str):
             },
             title="Not Found",
         )
-    with graphDB_Driver.session() as session:
-        session.write_transaction(neo4j_query.delete_node, expression_id, "expression")
+
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
         data={
@@ -4869,241 +3369,3 @@ def api_delete_expression(expression_id: str):
             ),
         },
     )
-
-
-@api_bp.route("/resources/symbol/scalar/<string:symbol_id>/delete", methods=["DELETE"])
-@require_auth
-def api_delete_scalar(symbol_id: str):
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        scalar_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "scalar", symbol_id
-        )
-    if scalar_dict is None:
-        return hal_error(
-            f"Scalar {symbol_id} does not exist",
-            404,
-            links={
-                "up": hal_link(
-                    url_for(".api_list_scalar_symbols", _external=True),
-                    "List of Scalar Symbols",
-                )
-            },
-            title="Not Found",
-        )
-    with graphDB_Driver.session() as session:
-        session.write_transaction(neo4j_query.delete_node, symbol_id, "scalar")
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={
-            "status": "successfully deleted " + symbol_id,
-            "deleted_scalar_id": symbol_id,
-        },
-        links={
-            "self": hal_link(
-                url_for(".api_delete_scalar", symbol_id=symbol_id, _external=True),
-                "Delete scalar",
-            ),
-            "up": hal_link(
-                url_for(".api_list_scalar_symbols", _external=True),
-                "List of Scalar Symbols",
-            ),
-            "collection": hal_link(
-                url_for(".api_list_scalar_symbols", _external=True), "Scalar Symbols"
-            ),
-        },
-    )
-
-
-@api_bp.route("/resources/symbol/vector/<string:symbol_id>/delete", methods=["DELETE"])
-@require_auth
-def api_delete_vector(symbol_id: str):
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        vector_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "vector", symbol_id
-        )
-    if vector_dict is None:
-        return hal_error(
-            f"Vector {symbol_id} does not exist",
-            404,
-            links={
-                "up": hal_link(
-                    url_for(".api_list_vector_symbols", _external=True),
-                    "List of Vector Symbols",
-                )
-            },
-            title="Not Found",
-        )
-    with graphDB_Driver.session() as session:
-        session.write_transaction(neo4j_query.delete_node, symbol_id, "vector")
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={
-            "status": "successfully deleted " + symbol_id,
-            "deleted_vector_id": symbol_id,
-        },
-        links={
-            "self": hal_link(
-                url_for(".api_delete_vector", symbol_id=symbol_id, _external=True),
-                "Delete vector",
-            ),
-            "up": hal_link(
-                url_for(".api_list_vector_symbols", _external=True),
-                "List of Vector Symbols",
-            ),
-            "collection": hal_link(
-                url_for(".api_list_vector_symbols", _external=True), "Vector Symbols"
-            ),
-        },
-    )
-
-
-@api_bp.route("/resources/symbol/matrix/<string:symbol_id>/delete", methods=["DELETE"])
-@require_auth
-def api_delete_matrix(symbol_id: str):
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        matrix_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "matrix", symbol_id
-        )
-    if matrix_dict is None:
-        return hal_error(
-            f"Matrix {symbol_id} does not exist",
-            404,
-            links={
-                "up": hal_link(
-                    url_for(".api_list_matrix_symbols", _external=True),
-                    "List of Matrix Symbols",
-                )
-            },
-            title="Not Found",
-        )
-    with graphDB_Driver.session() as session:
-        session.write_transaction(neo4j_query.delete_node, symbol_id, "matrix")
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={
-            "status": "successfully deleted " + symbol_id,
-            "deleted_matrix_id": symbol_id,
-        },
-        links={
-            "self": hal_link(
-                url_for(".api_delete_matrix", symbol_id=symbol_id, _external=True),
-                "Delete matrix",
-            ),
-            "up": hal_link(
-                url_for(".api_list_matrix_symbols", _external=True),
-                "List of Matrix Symbols",
-            ),
-            "collection": hal_link(
-                url_for(".api_list_matrix_symbols", _external=True), "Matrix Symbols"
-            ),
-        },
-    )
-
-
-@api_bp.route(
-    "/resources/symbol/operation/<string:operation_id>/delete", methods=["DELETE"]
-)
-@require_auth
-def api_delete_operation(operation_id: str):
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        operation_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "operation", operation_id
-        )
-    if operation_dict is None:
-        return hal_error(
-            f"Operation {operation_id} does not exist",
-            404,
-            links={
-                "up": hal_link(
-                    url_for(".api_list_operation_symbols", _external=True),
-                    "List of Operation Symbols",
-                )
-            },
-            title="Not Found",
-        )
-    with graphDB_Driver.session() as session:
-        session.write_transaction(neo4j_query.delete_node, operation_id, "operation")
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={
-            "status": "successfully deleted " + operation_id,
-            "deleted_operation_id": operation_id,
-        },
-        links={
-            "self": hal_link(
-                url_for(
-                    ".api_delete_operation", operation_id=operation_id, _external=True
-                ),
-                "Delete operation",
-            ),
-            "up": hal_link(
-                url_for(".api_list_operation_symbols", _external=True),
-                "List of Operation Symbols",
-            ),
-            "collection": hal_link(
-                url_for(".api_list_operation_symbols", _external=True),
-                "Operation Symbols",
-            ),
-        },
-    )
-
-
-@api_bp.route(
-    "/resources/symbol/relation/<string:relation_id>/delete", methods=["DELETE"]
-)
-@require_auth
-def api_delete_relation(relation_id: str):
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
-        relation_dict = session.read_transaction(
-            neo4j_query.get_node_properties_from_id, "relation", relation_id
-        )
-    if relation_dict is None:
-        return hal_error(
-            f"Relation {relation_id} does not exist",
-            404,
-            links={
-                "up": hal_link(
-                    url_for(".api_list_relation_symbols", _external=True),
-                    "List of Relation Symbols",
-                )
-            },
-            title="Not Found",
-        )
-    with graphDB_Driver.session() as session:
-        session.write_transaction(neo4j_query.delete_node, relation_id, "relation")
-    logger.info("[TRACE] end " + trace_id)
-    return hal_response(
-        data={
-            "status": "successfully deleted " + relation_id,
-            "deleted_relation_id": relation_id,
-        },
-        links={
-            "self": hal_link(
-                url_for(
-                    ".api_delete_relation", relation_id=relation_id, _external=True
-                ),
-                "Delete relation",
-            ),
-            "up": hal_link(
-                url_for(".api_list_relation_symbols", _external=True),
-                "List of Relation Symbols",
-            ),
-            "collection": hal_link(
-                url_for(".api_list_relation_symbols", _external=True),
-                "Relation Symbols",
-            ),
-        },
-    )
-
-
-# EOF

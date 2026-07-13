@@ -197,23 +197,24 @@ def guess_sympy_from_expression(graphDB_Driver, query_time_dict, expression_dict
         )
     except Exception as err:
         logger.error("revised_expr_rhs = " + str(type(err).__name__) + str(err))
-        revised_expr_lhs = None
+        revised_expr_rhs = None
 
     logger.info(
         "revised_expr_lhs,rhs=" + str(revised_expr_lhs) + " " + str(revised_expr_rhs)
     )
 
+    revised_expr_lhs_with_str = None
+    revised_expr_rhs_with_str = None
+
     if revised_expr_lhs:
         revised_expr_lhs_with_str = re.sub(
             r"(pdg\d\d\d\d\d\d\d)", r"Symbol('\1')", str(revised_expr_lhs)
         )
-    else:
-        revised_expr_lhs_with_str = None
+
     if revised_expr_rhs:
         revised_expr_rhs_with_str = re.sub(
             r"(pdg\d\d\d\d\d\d\d)", r"Symbol('\1')", str(revised_expr_rhs)
         )
-        revised_expr_rhs_with_str = None
 
     logger.info("revised_expr_lhs_with_str=" + str(revised_expr_lhs_with_str))
     logger.info("revised_expr_rhs_with_str=" + str(revised_expr_rhs_with_str))
@@ -876,14 +877,22 @@ def get_dict_of_node_type_for_every_id(
     #  {'n.id': '8047316', 'labels(n)': ['vector', 'symbol']},
     #  {'n.id': '2587054', 'labels(n)': ['vector']}, {'n.id': '7688226', 'labels(n)': ['feed']}, {'n.id': '6529449', 'labels(n)': ['feed']}, {'n.id': '6529458', 'labels(n)': ['feed']}]
 
-    dict_of_symbol_id_and_type = {}  # type: Dict[str,str]
+    dict_of_symbol_id_and_type = {}
     for this_dict in list_of_records:
-        if len(this_dict["labels(n)"]) > 1:
-            for symbol_category in this_dict["labels(n)"]:
-                if symbol_category != "symbol":
-                    dict_of_symbol_id_and_type[this_dict["n.id"]] = symbol_category
-        else:  # there's just one node label
-            dict_of_symbol_id_and_type[this_dict["n.id"]] = this_dict["labels(n)"][0]
+        labels = this_dict["labels(n)"]
+        # Filter for the specific node type using list_of_valid.node_types
+        specific_types = [
+            lbl
+            for lbl in labels
+            if lbl in list_of_valid.node_types and lbl not in ("symbol", "a_node")
+        ]
+        if specific_types:
+            dict_of_symbol_id_and_type[this_dict["n.id"]] = specific_types[0]
+        else:
+            # Fallback to first label if no matches found
+            dict_of_symbol_id_and_type[this_dict["n.id"]] = (
+                labels[0] if labels else "unknown"
+            )
 
     logger.info("[TRACE] end " + trace_id)
     return dict_of_symbol_id_and_type, query_time_dict

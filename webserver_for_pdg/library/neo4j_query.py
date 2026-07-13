@@ -510,7 +510,8 @@ def get_nodes_of_type(tx: Transaction, node_type: str) -> list:
     # must be one of these node types. See also 'schema.log' file
     logger.info("node type:" + node_type)
 
-    assert node_type in list_of_valid.node_types
+    if node_type not in list_of_valid.node_types:
+        raise ValueError(f"Invalid node type: {node_type}")
 
     query = f"MATCH (n:{node_type}) RETURN n ORDER BY n.id"
 
@@ -561,7 +562,9 @@ def get_count_nodes_of_type(tx: Transaction, node_type: str) -> int:
 
     # must be one of these node types. See also 'schema.log' file
     logger.info("neo4j_query/get_count_nodes_of_type:  node type:" + node_type)
-    assert node_type in list_of_valid.node_types
+    if node_type not in list_of_valid.node_types:
+        raise ValueError(f"Invalid node type: {node_type}")
+
 
     node_count = -1
     for result in tx.run("MATCH (n:" + node_type + ") RETURN count(n) as count"):
@@ -1003,25 +1006,23 @@ def get_inference_rule_connected_to_step_ID(tx: Transaction, step_id: str):
 
 
 @trace_execution
-def get_derivation_id_from_step_id(tx: Transaction, step_id: str) -> str:
+def get_derivation_id_from_step_id(tx: Transaction, step_id: str) -> Optional[str]:
     """ """
 
     logger.info("neo4j_query/get_derivation_id_from_step_id: step_id=" + str(step_id))
 
-    result = tx.run(
-        'MATCH (d:derivation)-[r:"HAS_STEP"]->(:step {"id":"'
-        + step_id
-        + "}) RETURN d.id"
-    )
+    query = "MATCH (d:derivation)-[:HAS_STEP]->(:step {id: $step_id}) RETURN d.id AS derivation_id"
+    result = tx.run(query, step_id=step_id)
+    record = result.single()
 
-    derivation_id = result.data()
-
-    logger.info(
-        "neo4j_query/get_derivation_id_from_step_id: derivation_id="
-        + str(derivation_id)
-    )
-
-    return derivation_id
+    if record:
+        derivation_id = record["derivation_id"]
+        logger.info(
+            "neo4j_query/get_derivation_id_from_step_id: derivation_id="
+            + str(derivation_id)
+        )
+        return derivation_id
+    return None
 
 
 @trace_execution
@@ -1109,7 +1110,9 @@ def get_node_properties_from_id(
     """
 
     logger.info("node_type=" + node_type)
-    assert node_type in list_of_valid.node_types
+    if node_type not in list_of_valid.node_types:
+        raise ValueError(f"Invalid node type: {node_type}")
+
     logger.info("node_id:" + node_id)
 
     query = f"MATCH (n:{node_type}) WHERE n.id = $node_id RETURN n"
@@ -1130,6 +1133,20 @@ def get_node_properties_from_id(
 
 
 @trace_execution
+def symbol_exists(tx: Transaction, symbol_id: str) -> bool:
+    query = 'MATCH (s) WHERE s.id = $sid AND "symbol" IN labels(s) RETURN s'
+    result = tx.run(query, sid=symbol_id)
+    return result.single() is not None
+
+
+@trace_execution
+def feed_exists(tx: Transaction, feed_id: str) -> bool:
+    query = "MATCH (f:feed {id: $fid}) RETURN f"
+    result = tx.run(query, fid=feed_id)
+    return result.single() is not None
+
+
+@trace_execution
 def add_derivation(
     tx,
     derivation_id: str,
@@ -1138,7 +1155,7 @@ def add_derivation(
     derivation_abstract_latex: str,
     derivation_reference_latex: str,
     author_name_latex: str,
-) -> None:
+) -> bool:
     """
     Create a new derivation node
 
@@ -1150,15 +1167,14 @@ def add_derivation(
 
     """
 
+    dup_check = tx.run(
+        "MATCH (d:derivation {name_latex: $name}) RETURN d", name=derivation_name_latex
+    )
+    if dup_check.peek() is not None:
+        return False
+
     tx.run(
-        "MERGE (:derivation {"
-        "  id: $id, "
-        "  name_latex: $name, "
-        "  abstract_latex: $abstract, "
-        "  created_datetime: $now, "
-        "  reference_latex: $ref, "
-        "  author_name_latex: $author"
-        "})",
+        "CREATE (:derivation:a_node { id: $id, name_latex: $name, abstract_latex: $abstract, created_datetime: $now, reference_latex: $ref, author_name_latex: $author})",
         id=derivation_id,
         name=derivation_name_latex,
         abstract=derivation_abstract_latex,
@@ -1166,8 +1182,7 @@ def add_derivation(
         ref=derivation_reference_latex,
         author=author_name_latex,
     ).consume()
-
-    return
+    return True
 
 
 @trace_execution
@@ -1181,7 +1196,7 @@ def add_inference_rule(
     number_of_outputs: int,
     now_str: str,
     author_name_latex: str,
-):
+) -> bool:
     """
     the "number_of_" are passed in as integers,
     but when writing the query string they are
@@ -1198,19 +1213,14 @@ def add_inference_rule(
     assert int(number_of_feeds) >= 0
     assert int(number_of_outputs) >= 0
 
-    query = (
-        "MERGE (:inference_rule {"
-        "  id: $id, "
-        "  name_latex: $name, "
-        "  latex: $latex, "
-        "  created_datetime: $now, "
-        "  author_name_latex: $author, "
-        "  number_of_inputs: $inputs, "
-        "  number_of_feeds: $feeds, "
-        "  number_of_outputs: $outputs"
-        "})"
+    dup_check = tx.run(
+        "MATCH (i:inference_rule {name_latex: $name}) RETURN i",
+        name=inference_rule_name,
     )
+    if dup_check.peek() is not None:
+        return False
 
+    query = "CREATE (:inference_rule:a_node { id: $id, name_latex: $name, latex: $latex, created_datetime: $now, author_name_latex: $author, number_of_inputs: $inputs, number_of_feeds: $feeds, number_of_outputs: $outputs})"
     tx.run(
         query,
         id=inference_rule_id,
@@ -1222,7 +1232,18 @@ def add_inference_rule(
         feeds=number_of_feeds,
         outputs=number_of_outputs,
     ).consume()
+    return True
 
+
+@trace_execution
+def edit_step_sequence_index(
+    tx: Transaction, derivation_id: str, step_id: str, new_index: int
+) -> None:
+    query = """
+    MATCH (d:derivation {id: $did})-[r:HAS_STEP]->(s:step {id: $sid})
+    SET r.sequence_index = $new_index
+    """
+    tx.run(query, did=derivation_id, sid=step_id, new_index=new_index).consume()
     return
 
 
@@ -1291,6 +1312,11 @@ def edit_step_feed(
 
     tx.run(query, params).consume()
 
+
+@trace_execution
+def disconnect_feed_from_step(tx: Transaction, step_id: str, feed_id: str) -> None:
+    query = "MATCH (s:step {id: $sid})-[r:HAS_FEED]->(f:feed {id: $fid}) DELETE r"
+    tx.run(query, sid=step_id, fid=feed_id).consume()
     return
 
 
@@ -1370,11 +1396,25 @@ def edit_expression(
     expression_description_latex: str,
     expression_reference_latex: str,
     author_name_latex: str,
-) -> None:
+) -> bool:
     """
     see https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887#update-node-properties-add-new-or-modify
     """
 
+    # Duplicate check (excluding the node currently being edited)
+    dup_check = tx.run(
+        "MATCH (e:expression) "
+        "WHERE e.latex_lhs = $lhs AND e.latex_relation = $relation AND e.latex_rhs = $rhs AND e.id <> $id "
+        "RETURN e",
+        lhs=expression_latex_lhs,
+        relation=expression_latex_relation,
+        rhs=expression_latex_rhs,
+        id=expression_id,
+    )
+    if dup_check.peek() is not None:
+        return False
+
+    # Perform safe update
     properties = {
         "id": expression_id,
         "name_latex": expression_name_latex,
@@ -1386,21 +1426,19 @@ def edit_expression(
         "latex_rhs": expression_latex_rhs,
         "latex_condition": expression_latex_condition,
     }
-
     query = """
-    MERGE (e:expression {id: $id})
+    MATCH (e:expression {id: $id})
     SET e += $props
+    RETURN e
     """
-
-    tx.run(query, id=expression_id, props=properties).consume()
-
-    return
+    result = tx.run(query, id=expression_id, props=properties)
+    return result.single() is not None
 
 
 @trace_execution
 def edit_node_property(
     tx, node_type: str, node_id: str, property_key: str, property_value
-) -> None:
+) -> bool:
     """
     property_value can be either str or int
 
@@ -1412,23 +1450,15 @@ def edit_node_property(
     (Gemini 3.1 Pro says to use `MATCH` instead.)
     """
 
-    assert node_type in list_of_valid.node_types
+    if node_type not in list_of_valid.node_types:
+        raise ValueError(f"Invalid node type: {node_type}")
 
-    # https://neo4j.com/docs/getting-started/cypher-intro/updating/
-
-    # https://stackoverflow.com/a/15019884/1164295 says "bool is a subclass of int."
-    if isinstance(property_value, int):
-        tx.run(
-            "MERGE (n:" + str(node_type) + ' {id:"' + str(node_id) + '"})'
-            "SET n." + str(property_key) + " = " + str(property_value)
-        ).consume()
-    elif isinstance(property_value, str):  # string needs quotes
-        tx.run(
-            "MERGE (n:" + str(node_type) + ' {id:"' + str(node_id) + '"})'
-            "SET n." + str(property_key) + ' = "' + str(property_value) + '"'
-        ).consume()
-
-    return
+    # Safely perform property changes inside transaction with MATCH (prevents recreation)
+    query = (
+        f"MATCH (n:{node_type} {{id: $node_id}}) SET n.{property_key} = $value RETURN n"
+    )
+    result = tx.run(query, node_id=node_id, value=property_value)
+    return result.single() is not None
 
 
 # @trace_execution
@@ -1506,7 +1536,9 @@ def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
 
     # must be one of these node types. See also 'schema.log' file
     logger.info("node_type= " + node_type)
-    assert node_type in list_of_valid.node_types
+    if node_type not in list_of_valid.node_types:
+        raise ValueError(f"Invalid node type: {node_type}")
+
 
     tx.run(
         "MATCH (d:" + node_type + ' {id:"' + node_id + '"}) DETACH DELETE d'
@@ -1679,47 +1711,50 @@ def connect_step_to_derivation(
     step_id: str,
     derivation_id: str,
     inference_rule_id: str,
-    new_sequence_value: int,
+    requested_sequence_value: int | None,
     now_str: str,
     note_before_step_latex: str,
     note_after_step_latex: str,
     author_name_latex: str,
-) -> None:
-    """
-    can't add inference rules in same query because step needs to exist first
-    """
+) -> dict | None:
+    deriv_check = tx.run(
+        "MATCH (d:derivation {id: $did}) RETURN d", did=derivation_id
+    ).single()
+    inf_check = tx.run(
+        "MATCH (i:inference_rule {id: $iid}) RETURN i", iid=inference_rule_id
+    ).single()
+    if not deriv_check or not inf_check:
+        return None
 
-    # # https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Result
-    # print("result=",result.single())
+    if requested_sequence_value is None:
+        seq_query = "MATCH (d:derivation {id: $did}) OPTIONAL MATCH (d)-[r:HAS_STEP]->(:step) RETURN coalesce(max(r.sequence_index), -1) + 1 AS next_seq"
+        seq_res = tx.run(seq_query, did=derivation_id).single()
+        seq_val = seq_res["next_seq"] if seq_res else 0
+    else:
+        seq_val = requested_sequence_value
 
-    # logger.info("insert step with id; this works")
-    result = tx.run(
-        'MERGE (:step {id:"' + step_id + '", '
-        'author_name_latex:"' + author_name_latex + '", '
-        'note_before_step_latex:"' + note_before_step_latex + '", '
-        'created_datetime:"' + now_str + '", '
-        'note_after_step_latex:"' + note_after_step_latex + '"})'
-    )
-    # print(result.data()) # this just shows "[]"
-
-    logger.info("step with edge " + derivation_id)
     tx.run(
-        "MATCH (a:derivation),(b:step) "
-        'WHERE a.id="' + str(derivation_id) + '" AND b.id="' + str(step_id) + '" '
-        "MERGE (a)-[r:HAS_STEP {sequence_index: "
-        + str(new_sequence_value)
-        + "}]->(b) RETURN r"
+        "CREATE (:step:a_node {id: $step_id, author_name_latex: $author, note_before_step_latex: $before, created_datetime: $now, note_after_step_latex: $after})",
+        step_id=step_id,
+        author=author_name_latex,
+        before=note_before_step_latex,
+        now=now_str,
+        after=note_after_step_latex,
     ).consume()
 
-    logger.info("inference_rule_id " + inference_rule_id)
     tx.run(
-        "MATCH (a:step),(b:inference_rule) "
-        'WHERE a.id="' + str(step_id) + '" AND b.id="' + str(inference_rule_id) + '"'
-        "MERGE (a)-[:HAS_INFERENCE_RULE]->(b)"
+        "MATCH (a:derivation {id: $did}), (b:step {id: $sid}) MERGE (a)-[r:HAS_STEP {sequence_index: $seq}]->(b)",
+        did=derivation_id,
+        sid=step_id,
+        seq=seq_val,
     ).consume()
-    # print(result.data()) # this just shows "[]"
 
-    return
+    tx.run(
+        "MATCH (a:step {id: $sid}), (b:inference_rule {id: $iid}) MERGE (a)-[:HAS_INFERENCE_RULE]->(b)",
+        sid=step_id,
+        iid=inference_rule_id,
+    ).consume()
+    return {"sequence_index": seq_val}
 
 
 @trace_execution
@@ -1787,7 +1822,7 @@ def connect_expressions_to_step(
     query = """
     MATCH (a:step {id: $step_id})
     UNWIND $feeds AS feed_data
-    MATCH (b:expression {id: feed_data.id})
+    MATCH (b:feed {id: feed_data.id})
     MERGE (a)-[:HAS_FEED {sequence_index: feed_data.idx}]->(b)
     """
     tx.run(query, step_id=step_id, feeds=feeds_data)
@@ -1831,13 +1866,21 @@ def add_expression(
     expression_reference_latex: str,
     now_str: str,
     author_name_latex: str,
-) -> None:
+) -> bool:
     """
     nothing returned by function because action is to write change to Neo4j database
 
     `add_expression` doesn't have `sympy_lhs`, `sympy_rhs`, `lean` because those are added in a separate action
 
     """
+    dup_check = tx.run(
+        "MATCH (e:expression) WHERE e.latex_lhs = $lhs AND e.latex_relation = $relation AND e.latex_rhs = $rhs RETURN e",
+        lhs=expression_latex_lhs,
+        relation=expression_latex_relation,
+        rhs=expression_latex_rhs,
+    )
+    if dup_check.peek() is not None:
+        return False
 
     params = {
         "id": str(expression_id),
@@ -1851,20 +1894,10 @@ def add_expression(
         "ref": str(expression_reference_latex),
         "author": str(author_name_latex),
     }
-
     query = """
-        MERGE (e:expression:a_node {id: $id})
-        ON CREATE SET 
+        CREATE (e:expression:a_node {id: $id})
+        SET 
             e.created_datetime = $created,
-            e.name_latex = $name,
-            e.latex_lhs = $lhs,
-            e.latex_relation = $relation,
-            e.latex_rhs = $rhs,
-            e.latex_condition = $condition,
-            e.description_latex = $desc,
-            e.reference_latex = $ref,
-            e.author_name_latex = $author
-        ON MATCH SET 
             e.name_latex = $name,
             e.latex_lhs = $lhs,
             e.latex_relation = $relation,
@@ -1875,8 +1908,7 @@ def add_expression(
             e.author_name_latex = $author
     """
     tx.run(query, params).consume()
-
-    return
+    return True
 
 
 @trace_execution
@@ -1899,18 +1931,13 @@ def add_feed(
         "author": str(author_name_latex),
         "created": now_str,
     }
-
     query = """
-        MERGE (f:feed:a_node {id: $id})
-        ON CREATE SET 
+        CREATE (f:feed:a_node {id: $id})
+        SET 
             f.created_datetime = $created,
             f.latex = $latex,
             f.author_name_latex = $author
-        ON MATCH SET 
-            f.latex = $latex,
-            f.author_name_latex = $author
     """
-
     tx.run(query, params).consume()
 
     return
