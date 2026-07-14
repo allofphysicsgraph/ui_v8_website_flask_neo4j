@@ -326,6 +326,16 @@ def _stamp_last_modified(tx, node_type, node_id):
     )
 
 
+def _parse_bool(value, default=False):
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in ("true", "1", "yes", "on")
+    return bool(value)
+
+
 def require_auth(view_func):
     """Require a valid `Authorization: Bearer <token>` header.
 
@@ -697,65 +707,123 @@ def api_list_expressions():
 
     """
     trace_id = str(uuid.uuid4())
-    logger.info('[TRACE] start ' + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     with graphDB_Driver.session() as session:
-        list_of_dicts = session.read_transaction(neo4j_query.get_nodes_of_type, 'expression')
-        
+        list_of_dicts = session.read_transaction(
+            neo4j_query.get_nodes_of_type, "expression"
+        )
+
     embedded_items = []
     for item in list_of_dicts:
         resource = item.copy()
-        item_id = resource.get('id')
+        item_id = resource.get("id")
         if not item_id:
-            logger.warning('Found expression without ID during API list generation.')
+            logger.warning("Found expression without ID during API list generation.")
             continue
-            
+
         # 1. Read-only actions (GET) go strictly inside _links
-        resource['_links'] = {
-            'self': hal_link(url_for('.api_expression_metadata', expression_id=item_id, _external=True), 'Get expression metadata')
+        resource["_links"] = {
+            "self": hal_link(
+                url_for(
+                    ".api_expression_metadata", expression_id=item_id, _external=True
+                ),
+                "Get expression metadata",
+            )
         }
-        
+
         # 2. Non-safe actions (POST, DELETE) belong inside item-level _templates
-        resource['_templates'] = {
-            'edit': hal_template('POST', [
-                hal_property('expression_latex_lhs', value=resource.get('latex_lhs'), required=True, prompt='LHS (LaTeX)'),
-                hal_property('expression_relation_latex', value=resource.get('latex_relation'), required=True, prompt='Relation (LaTeX)'),
-                hal_property('expression_latex_rhs', value=resource.get('latex_rhs'), required=True, prompt='RHS (LaTeX)'),
-                hal_property('expression_latex_condition', value=resource.get('latex_condition'), prompt='Condition (LaTeX)'),
-                hal_property('expression_name_latex', value=resource.get('name_latex'), prompt='Name (LaTeX)'),
-                hal_property('expression_description_latex', value=resource.get('description_latex'), prompt='Description (LaTeX)'),
-                hal_property('expression_reference_latex', value=resource.get('reference_latex'), prompt='Reference (LaTeX)')
-            ], title='Edit this expression'),
-            'delete': hal_template('DELETE', [], title='Delete this expression')
+        resource["_templates"] = {
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "expression_latex_lhs",
+                        value=resource.get("latex_lhs"),
+                        required=True,
+                        prompt="LHS (LaTeX)",
+                    ),
+                    hal_property(
+                        "expression_relation_latex",
+                        value=resource.get("latex_relation"),
+                        required=True,
+                        prompt="Relation (LaTeX)",
+                    ),
+                    hal_property(
+                        "expression_latex_rhs",
+                        value=resource.get("latex_rhs"),
+                        required=True,
+                        prompt="RHS (LaTeX)",
+                    ),
+                    hal_property(
+                        "expression_latex_condition",
+                        value=resource.get("latex_condition"),
+                        prompt="Condition (LaTeX)",
+                    ),
+                    hal_property(
+                        "expression_name_latex",
+                        value=resource.get("name_latex"),
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "expression_description_latex",
+                        value=resource.get("description_latex"),
+                        prompt="Description (LaTeX)",
+                    ),
+                    hal_property(
+                        "expression_reference_latex",
+                        value=resource.get("reference_latex"),
+                        prompt="Reference (LaTeX)",
+                    ),
+                ],
+                title="Edit this expression",
+            ),
+            "delete": hal_template("DELETE", [], title="Delete this expression"),
         }
         embedded_items.append(resource)
-        
+
     # Collection-level read links
     links = {
-        'self': hal_link(url_for('.api_list_expressions', _external=True), 'List of Expressions'),
-        'up': hal_link(url_for('.api_start_here', _external=True), 'API Entry Point')
+        "self": hal_link(
+            url_for(".api_list_expressions", _external=True), "List of Expressions"
+        ),
+        "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point"),
     }
-    
+
     # Collection-level write templates (e.g., adding an Expression)
     templates = {
-        'default': hal_template('POST', [
-            hal_property('expression_latex_lhs', required=True, prompt='LHS (LaTeX)'),
-            hal_property('expression_relation_latex', required=True, prompt='Relation (LaTeX)'),
-            hal_property('expression_latex_rhs', required=True, prompt='RHS (LaTeX)'),
-            hal_property('expression_latex_condition', prompt='Condition (LaTeX)'),
-            hal_property('expression_name_latex', prompt='Name (LaTeX)'),
-            hal_property('expression_description_latex', prompt='Description (LaTeX)'),
-            hal_property('expression_reference_latex', prompt='Reference (LaTeX)')
-        ], title='Create a new expression')
+        "default": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "expression_latex_lhs", required=True, prompt="LHS (LaTeX)"
+                ),
+                hal_property(
+                    "expression_relation_latex",
+                    required=True,
+                    prompt="Relation (LaTeX)",
+                ),
+                hal_property(
+                    "expression_latex_rhs", required=True, prompt="RHS (LaTeX)"
+                ),
+                hal_property("expression_latex_condition", prompt="Condition (LaTeX)"),
+                hal_property("expression_name_latex", prompt="Name (LaTeX)"),
+                hal_property(
+                    "expression_description_latex", prompt="Description (LaTeX)"
+                ),
+                hal_property("expression_reference_latex", prompt="Reference (LaTeX)"),
+            ],
+            title="Create a new expression",
+        )
     }
-    
-    logger.info('[TRACE] end ' + trace_id)
+
+    logger.info("[TRACE] end " + trace_id)
     # Serves the correct application/prs.hal-forms+json media type automatically
     return hal_response(
-        data={'count': len(embedded_items)},
+        data={"count": len(embedded_items)},
         links=links,
-        embedded={'expressions': embedded_items},
+        embedded={"expressions": embedded_items},
         templates=templates,
-        status=200
+        status=200,
     )
 
 
@@ -1670,6 +1738,723 @@ def api_create_expression():
     )
 
 
+@api_bp.route("/resources/symbol/operation", methods=["POST"])
+@require_auth
+def api_create_operation_symbol():
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_operation_symbols", _external=True),
+            "List of Operation Symbols",
+        )
+    }
+    data_from_user = request.get_json() if request.is_json else request.args
+    operation_name_latex = data_from_user.get("operation_name_latex", "")
+    operation_latex = data_from_user.get("operation_latex")
+    operation_description_latex = data_from_user.get("operation_description_latex", "")
+    operation_reference_latex = data_from_user.get("operation_reference_latex", "")
+    operation_argument_count = data_from_user.get("operation_argument_count", 0)
+    if not operation_name_latex or not operation_latex:
+        return hal_error(
+            "Missing required fields (operation_name_latex, operation_latex)",
+            400,
+            links=up_link,
+            title="Missing Field",
+        )
+    try:
+        operation_argument_count = int(operation_argument_count)
+    except (TypeError, ValueError):
+        return hal_error(
+            "operation_argument_count must be an integer",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    if operation_argument_count <= 0:
+        return hal_error(
+            "operation_argument_count must be greater than 0",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    author_name_latex = g.current_author["author_name_latex"]
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+    query_time_dict = {}
+    operation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+
+    def _create_atomic(tx):
+        neo4j_query.add_operation_symbol(
+            tx,
+            operation_id,
+            operation_name_latex,
+            operation_latex,
+            operation_description_latex,
+            operation_reference_latex,
+            operation_argument_count,
+            now_str,
+            author_name_latex,
+        )
+        return True
+
+    with graphDB_Driver.session() as session:
+        session.write_transaction(_create_atomic)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "operation symbol "
+            + str(operation_name_latex)
+            + " added successfully",
+            "id": operation_id,
+            "created": now_str,
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_operation_metadata", operation_id=operation_id, _external=True
+                ),
+                "Get the new operation symbol",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_operation_symbols", _external=True),
+                "List of Operation Symbols",
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        templates={
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "operation_name_latex",
+                        required=True,
+                        value=operation_name_latex,
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "operation_latex",
+                        required=True,
+                        value=operation_latex,
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "operation_description_latex",
+                        value=operation_description_latex,
+                        prompt="Description (LaTeX)",
+                    ),
+                    hal_property(
+                        "operation_reference_latex",
+                        value=operation_reference_latex,
+                        prompt="Reference (LaTeX)",
+                    ),
+                    hal_property(
+                        "operation_argument_count",
+                        type_="number",
+                        required=True,
+                        value=operation_argument_count,
+                        prompt="Number of Arguments",
+                    ),
+                ],
+                title="Edit this operation symbol",
+            )
+        },
+        status=201,
+    )
+
+
+@api_bp.route("/resources/symbol/relation", methods=["POST"])
+@require_auth
+def api_create_relation_symbol():
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_relation_symbols", _external=True),
+            "List of Relation Symbols",
+        )
+    }
+    data_from_user = request.get_json() if request.is_json else request.args
+    relation_name_latex = data_from_user.get("relation_name_latex", "")
+    relation_latex = data_from_user.get("relation_latex")
+    relation_description_latex = data_from_user.get("relation_description_latex", "")
+    relation_reference_latex = data_from_user.get("relation_reference_latex", "")
+    if not relation_name_latex or not relation_latex:
+        return hal_error(
+            "Missing required fields (relation_name_latex, relation_latex)",
+            400,
+            links=up_link,
+            title="Missing Field",
+        )
+    author_name_latex = g.current_author["author_name_latex"]
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+    query_time_dict = {}
+    relation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+
+    def _create_atomic(tx):
+        neo4j_query.add_relation_symbol(
+            tx,
+            relation_id,
+            relation_name_latex,
+            relation_latex,
+            relation_description_latex,
+            relation_reference_latex,
+            now_str,
+            author_name_latex,
+        )
+        return True
+
+    with graphDB_Driver.session() as session:
+        session.write_transaction(_create_atomic)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "relation symbol "
+            + str(relation_name_latex)
+            + " added successfully",
+            "id": relation_id,
+            "created": now_str,
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_relation_metadata", relation_id=relation_id, _external=True
+                ),
+                "Get the new relation symbol",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_relation_symbols", _external=True),
+                "List of Relation Symbols",
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        templates={
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "relation_name_latex",
+                        required=True,
+                        value=relation_name_latex,
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "relation_latex",
+                        required=True,
+                        value=relation_latex,
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "relation_description_latex",
+                        value=relation_description_latex,
+                        prompt="Description (LaTeX)",
+                    ),
+                    hal_property(
+                        "relation_reference_latex",
+                        value=relation_reference_latex,
+                        prompt="Reference (LaTeX)",
+                    ),
+                ],
+                title="Edit this relation symbol",
+            )
+        },
+        status=201,
+    )
+
+
+@api_bp.route("/resources/symbol/scalar", methods=["POST"])
+@require_auth
+def api_create_scalar_symbol():
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_scalar_symbols", _external=True),
+            "List of Scalar Symbols",
+        )
+    }
+    data_from_user = request.get_json() if request.is_json else request.args
+    symbol_name_latex = data_from_user.get("symbol_name_latex", "")
+    symbol_latex = data_from_user.get("symbol_latex")
+    symbol_description_latex = data_from_user.get("symbol_description_latex", "")
+    symbol_reference_latex = data_from_user.get("symbol_reference_latex", "")
+    symbol_scope = data_from_user.get("symbol_scope")
+    symbol_variable_or_constant = data_from_user.get("symbol_variable_or_constant")
+    symbol_domain = data_from_user.get("symbol_domain", "any") or "any"
+    if not symbol_latex:
+        return hal_error(
+            "Missing required field: symbol_latex",
+            400,
+            links=up_link,
+            title="Missing Field",
+        )
+    if not symbol_scope or symbol_scope not in list_of_valid.scalar_scope:
+        return hal_error(
+            f"symbol_scope is required and must be one of {list_of_valid.scalar_scope}",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    if not symbol_variable_or_constant or symbol_variable_or_constant not in (
+        "variable",
+        "constant",
+    ):
+        return hal_error(
+            'symbol_variable_or_constant is required and must be "variable" or "constant"',
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    if symbol_domain not in list_of_valid.scalar_domain:
+        return hal_error(
+            f"symbol_domain must be one of {list_of_valid.scalar_domain}",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    dimension_field_names = [
+        "dimension_length",
+        "dimension_time",
+        "dimension_mass",
+        "dimension_temperature",
+        "dimension_electric_charge",
+        "dimension_amount_of_substance",
+        "dimension_luminous_intensity",
+    ]
+    dimension_values = {}
+    for field_name in dimension_field_names:
+        raw_value = data_from_user.get(field_name, 0)
+        try:
+            dimension_values[field_name] = (
+                int(raw_value) if raw_value not in (None, "") else 0
+            )
+        except (TypeError, ValueError):
+            return hal_error(
+                f"{field_name} must be an integer",
+                400,
+                links=up_link,
+                title="Invalid Field",
+            )
+    author_name_latex = g.current_author["author_name_latex"]
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+    query_time_dict = {}
+    symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+
+    def _create_atomic(tx):
+        neo4j_query.add_scalar_symbol(
+            tx,
+            symbol_id,
+            symbol_name_latex,
+            symbol_latex,
+            symbol_description_latex,
+            symbol_reference_latex,
+            symbol_scope,
+            symbol_variable_or_constant,
+            symbol_domain,
+            dimension_values["dimension_length"],
+            dimension_values["dimension_time"],
+            dimension_values["dimension_mass"],
+            dimension_values["dimension_temperature"],
+            dimension_values["dimension_electric_charge"],
+            dimension_values["dimension_amount_of_substance"],
+            dimension_values["dimension_luminous_intensity"],
+            now_str,
+            author_name_latex,
+        )
+        return True
+
+    with graphDB_Driver.session() as session:
+        session.write_transaction(_create_atomic)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "scalar symbol " + str(symbol_name_latex) + " added successfully",
+            "id": symbol_id,
+            "created": now_str,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_scalar_metadata", symbol_id=symbol_id, _external=True),
+                "Get the new scalar symbol",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_scalar_symbols", _external=True),
+                "List of Scalar Symbols",
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        templates={
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "symbol_name_latex",
+                        value=symbol_name_latex,
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_latex",
+                        required=True,
+                        value=symbol_latex,
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "symbol_description_latex",
+                        value=symbol_description_latex,
+                        prompt="Description (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_reference_latex",
+                        value=symbol_reference_latex,
+                        prompt="Reference (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_scope",
+                        required=True,
+                        value=symbol_scope,
+                        options=list_of_valid.scalar_scope,
+                        prompt="Scope",
+                    ),
+                    hal_property(
+                        "symbol_variable_or_constant",
+                        required=True,
+                        value=symbol_variable_or_constant,
+                        options=["variable", "constant"],
+                        prompt="Variable or Constant",
+                    ),
+                    hal_property(
+                        "symbol_domain",
+                        value=symbol_domain,
+                        options=list_of_valid.scalar_domain,
+                        prompt="Domain",
+                    ),
+                    hal_property(
+                        "dimension_length",
+                        type_="number",
+                        value=dimension_values["dimension_length"],
+                        prompt="Dimension: Length exponent",
+                    ),
+                    hal_property(
+                        "dimension_time",
+                        type_="number",
+                        value=dimension_values["dimension_time"],
+                        prompt="Dimension: Time exponent",
+                    ),
+                    hal_property(
+                        "dimension_mass",
+                        type_="number",
+                        value=dimension_values["dimension_mass"],
+                        prompt="Dimension: Mass exponent",
+                    ),
+                    hal_property(
+                        "dimension_temperature",
+                        type_="number",
+                        value=dimension_values["dimension_temperature"],
+                        prompt="Dimension: Temperature exponent",
+                    ),
+                    hal_property(
+                        "dimension_electric_charge",
+                        type_="number",
+                        value=dimension_values["dimension_electric_charge"],
+                        prompt="Dimension: Electric charge exponent",
+                    ),
+                    hal_property(
+                        "dimension_amount_of_substance",
+                        type_="number",
+                        value=dimension_values["dimension_amount_of_substance"],
+                        prompt="Dimension: Amount of substance exponent",
+                    ),
+                    hal_property(
+                        "dimension_luminous_intensity",
+                        type_="number",
+                        value=dimension_values["dimension_luminous_intensity"],
+                        prompt="Dimension: Luminous intensity exponent",
+                    ),
+                ],
+                title="Edit this scalar symbol",
+            )
+        },
+        status=201,
+    )
+
+
+@api_bp.route("/resources/symbol/vector", methods=["POST"])
+@require_auth
+def api_create_vector_symbol():
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_vector_symbols", _external=True),
+            "List of Vector Symbols",
+        )
+    }
+    data_from_user = request.get_json() if request.is_json else request.args
+    symbol_name_latex = data_from_user.get("symbol_name_latex", "")
+    symbol_latex = data_from_user.get("symbol_latex")
+    symbol_description_latex = data_from_user.get("symbol_description_latex", "")
+    symbol_reference_latex = data_from_user.get("symbol_reference_latex", "")
+    symbol_is_composite = _parse_bool(
+        data_from_user.get("symbol_is_composite"), default=False
+    )
+    symbol_size = data_from_user.get("symbol_size", "arbitrary") or "arbitrary"
+    symbol_orientation = data_from_user.get("symbol_orientation", "")
+    symbol_number_of_entries = data_from_user.get("symbol_number_of_entries", "")
+    if not symbol_latex:
+        return hal_error(
+            "Missing required field: symbol_latex",
+            400,
+            links=up_link,
+            title="Missing Field",
+        )
+    if symbol_size != "arbitrary" and (not symbol_number_of_entries):
+        return hal_error(
+            'symbol_number_of_entries is required unless symbol_size is "arbitrary"',
+            400,
+            links=up_link,
+            title="Missing Field",
+        )
+    author_name_latex = g.current_author["author_name_latex"]
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+    query_time_dict = {}
+    symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+
+    def _create_atomic(tx):
+        neo4j_query.add_vector_symbol(
+            tx,
+            symbol_id,
+            symbol_name_latex,
+            symbol_latex,
+            symbol_description_latex,
+            symbol_reference_latex,
+            symbol_is_composite,
+            symbol_size,
+            symbol_orientation,
+            symbol_number_of_entries,
+            now_str,
+            author_name_latex,
+        )
+        return True
+
+    with graphDB_Driver.session() as session:
+        session.write_transaction(_create_atomic)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "vector symbol " + str(symbol_name_latex) + " added successfully",
+            "id": symbol_id,
+            "created": now_str,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_vector_metadata", symbol_id=symbol_id, _external=True),
+                "Get the new vector symbol",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_vector_symbols", _external=True),
+                "List of Vector Symbols",
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        templates={
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "symbol_name_latex",
+                        value=symbol_name_latex,
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_latex",
+                        required=True,
+                        value=symbol_latex,
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "symbol_description_latex",
+                        value=symbol_description_latex,
+                        prompt="Description (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_reference_latex",
+                        value=symbol_reference_latex,
+                        prompt="Reference (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_is_composite",
+                        type_="checkbox",
+                        value=symbol_is_composite,
+                        prompt="Is Composite?",
+                    ),
+                    hal_property(
+                        "symbol_size",
+                        required=True,
+                        value=symbol_size,
+                        prompt='Size ("arbitrary" or a fixed size)',
+                    ),
+                    hal_property(
+                        "symbol_orientation",
+                        value=symbol_orientation,
+                        prompt="Orientation",
+                    ),
+                    hal_property(
+                        "symbol_number_of_entries",
+                        value=symbol_number_of_entries,
+                        prompt="Number of Entries",
+                    ),
+                ],
+                title="Edit this vector symbol",
+            )
+        },
+        status=201,
+    )
+
+
+@api_bp.route("/resources/symbol/matrix", methods=["POST"])
+@require_auth
+def api_create_matrix_symbol():
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_matrix_symbols", _external=True),
+            "List of Matrix Symbols",
+        )
+    }
+    data_from_user = request.get_json() if request.is_json else request.args
+    symbol_name_latex = data_from_user.get("symbol_name_latex", "")
+    symbol_latex = data_from_user.get("symbol_latex")
+    symbol_description_latex = data_from_user.get("symbol_description_latex", "")
+    symbol_reference_latex = data_from_user.get("symbol_reference_latex", "")
+    symbol_is_composite = _parse_bool(
+        data_from_user.get("symbol_is_composite"), default=False
+    )
+    symbol_size = data_from_user.get("symbol_size", "arbitrary") or "arbitrary"
+    symbol_number_of_rows = data_from_user.get("symbol_number_of_rows", "")
+    symbol_number_of_columns = data_from_user.get("symbol_number_of_columns", "")
+    if not symbol_latex:
+        return hal_error(
+            "Missing required field: symbol_latex",
+            400,
+            links=up_link,
+            title="Missing Field",
+        )
+    if symbol_size != "arbitrary" and (
+        not symbol_number_of_rows or not symbol_number_of_columns
+    ):
+        return hal_error(
+            'symbol_number_of_rows and symbol_number_of_columns are required unless symbol_size is "arbitrary"',
+            400,
+            links=up_link,
+            title="Missing Field",
+        )
+    author_name_latex = g.current_author["author_name_latex"]
+    now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
+    query_time_dict = {}
+    symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+
+    def _create_atomic(tx):
+        neo4j_query.add_matrix_symbol(
+            tx,
+            symbol_id,
+            symbol_name_latex,
+            symbol_latex,
+            symbol_description_latex,
+            symbol_reference_latex,
+            symbol_is_composite,
+            symbol_size,
+            symbol_number_of_rows,
+            symbol_number_of_columns,
+            now_str,
+            author_name_latex,
+        )
+        return True
+
+    with graphDB_Driver.session() as session:
+        session.write_transaction(_create_atomic)
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "matrix symbol " + str(symbol_name_latex) + " added successfully",
+            "id": symbol_id,
+            "created": now_str,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_matrix_metadata", symbol_id=symbol_id, _external=True),
+                "Get the new matrix symbol",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_matrix_symbols", _external=True),
+                "List of Matrix Symbols",
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        templates={
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "symbol_name_latex",
+                        value=symbol_name_latex,
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_latex",
+                        required=True,
+                        value=symbol_latex,
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "symbol_description_latex",
+                        value=symbol_description_latex,
+                        prompt="Description (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_reference_latex",
+                        value=symbol_reference_latex,
+                        prompt="Reference (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_is_composite",
+                        type_="checkbox",
+                        value=symbol_is_composite,
+                        prompt="Is Composite?",
+                    ),
+                    hal_property(
+                        "symbol_size",
+                        required=True,
+                        value=symbol_size,
+                        prompt='Size ("arbitrary" or a fixed size)',
+                    ),
+                    hal_property(
+                        "symbol_number_of_rows",
+                        value=symbol_number_of_rows,
+                        prompt="Number of Rows",
+                    ),
+                    hal_property(
+                        "symbol_number_of_columns",
+                        value=symbol_number_of_columns,
+                        prompt="Number of Columns",
+                    ),
+                ],
+                title="Edit this matrix symbol",
+            )
+        },
+        status=201,
+    )
+
+
 @api_bp.route("/resources/derivation/<string:derivation_id>/edit", methods=["POST"])
 @require_auth
 def api_edit_derivation(derivation_id: str):
@@ -1947,6 +2732,499 @@ def api_edit_expression(expression_id: str):
     )
 
 
+@api_bp.route(
+    "/resources/symbol/operation/<string:operation_id>/edit", methods=["POST"]
+)
+@require_auth
+def api_edit_operation(operation_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    data_from_user = request.get_json() if request.is_json else request.args
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_operation_symbols", _external=True),
+            "List of Operation Symbols",
+        )
+    }
+    editable_fields = {
+        "operation_name_latex": "name_latex",
+        "operation_latex": "latex",
+        "operation_description_latex": "description_latex",
+        "operation_reference_latex": "reference_latex",
+    }
+    updated_fields = []
+
+    def _edit_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(
+            tx, "operation", operation_id
+        )
+        if existing is None:
+            return "NOT_FOUND"
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key) not in (
+                None,
+                "",
+            ):
+                updated = neo4j_query.edit_node_property(
+                    tx,
+                    "operation",
+                    operation_id,
+                    node_property,
+                    data_from_user.get(form_key),
+                )
+                if updated:
+                    updated_fields.append(node_property)
+        if "operation_argument_count" in data_from_user and data_from_user.get(
+            "operation_argument_count"
+        ) not in (None, ""):
+            try:
+                argument_count = int(data_from_user.get("operation_argument_count"))
+            except (TypeError, ValueError):
+                return "INVALID_ARGUMENT_COUNT"
+            if argument_count <= 0:
+                return "INVALID_ARGUMENT_COUNT"
+            updated = neo4j_query.edit_node_property(
+                tx, "operation", operation_id, "argument_count", argument_count
+            )
+            if updated:
+                updated_fields.append("argument_count")
+        if updated_fields:
+            _stamp_last_modified(tx, "operation", operation_id)
+        return "SUCCESS"
+
+    with graphDB_Driver.session() as session:
+        status = session.write_transaction(_edit_atomic)
+    if status == "NOT_FOUND":
+        return hal_error(
+            f"Operation {operation_id} does not exist",
+            404,
+            links=up_link,
+            title="Not Found",
+        )
+    elif status == "INVALID_ARGUMENT_COUNT":
+        return hal_error(
+            "operation_argument_count must be a positive integer",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "operation symbol updated successfully",
+            "id": operation_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(
+                    ".api_edit_operation", operation_id=operation_id, _external=True
+                ),
+                "Edit operation symbol",
+            ),
+            "operation": hal_link(
+                url_for(
+                    ".api_operation_metadata", operation_id=operation_id, _external=True
+                ),
+                "Get operation metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_operation_symbols", _external=True),
+                "List of Operation Symbols",
+            ),
+        },
+    )
+
+
+@api_bp.route("/resources/symbol/relation/<string:relation_id>/edit", methods=["POST"])
+@require_auth
+def api_edit_relation(relation_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    data_from_user = request.get_json() if request.is_json else request.args
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_relation_symbols", _external=True),
+            "List of Relation Symbols",
+        )
+    }
+    editable_fields = {
+        "relation_name_latex": "name_latex",
+        "relation_latex": "latex",
+        "relation_description_latex": "description_latex",
+        "relation_reference_latex": "reference_latex",
+    }
+    updated_fields = []
+
+    def _edit_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(tx, "relation", relation_id)
+        if existing is None:
+            return False
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key) not in (
+                None,
+                "",
+            ):
+                updated = neo4j_query.edit_node_property(
+                    tx,
+                    "relation",
+                    relation_id,
+                    node_property,
+                    data_from_user.get(form_key),
+                )
+                if updated:
+                    updated_fields.append(node_property)
+        if updated_fields:
+            _stamp_last_modified(tx, "relation", relation_id)
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_edit_atomic)
+    if not found:
+        return hal_error(
+            f"Relation {relation_id} does not exist",
+            404,
+            links=up_link,
+            title="Not Found",
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "relation symbol updated successfully",
+            "id": relation_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_edit_relation", relation_id=relation_id, _external=True),
+                "Edit relation symbol",
+            ),
+            "relation": hal_link(
+                url_for(
+                    ".api_relation_metadata", relation_id=relation_id, _external=True
+                ),
+                "Get relation metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_relation_symbols", _external=True),
+                "List of Relation Symbols",
+            ),
+        },
+    )
+
+
+@api_bp.route("/resources/symbol/scalar/<string:symbol_id>/edit", methods=["POST"])
+@require_auth
+def api_edit_scalar(symbol_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    data_from_user = request.get_json() if request.is_json else request.args
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_scalar_symbols", _external=True),
+            "List of Scalar Symbols",
+        )
+    }
+    text_fields = {
+        "symbol_name_latex": "name_latex",
+        "symbol_latex": "latex",
+        "symbol_description_latex": "description_latex",
+        "symbol_reference_latex": "reference_latex",
+    }
+    numeric_fields = [
+        "dimension_length",
+        "dimension_time",
+        "dimension_mass",
+        "dimension_temperature",
+        "dimension_electric_charge",
+        "dimension_amount_of_substance",
+        "dimension_luminous_intensity",
+    ]
+    updated_fields = []
+    if (
+        "symbol_scope" in data_from_user
+        and data_from_user.get("symbol_scope")
+        and data_from_user.get("symbol_scope") not in list_of_valid.scalar_scope
+    ):
+        return hal_error(
+            f"symbol_scope must be one of {list_of_valid.scalar_scope}",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    if (
+        "symbol_domain" in data_from_user
+        and data_from_user.get("symbol_domain")
+        and data_from_user.get("symbol_domain") not in list_of_valid.scalar_domain
+    ):
+        return hal_error(
+            f"symbol_domain must be one of {list_of_valid.scalar_domain}",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    if (
+        "symbol_variable_or_constant" in data_from_user
+        and data_from_user.get("symbol_variable_or_constant")
+        and data_from_user.get("symbol_variable_or_constant")
+        not in ("variable", "constant")
+    ):
+        return hal_error(
+            'symbol_variable_or_constant must be "variable" or "constant"',
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+
+    def _edit_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(tx, "scalar", symbol_id)
+        if existing is None:
+            return "NOT_FOUND"
+        for form_key, node_property in text_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key) not in (
+                None,
+                "",
+            ):
+                updated = neo4j_query.edit_node_property(
+                    tx, "scalar", symbol_id, node_property, data_from_user.get(form_key)
+                )
+                if updated:
+                    updated_fields.append(node_property)
+        if "symbol_scope" in data_from_user and data_from_user.get("symbol_scope"):
+            updated = neo4j_query.edit_node_property(
+                tx, "scalar", symbol_id, "scope", data_from_user.get("symbol_scope")
+            )
+            if updated:
+                updated_fields.append("scope")
+        if "symbol_variable_or_constant" in data_from_user and data_from_user.get(
+            "symbol_variable_or_constant"
+        ):
+            updated = neo4j_query.edit_node_property(
+                tx,
+                "scalar",
+                symbol_id,
+                "variable_or_constant",
+                data_from_user.get("symbol_variable_or_constant"),
+            )
+            if updated:
+                updated_fields.append("variable_or_constant")
+        if "symbol_domain" in data_from_user and data_from_user.get("symbol_domain"):
+            updated = neo4j_query.edit_node_property(
+                tx, "scalar", symbol_id, "domain", data_from_user.get("symbol_domain")
+            )
+            if updated:
+                updated_fields.append("domain")
+        for form_key in numeric_fields:
+            if form_key in data_from_user and data_from_user.get(form_key) not in (
+                None,
+                "",
+            ):
+                try:
+                    value = int(data_from_user.get(form_key))
+                except (TypeError, ValueError):
+                    return "INVALID_DIMENSION"
+                updated = neo4j_query.edit_node_property(
+                    tx, "scalar", symbol_id, form_key, value
+                )
+                if updated:
+                    updated_fields.append(form_key)
+        if updated_fields:
+            _stamp_last_modified(tx, "scalar", symbol_id)
+        return "SUCCESS"
+
+    with graphDB_Driver.session() as session:
+        status = session.write_transaction(_edit_atomic)
+    if status == "NOT_FOUND":
+        return hal_error(
+            f"Scalar {symbol_id} does not exist", 404, links=up_link, title="Not Found"
+        )
+    elif status == "INVALID_DIMENSION":
+        return hal_error(
+            "dimension fields must be integers",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "scalar symbol updated successfully",
+            "id": symbol_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_edit_scalar", symbol_id=symbol_id, _external=True),
+                "Edit scalar symbol",
+            ),
+            "scalar": hal_link(
+                url_for(".api_scalar_metadata", symbol_id=symbol_id, _external=True),
+                "Get scalar metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_scalar_symbols", _external=True),
+                "List of Scalar Symbols",
+            ),
+        },
+    )
+
+
+@api_bp.route("/resources/symbol/vector/<string:symbol_id>/edit", methods=["POST"])
+@require_auth
+def api_edit_vector(symbol_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    data_from_user = request.get_json() if request.is_json else request.args
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_vector_symbols", _external=True),
+            "List of Vector Symbols",
+        )
+    }
+    editable_fields = {
+        "symbol_name_latex": "name_latex",
+        "symbol_latex": "latex",
+        "symbol_description_latex": "description_latex",
+        "symbol_reference_latex": "reference_latex",
+        "symbol_size": "size",
+        "symbol_orientation": "orientation",
+        "symbol_number_of_entries": "number_of_entries",
+    }
+    updated_fields = []
+
+    def _edit_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(tx, "vector", symbol_id)
+        if existing is None:
+            return "NOT_FOUND"
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key) not in (
+                None,
+                "",
+            ):
+                updated = neo4j_query.edit_node_property(
+                    tx, "vector", symbol_id, node_property, data_from_user.get(form_key)
+                )
+                if updated:
+                    updated_fields.append(node_property)
+        if "symbol_is_composite" in data_from_user:
+            value = _parse_bool(data_from_user.get("symbol_is_composite"))
+            updated = neo4j_query.edit_node_property(
+                tx, "vector", symbol_id, "is_composite", value
+            )
+            if updated:
+                updated_fields.append("is_composite")
+        if updated_fields:
+            _stamp_last_modified(tx, "vector", symbol_id)
+        return "SUCCESS"
+
+    with graphDB_Driver.session() as session:
+        status = session.write_transaction(_edit_atomic)
+    if status == "NOT_FOUND":
+        return hal_error(
+            f"Vector {symbol_id} does not exist", 404, links=up_link, title="Not Found"
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "vector symbol updated successfully",
+            "id": symbol_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_edit_vector", symbol_id=symbol_id, _external=True),
+                "Edit vector symbol",
+            ),
+            "vector": hal_link(
+                url_for(".api_vector_metadata", symbol_id=symbol_id, _external=True),
+                "Get vector metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_vector_symbols", _external=True),
+                "List of Vector Symbols",
+            ),
+        },
+    )
+
+
+@api_bp.route("/resources/symbol/matrix/<string:symbol_id>/edit", methods=["POST"])
+@require_auth
+def api_edit_matrix(symbol_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    data_from_user = request.get_json() if request.is_json else request.args
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_matrix_symbols", _external=True),
+            "List of Matrix Symbols",
+        )
+    }
+    editable_fields = {
+        "symbol_name_latex": "name_latex",
+        "symbol_latex": "latex",
+        "symbol_description_latex": "description_latex",
+        "symbol_reference_latex": "reference_latex",
+        "symbol_size": "size",
+        "symbol_number_of_rows": "number_of_rows",
+        "symbol_number_of_columns": "number_of_columns",
+    }
+    updated_fields = []
+
+    def _edit_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(tx, "matrix", symbol_id)
+        if existing is None:
+            return "NOT_FOUND"
+        for form_key, node_property in editable_fields.items():
+            if form_key in data_from_user and data_from_user.get(form_key) not in (
+                None,
+                "",
+            ):
+                updated = neo4j_query.edit_node_property(
+                    tx, "matrix", symbol_id, node_property, data_from_user.get(form_key)
+                )
+                if updated:
+                    updated_fields.append(node_property)
+        if "symbol_is_composite" in data_from_user:
+            value = _parse_bool(data_from_user.get("symbol_is_composite"))
+            updated = neo4j_query.edit_node_property(
+                tx, "matrix", symbol_id, "is_composite", value
+            )
+            if updated:
+                updated_fields.append("is_composite")
+        if updated_fields:
+            _stamp_last_modified(tx, "matrix", symbol_id)
+        return "SUCCESS"
+
+    with graphDB_Driver.session() as session:
+        status = session.write_transaction(_edit_atomic)
+    if status == "NOT_FOUND":
+        return hal_error(
+            f"Matrix {symbol_id} does not exist", 404, links=up_link, title="Not Found"
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "matrix symbol updated successfully",
+            "id": symbol_id,
+            "updated_fields": updated_fields,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_edit_matrix", symbol_id=symbol_id, _external=True),
+                "Edit matrix symbol",
+            ),
+            "matrix": hal_link(
+                url_for(".api_matrix_metadata", symbol_id=symbol_id, _external=True),
+                "Get matrix metadata",
+            ),
+            "up": hal_link(
+                url_for(".api_list_matrix_symbols", _external=True),
+                "List of Matrix Symbols",
+            ),
+        },
+    )
+
+
 @api_bp.route("/resources/derivation/<string:derivation_id>/metadata", methods=["GET"])
 def api_derivation_metadata(derivation_id: str):
     trace_id = str(uuid.uuid4())
@@ -2072,46 +3350,95 @@ def api_expression_metadata(expression_id: str):
     - set: change existing values
     """
     trace_id = str(uuid.uuid4())
-    logger.info('[TRACE] start ' + trace_id)
+    logger.info("[TRACE] start " + trace_id)
     with graphDB_Driver.session() as session:
-        expression_dict = session.read_transaction(neo4j_query.get_node_properties_from_id, 'expression', expression_id)
-        
+        expression_dict = session.read_transaction(
+            neo4j_query.get_node_properties_from_id, "expression", expression_id
+        )
+
     if expression_dict is None:
         return hal_error(
-            f'Expression {expression_id} does not exist', 
-            404, 
-            links={'up': hal_link(url_for('.api_list_expressions', _external=True), 'List of Expressions')}, 
-            title='Not Found'
+            f"Expression {expression_id} does not exist",
+            404,
+            links={
+                "up": hal_link(
+                    url_for(".api_list_expressions", _external=True),
+                    "List of Expressions",
+                )
+            },
+            title="Not Found",
         )
-        
+
     # Safe link transitions
     links = {
-        'self': hal_link(url_for('.api_expression_metadata', expression_id=expression_id, _external=True), 'Get expression metadata'),
-        'up': hal_link(url_for('.api_list_expressions', _external=True), 'List of Expressions')
+        "self": hal_link(
+            url_for(
+                ".api_expression_metadata", expression_id=expression_id, _external=True
+            ),
+            "Get expression metadata",
+        ),
+        "up": hal_link(
+            url_for(".api_list_expressions", _external=True), "List of Expressions"
+        ),
     }
-    
+
     # State-changing operations formatted as templates
     templates = {
-        'edit': hal_template('POST', [
-            hal_property('expression_latex_lhs', value=expression_dict.get('latex_lhs'), required=True, prompt='LHS (LaTeX)'),
-            hal_property('expression_relation_latex', value=expression_dict.get('latex_relation'), required=True, prompt='Relation (LaTeX)'),
-            hal_property('expression_latex_rhs', value=expression_dict.get('latex_rhs'), required=True, prompt='RHS (LaTeX)'),
-            hal_property('expression_latex_condition', value=expression_dict.get('latex_condition'), prompt='Condition (LaTeX)'),
-            hal_property('expression_name_latex', value=expression_dict.get('name_latex'), prompt='Name (LaTeX)'),
-            hal_property('expression_description_latex', value=expression_dict.get('description_latex'), prompt='Description (LaTeX)'),
-            hal_property('expression_reference_latex', value=expression_dict.get('reference_latex'), prompt='Reference (LaTeX)')
-        ], title='Edit this expression'),
-        'delete': hal_template('DELETE', [], title='Delete this expression'),
-        'associate-symbol': hal_template('POST', [
-            hal_property('symbol_id', required=True, prompt='Symbol ID to Associate')
-        ], title='Associate symbol with this expression')
+        "edit": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "expression_latex_lhs",
+                    value=expression_dict.get("latex_lhs"),
+                    required=True,
+                    prompt="LHS (LaTeX)",
+                ),
+                hal_property(
+                    "expression_relation_latex",
+                    value=expression_dict.get("latex_relation"),
+                    required=True,
+                    prompt="Relation (LaTeX)",
+                ),
+                hal_property(
+                    "expression_latex_rhs",
+                    value=expression_dict.get("latex_rhs"),
+                    required=True,
+                    prompt="RHS (LaTeX)",
+                ),
+                hal_property(
+                    "expression_latex_condition",
+                    value=expression_dict.get("latex_condition"),
+                    prompt="Condition (LaTeX)",
+                ),
+                hal_property(
+                    "expression_name_latex",
+                    value=expression_dict.get("name_latex"),
+                    prompt="Name (LaTeX)",
+                ),
+                hal_property(
+                    "expression_description_latex",
+                    value=expression_dict.get("description_latex"),
+                    prompt="Description (LaTeX)",
+                ),
+                hal_property(
+                    "expression_reference_latex",
+                    value=expression_dict.get("reference_latex"),
+                    prompt="Reference (LaTeX)",
+                ),
+            ],
+            title="Edit this expression",
+        ),
+        "delete": hal_template("DELETE", [], title="Delete this expression"),
+        "associate-symbol": hal_template(
+            "POST",
+            [hal_property("symbol_id", required=True, prompt="Symbol ID to Associate")],
+            title="Associate symbol with this expression",
+        ),
     }
-    
-    logger.info('[TRACE] end ' + trace_id)
+
+    logger.info("[TRACE] end " + trace_id)
     return hal_response(
-        data={'metadata': expression_dict},
-        links=links,
-        templates=templates
+        data={"metadata": expression_dict}, links=links, templates=templates
     )
 
 
@@ -3366,6 +4693,235 @@ def api_delete_expression(expression_id: str):
             ),
             "collection": hal_link(
                 url_for(".api_list_expressions", _external=True), "Expressions"
+            ),
+        },
+    )
+
+
+@api_bp.route(
+    "/resources/symbol/operation/<string:operation_id>/delete", methods=["DELETE"]
+)
+@require_auth
+def api_delete_operation(operation_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_operation_symbols", _external=True),
+            "List of Operation Symbols",
+        )
+    }
+
+    def _delete_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(
+            tx, "operation", operation_id
+        )
+        if existing is None:
+            return False
+        neo4j_query.delete_node(tx, operation_id, "operation")
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_delete_atomic)
+    if not found:
+        return hal_error(
+            f"Operation {operation_id} does not exist",
+            404,
+            links=up_link,
+            title="Not Found",
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + operation_id,
+            "deleted_operation_id": operation_id,
+        },
+        links={
+            "up": hal_link(
+                url_for(".api_list_operation_symbols", _external=True),
+                "List of Operation Symbols",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_operation_symbols", _external=True),
+                "Operation Symbols",
+            ),
+        },
+    )
+
+
+@api_bp.route(
+    "/resources/symbol/relation/<string:relation_id>/delete", methods=["DELETE"]
+)
+@require_auth
+def api_delete_relation(relation_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_relation_symbols", _external=True),
+            "List of Relation Symbols",
+        )
+    }
+
+    def _delete_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(tx, "relation", relation_id)
+        if existing is None:
+            return False
+        neo4j_query.delete_node(tx, relation_id, "relation")
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_delete_atomic)
+    if not found:
+        return hal_error(
+            f"Relation {relation_id} does not exist",
+            404,
+            links=up_link,
+            title="Not Found",
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + relation_id,
+            "deleted_relation_id": relation_id,
+        },
+        links={
+            "up": hal_link(
+                url_for(".api_list_relation_symbols", _external=True),
+                "List of Relation Symbols",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_relation_symbols", _external=True),
+                "Relation Symbols",
+            ),
+        },
+    )
+
+
+@api_bp.route("/resources/symbol/scalar/<string:symbol_id>/delete", methods=["DELETE"])
+@require_auth
+def api_delete_scalar(symbol_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_scalar_symbols", _external=True),
+            "List of Scalar Symbols",
+        )
+    }
+
+    def _delete_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(tx, "scalar", symbol_id)
+        if existing is None:
+            return False
+        neo4j_query.delete_node(tx, symbol_id, "scalar")
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_delete_atomic)
+    if not found:
+        return hal_error(
+            f"Scalar {symbol_id} does not exist", 404, links=up_link, title="Not Found"
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + symbol_id,
+            "deleted_scalar_id": symbol_id,
+        },
+        links={
+            "up": hal_link(
+                url_for(".api_list_scalar_symbols", _external=True),
+                "List of Scalar Symbols",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_scalar_symbols", _external=True), "Scalar Symbols"
+            ),
+        },
+    )
+
+
+@api_bp.route("/resources/symbol/vector/<string:symbol_id>/delete", methods=["DELETE"])
+@require_auth
+def api_delete_vector(symbol_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_vector_symbols", _external=True),
+            "List of Vector Symbols",
+        )
+    }
+
+    def _delete_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(tx, "vector", symbol_id)
+        if existing is None:
+            return False
+        neo4j_query.delete_node(tx, symbol_id, "vector")
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_delete_atomic)
+    if not found:
+        return hal_error(
+            f"Vector {symbol_id} does not exist", 404, links=up_link, title="Not Found"
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + symbol_id,
+            "deleted_vector_id": symbol_id,
+        },
+        links={
+            "up": hal_link(
+                url_for(".api_list_vector_symbols", _external=True),
+                "List of Vector Symbols",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_vector_symbols", _external=True), "Vector Symbols"
+            ),
+        },
+    )
+
+
+@api_bp.route("/resources/symbol/matrix/<string:symbol_id>/delete", methods=["DELETE"])
+@require_auth
+def api_delete_matrix(symbol_id: str):
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(
+            url_for(".api_list_matrix_symbols", _external=True),
+            "List of Matrix Symbols",
+        )
+    }
+
+    def _delete_atomic(tx):
+        existing = neo4j_query.get_node_properties_from_id(tx, "matrix", symbol_id)
+        if existing is None:
+            return False
+        neo4j_query.delete_node(tx, symbol_id, "matrix")
+        return True
+
+    with graphDB_Driver.session() as session:
+        found = session.write_transaction(_delete_atomic)
+    if not found:
+        return hal_error(
+            f"Matrix {symbol_id} does not exist", 404, links=up_link, title="Not Found"
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "status": "successfully deleted " + symbol_id,
+            "deleted_matrix_id": symbol_id,
+        },
+        links={
+            "up": hal_link(
+                url_for(".api_list_matrix_symbols", _external=True),
+                "List of Matrix Symbols",
+            ),
+            "collection": hal_link(
+                url_for(".api_list_matrix_symbols", _external=True), "Matrix Symbols"
             ),
         },
     )
