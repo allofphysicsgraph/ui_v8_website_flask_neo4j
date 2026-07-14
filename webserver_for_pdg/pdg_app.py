@@ -1716,7 +1716,7 @@ def to_review_derivation(
 
             # path_to_pdf = "/code/static/dumping_grounds/"  # should end with slash
 
-            if web_app.static_folder is None
+            if web_app.static_folder is None:
                 raise ValueError("Missing static folder")
             try:
                 pdf_filename = latex.create_pdf_for_derivation(
@@ -3682,7 +3682,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> ResponseRetur
         if "new value and dimension" in request.form:
             if web_form_constant_properties.validate():
 
-                if web_form_constant_properties.number_decimal.data is  None:
+                if web_form_constant_properties.number_decimal.data is None:
                     raise ValueError("undefined number_decimal")
                 if web_form_constant_properties.number_power.data is None:
                     raise ValueError("undefined number_power")
