@@ -59,12 +59,11 @@ If you have questions, AskUserQuestion
 import time
 import datetime
 import uuid
-import tokenize
 import os
 import json
 import secrets
 import functools
-from sympy.parsing.sympy_parser import parse_expr
+
 
 from flask import (
     Blueprint,
@@ -75,7 +74,7 @@ from flask import (
     make_response,
 )
 
-from typing import NewType, Dict, List
+from typing import Dict, List
 import neo4j  # type: ignore
 
 # from flask_wtf.csrf import generate_csrf
