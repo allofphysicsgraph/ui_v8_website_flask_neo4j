@@ -32,6 +32,22 @@ def test_get_index_has_title(page: Page):
     # `.to_have_title` shows up in the HTML's <title> tag -- the browser tab
 
 
+def test_get_student_documentation(page: Page):
+    page.goto(URL + '/documentation/student')
+    expect(page).to_have_title(re.compile('Documentation for Students'))
+
+def test_get_instructor_documentation(page: Page):
+    page.goto(URL + '/documentation/instructor')
+    expect(page).to_have_title(re.compile('Documentation for instructors'))
+
+def test_get_researcher_documentation(page: Page):
+    page.goto(URL + '/documentation/researcher')
+    expect(page).to_have_title(re.compile('Documentation for researchers'))
+
+def test_get_llm_workflow_documentation(page: Page):
+    page.goto(URL + '/llm_workflow_documentation')
+    expect(page.get_by_role('heading', name='LLM Workflow documentation')).to_be_visible()
+
 def test_get_rss_feed(page: Page):
     # Navigate to the RSS feed path
     response = page.goto(URL + "/rss.xml")
@@ -371,14 +387,50 @@ def test_get_workflow_page(page: Page):
         page.get_by_role("heading", name=re.compile("Webpages used"))
     ).to_be_visible()
 
+def test_get_review_derivation_generate_tex(page: Page):
+    page.goto(URL + '/review_derivation/0000201726')
+    tex_button = page.locator('input[name="generate tex"]')
+    page.wait_for_load_state('networkidle')
+    with page.expect_download() as download_info:
+        tex_button.click(force=True)
+        download = download_info.value
+        assert download.suggested_filename == 'generated_0000201726.tex'
+
+def test_get_class_notes_subpage(page: Page):
+    page.goto(URL + '/class_notes/math402_mathematical_physics_hale')
+    expect(page).to_have_title(re.compile('Math 402'))
+
+def test_get_spectrum_precision_layer_lecture(page: Page):
+    page.goto(URL + '/spectrum_of_precision/lecture')
+    expect(page).to_have_title(re.compile('Spectrum of Precision'))
 
 def test_get_profile_page(page: Page):
     page.goto(URL + "/profile")
 
+def test_get_select_step_page(page: Page):
+    page.goto(URL + '/select_step/0000201726')
+    expect(page.get_by_role('heading', name='Derivation: Select Step')).to_be_visible()
+
+def test_get_from_llm_page(page: Page):
+    page.goto(URL + '/from_llm')
+    # Verifies the static Gemini template rendering
+    expect(page).to_have_url(URL + '/from_llm')
+
+def test_get_api_hal_explorer(page: Page):
+    page.goto(URL + '/api_hal_explorer')
+    expect(page).to_have_url(URL + '/api_hal_explorer')
+
+def test_get_api_json_to_console(page: Page):
+    page.goto(URL + '/api_json_to_console')
+    expect(page).to_have_url(URL + '/api_json_to_console')
 
 def test_get_search_page(page: Page):
     page.goto(URL + "/search")
 
+def test_get_search_redirect_behavior(page: Page):
+    page.goto(URL + '/search?q=schrodinger')
+    # Asserts that the app successfully redirects to the external Google search engine
+    expect(page).to_have_url(re.compile(r'https://www\.google\.com/search.*site%3Aallofphysics\.com\+schrodinger'))
 
 def test_get_favicon_page(page: Page):
     page.goto(URL + "/favicon.ico")
