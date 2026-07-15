@@ -110,52 +110,6 @@ api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 # csrf.exempt(bp)
 
 
-# @api_bp.route("/v1/resources/do_nothing", methods=["GET"])
-# def api_do_nothing():
-#     """
-#     to use session cookies,
-#     curl --head -c cookies.txt https://localhost/api/v1/resources/do_nothing
-#     where
-#     `--head`: only fetch the headers of the response.
-#     `-c cookies.txt`: save the cookies received in the response to a file named cookies.txt.
-#     Then
-#     curl -b cookies.txt https://localhost/api/v1/resources/derivation/create
-
-
-#     """
-#     trace_id = str(uuid.uuid4())
-#     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
-#     return
-
-
-# @api_bp.route("/v1/auth/csrf", methods=["GET"])
-# def api_register():
-#     """
-#     a CSRF token can be generated manually as per
-#     https://stackoverflow.com/a/76495384/1164295
-
-#     However, CSRF has been exempted for the blueprint routes in this file.
-#     This API endpoint shouldn't normally be relevant
-
-#     if the web UI is being tested using CURL, see
-#     https://stackoverflow.com/a/18772355/1164295
-#     https://stackoverflow.com/a/35205378/1164295
-#     for creating cookies when submitting forms
-
-#     curl --silent --insecure https://localhost/api/v1/resources/register | python3 -m json.tool
-
-#     """
-#     trace_id = str(uuid.uuid4())
-#     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
-#     # csrf_token = csrf.generate_csrf() # AttributeError: 'CSRFProtect' object has no attribute 'generate_csrf'
-
-#     # current_token = g.csrf_token
-
-#     csrf_token = generate_csrf(token_key="your key here")
-
-#     return jsonify({"csrf token": csrf_token})
-
-
 # The following `def hal_` were suggested 2026-07-11 by Claude Sonnet 5 on "medium"
 # https://claude.ai/share/4331b79a-6794-4c68-b95d-82b0c4e47e75
 
@@ -406,75 +360,44 @@ def api_start_here():
 
     """
     # Construct the HAL payload
-    # HAL requires a "_links" key.
     # "self" is mandatory and points to the current resource.
-    payload = {
-        "message": "Welcome to the Physics Derivation Graph API. Please explore the available resources.",
-        "_links": {
-            "self": {
-                "href": url_for(".api_start_here", _external=True),
-                "title": "API Entry Point",
-                "type": "GET",
-            },
-            "derivations": {
-                "href": url_for(".api_list_derivations", _external=True),
-                "title": "List derivations",
-                "type": "GET",
-            },
-            "inference_rules": {
-                "href": url_for(".api_list_inference_rules", _external=True),
-                "title": "List inference rules",
-                "type": "GET",
-            },
-            "expressions": {
-                "href": url_for(".api_list_expressions", _external=True),
-                "title": "List expressions",
-                "type": "GET",
-            },
-            "operation_symbols": {
-                "href": url_for(".api_list_operation_symbols", _external=True),
-                "title": "List operations",
-                "type": "GET",
-            },
-            "relation_symbols": {
-                "href": url_for(".api_list_relation_symbols", _external=True),
-                "title": "List relations",
-                "type": "GET",
-            },
-            "scalar_symbols": {
-                "href": url_for(".api_list_scalar_symbols", _external=True),
-                "title": "List scalars",
-                "type": "GET",
-            },
-            "vector_symbols": {
-                "href": url_for(".api_list_vector_symbols", _external=True),
-                "title": "List vectors",
-                "type": "GET",
-            },
-            "matrix_symbols": {
-                "href": url_for(".api_list_matrix_symbols", _external=True),
-                "title": "List matrices",
-                "type": "GET",
-            },
-            "whoami": {
-                "href": url_for(".api_whoami", _external=True),
-                "title": "Identify the current API caller",
-                "type": "GET",
-            },
-        },
-    }
     # The `.` prefix tells Flask to look for these functions within the current Blueprint.
     # use `_external=True` to generate absolute URLs (e.g., http://servername/v1/...) rather than relative paths. This is best practice for APIs, as clients may not know the base domain context.
 
-    # Flask's jsonify defaults to application/json. Since we want HAL compliance,
-    # wrap the json in `make_response` and manually override the header to `application/hal+json`.
-
-    response = make_response(jsonify(payload))
-
-    # Set the Content-Type to application/hal+json
-    response.headers["Content-Type"] = "application/hal+json"
-
-    return response
+    data = {
+        "message": "Welcome to the Physics Derivation Graph API. Please explore the available resources."
+    }
+    links = {
+        "self": hal_link(url_for(".api_start_here", _external=True), "API Entry Point"),
+        "derivations": hal_link(
+            url_for(".api_list_derivations", _external=True), "List derivations"
+        ),
+        "inference_rules": hal_link(
+            url_for(".api_list_inference_rules", _external=True), "List inference rules"
+        ),
+        "expressions": hal_link(
+            url_for(".api_list_expressions", _external=True), "List expressions"
+        ),
+        "operation_symbols": hal_link(
+            url_for(".api_list_operation_symbols", _external=True), "List operations"
+        ),
+        "relation_symbols": hal_link(
+            url_for(".api_list_relation_symbols", _external=True), "List relations"
+        ),
+        "scalar_symbols": hal_link(
+            url_for(".api_list_scalar_symbols", _external=True), "List scalars"
+        ),
+        "vector_symbols": hal_link(
+            url_for(".api_list_vector_symbols", _external=True), "List vectors"
+        ),
+        "matrix_symbols": hal_link(
+            url_for(".api_list_matrix_symbols", _external=True), "List matrices"
+        ),
+        "whoami": hal_link(
+            url_for(".api_whoami", _external=True), "Identify the current API caller"
+        ),
+    }
+    return hal_response(data=data, links=links)
 
 
 @api_bp.route("/whoami", methods=["GET"])
@@ -871,59 +794,66 @@ def api_list_operation_symbols():
             )
             continue
 
+        # Use hal_link helper to generate standard transitions
         resource["_links"] = {
-            "self": {
-                "href": url_for(
+            "self": hal_link(
+                url_for(
                     ".api_operation_metadata", operation_id=item_id, _external=True
                 ),
-                "title": "Get operation metadata",
-                "type": "GET",
-            },
-            "edit": {
-                "href": url_for(
-                    ".api_edit_operation", operation_id=item_id, _external=True
-                ),
-                "title": "Edit this operation",
-                "method": "POST",
-            },
-            "delete": {
-                "href": url_for(
-                    ".api_delete_operation", operation_id=item_id, _external=True
-                ),
-                "title": "Delete operation",
-                "method": "DELETE",
-            },
+                "Get operation metadata",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_operation", operation_id=item_id, _external=True),
+                "Edit this operation",
+            ),
+            "delete": hal_link(
+                url_for(".api_delete_operation", operation_id=item_id, _external=True),
+                "Delete operation",
+            ),
         }
         embedded_items.append(resource)
 
-    # For HATEOAS, Construct the Collection-level HAL payload
-    payload = {
-        "count": len(embedded_items),
-        "_links": {
-            "self": {
-                "href": url_for(".api_list_operation_symbols", _external=True),
-                "title": "List of Operation Symbols",
-                "type": "GET",
-            },
-            "up": {
-                "href": url_for(".api_start_here", _external=True),
-                "title": "API Home",
-                "type": "GET",
-            },
-            "create": {
-                "href": url_for(".api_create_operation_symbol", _external=True),
-                "title": "Create a new operation symbol",
-                "method": "POST",
-            },
-        },
-        "_embedded": {"operation_symbols": embedded_items},
+    links = {
+        "self": hal_link(
+            url_for(".api_list_operation_symbols", _external=True),
+            "List of Operation Symbols",
+        ),
+        "up": hal_link(url_for(".api_start_here", _external=True), "API Home"),
     }
 
-    response = make_response(jsonify(payload))
-    response.headers["Content-Type"] = "application/hal+json"
+    # Expose the creation option as a HAL-Forms template instead of a custom POST link
+    templates = {
+        "default": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "operation_name_latex", required=True, prompt="Name (LaTeX)"
+                ),
+                hal_property(
+                    "operation_latex", required=True, prompt="LaTeX Representation"
+                ),
+                hal_property(
+                    "operation_description_latex", prompt="Description (LaTeX)"
+                ),
+                hal_property("operation_reference_latex", prompt="Reference (LaTeX)"),
+                hal_property(
+                    "operation_argument_count",
+                    type_="number",
+                    required=True,
+                    prompt="Number of Arguments",
+                ),
+            ],
+            title="Create a new operation symbol",
+        )
+    }
 
     logger.info("[TRACE] end " + trace_id)
-    return response
+    return hal_response(
+        data={"count": len(embedded_items)},
+        links=links,
+        embedded={"operation_symbols": embedded_items},
+        templates=templates,
+    )
 
 
 @api_bp.route("/resources/symbol/relations", methods=["GET"])
@@ -961,58 +891,53 @@ def api_list_relation_symbols():
             continue
 
         resource["_links"] = {
-            "self": {
-                "href": url_for(
-                    ".api_relation_metadata", relation_id=item_id, _external=True
-                ),
-                "title": "Get relation metadata",
-                "type": "GET",
-            },
-            "edit": {
-                "href": url_for(
-                    ".api_edit_relation", relation_id=item_id, _external=True
-                ),
-                "title": "Edit this relation",
-                "method": "POST",
-            },
-            "delete": {
-                "href": url_for(
-                    ".api_delete_relation", relation_id=item_id, _external=True
-                ),
-                "title": "Delete relation",
-                "method": "DELETE",
-            },
+            "self": hal_link(
+                url_for(".api_relation_metadata", relation_id=item_id, _external=True),
+                "Get relation metadata",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_relation", relation_id=item_id, _external=True),
+                "Edit this relation",
+            ),
+            "delete": hal_link(
+                url_for(".api_delete_relation", relation_id=item_id, _external=True),
+                "Delete relation",
+            ),
         }
         embedded_items.append(resource)
 
-    # For HATEOAS, Construct the Collection-level HAL payload
-    payload = {
-        "count": len(embedded_items),
-        "_links": {
-            "self": {
-                "href": url_for(".api_list_relation_symbols", _external=True),
-                "title": "List of Relation Symbols",
-                "type": "GET",
-            },
-            "up": {
-                "href": url_for(".api_start_here", _external=True),
-                "title": "API Home",
-                "type": "GET",
-            },
-            "create": {
-                "href": url_for(".api_create_relation_symbol", _external=True),
-                "title": "Create a new relation symbol",
-                "method": "POST",
-            },
-        },
-        "_embedded": {"relation_symbols": embedded_items},
+    links = {
+        "self": hal_link(
+            url_for(".api_list_relation_symbols", _external=True),
+            "List of Relation Symbols",
+        ),
+        "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point"),
     }
 
-    response = make_response(jsonify(payload))
-    response.headers["Content-Type"] = "application/hal+json"
+    templates = {
+        "default": hal_template(
+            "POST",
+            [
+                hal_property("relation_name_latex", prompt="Name (LaTeX)"),
+                hal_property(
+                    "relation_latex", required=True, prompt="LaTeX Representation"
+                ),
+                hal_property(
+                    "relation_description_latex", prompt="Description (LaTeX)"
+                ),
+                hal_property("relation_reference_latex", prompt="Reference (LaTeX)"),
+            ],
+            title="Create a new relation symbol",
+        )
+    }
 
     logger.info("[TRACE] end " + trace_id)
-    return response
+    return hal_response(
+        data={"count": len(embedded_items)},
+        links=links,
+        embedded={"relation_symbols": embedded_items},
+        templates=templates,
+    )
 
 
 @api_bp.route("/resources/symbol/scalars", methods=["GET"])
@@ -1061,56 +986,111 @@ def api_list_scalar_symbols():
             continue
 
         resource["_links"] = {
-            "self": {
-                "href": url_for(
-                    ".api_scalar_metadata", symbol_id=item_id, _external=True
-                ),
-                "title": "Get scalar metadata",
-                "type": "GET",
-            },
-            "edit": {
-                "href": url_for(".api_edit_scalar", symbol_id=item_id, _external=True),
-                "title": "Edit this scalar",
-                "method": "POST",
-            },
-            "delete": {
-                "href": url_for(
-                    ".api_delete_scalar", symbol_id=item_id, _external=True
-                ),
-                "title": "Delete scalar",
-                "method": "DELETE",
-            },
+            "self": hal_link(
+                url_for(".api_scalar_metadata", symbol_id=item_id, _external=True),
+                "Get scalar metadata",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_scalar", symbol_id=item_id, _external=True),
+                "Edit this scalar",
+            ),
+            "delete": hal_link(
+                url_for(".api_delete_scalar", symbol_id=item_id, _external=True),
+                "Delete scalar",
+            ),
         }
         embedded_items.append(resource)
 
-    # For HATEOAS, Construct the Collection-level HAL payload
-    payload = {
-        "count": len(embedded_items),
-        "_links": {
-            "self": {
-                "href": url_for(".api_list_scalar_symbols", _external=True),
-                "title": "List of Scalar Symbols",
-                "type": "GET",
-            },
-            "up": {
-                "href": url_for(".api_start_here", _external=True),
-                "title": "API Home",
-                "type": "GET",
-            },
-            "create": {
-                "href": url_for(".api_create_scalar_symbol", _external=True),
-                "title": "Create a new scalar symbol",
-                "method": "POST",
-            },
-        },
-        "_embedded": {"scalar_symbols": embedded_items},
+    links = {
+        "self": hal_link(
+            url_for(".api_list_scalar_symbols", _external=True),
+            "List of Scalar Symbols",
+        ),
+        "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point"),
     }
 
-    response = make_response(jsonify(payload))
-    response.headers["Content-Type"] = "application/hal+json"
+    templates = {
+        "default": hal_template(
+            "POST",
+            [
+                hal_property("symbol_name_latex", prompt="Name (LaTeX)"),
+                hal_property(
+                    "symbol_latex", required=True, prompt="LaTeX Representation"
+                ),
+                hal_property("symbol_description_latex", prompt="Description (LaTeX)"),
+                hal_property("symbol_reference_latex", prompt="Reference (LaTeX)"),
+                hal_property(
+                    "symbol_scope",
+                    required=True,
+                    options=list_of_valid.scalar_scope,
+                    prompt="Scope",
+                ),
+                hal_property(
+                    "symbol_variable_or_constant",
+                    required=True,
+                    options=["variable", "constant"],
+                    prompt="Variable or Constant",
+                ),
+                hal_property(
+                    "symbol_domain",
+                    value="any",
+                    options=list_of_valid.scalar_domain,
+                    prompt="Domain",
+                ),
+                hal_property(
+                    "dimension_length",
+                    type_="number",
+                    value=0,
+                    prompt="Dimension: Length exponent",
+                ),
+                hal_property(
+                    "dimension_time",
+                    type_="number",
+                    value=0,
+                    prompt="Dimension: Time exponent",
+                ),
+                hal_property(
+                    "dimension_mass",
+                    type_="number",
+                    value=0,
+                    prompt="Dimension: Mass exponent",
+                ),
+                hal_property(
+                    "dimension_temperature",
+                    type_="number",
+                    value=0,
+                    prompt="Dimension: Temperature exponent",
+                ),
+                hal_property(
+                    "dimension_electric_charge",
+                    type_="number",
+                    value=0,
+                    prompt="Dimension: Electric charge exponent",
+                ),
+                hal_property(
+                    "dimension_amount_of_substance",
+                    type_="number",
+                    value=0,
+                    prompt="Dimension: Amount of substance exponent",
+                ),
+                hal_property(
+                    "dimension_luminous_intensity",
+                    type_="number",
+                    value=0,
+                    prompt="Dimension: Luminous intensity exponent",
+                ),
+            ],
+            title="Create a new scalar symbol",
+        )
+    }
 
     logger.info("[TRACE] end " + trace_id)
-    return response
+    return hal_response(
+        data={"count": len(embedded_items)},
+        links=links,
+        embedded={"scalar_symbols": embedded_items},
+        templates=templates,
+    )
 
 
 @api_bp.route("/resources/symbol/vectors", methods=["GET"])
@@ -1157,56 +1137,65 @@ def api_list_vector_symbols():
             continue
 
         resource["_links"] = {
-            "self": {
-                "href": url_for(
-                    ".api_vector_metadata", symbol_id=item_id, _external=True
-                ),
-                "title": "Get vector metadata",
-                "type": "GET",
-            },
-            "edit": {
-                "href": url_for(".api_edit_vector", symbol_id=item_id, _external=True),
-                "title": "Edit this vector",
-                "method": "POST",
-            },
-            "delete": {
-                "href": url_for(
-                    ".api_delete_vector", symbol_id=item_id, _external=True
-                ),
-                "title": "Delete vector",
-                "method": "DELETE",
-            },
+            "self": hal_link(
+                url_for(".api_vector_metadata", symbol_id=item_id, _external=True),
+                "Get vector metadata",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_vector", symbol_id=item_id, _external=True),
+                "Edit this vector",
+            ),
+            "delete": hal_link(
+                url_for(".api_delete_vector", symbol_id=item_id, _external=True),
+                "Delete vector",
+            ),
         }
         embedded_items.append(resource)
 
-    # For HATEOAS, Construct the Collection-level HAL payload
-    payload = {
-        "count": len(embedded_items),
-        "_links": {
-            "self": {
-                "href": url_for(".api_list_vector_symbols", _external=True),
-                "title": "List of Vector Symbols",
-                "type": "GET",
-            },
-            "up": {
-                "href": url_for(".api_start_here", _external=True),
-                "title": "API Home",
-                "type": "GET",
-            },
-            "create": {
-                "href": url_for(".api_create_vector_symbol", _external=True),
-                "title": "Create a new vector symbol",
-                "method": "POST",
-            },
-        },
-        "_embedded": {"vector_symbols": embedded_items},
+    links = {
+        "self": hal_link(
+            url_for(".api_list_vector_symbols", _external=True),
+            "List of Vector Symbols",
+        ),
+        "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point"),
     }
 
-    response = make_response(jsonify(payload))
-    response.headers["Content-Type"] = "application/hal+json"
+    templates = {
+        "default": hal_template(
+            "POST",
+            [
+                hal_property("symbol_name_latex", prompt="Name (LaTeX)"),
+                hal_property(
+                    "symbol_latex", required=True, prompt="LaTeX Representation"
+                ),
+                hal_property("symbol_description_latex", prompt="Description (LaTeX)"),
+                hal_property("symbol_reference_latex", prompt="Reference (LaTeX)"),
+                hal_property(
+                    "symbol_is_composite",
+                    type_="checkbox",
+                    value=False,
+                    prompt="Is Composite?",
+                ),
+                hal_property(
+                    "symbol_size",
+                    required=True,
+                    value="arbitrary",
+                    prompt='Size ("arbitrary" or a fixed size)',
+                ),
+                hal_property("symbol_orientation", prompt="Orientation"),
+                hal_property("symbol_number_of_entries", prompt="Number of Entries"),
+            ],
+            title="Create a new vector symbol",
+        )
+    }
 
     logger.info("[TRACE] end " + trace_id)
-    return response
+    return hal_response(
+        data={"count": len(embedded_items)},
+        links=links,
+        embedded={"vector_symbols": embedded_items},
+        templates=templates,
+    )
 
 
 @api_bp.route("/resources/symbol/matrices", methods=["GET"])
@@ -1253,56 +1242,65 @@ def api_list_matrix_symbols():
             continue
 
         resource["_links"] = {
-            "self": {
-                "href": url_for(
-                    ".api_matrix_metadata", symbol_id=item_id, _external=True
-                ),
-                "title": "Get matrix metadata",
-                "type": "GET",
-            },
-            "edit": {
-                "href": url_for(".api_edit_matrix", symbol_id=item_id, _external=True),
-                "title": "Edit this matrix",
-                "method": "POST",
-            },
-            "delete": {
-                "href": url_for(
-                    ".api_delete_matrix", symbol_id=item_id, _external=True
-                ),
-                "title": "Delete matrix",
-                "method": "DELETE",
-            },
+            "self": hal_link(
+                url_for(".api_matrix_metadata", symbol_id=item_id, _external=True),
+                "Get matrix metadata",
+            ),
+            "edit": hal_link(
+                url_for(".api_edit_matrix", symbol_id=item_id, _external=True),
+                "Edit this matrix",
+            ),
+            "delete": hal_link(
+                url_for(".api_delete_matrix", symbol_id=item_id, _external=True),
+                "Delete matrix",
+            ),
         }
         embedded_items.append(resource)
 
-    # For HATEOAS, Construct the Collection-level HAL payload
-    payload = {
-        "count": len(embedded_items),
-        "_links": {
-            "self": {
-                "href": url_for(".api_list_matrix_symbols", _external=True),
-                "title": "List of Matrix Symbols",
-                "type": "GET",
-            },
-            "up": {
-                "href": url_for(".api_start_here", _external=True),
-                "title": "API Home",
-                "type": "GET",
-            },
-            "create": {
-                "href": url_for(".api_create_matrix_symbol", _external=True),
-                "title": "Create a new matrix symbol",
-                "method": "POST",
-            },
-        },
-        "_embedded": {"matrix_symbols": embedded_items},
+    links = {
+        "self": hal_link(
+            url_for(".api_list_matrix_symbols", _external=True),
+            "List of Matrix Symbols",
+        ),
+        "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point"),
     }
 
-    response = make_response(jsonify(payload))
-    response.headers["Content-Type"] = "application/hal+json"
+    templates = {
+        "default": hal_template(
+            "POST",
+            [
+                hal_property("symbol_name_latex", prompt="Name (LaTeX)"),
+                hal_property(
+                    "symbol_latex", required=True, prompt="LaTeX Representation"
+                ),
+                hal_property("symbol_description_latex", prompt="Description (LaTeX)"),
+                hal_property("symbol_reference_latex", prompt="Reference (LaTeX)"),
+                hal_property(
+                    "symbol_is_composite",
+                    type_="checkbox",
+                    value=False,
+                    prompt="Is Composite?",
+                ),
+                hal_property(
+                    "symbol_size",
+                    required=True,
+                    value="arbitrary",
+                    prompt='Size ("arbitrary" or a fixed size)',
+                ),
+                hal_property("symbol_number_of_rows", prompt="Number of Rows"),
+                hal_property("symbol_number_of_columns", prompt="Number of Columns"),
+            ],
+            title="Create a new matrix symbol",
+        )
+    }
 
     logger.info("[TRACE] end " + trace_id)
-    return response
+    return hal_response(
+        data={"count": len(embedded_items)},
+        links=links,
+        embedded={"matrix_symbols": embedded_items},
+        templates=templates,
+    )
 
 
 @api_bp.route("/resources/derivation", methods=["POST"])

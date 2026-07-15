@@ -62,97 +62,103 @@ def test_validate_operations_api(page: Page):
 
 
 def test_api_entry_point(page: Page):
-    response = page.request.get(f'{URL}/api/')
+    response = page.request.get(f"{URL}/api/")
     assert response.ok
     assert response.status == 200
-    assert 'application/hal+json' in response.headers.get('content-type', '')
-    
+    assert "application/hal+json" in response.headers.get("content-type", "")
+
     data = response.json()
-    assert 'message' in data
-    assert '_links' in data
-    
-    links = data['_links']
-    assert 'derivations' in links
-    assert 'inference_rules' in links
-    assert 'whoami' in links
+    assert "message" in data
+    assert "_links" in data
+
+    links = data["_links"]
+    assert "derivations" in links
+    assert "inference_rules" in links
+    assert "whoami" in links
 
 
 def test_list_derivations_api(page: Page):
-    response = page.request.get(f'{URL}/api/resources/derivations')
+    response = page.request.get(f"{URL}/api/resources/derivations")
     assert response.ok
     assert response.status == 200
-    assert 'application/prs.hal-forms+json' in response.headers.get('content-type', '')
-    
+    assert "application/prs.hal-forms+json" in response.headers.get("content-type", "")
+
     data = response.json()
-    assert 'count' in data
-    assert '_embedded' in data
-    assert 'derivations' in data['_embedded']
-    
+    assert "count" in data
+    assert "_embedded" in data
+    assert "derivations" in data["_embedded"]
+
     # Check default template structures for creation
-    assert '_templates' in data
-    assert 'default' in data['_templates']
-    assert data['_templates']['default']['method'] == 'POST'
+    assert "_templates" in data
+    assert "default" in data["_templates"]
+    assert data["_templates"]["default"]["method"] == "POST"
+
 
 def test_list_expressions_api(page: Page):
-    response = page.request.get(f'{URL}/api/resources/expressions')
+    response = page.request.get(f"{URL}/api/resources/expressions")
     assert response.ok
     assert response.status == 200
-    assert 'application/prs.hal-forms+json' in response.headers.get('content-type', '')
-    
+    assert "application/prs.hal-forms+json" in response.headers.get("content-type", "")
+
     data = response.json()
-    assert 'count' in data
-    assert 'expressions' in data['_embedded']
+    assert "count" in data
+    assert "expressions" in data["_embedded"]
 
 
 def test_list_scalars_api(page: Page):
-    response = page.request.get(f'{URL}/api/resources/symbol/scalars')
+    response = page.request.get(f"{URL}/api/resources/symbol/scalars")
     assert response.ok
     assert response.status == 200
-    assert 'application/hal+json' in response.headers.get('content-type', '')
-    
+    assert "application/hal+json" in response.headers.get("content-type", "")
+
     data = response.json()
-    assert 'count' in data
-    assert 'scalar_symbols' in data['_embedded']
+    assert "count" in data
+    assert "scalar_symbols" in data["_embedded"]
+
 
 def test_list_relations_api(page: Page):
-    response = page.request.get(f'{URL}/api/resources/symbol/relations')
+    response = page.request.get(f"{URL}/api/resources/symbol/relations")
     assert response.ok
     assert response.status == 200
-    assert 'application/hal+json' in response.headers.get('content-type', '')
-    
+    assert "application/hal+json" in response.headers.get("content-type", "")
+
     data = response.json()
-    assert 'count' in data
-    assert 'relation_symbols' in data['_embedded']
+    assert "count" in data
+    assert "relation_symbols" in data["_embedded"]
 
 
 def test_derivation_metadata_and_steps_api(page: Page):
     # Step 1: Query the list to dynamically acquire a valid derivation ID
-    list_response = page.request.get(f'{URL}/api/resources/derivations')
+    list_response = page.request.get(f"{URL}/api/resources/derivations")
     assert list_response.ok
-    derivations = list_response.json().get('_embedded', {}).get('derivations', [])
-    
+    derivations = list_response.json().get("_embedded", {}).get("derivations", [])
+
     if not derivations:
         return  # Skip if database is completely empty
-        
-    target_id = derivations[0]['id']
-    
+
+    target_id = derivations[0]["id"]
+
     # Step 2: Validate Metadata API for this specific ID
-    meta_response = page.request.get(f'{URL}/api/resources/derivation/{target_id}/metadata')
+    meta_response = page.request.get(
+        f"{URL}/api/resources/derivation/{target_id}/metadata"
+    )
     assert meta_response.ok
     assert meta_response.status == 200
-    
+
     meta_data = meta_response.json()
-    assert 'metadata' in meta_data
-    assert meta_data['metadata']['id'] == target_id
-    
+    assert "metadata" in meta_data
+    assert meta_data["metadata"]["id"] == target_id
+
     # Step 3: Validate Steps list API for this specific ID
-    steps_response = page.request.get(f'{URL}/api/resources/derivation/{target_id}/steps')
+    steps_response = page.request.get(
+        f"{URL}/api/resources/derivation/{target_id}/steps"
+    )
     assert steps_response.ok
     assert steps_response.status == 200
-    
+
     steps_data = steps_response.json()
-    assert 'count' in steps_data
-    assert 'steps' in steps_data['_embedded']
+    assert "count" in steps_data
+    assert "steps" in steps_data["_embedded"]
 
 
 # EOF

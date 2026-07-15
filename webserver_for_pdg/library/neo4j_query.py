@@ -565,7 +565,6 @@ def get_count_nodes_of_type(tx: Transaction, node_type: str) -> int:
     if node_type not in list_of_valid.node_types:
         raise ValueError(f"Invalid node type: {node_type}")
 
-
     node_count = -1
     for result in tx.run("MATCH (n:" + node_type + ") RETURN count(n) as count"):
         logger.info(result.data()["count"])
@@ -1538,7 +1537,6 @@ def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
     logger.info("node_type= " + node_type)
     if node_type not in list_of_valid.node_types:
         raise ValueError(f"Invalid node type: {node_type}")
-
 
     tx.run(
         "MATCH (d:" + node_type + ' {id:"' + node_id + '"}) DETACH DELETE d'
