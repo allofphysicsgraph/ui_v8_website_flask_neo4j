@@ -30,7 +30,7 @@ from . import neo4j_query
 api_nohateoas_bp = Blueprint("pdg_api_not_HATEOAS", __name__, url_prefix="/api")
 
 
-@api_nohateoas_bp.route("/v1/resources/sympy_check", methods=["GET", "POST"])
+@api_nohateoas_bp.route("/resources/sympy_check", methods=["GET", "POST"])
 def api_sympy_check():
     """
     <https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/134>
@@ -54,7 +54,7 @@ def api_sympy_check():
     return jsonify({"canonical": str(expr.canonical), "variables": str(var_names)})
 
 
-@api_nohateoas_bp.route("/v1/resources/png_from_latex", methods=["GET", "POST"])
+@api_nohateoas_bp.route("/resources/png_from_latex", methods=["GET", "POST"])
 def api_png_from_latex():
     r"""
     `GET` method is necessary; otherwise user can't explore this endpoint from the browser.
@@ -103,7 +103,7 @@ def api_png_from_latex():
     return jsonify({"png_location": path_to_png_with_filename_no_prefix_directory})
 
 
-@api_nohateoas_bp.route("/v1/resources/cypher", methods=["GET"])
+@api_nohateoas_bp.route("/resources/cypher", methods=["GET"])
 def api_cypher_query():
     r"""
 
