@@ -7,11 +7,9 @@
 # https://creativecommons.org/licenses/by/4.0/
 
 
-
 from playwright.sync_api import Page, expect
 
 URL = "http://localhost:5000/api/"
-
 
 
 def test_sympy():
@@ -38,4 +36,3 @@ def test_sympy():
         print("Detected Variables:", data["variables"])
 
     print("Non-HATEOAS SymPy verification passed.\n")
-

@@ -8,8 +8,91 @@
 
 from playwright.sync_api import Page, expect
 
+# The HATEOAS blueprint is registered under url_prefix='/api'
 # this is what is exposed inside the Docker container
-URL = "http://localhost:5000"
+URL = "http://localhost:5000/api/"
+
+# Gemini 3.5 Flash suggested
+# URL = "https://host.docker.internal/api/"
+
+# import requests
+# import urllib3
+
+# Suppress insecure request warnings if testing against self-signed local certificates
+# urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+
+def test_api_entrypoint():
+    """Verifies that the API entry point returns the expected HATEOAS response structure."""
+    print("Testing HATEOAS Entrypoint...")
+    response = requests.get(BASE_URL, verify=False)
+    response.raise_for_status()
+
+    # Assert correct Content-Type as configured in hal_response()
+    expected_content_type = "application/prs.hal-forms+json"
+    assert expected_content_type in response.headers.get(
+        "Content-Type", ""
+    ), f"Expected content type to contain {expected_content_type}, but got {response.headers.get('Content-Type')}"
+
+    data = response.json()
+    print("Status Code:", response.status_code)
+    print("Content-Type:", response.headers.get("Content-Type"))
+
+    # Structural assertions matching the api_start_here function in pdg_api.py
+    assert "message" in data
+    assert "Welcome to the Physics Derivation Graph API" in data["message"]
+    assert "_links" in data
+
+    links = data["_links"]
+    assert "self" in links
+    assert "derivations" in links
+    assert "inference_rules" in links
+    assert "expressions" in links
+    assert "whoami" in links
+
+    print("HATEOAS Entrypoint verification passed.\n")
+    return data
+
+
+def test_get_derivations(entrypoint_links):
+    """Navigates to the derivations collection and asserts structure."""
+    print("Testing Navigation to Derivations Collection...")
+    derivations_url = entrypoint_links["derivations"]["href"]
+
+    response = requests.get(derivations_url, verify=False)
+    response.raise_for_status()
+
+    assert "application/prs.hal-forms+json" in response.headers.get("Content-Type", "")
+    data = response.json()
+
+    # Assert basic response structure for collections
+    assert "count" in data
+    assert "_links" in data
+    assert "self" in data["_links"]
+
+    print(f"Discovered {data.get('count', 0)} derivation items.")
+    print("Derivations Collection verification passed.\n")
+
+
+def test_unauthorized_whoami(entrypoint_links):
+    """Verifies that accessing an authorized endpoint without a token returns a 401 error."""
+    print("Testing Unauthorized access on /whoami...")
+    whoami_url = entrypoint_links["whoami"]["href"]
+
+    response = requests.get(whoami_url, verify=False)
+
+    # The require_auth decorator returns a 401 status code
+    assert (
+        response.status_code == 401
+    ), f"Expected status code 401, got {response.status_code}"
+    assert "application/prs.hal-forms+json" in response.headers.get("Content-Type", "")
+
+    error_payload = response.json()
+    assert error_payload.get("title") == "Unauthorized"
+    assert "WWW-Authenticate" in response.headers
+    assert "Bearer" in response.headers["WWW-Authenticate"]
+
+    print("Unauthorized behavior verified successfully.\n")
 
 
 def test_validate_operations_api(page: Page):
@@ -62,19 +145,35 @@ def test_validate_operations_api(page: Page):
 
 
 def test_api_entry_point(page: Page):
+    """Verifies that the API entry point returns the expected HATEOAS response structure."""
+    print("Testing HATEOAS Entrypoint...")
     response = page.request.get(f"{URL}/api/")
     assert response.ok
     assert response.status == 200
-    assert "application/hal+json" in response.headers.get("content-type", "")
+    # Assert correct Content-Type as configured in hal_response()
+    expected_content_type = "application/prs.hal-forms+json"
+    assert expected_content_type in response.headers.get(
+        "Content-Type", ""
+    ), f"Expected content type to contain {expected_content_type}, but got {response.headers.get('Content-Type')}"
 
     data = response.json()
+    print("Status Code:", response.status_code)
+    print("Content-Type:", response.headers.get("Content-Type"))
+
+    # Structural assertions matching the api_start_here function in pdg_api.py
     assert "message" in data
+    assert "Welcome to the Physics Derivation Graph API" in data["message"]
     assert "_links" in data
 
     links = data["_links"]
+    assert "self" in links
     assert "derivations" in links
     assert "inference_rules" in links
+    assert "expressions" in links
     assert "whoami" in links
+
+    print("HATEOAS Entrypoint verification passed.\n")
+    return data
 
 
 def test_list_derivations_api(page: Page):

@@ -1839,7 +1839,6 @@ def search_symbols_by_latex(tx: Transaction, search_string: str) -> list:
     return node_list
 
 
-
 @trace_execution
 def connect_expressions_to_step(
     tx,

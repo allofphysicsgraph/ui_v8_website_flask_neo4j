@@ -454,7 +454,6 @@ def test_get_search_redirect_behavior(page: Page):
     expect(page).to_have_url(
         re.compile(
             r"https://www\.google\.com/search.*site%3Aallofphysics\.com\+schrodinger"
-
         )
     )
 
