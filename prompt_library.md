@@ -16,6 +16,10 @@ I don't care about efficiency or latency.
 If a race condition is found, tell me about the situation, which functions have race conditions, and what the plan is to remedy the situation.
 
 
+Some of the tests are out of sync with the source code. 
+Revise the existing tests to look for results produced by the API.
+
+
 # Action
 
 If the fix is easy, provide a description of the fix and a snippet. Do not write out the entire file. 
