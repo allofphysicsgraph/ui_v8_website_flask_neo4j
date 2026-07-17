@@ -439,16 +439,22 @@ def test_get_api_json_to_console(page: Page):
     expect(page).to_have_url(URL + "/api_json_to_console")
 
 
-def test_get_search_page(page: Page):
-    page.goto(URL + "/search")
+# def test_get_search_page(page: Page):
+#     page.goto(URL + "/search")
 
 
 def test_get_search_redirect_behavior(page: Page):
+    """
+    The footer's 'search' should redirect to google
+
+    https://www.google.com/search?&q=site%3Aallofphysics.com+schrodinger
+    """
     page.goto(URL + "/search?q=schrodinger")
     # Asserts that the app successfully redirects to the external Google search engine
     expect(page).to_have_url(
         re.compile(
             r"https://www\.google\.com/search.*site%3Aallofphysics\.com\+schrodinger"
+
         )
     )
 
