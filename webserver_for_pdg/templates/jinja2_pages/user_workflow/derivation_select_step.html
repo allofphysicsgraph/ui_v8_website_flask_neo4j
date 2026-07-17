@@ -39,9 +39,12 @@
     <TH>output(s)</TH>
   </tr>
   {% for step_dict in list_of_step_dicts %}
+  <!--
+   {{ step_dict }}
+  -->
   <tr>
     <td>
-      <a href="{{ url_for('to_edit_step', step_id=step_dict['id'] ) }}?referrer=derivation_select_step">
+      <a href="{{ url_for('to_edit_step', derivation_id=derivation_dict['id'], step_id=step_dict['id'] ) }}?referrer=derivation_select_step">
           {{ step_dict['id'] }}
       </a>
     </td>
