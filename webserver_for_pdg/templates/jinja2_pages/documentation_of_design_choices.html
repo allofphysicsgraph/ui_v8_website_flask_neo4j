@@ -216,6 +216,34 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 <HR/>
 <P>&nbsp;</P>
 
+
+
+<H2 id="which layer for search?"><i>Decision</i>: where should symbol search be performed?</H2>
+
+<P>Options:
+  <UL>
+<LI> search of symbols in Javascript: e.g., on `webserver_for_pdg/templates/jinja2_pages/user_workflow/symbol_scalar_list.html` has
+<pre>
+&lt;P&gt;&lt;label for="searchbox"&gt;Case-insensitive fuzzy Search:&lt;/label&gt;
+  &lt;input type="text" id="searchbox" name="search" placeholder="Look for"&gt;
+</pre>
+<LI> search of symbols in Python (`pdg_app.py`)
+<LI> search of latex symbols in neo4j: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/146
+</UL>
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+<H2 id="next step vs step index"><i>Decision</i>: </H2>
+
+
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+
 <H2 id="ASCII or Unicode"><i>Decision</i>: Character support: ASCII or Unicode?</H2>
 
 <P><em>current status</em>: Only ASCII is supported.</P>
