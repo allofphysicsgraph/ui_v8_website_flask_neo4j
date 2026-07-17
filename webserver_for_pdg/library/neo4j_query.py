@@ -41,11 +41,53 @@ import logging
 
 # for the trace decorator
 import functools
-
-
+import re
 from . import list_of_valid
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Allowlists used to validate identifiers (labels, relationship types,
+# property names) that Neo4j does not allow to be passed as bind
+# parameters. Anything not covered by one of these MUST be rejected with a
+# ValueError before being interpolated into a Cypher string.
+# ---------------------------------------------------------------------------
+
+# Maps the property-key names that `add_constant_value_with_units` is
+# allowed to set on a value_with_units node to the list of values that are
+# valid for that property. Keys deliberately mirror the list names in
+# list_of_valid.py (dimension_mass_units -> list_of_valid.dimension_mass_units,
+# etc). This is a judgment call made in the absence of an explicit
+# "these are the property names" list in list_of_valid.py -- if the real
+# on-node property names differ, update the keys here (the value-list
+# references will still be correct).
+DIMENSION_UNIT_PROPERTY_VALID_VALUES = {
+    "dimension_mass_units": list_of_valid.dimension_mass_units,
+    "dimension_time_units": list_of_valid.dimension_time_units,
+    "dimension_length_units": list_of_valid.dimension_length_units,
+    "dimension_temperature_units": list_of_valid.dimension_temperature_units,
+    "dimension_electric_charge_units": list_of_valid.dimension_electric_charge_units,
+    "dimension_amount_of_substance_units": list_of_valid.dimension_amount_of_substance_units,
+    "dimension_luminous_intensity_units": list_of_valid.dimension_luminous_intensity_units,
+}
+
+# edit_node_property() has no existing allowlist of editable property
+# names in list_of_valid.py to check against. In the absence of one, a
+# property key is only accepted if it looks like a real Cypher identifier
+# (this is what actually prevents Cypher injection via the key), and a
+# small denylist blocks structural properties that should never be
+# overwritten through this generic setter. Swap this out for a hard
+# allowlist of editable property names if/when one becomes available.
+_SAFE_PROPERTY_KEY_PATTERN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+_PROTECTED_PROPERTY_KEYS = {"id", "created_datetime"}
+
+# user_query() keyword blocklist: rejects any query containing a write
+# keyword as a whole word (so it doesn't false-positive on things like
+# "created_datetime"). This is defense-in-depth ONLY -- see the docstring
+# on user_query() for the required caller-side protection.
+_WRITE_KEYWORD_PATTERN = re.compile(
+    r"\b(CALL|CREATE|MERGE|DELETE|SET|REMOVE)\b", re.IGNORECASE
+)
 
 
 def trace_execution(func):
@@ -951,9 +993,9 @@ def get_feeds_used_in_step(tx: Transaction, step_id: str) -> List[dict]:
     logger.info("step_id=" + str(step_id))
 
     list_of_feeds = []  # type: List[dict]
-    for result in tx.run(
-        'MATCH (:step {id:"' + step_id + '"})-[:HAS_FEED]->(f:feed) RETURN f'
-    ):
+
+    query = "MATCH (:step {id: $step_id})-[:HAS_FEED]->(f:feed) RETURN f"
+    for result in tx.run(query, step_id=step_id):
         list_of_feeds.append(result.data()["f"])
 
     return list_of_feeds
@@ -963,13 +1005,8 @@ def get_feeds_used_in_step(tx: Transaction, step_id: str) -> List[dict]:
 def get_sequence_index_for_step(tx: Transaction, step_id: str) -> int | None:
     """ """
     sequence_index = 0
-    result = tx.run(
-        'MATCH ()-[r:HAS_STEP]->(n:step {id:"' + step_id + '"}) RETURN r.sequence_index'
-    )
-    # print(type(result)) # don't access the `result` variable more than once, as mentioned on https://neo4j.com/docs/python-manual/current/transformers/
-
-    # sequence_index = result.data()[0]["r.sequence_index"]
-
+    query = "MATCH ()-[r:HAS_STEP]->(n:step {id: $step_id}) RETURN r.sequence_index"
+    result = tx.run(query, step_id=step_id)
     data = result.data()
     sequence_index = data[0]["r.sequence_index"] if data else None
 
@@ -985,11 +1022,8 @@ def get_inference_rule_connected_to_step_ID(tx: Transaction, step_id: str):
 
     """
 
-    result = tx.run(
-        'MATCH (n:step {id:"'
-        + step_id
-        + '"})-[r:HAS_INFERENCE_RULE]->(m:inference_rule) RETURN m'
-    )
+    query = "MATCH (n:step {id: $step_id})-[r:HAS_INFERENCE_RULE]->(m:inference_rule) RETURN m"
+    result = tx.run(query, step_id=step_id)
     # print(type(result)) # don't access the `result` variable more than once, as mentioned on https://neo4j.com/docs/python-manual/current/transformers/
     inf_rule_list_of_dicts = result.data()
     # print(type(inf_rule_result))  # <class 'list'>
@@ -1035,28 +1069,12 @@ def get_expressions_from_step_id_and_expr_type(
     """
 
     logger.info("step_id=" + step_id + "; expression_type=" + expression_type)
-    assert (
-        expression_type == "HAS_INPUT"
-        or expression_type == "HAS_FEED"
-        or expression_type == "HAS_OUTPUT"
-    )
-
-    if expression_type == "HAS_FEED":
-        destination_node_type = "feed"
-    else:
-        destination_node_type = "expression"
-
-    list_of_expression_dicts = []  # type: List[dict]
-    for result in tx.run(
-        'MATCH (:step {id:"'
-        + step_id
-        + '"})-[r:'
-        + expression_type
-        + "]->(m:"
-        + destination_node_type
-        + ") RETURN m"
-    ):
-        # print(result.data())
+    if expression_type not in {"HAS_INPUT", "HAS_FEED", "HAS_OUTPUT"}:
+        raise ValueError(f"Invalid expression_type: {expression_type}")
+    destination_node_type = "feed" if expression_type == "HAS_FEED" else "expression"
+    query = f"MATCH (:step {{id: $step_id}})-[r:{expression_type}]->(m:{destination_node_type}) RETURN m"
+    list_of_expression_dicts = []
+    for result in tx.run(query, step_id=step_id):
         list_of_expression_dicts.append(result.data()["m"])
 
     # print("list_of_expression_dicts=", list_of_expression_dicts)
@@ -1080,9 +1098,9 @@ def get_expressions_from_step_id(tx: Transaction, step_id: str) -> List[dict]:
     logger.info("step_id=" + step_id)
 
     list_of_expression_dicts = []  # type: List[dict]
-    for result in tx.run(
-        'MATCH (:step {id:"' + step_id + '"})-[]->(e:expression) RETURN e'
-    ):
+
+    query = "MATCH (:step {id: $step_id})-[]->(e:expression) RETURN e"
+    for result in tx.run(query, step_id=step_id):
         list_of_expression_dicts.append(result.data()["e"])
 
     return list_of_expression_dicts
@@ -1238,6 +1256,32 @@ def add_inference_rule(
 def edit_step_sequence_index(
     tx: Transaction, derivation_id: str, step_id: str, new_index: int
 ) -> None:
+    # Same lock as connect_step_to_derivation, on the same node -- this is
+    # what makes the two functions serialize against each other instead of
+    # racing to write conflicting sequence_index values.
+    lock = tx.run(
+        "MATCH (d:derivation {id: $did}) CALL apoc.lock.nodes([d]) RETURN d",
+        did=derivation_id,
+    ).single()
+    if not lock:
+        raise ValueError(f"no derivation with id {derivation_id}")
+
+    conflict = tx.run(
+        """
+        MATCH (d:derivation {id: $did})-[r:HAS_STEP]->(s:step)
+        WHERE r.sequence_index = $new_index AND s.id <> $sid
+        RETURN count(r) AS c
+        """,
+        did=derivation_id,
+        sid=step_id,
+        new_index=new_index,
+    ).single()
+    if conflict["c"] > 0:
+        raise ValueError(
+            f"sequence_index {new_index} is already used by another step "
+            f"in derivation {derivation_id}"
+        )
+
     query = """
     MATCH (d:derivation {id: $did})-[r:HAS_STEP]->(s:step {id: $sid})
     SET r.sequence_index = $new_index
@@ -1451,8 +1495,13 @@ def edit_node_property(
 
     if node_type not in list_of_valid.node_types:
         raise ValueError(f"Invalid node type: {node_type}")
-
-    # Safely perform property changes inside transaction with MATCH (prevents recreation)
+    # property_key can't be a bind parameter either. See
+    # _SAFE_PROPERTY_KEY_PATTERN / _PROTECTED_PROPERTY_KEYS above for why
+    # this is a pattern + denylist rather than a hard allowlist.
+    if not _SAFE_PROPERTY_KEY_PATTERN.match(property_key):
+        raise ValueError(f"Invalid property key: {property_key}")
+    if property_key in _PROTECTED_PROPERTY_KEYS:
+        raise ValueError(f"Property key is not editable: {property_key}")
     query = (
         f"MATCH (n:{node_type} {{id: $node_id}}) SET n.{property_key} = $value RETURN n"
     )
@@ -1537,11 +1586,8 @@ def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
     logger.info("node_type= " + node_type)
     if node_type not in list_of_valid.node_types:
         raise ValueError(f"Invalid node type: {node_type}")
-
-    tx.run(
-        "MATCH (d:" + node_type + ' {id:"' + node_id + '"}) DETACH DELETE d'
-    ).consume()
-
+    query = f"MATCH (d:{node_type} {{id: $node_id}}) DETACH DELETE d"
+    tx.run(query, node_id=node_id).consume()
     return
 
 
@@ -1553,14 +1599,8 @@ def disconnect_symbol_from_feed(tx, symbol_id: str, feed_id: str) -> None:
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
     """
 
-    tx.run(
-        "MATCH (e:feed)-[r:IS_COMPRISED_OF]->(s)"
-        + 'WHERE e.id="'
-        + str(feed_id)
-        + '" AND s.id="'
-        + str(symbol_id)
-        + '"  DELETE r'
-    ).consume()
+    query = "MATCH (e:feed)-[r:IS_COMPRISED_OF]->(s) WHERE e.id = $feed_id AND s.id = $symbol_id DELETE r"
+    tx.run(query, feed_id=feed_id, symbol_id=symbol_id).consume()
 
     return
 
@@ -1573,14 +1613,8 @@ def disconnect_symbol_from_expression(tx, symbol_id: str, expression_id: str) ->
     https://neo4j.com/docs/cypher-manual/current/clauses/delete/
     """
 
-    tx.run(
-        "MATCH (e:expression)-[r:IS_COMPRISED_OF]->(s)"
-        + 'WHERE e.id="'
-        + str(expression_id)
-        + '" AND s.id="'
-        + str(symbol_id)
-        + '"  DELETE r'
-    ).consume()
+    query = "MATCH (e:expression)-[r:IS_COMPRISED_OF]->(s) WHERE e.id = $expression_id AND s.id = $symbol_id DELETE r"
+    tx.run(query, expression_id=expression_id, symbol_id=symbol_id).consume()
 
     return
 
@@ -1647,11 +1681,8 @@ def connect_symbol_to_feed(tx, symbol_id: str, feed_id: str) -> None:
     """ """
     logger.info("symbol_id=" + symbol_id + "; feed_id=" + feed_id)
 
-    tx.run(
-        "MATCH (f:feed {id: '" + feed_id + "'})"
-        "MATCH (s {id: '" + symbol_id + "'})"
-        "MERGE (f)-[:IS_COMPRISED_OF]->(s)"
-    ).consume()
+    query = "MATCH (f:feed {id: $feed_id}) MATCH (s {id: $symbol_id}) MERGE (f)-[:IS_COMPRISED_OF]->(s)"
+    tx.run(query, feed_id=feed_id, symbol_id=symbol_id).consume()
 
     return
 
@@ -1661,11 +1692,8 @@ def connect_symbol_to_expression(tx, symbol_id: str, expression_id: str) -> None
     """ """
     logger.info("symbol_id=" + symbol_id + "; expression_id=" + expression_id)
 
-    tx.run(
-        "MATCH (e:expression {id: '" + expression_id + "'})"
-        "MATCH (n {id: '" + symbol_id + "'})"
-        "MERGE (e)-[r:IS_COMPRISED_OF]->(n)"
-    ).consume()
+    query = "MATCH (e:expression {id: $expression_id}) MATCH (n {id: $symbol_id}) MERGE (e)-[r:IS_COMPRISED_OF]->(n)"
+    tx.run(query, expression_id=expression_id, symbol_id=symbol_id).consume()
 
     return
 
@@ -1686,11 +1714,9 @@ def get_list_of_sequence_values_for_derivation_id(
     # )
 
     list_of_sequence_values = []  # type: List[int]
-    for result in tx.run(
-        'MATCH (d:derivation {id:"'
-        + derivation_id
-        + '"})-[r]->(s:step) RETURN r.sequence_index'
-    ):
+    query = "MATCH (d:derivation {id: $derivation_id})-[r]->(s:step) RETURN r.sequence_index"
+    for result in tx.run(query, derivation_id=derivation_id):
+
         record = result.data()
         # record= {'r.sequence_index': '1'}
         logger.info("record=" + str(record))
@@ -1715,8 +1741,16 @@ def connect_step_to_derivation(
     note_after_step_latex: str,
     author_name_latex: str,
 ) -> dict | None:
+    # Acquire an exclusive write lock on the derivation node before reading
+    # or writing any HAS_STEP.sequence_index for it. This forces any other
+    # transaction that also locks this same derivation node (see
+    # edit_step_sequence_index) to wait until this transaction commits, so
+    # the "next index" computed below can't race with a concurrent caller.
+    # apoc.lock.nodes() is a void procedure -- it returns nothing itself,
+    # so `d` from the preceding MATCH is what gets returned/checked here.
     deriv_check = tx.run(
-        "MATCH (d:derivation {id: $did}) RETURN d", did=derivation_id
+        "MATCH (d:derivation {id: $did}) CALL apoc.lock.nodes([d]) RETURN d",
+        did=derivation_id,
     ).single()
     inf_check = tx.run(
         "MATCH (i:inference_rule {id: $iid}) RETURN i", iid=inference_rule_id
@@ -1729,6 +1763,22 @@ def connect_step_to_derivation(
         seq_res = tx.run(seq_query, did=derivation_id).single()
         seq_val = seq_res["next_seq"] if seq_res else 0
     else:
+        # Caller supplied an explicit index -- it must not already be in
+        # use anywhere in this derivation, or ordering becomes ambiguous.
+        conflict = tx.run(
+            """
+            MATCH (d:derivation {id: $did})-[r:HAS_STEP]->(:step)
+            WHERE r.sequence_index = $seq
+            RETURN count(r) AS c
+            """,
+            did=derivation_id,
+            seq=requested_sequence_value,
+        ).single()
+        if conflict["c"] > 0:
+            raise ValueError(
+                f"sequence_index {requested_sequence_value} is already used "
+                f"in derivation {derivation_id}"
+            )
         seq_val = requested_sequence_value
 
     tx.run(
@@ -1756,6 +1806,41 @@ def connect_step_to_derivation(
 
 
 @trace_execution
+def search_symbols_by_latex(tx: Transaction, search_string: str) -> list:
+    """
+    Search the `latex` property of `:symbol` nodes server-side, replacing
+    the previous pattern of fetching all symbols via get_nodes_of_type()
+    and filtering in Python.
+
+    Match is a case-sensitive substring match (Cypher CONTAINS), since
+    LaTeX commands are case-sensitive (e.g. \\Gamma vs \\gamma are
+    different symbols).
+
+    Returns all matching nodes (no limit), ordered by id.
+
+    Written by Claude Sonnet 5 on 2026-07-16
+    https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/146
+    """
+
+    if not search_string or not search_string.strip():
+        raise ValueError("search_string must be a non-empty string")
+
+    query = """
+        MATCH (s:symbol)
+        WHERE s.latex CONTAINS $search_string
+        RETURN s
+        ORDER BY s.id
+    """
+
+    node_list = []  # type: List[dict]
+    for result in tx.run(query, search_string=search_string):
+        node_list.append(result.data()["s"])
+
+    return node_list
+
+
+
+@trace_execution
 def connect_expressions_to_step(
     tx,
     step_id: str,
@@ -1779,6 +1864,27 @@ def connect_expressions_to_step(
     logger.info("list_of_feed_IDs" + str(list_of_feed_IDs))
     logger.info("list_of_output_expression_IDs" + str(list_of_output_expression_IDs))
 
+    # Lock the step node so a second call for this step (e.g. adding more
+    # inputs later) can't compute a starting index that races with this
+    # call. Held until this transaction commits.
+    lock = tx.run(
+        "MATCH (s:step {id: $step_id}) CALL apoc.lock.nodes([s]) RETURN s",
+        step_id=step_id,
+    ).single()
+    if not lock:
+        raise ValueError(f"no step with id {step_id}")
+
+    def _next_index(rel_type: str) -> int:
+        # rel_type is always one of the hardcoded literals passed below,
+        # never caller input, so interpolating it is safe here -- Cypher
+        # has no way to bind a relationship type as a parameter.
+        rec = tx.run(
+            f"MATCH (:step {{id: $step_id}})-[r:{rel_type}]->() "
+            f"RETURN coalesce(max(r.sequence_index), -1) + 1 AS next_seq",
+            step_id=step_id,
+        ).single()
+        return rec["next_seq"]
+
     # # input expressions
     # for input_index, input_id in enumerate(list_of_input_expression_IDs):
     #     logger.info("input_id=" + input_id + "; input_index=" + str(input_index))
@@ -1790,18 +1896,20 @@ def connect_expressions_to_step(
     #     ).consume()
     #     # print(result.data()) # this just shows "[]"
 
-    inputs_data = [
-        {"id": exp_id, "idx": idx}
-        for idx, exp_id in enumerate(list_of_input_expression_IDs)
-    ]
+    if list_of_input_expression_IDs:
+        start = _next_index("HAS_INPUT")
+        inputs_data = [
+            {"id": exp_id, "idx": start + i}
+            for i, exp_id in enumerate(list_of_input_expression_IDs)
+        ]
 
-    query = """
-    MATCH (a:step {id: $step_id})
-    UNWIND $inputs AS input_data
-    MATCH (b:expression {id: input_data.id})
-    MERGE (a)-[:HAS_INPUT {sequence_index: input_data.idx}]->(b)
-    """
-    tx.run(query, step_id=step_id, inputs=inputs_data)
+        query = """
+        MATCH (a:step {id: $step_id})
+        UNWIND $inputs AS input_data
+        MATCH (b:expression {id: input_data.id})
+        MERGE (a)-[:HAS_INPUT {sequence_index: input_data.idx}]->(b)
+        """
+        tx.run(query, step_id=step_id, inputs=inputs_data)
 
     # # feed expressions
     # for feed_index, feed_id in enumerate(list_of_feed_IDs):
@@ -1813,17 +1921,20 @@ def connect_expressions_to_step(
     #     ).consume()
     #     # print(result.data()) # this just shows "[]"
 
-    feeds_data = [
-        {"id": exp_id, "idx": idx} for idx, exp_id in enumerate(list_of_feed_IDs)
-    ]
+    if list_of_feed_IDs:
+        start = _next_index("HAS_FEED")
+        feeds_data = [
+            {"id": exp_id, "idx": start + i}
+            for i, exp_id in enumerate(list_of_feed_IDs)
+        ]
 
-    query = """
-    MATCH (a:step {id: $step_id})
-    UNWIND $feeds AS feed_data
-    MATCH (b:feed {id: feed_data.id})
-    MERGE (a)-[:HAS_FEED {sequence_index: feed_data.idx}]->(b)
-    """
-    tx.run(query, step_id=step_id, feeds=feeds_data)
+        query = """
+        MATCH (a:step {id: $step_id})
+        UNWIND $feeds AS feed_data
+        MATCH (b:feed {id: feed_data.id})
+        MERGE (a)-[:HAS_FEED {sequence_index: feed_data.idx}]->(b)
+        """
+        tx.run(query, step_id=step_id, feeds=feeds_data)
 
     # # output expressions
     # for output_index, output_id in enumerate(list_of_output_expression_IDs):
@@ -1835,18 +1946,20 @@ def connect_expressions_to_step(
     #     ).consume()
     #     # print(result.data()) # this just shows "[]"
 
-    outputs_data = [
-        {"id": exp_id, "idx": idx}
-        for idx, exp_id in enumerate(list_of_output_expression_IDs)
-    ]
+    if list_of_output_expression_IDs:
+        start = _next_index("HAS_OUTPUT")
+        outputs_data = [
+            {"id": exp_id, "idx": start + i}
+            for i, exp_id in enumerate(list_of_output_expression_IDs)
+        ]
 
-    query = """
-    MATCH (a:step {id: $step_id})
-    UNWIND $outputs AS output_data
-    MATCH (b:expression {id: output_data.id})
-    MERGE (a)-[:HAS_OUTPUT {sequence_index: output_data.idx}]->(b)
-    """
-    tx.run(query, step_id=step_id, outputs=outputs_data)
+        query = """
+        MATCH (a:step {id: $step_id})
+        UNWIND $outputs AS output_data
+        MATCH (b:expression {id: output_data.id})
+        MERGE (a)-[:HAS_OUTPUT {sequence_index: output_data.idx}]->(b)
+        """
+        tx.run(query, step_id=step_id, outputs=outputs_data)
 
     return
 
@@ -2011,70 +2124,50 @@ def add_constant_value_with_units(
     but is not expected to work for editing constants. See Gemini 3 Pro's observation inline below.
     """
 
-    str_to_add = ""
+    # dict_of_units keys become property names on the value_with_units node,
+    # and property names can't be bind parameters, so every key must be
+    # checked against a fixed allowlist (DIMENSION_UNIT_PROPERTY_VALID_VALUES)
+    # before use, and every value must belong to that key's list of valid
+    # units. Everything else is passed as a single params dict.
+    unit_props = {}
     for property_key, property_value in dict_of_units.items():
-        str_to_add += property_key + ':"' + str(property_value) + '", '
-
-    logger.info("neo4j_query/add_constant_value_with_units: str_to_add=" + str_to_add)
-
-    # create new node for value
-    tx.run(
-        "merge (:value_with_units:a_node "
-        "{number_decimal:" + str(number_decimal) + ", "
-        " number_power: " + str(number_power) + ", "
-        ' created_datetime:"' + now_str + '",'
-        ' id:"'
-        + str(value_with_units_id)
-        + '", '
-        + str_to_add
-        + ' author_name_latex:"'
-        + str(author_name_latex)
-        + '"})'
-    ).consume()
-
-    # TODO, pointed out by Gemini 3 Pro on 2026-02-03:
-    # In a parameterized query, you cannot inject raw string fragments for property names.
-    # You must add the specific values (e.g., unit information) directly into the params dictionary and the SET clauses.
-
-    # params = {
-    #     "id": str(value_with_units_id),
-    #     "num_dec": number_decimal,
-    #     "num_pow": number_power,
-    #     "created": now_str,
-    #     "author": str(author_name_latex)
-    #     # You must extract the values from 'str_to_add' and put them here.
-    #     # Example: "unit": str(unit_variable)
-    # }
-    # query = """
-    #     MERGE (v:value_with_units {id: $id})
-    #     ON CREATE SET
-    #         v.created_datetime = $created,
-    #         v.number_decimal = $num_dec,
-    #         v.number_power = $num_pow,
-    #         v.author_name_latex = $author
-    #         // Add specific properties from str_to_add here
-    #         // Example: v.unit_latex = $unit
-    #     ON MATCH SET
-    #         v.number_decimal = $num_dec,
-    #         v.number_power = $num_pow,
-    #         v.author_name_latex = $author
-    #         // Add specific properties from str_to_add here
-    #         // Example: v.unit_latex = $unit
-    #         // Note: created_datetime is NOT updated here
-    # """
-    # tx.run(query, params)
-
-    # create edge between scalar and value
-    tx.run(
-        "MATCH (s:scalar),(v:value_with_units) "
-        'WHERE s.id="'
-        + str(scalar_id)
-        + '" AND v.id="'
-        + str(value_with_units_id)
-        + '" '
-        "MERGE (s)-[:HAS_VALUE]->(v)"
-    ).consume()
-
+        if property_key not in DIMENSION_UNIT_PROPERTY_VALID_VALUES:
+            raise ValueError(f"Invalid unit property key: {property_key}")
+        valid_values = DIMENSION_UNIT_PROPERTY_VALID_VALUES[property_key]
+        if property_value not in valid_values:
+            raise ValueError(
+                f"Invalid unit value {property_value!r} for property {property_key!r}"
+            )
+        unit_props[property_key] = property_value
+    logger.info(
+        "neo4j_query/add_constant_value_with_units: unit_props=" + str(unit_props)
+    )
+    params = {
+        "value_id": str(value_with_units_id),
+        "scalar_id": str(scalar_id),
+        "number_decimal": number_decimal,
+        "number_power": number_power,
+        "created": str(now_str),
+        "author": str(author_name_latex),
+        "unit_props": unit_props,
+    }
+    query = """
+    MERGE (v:value_with_units:a_node {id: $value_id})
+    ON CREATE SET
+        v.created_datetime = $created,
+        v.number_decimal = $number_decimal,
+        v.number_power = $number_power,
+        v.author_name_latex = $author
+    ON MATCH SET
+        v.number_decimal = $number_decimal,
+        v.number_power = $number_power,
+        v.author_name_latex = $author
+    SET v += $unit_props
+    WITH v
+    MATCH (s:scalar {id: $scalar_id})
+    MERGE (s)-[:HAS_VALUE]->(v)
+    """
+    tx.run(query, params).consume()
     return
 
 
@@ -2507,9 +2600,22 @@ def delete_all_nodes_and_relationships(tx: Transaction) -> None:
 @trace_execution
 def user_query(tx: Transaction, query: str) -> list:
     """
+    Execute an arbitrary, user-supplied Cypher query. READ-ONLY.
     User-submitted Cypher query for Neo4j database
 
     Read-only for Neo4j database
+
+
+    IMPORTANT - caller responsibility: `tx` must be a transaction opened
+    in read mode, e.g. via `session.execute_read(...)`. This function
+    intentionally keeps the same `tx: Transaction` signature as every
+    other function in this module and does NOT open its own
+    session/transaction, so it cannot itself guarantee read-only access.
+    The keyword blocklist below is defense-in-depth, not a full Cypher
+    parser, so the real enforcement backstop is Neo4j's server-side
+    rejection of writes inside a read transaction. If this is ever called
+    with a write-mode transaction, that backstop is gone.
+
 
     Allowing arbitrary users to pass raw Cypher queries is exceptionally dangerous.
     While you catch `neo4j.exceptions.ClientError` to mimic read-only behavior, a clever user can still:
@@ -2522,7 +2628,8 @@ def user_query(tx: Transaction, query: str) -> list:
         when executing `user_query`.
 
     """
-
+    if _WRITE_KEYWORD_PATTERN.search(query):
+        return ["WRITE OPERATIONS NOT ALLOWED (blocked keyword)"]
     list_of_results = []
     try:
         for result in tx.run(query):
