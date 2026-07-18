@@ -114,12 +114,14 @@ api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 # https://claude.ai/share/4331b79a-6794-4c68-b95d-82b0c4e47e75
 
 
-def hal_link(href, title=None, name=None):
+def hal_link(href, title=None, name=None, method=None):
     link = {"href": href}
     if title:
         link["title"] = title
     if name:
         link["name"] = name
+    if method:
+        link["method"] = method
     return link
 
 
@@ -555,12 +557,14 @@ def api_list_inference_rules():
             "edit": hal_link(
                 url_for(".api_edit_inference_rule", infrule_id=item_id, _external=True),
                 "Edit this inference rule",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(
                     ".api_delete_inference_rule", infrule_id=item_id, _external=True
                 ),
                 "Delete inference rule",
+                method="DELETE",
             ),
         }
         embedded_items.append(resource)
@@ -805,10 +809,12 @@ def api_list_operation_symbols():
             "edit": hal_link(
                 url_for(".api_edit_operation", operation_id=item_id, _external=True),
                 "Edit this operation",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(".api_delete_operation", operation_id=item_id, _external=True),
                 "Delete operation",
+                method="DELETE",
             ),
         }
         embedded_items.append(resource)
@@ -898,10 +904,12 @@ def api_list_relation_symbols():
             "edit": hal_link(
                 url_for(".api_edit_relation", relation_id=item_id, _external=True),
                 "Edit this relation",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(".api_delete_relation", relation_id=item_id, _external=True),
                 "Delete relation",
+                method="DELETE",
             ),
         }
         embedded_items.append(resource)
@@ -993,10 +1001,12 @@ def api_list_scalar_symbols():
             "edit": hal_link(
                 url_for(".api_edit_scalar", symbol_id=item_id, _external=True),
                 "Edit this scalar",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(".api_delete_scalar", symbol_id=item_id, _external=True),
                 "Delete scalar",
+                method="DELETE",
             ),
         }
         embedded_items.append(resource)
@@ -1144,10 +1154,12 @@ def api_list_vector_symbols():
             "edit": hal_link(
                 url_for(".api_edit_vector", symbol_id=item_id, _external=True),
                 "Edit this vector",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(".api_delete_vector", symbol_id=item_id, _external=True),
                 "Delete vector",
+                method="DELETE",
             ),
         }
         embedded_items.append(resource)
@@ -1249,10 +1261,12 @@ def api_list_matrix_symbols():
             "edit": hal_link(
                 url_for(".api_edit_matrix", symbol_id=item_id, _external=True),
                 "Edit this matrix",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(".api_delete_matrix", symbol_id=item_id, _external=True),
                 "Delete matrix",
+                method="DELETE",
             ),
         }
         embedded_items.append(resource)
@@ -2941,7 +2955,7 @@ def api_edit_scalar(symbol_id: str):
     if (
         "symbol_scope" in data_from_user
         and data_from_user.get("symbol_scope")
-        and data_from_user.get("symbol_scope") not in list_of_valid.scalar_scope
+        and (data_from_user.get("symbol_scope") not in list_of_valid.scalar_scope)
     ):
         return hal_error(
             f"symbol_scope must be one of {list_of_valid.scalar_scope}",
@@ -2952,7 +2966,7 @@ def api_edit_scalar(symbol_id: str):
     if (
         "symbol_domain" in data_from_user
         and data_from_user.get("symbol_domain")
-        and data_from_user.get("symbol_domain") not in list_of_valid.scalar_domain
+        and (data_from_user.get("symbol_domain") not in list_of_valid.scalar_domain)
     ):
         return hal_error(
             f"symbol_domain must be one of {list_of_valid.scalar_domain}",
@@ -2963,8 +2977,10 @@ def api_edit_scalar(symbol_id: str):
     if (
         "symbol_variable_or_constant" in data_from_user
         and data_from_user.get("symbol_variable_or_constant")
-        and data_from_user.get("symbol_variable_or_constant")
-        not in ("variable", "constant")
+        and (
+            data_from_user.get("symbol_variable_or_constant")
+            not in ("variable", "constant")
+        )
     ):
         return hal_error(
             'symbol_variable_or_constant must be "variable" or "constant"',
@@ -3266,6 +3282,7 @@ def api_derivation_metadata(derivation_id: str):
                     ".api_edit_derivation", derivation_id=derivation_id, _external=True
                 ),
                 "Edit this derivation",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(
@@ -3274,6 +3291,7 @@ def api_derivation_metadata(derivation_id: str):
                     _external=True,
                 ),
                 "Delete this derivation",
+                method="DELETE",
             ),
             "up": hal_link(
                 url_for(".api_list_derivations", _external=True), "List of Derivations"
@@ -3324,12 +3342,14 @@ def api_inference_rule_metadata(infrule_id: str):
                     ".api_edit_inference_rule", infrule_id=infrule_id, _external=True
                 ),
                 "Edit this inference rule",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(
                     ".api_delete_inference_rule", infrule_id=infrule_id, _external=True
                 ),
                 "Delete this inference rule",
+                method="DELETE",
             ),
             "up": hal_link(
                 url_for(".api_list_inference_rules", _external=True),
@@ -3475,10 +3495,12 @@ def api_scalar_metadata(symbol_id: str):
             "edit": hal_link(
                 url_for(".api_edit_scalar", symbol_id=symbol_id, _external=True),
                 "Edit this scalar",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(".api_delete_scalar", symbol_id=symbol_id, _external=True),
                 "Delete this scalar",
+                method="DELETE",
             ),
             "up": hal_link(
                 url_for(".api_list_scalar_symbols", _external=True),
@@ -3524,10 +3546,12 @@ def api_vector_metadata(symbol_id: str):
             "edit": hal_link(
                 url_for(".api_edit_vector", symbol_id=symbol_id, _external=True),
                 "Edit this vector",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(".api_delete_vector", symbol_id=symbol_id, _external=True),
                 "Delete this vector",
+                method="DELETE",
             ),
             "up": hal_link(
                 url_for(".api_list_vector_symbols", _external=True),
@@ -3568,10 +3592,12 @@ def api_matrix_metadata(symbol_id: str):
             "edit": hal_link(
                 url_for(".api_edit_matrix", symbol_id=symbol_id, _external=True),
                 "Edit this matrix",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(".api_delete_matrix", symbol_id=symbol_id, _external=True),
                 "Delete this matrix",
+                method="DELETE",
             ),
             "up": hal_link(
                 url_for(".api_list_matrix_symbols", _external=True),
@@ -3622,12 +3648,14 @@ def api_operation_metadata(operation_id: str):
                     ".api_edit_operation", operation_id=operation_id, _external=True
                 ),
                 "Edit this operation",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(
                     ".api_delete_operation", operation_id=operation_id, _external=True
                 ),
                 "Delete this operation",
+                method="DELETE",
             ),
             "up": hal_link(
                 url_for(".api_list_operation_symbols", _external=True),
@@ -3676,12 +3704,14 @@ def api_relation_metadata(relation_id: str):
             "edit": hal_link(
                 url_for(".api_edit_relation", relation_id=relation_id, _external=True),
                 "Edit this relation",
+                method="POST",
             ),
             "delete": hal_link(
                 url_for(
                     ".api_delete_relation", relation_id=relation_id, _external=True
                 ),
                 "Delete this relation",
+                method="DELETE",
             ),
             "up": hal_link(
                 url_for(".api_list_relation_symbols", _external=True),
@@ -3721,6 +3751,7 @@ def api_derivation_steps(derivation_id: str):
                     _external=True,
                 ),
                 "Delete step",
+                method="DELETE",
             ),
         }
         formatted_steps.append(step_copy)
@@ -4026,6 +4057,7 @@ def api_get_step(derivation_id: str, step_id: str):
                 _external=True,
             ),
             "Delete step",
+            method="DELETE",
         ),
     }
     return hal_response(data=full_step_data, links=links)
