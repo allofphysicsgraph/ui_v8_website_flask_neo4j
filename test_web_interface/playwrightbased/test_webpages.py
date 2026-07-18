@@ -202,7 +202,7 @@ def test_get_list_matrices_page(page: Page):
 
 
 def test_get_list_expressions_page(page: Page):
-    page.goto(URL + "/list_expressions", timeout: 120_000)
+    page.goto(URL + "/list_expressions", timeout=120_000)
 
     expect(page).to_have_title(re.compile("Expression"))
 
@@ -742,4 +742,5 @@ def test_get_query_list_derivation_IDs(page: Page):
         # Verify the page didn't navigate away
         expect(page).to_have_url(URL + "/review_derivation/" + dev_id)
 
-#EOF
+
+# EOF
