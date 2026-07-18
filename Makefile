@@ -108,9 +108,11 @@ pytest_out_py:
 	rm -rf test_python/.pytest_cache
 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/ -it $$(docker ps -qf "name=flask-webserver") python3 -m pytest test_python/
 
-pytest_out_web:
+pytest_out_web: pytest_out_py
+	date
 	rm -rf test_web_interface/playwrightbased/.pytest_cache
 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ -it $$(docker ps -qf "name=flask-webserver") pytest
+	date
 # 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ -it $$(docker ps -qf "name=flask-webserver") pytest --exitfirst
 # can't use 
 #       $(DOCKER_OR_PODMAN) run -v`pwd`:/scratch --workdir /scratch/test_web_interface/playwrightbased/ -it $(WEBSERVER_IMAGE):$(CONTAINER_TAG) pytest --exitfirst
