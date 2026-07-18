@@ -67,7 +67,7 @@ launch_webserver:
 	        --entrypoint python3 -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) /scratch/validate_jinja2.py
 	$(DOCKER_OR_PODMAN) run --rm -t -e PYTHONUNBUFFERED=1 -w /scratch \
 	        --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) \
-	        -c 'black -v --workers 1 /scratch/webserver_for_pdg/*.py /scratch/test_web_interface/playwright/*.py /scratch/webserver_for_pdg/library/*.py /scratch/test_python/*.py validate_jinja2.py'
+	        -c 'black -v --workers 1 /scratch/webserver_for_pdg/*.py /scratch/test_web_interface/playwrightbased/*.py /scratch/webserver_for_pdg/library/*.py /scratch/test_python/*.py validate_jinja2.py'
 	# https://docs.docker.com/compose/reference/up/
 	WEBSERVER_IMAGE_NAME=$(WEBSERVER_IMAGE) TAG_WITH_ARCH=$(CONTAINER_TAG)  $(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans $(COMPOSE_FLAGS)
 
@@ -97,7 +97,7 @@ black_out:
 	--entrypoint='' --workdir /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) make black_in
 
 black_in:
-	black -v --workers 1 webserver_for_pdg/*.py webserver_for_pdg/library/*.py test_web_interface/playwright/*.py /scratch/test_python/*.py validate_jinja2.py
+	black -v --workers 1 webserver_for_pdg/*.py webserver_for_pdg/library/*.py test_web_interface/playwrightbased/*.py /scratch/test_python/*.py validate_jinja2.py
 
 mypy_out:
 	rm -rf .mypy_cachce
@@ -109,20 +109,20 @@ pytest_out_py:
 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/ -it $$(docker ps -qf "name=flask-webserver") python3 -m pytest test_python/
 
 pytest_out_web:
-	rm -rf test_web_interface/playwright/.pytest_cache
-	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwright/ -it $$(docker ps -qf "name=flask-webserver") pytest
-# 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwright/ -it $$(docker ps -qf "name=flask-webserver") pytest --exitfirst
+	rm -rf test_web_interface/playwrightbased/.pytest_cache
+	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ -it $$(docker ps -qf "name=flask-webserver") pytest
+# 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ -it $$(docker ps -qf "name=flask-webserver") pytest --exitfirst
 # can't use 
-#       $(DOCKER_OR_PODMAN) run -v`pwd`:/scratch --workdir /scratch/test_web_interface/playwright/ -it $(WEBSERVER_IMAGE):$(CONTAINER_TAG) pytest --exitfirst
+#       $(DOCKER_OR_PODMAN) run -v`pwd`:/scratch --workdir /scratch/test_web_interface/playwrightbased/ -it $(WEBSERVER_IMAGE):$(CONTAINER_TAG) pytest --exitfirst
 # for pytest because the webserver has to be running
 
 pytest_out_create_html:
-	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwright/ $$(docker ps -qf "name=flask-webserver") pytest --html=pytest_report.html --self-contained-html
+	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ $$(docker ps -qf "name=flask-webserver") pytest --html=pytest_report.html --self-contained-html
 
 # in https://www.youtube.com/watch?v=xjWjfRVTUHo the creator of coverage.py says use incurs 5% overhead. BHP hasn't measured this yet.
 # see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138
 #coverage:
-#	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwright/ $$(docker ps -qf "name=flask-webserver") pytest --cov=. --cov-report=html
+#	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ $$(docker ps -qf "name=flask-webserver") pytest --cov=. --cov-report=html
 
 # keep the conf folder since that has the configuration
 # keep plugin folder since that has apocalypse
