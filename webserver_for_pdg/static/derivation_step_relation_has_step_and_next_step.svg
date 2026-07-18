@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="380pt" height="310pt" viewBox="0.00 0.00 380.00 310.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 306.4)">
+<title>G</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-306.4 375.58,-306.4 375.58,4 -4,4"/>
+<!-- step_1 -->
+<g id="node1" class="node">
+<title>step_1</title>
+<ellipse fill="none" stroke="black" cx="98.71" cy="-195.6" rx="27" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="98.71" y="-191.4" font-family="Times,serif" font-size="14.00">step</text>
+</g>
+<!-- step_2 -->
+<g id="node2" class="node">
+<title>step_2</title>
+<ellipse fill="none" stroke="black" cx="194.71" cy="-106.8" rx="27" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="194.71" y="-102.6" font-family="Times,serif" font-size="14.00">step</text>
+</g>
+<!-- step_1&#45;&gt;step_2 -->
+<g id="edge2" class="edge">
+<title>step_1-&gt;step_2</title>
+<path fill="none" stroke="black" d="M94.53,-177.69C92.85,-166.76 92.72,-152.76 99.82,-142.8 112.75,-124.67 136.15,-115.91 156.48,-111.69"/>
+<polygon fill="black" stroke="black" points="156.94,-115.17 166.19,-110 155.74,-108.27 156.94,-115.17"/>
+<text xml:space="preserve" text-anchor="middle" x="140.26" y="-147" font-family="Times,serif" font-size="14.00">:NEXT_STEP</text>
+</g>
+<!-- step_3 -->
+<g id="node3" class="node">
+<title>step_3</title>
+<ellipse fill="none" stroke="black" cx="244.71" cy="-18" rx="27" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="244.71" y="-13.8" font-family="Times,serif" font-size="14.00">step</text>
+</g>
+<!-- step_2&#45;&gt;step_3 -->
+<g id="edge3" class="edge">
+<title>step_2-&gt;step_3</title>
+<path fill="none" stroke="black" d="M193.09,-88.47C192.89,-77.89 194.07,-64.45 199.82,-54 203.54,-47.25 209.15,-41.37 215.16,-36.45"/>
+<polygon fill="black" stroke="black" points="216.84,-39.56 222.86,-30.84 212.72,-33.9 216.84,-39.56"/>
+<text xml:space="preserve" text-anchor="middle" x="240.26" y="-58.2" font-family="Times,serif" font-size="14.00">:NEXT_STEP</text>
+</g>
+<!-- derivation -->
+<g id="node4" class="node">
+<title>derivation</title>
+<ellipse fill="none" stroke="black" cx="150.71" cy="-284.4" rx="50.19" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="150.71" y="-280.2" font-family="Times,serif" font-size="14.00">derivation</text>
+</g>
+<!-- derivation&#45;&gt;step_1 -->
+<g id="edge1" class="edge">
+<title>derivation-&gt;step_1</title>
+<path fill="none" stroke="black" d="M102.98,-278.31C65.24,-273.18 16.96,-263.79 4.82,-248.4 -13.67,-224.96 27.86,-210.56 61.46,-203.07"/>
+<polygon fill="black" stroke="black" points="61.88,-206.56 70.97,-201.1 60.46,-199.7 61.88,-206.56"/>
+<text xml:space="preserve" text-anchor="middle" x="45.26" y="-235.8" font-family="Times,serif" font-size="14.00">:NEXT_STEP</text>
+</g>
+<!-- derivation&#45;&gt;step_1 -->
+<g id="edge4" class="edge">
+<title>derivation-&gt;step_1</title>
+<path fill="none" stroke="black" d="M127.27,-268.26C120.46,-262.78 113.66,-256.03 109.14,-248.4 104.99,-241.4 102.47,-233.03 100.94,-225.09"/>
+<polygon fill="black" stroke="black" points="104.44,-224.85 99.55,-215.45 97.51,-225.85 104.44,-224.85"/>
+<text xml:space="preserve" text-anchor="middle" x="144.92" y="-235.8" font-family="Times,serif" font-size="14.00">:HAS_STEP</text>
+</g>
+<!-- derivation&#45;&gt;step_2 -->
+<g id="edge5" class="edge">
+<title>derivation-&gt;step_2</title>
+<path fill="none" stroke="black" d="M167.99,-267.4C172.92,-261.87 177.75,-255.32 180.71,-248.4 196.23,-212.08 197.77,-165.84 196.77,-136.51"/>
+<polygon fill="black" stroke="black" points="200.27,-136.39 196.29,-126.57 193.28,-136.73 200.27,-136.39"/>
+<text xml:space="preserve" text-anchor="middle" x="231.81" y="-191.4" font-family="Times,serif" font-size="14.00">:HAS_STEP</text>
+</g>
+<!-- derivation&#45;&gt;step_3 -->
+<g id="edge6" class="edge">
+<title>derivation-&gt;step_3</title>
+<path fill="none" stroke="black" d="M188.77,-272.27C216.82,-261.91 253.17,-243.48 271.71,-213.6 309.16,-153.23 308.36,-119.44 280.71,-54 278.44,-48.62 274.88,-43.65 270.88,-39.26"/>
+<polygon fill="black" stroke="black" points="273.57,-36.99 263.93,-32.6 268.73,-42.04 273.57,-36.99"/>
+<text xml:space="preserve" text-anchor="middle" x="335.79" y="-147" font-family="Times,serif" font-size="14.00">:HAS_STEP</text>
+</g>
+</g>
+</svg>

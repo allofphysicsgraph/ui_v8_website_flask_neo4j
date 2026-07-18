@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="303pt" height="150pt" viewBox="0.00 0.00 303.00 150.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 145.6)">
+<title>G</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-145.6 298.99,-145.6 298.99,4 -4,4"/>
+<!-- step_1 -->
+<g id="node1" class="node">
+<title>step_1</title>
+<ellipse fill="none" stroke="black" cx="27" cy="-18" rx="27" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="27" y="-13.8" font-family="Times,serif" font-size="14.00">step</text>
+</g>
+<!-- step_2 -->
+<g id="node2" class="node">
+<title>step_2</title>
+<ellipse fill="none" stroke="black" cx="126" cy="-18" rx="27" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="126" y="-13.8" font-family="Times,serif" font-size="14.00">step</text>
+</g>
+<!-- step_3 -->
+<g id="node3" class="node">
+<title>step_3</title>
+<ellipse fill="none" stroke="black" cx="225" cy="-18" rx="27" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="225" y="-13.8" font-family="Times,serif" font-size="14.00">step</text>
+</g>
+<!-- derivation -->
+<g id="node4" class="node">
+<title>derivation</title>
+<ellipse fill="none" stroke="black" cx="126" cy="-123.6" rx="50.19" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="126" y="-119.4" font-family="Times,serif" font-size="14.00">derivation</text>
+</g>
+<!-- derivation&#45;&gt;step_1 -->
+<g id="edge1" class="edge">
+<title>derivation-&gt;step_1</title>
+<path fill="none" stroke="black" d="M85.65,-112.6C71.52,-107.28 56.65,-99.32 46.45,-87.6 36.83,-76.55 31.95,-61.06 29.48,-47.59"/>
+<polygon fill="black" stroke="black" points="32.98,-47.34 28.09,-37.94 26.05,-48.34 32.98,-47.34"/>
+<text xml:space="preserve" text-anchor="middle" x="84.22" y="-75" font-family="Times,serif" font-size="14.00">:HAS_STEP</text>
+<text xml:space="preserve" text-anchor="middle" x="84.22" y="-58.2" font-family="Times,serif" font-size="14.00">step_index=1</text>
+</g>
+<!-- derivation&#45;&gt;step_2 -->
+<g id="edge2" class="edge">
+<title>derivation-&gt;step_2</title>
+<path fill="none" stroke="black" d="M126,-105.49C126,-89.84 126,-66.37 126,-47.82"/>
+<polygon fill="black" stroke="black" points="129.5,-47.99 126,-37.99 122.5,-47.99 129.5,-47.99"/>
+<text xml:space="preserve" text-anchor="middle" x="163.78" y="-75" font-family="Times,serif" font-size="14.00">:HAS_STEP</text>
+<text xml:space="preserve" text-anchor="middle" x="163.78" y="-58.2" font-family="Times,serif" font-size="14.00">step_index=2</text>
+</g>
+<!-- derivation&#45;&gt;step_3 -->
+<g id="edge3" class="edge">
+<title>derivation-&gt;step_3</title>
+<path fill="none" stroke="black" d="M165.26,-111.99C178.8,-106.62 193.04,-98.79 203,-87.6 212.84,-76.54 218.28,-61.05 221.29,-47.59"/>
+<polygon fill="black" stroke="black" points="224.7,-48.4 223.08,-37.93 217.82,-47.12 224.7,-48.4"/>
+<text xml:space="preserve" text-anchor="middle" x="257.22" y="-75" font-family="Times,serif" font-size="14.00">:HAS_STEP</text>
+<text xml:space="preserve" text-anchor="middle" x="257.22" y="-58.2" font-family="Times,serif" font-size="14.00">step_index=3</text>
+</g>
+</g>
+</svg>

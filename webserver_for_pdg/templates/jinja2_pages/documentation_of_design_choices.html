@@ -220,6 +220,8 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 
 <H2 id="which layer for search?"><i>Decision</i>: where should symbol search be performed?</H2>
 
+<P><em>current status</em>: <code>step_index</code> is a property of the <code>:HAS_STEP</code> edges between <code>:derivation</code> and <code>:step</code>.
+
 <P>Options:
   <UL>
 <LI> search of symbols in Javascript: e.g., on `webserver_for_pdg/templates/jinja2_pages/user_workflow/symbol_scalar_list.html` has
@@ -235,9 +237,74 @@ See the full list of  <a href="#not in scope">not in scope</a>.
 <HR/>
 <P>&nbsp;</P>
 
-<H2 id="next step vs step index"><i>Decision</i>: </H2>
+<H2 id="next step vs step index"><i>Decision</i>: what should edge between derivation and step be?</H2>
+
+<img src="{{ url_for('static', filename='derivation_step_relation_index.svg') }}">
 
 
+<UL>
+  <LI>BAD: introduces race conditions for getting and setting and resetting the index</LI>
+ <LI>BAD: Requires extra logic for handling the index values</LI>
+ <LI>GOOD: Makes queries to derivation easier for steps and sequencing steps</LI>
+</UL>
+
+<pre>
+digraph G {
+//splines=line
+//splines=ortho;
+step_1 [label="step"]
+step_2 [label="step"]
+step_3 [label="step"]
+derivation -> step_1 [label=":HAS_STEP\nstep_index=1"]
+derivation -> step_2 [label=":HAS_STEP\nstep_index=2"]
+derivation -> step_3 [label=":HAS_STEP\nstep_index=3"]
+}
+</pre>
+<!--
+https://dreampuf.github.io/GraphvizOnline/?engine=dot#digraph%20G%20%7B%0A%2F%2Fsplines%3Dline%0A%2F%2Fsplines%3Dortho%3B%0Astep_1%20%5Blabel%3D%22step%22%5D%0Astep_2%20%5Blabel%3D%22step%22%5D%0Astep_3%20%5Blabel%3D%22step%22%5D%0Aderivation%20-%3E%20step_1%20%5Blabel%3D%22%3AHAS_STEP%5Cnstep_index%3D1%22%5D%0Aderivation%20-%3E%20step_2%20%5Blabel%3D%22%3AHAS_STEP%5Cnstep_index%3D2%22%5D%0Aderivation%20-%3E%20step_3%20%5Blabel%3D%22%3AHAS_STEP%5Cnstep_index%3D3%22%5D%0A%7D
+-->
+
+<img src="{{ url_for('static', filename='derivation_step_relation_next_step.svg') }}">
+
+<UL>
+  <LI>GOOD: no race condition for step index</LI>
+<LI>GOOD: easier to break a derivation by separating one step</LI>
+<LI>BAD: harder to query how many steps exist</LI>
+<LI>BAD: Extra logic needed to calculate step index</LI>
+</UL>
+
+<pre>
+digraph G {
+rankdir=LR;
+step_1 [label="step"]
+step_2 [label="step"]
+step_3 [label="step"]
+derivation -> step_1 [label=":NEXT_STEP"]
+step_1 -> step_2 [label=":NEXT_STEP"]
+step_2 -> step_3 [label=":NEXT_STEP"]
+}
+</pre>
+
+<img src="{{ url_for('static', filename='derivation_step_relation_has_step_and_next_step.svg') }}">
+
+<UL>
+  <LI>BAD: Likely to become inconsistent</LI>
+  <LI>BAD: Extra logic needed to add/remove edges</LI>
+</UL>
+
+<pre>
+digraph G {
+step_1 [label="step"]
+step_2 [label="step"]
+step_3 [label="step"]
+derivation -> step_1 [label=":NEXT_STEP"]
+step_1 -> step_2 [label=":NEXT_STEP"]
+step_2 -> step_3 [label=":NEXT_STEP"]
+derivation -> step_1 [label=":HAS_STEP"]
+derivation -> step_2 [label=":HAS_STEP"]
+derivation -> step_3 [label=":HAS_STEP"]
+}
+</pre>
 
 <P>&nbsp;</P>
 <HR/>
