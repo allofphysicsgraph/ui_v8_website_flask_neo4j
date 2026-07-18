@@ -7,23 +7,21 @@
 # https://creativecommons.org/licenses/by/4.0/
 
 
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
-URL = "http://localhost:5000/api/"
+# This blueprint registers routes starting with '/v1/resources' under url_prefix='/api'
+URL = "http://localhost:5000/api"
 
 
-def test_sympy():
+def test_sympy(page: Page):
     """Verifies standard JSON output from the sympy validation endpoint."""
-    print("Testing Non-HATEOAS SymPy verification endpoint...")
-    # This blueprint registers routes starting with '/v1/resources' under url_prefix='/api'
-    response = page.request.get(f"{URL}/api/resources/sympy_check")
+    sympy_url = f"{URL}/resources/sympy_check"
     params = {"sympy": "x**2 + y"}
-
-    response = requests.get(sympy_url, params=params, verify=False)
-    response.raise_for_status()
+    response = page.request.get(sympy_url, params=params)
+    assert response.ok, f"Request failed with status {response.status}"
 
     # The non-HATEOAS endpoint uses standard Flask jsonify returning application/json
-    assert "application/json" in response.headers.get("Content-Type", "")
+    assert "application/json" in response.headers.get("content-type", "")
     data = response.json()
 
     # SymPy parser returns variables and a canonical form or INVALID
@@ -34,5 +32,3 @@ def test_sympy():
         assert "variables" in data
         print("Canonical Form:", data["canonical"])
         print("Detected Variables:", data["variables"])
-
-    print("Non-HATEOAS SymPy verification passed.\n")
