@@ -5,6 +5,7 @@
 # https://allofphysics.com
 # Creative Commons Attribution 4.0 International License
 # https://creativecommons.org/licenses/by/4.0/
+
 import os
 from urllib.parse import urljoin
 from typing import Generator
