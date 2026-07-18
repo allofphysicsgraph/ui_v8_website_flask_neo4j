@@ -1111,51 +1111,6 @@ def get_dict_of_node_dicts(
     return dict_of_all_node_dicts, query_time_dict
 
 
-def _NOT_IN_USE_get_dict_of_derivations_used_per_inference_rule(
-    graphDB_Driver,
-    query_time_dict: query_timing_result_type,
-    list_of_inference_rule_dicts: list,
-) -> Tuple[dict, query_timing_result_type]:
-    """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-
-    # TODO: Neo4j inside loop causes high latency
-    dict_of_derivations_used_per_inference_rule = {}
-    for this_inference_rule_dict in list_of_inference_rule_dicts:
-        list_of_derivations_that_use_this_inference_rule_id = []
-        with graphDB_Driver.session() as session:
-            query_start_time = time.time()
-            list_of_derivations_that_use_this_inference_rule_id = (
-                session.read_transaction(
-                    neo4j_query.get_derivations_that_use_inference_rule,
-                    this_inference_rule_dict["id"],
-                )
-            )
-            query_time_dict[
-                "compute/get_dict_of_derivations_used_per_inference_rule: get_derivations_that_use_inference_rule"
-                + trace_id
-            ] = round(time.time() - query_start_time, 3)
-        logger.info(
-            "list_of_derivations_that_use_this_inference_rule_id="
-            + str(list_of_derivations_that_use_this_inference_rule_id)
-        )
-        # can't use set on a list of dicts
-        # list_of_derivations_that_use_this_inference_rule_id = list(
-        #    set(list_of_derivations_that_use_this_inference_rule_id)
-        # )
-        new_temp_dict = {}
-        for this_derivation_dict in list_of_derivations_that_use_this_inference_rule_id:
-            new_temp_dict[this_derivation_dict["id"]] = this_derivation_dict
-
-        list_of_derivations_that_use_this_inference_rule_id = []
-        for derivation_id, derivation_dict in new_temp_dict.items():
-            list_of_derivations_that_use_this_inference_rule_id.append(derivation_dict)
-
-        dict_of_derivations_used_per_inference_rule[this_inference_rule_dict["id"]] = (
-            list_of_derivations_that_use_this_inference_rule_id
-        )
-    return dict_of_derivations_used_per_inference_rule, query_time_dict
 
 
 def get_dict_of_steps_in_derivation(
