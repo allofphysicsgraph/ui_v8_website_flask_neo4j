@@ -75,7 +75,7 @@ def hash_of_file(filename_with_full_path: str) -> str:
     return hashed_file
 
 
-def make_string_safe_for_latex(unsafe_str: str) -> str:
+def _NOT_IN_USE_make_string_safe_for_latex(unsafe_str: str) -> str:
     """
     latex characters that require an escape for printing:
     # $ % & \ ^ _ { }
