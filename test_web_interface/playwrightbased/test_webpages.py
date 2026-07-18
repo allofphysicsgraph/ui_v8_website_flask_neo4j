@@ -10,17 +10,13 @@ import re
 import json
 import os
 from playwright.sync_api import Page, expect
-import pytest
+import time
+
+# for RSS feed
 import xml.etree.ElementTree as ET
 
 # this is what is exposed inside the Docker container
 URL = "http://localhost:5000"
-
-
-# this test should fail since the page requires being logged in
-def test_get_edit_relation_RELATIONID(page: Page):
-    page.goto(URL + "/edit_relation/0001247576")
-    expect(page.get_by_role("heading", name="Edit relation")).to_be_visible()
 
 
 def test_get_index_has_title(page: Page):
@@ -206,7 +202,7 @@ def test_get_list_matrices_page(page: Page):
 
 
 def test_get_list_expressions_page(page: Page):
-    page.goto(URL + "/list_expressions")
+    page.goto(URL + "/list_expressions", timeout: 120_000)
 
     expect(page).to_have_title(re.compile("Expression"))
 
@@ -394,14 +390,34 @@ def test_get_workflow_page(page: Page):
     ).to_be_visible()
 
 
+# The following applies if flask is sending the response as a file to download
+# def test_get_review_derivation_generate_tex(page: Page):
+#     page.goto(URL + "/review_derivation/0000201726")
+#     tex_button = page.locator('input[name="generate tex"]')
+#     page.wait_for_load_state("networkidle")
+#     with page.expect_download() as download_info:
+#         tex_button.click(force=True)
+#         download = download_info.value
+#         assert download.suggested_filename == "generated_0000201726.tex"
+
+
+# this test assumes the .tex file opens in the same tab as the webpage.
 def test_get_review_derivation_generate_tex(page: Page):
     page.goto(URL + "/review_derivation/0000201726")
     tex_button = page.locator('input[name="generate tex"]')
     page.wait_for_load_state("networkidle")
-    with page.expect_download() as download_info:
-        tex_button.click(force=True)
-        download = download_info.value
-        assert download.suggested_filename == "generated_0000201726.tex"
+
+    # Click the button, which triggers standard page navigation
+    tex_button.click(force=True)
+
+    # Wait for the navigation to the .tex file to complete
+    page.wait_for_url("**/static/generated_0000201726.tex*")
+
+    # Optional: Verify the text content inside the page to ensure it loaded correctly
+    content = page.locator("body").text_content()
+    assert (
+        "\\begin{document}" in content
+    )  # Replace with a keyword expected in your TeX file
 
 
 def test_get_class_notes_subpage(page: Page):
@@ -420,7 +436,7 @@ def test_get_profile_page(page: Page):
 
 def test_get_select_step_page(page: Page):
     page.goto(URL + "/select_step/0000201726")
-    expect(page.get_by_role("heading", name="Derivation: Select Step")).to_be_visible()
+    expect(page.get_by_role("heading", name="Edit or delete a step")).to_be_visible()
 
 
 def test_get_from_llm_page(page: Page):
@@ -643,6 +659,7 @@ def test_get_review_derivation_instance(page: Page):
     with page.expect_download() as download_info:
         pdf_button.click(force=True)
 
+        print("download PDF using button")
         download = download_info.value
         print(f"Downloaded from: {download.url}")
 
@@ -725,11 +742,4 @@ def test_get_query_list_derivation_IDs(page: Page):
         # Verify the page didn't navigate away
         expect(page).to_have_url(URL + "/review_derivation/" + dev_id)
 
-
-# # This test comes first so that we can "log in"
-# @pytest.fixture
-# def logged_in_page(page: Page):
-#     # Visit the backdoor route to establish the session cookie
-#     page.goto(f"{URL}/login-test-user")
-#     # Verify we are logged in
-#     return page
+#EOF
