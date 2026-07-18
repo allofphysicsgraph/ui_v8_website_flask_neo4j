@@ -395,23 +395,23 @@ def test_get_dict_of_node_dicts(mock_list_of_valid, mock_neo4j_query, mock_drive
     assert res["n2"]["node_type"] == "expression"
 
 
-@patch("webserver_for_pdg.library.compute.neo4j_query")
-def test_get_dict_of_derivations_used_per_inference_rule(mock_neo4j_query, mock_driver):
-    driver, session = mock_driver
+# @patch("webserver_for_pdg.library.compute.neo4j_query")
+# def test_get_dict_of_derivations_used_per_inference_rule(mock_neo4j_query, mock_driver):
+#     driver, session = mock_driver
 
-    session.read_transaction.side_effect = [
-        [
-            {"id": "deriv1", "name": "Derivation 1"},
-            {"id": "deriv2", "name": "Derivation 2"},
-        ],  # for rule1
-        [{"id": "deriv1", "name": "Derivation 1"}],  # for rule2
-    ]
+#     session.read_transaction.side_effect = [
+#         [
+#             {"id": "deriv1", "name": "Derivation 1"},
+#             {"id": "deriv2", "name": "Derivation 2"},
+#         ],  # for rule1
+#         [{"id": "deriv1", "name": "Derivation 1"}],  # for rule2
+#     ]
 
-    rules = [{"id": "rule1"}, {"id": "rule2"}]
+#     rules = [{"id": "rule1"}, {"id": "rule2"}]
 
-    res, q = get_dict_of_derivations_used_per_inference_rule(driver, {}, rules)
-    assert len(res["rule1"]) == 2
-    assert len(res["rule2"]) == 1
+#     res, q = get_dict_of_derivations_used_per_inference_rule(driver, {}, rules)
+#     assert len(res["rule1"]) == 2
+#     assert len(res["rule2"]) == 1
 
 
 @patch("webserver_for_pdg.library.compute.neo4j_query")
@@ -456,4 +456,4 @@ def test_remove_latex_presention_markings():
     assert "\\quad" not in cleaned
 
 
-#EOF
+# EOF

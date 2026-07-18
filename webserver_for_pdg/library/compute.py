@@ -1111,7 +1111,7 @@ def get_dict_of_node_dicts(
     return dict_of_all_node_dicts, query_time_dict
 
 
-def get_dict_of_derivations_used_per_inference_rule(
+def _NOT_IN_USE_get_dict_of_derivations_used_per_inference_rule(
     graphDB_Driver,
     query_time_dict: query_timing_result_type,
     list_of_inference_rule_dicts: list,

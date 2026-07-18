@@ -293,6 +293,39 @@ def get_user_stats(tx: Transaction, author: str):
 
 
 @trace_execution
+def get_inference_rules_with_derivations(tx: Transaction) -> List[Dict[str, Any]]:
+    """
+    Returns every inference_rule node together with the (deduplicated) list of
+    derivations that use it, in a single round trip.
+
+    Replaces the old pattern of: fetch all inference rules, then loop and run
+    get_derivations_that_use_inference_rule once per rule (N+1 queries).
+
+    Uses OPTIONAL MATCH so inference rules with zero derivations are still
+    included, with an empty derivations list - matching prior behavior where
+    every inference rule got an entry in the result dict.
+    """
+    query = """
+    MATCH (i:inference_rule)
+    OPTIONAL MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:HAS_INFERENCE_RULE]->(i)
+    WITH i, collect(DISTINCT d) AS derivation_nodes
+    RETURN i AS inference_rule,
+           [d IN derivation_nodes WHERE d IS NOT NULL] AS derivations
+    ORDER BY i.id
+    """
+    result = tx.run(query)
+    rows = []
+    for record in result:
+        rows.append(
+            {
+                "inference_rule": dict(record["inference_rule"]),
+                "derivations": [dict(d) for d in record["derivations"]],
+            }
+        )
+    return rows
+
+
+@trace_execution
 def get_list_of_input_expressions_used_in_step(
     tx: Transaction, step_id: str
 ) -> List[dict]:
@@ -869,7 +902,7 @@ def get_derivations_that_use_inference_rule(
     logger.info("inference_rule_id=" + inference_rule_id)
 
     query = """
-    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:USES_RULE]->(i:inference_rule)
+    MATCH (d:derivation)-[:HAS_STEP]->(:step)-[:HAS_INFERENCE_RULE]->(i:inference_rule)
     WHERE i.id = $rule_id
     RETURN d
     """
@@ -877,7 +910,7 @@ def get_derivations_that_use_inference_rule(
     result = tx.run(query, rule_id=inference_rule_id)
 
     # Use a list comprehension for a more Pythonic return
-    list_of_derivation_dicts = [record["d"] for record in result]
+    list_of_derivation_dicts = [dict(record["d"]) for record in result]
 
     return list_of_derivation_dicts
 

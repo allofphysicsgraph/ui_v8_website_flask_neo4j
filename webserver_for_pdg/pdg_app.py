@@ -6663,31 +6663,35 @@ def to_list_derivations() -> ResponseReturnValue:
 
 @web_app.route("/list_inference_rules")
 def to_list_inference_rules() -> ResponseReturnValue:
-    """
-    >>> to_show_all_inference_rules()
-    """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
 
+    # OLD, DEPRECATED: get list of inference rules from Neo4j
+    # with graphDB_Driver.session() as session, track_time(
+    #     query_time_dict, "pdg_app/to_list_inference_rules" + trace_id
+    # ):
+
+    #     list_of_inference_rules = session.read_transaction(
+    #         neo4j_query.get_nodes_of_type, "inference_rule"
+    #     )
+
+    # New: get inference rules and derivations from Neo4j
     with graphDB_Driver.session() as session, track_time(
         query_time_dict, "pdg_app/to_list_inference_rules" + trace_id
     ):
-
-        list_of_inference_rules = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "inference_rule"
+        rows = session.read_transaction(
+            neo4j_query.get_inference_rules_with_derivations
         )
 
-    dict_of_derivations_used_per_inference_rule, query_time_dict = (
-        compute.get_dict_of_derivations_used_per_inference_rule(
-            graphDB_Driver, query_time_dict, list_of_inference_rules
-        )
-    )
+    list_of_inference_rules = [row["inference_rule"] for row in rows]
+    dict_of_derivations_used_per_inference_rule = {
+        row["inference_rule"]["id"]: row["derivations"] for row in rows
+    }
 
     logger.info("inference rule list:")
     for inference_rule_dict in list_of_inference_rules:
         logger.info("to_list_inference_rules " + str(inference_rule_dict))
-
     logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/inference_rule_list.html",
