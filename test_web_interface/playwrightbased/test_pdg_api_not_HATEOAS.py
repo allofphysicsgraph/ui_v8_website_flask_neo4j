@@ -33,4 +33,5 @@ def test_sympy(page: Page):
         print("Canonical Form:", data["canonical"])
         print("Detected Variables:", data["variables"])
 
-#EOF
+
+# EOF
