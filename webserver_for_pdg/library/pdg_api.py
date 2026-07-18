@@ -87,7 +87,6 @@ logger = logging.getLogger(__name__)
 from . import neo4j_query
 
 # from . import compute
-# from . import latex
 from . import list_of_valid
 
 
