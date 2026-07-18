@@ -14,7 +14,7 @@ from playwright.sync_api import Playwright, APIRequestContext
 
 # The HATEOAS blueprint is registered under url_prefix='/api'
 # this is what is exposed inside the Docker container
-URL = os.environ.get("PDG_API_URL", "http://localhost:5000/api")
+URL = "http://localhost:5000/api"
 
 # Gemini 3.5 Flash suggested
 # URL = "https://host.docker.internal/api/"
