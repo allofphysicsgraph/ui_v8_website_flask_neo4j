@@ -2,6 +2,7 @@ logs/*.log
 logs/*.log.1
 logs/*.log.2
 logs/*.log.3
+temp_for_llm/*.py
 test_web_interface/playwrightbased/.coverage
 test_web_interface/playwrightbased/htmlcov/
 test_web_interface/playwrightbased/pytest_report.html
