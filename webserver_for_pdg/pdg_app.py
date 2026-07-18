@@ -1985,17 +1985,28 @@ def to_edit_derivation_metadata(
             if web_form_edit_derivation.validate():
                 # sanitize Latex
                 # TODO: notify user if what they submitted has been altered.
-                derivation_name_latex = latex.make_string_safe_for_latex(
-                    str(web_form_edit_derivation.derivation_name_latex.data).strip()
-                )
-                derivation_reference_latex = latex.make_string_safe_for_latex(
-                    str(
-                        web_form_edit_derivation.derivation_reference_latex.data
-                    ).strip()
-                )
-                abstract_latex = latex.make_string_safe_for_latex(
-                    str(web_form_edit_derivation.abstract_latex.data).strip()
-                )
+                # derivation_name_latex = latex.make_string_safe_for_latex(
+                #     str(web_form_edit_derivation.derivation_name_latex.data).strip()
+                # )
+                # derivation_reference_latex = latex.make_string_safe_for_latex(
+                #     str(
+                #         web_form_edit_derivation.derivation_reference_latex.data
+                #     ).strip()
+                # )
+                # abstract_latex = latex.make_string_safe_for_latex(
+                #     str(web_form_edit_derivation.abstract_latex.data).strip()
+                # )
+
+                derivation_name_latex = str(
+                    web_form_edit_derivation.derivation_name_latex.data
+                ).strip()
+                derivation_reference_latex = str(
+                    web_form_edit_derivation.derivation_reference_latex.data
+                ).strip()
+
+                abstract_latex = str(
+                    web_form_edit_derivation.abstract_latex.data
+                ).strip()
 
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/ " + trace_id
