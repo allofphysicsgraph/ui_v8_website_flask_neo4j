@@ -9,8 +9,6 @@ import logging
 import pytest
 from unittest.mock import MagicMock, patch
 
-# Remove these names so pytest does not try to collect them
-del test, doctest
 
 from webserver_for_pdg.library.compute import *
 
