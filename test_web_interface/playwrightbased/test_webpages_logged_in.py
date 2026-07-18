@@ -4,6 +4,7 @@ from playwright.sync_api import Page, expect
 
 URL = "http://localhost:5000"
 
+# See https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/107
 
 # This test comes first so that we can "log in"
 @pytest.fixture
