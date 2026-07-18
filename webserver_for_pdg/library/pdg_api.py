@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Physics Derivation Graph
-# Ben Payne, 2026
+# Ben Payne
 # http://creativecommons.org/licenses/by/4.0/
 # Attribution 4.0 International (CC BY 4.0)
 
@@ -43,6 +43,36 @@ When sending data via a `POST` or `PUT` request, two common formats (specified v
 - `application/json`
 - `application/x-www-form-urlencoded`
 
+<HR>
+
+API authentication use with Curl:
+```
+curl -X POST http://localhost:5000/api/resources/derivation \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "derivation_name_latex": "E = mc^2",
+    "derivation_abstract_latex": "Mass-energy equivalence derivation."
+  }'
+```
+
+API authentication using `requests` library:
+```
+import requests
+
+url = "http://localhost:5000/api/resources/derivation"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+payload = {
+    "derivation_name_latex": "E = mc^2",
+    "derivation_abstract_latex": "Mass-energy equivalence derivation."
+}
+
+response = requests.post(url, headers=headers, json=payload)
+print(response.json())
+```
 
 <HR>
 
@@ -88,6 +118,7 @@ from . import neo4j_query
 
 # from . import compute
 from . import list_of_valid
+from . import api_keys
 
 
 from .compute import query_timing_result_type
@@ -186,79 +217,6 @@ def hal_error(message, status, links=None, title="Error"):
     return resp
 
 
-def _load_configured_api_keys():
-    """Parse PDG_API_KEYS, a JSON array of records identifying each caller.
-
-    Expected shape:
-    PDG_API_KEYS='[
-        {"token": "long-random-string-1", "author_id": "ben", "author_name_latex": "Ben"},
-        {"token": "long-random-string-2", "author_id": "alice", "author_name_latex": "Alice"}
-    ]'
-
-    Falls back to the legacy single-key PDG_API_KEY var (attributed to
-    author_id "unknown") so existing deployments don't break on upgrade.
-    Returns a list of dicts, or [] if nothing is configured / the JSON is malformed.
-    """
-    raw = os.environ.get("PDG_API_KEYS")
-    if raw:
-        try:
-            records = json.loads(raw)
-        except json.JSONDecodeError as err:
-            logger.critical("PDG_API_KEYS is not valid JSON: " + str(err))
-            return []
-        valid_records = []
-        for record in records:
-            if (
-                not isinstance(record, dict)
-                or not record.get("token")
-                or not record.get("author_id")
-            ):
-                logger.critical(
-                    "Ignoring malformed PDG_API_KEYS entry (needs token + author_id): "
-                    + str(record)
-                )
-                continue
-            record.setdefault("author_name_latex", record["author_id"])
-            valid_records.append(record)
-        return valid_records
-    legacy_key = os.environ.get("PDG_API_KEY")
-    if legacy_key:
-        logger.warning(
-            "PDG_API_KEY is deprecated; migrate to PDG_API_KEYS with per-caller identities"
-        )
-        return [
-            {
-                "token": legacy_key,
-                "author_id": "unknown",
-                "author_name_latex": "unknown",
-            }
-        ]
-    return []
-
-
-def _extract_bearer_token(auth_header):
-    if not auth_header:
-        return None
-    parts = auth_header.split(None, 1)
-    if len(parts) != 2 or parts[0].lower() != "bearer":
-        return None
-    return parts[1].strip()
-
-
-def _match_caller(supplied_token, configured_keys):
-    """Constant-time-compare supplied_token against every configured token.
-
-    Checks every record rather than stopping at the first mismatch so the
-    response time doesn't leak which position in the list (if any) is close
-    to matching.
-    """
-    matched = None
-    for record in configured_keys:
-        if secrets.compare_digest(supplied_token, record["token"]):
-            matched = record
-    return matched
-
-
 def _stamp_last_modified(tx, node_type, node_id):
     """Record who last edited a node and when, using the same generic
     property-setter the editable_fields loops already rely on. Called only
@@ -299,7 +257,7 @@ def require_auth(view_func):
 
     @functools.wraps(view_func)
     def wrapped_view(*args, **kwargs):
-        configured_keys = _load_configured_api_keys()
+        configured_keys = api_keys.load_configured_api_keys()
         if not configured_keys:
             logger.critical(
                 "No API keys configured (PDG_API_KEYS); refusing write request"
@@ -311,9 +269,13 @@ def require_auth(view_func):
             )
             resp.headers["WWW-Authenticate"] = 'Bearer realm="pdg_api"'
             return resp
-        supplied_token = _extract_bearer_token(request.headers.get("Authorization"))
+        supplied_token = api_keys.extract_bearer_token(
+            request.headers.get("Authorization")
+        )
         caller = (
-            _match_caller(supplied_token, configured_keys) if supplied_token else None
+            api_keys.match_caller(supplied_token, configured_keys)
+            if supplied_token
+            else None
         )
         if caller is None:
             resp = hal_error(
