@@ -9,6 +9,7 @@
 import os
 import uuid
 import tokenize
+import neo4j
 
 from sympy.parsing.sympy_parser import parse_expr
 
@@ -26,6 +27,7 @@ logger = logging.getLogger(__name__)
 from .initialize_neo4j import graphDB_Driver
 from .compute import hash_of_string
 from . import neo4j_query
+from . import latex
 
 api_nohateoas_bp = Blueprint("pdg_api_not_HATEOAS", __name__, url_prefix="/api")
 
@@ -50,8 +52,19 @@ def api_sympy_check():
         return jsonify({"INVALID": str(err)})
 
     var_names = [str(s) for s in expr.free_symbols]
+    logger.info(str(var_names))
 
-    return jsonify({"canonical": str(expr.canonical), "variables": str(var_names)})
+    # SymPy does not define a `.canonical` attribute on standard algebraic
+    # expression classes (such as Add, Mul, Pow, or Symbol)
+    # In SymPy, only Relational objects (such as equations or inequalities
+    # like `x < y`) feature a `.canonical` property (used to reorder the
+    # sides of an inequality or move terms to a preferred side).
+    # For standard algebraic expressions like Add, SymPy automatically
+    # applies basic canonicalization and ordering during construction,
+    # meaning the parsed expr itself is already in its default canonical form.
+    canonical_str = str(expr.canonical) if hasattr(expr, "canonical") else str(expr)
+
+    return jsonify({"canonical": canonical_str, "variables": str(var_names)})
 
 
 @api_nohateoas_bp.route("/resources/png_from_latex", methods=["GET", "POST"])
