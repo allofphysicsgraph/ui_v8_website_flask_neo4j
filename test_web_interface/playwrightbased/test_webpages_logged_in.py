@@ -17,3 +17,6 @@ def logged_in_page(page: Page):
 def test_get_edit_relation_RELATIONID(page: Page):
     page.goto(f"{URL}/edit_relation/0001247576")
     expect(page.get_by_role("heading", name="Edit relation")).to_be_visible()
+
+
+#EOF

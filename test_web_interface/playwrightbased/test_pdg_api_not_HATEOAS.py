@@ -32,3 +32,5 @@ def test_sympy(page: Page):
         assert "variables" in data
         print("Canonical Form:", data["canonical"])
         print("Detected Variables:", data["variables"])
+
+#EOF
