@@ -125,7 +125,7 @@
 
         <!-- Middle: Links -->
         <div class="column">
-            <h2 class="column-title">Transitions (_links)</h2>
+            <h2 class="column-title">Transitions (_links / _templates)</h2>
             <div id="links-container">
                 <p>No transition links available.</p>
             </div>
@@ -147,7 +147,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const startingUrl = document.getElementById('input-url').value;
-            navigateTo(startingUrl, true);
+            navigateTo(startingUrl, { isInitial: true });
 
             document.getElementById('btn-go').addEventListener('click', () => {
                 navigateTo(document.getElementById('input-url').value);
@@ -162,19 +162,26 @@
             document.getElementById('btn-back').addEventListener('click', () => {
                 if (historyIndex > 0) {
                     historyIndex--;
-                    navigateTo(historyStack[historyIndex], false, true);
+                    navigateTo(historyStack[historyIndex], { isHistoryNav: true });
                 }
             });
 
             document.getElementById('btn-forward').addEventListener('click', () => {
                 if (historyIndex < historyStack.length - 1) {
                     historyIndex++;
-                    navigateTo(historyStack[historyIndex], false, true);
+                    navigateTo(historyStack[historyIndex], { isHistoryNav: true });
                 }
             });
         });
 
-        async function navigateTo(url, isInitial = false, isHistoryNav = false) {
+        // Core navigation/action function. Every transition in this explorer -- whether it's
+        // just following a GET link or submitting an edit/delete -- goes through here, and the
+        // HTTP method actually used is always whatever the API told us to use (link.method /
+        // template.method), never assumed to be GET. This was the root cause of the 405 errors:
+        // the previous version always called fetch(url, { headers }) with no method, so every
+        // click -- including ones meant to POST an edit or DELETE a record -- sent a GET.
+        async function navigateTo(url, options = {}) {
+            const { method = 'GET', body = null, isHistoryNav = false } = options;
             if (!url) return;
 
             showLoading();
@@ -189,30 +196,48 @@
                 headers.append('Authorization', authToken);
             }
 
+            const fetchInit = { method, headers };
+            if (body !== null) {
+                headers.append('Content-Type', 'application/json');
+                fetchInit.body = JSON.stringify(body);
+            }
+
             try {
-                const response = await fetch(url, { headers });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
+                const response = await fetch(url, fetchInit);
 
                 const contentType = response.headers.get('content-type') || '';
-                if (!contentType.includes('json')) {
+                const data = contentType.includes('json') ? await response.json() : null;
+
+                if (!response.ok) {
+                    // hal_error() responses carry a 'detail' (and 'title'); surface that instead
+                    // of just the generic status text when we have it.
+                    const apiDetail = data && (data.detail || data.title);
+                    const message = apiDetail
+                        ? `HTTP ${response.status}: ${apiDetail}`
+                        : `HTTP ${response.status}: ${response.statusText}`;
+                    throw new Error(message);
+                }
+
+                if (!data) {
                     throw new Error('Response is not application/json or application/hal+json');
                 }
 
-                const data = await response.json();
-                
-                if (!isHistoryNav) {
-                    if (historyIndex < historyStack.length - 1) {
-                        historyStack = historyStack.slice(0, historyIndex + 1);
+                // Only GET navigations are "pages" that belong on the back/forward stack and in
+                // the URL bar. POST/DELETE actions are commands -- we render whatever the API
+                // sends back (e.g. "successfully deleted ...") without pretending it's a new
+                // page you browsed to.
+                if (method === 'GET') {
+                    if (!isHistoryNav) {
+                        if (historyIndex < historyStack.length - 1) {
+                            historyStack = historyStack.slice(0, historyIndex + 1);
+                        }
+                        historyStack.push(url);
+                        historyIndex = historyStack.length - 1;
                     }
-                    historyStack.push(url);
-                    historyIndex = historyStack.length - 1;
+                    updateHistoryButtons();
+                    document.getElementById('input-url').value = url;
                 }
-                updateHistoryButtons();
 
-                document.getElementById('input-url').value = url;
                 renderResource(data);
 
             } catch (err) {
@@ -227,12 +252,44 @@
             document.getElementById('btn-forward').disabled = historyIndex >= historyStack.length - 1;
         }
 
+        // Escape a value for placement in ordinary HTML text/attribute content (table cells,
+        // <pre> blocks, labels). LaTeX payloads routinely contain & < > " \, so this matters.
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Escape a value for safe embedding inside a single-quoted JS string literal that
+        // itself lives inside an HTML onclick="..." attribute (double-quoted). Order matters:
+        // escape & first so later entities aren't double-escaped.
+        function attrSafe(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'")
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function methodBadge(method) {
+            const m = (method || 'GET').toUpperCase();
+            const colors = { GET: '#2196f3', POST: '#4caf50', DELETE: '#c62828', PUT: '#ff9800', PATCH: '#ff9800' };
+            const color = colors[m] || '#666';
+            return `<span style="background-color: ${color}; color: #fff; font-size: 10px; padding: 2px 5px; border-radius: 3px; margin-left: 6px;">${m}</span>`;
+        }
+
         function renderResource(data) {
             const propertiesContainer = document.getElementById('properties-container');
             const linksContainer = document.getElementById('links-container');
             const embeddedContainer = document.getElementById('embedded-container');
 
-            const { _links, _embedded, ...properties } = data;
+            const { _links, _embedded, _templates, ...properties } = data;
+            const selfHref = (_links && _links.self && _links.self.href) || document.getElementById('input-url').value;
 
             // 1. Render Properties Panel
             if (Object.keys(properties).length === 0) {
@@ -245,66 +302,46 @@
                     <tbody>`;
                 for (const [key, val] of Object.entries(properties)) {
                     const displayValue = typeof val === 'object' ? JSON.stringify(val) : val;
-                    tableHtml += `<tr><td><strong>${key}</strong></td><td>${displayValue}</td></tr>`;
+                    tableHtml += `<tr><td><strong>${escapeHtml(key)}</strong></td><td>${escapeHtml(displayValue)}</td></tr>`;
                 }
                 tableHtml += `</tbody></table>`;
-                
+
                 tableHtml += `
                     <details>
                         <summary>Raw JSON State</summary>
-                        <pre>${JSON.stringify(properties, null, 2)}</pre>
+                        <pre>${escapeHtml(JSON.stringify(properties, null, 2))}</pre>
                     </details>
                 `;
                 propertiesContainer.innerHTML = tableHtml;
             }
 
-            // 2. Render Links Panel
-            if (!_links || Object.keys(_links).length === 0) {
-                linksContainer.innerHTML = `<p>No transition links found.</p>`;
+            // 2. Render Transitions Panel: both _links (HAL links) and _templates (HAL-FORMS).
+            // The previous version only ever looked at _links, so any resource that exposes its
+            // actions via _templates -- which is exactly how expressions, derivations, and
+            // inference_rules expose "edit" and "delete" -- had no button rendered for them at
+            // all. Symbol resources (operation/relation/scalar/vector/matrix) use _links with an
+            // explicit method instead; both shapes are handled here now.
+            const hasLinks = _links && Object.keys(_links).length > 0;
+            const hasTemplates = _templates && Object.keys(_templates).length > 0;
+
+            if (!hasLinks && !hasTemplates) {
+                linksContainer.innerHTML = `<p>No transition links or forms available.</p>`;
             } else {
                 linksContainer.innerHTML = '';
-                
-                for (const [rel, linkObj] of Object.entries(_links)) {
-                    const links = Array.isArray(linkObj) ? linkObj : [linkObj];
-                    
-                    links.forEach((link, index) => {
-                        const linkCard = document.createElement('div');
-                        linkCard.className = 'card';
 
-                        const relText = Array.isArray(linkObj) ? `${rel} [${index}]` : rel;
-                        const titleText = link.title ? ` (${link.title})` : '';
+                if (hasLinks) {
+                    for (const [rel, linkObj] of Object.entries(_links)) {
+                        const links = Array.isArray(linkObj) ? linkObj : [linkObj];
+                        links.forEach((link, index) => {
+                            linksContainer.appendChild(buildLinkCard(rel, link, Array.isArray(linkObj) ? index : null));
+                        });
+                    }
+                }
 
-                        let innerContent = `
-                            <div>
-                                <strong>Relation:</strong> ${relText}${titleText}
-                                ${link.templated ? ' <span style="background-color: #ffeb3b; padding: 2px; font-size: 11px;">TEMPLATED</span>' : ''}
-                            </div>
-                            <div style="font-size: 12px; color: #555; word-break: break-all; margin: 4px 0;"><strong>HREF:</strong> ${link.href}</div>
-                        `;
-
-                        if (link.templated) {
-                            const params = getTemplateVariables(link.href);
-                            innerContent += `
-                                <form style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 8px;" onsubmit="handleTemplateSubmit(event, '${link.href}')">
-                                    <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px;">Fill Parameters:</div>
-                                    ${params.map(p => `
-                                        <div style="margin-bottom: 4px;">
-                                            <label style="font-size: 11px;">${p}: </label>
-                                            <input required type="text" name="${p}" style="font-size: 11px; padding: 2px;" />
-                                        </div>
-                                    `).join('')}
-                                    <button type="submit" style="font-size: 11px; margin-top: 4px;">Submit &rarr;</button>
-                                </form>
-                            `;
-                        } else {
-                            innerContent += `
-                                <button onclick="navigateTo('${link.href}')" style="margin-top: 6px;">Follow Link &rarr;</button>
-                            `;
-                        }
-
-                        linkCard.innerHTML = innerContent;
-                        linksContainer.appendChild(linkCard);
-                    });
+                if (hasTemplates) {
+                    for (const [rel, template] of Object.entries(_templates)) {
+                        linksContainer.appendChild(buildTemplateCard(rel, template, selfHref));
+                    }
                 }
             }
 
@@ -313,37 +350,215 @@
                 embeddedContainer.innerHTML = `<p>No inline embedded resources found.</p>`;
             } else {
                 embeddedContainer.innerHTML = '';
-                
+
                 for (const [rel, embedVal] of Object.entries(_embedded)) {
                     const embeds = Array.isArray(embedVal) ? embedVal : [embedVal];
-                    
+
                     const relSection = document.createElement('div');
-                    relSection.innerHTML = `<h3 style="border-bottom: 1px dashed #000; margin-top: 15px;">Relation: ${rel} (${embeds.length})</h3>`;
-                    
+                    relSection.innerHTML = `<h3 style="border-bottom: 1px dashed #000; margin-top: 15px;">Relation: ${escapeHtml(rel)} (${embeds.length})</h3>`;
+
                     embeds.forEach((resource, index) => {
                         const embedCard = document.createElement('div');
                         embedCard.className = 'card';
-                        
-                        const selfHref = resource._links && resource._links.self ? resource._links.self.href : null;
+
+                        const itemSelfHref = resource._links && resource._links.self ? resource._links.self.href : null;
                         const displayName = resource.name || resource.title || resource.id || `Item #${index + 1}`;
-                        
+
                         let cardContent = `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <strong>${displayName}</strong>
-                                ${selfHref ? `<button onclick="navigateTo('${selfHref}')" style="font-size: 11px;">Inspect &rarr;</button>` : ''}
+                                <strong>${escapeHtml(displayName)}</strong>
+                                ${itemSelfHref ? `<button onclick="navigateTo('${attrSafe(itemSelfHref)}')" style="font-size: 11px;">Inspect &rarr;</button>` : ''}
                             </div>
                         `;
-                        
-                        const { _links: el, _embedded: ee, ...embedProps } = resource;
-                        cardContent += `<pre style="font-size: 11px; margin: 0;">${JSON.stringify(embedProps, null, 2)}</pre>`;
-                        
+
+                        const { _links: el, _embedded: ee, _templates: et, ...embedProps } = resource;
+                        cardContent += `<pre style="font-size: 11px; margin: 0;">${escapeHtml(JSON.stringify(embedProps, null, 2))}</pre>`;
+
                         embedCard.innerHTML = cardContent;
+
+                        // Inline actions (edit/delete/etc.) so the user doesn't have to Inspect
+                        // first: render any non-self _links and any _templates that came
+                        // embedded with this item, same as the top-level panel does.
+                        const actionsWrap = document.createElement('div');
+                        actionsWrap.style.marginTop = '8px';
+                        actionsWrap.style.borderTop = '1px dashed #ccc';
+                        actionsWrap.style.paddingTop = '8px';
+                        let hasActions = false;
+
+                        if (el) {
+                            for (const [rel2, linkObj2] of Object.entries(el)) {
+                                if (rel2 === 'self') continue;
+                                const links2 = Array.isArray(linkObj2) ? linkObj2 : [linkObj2];
+                                links2.forEach((link2, idx2) => {
+                                    actionsWrap.appendChild(buildLinkCard(rel2, link2, Array.isArray(linkObj2) ? idx2 : null));
+                                    hasActions = true;
+                                });
+                            }
+                        }
+                        if (et) {
+                            const itemTarget = itemSelfHref || selfHref;
+                            for (const [rel2, template2] of Object.entries(et)) {
+                                actionsWrap.appendChild(buildTemplateCard(rel2, template2, itemTarget));
+                                hasActions = true;
+                            }
+                        }
+                        if (hasActions) {
+                            embedCard.appendChild(actionsWrap);
+                        }
+
                         relSection.appendChild(embedCard);
                     });
-                    
+
                     embeddedContainer.appendChild(relSection);
                 }
             }
+        }
+
+        // Builds a card for one _links entry. GET links behave as before ("Follow Link").
+        // DELETE links get a confirm-then-delete button. POST/PUT/PATCH links that carry no
+        // field definitions (this API's symbol-type "edit" links are like this -- they give a
+        // href + method but no _templates properties to build a form from) are still sendable,
+        // but flagged, since submitting them with no body just re-saves existing values.
+        function buildLinkCard(rel, link, indexLabel) {
+            const linkCard = document.createElement('div');
+            linkCard.className = 'card';
+
+            const relText = indexLabel !== null ? `${rel} [${indexLabel}]` : rel;
+            const titleText = link.title ? ` (${link.title})` : '';
+            const method = (link.method || 'GET').toUpperCase();
+
+            let innerContent = `
+                <div>
+                    <strong>Relation:</strong> ${escapeHtml(relText)}${escapeHtml(titleText)}
+                    ${methodBadge(method)}
+                    ${link.templated ? ' <span style="background-color: #ffeb3b; padding: 2px; font-size: 11px;">TEMPLATED</span>' : ''}
+                </div>
+                <div style="font-size: 12px; color: #555; word-break: break-all; margin: 4px 0;"><strong>HREF:</strong> ${escapeHtml(link.href)}</div>
+            `;
+
+            if (link.templated) {
+                const params = getTemplateVariables(link.href);
+                innerContent += `
+                    <form style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 8px;" onsubmit="handleTemplateSubmit(event, '${attrSafe(link.href)}', '${method}')">
+                        <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px;">Fill Parameters:</div>
+                        ${params.map(p => `
+                            <div style="margin-bottom: 4px;">
+                                <label style="font-size: 11px;">${escapeHtml(p)}: </label>
+                                <input required type="text" name="${escapeHtml(p)}" style="font-size: 11px; padding: 2px;" />
+                            </div>
+                        `).join('')}
+                        <button type="submit" style="font-size: 11px; margin-top: 4px;">Submit &rarr;</button>
+                    </form>
+                `;
+            } else if (method === 'DELETE') {
+                innerContent += `
+                    <button onclick="handleDeleteClick('${attrSafe(link.href)}', '${attrSafe(link.title || rel)}')" style="margin-top: 6px; color: #b00;">Delete &rarr;</button>
+                `;
+            } else if (method === 'GET') {
+                innerContent += `
+                    <button onclick="navigateTo('${attrSafe(link.href)}')" style="margin-top: 6px;">Follow Link &rarr;</button>
+                `;
+            } else {
+                innerContent += `
+                    <button onclick="handleBareActionClick('${attrSafe(link.href)}', '${method}')" style="margin-top: 6px;">Submit ${method} (no field data provided by API) &rarr;</button>
+                `;
+            }
+
+            linkCard.innerHTML = innerContent;
+            return linkCard;
+        }
+
+        // Builds a card for one _templates (HAL-FORMS) entry: a real input form built from
+        // template.properties, or a plain confirm-then-submit button when there are no
+        // properties (e.g. a "delete" template). Submits to targetHref (the resource's own
+        // self href, per HAL-FORMS convention, since these templates carry no href of their own).
+        function buildTemplateCard(rel, template, targetHref) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const method = (template.method || 'POST').toUpperCase();
+            const titleText = template.title ? ` (${template.title})` : '';
+            const properties = template.properties || [];
+
+            let inner = `
+                <div>
+                    <strong>Form:</strong> ${escapeHtml(rel)}${escapeHtml(titleText)}
+                    ${methodBadge(method)}
+                </div>
+                <div style="font-size: 12px; color: #555; word-break: break-all; margin: 4px 0;"><strong>TARGET:</strong> ${escapeHtml(targetHref)}</div>
+            `;
+
+            if (properties.length === 0) {
+                if (method === 'DELETE') {
+                    inner += `<button onclick="handleDeleteClick('${attrSafe(targetHref)}', '${attrSafe(template.title || rel)}')" style="margin-top: 6px; color: #b00;">Delete &rarr;</button>`;
+                } else {
+                    inner += `<button onclick="handleBareActionClick('${attrSafe(targetHref)}', '${method}')" style="margin-top: 6px;">Submit ${method} &rarr;</button>`;
+                }
+            } else {
+                const formId = 'tpl-' + Math.random().toString(36).slice(2);
+                inner += `<form id="${formId}" style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 8px;">`;
+                properties.forEach(prop => {
+                    inner += renderTemplateField(prop);
+                });
+                inner += `<button type="button" onclick="handleTemplateFormSubmit('${formId}', '${attrSafe(targetHref)}', '${method}')" style="font-size: 11px; margin-top: 6px;">Submit ${method} &rarr;</button>`;
+                inner += `</form>`;
+            }
+
+            card.innerHTML = inner;
+            return card;
+        }
+
+        // Renders one HAL-FORMS property as a labeled <input> or <select>. Handles the
+        // 'options.inline' shape from hal_property() defensively: entries may be plain strings
+        // (as several call sites in pdg_api.py pass, e.g. ['variable', 'constant']) or objects
+        // keyed by promptField/valueField -- both are supported without guessing wrong.
+        function renderTemplateField(prop) {
+            const label = prop.prompt || prop.name;
+            const requiredAttr = prop.required ? 'required' : '';
+            const readOnlyAttr = prop.readOnly ? 'disabled' : '';
+            const currentValue = (prop.value !== undefined && prop.value !== null) ? String(prop.value) : '';
+
+            let fieldHtml;
+            if (prop.options && Array.isArray(prop.options.inline)) {
+                const promptField = prop.options.promptField || 'prompt';
+                const valueField = prop.options.valueField || 'value';
+                const optionsHtml = prop.options.inline.map(opt => {
+                    const isObj = typeof opt === 'object' && opt !== null;
+                    const optValue = isObj ? opt[valueField] : opt;
+                    const optLabel = isObj ? (opt[promptField] ?? opt[valueField]) : opt;
+                    const selected = String(optValue) === currentValue ? 'selected' : '';
+                    return `<option value="${escapeHtml(optValue)}" ${selected}>${escapeHtml(optLabel)}</option>`;
+                }).join('');
+                fieldHtml = `<select name="${escapeHtml(prop.name)}" ${requiredAttr} ${readOnlyAttr} style="font-size: 11px; padding: 2px;">${optionsHtml}</select>`;
+            } else {
+                const inputType = prop.type === 'number' ? 'number' : 'text';
+                fieldHtml = `<input type="${inputType}" name="${escapeHtml(prop.name)}" value="${escapeHtml(currentValue)}" ${requiredAttr} ${readOnlyAttr} style="font-size: 11px; padding: 2px; width: 220px;" />`;
+            }
+
+            return `
+                <div style="margin-bottom: 6px;">
+                    <label style="font-size: 11px; display: block;">${escapeHtml(label)}${prop.required ? ' *' : ''}: </label>
+                    ${fieldHtml}
+                </div>
+            `;
+        }
+
+        function handleTemplateFormSubmit(formId, targetHref, method) {
+            const form = document.getElementById(formId);
+            if (!form.reportValidity()) return;
+            const formData = new FormData(form);
+            const values = {};
+            formData.forEach((val, key) => { values[key] = val; });
+            navigateTo(targetHref, { method, body: values });
+        }
+
+        function handleDeleteClick(href, label) {
+            if (!confirm(`Delete ${label}? This cannot be undone.`)) return;
+            navigateTo(href, { method: 'DELETE' });
+        }
+
+        function handleBareActionClick(href, method) {
+            if (!confirm(`Send ${method} to ${href} with no field data?\n\nThe API exposed this as a plain _links entry with no accompanying _templates properties, so there's nothing to build a form from -- this will just resubmit existing values.`)) return;
+            navigateTo(href, { method });
         }
 
         function getTemplateVariables(href) {
@@ -359,7 +574,7 @@
             return variables;
         }
 
-        function handleTemplateSubmit(event, hrefTemplate) {
+        function handleTemplateSubmit(event, hrefTemplate, method) {
             event.preventDefault();
             const form = event.target;
             const formData = new FormData(form);
@@ -368,7 +583,7 @@
 
             let resolvedUrl = hrefTemplate;
             const matches = hrefTemplate.match(/\{([^}]+)\}/g) || [];
-            
+
             matches.forEach(m => {
                 let inner = m.slice(1, -1);
                 if (inner.startsWith('?') || inner.startsWith('&')) {
@@ -377,7 +592,7 @@
                     const activeQueries = vars
                         .filter(v => values[v] !== undefined && values[v] !== '')
                         .map(v => `${v}=${encodeURIComponent(values[v])}`);
-                    
+
                     if (activeQueries.length > 0) {
                         resolvedUrl = resolvedUrl.replace(m, prefix + activeQueries.join('&'));
                     } else {
@@ -391,7 +606,7 @@
                 }
             });
 
-            navigateTo(resolvedUrl);
+            navigateTo(resolvedUrl, { method: method || 'GET' });
         }
 
         function showLoading() {
