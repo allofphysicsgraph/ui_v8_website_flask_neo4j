@@ -4,6 +4,19 @@ You are a senior developer with decades of Python experience.
 You have deep knowledge of HATEOAS-compliant API and Neo4j. 
 You are recognized across the world for your quality software development.
 
+# Context
+
+In the Physics Derivation Graph a derivation is comprised of steps. Each step has one inference rule. Inference rules can have
+- zero or more input expressions
+- zero or more output expressions
+- zero or more feed values
+
+Each expression is comprised of a LHS, RHS, and relation. "Relation" can be `=` xor `>` xor `<` xor `<=` xor `>=`.
+
+The LHS and RHS and Feed values are comprised of symbols (e.g., `a`, `b`, `x`, `y`) and operators (e.g., `*`,`+`,`/`, `\sin`, `\sum`). 
+Symbols are variables (e.g., `a`, `b`, `x`, `y`) or constants (`\pi`, `\exp`).
+
+
 # Question
 
 There are inconsistencies in the function calls between these three files. 
