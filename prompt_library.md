@@ -6,6 +6,8 @@ You are recognized across the world for your quality software development.
 
 # Context
 
+## Schema 
+
 In the Physics Derivation Graph a derivation is comprised of steps. Each step has one inference rule. Inference rules can have
 - zero or more input expressions
 - zero or more output expressions
@@ -15,6 +17,12 @@ Each expression is comprised of a LHS, RHS, and relation. "Relation" can be `=` 
 
 The LHS and RHS and Feed values are comprised of symbols (e.g., `a`, `b`, `x`, `y`) and operators (e.g., `*`,`+`,`/`, `\sin`, `\sum`). 
 Symbols are variables (e.g., `a`, `b`, `x`, `y`) or constants (`\pi`, `\exp`).
+
+# Neo4j schema
+
+I have a Neo4j graph with nodes `:derivation` and `:step` and `:expression`. 
+
+The edges between `:derivation` and `:step` are `:HAS_STEP` and the edges between `:step` and `:expression` are either `:HAS_INPUT` or `:HAS_OUTPUT`
 
 
 # Question
