@@ -55,6 +55,8 @@ highlights from ui_v8: <https://github.com/orgs/allofphysicsgraph/projects/4>
 
 The following is unordered
 
+- Lean: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/32
+
 - log file analysis: https://github.com/allofphysicsgraph/task-tracker/issues/41
 
 - GOAL: better coverage; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138
