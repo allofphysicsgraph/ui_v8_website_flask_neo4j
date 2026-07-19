@@ -166,6 +166,17 @@ MATCH (n) WHERE n.id IS NOT NULL WITH n.id AS propertyId, collect(n) AS nodes, c
     <td></td>
   </tr>
   <tr>
+    <td id="expressions not connected to derivation">expressions not connected to derivation
+      <a href="#expressions not connected to derivation">#</a></td>
+    <td><a href="{{ url_for('to_query') }}?cypher=MATCH (e:expression) WHERE NOT EXISTS {   MATCH (:derivation)-[:HAS_STEP]->(:step)-[:HAS_INPUT|:HAS_OUTPUT]-(e) } RETURN e AS orphanedExpressions">
+MATCH (e:expression) 
+WHERE NOT EXISTS {
+  MATCH (:derivation)-[:HAS_STEP]->(:step)-[:HAS_INPUT|:HAS_OUTPUT]-(e)
+} 
+RETURN e AS orphanedExpressions</a></td>
+    <td></td>
+  </tr>
+  <tr>
     <td id="all distinct node labels and the unique property keys used within each label">
             all distinct node labels and the unique property keys used within each label.
             <a href="#all distinct node labels and the unique property keys used within each label">#</a></td>
