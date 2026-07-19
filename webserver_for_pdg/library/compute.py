@@ -1111,8 +1111,6 @@ def get_dict_of_node_dicts(
     return dict_of_all_node_dicts, query_time_dict
 
 
-
-
 def get_dict_of_steps_in_derivation(
     graphDB_Driver,
     derivation_id: unique_numeric_id_as_str,
