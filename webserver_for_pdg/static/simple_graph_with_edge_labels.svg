@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="533pt" height="572pt" viewBox="0.00 0.00 533.00 572.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 568)">
+<title>G</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-568 528.52,-568 528.52,4 -4,4"/>
+<!-- declare_initial_a_eq_b -->
+<g id="node1" class="node">
+<title>declare_initial_a_eq_b</title>
+<polygon fill="none" stroke="black" points="155.95,-458.4 0,-458.4 0,-422.4 155.95,-422.4 155.95,-458.4"/>
+<text xml:space="preserve" text-anchor="middle" x="77.97" y="-436.2" font-family="Times,serif" font-size="14.00">declare initial expression</text>
+</g>
+<!-- a_eq_b -->
+<g id="node2" class="node">
+<title>a_eq_b</title>
+<ellipse fill="none" stroke="black" cx="118.97" cy="-334.8" rx="30.43" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="118.97" y="-330.6" font-family="Times,serif" font-size="14.00">a = b</text>
+</g>
+<!-- declare_initial_a_eq_b&#45;&gt;a_eq_b -->
+<g id="edge1" class="edge">
+<title>declare_initial_a_eq_b-&gt;a_eq_b</title>
+<path fill="none" stroke="black" d="M84.74,-422.29C91.1,-406.23 100.72,-381.92 108.15,-363.16"/>
+<polygon fill="black" stroke="black" points="111.35,-364.58 111.77,-354 104.84,-362.01 111.35,-364.58"/>
+<text xml:space="preserve" text-anchor="middle" x="151.6" y="-391.8" font-family="Times,serif" font-size="14.00">:HAS_OUTPUT</text>
+<text xml:space="preserve" text-anchor="middle" x="151.6" y="-375" font-family="Times,serif" font-size="14.00">expr_index=1</text>
+</g>
+<!-- LHS_eq_RHS -->
+<g id="node5" class="node">
+<title>LHS_eq_RHS</title>
+<polygon fill="none" stroke="black" points="317.26,-247.2 232.68,-247.2 232.68,-211.2 317.26,-211.2 317.26,-247.2"/>
+<text xml:space="preserve" text-anchor="middle" x="274.97" y="-225" font-family="Times,serif" font-size="14.00">LHS = RHS</text>
+</g>
+<!-- a_eq_b&#45;&gt;LHS_eq_RHS -->
+<g id="edge3" class="edge">
+<title>a_eq_b-&gt;LHS_eq_RHS</title>
+<path fill="none" stroke="black" d="M127.96,-317.12C137.11,-301.62 152.65,-278.93 171.86,-265.2 186.49,-254.74 204.49,-247.22 221.34,-241.9"/>
+<polygon fill="black" stroke="black" points="222.13,-245.31 230.74,-239.14 220.16,-238.6 222.13,-245.31"/>
+<text xml:space="preserve" text-anchor="middle" x="211.91" y="-286.2" font-family="Times,serif" font-size="14.00">:HAS_INPUT</text>
+<text xml:space="preserve" text-anchor="middle" x="211.91" y="-269.4" font-family="Times,serif" font-size="14.00">expr_index=1</text>
+</g>
+<!-- declare_initial_b_eq_c -->
+<g id="node3" class="node">
+<title>declare_initial_b_eq_c</title>
+<polygon fill="none" stroke="black" points="329.95,-458.4 174,-458.4 174,-422.4 329.95,-422.4 329.95,-458.4"/>
+<text xml:space="preserve" text-anchor="middle" x="251.97" y="-436.2" font-family="Times,serif" font-size="14.00">declare initial expression</text>
+</g>
+<!-- b_eq_c -->
+<g id="node4" class="node">
+<title>b_eq_c</title>
+<ellipse fill="none" stroke="black" cx="246.97" cy="-334.8" rx="30.43" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="246.97" y="-330.6" font-family="Times,serif" font-size="14.00">b = c</text>
+</g>
+<!-- declare_initial_b_eq_c&#45;&gt;b_eq_c -->
+<g id="edge2" class="edge">
+<title>declare_initial_b_eq_c-&gt;b_eq_c</title>
+<path fill="none" stroke="black" d="M245.95,-422.16C244.27,-416.57 242.69,-410.29 241.86,-404.4 239.99,-391.23 240.72,-376.53 242.13,-364.13"/>
+<polygon fill="black" stroke="black" points="245.55,-364.95 243.44,-354.56 238.62,-364 245.55,-364.95"/>
+<text xml:space="preserve" text-anchor="middle" x="288.91" y="-391.8" font-family="Times,serif" font-size="14.00">:HAS_OUTPUT</text>
+<text xml:space="preserve" text-anchor="middle" x="288.91" y="-375" font-family="Times,serif" font-size="14.00">expr_index=1</text>
+</g>
+<!-- b_eq_c&#45;&gt;LHS_eq_RHS -->
+<g id="edge6" class="edge">
+<title>b_eq_c-&gt;LHS_eq_RHS</title>
+<path fill="none" stroke="black" d="M250.89,-316.52C254.13,-302.6 258.97,-282.56 263.86,-265.2 264.46,-263.04 265.12,-260.81 265.79,-258.57"/>
+<polygon fill="black" stroke="black" points="269.13,-259.61 268.75,-249.02 262.44,-257.53 269.13,-259.61"/>
+<text xml:space="preserve" text-anchor="middle" x="303.91" y="-286.2" font-family="Times,serif" font-size="14.00">:HAS_INPUT</text>
+<text xml:space="preserve" text-anchor="middle" x="303.91" y="-269.4" font-family="Times,serif" font-size="14.00">expr_index=1</text>
+</g>
+<!-- a_eq_c -->
+<g id="node6" class="node">
+<title>a_eq_c</title>
+<ellipse fill="none" stroke="black" cx="343.97" cy="-123.6" rx="29.88" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="343.97" y="-119.4" font-family="Times,serif" font-size="14.00">a = c</text>
+</g>
+<!-- LHS_eq_RHS&#45;&gt;a_eq_c -->
+<g id="edge4" class="edge">
+<title>LHS_eq_RHS-&gt;a_eq_c</title>
+<path fill="none" stroke="black" d="M286.37,-211.09C297.4,-194.53 314.26,-169.21 326.9,-150.24"/>
+<polygon fill="black" stroke="black" points="329.77,-152.23 332.4,-141.97 323.95,-148.35 329.77,-152.23"/>
+<text xml:space="preserve" text-anchor="middle" x="366.74" y="-180.6" font-family="Times,serif" font-size="14.00">:HAS_OUTPUT</text>
+<text xml:space="preserve" text-anchor="middle" x="366.74" y="-163.8" font-family="Times,serif" font-size="14.00">expr_index=1</text>
+</g>
+<!-- declare_final -->
+<g id="node7" class="node">
+<title>declare_final</title>
+<polygon fill="none" stroke="black" points="472.44,-36 323.5,-36 323.5,0 472.44,0 472.44,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="397.97" y="-13.8" font-family="Times,serif" font-size="14.00">declare final expression</text>
+</g>
+<!-- a_eq_c&#45;&gt;declare_final -->
+<g id="edge5" class="edge">
+<title>a_eq_c-&gt;declare_final</title>
+<path fill="none" stroke="black" d="M343.38,-105.12C343.64,-90.53 345.82,-69.67 354.86,-54 356.84,-50.55 359.31,-47.31 362.05,-44.29"/>
+<polygon fill="black" stroke="black" points="364.4,-46.89 369.22,-37.45 359.57,-41.82 364.4,-46.89"/>
+<text xml:space="preserve" text-anchor="middle" x="394.91" y="-75" font-family="Times,serif" font-size="14.00">:HAS_INPUT</text>
+<text xml:space="preserve" text-anchor="middle" x="394.91" y="-58.2" font-family="Times,serif" font-size="14.00">expr_1</text>
+</g>
+<!-- derivation_name -->
+<g id="node8" class="node">
+<title>derivation_name</title>
+<polygon fill="none" stroke="black" points="391.54,-538.54 391.54,-553.46 344.93,-564 279.01,-564 232.4,-553.46 232.4,-538.54 279.01,-528 344.93,-528 391.54,-538.54"/>
+<text xml:space="preserve" text-anchor="middle" x="311.97" y="-541.8" font-family="Times,serif" font-size="14.00">derivation name</text>
+</g>
+<!-- derivation_name&#45;&gt;declare_initial_a_eq_b -->
+<g id="edge9" class="edge">
+<title>derivation_name-&gt;declare_initial_a_eq_b</title>
+<path fill="none" stroke="black" d="M250.67,-534.03C226.84,-528.53 199.72,-520.7 176.42,-510 151.32,-498.47 125.81,-480.48 107.05,-465.81"/>
+<polygon fill="black" stroke="black" points="109.33,-463.16 99.33,-459.66 104.97,-468.63 109.33,-463.16"/>
+<text xml:space="preserve" text-anchor="middle" x="214.2" y="-497.4" font-family="Times,serif" font-size="14.00">:HAS_STEP</text>
+<text xml:space="preserve" text-anchor="middle" x="214.2" y="-480.6" font-family="Times,serif" font-size="14.00">step_index=2</text>
+</g>
+<!-- derivation_name&#45;&gt;declare_initial_b_eq_c -->
+<g id="edge8" class="edge">
+<title>derivation_name-&gt;declare_initial_b_eq_c</title>
+<path fill="none" stroke="black" d="M284.86,-527.79C278.68,-522.73 272.68,-516.72 268.42,-510 260.85,-498.04 256.76,-482.89 254.55,-469.87"/>
+<polygon fill="black" stroke="black" points="258.05,-469.6 253.22,-460.17 251.11,-470.55 258.05,-469.6"/>
+<text xml:space="preserve" text-anchor="middle" x="306.2" y="-497.4" font-family="Times,serif" font-size="14.00">:HAS_STEP</text>
+<text xml:space="preserve" text-anchor="middle" x="306.2" y="-480.6" font-family="Times,serif" font-size="14.00">step_index=1</text>
+</g>
+<!-- derivation_name&#45;&gt;LHS_eq_RHS -->
+<g id="edge7" class="edge">
+<title>derivation_name-&gt;LHS_eq_RHS</title>
+<path fill="none" stroke="black" d="M332.51,-527.56C337.16,-522.43 341.47,-516.45 343.97,-510 353.82,-484.64 358.21,-288.38 343.97,-265.2 339.77,-258.35 333.76,-252.8 327.03,-248.3"/>
+<polygon fill="black" stroke="black" points="329.21,-245.52 318.8,-243.56 325.71,-251.58 329.21,-245.52"/>
+<text xml:space="preserve" text-anchor="middle" x="390.85" y="-391.8" font-family="Times,serif" font-size="14.00">:HAS_STEP</text>
+<text xml:space="preserve" text-anchor="middle" x="390.85" y="-375" font-family="Times,serif" font-size="14.00">step_index=3</text>
+</g>
+<!-- derivation_name&#45;&gt;declare_final -->
+<g id="edge10" class="edge">
+<title>derivation_name-&gt;declare_final</title>
+<path fill="none" stroke="black" d="M359.5,-530.78C399.07,-515.67 448.97,-487.47 448.97,-441.4 448.97,-441.4 448.97,-441.4 448.97,-122.6 448.97,-91.48 450.09,-81.2 434.97,-54 433.17,-50.75 430.96,-47.63 428.53,-44.68"/>
+<polygon fill="black" stroke="black" points="431.18,-42.38 421.78,-37.48 426.07,-47.17 431.18,-42.38"/>
+<text xml:space="preserve" text-anchor="middle" x="486.75" y="-286.2" font-family="Times,serif" font-size="14.00">:HAS_STEP</text>
+<text xml:space="preserve" text-anchor="middle" x="486.75" y="-269.4" font-family="Times,serif" font-size="14.00">step_index=4</text>
+</g>
+</g>
+</svg>

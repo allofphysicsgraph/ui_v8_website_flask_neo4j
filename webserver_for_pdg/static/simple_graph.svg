@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="338pt" height="332pt" viewBox="0.00 0.00 338.00 332.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 328)">
+<title>G</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-328 333.95,-328 333.95,4 -4,4"/>
+<!-- declare_initial_a_eq_b -->
+<g id="node1" class="node">
+<title>declare_initial_a_eq_b</title>
+<polygon fill="none" stroke="black" points="155.95,-324 0,-324 0,-288 155.95,-288 155.95,-324"/>
+<text xml:space="preserve" text-anchor="middle" x="77.97" y="-301.8" font-family="Times,serif" font-size="14.00">declare initial expression</text>
+</g>
+<!-- a_eq_b -->
+<g id="node2" class="node">
+<title>a_eq_b</title>
+<ellipse fill="none" stroke="black" cx="124.97" cy="-234" rx="30.43" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="124.97" y="-229.8" font-family="Times,serif" font-size="14.00">a = b</text>
+</g>
+<!-- declare_initial_a_eq_b&#45;&gt;a_eq_b -->
+<g id="edge1" class="edge">
+<title>declare_initial_a_eq_b-&gt;a_eq_b</title>
+<path fill="none" stroke="black" d="M89.59,-287.7C95.1,-279.49 101.79,-269.52 107.87,-260.48"/>
+<polygon fill="black" stroke="black" points="110.62,-262.65 113.29,-252.4 104.81,-258.75 110.62,-262.65"/>
+</g>
+<!-- LHS_eq_RHS -->
+<g id="node5" class="node">
+<title>LHS_eq_RHS</title>
+<polygon fill="none" stroke="black" points="206.26,-180 121.68,-180 121.68,-144 206.26,-144 206.26,-180"/>
+<text xml:space="preserve" text-anchor="middle" x="163.97" y="-157.8" font-family="Times,serif" font-size="14.00">LHS = RHS</text>
+</g>
+<!-- a_eq_b&#45;&gt;LHS_eq_RHS -->
+<g id="edge3" class="edge">
+<title>a_eq_b-&gt;LHS_eq_RHS</title>
+<path fill="none" stroke="black" d="M134.22,-216.41C138.55,-208.62 143.84,-199.14 148.75,-190.33"/>
+<polygon fill="black" stroke="black" points="151.71,-192.21 153.52,-181.77 145.59,-188.8 151.71,-192.21"/>
+</g>
+<!-- declare_initial_b_eq_c -->
+<g id="node3" class="node">
+<title>declare_initial_b_eq_c</title>
+<polygon fill="none" stroke="black" points="329.95,-324 174,-324 174,-288 329.95,-288 329.95,-324"/>
+<text xml:space="preserve" text-anchor="middle" x="251.97" y="-301.8" font-family="Times,serif" font-size="14.00">declare initial expression</text>
+</g>
+<!-- b_eq_c -->
+<g id="node4" class="node">
+<title>b_eq_c</title>
+<ellipse fill="none" stroke="black" cx="227.97" cy="-234" rx="30.43" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="227.97" y="-229.8" font-family="Times,serif" font-size="14.00">b = c</text>
+</g>
+<!-- declare_initial_b_eq_c&#45;&gt;b_eq_c -->
+<g id="edge2" class="edge">
+<title>declare_initial_b_eq_c-&gt;b_eq_c</title>
+<path fill="none" stroke="black" d="M246.04,-287.7C243.48,-280.24 240.43,-271.32 237.56,-262.97"/>
+<polygon fill="black" stroke="black" points="240.88,-261.86 234.33,-253.54 234.26,-264.13 240.88,-261.86"/>
+</g>
+<!-- b_eq_c&#45;&gt;LHS_eq_RHS -->
+<g id="edge6" class="edge">
+<title>b_eq_c-&gt;LHS_eq_RHS</title>
+<path fill="none" stroke="black" d="M214.09,-217.81C206.24,-209.23 196.22,-198.27 187.21,-188.42"/>
+<polygon fill="black" stroke="black" points="189.98,-186.26 180.65,-181.24 184.82,-190.99 189.98,-186.26"/>
+</g>
+<!-- a_eq_c -->
+<g id="node6" class="node">
+<title>a_eq_c</title>
+<ellipse fill="none" stroke="black" cx="163.97" cy="-90" rx="29.88" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="163.97" y="-85.8" font-family="Times,serif" font-size="14.00">a = c</text>
+</g>
+<!-- LHS_eq_RHS&#45;&gt;a_eq_c -->
+<g id="edge4" class="edge">
+<title>LHS_eq_RHS-&gt;a_eq_c</title>
+<path fill="none" stroke="black" d="M163.97,-143.7C163.97,-136.41 163.97,-127.73 163.97,-119.54"/>
+<polygon fill="black" stroke="black" points="167.47,-119.62 163.97,-109.62 160.47,-119.62 167.47,-119.62"/>
+</g>
+<!-- declare_final -->
+<g id="node7" class="node">
+<title>declare_final</title>
+<polygon fill="none" stroke="black" points="238.44,-36 89.5,-36 89.5,0 238.44,0 238.44,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="163.97" y="-13.8" font-family="Times,serif" font-size="14.00">declare final expression</text>
+</g>
+<!-- a_eq_c&#45;&gt;declare_final -->
+<g id="edge5" class="edge">
+<title>a_eq_c-&gt;declare_final</title>
+<path fill="none" stroke="black" d="M163.97,-71.7C163.97,-64.41 163.97,-55.73 163.97,-47.54"/>
+<polygon fill="black" stroke="black" points="167.47,-47.62 163.97,-37.62 160.47,-47.62 167.47,-47.62"/>
+</g>
+</g>
+</svg>
