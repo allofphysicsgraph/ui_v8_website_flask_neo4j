@@ -93,7 +93,7 @@ import os
 import json
 import secrets
 import functools
-
+import tokenize
 
 from flask import (
     Blueprint,
@@ -113,7 +113,12 @@ import neo4j  # type: ignore
 import logging
 
 logger = logging.getLogger(__name__)
-
+import sympy
+from sympy.parsing.sympy_parser import (
+    parse_expr,
+    standard_transformations,
+    implicit_multiplication_application,
+)
 from . import neo4j_query
 
 # from . import compute
@@ -131,7 +136,38 @@ from .initialize_neo4j import graphDB_Driver
 # http://flask.palletsprojects.com/en/1.1.x/tutorial/views/
 api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 
+# --- sympy_check configuration -------------------------------------------------
+# Maximum length (characters) accepted for a submitted expression. This endpoint
+# is unauthenticated, so an unbounded input length would be an easy resource-
+# exhaustion (DoS) vector via pathologically large/nested expressions.
+MAX_SYMPY_INPUT_LENGTH = 500
 
+
+# sympy's parse_expr() parses by transforming the input into a Python expression
+# and running it through eval(). That is safe-ish for trusted input, but this
+# route accepts arbitrary, unauthenticated user input, so eval() must not have
+# access to Python builtins (__import__, open, exec, etc.). We build one shared,
+# read-only globals dict at import time: it's seeded with `from sympy import *`
+# (so function names like sin, cos, pi, Integral... resolve normally) and then
+# __builtins__ is explicitly overridden with an empty mapping. sympy also
+# compiles in 'eval' mode (a single expression, not statements), so assignment
+# or import statements are rejected by the compiler before this even matters.
+# Blocking __builtins__ alone is NOT sufficient: Python's attribute-traversal
+# gadget (().__class__.__bases__[0].__subclasses__() -> ... -> subprocess.Popen)
+# needs no builtins, only dunder attribute access on literals. The route below
+# additionally rejects any input containing '__' before parsing; the two
+# measures are both required, not redundant.
+def _build_safe_sympy_globals():
+    safe_globals = {}
+    exec("from sympy import *", safe_globals)
+    safe_globals["__builtins__"] = {}
+    return safe_globals
+
+
+_SYMPY_SAFE_GLOBALS = _build_safe_sympy_globals()
+_SYMPY_TRANSFORMATIONS = standard_transformations + (
+    implicit_multiplication_application,
+)
 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/56
 # BHP, 2025-01-09: I am not dealing with log-in requirements,
 # so I am disabling csrf for the APIs as per
@@ -359,6 +395,12 @@ def api_start_here():
         "whoami": hal_link(
             url_for(".api_whoami", _external=True), "Identify the current API caller"
         ),
+        "sympy_check": hal_link(
+            url_for(".api_sympy_check", _external=True), "Check a sympy expression"
+        ),
+        "cypher_query": hal_link(
+            url_for(".api_cypher_query", _external=True), "Query Neo4j database using Cypher"
+        ),
     }
     return hal_response(data=data, links=links)
 
@@ -378,6 +420,130 @@ def api_whoami():
             "up": hal_link(
                 url_for(".api_start_here", _external=True), "API Entry Point"
             ),
+        },
+    )
+
+
+@api_bp.route("/resources/sympy_check", methods=["GET", "POST"])
+def api_sympy_check():
+    """Parse a user-supplied math expression with sympy and report its
+    canonical form and free variables. 
+
+    <https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/134>
+
+    on 2026-07-11, Claude Sonnet 5 on 'medium' warns that
+    > parse_expr is not a safe sandboxed parser for untrusted strings —
+    > it's a known vector for resource-exhaustion and code-execution-adjacent
+    > abuse depending on the sympy version and transformations in use. There's
+    > no auth, no length limit, no timeout.
+
+    """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point")
+    }
+
+    if request.is_json:
+        data_from_user = request.get_json()
+        user_input = data_from_user.get("sympy")
+    else:
+        user_input = request.args.get("sympy")
+
+    if not user_input:
+        return hal_error(
+            "Missing required field: sympy", 400, links=up_link, title="Missing Field"
+        )
+
+    if len(user_input) > MAX_SYMPY_INPUT_LENGTH:
+        return hal_error(
+            f"sympy expression exceeds maximum length of {MAX_SYMPY_INPUT_LENGTH} characters",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+
+    if "__" in user_input:
+        # Blocking __builtins__ in the eval globals (below) is not sufficient on
+        # its own: Python's attribute-traversal sandbox-escape gadget
+        # (().__class__.__bases__[0].__subclasses__() -> ... -> subprocess.Popen)
+        # needs no builtins at all, only dunder attribute access on ordinary
+        # literals. No legitimate sympy expression needs a double underscore,
+        # so it's rejected outright rather than attempting to allow-list safe
+        # dunder uses.
+        return hal_error(
+            "Expression must not contain double underscores",
+            400,
+            links=up_link,
+            title="Invalid Expression",
+        )
+
+    try:
+        expr = parse_expr(
+            user_input,
+            transformations=_SYMPY_TRANSFORMATIONS,
+            global_dict=_SYMPY_SAFE_GLOBALS,
+            evaluate=True,
+        )
+    except (
+        tokenize.TokenError,
+        SyntaxError,
+        TypeError,
+        AttributeError,
+        sympy.SympifyError,
+    ) as err:
+        return hal_error(str(err), 400, links=up_link, title="Invalid Expression")
+    except Exception as err:
+        # Defensive catch-all: parse_expr can raise a variety of exception
+        # types depending on the malformed input, and a 500 is never an
+        # appropriate response to "the user typed something we can't parse".
+        logger.warning(
+            "[TRACE] " + trace_id + " unexpected sympy_check parse failure: " + str(err)
+        )
+        return hal_error(
+            "Could not parse the supplied expression",
+            400,
+            links=up_link,
+            title="Invalid Expression",
+        )
+
+    var_names = sorted((str(s) for s in expr.free_symbols))
+    logger.info("[TRACE] " + trace_id + " variables: " + str(var_names))
+
+    # SymPy does not define a `.canonical` attribute on standard algebraic
+    # expression classes (such as Add, Mul, Pow, or Symbol)
+    # In SymPy, only Relational objects (such as equations or inequalities
+    # like `x < y`) feature a `.canonical` property (used to reorder the
+    # sides of an inequality or move terms to a preferred side).
+    # For standard algebraic expressions like Add, SymPy automatically
+    # applies basic canonicalization and ordering during construction,
+    # meaning the parsed expr itself is already in its default canonical form.    
+    canonical_str = str(expr.canonical) if hasattr(expr, "canonical") else str(expr)
+
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={"input": user_input, "canonical": canonical_str, "variables": var_names},
+        links={
+            "self": hal_link(
+                url_for(".api_sympy_check", _external=True), "Sympy expression check"
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        templates={
+            "default": hal_template(
+                "GET",
+                [
+                    hal_property(
+                        "sympy",
+                        required=True,
+                        prompt="Expression (sympy/Python syntax)",
+                        value=user_input,
+                    )
+                ],
+                title="Check another expression",
+            )
         },
     )
 
