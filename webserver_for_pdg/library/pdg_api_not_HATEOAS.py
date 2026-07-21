@@ -32,39 +32,24 @@ from . import latex
 api_nohateoas_bp = Blueprint("pdg_api_not_HATEOAS", __name__, url_prefix="/api")
 
 
-@api_nohateoas_bp.route("/resources/sympy_check", methods=["GET", "POST"])
-def api_sympy_check():
-    """
-    <https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/134>
+# @api_nohateoas_bp.route("/resources/sympy_check", methods=["GET", "POST"])
+# def api_sympy_check():
+#     """
 
-    on 2026-07-11, Claude Sonnet 5 on 'medium' warns that
-    > parse_expr is not a safe sandboxed parser for untrusted strings —
-    > it's a known vector for resource-exhaustion and code-execution-adjacent
-    > abuse depending on the sympy version and transformations in use. There's
-    > no auth, no length limit, no timeout.
+#     """
+#     user_input = request.args.get("sympy")
 
-    """
-    user_input = request.args.get("sympy")
+#     try:
+#         expr = parse_expr(user_input)
+#     except tokenize.TokenError as err:
+#         return jsonify({"INVALID": str(err)})
 
-    try:
-        expr = parse_expr(user_input)
-    except tokenize.TokenError as err:
-        return jsonify({"INVALID": str(err)})
+#     var_names = [str(s) for s in expr.free_symbols]
+#     logger.info(str(var_names))
 
-    var_names = [str(s) for s in expr.free_symbols]
-    logger.info(str(var_names))
+#     canonical_str = str(expr.canonical) if hasattr(expr, "canonical") else str(expr)
 
-    # SymPy does not define a `.canonical` attribute on standard algebraic
-    # expression classes (such as Add, Mul, Pow, or Symbol)
-    # In SymPy, only Relational objects (such as equations or inequalities
-    # like `x < y`) feature a `.canonical` property (used to reorder the
-    # sides of an inequality or move terms to a preferred side).
-    # For standard algebraic expressions like Add, SymPy automatically
-    # applies basic canonicalization and ordering during construction,
-    # meaning the parsed expr itself is already in its default canonical form.
-    canonical_str = str(expr.canonical) if hasattr(expr, "canonical") else str(expr)
-
-    return jsonify({"canonical": canonical_str, "variables": str(var_names)})
+#     return jsonify({"canonical": canonical_str, "variables": str(var_names)})
 
 
 @api_nohateoas_bp.route("/resources/png_from_latex", methods=["GET", "POST"])
@@ -116,46 +101,46 @@ def api_png_from_latex():
     return jsonify({"png_location": path_to_png_with_filename_no_prefix_directory})
 
 
-@api_nohateoas_bp.route("/resources/cypher", methods=["GET"])
-def api_cypher_query():
-    r"""
+# @api_nohateoas_bp.route("/resources/cypher", methods=["GET"])
+# def api_cypher_query():
+#     r"""
 
-    .. code-block:: bash
+#     .. code-block:: bash
 
-        curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
+#         curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
 
-    """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
-    # query_time_dict = {}  # type: query_timing_result_type
+#     """
+#     trace_id = str(uuid.uuid4())
+#     logger.info("[TRACE] start " + trace_id)
+#     # query_time_dict = {}  # type: query_timing_result_type
 
-    user_query = request.args.get("query")
+#     user_query = request.args.get("query")
 
-    logger.info("user_query: " + str(user_query))
+#     logger.info("user_query: " + str(user_query))
 
-    list_of_records = []  # type: List[str]
-    if user_query:
-        try:
-            # https://neo4j.com/docs/python-manual/current/session-api/
-            with graphDB_Driver.session() as session:
-                # query_start_time = time.time()
-                list_of_records = session.read_transaction(
-                    neo4j_query.user_query, user_query
-                )
-                # query_time_dict["api_cypher_query: user_query"] = round(
-                #     time.time() - query_start_time, 3
-                # )
-        except neo4j.exceptions.ClientError:
-            list_of_records = ["WRITE OPERATIONS NOT ALLOWED (ClientError)"]
-        except neo4j.exceptions.TransactionError:
-            list_of_records = ["not a valid Cypher query (TransactionError)"]
-    else:
-        list_of_records = [
-            "use: curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\\(n\\)%20RETURN%20DISTINCT%20labels\\(n\\)"
-        ]
+#     list_of_records = []  # type: List[str]
+#     if user_query:
+#         try:
+#             # https://neo4j.com/docs/python-manual/current/session-api/
+#             with graphDB_Driver.session() as session:
+#                 # query_start_time = time.time()
+#                 list_of_records = session.read_transaction(
+#                     neo4j_query.user_query, user_query
+#                 )
+#                 # query_time_dict["api_cypher_query: user_query"] = round(
+#                 #     time.time() - query_start_time, 3
+#                 # )
+#         except neo4j.exceptions.ClientError:
+#             list_of_records = ["WRITE OPERATIONS NOT ALLOWED (ClientError)"]
+#         except neo4j.exceptions.TransactionError:
+#             list_of_records = ["not a valid Cypher query (TransactionError)"]
+#     else:
+#         list_of_records = [
+#             "use: curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\\(n\\)%20RETURN%20DISTINCT%20labels\\(n\\)"
+#         ]
 
-    logger.info("[TRACE] end " + trace_id)
-    return jsonify(list_of_records)
+#     logger.info("[TRACE] end " + trace_id)
+#     return jsonify(list_of_records)
 
 
 # EOF

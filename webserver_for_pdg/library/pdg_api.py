@@ -399,7 +399,8 @@ def api_start_here():
             url_for(".api_sympy_check", _external=True), "Check a sympy expression"
         ),
         "cypher_query": hal_link(
-            url_for(".api_cypher_query", _external=True), "Query Neo4j database using Cypher"
+            url_for(".api_cypher_query", _external=True),
+            "Query Neo4j database using Cypher",
         ),
     }
     return hal_response(data=data, links=links)
@@ -427,7 +428,7 @@ def api_whoami():
 @api_bp.route("/resources/sympy_check", methods=["GET", "POST"])
 def api_sympy_check():
     """Parse a user-supplied math expression with sympy and report its
-    canonical form and free variables. 
+    canonical form and free variables.
 
     <https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/134>
 
@@ -517,7 +518,7 @@ def api_sympy_check():
     # sides of an inequality or move terms to a preferred side).
     # For standard algebraic expressions like Add, SymPy automatically
     # applies basic canonicalization and ordering during construction,
-    # meaning the parsed expr itself is already in its default canonical form.    
+    # meaning the parsed expr itself is already in its default canonical form.
     canonical_str = str(expr.canonical) if hasattr(expr, "canonical") else str(expr)
 
     logger.info("[TRACE] end " + trace_id)
@@ -545,6 +546,86 @@ def api_sympy_check():
                 title="Check another expression",
             )
         },
+    )
+
+
+EXAMPLE_CYPHER_QUERY = "MATCH (n) RETURN DISTINCT labels(n)"
+
+
+@api_bp.route("/resources/cypher", methods=["GET", "POST"])
+def api_cypher_query():
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] start " + trace_id)
+    up_link = {
+        "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point")
+    }
+    self_template = {
+        "default": hal_template(
+            "GET",
+            [
+                hal_property(
+                    "query",
+                    required=True,
+                    prompt="Cypher query (read-only)",
+                    value=None,
+                )
+            ],
+            title="Run a Cypher query",
+            content_type="application/x-www-form-urlencoded",
+        )
+    }
+    if request.is_json:
+        data_from_user = request.get_json(silent=True) or {}
+        user_query = data_from_user.get("query")
+    else:
+        user_query = request.args.get("query")
+    logger.info("[TRACE] " + trace_id + " user_query: " + str(user_query))
+    if not user_query:
+        return hal_error(
+            "Missing required field: query. Example: GET /api/resources/cypher?query="
+            + EXAMPLE_CYPHER_QUERY,
+            400,
+            links=up_link,
+            title="Missing Field",
+        )
+    try:
+        with graphDB_Driver.session() as session:
+            list_of_records = session.read_transaction(
+                neo4j_query.user_query, user_query
+            )
+    except neo4j.exceptions.ClientError as err:
+        logger.info("[TRACE] " + trace_id + " rejected ClientError: " + str(err))
+        return hal_error(
+            "Write operations are not allowed on this read-only endpoint (ClientError): "
+            + str(err),
+            400,
+            links=up_link,
+            title="Write Operation Rejected",
+        )
+    except neo4j.exceptions.TransactionError as err:
+        logger.info("[TRACE] " + trace_id + " rejected TransactionError: " + str(err))
+        return hal_error(
+            "Not a valid Cypher query (TransactionError): " + str(err),
+            400,
+            links=up_link,
+            title="Invalid Query",
+        )
+    logger.info("[TRACE] end " + trace_id)
+    return hal_response(
+        data={
+            "query": user_query,
+            "count": len(list_of_records),
+            "records": list_of_records,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_cypher_query", _external=True), "Cypher query result"
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        templates=self_template,
     )
 
 
@@ -1773,8 +1854,8 @@ def api_create_expression():
 
     if (
         not expression_latex_lhs
-        or not expression_relation_latex
-        or not expression_latex_rhs
+        or (not expression_relation_latex)
+        or (not expression_latex_rhs)
     ):
         return hal_error(
             "Missing required expression formula fields",
