@@ -189,6 +189,220 @@ docker exec --workdir /scratch/ $(docker ps -qf "name=flask-webserver") /bin/bas
 <HR/>
 <P>&nbsp;</P>
 
+<H2 id="edge indices">Edges in the Physics Derivation Graph have positive integer indices</H2>
+
+<P>A simple graph for a derivation might be something like
+<P><img src="{{ url_for('static', filename='simple_graph.svg') }}">
+<!--
+<pre>
+digraph G {
+declare_initial_a_eq_b [label="declare initial expression" shape="rectangle"]
+a_eq_b [label="a = b"]
+declare_initial_a_eq_b -> a_eq_b
+
+declare_initial_b_eq_c [label="declare initial expression" shape="rectangle"]
+b_eq_c [label="b = c"]
+declare_initial_b_eq_c -> b_eq_c
+
+LHS_eq_RHS [label="LHS = RHS" shape="rectangle"]
+a_eq_c [label="a = c"]
+declare_final [label="declare final expression" shape="rectangle"]
+a_eq_b -> LHS_eq_RHS -> a_eq_c -> declare_final
+b_eq_c -> LHS_eq_RHS
+
+}
+</pre>
+-->
+
+<P>The purpose of <code>step_index</code> is to deterministically order expressions in the PDF and review-of-derivation page, and to allow users to manually adjust what the sequence is.
+
+<P>Each <code>:HAS_INPUT</code> and <code>:HAS_OUTPUT</code> and <code>:HAS_FEED</code> also has indices so the inference rule can explicitly refer to arguments.
+<P><img src="{{ url_for('static', filename='simple_graph_with_edge_labels.svg') }}">
+
+<!--
+<pre>
+digraph G {
+declare_initial_a_eq_b [label="declare initial expression" shape="rectangle"]
+a_eq_b [label="a = b"]
+declare_initial_a_eq_b -> a_eq_b [label=":HAS_OUTPUT\nexpr_index=1"]
+
+declare_initial_b_eq_c [label="declare initial expression" shape="rectangle"]
+b_eq_c [label="b = c"]
+declare_initial_b_eq_c -> b_eq_c [label=":HAS_OUTPUT\nexpr_index=1"]
+
+LHS_eq_RHS [label="LHS = RHS" shape="rectangle"]
+a_eq_c [label="a = c"]
+declare_final [label="declare final expression" shape="rectangle"]
+a_eq_b -> LHS_eq_RHS [label=":HAS_INPUT\nexpr_index=1"]
+LHS_eq_RHS -> a_eq_c [label=":HAS_OUTPUT\nexpr_index=1"]
+a_eq_c -> declare_final [label=":HAS_INPUT\nexpr_1"]
+b_eq_c -> LHS_eq_RHS [label=":HAS_INPUT\nexpr_index=1"]
+
+derivation_name [label="derivation name" shape="octagon"]
+derivation_name -> LHS_eq_RHS [label=":HAS_STEP\nstep_index=3"]
+derivation_name -> declare_initial_b_eq_c [label=":HAS_STEP\nstep_index=1"]
+derivation_name -> declare_initial_a_eq_b [label=":HAS_STEP\nstep_index=2"]
+derivation_name -> declare_final [label=":HAS_STEP\nstep_index=4"]
+}
+</pre>
+-->
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
+
+<h2 id="CRUD constraints">CRUD constraints</h2>
+
+The Physics Derivation Graph is a <a href="https://en.wikipedia.org/wiki/Create,_read,_update_and_delete">CRUD</a> UI that imposes specific constraints and sequences. The table below identifies some of the constraints for each type of node.
+
+<table border=1><thead>
+  <tr>
+    <th></th>
+    <th>Create</th>
+    <th>Read</th>
+    <th>Update</th>
+    <th>Delete</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td>derivation</td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>user provides metadata</LI>
+        </UL></td>
+    <td></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>metadata fields</LI>
+        </UL></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>deletes all associated steps and feeds</LI>
+        <LI>does not alter expressions or inference rules</LI>
+        </UL></td>
+  </tr>
+  <tr>
+    <td>step</td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>must be tied to a specific derivation</LI>
+        <LI>user provides input expression, inference rule, feed, output expression, note</LI>
+        </UL></td>
+    <td></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>which expressions are connected</LI>
+        <LI>cannot edit which inference rule</LI>
+        </UL></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>deletes feeds associated with step</LI>
+        <LI>does not alter expressions or inference rules</LI>
+        </UL></td>
+  </tr>
+  <tr>
+    <td>inference rule</td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>user provides number of arguments, latex description</LI>
+        </UL></td>
+    <td></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>latex description</LI>
+        <LI>user can only edit number of arguments if inference rule is not in use</LI>
+        </UL></LI>
+        </UL></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>delete only if not in use by step</LI>
+        </UL></td>
+  </tr>
+  <tr>
+    <td>expression</td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>one and only one :HAS_RELATION edge is required</LI>
+        <LI>at least one :HAS_SYMBOL edge is required</LI>
+        <LI>user provides latex, SymPy, and Lean representation</LI>
+        </UL></td>
+    <td></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>metadata fields</LI>
+        </UL></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>delete only if not connected to step</LI>
+        <LI>does not alter symbols and relations</LI>
+        </UL></td>
+  </tr>
+  <tr>
+    <td>symbol</td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>user provides latex, description</LI>
+        <LI>optional: name, reference</LI>
+        </UL></td>
+    <td></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        </UL></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>delete only if not in use in expression</LI>
+        </UL></td>
+  </tr>
+  <tr>
+    <td>relation</td>
+    <td><UL>
+        <LI>authorization required</LI>
+        </UL></td>
+    <td></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>user can only change number of arguments if relation is not in use</LI>
+        </UL></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>delete only if not in use in expression</LI>
+        </UL></td>
+  </tr>
+  <tr>
+    <td>operator</td>
+    <td><UL>
+        <LI>authorization required</LI>
+        </UL></td>
+    <td></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        </UL></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>delete only if not in use in expression</LI>
+        </UL></td>
+  </tr>
+  <tr>
+    <td>feed</td>
+    <td><UL>
+        <LI>authorization required</LI>
+        </UL></td>
+    <td></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        </UL></td>
+    <td><UL>
+        <LI>authorization required</LI>
+        <LI>delete only if not in use in step</LI>
+        </UL></td>
+  </tr>
+</tbody></table>
+
+<P>&nbsp;</P>
+<HR/>
+<P>&nbsp;</P>
+
 <H2><a name="how to navigate the codebase">How to navigate the codebase</a></H2>
 
 <P>
@@ -259,21 +473,25 @@ Figure 3. State diagram for the web interface.
 
 <P>Those repos are to be worked through in sequence: <BR>
   
-<img src="{{ url_for('static', filename='tutorial_sequence.png') }}">
+<!--<img src="{ { url_for('static', filename='tutorial_sequence.png') } }">-->
+<img src="https://raw.githubusercontent.com/allofphysicsgraph/pdg_essential_demo_docker/refs/heads/main/tutorials_dependency_graph.svg">
+
+<!--
+Removed 2026-07-20 in favor of the github repos linked above.
 
 <H3 id="Docker and Make">Initial infrastructure: Docker and Make</H3>
 
 <P>Before running any project-specific code, investing in reproducibility enables future success.<BR/>
 Docker containers make software dependencies explicit.
 <P>
-The <a href="{{ url_for('static', filename='from_scratch_tutorial/docker_and_make/Dockerfile') }}">Dockerfile</a> contains
-<!-- include reads from templates -->
+The <a href="{ { url_for('static', filename='from_scratch_tutorial/docker_and_make/Dockerfile') }}">Dockerfile</a> contains
+<!- - include reads from templates - ->
 <pre>
-  {% include 'from_scratch_tutorial/docker_and_make/Dockerfile.html' %}
+  { % include 'from_scratch_tutorial/docker_and_make/Dockerfile.html' %}
 </pre>
-<P>Similarly, to improve reproducibility of Docker commands, use a <a href="{{ url_for('static', filename='from_scratch_tutorial/docker_and_make/Makefile') }}">Makefile</a> containing
+<P>Similarly, to improve reproducibility of Docker commands, use a <a href="{ { url_for('static', filename='from_scratch_tutorial/docker_and_make/Makefile') }}">Makefile</a> containing
 <pre>
-  {% include 'from_scratch_tutorial/docker_and_make/Makefile.html' %}
+  { % include 'from_scratch_tutorial/docker_and_make/Makefile.html' %}
 </pre>
 <P>See <a href="https://github.com/allofphysicsgraph/pdg_essential_demo_docker">https://github.com/allofphysicsgraph/pdg_essential_demo_docker</a>
 
@@ -282,30 +500,35 @@ The <a href="{{ url_for('static', filename='from_scratch_tutorial/docker_and_mak
 <P>See <a href="https://github.com/allofphysicsgraph/pdg_essential_demo_flask_website">https://github.com/allofphysicsgraph/pdg_essential_demo_flask_website</a>
 
 <P>
-<a href="{{ url_for('static', filename='from_scratch_tutorial/python_and_flask/Dockerfile') }}">Dockerfile</a>
+<a href="{ { url_for('static', filename='from_scratch_tutorial/python_and_flask/Dockerfile') }}">Dockerfile</a>
 <pre>
-  {% include 'from_scratch_tutorial/python_and_flask/Dockerfile.html' %}
+  { % include 'from_scratch_tutorial/python_and_flask/Dockerfile.html' %}
 </pre>
 
-<P><a href="{{ url_for('static', filename='from_scratch_tutorial/python_and_flask/controller.py') }}">controller.py</a>
+<P><a href="{ { url_for('static', filename='from_scratch_tutorial/python_and_flask/controller.py') }}">controller.py</a>
 <pre>
-  {% include 'from_scratch_tutorial/python_and_flask/controller.py.html' %}
+  { % include 'from_scratch_tutorial/python_and_flask/controller.py.html' %}
 </pre>
 </div>
 
 <P><a href="{{ url_for('static', filename='from_scratch_tutorial/python_and_flask/requirements.txt') }}">requirements.txt</a>
 <pre>
-  {% include 'from_scratch_tutorial/python_and_flask/requirements.txt' %}
+  { % include 'from_scratch_tutorial/python_and_flask/requirements.txt' %}
 </pre>
 
+-->
+
+<HR>
 
 <H2 id="ANTLR grammar">ANTLER grammar</H2>
 
-<P>ANTLR grammar:
+<P>The constraints of the Physics Derivation Graph can be treated as a grammar. 
+
+(This grammar should be equivalent to the schema of the Neo4j property graph.)
+
+<P>As an ANTLR grammar:
 <pre>
 grammar PhysicsDerivationGraph_grammar;
-
-// claim: this grammar should be equivalent to the schema of the Neo4j property graph
 
 derivation
    : step+
