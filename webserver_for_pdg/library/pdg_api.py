@@ -168,6 +168,42 @@ _SYMPY_SAFE_GLOBALS = _build_safe_sympy_globals()
 _SYMPY_TRANSFORMATIONS = standard_transformations + (
     implicit_multiplication_application,
 )
+
+HAL_FORMS_MIMETYPE = "application/prs.hal-forms+json"
+PLAIN_JSON_MIMETYPE = "application/json"
+_SUPPORTED_MIMETYPES = [HAL_FORMS_MIMETYPE, PLAIN_JSON_MIMETYPE]
+
+
+def _negotiate_response_mimetype():
+    """Pick a representation based on the client's Accept header.
+
+    hal-forms+json remains the default representation (matches ties and
+    missing/`*/*` Accept headers) so existing HAL clients are unaffected.
+    A client that explicitly prefers `application/json` (either by asking
+    for it alone, or by weighting it higher than hal-forms+json) gets the
+    plain-JSON representation instead.
+    """
+    return request.accept_mimetypes.best_match(
+        _SUPPORTED_MIMETYPES, default=HAL_FORMS_MIMETYPE
+    )
+
+
+def _strip_templates(value):
+    """Recursively remove '_templates' keys (the HAL-FORMS extension) from a
+    payload. Some list endpoints attach '_templates' directly onto each
+    embedded resource, not just at the top level, so a shallow strip isn't
+    enough to give plain application/json clients a clean representation."""
+    if isinstance(value, dict):
+        return {
+            key: _strip_templates(val)
+            for key, val in value.items()
+            if key != "_templates"
+        }
+    if isinstance(value, list):
+        return [_strip_templates(item) for item in value]
+    return value
+
+
 # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/56
 # BHP, 2025-01-09: I am not dealing with log-in requirements,
 # so I am disabling csrf for the APIs as per
@@ -234,9 +270,17 @@ def hal_response(data=None, links=None, embedded=None, templates=None, status=20
         payload["_embedded"] = embedded
     if templates:
         payload["_templates"] = templates
+    mimetype = _negotiate_response_mimetype()
+    # _templates is a HAL-FORMS extension (application/prs.hal-forms+json); a
+    # plain application/json client asked for standard JSON, so drop every
+    # occurrence (including ones nested inside _embedded items) rather than
+    # leaking a representation-specific field into that response.
+    if mimetype == PLAIN_JSON_MIMETYPE:
+        payload = _strip_templates(payload)
     resp = jsonify(payload)
     resp.status_code = status
-    resp.headers["Content-Type"] = "application/prs.hal-forms+json"
+    resp.headers["Content-Type"] = mimetype
+    resp.headers["Vary"] = "Accept"
     return resp
 
 
@@ -249,7 +293,8 @@ def hal_error(message, status, links=None, title="Error"):
     }
     resp = jsonify(payload)
     resp.status_code = status
-    resp.headers["Content-Type"] = "application/prs.hal-forms+json"
+    resp.headers["Content-Type"] = _negotiate_response_mimetype()
+    resp.headers["Vary"] = "Accept"
     return resp
 
 
@@ -325,6 +370,40 @@ def require_auth(view_func):
         return view_func(*args, **kwargs)
 
     return wrapped_view
+
+
+@api_bp.before_request
+def _handle_options_request():
+    """Self-descriptive OPTIONS support for every resource in this blueprint.
+
+    Rather than writing a bespoke OPTIONS handler per route, this hook fires
+    for any OPTIONS request that matched a route (request.url_rule is set)
+    and returns a HAL response listing the transitions available on *this*
+    URL, together with a standard Allow header. Requests that didn't match
+    any route (url_rule is None) fall through so normal 404 handling still
+    applies. This runs before @require_auth, so discovering what's possible
+    on a resource never requires authentication.
+    """
+    if request.method != "OPTIONS" or request.url_rule is None:
+        return None
+    allowed_methods = sorted(request.url_rule.methods)
+    transition_methods = sorted(
+        m for m in request.url_rule.methods if m not in ("HEAD", "OPTIONS")
+    )
+    templates = {
+        method.lower(): hal_template(method, [], title=f"{method} this resource")
+        for method in transition_methods
+    }
+    resp = hal_response(
+        data={
+            "title": "Available transitions for this resource",
+            "allowed_methods": allowed_methods,
+        },
+        links={"self": hal_link(request.base_url, "This resource")},
+        templates=templates,
+    )
+    resp.headers["Allow"] = ", ".join(allowed_methods)
+    return resp
 
 
 @api_bp.route("/", methods=["GET"])
@@ -3950,6 +4029,20 @@ def api_derivation_steps(derivation_id: str):
                     _external=True,
                 ),
                 "View step details",
+            ),
+            "derivation": hal_link(
+                url_for(
+                    ".api_derivation_metadata",
+                    derivation_id=derivation_id,
+                    _external=True,
+                ),
+                "Get derivation metadata",
+            ),
+            "steps": hal_link(
+                url_for(
+                    ".api_derivation_steps", derivation_id=derivation_id, _external=True
+                ),
+                "Steps in this derivation",
             ),
             "delete": hal_link(
                 url_for(
