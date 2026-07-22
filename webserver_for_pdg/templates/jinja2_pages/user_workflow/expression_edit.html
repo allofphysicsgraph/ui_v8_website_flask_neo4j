@@ -95,6 +95,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     <H3>Add Symbol to Expression \({{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}\)</h3>
   </legend>
 
+{% if current_user.is_authenticated %}
 <P>This table is based on guesses informed by strings in the expression.
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
@@ -148,12 +149,18 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   </form>
 
   <P>Symbol not listed? <a href="{{ url_for('to_add_symbol') }}">Create a new symbol</a>
+
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to add a symbol.</p>
+{% endif %}
+
 </fieldset>
 
 <fieldset>
   <legend>
     <H3>Remove Symbol used in Expression \({{ expression_dict['latex_lhs'] }}{{ expression_dict['latex_relation'] }}{{ expression_dict['latex_rhs'] }}\)</h3>
   </legend>
+{% if current_user.is_authenticated %}
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P><!--symbol count: { { list_of_symbol_IDs|length } }-->
@@ -164,6 +171,9 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
     </select>
     <input type="submit" name="remove symbol from expr" value="remove symbol from expression">
   </form>
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to remove a symbol.</p>
+{% endif %}
 </fieldset>
 
 </fieldset>
@@ -216,7 +226,7 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   <legend>
     <H3>Add operation used in Expression</h3>
   </legend>
-
+{% if current_user.is_authenticated %}
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
 
@@ -253,6 +263,10 @@ or return to <a href="{{ url_for('to_list_expressions') }}?referrer=expession_ed
   </form>
 
   <P>Operation not listed? <a href="{{ url_for('to_add_operation') }}">Create a new operation</a>
+
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to add a symbol.</p>
+{% endif %}
 </fieldset>
 
 
@@ -263,7 +277,7 @@ There are no operations associated with this expression, so there's nothing to r
   <legend>
     <H3>Remove operation used in Expression</h3>
   </legend>
-
+{% if current_user.is_authenticated %}
 <!--
 operations_in_expression<BR>
 {{ operations_in_expression }}
@@ -278,6 +292,9 @@ operations_in_expression<BR>
     </select>
     <input type="submit" name="remove operation from expr" value="remove operation from expression">
   </form>
+  {% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to remove a relation.</p>
+{% endif %}
 </fieldset>
 {% endif %}
 </fieldset>
@@ -297,6 +314,7 @@ operations_in_expression<BR>
 relations_not_in_expression<BR>
 {{ relations_not_in_expression }}
 -->
+{% if current_user.is_authenticated %}
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P><!-- operation count: { { list_of_operation_IDs|length } } -->
@@ -307,7 +325,9 @@ relations_not_in_expression<BR>
     </select>
     <input type="submit" name="update relation in expr" value="update relation used in expression">
   </form>
-
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to change a relation.</p>
+{% endif %}
 </fieldset>
 </fieldset>
 
@@ -315,7 +335,7 @@ relations_not_in_expression<BR>
     <legend>
       <H1>Edit Expression Latex and metadata</h1>
     </legend>
-
+{% if current_user.is_authenticated %}
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_new_expression.csrf_token }}
 
@@ -373,6 +393,9 @@ relations_not_in_expression<BR>
       <input type="submit" name="edit expression latex" value="Edit expression">
     </P>
   </form>
+  {% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to edit the expression.</p>
+{% endif %}
 </fieldset>
 
   <fieldset>
@@ -383,7 +406,7 @@ relations_not_in_expression<BR>
 <!--<P>expression_dict['sympy_lhs']: <BR>{ {expression_dict['sympy_lhs']}} -->
 <!--<P>expression_dict['sympy_rhs']: <BR>{ {expression_dict['sympy_rhs']}} -->
 
-
+{% if current_user.is_authenticated %}
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_expression_sympy.csrf_token }}
 
@@ -396,7 +419,9 @@ relations_not_in_expression<BR>
   
   <P><input type="submit" name="edit expression sympy" value="Edit expression SymPy and Lean">
   </form>
-
+  {% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to edit the expression.</p>
+{% endif %}
 </fieldset>
 
 {% if derivations_that_use_expression|length == 0 %}
@@ -404,13 +429,16 @@ relations_not_in_expression<BR>
     <legend>
       <H1>Delete Expression</h1>
     </legend>
-
+{% if current_user.is_authenticated %}
     <P color="red">WARNING: THERE IS NO UNDO</P>
     <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
 
     <input type="submit" name="delete expression" value="Delete expression">
     </form>
+  {% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to delete the expression.</p>
+{% endif %}
 </fieldset>
 {% else %}
 "Delete Expression" isn't available because this expression is used in one or more derivations.
