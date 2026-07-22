@@ -1302,6 +1302,9 @@ def to_navigation():
     #     logger.info(current_user.email)
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("to_navigation: request.form = " + str(request.form))
 
         # check if the post request has the file part
@@ -1529,6 +1532,9 @@ def to_add_derivation() -> ResponseReturnValue:
     logger.info("request.method=" + str(request.method))  # POST
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form =" + str(request.form))
         if "new derivation" in request.form:
             if web_form_new_derivation.validate():
@@ -1709,6 +1715,9 @@ def to_review_derivation(
     )
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("to_review_derivation: request.form = " + str(request.form))
 
         if "generate pdf" in request.form:
@@ -1979,6 +1988,9 @@ def to_edit_derivation_metadata(
         return redirect(url_for("to_list_derivations"))
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "edit metadata" in request.form:
@@ -2143,7 +2155,7 @@ def to_add_step_select_inference_rule(
 
 
 @web_app.route("/edit_expression/<expression_id>", methods=["GET", "POST"])
-@login_required
+# @login_required
 def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     authenticated user can edit expression by
@@ -2256,6 +2268,9 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseRetur
     )
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "add symbol to expr" in request.form:
@@ -2591,6 +2606,9 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
                 symbols_not_in_feed.append(this_symbol)
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
         logger.info("request.form.keys()= " + str(request.form.keys()))
 
@@ -2778,6 +2796,9 @@ def to_add_expression() -> ResponseReturnValue:
     list_of_relations = sorted_list_of_relations
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "new expression" in request.form:
@@ -2994,6 +3015,9 @@ def to_add_feed() -> ResponseReturnValue:
     sympy_as_latex_per_feed_id = compute.get_sympy_as_latex_per_feed_id(list_of_feeds)
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "new multi-symbol or numeric" in request.form.keys():
@@ -3251,6 +3275,9 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnV
     logger.info("request.method =" + str(request.method))
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "add symbol to expr" in request.form:
@@ -3364,6 +3391,9 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> ResponseReturnVal
     logger.info("request.form = " + str(request.form))
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
         if "edit relation" in request.form:
             if web_form_new_symbol.validate():
@@ -3467,6 +3497,9 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> ResponseReturnValue:
         )
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "edit scalar" in request.form:
@@ -3688,6 +3721,9 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> ResponseRetur
         )
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "new value and dimension" in request.form:
@@ -3802,6 +3838,9 @@ def to_add_symbol_scalar() -> ResponseReturnValue:
     web_form_scalar_properties = SpecifyNewSymbolScalarForm()
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
         if "new scalar" in request.form:
             if web_form_scalar_properties.validate():
@@ -3971,6 +4010,9 @@ def to_add_symbol_vector() -> ResponseReturnValue:
         )
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "new vector" in request.form:
@@ -4086,6 +4128,9 @@ def to_add_symbol_matrix() -> ResponseReturnValue:
         )
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "new matrix" in request.form:
@@ -4195,6 +4240,9 @@ def to_add_operation() -> ResponseReturnValue:
     web_form_add_operation = SpecifyNewSymbolOperationForm()
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "new operation" in request.form:
@@ -4301,6 +4349,9 @@ def to_add_relation() -> ResponseReturnValue:
     web_form_add_relation = SpecifyNewSymbolRelationForm()
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
         if "new relation" in request.form:
             if web_form_add_relation.validate():
@@ -4411,6 +4462,9 @@ def to_add_step_select_expressions(
     web_form_new_step = SpecifyNewStepForm()
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "new step" in request.form:
@@ -4640,6 +4694,9 @@ def to_add_symbols_and_operations_for_expression(
     # The checkboxes are determined dynamically,
     # so I don't see how a class-based form could be used.
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         # there are four possible choices for the user:
@@ -4763,6 +4820,9 @@ def to_add_sympy_and_lean_for_expression(
     web_form_new_expression_sympy = SpecifyNewExpressionSympyLeanForm()
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         sympy_str_lhs = str(web_form_new_expression_sympy.sympy_str_lhs.data).strip()
@@ -5019,6 +5079,9 @@ def to_add_symbols_and_operations_for_feed(
     # The checkboxes are determined dynamically,
     # so I don't see how a class-based form could be used.
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         list_of_symbol_IDs_in_expression = []  # type: List[str]
@@ -5118,6 +5181,9 @@ def to_add_sympy_and_lean_for_feed(
     logger.info("revised_feed_with_str=" + str(revised_feed_with_str))
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         sympy_str = str(web_form_new_feed_sympy.sympy_str.data).strip()
@@ -5206,6 +5272,9 @@ def to_add_inference_rule() -> ResponseReturnValue:
     )
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form=" + str(request.form))
 
         if "new infrule" in request.form:
@@ -5402,6 +5471,9 @@ def to_edit_step(
     )
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info("request.form = " + str(request.form))
 
         if "replace input expression" in request.form:
@@ -5675,6 +5747,9 @@ def to_edit_inference_rule(
     )
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         logger.info(" request.form = " + str(request.form))
 
         if "delete infrule" in request.form:
@@ -5892,6 +5967,9 @@ def to_query() -> ResponseReturnValue:
     web_form_cypher = CypherQueryForm()
 
     if request.method == "POST":
+        if not current_user.is_authenticated:
+            abort(403)  # Forbidden
+
         if "query submitted" in request.form:
             if web_form_cypher.validate():
                 query = str(web_form_cypher.query.data).strip()
