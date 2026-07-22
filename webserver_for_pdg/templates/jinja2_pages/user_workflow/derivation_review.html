@@ -138,6 +138,7 @@ Hold the mouse over a node to highlight that node and its neighbors. You can zoo
   <H2>Actions: Edit Derivation</h2>
 </legend>
 
+{% if current_user.is_authenticated %}
 <UL>
 <LI> <a href="{{ url_for('to_add_step_select_inference_rule', derivation_id=derivation_dict['id']) }}">add step to this derivation</a></LI>
 <!--
@@ -147,7 +148,9 @@ the following two were removed because the user should click on step ID in table
 <LI> <a href="{{ url_for('to_edit_derivation_metadata', derivation_id=derivation_dict['id']) }}">rename this derivation</a></LI>
 <LI> <a href="{{ url_for('to_edit_derivation_metadata', derivation_id=derivation_dict['id']) }}">edit abstract for this derivation</a></LI>
   </UL>
-
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to edit the steps of derivation, edit the abstract, or rename the derivation.</p>
+{% endif %}
 </fieldset>
 
 <fieldset>
@@ -167,11 +170,12 @@ the following two were removed because the user should click on step ID in table
   </form>
 </fieldset>
 
-
 <fieldset>
   <legend>
     <H2>Delete Derivation and all associated steps</H2>
   </legend>
+
+{% if current_user.is_authenticated %}
 <P>This does not remove expressions, symbols, and operations. 
   <!--<form method="post" action="" onsubmit="return checkForm(this);">-->
     <form method="post" action="">
@@ -182,6 +186,9 @@ the following two were removed because the user should click on step ID in table
 <input type="submit" name="delete derivation" value="delete derivation and steps">
 
   </form>
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to delete the derivation.</p>
+{% endif %}
 </fieldset>
 
 
