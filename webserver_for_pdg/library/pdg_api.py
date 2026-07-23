@@ -254,10 +254,14 @@ def hal_property(
     return prop
 
 
-def hal_template(method, properties, title=None, content_type="application/json"):
+def hal_template(
+    method, properties, title=None, content_type="application/json", target=None
+):
     template = {"method": method, "contentType": content_type, "properties": properties}
     if title:
         template["title"] = title
+    if target:
+        template["target"] = target
     return template
 
 
@@ -758,12 +762,37 @@ def api_list_derivations():
             "edit": hal_template(
                 "POST",
                 [
-                    hal_property("derivation_name_latex", required=True),
-                    hal_property("derivation_abstract_latex", required=True),
+                    hal_property(
+                        "derivation_name_latex",
+                        required=True,
+                        value=resource.get("name_latex"),
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "derivation_abstract_latex",
+                        required=True,
+                        value=resource.get("abstract_latex"),
+                        prompt="Abstract (LaTeX)",
+                    ),
+                    hal_property(
+                        "derivation_reference_latex",
+                        value=resource.get("reference_latex"),
+                        prompt="Reference (LaTeX)",
+                    ),
                 ],
-                title="Edit derivation",
+                title="Edit this derivation",
+                target=url_for(
+                    ".api_edit_derivation", derivation_id=item_id, _external=True
+                ),
             ),
-            "delete": hal_template("DELETE", [], title="Delete derivation"),
+            "delete": hal_template(
+                "DELETE",
+                [],
+                title="Delete this derivation",
+                target=url_for(
+                    ".api_delete_derivation", derivation_id=item_id, _external=True
+                ),
+            ),
         }
         embedded_items.append(resource)
 
@@ -840,18 +869,55 @@ def api_list_inference_rules():
                     ".api_inference_rule_metadata", infrule_id=item_id, _external=True
                 ),
                 "Get inference rule metadata",
+            )
+        }
+        resource["_templates"] = {
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "inference_rule_name_latex",
+                        required=True,
+                        value=resource.get("name_latex"),
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "inference_rule_latex",
+                        required=True,
+                        value=resource.get("latex"),
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "number_of_inputs",
+                        type_="number",
+                        value=resource.get("number_of_inputs"),
+                        prompt="Number of Inputs",
+                    ),
+                    hal_property(
+                        "number_of_feeds",
+                        type_="number",
+                        value=resource.get("number_of_feeds"),
+                        prompt="Number of Feeds",
+                    ),
+                    hal_property(
+                        "number_of_outputs",
+                        type_="number",
+                        value=resource.get("number_of_outputs"),
+                        prompt="Number of Outputs",
+                    ),
+                ],
+                title="Edit this inference rule",
+                target=url_for(
+                    ".api_edit_inference_rule", infrule_id=item_id, _external=True
+                ),
             ),
-            "edit": hal_link(
-                url_for(".api_edit_inference_rule", infrule_id=item_id, _external=True),
-                "Edit this inference rule",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(
+            "delete": hal_template(
+                "DELETE",
+                [],
+                title="Delete this inference rule",
+                target=url_for(
                     ".api_delete_inference_rule", infrule_id=item_id, _external=True
                 ),
-                "Delete inference rule",
-                method="DELETE",
             ),
         }
         embedded_items.append(resource)
@@ -989,8 +1055,18 @@ def api_list_expressions():
                     ),
                 ],
                 title="Edit this expression",
+                target=url_for(
+                    ".api_edit_expression", expression_id=item_id, _external=True
+                ),
             ),
-            "delete": hal_template("DELETE", [], title="Delete this expression"),
+            "delete": hal_template(
+                "DELETE",
+                [],
+                title="Delete this expression",
+                target=url_for(
+                    ".api_delete_expression", expression_id=item_id, _external=True
+                ),
+            ),
         }
         embedded_items.append(resource)
 
@@ -1092,16 +1168,54 @@ def api_list_operation_symbols():
                     ".api_operation_metadata", operation_id=item_id, _external=True
                 ),
                 "Get operation metadata",
+            )
+        }
+        resource["_templates"] = {
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "operation_name_latex",
+                        required=True,
+                        value=resource.get("name_latex"),
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "operation_latex",
+                        required=True,
+                        value=resource.get("latex"),
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "operation_description_latex",
+                        value=resource.get("description_latex"),
+                        prompt="Description (LaTeX)",
+                    ),
+                    hal_property(
+                        "operation_reference_latex",
+                        value=resource.get("reference_latex"),
+                        prompt="Reference (LaTeX)",
+                    ),
+                    hal_property(
+                        "operation_argument_count",
+                        type_="number",
+                        required=True,
+                        value=resource.get("argument_count"),
+                        prompt="Number of Arguments",
+                    ),
+                ],
+                title="Edit this operation symbol",
+                target=url_for(
+                    ".api_edit_operation", operation_id=item_id, _external=True
+                ),
             ),
-            "edit": hal_link(
-                url_for(".api_edit_operation", operation_id=item_id, _external=True),
-                "Edit this operation",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(".api_delete_operation", operation_id=item_id, _external=True),
-                "Delete operation",
-                method="DELETE",
+            "delete": hal_template(
+                "DELETE",
+                [],
+                title="Delete this operation symbol",
+                target=url_for(
+                    ".api_delete_operation", operation_id=item_id, _external=True
+                ),
             ),
         }
         embedded_items.append(resource)
@@ -1187,16 +1301,46 @@ def api_list_relation_symbols():
             "self": hal_link(
                 url_for(".api_relation_metadata", relation_id=item_id, _external=True),
                 "Get relation metadata",
+            )
+        }
+        resource["_templates"] = {
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "relation_name_latex",
+                        value=resource.get("name_latex"),
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "relation_latex",
+                        required=True,
+                        value=resource.get("latex"),
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "relation_description_latex",
+                        value=resource.get("description_latex"),
+                        prompt="Description (LaTeX)",
+                    ),
+                    hal_property(
+                        "relation_reference_latex",
+                        value=resource.get("reference_latex"),
+                        prompt="Reference (LaTeX)",
+                    ),
+                ],
+                title="Edit this relation symbol",
+                target=url_for(
+                    ".api_edit_relation", relation_id=item_id, _external=True
+                ),
             ),
-            "edit": hal_link(
-                url_for(".api_edit_relation", relation_id=item_id, _external=True),
-                "Edit this relation",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(".api_delete_relation", relation_id=item_id, _external=True),
-                "Delete relation",
-                method="DELETE",
+            "delete": hal_template(
+                "DELETE",
+                [],
+                title="Delete this relation symbol",
+                target=url_for(
+                    ".api_delete_relation", relation_id=item_id, _external=True
+                ),
             ),
         }
         embedded_items.append(resource)
@@ -1284,16 +1428,104 @@ def api_list_scalar_symbols():
             "self": hal_link(
                 url_for(".api_scalar_metadata", symbol_id=item_id, _external=True),
                 "Get scalar metadata",
+            )
+        }
+        resource["_templates"] = {
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "symbol_name_latex",
+                        value=resource.get("name_latex"),
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_latex",
+                        required=True,
+                        value=resource.get("latex"),
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "symbol_description_latex",
+                        value=resource.get("description_latex"),
+                        prompt="Description (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_reference_latex",
+                        value=resource.get("reference_latex"),
+                        prompt="Reference (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_scope",
+                        required=True,
+                        value=resource.get("scope"),
+                        options=list_of_valid.scalar_scope,
+                        prompt="Scope",
+                    ),
+                    hal_property(
+                        "symbol_variable_or_constant",
+                        required=True,
+                        value=resource.get("variable_or_constant"),
+                        options=["variable", "constant"],
+                        prompt="Variable or Constant",
+                    ),
+                    hal_property(
+                        "symbol_domain",
+                        value=resource.get("domain"),
+                        options=list_of_valid.scalar_domain,
+                        prompt="Domain",
+                    ),
+                    hal_property(
+                        "dimension_length",
+                        type_="number",
+                        value=resource.get("dimension_length"),
+                        prompt="Dimension: Length exponent",
+                    ),
+                    hal_property(
+                        "dimension_time",
+                        type_="number",
+                        value=resource.get("dimension_time"),
+                        prompt="Dimension: Time exponent",
+                    ),
+                    hal_property(
+                        "dimension_mass",
+                        type_="number",
+                        value=resource.get("dimension_mass"),
+                        prompt="Dimension: Mass exponent",
+                    ),
+                    hal_property(
+                        "dimension_temperature",
+                        type_="number",
+                        value=resource.get("dimension_temperature"),
+                        prompt="Dimension: Temperature exponent",
+                    ),
+                    hal_property(
+                        "dimension_electric_charge",
+                        type_="number",
+                        value=resource.get("dimension_electric_charge"),
+                        prompt="Dimension: Electric charge exponent",
+                    ),
+                    hal_property(
+                        "dimension_amount_of_substance",
+                        type_="number",
+                        value=resource.get("dimension_amount_of_substance"),
+                        prompt="Dimension: Amount of substance exponent",
+                    ),
+                    hal_property(
+                        "dimension_luminous_intensity",
+                        type_="number",
+                        value=resource.get("dimension_luminous_intensity"),
+                        prompt="Dimension: Luminous intensity exponent",
+                    ),
+                ],
+                title="Edit this scalar symbol",
+                target=url_for(".api_edit_scalar", symbol_id=item_id, _external=True),
             ),
-            "edit": hal_link(
-                url_for(".api_edit_scalar", symbol_id=item_id, _external=True),
-                "Edit this scalar",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(".api_delete_scalar", symbol_id=item_id, _external=True),
-                "Delete scalar",
-                method="DELETE",
+            "delete": hal_template(
+                "DELETE",
+                [],
+                title="Delete this scalar symbol",
+                target=url_for(".api_delete_scalar", symbol_id=item_id, _external=True),
             ),
         }
         embedded_items.append(resource)
@@ -1437,16 +1669,64 @@ def api_list_vector_symbols():
             "self": hal_link(
                 url_for(".api_vector_metadata", symbol_id=item_id, _external=True),
                 "Get vector metadata",
+            )
+        }
+        resource["_templates"] = {
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "symbol_name_latex",
+                        value=resource.get("name_latex"),
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_latex",
+                        required=True,
+                        value=resource.get("latex"),
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "symbol_description_latex",
+                        value=resource.get("description_latex"),
+                        prompt="Description (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_reference_latex",
+                        value=resource.get("reference_latex"),
+                        prompt="Reference (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_is_composite",
+                        type_="checkbox",
+                        value=resource.get("is_composite"),
+                        prompt="Is Composite?",
+                    ),
+                    hal_property(
+                        "symbol_size",
+                        required=True,
+                        value=resource.get("size"),
+                        prompt='Size ("arbitrary" or a fixed size)',
+                    ),
+                    hal_property(
+                        "symbol_orientation",
+                        value=resource.get("orientation"),
+                        prompt="Orientation",
+                    ),
+                    hal_property(
+                        "symbol_number_of_entries",
+                        value=resource.get("number_of_entries"),
+                        prompt="Number of Entries",
+                    ),
+                ],
+                title="Edit this vector symbol",
+                target=url_for(".api_edit_vector", symbol_id=item_id, _external=True),
             ),
-            "edit": hal_link(
-                url_for(".api_edit_vector", symbol_id=item_id, _external=True),
-                "Edit this vector",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(".api_delete_vector", symbol_id=item_id, _external=True),
-                "Delete vector",
-                method="DELETE",
+            "delete": hal_template(
+                "DELETE",
+                [],
+                title="Delete this vector symbol",
+                target=url_for(".api_delete_vector", symbol_id=item_id, _external=True),
             ),
         }
         embedded_items.append(resource)
@@ -1544,16 +1824,64 @@ def api_list_matrix_symbols():
             "self": hal_link(
                 url_for(".api_matrix_metadata", symbol_id=item_id, _external=True),
                 "Get matrix metadata",
+            )
+        }
+        resource["_templates"] = {
+            "edit": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "symbol_name_latex",
+                        value=resource.get("name_latex"),
+                        prompt="Name (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_latex",
+                        required=True,
+                        value=resource.get("latex"),
+                        prompt="LaTeX Representation",
+                    ),
+                    hal_property(
+                        "symbol_description_latex",
+                        value=resource.get("description_latex"),
+                        prompt="Description (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_reference_latex",
+                        value=resource.get("reference_latex"),
+                        prompt="Reference (LaTeX)",
+                    ),
+                    hal_property(
+                        "symbol_is_composite",
+                        type_="checkbox",
+                        value=resource.get("is_composite"),
+                        prompt="Is Composite?",
+                    ),
+                    hal_property(
+                        "symbol_size",
+                        required=True,
+                        value=resource.get("size"),
+                        prompt='Size ("arbitrary" or a fixed size)',
+                    ),
+                    hal_property(
+                        "symbol_number_of_rows",
+                        value=resource.get("number_of_rows"),
+                        prompt="Number of Rows",
+                    ),
+                    hal_property(
+                        "symbol_number_of_columns",
+                        value=resource.get("number_of_columns"),
+                        prompt="Number of Columns",
+                    ),
+                ],
+                title="Edit this matrix symbol",
+                target=url_for(".api_edit_matrix", symbol_id=item_id, _external=True),
             ),
-            "edit": hal_link(
-                url_for(".api_edit_matrix", symbol_id=item_id, _external=True),
-                "Edit this matrix",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(".api_delete_matrix", symbol_id=item_id, _external=True),
-                "Delete matrix",
-                method="DELETE",
+            "delete": hal_template(
+                "DELETE",
+                [],
+                title="Delete this matrix symbol",
+                target=url_for(".api_delete_matrix", symbol_id=item_id, _external=True),
             ),
         }
         embedded_items.append(resource)
@@ -3547,43 +3875,61 @@ def api_derivation_metadata(derivation_id: str):
             title="Not Found",
         )
     logger.info("[TRACE] end " + trace_id)
+    links = {
+        "self": hal_link(
+            url_for(
+                ".api_derivation_metadata", derivation_id=derivation_id, _external=True
+            ),
+            "Get derivation metadata",
+        ),
+        "steps": hal_link(
+            url_for(
+                ".api_derivation_steps", derivation_id=derivation_id, _external=True
+            ),
+            "View derivation steps",
+        ),
+        "up": hal_link(
+            url_for(".api_list_derivations", _external=True), "List of Derivations"
+        ),
+    }
+    templates = {
+        "edit": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "derivation_name_latex",
+                    required=True,
+                    value=derivation_dict.get("name_latex"),
+                    prompt="Name (LaTeX)",
+                ),
+                hal_property(
+                    "derivation_abstract_latex",
+                    required=True,
+                    value=derivation_dict.get("abstract_latex"),
+                    prompt="Abstract (LaTeX)",
+                ),
+                hal_property(
+                    "derivation_reference_latex",
+                    value=derivation_dict.get("reference_latex"),
+                    prompt="Reference (LaTeX)",
+                ),
+            ],
+            title="Edit this derivation",
+            target=url_for(
+                ".api_edit_derivation", derivation_id=derivation_id, _external=True
+            ),
+        ),
+        "delete": hal_template(
+            "DELETE",
+            [],
+            title="Delete this derivation",
+            target=url_for(
+                ".api_delete_derivation", derivation_id=derivation_id, _external=True
+            ),
+        ),
+    }
     return hal_response(
-        data={"metadata": derivation_dict},
-        links={
-            "self": hal_link(
-                url_for(
-                    ".api_derivation_metadata",
-                    derivation_id=derivation_id,
-                    _external=True,
-                ),
-                "Get derivation metadata",
-            ),
-            "steps": hal_link(
-                url_for(
-                    ".api_derivation_steps", derivation_id=derivation_id, _external=True
-                ),
-                "View derivation steps",
-            ),
-            "edit": hal_link(
-                url_for(
-                    ".api_edit_derivation", derivation_id=derivation_id, _external=True
-                ),
-                "Edit this derivation",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(
-                    ".api_delete_derivation",
-                    derivation_id=derivation_id,
-                    _external=True,
-                ),
-                "Delete this derivation",
-                method="DELETE",
-            ),
-            "up": hal_link(
-                url_for(".api_list_derivations", _external=True), "List of Derivations"
-            ),
-        },
+        data={"metadata": derivation_dict}, links=links, templates=templates
     )
 
 
@@ -3613,36 +3959,69 @@ def api_inference_rule_metadata(infrule_id: str):
             title="Not Found",
         )
     logger.info("[TRACE] end " + trace_id)
+    links = {
+        "self": hal_link(
+            url_for(
+                ".api_inference_rule_metadata", infrule_id=infrule_id, _external=True
+            ),
+            "Get inference rule metadata",
+        ),
+        "up": hal_link(
+            url_for(".api_list_inference_rules", _external=True),
+            "List of Inference Rules",
+        ),
+    }
+    templates = {
+        "edit": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "inference_rule_name_latex",
+                    required=True,
+                    value=inference_rule_dict.get("name_latex"),
+                    prompt="Name (LaTeX)",
+                ),
+                hal_property(
+                    "inference_rule_latex",
+                    required=True,
+                    value=inference_rule_dict.get("latex"),
+                    prompt="LaTeX Representation",
+                ),
+                hal_property(
+                    "number_of_inputs",
+                    type_="number",
+                    value=inference_rule_dict.get("number_of_inputs"),
+                    prompt="Number of Inputs",
+                ),
+                hal_property(
+                    "number_of_feeds",
+                    type_="number",
+                    value=inference_rule_dict.get("number_of_feeds"),
+                    prompt="Number of Feeds",
+                ),
+                hal_property(
+                    "number_of_outputs",
+                    type_="number",
+                    value=inference_rule_dict.get("number_of_outputs"),
+                    prompt="Number of Outputs",
+                ),
+            ],
+            title="Edit this inference rule",
+            target=url_for(
+                ".api_edit_inference_rule", infrule_id=infrule_id, _external=True
+            ),
+        ),
+        "delete": hal_template(
+            "DELETE",
+            [],
+            title="Delete this inference rule",
+            target=url_for(
+                ".api_delete_inference_rule", infrule_id=infrule_id, _external=True
+            ),
+        ),
+    }
     return hal_response(
-        data={"metadata": inference_rule_dict},
-        links={
-            "self": hal_link(
-                url_for(
-                    ".api_inference_rule_metadata",
-                    infrule_id=infrule_id,
-                    _external=True,
-                ),
-                "Get inference rule metadata",
-            ),
-            "edit": hal_link(
-                url_for(
-                    ".api_edit_inference_rule", infrule_id=infrule_id, _external=True
-                ),
-                "Edit this inference rule",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(
-                    ".api_delete_inference_rule", infrule_id=infrule_id, _external=True
-                ),
-                "Delete this inference rule",
-                method="DELETE",
-            ),
-            "up": hal_link(
-                url_for(".api_list_inference_rules", _external=True),
-                "List of Inference Rules",
-            ),
-        },
+        data={"metadata": inference_rule_dict}, links=links, templates=templates
     )
 
 
@@ -3731,12 +4110,27 @@ def api_expression_metadata(expression_id: str):
                 ),
             ],
             title="Edit this expression",
+            target=url_for(
+                ".api_edit_expression", expression_id=expression_id, _external=True
+            ),
         ),
-        "delete": hal_template("DELETE", [], title="Delete this expression"),
+        "delete": hal_template(
+            "DELETE",
+            [],
+            title="Delete this expression",
+            target=url_for(
+                ".api_delete_expression", expression_id=expression_id, _external=True
+            ),
+        ),
         "associate-symbol": hal_template(
             "POST",
             [hal_property("symbol_id", required=True, prompt="Symbol ID to Associate")],
             title="Associate symbol with this expression",
+            target=url_for(
+                ".api_associate_symbol_with_expression",
+                expression_id=expression_id,
+                _external=True,
+            ),
         ),
     }
 
@@ -3772,28 +4166,116 @@ def api_scalar_metadata(symbol_id: str):
             title="Not Found",
         )
     logger.info("[TRACE] end " + trace_id)
+    links = {
+        "self": hal_link(
+            url_for(".api_scalar_metadata", symbol_id=symbol_id, _external=True),
+            "Get scalar metadata",
+        ),
+        "up": hal_link(
+            url_for(".api_list_scalar_symbols", _external=True),
+            "List of Scalar Symbols",
+        ),
+    }
+    templates = {
+        "edit": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "symbol_name_latex",
+                    value=scalar_dict.get("name_latex"),
+                    prompt="Name (LaTeX)",
+                ),
+                hal_property(
+                    "symbol_latex",
+                    required=True,
+                    value=scalar_dict.get("latex"),
+                    prompt="LaTeX Representation",
+                ),
+                hal_property(
+                    "symbol_description_latex",
+                    value=scalar_dict.get("description_latex"),
+                    prompt="Description (LaTeX)",
+                ),
+                hal_property(
+                    "symbol_reference_latex",
+                    value=scalar_dict.get("reference_latex"),
+                    prompt="Reference (LaTeX)",
+                ),
+                hal_property(
+                    "symbol_scope",
+                    required=True,
+                    value=scalar_dict.get("scope"),
+                    options=list_of_valid.scalar_scope,
+                    prompt="Scope",
+                ),
+                hal_property(
+                    "symbol_variable_or_constant",
+                    required=True,
+                    value=scalar_dict.get("variable_or_constant"),
+                    options=["variable", "constant"],
+                    prompt="Variable or Constant",
+                ),
+                hal_property(
+                    "symbol_domain",
+                    value=scalar_dict.get("domain"),
+                    options=list_of_valid.scalar_domain,
+                    prompt="Domain",
+                ),
+                hal_property(
+                    "dimension_length",
+                    type_="number",
+                    value=scalar_dict.get("dimension_length"),
+                    prompt="Dimension: Length exponent",
+                ),
+                hal_property(
+                    "dimension_time",
+                    type_="number",
+                    value=scalar_dict.get("dimension_time"),
+                    prompt="Dimension: Time exponent",
+                ),
+                hal_property(
+                    "dimension_mass",
+                    type_="number",
+                    value=scalar_dict.get("dimension_mass"),
+                    prompt="Dimension: Mass exponent",
+                ),
+                hal_property(
+                    "dimension_temperature",
+                    type_="number",
+                    value=scalar_dict.get("dimension_temperature"),
+                    prompt="Dimension: Temperature exponent",
+                ),
+                hal_property(
+                    "dimension_electric_charge",
+                    type_="number",
+                    value=scalar_dict.get("dimension_electric_charge"),
+                    prompt="Dimension: Electric charge exponent",
+                ),
+                hal_property(
+                    "dimension_amount_of_substance",
+                    type_="number",
+                    value=scalar_dict.get("dimension_amount_of_substance"),
+                    prompt="Dimension: Amount of substance exponent",
+                ),
+                hal_property(
+                    "dimension_luminous_intensity",
+                    type_="number",
+                    value=scalar_dict.get("dimension_luminous_intensity"),
+                    prompt="Dimension: Luminous intensity exponent",
+                ),
+            ],
+            title="Edit this scalar symbol",
+            target=url_for(".api_edit_scalar", symbol_id=symbol_id, _external=True),
+        ),
+        "delete": hal_template(
+            "DELETE",
+            [],
+            title="Delete this scalar symbol",
+            target=url_for(".api_delete_scalar", symbol_id=symbol_id, _external=True),
+        ),
+    }
     return hal_response(
-        data={"metadata": scalar_dict},
-        links={
-            "self": hal_link(
-                url_for(".api_scalar_metadata", symbol_id=symbol_id, _external=True),
-                "Get scalar metadata",
-            ),
-            "edit": hal_link(
-                url_for(".api_edit_scalar", symbol_id=symbol_id, _external=True),
-                "Edit this scalar",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(".api_delete_scalar", symbol_id=symbol_id, _external=True),
-                "Delete this scalar",
-                method="DELETE",
-            ),
-            "up": hal_link(
-                url_for(".api_list_scalar_symbols", _external=True),
-                "List of Scalar Symbols",
-            ),
-        },
+        data={"metadata": scalar_dict}, links=links, templates=templates
     )
 
 
@@ -3823,28 +4305,76 @@ def api_vector_metadata(symbol_id: str):
             title="Not Found",
         )
     logger.info("[TRACE] end " + trace_id)
+    links = {
+        "self": hal_link(
+            url_for(".api_vector_metadata", symbol_id=symbol_id, _external=True),
+            "Get vector metadata",
+        ),
+        "up": hal_link(
+            url_for(".api_list_vector_symbols", _external=True),
+            "List of Vector Symbols",
+        ),
+    }
+    templates = {
+        "edit": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "symbol_name_latex",
+                    value=vector_dict.get("name_latex"),
+                    prompt="Name (LaTeX)",
+                ),
+                hal_property(
+                    "symbol_latex",
+                    required=True,
+                    value=vector_dict.get("latex"),
+                    prompt="LaTeX Representation",
+                ),
+                hal_property(
+                    "symbol_description_latex",
+                    value=vector_dict.get("description_latex"),
+                    prompt="Description (LaTeX)",
+                ),
+                hal_property(
+                    "symbol_reference_latex",
+                    value=vector_dict.get("reference_latex"),
+                    prompt="Reference (LaTeX)",
+                ),
+                hal_property(
+                    "symbol_is_composite",
+                    type_="checkbox",
+                    value=vector_dict.get("is_composite"),
+                    prompt="Is Composite?",
+                ),
+                hal_property(
+                    "symbol_size",
+                    required=True,
+                    value=vector_dict.get("size"),
+                    prompt='Size ("arbitrary" or a fixed size)',
+                ),
+                hal_property(
+                    "symbol_orientation",
+                    value=vector_dict.get("orientation"),
+                    prompt="Orientation",
+                ),
+                hal_property(
+                    "symbol_number_of_entries",
+                    value=vector_dict.get("number_of_entries"),
+                    prompt="Number of Entries",
+                ),
+            ],
+            title="Edit this vector symbol",
+            target=url_for(".api_edit_vector", symbol_id=symbol_id, _external=True),
+        ),
+        "delete": hal_template(
+            "DELETE",
+            [],
+            title="Delete this vector symbol",
+            target=url_for(".api_delete_vector", symbol_id=symbol_id, _external=True),
+        ),
+    }
     return hal_response(
-        data={"metadata": vector_dict},
-        links={
-            "self": hal_link(
-                url_for(".api_vector_metadata", symbol_id=symbol_id, _external=True),
-                "Get vector metadata",
-            ),
-            "edit": hal_link(
-                url_for(".api_edit_vector", symbol_id=symbol_id, _external=True),
-                "Edit this vector",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(".api_delete_vector", symbol_id=symbol_id, _external=True),
-                "Delete this vector",
-                method="DELETE",
-            ),
-            "up": hal_link(
-                url_for(".api_list_vector_symbols", _external=True),
-                "List of Vector Symbols",
-            ),
-        },
+        data={"metadata": vector_dict}, links=links, templates=templates
     )
 
 
@@ -3869,28 +4399,76 @@ def api_matrix_metadata(symbol_id: str):
             title="Not Found",
         )
     logger.info("[TRACE] end " + trace_id)
+    links = {
+        "self": hal_link(
+            url_for(".api_matrix_metadata", symbol_id=symbol_id, _external=True),
+            "Get matrix metadata",
+        ),
+        "up": hal_link(
+            url_for(".api_list_matrix_symbols", _external=True),
+            "List of Matrix Symbols",
+        ),
+    }
+    templates = {
+        "edit": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "symbol_name_latex",
+                    value=matrix_dict.get("name_latex"),
+                    prompt="Name (LaTeX)",
+                ),
+                hal_property(
+                    "symbol_latex",
+                    required=True,
+                    value=matrix_dict.get("latex"),
+                    prompt="LaTeX Representation",
+                ),
+                hal_property(
+                    "symbol_description_latex",
+                    value=matrix_dict.get("description_latex"),
+                    prompt="Description (LaTeX)",
+                ),
+                hal_property(
+                    "symbol_reference_latex",
+                    value=matrix_dict.get("reference_latex"),
+                    prompt="Reference (LaTeX)",
+                ),
+                hal_property(
+                    "symbol_is_composite",
+                    type_="checkbox",
+                    value=matrix_dict.get("is_composite"),
+                    prompt="Is Composite?",
+                ),
+                hal_property(
+                    "symbol_size",
+                    required=True,
+                    value=matrix_dict.get("size"),
+                    prompt='Size ("arbitrary" or a fixed size)',
+                ),
+                hal_property(
+                    "symbol_number_of_rows",
+                    value=matrix_dict.get("number_of_rows"),
+                    prompt="Number of Rows",
+                ),
+                hal_property(
+                    "symbol_number_of_columns",
+                    value=matrix_dict.get("number_of_columns"),
+                    prompt="Number of Columns",
+                ),
+            ],
+            title="Edit this matrix symbol",
+            target=url_for(".api_edit_matrix", symbol_id=symbol_id, _external=True),
+        ),
+        "delete": hal_template(
+            "DELETE",
+            [],
+            title="Delete this matrix symbol",
+            target=url_for(".api_delete_matrix", symbol_id=symbol_id, _external=True),
+        ),
+    }
     return hal_response(
-        data={"metadata": matrix_dict},
-        links={
-            "self": hal_link(
-                url_for(".api_matrix_metadata", symbol_id=symbol_id, _external=True),
-                "Get matrix metadata",
-            ),
-            "edit": hal_link(
-                url_for(".api_edit_matrix", symbol_id=symbol_id, _external=True),
-                "Edit this matrix",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(".api_delete_matrix", symbol_id=symbol_id, _external=True),
-                "Delete this matrix",
-                method="DELETE",
-            ),
-            "up": hal_link(
-                url_for(".api_list_matrix_symbols", _external=True),
-                "List of Matrix Symbols",
-            ),
-        },
+        data={"metadata": matrix_dict}, links=links, templates=templates
     )
 
 
@@ -3921,34 +4499,68 @@ def api_operation_metadata(operation_id: str):
             },
             title="Not Found",
         )
+    links = {
+        "self": hal_link(
+            url_for(
+                ".api_operation_metadata", operation_id=operation_id, _external=True
+            ),
+            "Get operation metadata",
+        ),
+        "up": hal_link(
+            url_for(".api_list_operation_symbols", _external=True),
+            "List of Operation Symbols",
+        ),
+    }
+    templates = {
+        "edit": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "operation_name_latex",
+                    required=True,
+                    value=operation_dict.get("name_latex"),
+                    prompt="Name (LaTeX)",
+                ),
+                hal_property(
+                    "operation_latex",
+                    required=True,
+                    value=operation_dict.get("latex"),
+                    prompt="LaTeX Representation",
+                ),
+                hal_property(
+                    "operation_description_latex",
+                    value=operation_dict.get("description_latex"),
+                    prompt="Description (LaTeX)",
+                ),
+                hal_property(
+                    "operation_reference_latex",
+                    value=operation_dict.get("reference_latex"),
+                    prompt="Reference (LaTeX)",
+                ),
+                hal_property(
+                    "operation_argument_count",
+                    type_="number",
+                    required=True,
+                    value=operation_dict.get("argument_count"),
+                    prompt="Number of Arguments",
+                ),
+            ],
+            title="Edit this operation symbol",
+            target=url_for(
+                ".api_edit_operation", operation_id=operation_id, _external=True
+            ),
+        ),
+        "delete": hal_template(
+            "DELETE",
+            [],
+            title="Delete this operation symbol",
+            target=url_for(
+                ".api_delete_operation", operation_id=operation_id, _external=True
+            ),
+        ),
+    }
     return hal_response(
-        data={"metadata": operation_dict},
-        links={
-            "self": hal_link(
-                url_for(
-                    ".api_operation_metadata", operation_id=operation_id, _external=True
-                ),
-                "Get operation metadata",
-            ),
-            "edit": hal_link(
-                url_for(
-                    ".api_edit_operation", operation_id=operation_id, _external=True
-                ),
-                "Edit this operation",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(
-                    ".api_delete_operation", operation_id=operation_id, _external=True
-                ),
-                "Delete this operation",
-                method="DELETE",
-            ),
-            "up": hal_link(
-                url_for(".api_list_operation_symbols", _external=True),
-                "List of Operation Symbols",
-            ),
-        },
+        data={"metadata": operation_dict}, links=links, templates=templates
     )
 
 
@@ -3979,32 +4591,58 @@ def api_relation_metadata(relation_id: str):
             },
             title="Not Found",
         )
+    links = {
+        "self": hal_link(
+            url_for(".api_relation_metadata", relation_id=relation_id, _external=True),
+            "Get relation metadata",
+        ),
+        "up": hal_link(
+            url_for(".api_list_relation_symbols", _external=True),
+            "List of Relation Symbols",
+        ),
+    }
+    templates = {
+        "edit": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "relation_name_latex",
+                    value=relation_dict.get("name_latex"),
+                    prompt="Name (LaTeX)",
+                ),
+                hal_property(
+                    "relation_latex",
+                    required=True,
+                    value=relation_dict.get("latex"),
+                    prompt="LaTeX Representation",
+                ),
+                hal_property(
+                    "relation_description_latex",
+                    value=relation_dict.get("description_latex"),
+                    prompt="Description (LaTeX)",
+                ),
+                hal_property(
+                    "relation_reference_latex",
+                    value=relation_dict.get("reference_latex"),
+                    prompt="Reference (LaTeX)",
+                ),
+            ],
+            title="Edit this relation symbol",
+            target=url_for(
+                ".api_edit_relation", relation_id=relation_id, _external=True
+            ),
+        ),
+        "delete": hal_template(
+            "DELETE",
+            [],
+            title="Delete this relation symbol",
+            target=url_for(
+                ".api_delete_relation", relation_id=relation_id, _external=True
+            ),
+        ),
+    }
     return hal_response(
-        data={"metadata": relation_dict},
-        links={
-            "self": hal_link(
-                url_for(
-                    ".api_relation_metadata", relation_id=relation_id, _external=True
-                ),
-                "Get relation metadata",
-            ),
-            "edit": hal_link(
-                url_for(".api_edit_relation", relation_id=relation_id, _external=True),
-                "Edit this relation",
-                method="POST",
-            ),
-            "delete": hal_link(
-                url_for(
-                    ".api_delete_relation", relation_id=relation_id, _external=True
-                ),
-                "Delete this relation",
-                method="DELETE",
-            ),
-            "up": hal_link(
-                url_for(".api_list_relation_symbols", _external=True),
-                "List of Relation Symbols",
-            ),
-        },
+        data={"metadata": relation_dict}, links=links, templates=templates
     )
 
 
@@ -4044,15 +4682,40 @@ def api_derivation_steps(derivation_id: str):
                 ),
                 "Steps in this derivation",
             ),
-            "delete": hal_link(
-                url_for(
+        }
+        step_copy["_templates"] = {
+            "edit-notes": hal_template(
+                "POST",
+                [
+                    hal_property(
+                        "note_before_step_latex",
+                        value=step.get("note_before_step_latex"),
+                        prompt="Note Before Step (LaTeX)",
+                    ),
+                    hal_property(
+                        "note_after_step_latex",
+                        value=step.get("note_after_step_latex"),
+                        prompt="Note After Step (LaTeX)",
+                    ),
+                ],
+                title="Edit step notes",
+                target=url_for(
+                    ".api_edit_step_notes",
+                    derivation_id=derivation_id,
+                    step_id=step_id,
+                    _external=True,
+                ),
+            ),
+            "delete": hal_template(
+                "DELETE",
+                [],
+                title="Delete this step",
+                target=url_for(
                     ".api_delete_step",
                     derivation_id=derivation_id,
                     step_id=step_id,
                     _external=True,
                 ),
-                "Delete step",
-                method="DELETE",
             ),
         }
         formatted_steps.append(step_copy)
@@ -4305,63 +4968,106 @@ def api_get_step(derivation_id: str, step_id: str):
             ),
             "View steps",
         ),
-        "edit-notes": hal_link(
-            url_for(
+    }
+    templates = {
+        "edit-notes": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "note_before_step_latex",
+                    value=full_step_data.get("note_before_step_latex"),
+                    prompt="Note Before Step (LaTeX)",
+                ),
+                hal_property(
+                    "note_after_step_latex",
+                    value=full_step_data.get("note_after_step_latex"),
+                    prompt="Note After Step (LaTeX)",
+                ),
+            ],
+            title="Edit step notes",
+            target=url_for(
                 ".api_edit_step_notes",
                 derivation_id=derivation_id,
                 step_id=step_id,
                 _external=True,
             ),
-            "Edit step notes",
         ),
-        "swap-input": hal_link(
-            url_for(
+        "swap-input": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "old_input_id", required=True, prompt="Existing Input Expression ID"
+                ),
+                hal_property(
+                    "new_input_id", required=True, prompt="New Input Expression ID"
+                ),
+            ],
+            title="Swap an input expression",
+            target=url_for(
                 ".api_swap_step_input",
                 derivation_id=derivation_id,
                 step_id=step_id,
                 _external=True,
             ),
-            "Swap input",
         ),
-        "swap-feed": hal_link(
-            url_for(
+        "swap-feed": hal_template(
+            "POST",
+            [
+                hal_property("old_feed_id", required=True, prompt="Existing Feed ID"),
+                hal_property("new_feed_id", required=True, prompt="New Feed ID"),
+            ],
+            title="Swap a feed",
+            target=url_for(
                 ".api_swap_step_feed",
                 derivation_id=derivation_id,
                 step_id=step_id,
                 _external=True,
             ),
-            "Swap feed",
         ),
-        "swap-output": hal_link(
-            url_for(
+        "swap-output": hal_template(
+            "POST",
+            [
+                hal_property(
+                    "old_output_id",
+                    required=True,
+                    prompt="Existing Output Expression ID",
+                ),
+                hal_property(
+                    "new_output_id", required=True, prompt="New Output Expression ID"
+                ),
+            ],
+            title="Swap an output expression",
+            target=url_for(
                 ".api_swap_step_output",
                 derivation_id=derivation_id,
                 step_id=step_id,
                 _external=True,
             ),
-            "Swap output",
         ),
-        "add-feed": hal_link(
-            url_for(
+        "add-feed": hal_template(
+            "POST",
+            [hal_property("feed_latex", required=True, prompt="Feed (LaTeX)")],
+            title="Add an inline feed to this step",
+            target=url_for(
                 ".api_add_step_feed",
                 derivation_id=derivation_id,
                 step_id=step_id,
                 _external=True,
             ),
-            "Add inline feed to step",
         ),
-        "delete": hal_link(
-            url_for(
+        "delete": hal_template(
+            "DELETE",
+            [],
+            title="Delete this step",
+            target=url_for(
                 ".api_delete_step",
                 derivation_id=derivation_id,
                 step_id=step_id,
                 _external=True,
             ),
-            "Delete step",
-            method="DELETE",
         ),
     }
-    return hal_response(data=full_step_data, links=links)
+    return hal_response(data=full_step_data, links=links, templates=templates)
 
 
 @api_bp.route(
