@@ -103,7 +103,7 @@ from flask import (
     request,
     make_response,
 )
-
+from werkzeug.exceptions import BadRequest
 from typing import Dict, List
 import neo4j  # type: ignore
 
@@ -408,6 +408,21 @@ def _handle_options_request():
     )
     resp.headers["Allow"] = ", ".join(allowed_methods)
     return resp
+
+
+@api_bp.errorhandler(BadRequest)
+def _handle_bad_request(err):
+    logger.info("[TRACE] BadRequest on %s %s: %r", request.method, request.path, err)
+    return hal_error(
+        "The request body could not be parsed. Please ensure it is well-formed JSON.",
+        400,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Malformed Request",
+    )
 
 
 @api_bp.errorhandler(neo4j.exceptions.DriverError)
