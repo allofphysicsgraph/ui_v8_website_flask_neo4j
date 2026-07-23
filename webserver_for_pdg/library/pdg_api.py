@@ -410,6 +410,91 @@ def _handle_options_request():
     return resp
 
 
+@api_bp.errorhandler(neo4j.exceptions.DriverError)
+def _handle_neo4j_driver_error(err):
+    """Centralized fallback for Neo4j driver-side failures that aren't caught
+    locally by a view function.
+
+    neo4j.exceptions.DriverError is the base class for connectivity/infrastructure
+    problems raised by the driver itself -- ServiceUnavailable, SessionExpired,
+    ConnectionPoolError, ResultError, TransactionError, etc. -- as opposed to
+    neo4j.exceptions.Neo4jError, which covers errors the server reports about a
+    specific query (bad Cypher, constraint violations, and similar). Those are a
+    separate class of problem, are meaningful only for the query-carrying
+    endpoints, and are intentionally left to be handled locally where they occur
+    (see api_cypher_query's ClientError/TransactionError handling), because a
+    generic driver-error response isn't a data-error, and mapping it to a 4xx
+    would misrepresent it as the caller's fault.
+
+    Without this handler, any of the ~54 session.write_transaction/read_transaction
+    calls in this blueprint that don't have a local try/except would let a DB
+    outage propagate past hal_error and out of Flask as an unhandled 500 with the
+    default HTML error page, instead of a HAL-formatted JSON error.
+    """
+    logger.error(
+        "[TRACE] Neo4j driver error on %s %s: %r", request.method, request.path, err
+    )
+    return hal_error(
+        "The database is temporarily unavailable. Please try again shortly.",
+        503,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title="Service Unavailable",
+    )
+
+
+@api_bp.errorhandler(neo4j.exceptions.ClientError)
+@api_bp.errorhandler(neo4j.exceptions.TransientError)
+@api_bp.errorhandler(neo4j.exceptions.DatabaseError)
+def _handle_neo4j_query_error(err):
+    """Centralized fallback for Neo4j server-reported errors (neo4j.exceptions.Neo4jError
+    subclasses) that aren't caught locally by a view function.
+
+    - ClientError: the query itself was rejected by the server (bad Cypher,
+      constraint violation, forbidden operation, auth/token issue). Unlike
+      api_cypher_query -- which accepts caller-supplied Cypher and already
+      handles ClientError itself as a 400 -- these other endpoints build their
+      own Cypher internally, so a ClientError here almost always means a bug in
+      the app's query or a genuine data conflict rather than a malformed caller
+      request. Surfaced as a 500, not a 4xx.
+    - DatabaseError: an internal server-side failure while executing an
+      otherwise-valid query (e.g. a corrupted store or execution failure).
+      Also a 500 -- not the caller's fault, and an immediate retry is unlikely
+      to help.
+    - TransientError: a temporary condition (leader election in progress,
+      DatabaseUnavailable, a write sent to a database that's momentarily
+      read-only) that should typically resolve on retry. Surfaced as a 503,
+      like the DriverError handler above.
+    """
+    status = 503 if isinstance(err, neo4j.exceptions.TransientError) else 500
+    title = "Service Unavailable" if status == 503 else "Database Error"
+    message = (
+        "The database is temporarily unable to service this request. Please try again shortly."
+        if status == 503
+        else "The database reported an error while processing this request."
+    )
+    logger.error(
+        "[TRACE] Neo4j %s on %s %s: %r",
+        type(err).__name__,
+        request.method,
+        request.path,
+        err,
+    )
+    return hal_error(
+        message,
+        status,
+        links={
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            )
+        },
+        title=title,
+    )
+
+
 @api_bp.route("/", methods=["GET"])
 def api_start_here():
     """
