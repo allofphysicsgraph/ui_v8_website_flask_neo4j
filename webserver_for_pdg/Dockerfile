@@ -10,6 +10,10 @@
 # https://hub.docker.com/r/phusion/baseimage/tags
 FROM phusion/baseimage:jammy-1.0.4
 
+# Suppress pip warnings and version checks during build/runtime
+ENV PIP_ROOT_USER_ACTION=ignore
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
 WORKDIR /code
 ENV FLASK_APP=pdg_app.py
 ENV FLASK_RUN_HOST=0.0.0.0
