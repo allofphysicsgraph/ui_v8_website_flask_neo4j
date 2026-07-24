@@ -28,6 +28,8 @@ from sympy.parsing.sympy_parser import parse_expr  # type: ignore
 from subprocess import PIPE  # https://docs.python.org/3/library/subprocess.html
 import subprocess  # https://stackoverflow.com/questions/39187886/what-is-the-difference-between-subprocess-popen-and-subprocess-run/39187984
 
+from typing import Any, List
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -81,7 +83,7 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
     return latex_str
 
 
-def cleaned_latex_str_to_sympy_expression(expr_latex: str):
+def cleaned_latex_str_to_sympy_expression(expr_latex: str) -> Any:
     """Convert a cleaned LaTeX string into a SymPy expression.
 
     This function wraps :func:`sympy.parsing.latex.parse_latex`, logging the
@@ -149,7 +151,7 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str):
     # <class 'sympy.core.relational.Equality'>
 
 
-def list_of_sympy_symbols_in_sympy_expression(sympy_expr):
+def list_of_sympy_symbols_in_sympy_expression(sympy_expr: Any) -> List[Any]:
     """Extracts all unique SymPy symbols contained in a SymPy expression.
 
     Traverses the given SymPy expression and collects every distinct

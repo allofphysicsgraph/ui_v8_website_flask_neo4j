@@ -71,7 +71,7 @@ logger = logging.getLogger(__name__)
 
 
 def generate_random_id(
-    graphDB_Driver, query_time_dict: query_timing_result_type
+    graphDB_Driver: Any, query_time_dict: query_timing_result_type
 ) -> Tuple[unique_numeric_id_as_str, query_timing_result_type]:
     """
     create statically defined numeric IDs for nodes in the graph
@@ -524,7 +524,7 @@ def generate_lookup_for_shorten_url(shorten_url_file: str) -> str:
     return random_string
 
 
-def add_url_to_shortened_list(now_str: str, current_user_email, user_url: str) -> str:
+def add_url_to_shortened_list(now_str: str, current_user_email: Optional[str], user_url: str) -> str:
     """
     User's email is part of the database in case someone decides to put something naughty in the database
 
@@ -588,7 +588,7 @@ def get_url_from_shortened_list(lookup: str) -> Tuple[str, str]:
 
 def send_email_with_msmtp(
     recipients: Union[str, List[str]], subject: str, body: str, from_address: str
-):
+) -> Tuple[bool, str]:
     """
     Sends an email using the system's msmtp command.
 
@@ -676,7 +676,7 @@ def send_email_with_msmtp(
 
 
 def check_whether_inference_rule_exists(
-    graphDB_Driver, query_time_dict, inference_rule_name: str, inference_rule_latex: str
+    graphDB_Driver: Any, query_time_dict: query_timing_result_type, inference_rule_name: str, inference_rule_latex: str
 ) -> Tuple[bool, str, query_timing_result_type]:
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -811,8 +811,8 @@ def get_sympy_as_latex_per_expr_id(
 
 
 def get_dimensional_consistency_for_every_expression(
-    graphDB_Driver, query_time_dict: query_timing_result_type
-):
+    graphDB_Driver: Any, query_time_dict: query_timing_result_type
+) -> Tuple[Dict[str, str], query_timing_result_type]:
     """
     This function checks the dimensional consistency of ALL expressions in PDG
     That is relevant for 'list_expressions' and 'create_expression'
@@ -871,8 +871,8 @@ def get_dimensional_consistency_for_every_expression(
 
 
 def get_dict_of_node_type_for_every_id(
-    graphDB_Driver, query_time_dict: query_timing_result_type
-) -> Tuple[dict, query_timing_result_type]:
+    graphDB_Driver: Any, query_time_dict: query_timing_result_type
+) -> Tuple[Dict[str, str], query_timing_result_type]:
     """
     >>> get_node_type_from_id()
     """
@@ -954,11 +954,11 @@ def remove_file_debris(
 
 
 def get_symbols_not_in_expression(
-    expression_dict,
-    symbols_in_expression,
-    graphDB_Driver,
+    expression_dict: dict,
+    symbols_in_expression: List[dict],
+    graphDB_Driver: Any,
     query_time_dict: query_timing_result_type,
-) -> Tuple[dict, query_timing_result_type]:
+) -> Tuple[List[dict], query_timing_result_type]:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -1017,11 +1017,11 @@ def get_symbols_not_in_expression(
 
 
 def get_operations_not_in_expression(
-    expression_dict,
-    operations_in_expression,
-    graphDB_Driver,
+    expression_dict: dict,
+    operations_in_expression: List[dict],
+    graphDB_Driver: Any,
     query_time_dict: query_timing_result_type,
-) -> Tuple[dict, query_timing_result_type]:
+) -> Tuple[List[dict], query_timing_result_type]:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -1070,11 +1070,11 @@ def get_operations_not_in_expression(
 
 
 def get_relations_not_in_expression(
-    expression_dict,
+    expression_dict: dict,
     relation_latex: str,
-    graphDB_Driver,
+    graphDB_Driver: Any,
     query_time_dict: query_timing_result_type,
-) -> Tuple[dict, query_timing_result_type]:
+) -> Tuple[List[dict], query_timing_result_type]:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -1101,8 +1101,8 @@ def get_relations_not_in_expression(
 
 
 def get_dict_of_node_dicts(
-    graphDB_Driver, query_time_dict: query_timing_result_type, node_type: str
-) -> Tuple[dict, query_timing_result_type]:
+    graphDB_Driver: Any, query_time_dict: query_timing_result_type, node_type: str
+) -> Tuple[Dict[str, dict], query_timing_result_type]:
     """
     >>> get_dict_of_node_dicts()
     """
@@ -1137,10 +1137,10 @@ def get_dict_of_node_dicts(
 
 
 def get_dict_of_steps_in_derivation(
-    graphDB_Driver,
+    graphDB_Driver: Any,
     derivation_id: unique_numeric_id_as_str,
     query_time_dict: query_timing_result_type,
-):
+) -> Tuple[Dict[str, dict], query_timing_result_type]:
     """
     returns dict with keys "step ID" and value dict with keys
     - sequence index

@@ -16,6 +16,7 @@ from .google_auth_sql_db import get_db
 from .google_auth_sql_db import init_db
 import sqlite3
 import logging
+from typing import Optional, Any
 
 logger = logging.getLogger(__name__)
 
@@ -23,14 +24,16 @@ logger = logging.getLogger(__name__)
 class User(UserMixin):
     logger.debug("in user.py/class User")
 
-    def __init__(self, id_, name, email, profile_pic):
+    def __init__(
+        self, id_: str, name: str, email: str, profile_pic: str
+    ) -> None:
         self.id = id_
         self.name = name
         self.email = email
         self.profile_pic = profile_pic
 
     @staticmethod
-    def get(user_id):
+    def get(user_id: str) -> Optional["User"]:
         logger.debug("in user.py/class User/get")
         # logger.debug(str(user_id)) # this is a numeric ID
         db = get_db()
@@ -53,7 +56,7 @@ class User(UserMixin):
         return user
 
     @staticmethod
-    def create(id_, name, email, profile_pic):
+    def create(id_: str, name: str, email: str, profile_pic: str) -> None:
         logger.debug("in user.py/class User/create")
         db = get_db()
         db.execute(

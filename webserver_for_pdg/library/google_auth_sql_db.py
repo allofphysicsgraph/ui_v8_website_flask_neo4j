@@ -13,11 +13,12 @@ import click
 from flask import current_app, g
 from flask.cli import with_appcontext
 import logging
+from typing import Optional, Any
 
 logger = logging.getLogger(__name__)
 
 
-def get_db():
+def get_db() -> sqlite3.Connection:
     logger.info("[TRACE] google_auth_sql_db/get_db")
     if "db" not in g:
         g.db = sqlite3.connect("users_sqlite.db", detect_types=sqlite3.PARSE_DECLTYPES)
@@ -26,7 +27,7 @@ def get_db():
     return g.db
 
 
-def close_db(e=None):
+def close_db(e: Optional[BaseException] = None) -> None:
     logger.info("[TRACE] google_auth_sql_db/close_db]")
 
     db = g.pop("db", None)
@@ -35,7 +36,7 @@ def close_db(e=None):
         db.close()
 
 
-def init_db():
+def init_db() -> None:
     logger.info("[TRACE] google_auth_sql_db/init_db")
     db = get_db()
 
@@ -50,7 +51,7 @@ def init_db():
 
 @click.command("init-db")
 @with_appcontext
-def init_db_command():
+def init_db_command() -> None:
     """Clear the existing data and create new tables."""
     logger.info("[TRACE] google_auth_sql_db/init_db_command")
     init_db()
@@ -59,7 +60,7 @@ def init_db_command():
 #    click.echo("Initialized the database.")
 
 
-def init_app(app):
+def init_app(app: Any) -> None:
     logger.info("[TRACE] google_auth_sql_db/init_app")
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)

@@ -2252,7 +2252,7 @@ def add_scalar_symbol(
     dimension_luminous_intensity: int,
     now_str: str,
     author_name_latex: str,
-):
+) -> None:
     """ """
 
     # corresponds to SpecifyNewSymbolDIRECTScalarForm
@@ -2336,7 +2336,7 @@ def add_vector_symbol(
     symbol_number_of_entries: str,
     now_str: str,
     author_name_latex: str,
-):
+) -> None:
     """ """
 
     # corresponds to SpecifyNewSymbolDIRECTVectorForm
@@ -2438,7 +2438,7 @@ def add_matrix_symbol(
     symbol_number_of_columns: str,
     now_str: str,
     author_name_latex: str,
-):
+) -> None:
     """ """
 
     # corresponds to SpecifyNewSymbolDIRECTMatrixForm
@@ -2634,7 +2634,7 @@ def add_relation_symbol(
 
 
 @trace_execution
-def get_list_of_all_node_IDs_and_labels(tx: Transaction) -> list:
+def get_list_of_all_node_IDs_and_labels(tx: Transaction) -> List[dict]:
     """ """
     result = tx.run("MATCH (n) RETURN n.id, labels(n)")
     record = result.data()
@@ -2659,7 +2659,7 @@ def delete_all_nodes_and_relationships(tx: Transaction) -> None:
 
 
 @trace_execution
-def user_query(tx: Transaction, query: str) -> list:
+def user_query(tx: Transaction, query: str) -> List[str]:
     """
     Execute an arbitrary, user-supplied Cypher query. READ-ONLY.
     User-submitted Cypher query for Neo4j database
