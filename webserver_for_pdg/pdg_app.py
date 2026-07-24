@@ -1755,8 +1755,7 @@ def to_review_derivation(
     )
 
     if request.method == "POST":
-        if not current_user.is_authenticated:
-            abort(403)  # Forbidden
+        # anonymous users can POST the button for generate PDF or generate tex
 
         logger.info("to_review_derivation: request.form = " + str(request.form))
 
@@ -1828,6 +1827,12 @@ def to_review_derivation(
             )
 
         elif "delete derivation" in request.form:
+            if not current_user.is_authenticated:
+                logger.warning(
+                    f"Unauthorized POST attempt to use delete button by anonymous user."
+                )
+                abort(403)  # Forbidden
+
             # delete derivation (yikes!). Here's how:
             # 1) for each step, delete step node
             # 2) delete derivation node
@@ -6002,8 +6007,8 @@ def to_query() -> ResponseReturnValue:
     web_form_cypher = CypherQueryForm()
 
     if request.method == "POST":
-        if not current_user.is_authenticated:
-            abort(403)  # Forbidden
+        # if not current_user.is_authenticated:
+        #     abort(403)  # Forbidden
 
         if "query submitted" in request.form:
             if web_form_cypher.validate():
