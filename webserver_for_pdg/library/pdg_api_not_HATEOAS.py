@@ -9,7 +9,7 @@
 import os
 import uuid
 import tokenize
-import neo4j
+import neo4j  # type: ignore
 
 from sympy.parsing.sympy_parser import parse_expr
 
