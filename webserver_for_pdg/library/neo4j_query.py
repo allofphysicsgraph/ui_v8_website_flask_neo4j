@@ -90,6 +90,36 @@ _WRITE_KEYWORD_PATTERN = re.compile(
 )
 
 
+class NodeIdCollisionError(Exception):
+    """Raised when a node-creation query collides with the unique constraint on
+    (:a_node {id}) - i.e. the randomly generated id that compute.generate_random_id()
+    handed out was, in fact, already in use by another node.
+
+    compute.generate_random_id() only checks a point-in-time snapshot of existing ids,
+    so two concurrent requests can race and be handed the same "unused" id - it is an
+    optimization, not a correctness guarantee. Correctness comes from the database's
+    unique constraint (see constrain_unique_id) plus this exception: every function that
+    creates a brand-new node MUST use CREATE (never MERGE) for that node, via
+    _create_or_raise_on_id_collision below, so a colliding id fails loudly here instead
+    of silently overwriting (MERGE) or crashing with a raw driver exception. Callers
+    (see compute.create_node_with_unique_id) catch this and retry with a fresh id.
+    """
+
+    pass
+
+
+def _create_or_raise_on_id_collision(tx: Transaction, query: str, params: dict) -> None:
+    """Run a CREATE-based node-creation query, translating a unique-id constraint
+    violation into NodeIdCollisionError. `query` must CREATE (not MERGE) the node that
+    owns the freshly generated id in `params['id']`, so that a duplicate id fails the
+    write instead of silently merging into the existing node."""
+    try:
+        tx.run(query, params).consume()
+    except neo4j.exceptions.ConstraintError as err:
+        raise NodeIdCollisionError(f"id already exists: {params.get('id')}") from err
+    return
+
+
 def trace_execution(func):
     """
     rather than each function having boilerplate, use decorator to add to every function
@@ -1245,16 +1275,16 @@ def add_derivation(
     )
     if dup_check.peek() is not None:
         return False
-
-    tx.run(
-        "CREATE (:derivation:a_node { id: $id, name_latex: $name, abstract_latex: $abstract, created_datetime: $now, reference_latex: $ref, author_name_latex: $author})",
-        id=derivation_id,
-        name=derivation_name_latex,
-        abstract=derivation_abstract_latex,
-        now=now_str,
-        ref=derivation_reference_latex,
-        author=author_name_latex,
-    ).consume()
+    query = "CREATE (:derivation:a_node { id: $id, name_latex: $name, abstract_latex: $abstract, created_datetime: $now, reference_latex: $ref, author_name_latex: $author})"
+    params = {
+        "id": derivation_id,
+        "name": derivation_name_latex,
+        "abstract": derivation_abstract_latex,
+        "now": now_str,
+        "ref": derivation_reference_latex,
+        "author": author_name_latex,
+    }
+    _create_or_raise_on_id_collision(tx, query, params)
     return True
 
 
@@ -1294,17 +1324,17 @@ def add_inference_rule(
         return False
 
     query = "CREATE (:inference_rule:a_node { id: $id, name_latex: $name, latex: $latex, created_datetime: $now, author_name_latex: $author, number_of_inputs: $inputs, number_of_feeds: $feeds, number_of_outputs: $outputs})"
-    tx.run(
-        query,
-        id=inference_rule_id,
-        name=inference_rule_name,
-        latex=inference_rule_latex,
-        now=now_str,
-        author=author_name_latex,
-        inputs=number_of_inputs,
-        feeds=number_of_feeds,
-        outputs=number_of_outputs,
-    ).consume()
+    params = {
+        "id": inference_rule_id,
+        "name": inference_rule_name,
+        "latex": inference_rule_latex,
+        "now": now_str,
+        "author": author_name_latex,
+        "inputs": number_of_inputs,
+        "feeds": number_of_feeds,
+        "outputs": number_of_outputs,
+    }
+    _create_or_raise_on_id_collision(tx, query, params)
     return True
 
 
@@ -1844,16 +1874,15 @@ def connect_step_to_derivation(
                 f"in derivation {derivation_id}"
             )
         seq_val = requested_sequence_value
-
-    tx.run(
-        "CREATE (:step:a_node {id: $step_id, author_name_latex: $author, note_before_step_latex: $before, created_datetime: $now, note_after_step_latex: $after})",
-        step_id=step_id,
-        author=author_name_latex,
-        before=note_before_step_latex,
-        now=now_str,
-        after=note_after_step_latex,
-    ).consume()
-
+    step_query = "CREATE (:step:a_node {id: $id, author_name_latex: $author, note_before_step_latex: $before, created_datetime: $now, note_after_step_latex: $after})"
+    step_params = {
+        "id": step_id,
+        "author": author_name_latex,
+        "before": note_before_step_latex,
+        "now": now_str,
+        "after": note_after_step_latex,
+    }
+    _create_or_raise_on_id_collision(tx, step_query, step_params)
     tx.run(
         "MATCH (a:derivation {id: $did}), (b:step {id: $sid}) MERGE (a)-[r:HAS_STEP {sequence_index: $seq}]->(b)",
         did=derivation_id,
@@ -2081,7 +2110,7 @@ def add_expression(
             e.reference_latex = $ref,
             e.author_name_latex = $author
     """
-    tx.run(query, params).consume()
+    _create_or_raise_on_id_collision(tx, query, params)
     return True
 
 
@@ -2112,8 +2141,7 @@ def add_feed(
             f.latex = $latex,
             f.author_name_latex = $author
     """
-    tx.run(query, params).consume()
-
+    _create_or_raise_on_id_collision(tx, query, params)
     return
 
 
@@ -2206,7 +2234,7 @@ def add_constant_value_with_units(
         "neo4j_query/add_constant_value_with_units: unit_props=" + str(unit_props)
     )
     params = {
-        "value_id": str(value_with_units_id),
+        "id": str(value_with_units_id),
         "scalar_id": str(scalar_id),
         "number_decimal": number_decimal,
         "number_power": number_power,
@@ -2215,22 +2243,17 @@ def add_constant_value_with_units(
         "unit_props": unit_props,
     }
     query = """
-    MERGE (v:value_with_units:a_node {id: $value_id})
-    ON CREATE SET
+    MATCH (s:scalar {id: $scalar_id})
+    CREATE (v:value_with_units:a_node {id: $id})
+    SET
         v.created_datetime = $created,
         v.number_decimal = $number_decimal,
         v.number_power = $number_power,
-        v.author_name_latex = $author
-    ON MATCH SET
-        v.number_decimal = $number_decimal,
-        v.number_power = $number_power,
-        v.author_name_latex = $author
-    SET v += $unit_props
-    WITH v
-    MATCH (s:scalar {id: $scalar_id})
-    MERGE (s)-[:HAS_VALUE]->(v)
+        v.author_name_latex = $author,
+        v += $unit_props
+    CREATE (s)-[:HAS_VALUE]->(v)
     """
-    tx.run(query, params).consume()
+    _create_or_raise_on_id_collision(tx, query, params)
     return
 
 
@@ -2255,9 +2278,12 @@ def add_scalar_symbol(
     now_str: str,
     author_name_latex: str,
 ) -> None:
-    """ """
-
-    # corresponds to SpecifyNewSymbolDIRECTScalarForm
+    """Create a brand-new scalar symbol node. symbol_id must not already exist -
+    raises NodeIdCollisionError (via _create_or_raise_on_id_collision) if it does,
+    so callers (compute.create_node_with_unique_id) can retry with a freshly
+    generated id instead of silently overwriting an existing symbol, which is what
+    the previous MERGE ... ON CREATE / ON MATCH implementation did on an id
+    collision."""
     assert len(symbol_latex) > 0
     assert len(symbol_scope) > 0
     assert len(symbol_variable_or_constant) > 0
@@ -2281,10 +2307,9 @@ def add_scalar_symbol(
         "created": now_str,
         "author": str(author_name_latex),
     }
-
     query = """
-        MERGE (s:symbol:scalar:a_node {id: $id})
-        ON CREATE SET 
+        CREATE (s:symbol:scalar:a_node {id: $id})
+        SET 
             s.created_datetime = $created,
             s.name_latex = $name,
             s.latex = $latex,
@@ -2301,26 +2326,8 @@ def add_scalar_symbol(
             s.dimension_amount_of_substance = $dim_amt,
             s.dimension_luminous_intensity = $dim_lum,
             s.author_name_latex = $author
-        ON MATCH SET 
-            s.name_latex = $name,
-            s.latex = $latex,
-            s.description_latex = $desc,
-            s.reference_latex = $ref,
-            s.scope = $scope,
-            s.variable_or_constant = $var_const,
-            s.domain = $domain,
-            s.dimension_length = $dim_len,
-            s.dimension_time = $dim_time,
-            s.dimension_mass = $dim_mass,
-            s.dimension_temperature = $dim_temp,
-            s.dimension_electric_charge = $dim_charge,
-            s.dimension_amount_of_substance = $dim_amt,
-            s.dimension_luminous_intensity = $dim_lum,
-            s.author_name_latex = $author
     """
-
-    tx.run(query, params)
-
+    _create_or_raise_on_id_collision(tx, query, params)
     return
 
 
@@ -2339,7 +2346,9 @@ def add_vector_symbol(
     now_str: str,
     author_name_latex: str,
 ) -> None:
-    """ """
+    """Create a brand-new vector symbol node. See add_scalar_symbol for the
+    add-vs-edit contract (this is add-only; a colliding symbol_id raises
+    NodeIdCollisionError instead of overwriting the existing node)."""
 
     # corresponds to SpecifyNewSymbolDIRECTVectorForm
     assert len(symbol_latex) > 0
@@ -2357,10 +2366,9 @@ def add_vector_symbol(
             "created": now_str,
             "author": str(author_name_latex),
         }
-
         query = """
-            MERGE (s:symbol:vector:a_node {id: $id})
-            ON CREATE SET 
+            CREATE (s:symbol:vector:a_node {id: $id})
+            SET 
                 s.created_datetime = $created,
                 s.name_latex = $name,
                 s.latex = $latex,
@@ -2370,19 +2378,8 @@ def add_vector_symbol(
                 s.size = $size,
                 s.is_composite = $is_composite,
                 s.author_name_latex = $author
-            ON MATCH SET 
-                s.name_latex = $name,
-                s.latex = $latex,
-                s.description_latex = $desc,
-                s.reference_latex = $ref,
-                s.orientation = $orientation,
-                s.size = $size,
-                s.is_composite = $is_composite,
-                s.author_name_latex = $author
         """
-        result = tx.run(query, params)
-
-    else:  # fixed size
+    else:
         params = {
             "id": str(symbol_id),
             "name": str(symbol_name),
@@ -2396,10 +2393,9 @@ def add_vector_symbol(
             "created": now_str,
             "author": str(author_name_latex),
         }
-
         query = """
-            MERGE (s:symbol:vector:a_node {id: $id})
-            ON CREATE SET 
+            CREATE (s:symbol:vector:a_node {id: $id})
+            SET 
                 s.created_datetime = $created,
                 s.name_latex = $name,
                 s.latex = $latex,
@@ -2410,19 +2406,8 @@ def add_vector_symbol(
                 s.number_of_entries = $num_entries,
                 s.is_composite = $is_composite,
                 s.author_name_latex = $author
-            ON MATCH SET 
-                s.name_latex = $name,
-                s.latex = $latex,
-                s.description_latex = $desc,
-                s.reference_latex = $ref,
-                s.orientation = $orientation,
-                s.size = $size,
-                s.number_of_entries = $num_entries,
-                s.is_composite = $is_composite,
-                s.author_name_latex = $author
         """
-        result = tx.run(query, params)
-
+    _create_or_raise_on_id_collision(tx, query, params)
     return
 
 
@@ -2441,24 +2426,18 @@ def add_matrix_symbol(
     now_str: str,
     author_name_latex: str,
 ) -> None:
-    """ """
+    """Create a brand-new matrix symbol node. See add_scalar_symbol for the
+    add-vs-edit contract (this is add-only; a colliding symbol_id raises
+    NodeIdCollisionError instead of overwriting the existing node)."""
 
     # corresponds to SpecifyNewSymbolDIRECTMatrixForm
     assert len(symbol_latex) > 0
 
     if symbol_size == "arbitrary":
         query = """
-            MERGE (m:symbol:matrix:a_node {id: $id})
-            ON CREATE SET
+            CREATE (m:symbol:matrix:a_node {id: $id})
+            SET
                 m.created_datetime = $created_datetime,
-                m.name_latex = $name_latex,
-                m.latex = $latex,
-                m.description_latex = $description_latex,
-                m.reference_latex = $reference_latex,
-                m.size = $size,
-                m.is_composite = $is_composite,
-                m.author_name_latex = $author_name_latex
-            ON MATCH SET
                 m.name_latex = $name_latex,
                 m.latex = $latex,
                 m.description_latex = $description_latex,
@@ -2478,24 +2457,11 @@ def add_matrix_symbol(
             "created_datetime": now_str,
             "author_name_latex": str(author_name_latex),
         }
-
-        result = tx.run(query, parameters)
-
-    else:  # fixed size
+    else:
         query = """
-            MERGE (m:matrix:symbol:a_node {id: $id})
-            ON CREATE SET
+            CREATE (m:matrix:symbol:a_node {id: $id})
+            SET
                 m.created_datetime = $created_datetime,
-                m.name_latex = $name_latex,
-                m.latex = $latex,
-                m.description_latex = $description_latex,
-                m.reference_latex = $reference_latex,
-                m.size = $size,
-                m.number_of_rows = $number_of_rows,
-                m.number_of_columns = $number_of_columns,
-                m.is_composite = $is_composite,
-                m.author_name_latex = $author_name_latex
-            ON MATCH SET
                 m.name_latex = $name_latex,
                 m.latex = $latex,
                 m.description_latex = $description_latex,
@@ -2519,9 +2485,7 @@ def add_matrix_symbol(
             "created_datetime": now_str,
             "author_name_latex": str(author_name_latex),
         }
-
-        result = tx.run(query, parameters)
-
+    _create_or_raise_on_id_collision(tx, query, parameters)
     return
 
 
@@ -2537,19 +2501,17 @@ def add_operation_symbol(
     now_str: str,
     author_name_latex: str,
 ) -> None:
-    """
-    nothing returned by function because action is to write change to Neo4j database
-
-    """
-
-    # corresponds to SpecifyNewSymbolDIRECTOperationForm
+    """Create a brand-new operation node. operation_id must not already exist -
+    raises NodeIdCollisionError if it does. To update an existing operation, use
+    edit_operation_symbol instead: it MATCHes rather than CREATEs, so it fails
+    (returns False) rather than silently fabricating or overwriting a node when
+    handed an id it shouldn't be trusted with."""
     assert len(operation_name) > 0
     assert len(operation_latex) > 0
     assert int(operation_argument_count) > 0
-
     query = """
-        MERGE (o:operation:a_node {id: $id})
-        ON CREATE SET 
+        CREATE (o:operation:a_node {id: $id})
+        SET 
             o.created_datetime = $created,
             o.name_latex = $name,
             o.latex = $latex,
@@ -2557,16 +2519,7 @@ def add_operation_symbol(
             o.reference_latex = $ref,
             o.argument_count = $arg_count,
             o.author_name_latex = $author
-        ON MATCH SET 
-            o.name_latex = $name,
-            o.latex = $latex,
-            o.description_latex = $desc,
-            o.reference_latex = $ref,
-            o.argument_count = $arg_count,
-            o.author_name_latex = $author
-            // Note: created_datetime is NOT updated here
     """
-
     params = {
         "id": str(operation_id),
         "name": str(operation_name),
@@ -2577,10 +2530,52 @@ def add_operation_symbol(
         "created": str(now_str),
         "author": str(author_name_latex),
     }
-
-    result = tx.run(query, params)
-
+    _create_or_raise_on_id_collision(tx, query, params)
     return
+
+
+@trace_execution
+def edit_operation_symbol(
+    tx: Transaction,
+    operation_id: str,
+    operation_name: str,
+    operation_latex: str,
+    operation_description_latex: str,
+    operation_reference_latex: str,
+    operation_argument_count: int,
+    author_name_latex: str,
+) -> bool:
+    """Update an existing operation node. Deliberately MATCH-based, never CREATE:
+    if operation_id does not exist this is a no-op that returns False, instead of
+    the previous MERGE-based add_operation_symbol, which would silently create a
+    brand-new node under what the user believed was an edit. Callers should flash
+    an error when this returns False. created_datetime is intentionally left
+    untouched, matching the old ON MATCH branch's behavior."""
+    assert len(operation_name) > 0
+    assert len(operation_latex) > 0
+    assert int(operation_argument_count) > 0
+    query = """
+        MATCH (o:operation:a_node {id: $id})
+        SET 
+            o.name_latex = $name,
+            o.latex = $latex,
+            o.description_latex = $desc,
+            o.reference_latex = $ref,
+            o.argument_count = $arg_count,
+            o.author_name_latex = $author
+        RETURN o
+    """
+    params = {
+        "id": str(operation_id),
+        "name": str(operation_name),
+        "latex": str(operation_latex),
+        "desc": str(operation_description_latex),
+        "ref": str(operation_reference_latex),
+        "arg_count": operation_argument_count,
+        "author": str(author_name_latex),
+    }
+    result = tx.run(query, params)
+    return result.single() is not None
 
 
 @trace_execution
@@ -2594,32 +2589,21 @@ def add_relation_symbol(
     now_str: str,
     author_name_latex: str,
 ) -> None:
-    """
-    nothing returned by function because action is to write change to Neo4j database
-    """
-
-    # corresponds to SpecifyNewSymbolDIRECTOperationForm
+    """Create a brand-new relation node. relation_id must not already exist -
+    raises NodeIdCollisionError if it does. To update an existing relation, use
+    edit_relation_symbol instead."""
     assert len(relation_name_latex) > 0
     assert len(relation_latex) > 0
-
     query = """
-        MERGE (o:relation:a_node {id: $id})
-        ON CREATE SET 
+        CREATE (o:relation:a_node {id: $id})
+        SET 
             o.created_datetime = $created,
             o.name_latex = $name,
             o.latex = $latex,
             o.description_latex = $desc,
             o.reference_latex = $ref,
             o.author_name_latex = $author
-        ON MATCH SET 
-            o.name_latex = $name,
-            o.latex = $latex,
-            o.description_latex = $desc,
-            o.reference_latex = $ref,
-            o.author_name_latex = $author
-            // Note: created_datetime is NOT updated here
     """
-
     params = {
         "id": str(relation_id),
         "name": str(relation_name_latex),
@@ -2629,10 +2613,45 @@ def add_relation_symbol(
         "created": str(now_str),
         "author": str(author_name_latex),
     }
-
-    result = tx.run(query, params)
-
+    _create_or_raise_on_id_collision(tx, query, params)
     return
+
+
+@trace_execution
+def edit_relation_symbol(
+    tx: Transaction,
+    relation_id: str,
+    relation_name_latex: str,
+    relation_latex: str,
+    relation_description_latex: str,
+    relation_reference_latex: str,
+    author_name_latex: str,
+) -> bool:
+    """Update an existing relation node. Deliberately MATCH-based, never CREATE;
+    see edit_operation_symbol for the rationale. Returns False (no-op) if
+    relation_id does not exist."""
+    assert len(relation_name_latex) > 0
+    assert len(relation_latex) > 0
+    query = """
+        MATCH (o:relation:a_node {id: $id})
+        SET 
+            o.name_latex = $name,
+            o.latex = $latex,
+            o.description_latex = $desc,
+            o.reference_latex = $ref,
+            o.author_name_latex = $author
+        RETURN o
+    """
+    params = {
+        "id": str(relation_id),
+        "name": str(relation_name_latex),
+        "latex": str(relation_latex),
+        "desc": str(relation_description_latex),
+        "ref": str(relation_reference_latex),
+        "author": str(author_name_latex),
+    }
+    result = tx.run(query, params)
+    return result.single() is not None
 
 
 @trace_execution

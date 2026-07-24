@@ -464,8 +464,7 @@ def callback():
         picture = userinfo_response.json()["picture"]
         users_name = userinfo_response.json()["given_name"]
     else:
-        return "User email not available or not verified by Google.", 400
-
+        return ("User email not available or not verified by Google.", 400)
     logger.info(users_name)
     logger.info(users_email)
     # Create a user in your db with the information provided
@@ -523,9 +522,7 @@ def to_logout():
 def login_test_user():
     # Only allow this route if in testing mode
     if not current_app.config.get("TESTING"):
-        return "Unauthorized", 403
-
-    # Simulate what Google Auth callback does
+        return ("Unauthorized", 403)
     session["user_id"] = "test-123"
     session["email"] = "test@example.com"
     return "Logged in as test user"
@@ -1618,20 +1615,23 @@ def to_add_derivation() -> ResponseReturnValue:
                 # as per https://strftime.org/
                 # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
-                with graphDB_Driver.session() as session, track_time(
-                    query_time_dict, "pdg_app/to_add_derivation " + trace_id
-                ):
-                    was_created = session.write_transaction(
+                derivation_id, was_created, query_time_dict = (
+                    compute.create_node_with_unique_id(
+                        graphDB_Driver,
+                        query_time_dict,
                         neo4j_query.add_derivation,
-                        derivation_id,
-                        now_str,
-                        derivation_name_latex,
-                        abstract_latex,
-                        derivation_reference_latex,
-                        author_name_latex,
+                        lambda new_id: (
+                            new_id,
+                            now_str,
+                            derivation_name_latex,
+                            abstract_latex,
+                            derivation_reference_latex,
+                            author_name_latex,
+                        ),
+                        trace_label="add_derivation",
                     )
+                )
+                logger.info("to_add_derivation: derivation_id=" + str(derivation_id))
                 if not was_created:
                     flash(
                         "pdg_app/to_add_derivation: a derivation with that name already exists"
@@ -2548,7 +2548,7 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseRetur
 
 
 @web_app.route("/edit_feed/<feed_id>", methods=["GET", "POST"])
-@login_required
+# @login_required
 def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit feed
@@ -2932,28 +2932,26 @@ def to_add_expression() -> ResponseReturnValue:
 
                 # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                expression_id, query_time_dict = compute.generate_random_id(
-                    graphDB_Driver, query_time_dict
-                )
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
-                with graphDB_Driver.session() as session, track_time(
-                    query_time_dict, "pdg_app/ " + trace_id
-                ):
-                    was_created = session.write_transaction(
+                expression_id, was_created, query_time_dict = (
+                    compute.create_node_with_unique_id(
+                        graphDB_Driver,
+                        query_time_dict,
                         neo4j_query.add_expression,
-                        expression_id,
-                        expression_name_latex,
-                        expression_latex_lhs,
-                        expression_relation,
-                        expression_latex_rhs,
-                        expression_latex_condition,
-                        expression_description_latex,
-                        expression_reference_latex,
-                        now_str,
-                        author_name_latex,
+                        lambda new_id: (
+                            new_id,
+                            expression_name_latex,
+                            expression_latex_lhs,
+                            expression_relation,
+                            expression_latex_rhs,
+                            expression_latex_condition,
+                            expression_description_latex,
+                            expression_reference_latex,
+                            now_str,
+                            author_name_latex,
+                        ),
+                        trace_label="add_expression",
                     )
+                )
                 if not was_created:
                     flash(
                         "pdg_app/to_add_expression: an expression with that LHS/relation/RHS already exists"
@@ -3050,24 +3048,13 @@ def to_add_feed() -> ResponseReturnValue:
 
                 # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                feed_id, query_time_dict = compute.generate_random_id(
-                    graphDB_Driver, query_time_dict
+                feed_id, _, query_time_dict = compute.create_node_with_unique_id(
+                    graphDB_Driver,
+                    query_time_dict,
+                    neo4j_query.add_feed,
+                    lambda new_id: (new_id, feed_latex, now_str, author_name_latex),
+                    trace_label="add_feed",
                 )
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
-                with graphDB_Driver.session() as session, track_time(
-                    query_time_dict, "pdg_app/ " + trace_id
-                ):
-
-                    session.write_transaction(
-                        neo4j_query.add_feed,
-                        feed_id,
-                        feed_latex,
-                        now_str,
-                        author_name_latex,
-                    )
-
                 logger.info("[TRACE] end " + trace_id)
                 if is_numeric:
                     return redirect(url_for("to_list_feeds"))
@@ -3088,10 +3075,6 @@ def to_add_feed() -> ResponseReturnValue:
             nominated_symbol_id = request.form["symbol_select_id_to_add"]
             logger.info("nominated_symbol_id=" + str(nominated_symbol_id))
 
-            feed_id, query_time_dict = compute.generate_random_id(
-                graphDB_Driver, query_time_dict
-            )
-
             # as per https://strftime.org/
             # %f = Microsecond as a decimal number, zero-padded on the left.
             now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
@@ -3111,17 +3094,21 @@ def to_add_feed() -> ResponseReturnValue:
                 )
 
                 logger.info("symbol_dict=" + str(symbol_dict))
-
-                # use the symbol key-value pair to populate feed
-
-                session.write_transaction(
-                    neo4j_query.add_feed,
-                    feed_id,
+            feed_id, _, query_time_dict = compute.create_node_with_unique_id(
+                graphDB_Driver,
+                query_time_dict,
+                neo4j_query.add_feed,
+                lambda new_id: (
+                    new_id,
                     symbol_dict["latex"],
                     now_str,
                     author_name_latex,
-                )
-
+                ),
+                trace_label="add_feed_from_symbol",
+            )
+            with graphDB_Driver.session() as session, track_time(
+                query_time_dict, "pdg_app/ " + trace_id
+            ):
                 symbol_as_sympy = "Symbol('pdg" + symbol_dict["id"] + "')"
 
                 # use the symbol key-value pair to populate feed
@@ -3311,26 +3298,30 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnV
                 )
 
                 author_name_latex = compute.encode_user_identifier(current_user.email)
-
-                # %f = Microsecond as a decimal number, zero-padded on the left.
-                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/ " + trace_id
                 ):
-
-                    session.write_transaction(
-                        neo4j_query.add_operation_symbol,
+                    was_updated = session.write_transaction(
+                        neo4j_query.edit_operation_symbol,
                         operation_id,
                         operation_name_latex,
                         operation_latex,
                         operation_description_latex,
                         operation_reference_latex,
                         operation_number_of_arguments,
-                        now_str,
                         author_name_latex,
                     )
+                if not was_updated:
+                    flash(
+                        "pdg_app/to_edit_operation: operation ID "
+                        + str(operation_id)
+                        + " no longer exists in database."
+                    )
+                    logger.error(
+                        "pdg_app/to_edit_operation: edit_operation_symbol found no operation with id "
+                        + str(operation_id)
+                    )
+                    return redirect(url_for("to_list_operations"))
                 return redirect(url_for("to_list_operations"))
             else:
                 flash(
@@ -3421,26 +3412,29 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> ResponseReturnVal
                 ).strip()
 
                 author_name_latex = compute.encode_user_identifier(current_user.email)
-
-                # %f = Microsecond as a decimal number, zero-padded on the left.
-                now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/ " + trace_id
                 ):
-
-                    session.write_transaction(
-                        neo4j_query.add_relation_symbol,
+                    was_updated = session.write_transaction(
+                        neo4j_query.edit_relation_symbol,
                         relation_id,
                         relation_name_latex,
                         relation_latex,
                         relation_description_latex,
                         relation_reference_latex,
-                        now_str,
                         author_name_latex,
                     )
-
+                if not was_updated:
+                    flash(
+                        "pdg_app/to_edit_relation: Relation ID "
+                        + str(relation_id)
+                        + " no longer exists in database."
+                    )
+                    logger.error(
+                        "pdg_app/to_edit_relation: edit_relation_symbol found no relation with id "
+                        + str(relation_id)
+                    )
+                    return redirect(url_for("to_list_relations"))
                 return redirect(url_for("to_list_relations"))
 
             else:
@@ -3778,32 +3772,27 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> ResponseRetur
                     dict_of_units["dimension_luminous_intensity_unit"] = request.form[
                         "luminous_intensity_select_unit"
                     ]
-
-                value_with_units_id, query_time_dict = compute.generate_random_id(
-                    graphDB_Driver, query_time_dict
-                )
-
                 author_name_latex = compute.encode_user_identifier(current_user.email)
 
                 # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
-                with graphDB_Driver.session() as session, track_time(
-                    query_time_dict, "pdg_app/ " + trace_id
-                ):
-
-                    session.write_transaction(
+                value_with_units_id, _, query_time_dict = (
+                    compute.create_node_with_unique_id(
+                        graphDB_Driver,
+                        query_time_dict,
                         neo4j_query.add_constant_value_with_units,
-                        scalar_id,
-                        value_with_units_id,
-                        number_decimal,
-                        number_power,
-                        dict_of_units,
-                        now_str,
-                        author_name_latex,
+                        lambda new_id: (
+                            scalar_id,
+                            new_id,
+                            number_decimal,
+                            number_power,
+                            dict_of_units,
+                            now_str,
+                            author_name_latex,
+                        ),
+                        trace_label="add_constant_value_with_units",
                     )
-
+                )
                 logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("to_list_scalars"))
 
@@ -3896,19 +3885,12 @@ def to_add_symbol_scalar() -> ResponseReturnValue:
 
                 # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                scalar_id, query_time_dict = compute.generate_random_id(
-                    graphDB_Driver, query_time_dict
-                )
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
-                with graphDB_Driver.session() as session, track_time(
-                    query_time_dict, "pdg_app/ " + trace_id
-                ):
-
-                    session.write_transaction(
-                        neo4j_query.add_scalar_symbol,
-                        scalar_id,
+                scalar_id, _, query_time_dict = compute.create_node_with_unique_id(
+                    graphDB_Driver,
+                    query_time_dict,
+                    neo4j_query.add_scalar_symbol,
+                    lambda new_id: (
+                        new_id,
                         scalar_name_latex,
                         scalar_latex,
                         scalar_description_latex,
@@ -3925,8 +3907,9 @@ def to_add_symbol_scalar() -> ResponseReturnValue:
                         dimension_luminous_intensity,
                         now_str,
                         author_name_latex,
-                    )
-
+                    ),
+                    trace_label="add_scalar_symbol",
+                )
                 if scalar_variable_or_constant == "constant":
                     return redirect(
                         url_for("to_add_value_and_units", scalar_id=scalar_id)
@@ -4060,19 +4043,12 @@ def to_add_symbol_vector() -> ResponseReturnValue:
 
                 # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                vector_id, query_time_dict = compute.generate_random_id(
-                    graphDB_Driver, query_time_dict
-                )
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
-                with graphDB_Driver.session() as session, track_time(
-                    query_time_dict, "pdg_app/ " + trace_id
-                ):
-
-                    session.write_transaction(
-                        neo4j_query.add_vector_symbol,
-                        vector_id,
+                vector_id, _, query_time_dict = compute.create_node_with_unique_id(
+                    graphDB_Driver,
+                    query_time_dict,
+                    neo4j_query.add_vector_symbol,
+                    lambda new_id: (
+                        new_id,
                         vector_name_latex,
                         vector_latex,
                         vector_description_latex,
@@ -4083,7 +4059,9 @@ def to_add_symbol_vector() -> ResponseReturnValue:
                         vector_number_of_entries,
                         now_str,
                         author_name_latex,
-                    )
+                    ),
+                    trace_label="add_vector_symbol",
+                )
                 return redirect(url_for("to_list_vectors"))
 
             else:
@@ -4179,19 +4157,12 @@ def to_add_symbol_matrix() -> ResponseReturnValue:
 
                 # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                matrix_id, query_time_dict = compute.generate_random_id(
-                    graphDB_Driver, query_time_dict
-                )
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
-                with graphDB_Driver.session() as session, track_time(
-                    query_time_dict, "pdg_app/ " + trace_id
-                ):
-
-                    session.write_transaction(
-                        neo4j_query.add_matrix_symbol,
-                        matrix_id,
+                matrix_id, _, query_time_dict = compute.create_node_with_unique_id(
+                    graphDB_Driver,
+                    query_time_dict,
+                    neo4j_query.add_matrix_symbol,
+                    lambda new_id: (
+                        new_id,
                         matrix_name_latex,
                         matrix_latex,
                         matrix_description_latex,
@@ -4202,7 +4173,9 @@ def to_add_symbol_matrix() -> ResponseReturnValue:
                         matrix_number_of_columns,
                         now_str,
                         author_name_latex,
-                    )
+                    ),
+                    trace_label="add_matrix_symbol",
+                )
                 logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("to_list_matrices"))
 
@@ -4284,22 +4257,13 @@ def to_add_operation() -> ResponseReturnValue:
                 logger.info("operation_argument_count" + str(operation_argument_count))
 
                 author_name_latex = compute.encode_user_identifier(current_user.email)
-
-                operation_id, query_time_dict = compute.generate_random_id(
-                    graphDB_Driver, query_time_dict
-                )
-
-                # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
-                with graphDB_Driver.session() as session, track_time(
-                    query_time_dict, "pdg_app/ " + trace_id
-                ):
-
-                    session.write_transaction(
-                        neo4j_query.add_operation_symbol,
-                        operation_id,
+                operation_id, _, query_time_dict = compute.create_node_with_unique_id(
+                    graphDB_Driver,
+                    query_time_dict,
+                    neo4j_query.add_operation_symbol,
+                    lambda new_id: (
+                        new_id,
                         operation_name_latex,
                         operation_latex,
                         operation_description_latex,
@@ -4307,9 +4271,10 @@ def to_add_operation() -> ResponseReturnValue:
                         operation_argument_count,
                         now_str,
                         author_name_latex,
-                    )
-                    logger.info("[TRACE] end " + trace_id)
-
+                    ),
+                    trace_label="add_operation_symbol",
+                )
+                logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("to_list_operations"))
             else:
                 flash("pdg_app/to_add_operation: " + str(web_form_add_operation.errors))
@@ -4391,26 +4356,21 @@ def to_add_relation() -> ResponseReturnValue:
 
                 # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                relation_id, query_time_dict = compute.generate_random_id(
-                    graphDB_Driver, query_time_dict
-                )
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
-                with graphDB_Driver.session() as session, track_time(
-                    query_time_dict, "pdg_app/ " + trace_id
-                ):
-
-                    session.write_transaction(
-                        neo4j_query.add_relation_symbol,
-                        relation_id,
+                relation_id, _, query_time_dict = compute.create_node_with_unique_id(
+                    graphDB_Driver,
+                    query_time_dict,
+                    neo4j_query.add_relation_symbol,
+                    lambda new_id: (
+                        new_id,
                         relation_name_latex,
                         relation_latex,
                         relation_description_latex,
                         relation_reference_latex,
                         now_str,
                         author_name_latex,
-                    )
+                    ),
+                    trace_label="add_relation_symbol",
+                )
                 logger.info("[trace] end " + trace_id)
                 return redirect(url_for("to_list_relations"))
 
@@ -4506,20 +4466,13 @@ def to_add_step_select_expressions(
                         list_of_output_expression_IDs.append(str(v))
 
                 author_name_latex = compute.encode_user_identifier(current_user.email)
-
-                step_id, query_time_dict = compute.generate_random_id(
-                    graphDB_Driver, query_time_dict
-                )
-                logger.info("generated step_id=" + str(step_id))
-
-                # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
                 try:
                     assert (
-                        (len(list_of_input_expression_IDs) > 0)
-                        or (len(list_of_feed_expression_IDs) > 0)
-                        or (len(list_of_output_expression_IDs) > 0)
+                        len(list_of_input_expression_IDs) > 0
+                        or len(list_of_feed_expression_IDs) > 0
+                        or len(list_of_output_expression_IDs) > 0
                     )
                 except AssertionError as err:
                     flash("pdg_app/to_add_step_select_expressions: " + str(err))
@@ -4531,37 +4484,42 @@ def to_add_step_select_expressions(
                             inference_rule_id=inference_rule_id,
                         )
                     )
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
+                step_id, step_result, query_time_dict = (
+                    compute.create_node_with_unique_id(
+                        graphDB_Driver,
+                        query_time_dict,
+                        neo4j_query.connect_step_to_derivation,
+                        lambda new_id: (
+                            new_id,
+                            derivation_id,
+                            inference_rule_id,
+                            None,
+                            now_str,
+                            note_before_step_latex,
+                            note_after_step_latex,
+                            author_name_latex,
+                        ),
+                        trace_label="connect_step_to_derivation",
+                    )
+                )
+                logger.info("generated step_id=" + str(step_id))
+                if step_result is None:
+                    flash(
+                        "pdg_app/to_add_step_select_expressions: derivation or inference rule no longer exists"
+                    )
+                    logger.error(
+                        "pdg_app/to_add_step_select_expressions: connect_step_to_derivation found missing derivation_id or inference_rule_id"
+                    )
+                    return redirect(
+                        url_for(
+                            "to_add_step_select_expressions",
+                            derivation_id=derivation_id,
+                            inference_rule_id=inference_rule_id,
+                        )
+                    )
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/ " + trace_id
                 ):
-
-                    step_result = session.write_transaction(
-                        neo4j_query.connect_step_to_derivation,
-                        step_id,
-                        derivation_id,
-                        inference_rule_id,
-                        None,
-                        now_str,
-                        note_before_step_latex,
-                        note_after_step_latex,
-                        author_name_latex,
-                    )
-                    if step_result is None:
-                        flash(
-                            "pdg_app/to_add_step_select_expressions: derivation or inference rule no longer exists"
-                        )
-                        logger.error(
-                            "pdg_app/to_add_step_select_expressions: connect_step_to_derivation found missing derivation_id or inference_rule_id"
-                        )
-                        return redirect(
-                            url_for(
-                                "to_add_step_select_expressions",
-                                derivation_id=derivation_id,
-                                inference_rule_id=inference_rule_id,
-                            )
-                        )
                     session.write_transaction(
                         neo4j_query.connect_expressions_to_step,
                         step_id,
@@ -4573,10 +4531,7 @@ def to_add_step_select_expressions(
                     )
 
                 return redirect(
-                    url_for(
-                        "to_review_derivation",
-                        derivation_id=derivation_id,
-                    )
+                    url_for("to_review_derivation", derivation_id=derivation_id)
                 )
 
             else:
@@ -5187,6 +5142,10 @@ def to_add_sympy_and_lean_for_feed(
     revised_feed_with_str = re.sub(
         r"(pdg\d\d\d\d\d\d\d)", r"Symbol('\1')", str(revised_expr)
     )
+    # Claude Sonnet 5 'high' thinks the above should be
+    # 	revised_feed_with_str = re.sub(
+    #        "(pdg\\d\\d\\d\\d\\d\\d\\d)", "Symbol('\\1')", str(revised_expr)
+    #    )
 
     # revised_feed_with_str = re.sub(r"^Eq", "sympy.Eq", revised_feed_with_str)
 
@@ -5371,22 +5330,25 @@ def to_add_inference_rule() -> ResponseReturnValue:
                 # as per https://strftime.org/
                 # %f = Microsecond as a decimal number, zero-padded on the left.
                 now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-
-                # https://neo4j.com/docs/python-manual/current/session-api/
-                with graphDB_Driver.session() as session, track_time(
-                    query_time_dict, "pdg_app/ " + trace_id
-                ):
-                    was_created = session.write_transaction(
+                inference_rule_id, was_created, query_time_dict = (
+                    compute.create_node_with_unique_id(
+                        graphDB_Driver,
+                        query_time_dict,
                         neo4j_query.add_inference_rule,
-                        inference_rule_id=inference_rule_id,
-                        inference_rule_name=inference_rule_name,
-                        inference_rule_latex=inference_rule_latex,
-                        number_of_inputs=number_of_inputs,
-                        number_of_feeds=number_of_feeds,
-                        number_of_outputs=number_of_outputs,
-                        now_str=now_str,
-                        author_name_latex=author_name_latex,
+                        lambda new_id: (
+                            new_id,
+                            inference_rule_name,
+                            inference_rule_latex,
+                            number_of_inputs,
+                            number_of_feeds,
+                            number_of_outputs,
+                            now_str,
+                            author_name_latex,
+                        ),
+                        trace_label="add_inference_rule",
                     )
+                )
+                logger.info("new inference_rule_id: " + str(inference_rule_id))
                 if not was_created:
                     flash(
                         "pdg_app/to_add_inference_rule: an inference rule with that name already exists"
@@ -5424,6 +5386,11 @@ def to_edit_step(
     derivation_id: unique_numeric_id_as_str, step_id: unique_numeric_id_as_str
 ) -> ResponseReturnValue:
     """
+    login required because
+    - the only actions available are to make changes (no review)
+    - the review of properties is available on derivation review
+
+
     to figure out which feeds could be swapped in I was
     - determining which feeds were not used
     - getting expressions used by this step
@@ -5579,7 +5546,7 @@ def to_edit_step(
             # Create a list without the selected element
             # (Matches the 'others' list logic from the previous step)
             new_list = [
-                x for i, x in enumerate(list_of_sequence_values) if i != current_idx
+                x for (i, x) in enumerate(list_of_sequence_values) if i != current_idx
             ]
 
             # Calculate the target insertion index
@@ -5722,7 +5689,11 @@ def to_edit_step(
 def to_edit_inference_rule(
     inference_rule_id: unique_numeric_id_as_str,
 ) -> ResponseReturnValue:
-    """ """
+    """
+    login required because
+    - the only actions available are to make breaking changes
+    - the review of properties is available on https://localhost/list_inference_rules
+    """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     query_time_dict = {}  # type: query_timing_result_type
@@ -6107,6 +6078,8 @@ def to_query() -> ResponseReturnValue:
                 r"&#39;<a href='edit_node/\1'>\1</a>&#39;",
                 revised_record,
             )
+            # Claude Sonnet 5 thinks the above should be
+            #                 "&#39;(\\d\\d\\d\\d\\d\\d\\d)&#39;",
             # sympy strings have "pdg" prefix
             revised_record = re.sub(
                 r"&#39;pdg(\d\d\d\d\d\d\d)&#39;",

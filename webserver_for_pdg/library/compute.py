@@ -73,11 +73,23 @@ logger = logging.getLogger(__name__)
 def generate_random_id(
     graphDB_Driver: Any, query_time_dict: query_timing_result_type
 ) -> Tuple[unique_numeric_id_as_str, query_timing_result_type]:
-    """
+    """Suggest a 10-digit id that, as of a moment ago, was not in use.
+
     create statically defined numeric IDs for nodes in the graph
 
     The node IDs that Neo4j assigns internally are not static,
     so they can't be used for the Physics Derivation Graph
+
+    Claude Sonnet 5 'high' says: This is an optimization, not a correctness guarantee. The
+    existence check reads a snapshot of ids into memory and is evaluated outside
+    of any write transaction, so two concurrent callers can easily be handed the
+    same "unused" id - with a large enough id space this is rare per call, but not
+    rare enough to ignore. Actual uniqueness is enforced by the database's
+    constraint on (:a_node {id}) (see neo4j_query.constrain_unique_id) at the
+    moment the node is created. Callers that create a node from an id returned
+    here MUST go through create_node_with_unique_id below, which retries this
+    function on a collision, rather than calling generate_random_id + a raw
+    write_transaction directly.
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -99,6 +111,93 @@ def generate_random_id(
     logger.info("new_id=" + str(new_id))
     logger.info("[TRACE] end " + trace_id)
     return str(new_id), query_time_dict
+
+
+def create_node_with_unique_id(
+    graphDB_Driver: Any,
+    query_time_dict: query_timing_result_type,
+    create_fn: Any,
+    build_args: Any,
+    max_attempts: int = 5,
+    trace_label: str = "",
+) -> Tuple[unique_numeric_id_as_str, Any, query_timing_result_type]:
+    """Generate an id and create a node with it, retrying with a fresh id if that
+    id turns out to collide with an existing node.
+
+    This is the one correct way to pair generate_random_id() with a node-creation
+    write: generate_random_id() only offers a probably-unused id, and the actual
+    guarantee comes from the database's uniqueness constraint on (:a_node {id})
+    plus the retry loop here. `create_fn` MUST be a neo4j_query write-transaction
+    function, i.e. callable(tx, *args), that CREATEs (never MERGEs) the node
+    holding the new id, and raises neo4j_query.NodeIdCollisionError if that id is
+    already taken (every add_* function in neo4j_query.py that creates a node from
+    a freshly generated id follows this contract).
+
+    Args:
+        create_fn: e.g. neo4j_query.add_scalar_symbol, neo4j_query.add_derivation,
+            neo4j_query.connect_step_to_derivation, etc.
+        build_args: callable(candidate_id: str) -> tuple of positional args to pass
+            to create_fn after tx. The candidate id can appear anywhere in that
+            tuple (e.g. add_constant_value_with_units expects the parent scalar_id
+            first and the new value_with_units_id second).
+        max_attempts: number of ids to try before giving up.
+
+    Returns:
+        (new_id, create_fn_result, query_time_dict). create_fn_result is whatever
+        create_fn returned on the attempt that succeeded (e.g. True/False for a
+        duplicate-name check unrelated to id collisions, or a dict/None for
+        connect_step_to_derivation) - it is passed through untouched so existing
+        callers can keep checking it exactly as before.
+
+    Raises:
+        RuntimeError: if max_attempts consecutive ids all collided. With a
+        10-digit id space this signals something is badly wrong (e.g. the id
+        space is nearly exhausted, or generate_random_id's existence check is
+        broken) rather than ordinary bad luck, so this is deliberately not
+        swallowed - it should surface as a 500 rather than fail silently.
+    """
+    trace_id = str(uuid.uuid4())
+    logger.info(
+        "[TRACE] start " + trace_id + " create_node_with_unique_id: " + trace_label
+    )
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max_attempts + 1):
+        candidate_id, query_time_dict = generate_random_id(
+            graphDB_Driver, query_time_dict
+        )
+        args = build_args(candidate_id)
+        try:
+            with graphDB_Driver.session() as session:
+                query_start_time = time.time()
+                result = session.write_transaction(create_fn, *args)
+                query_time_dict[
+                    "compute/create_node_with_unique_id: "
+                    + trace_label
+                    + " attempt_"
+                    + str(attempt)
+                    + " "
+                    + trace_id
+                ] = round(time.time() - query_start_time, 3)
+            logger.info("[TRACE] end " + trace_id)
+            return (candidate_id, result, query_time_dict)
+        except neo4j_query.NodeIdCollisionError as err:
+            last_error = err
+            logger.warning(
+                "compute/create_node_with_unique_id: id collision on attempt "
+                + str(attempt)
+                + " for "
+                + trace_label
+                + ": "
+                + str(candidate_id)
+                + "; retrying with a new id"
+            )
+            continue
+    logger.error(
+        "[TRACE] end " + trace_id + " - exhausted " + str(max_attempts) + " attempts"
+    )
+    raise RuntimeError(
+        f"create_node_with_unique_id: could not generate a unique id for {trace_label} after {max_attempts} attempts"
+    ) from last_error
 
 
 def get_placement_options(
@@ -123,9 +222,7 @@ def get_placement_options(
 
     # Identify the current position
     current_idx = list_of_sequence_values.index(selected_sequence_index)
-
-    # Create a list of the other elements
-    others = [x for i, x in enumerate(list_of_sequence_values) if i != current_idx]
+    others = [x for (i, x) in enumerate(list_of_sequence_values) if i != current_idx]
     n = len(others)
 
     options = []  # type: List[str]
