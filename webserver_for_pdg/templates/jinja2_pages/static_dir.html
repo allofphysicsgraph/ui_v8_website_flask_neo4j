@@ -6,7 +6,7 @@
 <UL>
 {% for file in list_of_files %}
   <LI>
-    <a href="{{ url_for(folder_name, filename=file) }}">
+    <a href="{{ url_for('static', filename=file) }}">
       {{ file }}
     </a>
   </LI>
