@@ -2368,9 +2368,12 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseRetur
         elif "edit expression latex" in request.form:
             if web_form_new_expression.validate():
                 logger.info("request.form = " + str(request.form))
-                expression_latex_lhs = latex.make_string_safe_for_latex(
-                    str(web_form_new_expression.expression_latex_lhs.data).strip()
-                )
+                # expression_latex_lhs = latex.make_string_safe_for_latex(
+                #     str(web_form_new_expression.expression_latex_lhs.data).strip()
+                # )
+                expression_latex_lhs = str(
+                    web_form_new_expression.expression_latex_lhs.data
+                ).strip()
                 expression_relation_id = request.form["symbol_relation_id_to_add"]
                 with graphDB_Driver.session() as session, track_time(
                     query_time_dict, "pdg_app/ " + trace_id
@@ -2379,23 +2382,32 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseRetur
                         neo4j_query.get_relation_latex, expression_relation_id
                     )
                 logger.info(str(expression_relation))
-                expression_latex_rhs = latex.make_string_safe_for_latex(
-                    str(web_form_new_expression.expression_latex_rhs.data).strip()
-                )
-                expression_latex_condition = latex.make_string_safe_for_latex(
-                    str(web_form_new_expression.expression_latex_condition.data).strip()
-                )
-                expression_name_latex = latex.make_string_safe_for_latex(
-                    str(web_form_new_expression.expression_name_latex.data).strip()
-                )
-                expression_reference_latex = latex.make_string_safe_for_latex(
-                    str(web_form_new_expression.expression_reference_latex.data).strip()
-                )
-                expression_description_latex = latex.make_string_safe_for_latex(
-                    str(
-                        web_form_new_expression.expression_description_latex.data
-                    ).strip()
-                )
+                # expression_latex_rhs = latex.make_string_safe_for_latex(
+                #     str(web_form_new_expression.expression_latex_rhs.data).strip()
+                # )
+                expression_latex_rhs = str(
+                    web_form_new_expression.expression_latex_rhs.data
+                ).strip()
+
+                # expression_latex_condition = latex.make_string_safe_for_latex(
+                #     str(web_form_new_expression.expression_latex_condition.data).strip()
+                # )
+                expression_latex_condition = str(
+                    web_form_new_expression.expression_latex_condition.data
+                ).strip()
+
+                expression_name_latex = str(
+                    web_form_new_expression.expression_name_latex.data
+                ).strip()
+
+                expression_reference_latex = str(
+                    web_form_new_expression.expression_reference_latex.data
+                ).strip()
+
+                expression_description_latex = str(
+                    web_form_new_expression.expression_description_latex.data
+                ).strip()
+
                 logger.info("expression_latex_lhs=" + str(expression_latex_lhs))
                 logger.info("expression_latex_rhs=" + str(expression_latex_rhs))
                 logger.info(
@@ -5257,19 +5269,31 @@ def to_add_inference_rule() -> ResponseReturnValue:
     web_form_new_infrule = SpecifyNewInferenceRuleForm()
 
     list_of_inference_rule_dicts = []
+    # with graphDB_Driver.session() as session, track_time(
+    #     query_time_dict, "pdg_app/ " + trace_id
+    # ):
+
+    #     list_of_inference_rule_dicts = session.read_transaction(
+    #         neo4j_query.get_nodes_of_type, "inference_rule"
+    #     )
+
+    # dict_of_derivations_used_per_inference_rule, query_time_dict = (
+    #     compute.get_dict_of_derivations_used_per_inference_rule(
+    #         graphDB_Driver, query_time_dict, list_of_inference_rule_dicts
+    #     )
+    # )
+
     with graphDB_Driver.session() as session, track_time(
-        query_time_dict, "pdg_app/ " + trace_id
+        query_time_dict, "pdg_app/to_list_inference_rules" + trace_id
     ):
-
-        list_of_inference_rule_dicts = session.read_transaction(
-            neo4j_query.get_nodes_of_type, "inference_rule"
+        rows = session.read_transaction(
+            neo4j_query.get_inference_rules_with_derivations
         )
 
-    dict_of_derivations_used_per_inference_rule, query_time_dict = (
-        compute.get_dict_of_derivations_used_per_inference_rule(
-            graphDB_Driver, query_time_dict, list_of_inference_rule_dicts
-        )
-    )
+    list_of_inference_rule_dicts = [row["inference_rule"] for row in rows]
+    dict_of_derivations_used_per_inference_rule = {
+        row["inference_rule"]["id"]: row["derivations"] for row in rows
+    }
 
     if request.method == "POST":
         if not current_user.is_authenticated:
