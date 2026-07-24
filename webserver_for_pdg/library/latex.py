@@ -75,59 +75,64 @@ def hash_of_file(filename_with_full_path: str) -> str:
     return hashed_file
 
 
-def _NOT_IN_USE_make_string_safe_for_latex(unsafe_str: str) -> str:
-    """
-    latex characters that require an escape for printing:
-    # $ % & \ ^ _ { }
-    TODO: I'm not escaping all of these
+# commented out 2026-07-23. The right thing to do is to validate that the
+# user-provided input is valid Latex prior to adding content to the database.
+# The reason for this is that all down-stream capabilities assume the content
+# is valid latex.
+#
+# def _NOT_IN_USE_make_string_safe_for_latex(unsafe_str: str) -> str:
+#     """
+#     latex characters that require an escape for printing:
+#     # $ % & \ ^ _ { }
+#     TODO: I'm not escaping all of these
 
-    Args:
-        unsafe_str: strings that may cause Latex compilation to fail, e.g., "a_string" or "url#subsection"
-    Returns:
-        safe_str: a string that latex should be able to print, e.g., "a\_string" or "url\#subsection"
+#     Args:
+#         unsafe_str: strings that may cause Latex compilation to fail, e.g., "a_string" or "url#subsection"
+#     Returns:
+#         safe_str: a string that latex should be able to print, e.g., "a\_string" or "url\#subsection"
 
-    >>> make_string_safe_for_latex("hello world")
-    "hello world"
+#     >>> make_string_safe_for_latex("hello world")
+#     "hello world"
 
-    >>> make_string_safe_for_latex("hello_world")
-    "hello\_world"
-    """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+#     >>> make_string_safe_for_latex("hello_world")
+#     "hello\_world"
+#     """
+#     trace_id = str(uuid.uuid4())
+#     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
-    # some derivation notes have valid underscores, like
-    # \cite{yyyy_author}
-    # while some underscores are invalid latex, like
-    # https://en.wikipedia.org/wiki/Equations_of_motion
-    # --> Remove citations
-    # problem: using
-    # re.sub(r'cite{.*}', '', some_text)
-    # on the string
-    # some_text = "an example cite{2222_asdf} and http://asdf_fagaaf and cite{9492_942} of http:/ss_asdf and more"
-    # is greedy
-    # to use a non-greedy search; https://stackoverflow.com/a/2503438/1164295
-    # unsafe_str_without_citations = re.sub(r"cite{.*?}", "", unsafe_str)
+#     # some derivation notes have valid underscores, like
+#     # \cite{yyyy_author}
+#     # while some underscores are invalid latex, like
+#     # https://en.wikipedia.org/wiki/Equations_of_motion
+#     # --> Remove citations
+#     # problem: using
+#     # re.sub(r'cite{.*}', '', some_text)
+#     # on the string
+#     # some_text = "an example cite{2222_asdf} and http://asdf_fagaaf and cite{9492_942} of http:/ss_asdf and more"
+#     # is greedy
+#     # to use a non-greedy search; https://stackoverflow.com/a/2503438/1164295
+#     # unsafe_str_without_citations = re.sub(r"cite{.*?}", "", unsafe_str)
 
-    # replace the first _ that occurs within citation with another string
-    unsafe_str_replaced_cite = re.sub(
-        r"cite{(.*?)_(.*?)}", "cite{\\1NONSTANDARDUNDRSCR\\2}", unsafe_str
-    )
-    # that approach breaks when cite has more than one underscore, for example
-    # \cite{yyyy_author1_author2}
-    unsafe_str_replaced_cite = re.sub(
-        r"cite{(.*?)_(.*?)}", "cite{\\1NONSTANDARDUNDRSCR\\2}", unsafe_str_replaced_cite
-    )
+#     # replace the first _ that occurs within citation with another string
+#     unsafe_str_replaced_cite = re.sub(
+#         r"cite{(.*?)_(.*?)}", "cite{\\1NONSTANDARDUNDRSCR\\2}", unsafe_str
+#     )
+#     # that approach breaks when cite has more than one underscore, for example
+#     # \cite{yyyy_author1_author2}
+#     unsafe_str_replaced_cite = re.sub(
+#         r"cite{(.*?)_(.*?)}", "cite{\\1NONSTANDARDUNDRSCR\\2}", unsafe_str_replaced_cite
+#     )
 
-    safe_str = unsafe_str_replaced_cite.replace("_", "\_").replace("%", "\%")
+#     safe_str = unsafe_str_replaced_cite.replace("_", "\_").replace("%", "\%")
 
-    fixed_underscore_str = safe_str.replace("NONSTANDARDUNDRSCR", "_")
+#     fixed_underscore_str = safe_str.replace("NONSTANDARDUNDRSCR", "_")
 
-    no_hashtag_str = (
-        fixed_underscore_str.replace("#", "\#").replace("$", "\$").replace("%", "\%")
-    )
+#     no_hashtag_str = (
+#         fixed_underscore_str.replace("#", "\#").replace("$", "\$").replace("%", "\%")
+#     )
 
-    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
-    return no_hashtag_str
+#     logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+#     return no_hashtag_str
 
 
 def create_d3js_json(
