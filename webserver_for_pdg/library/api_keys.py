@@ -9,10 +9,15 @@ import os
 import hashlib
 import zlib
 import random
+import json
+import logging
 from datetime import datetime
+from typing import List, Optional, Dict, Any
+
+logger = logging.getLogger(__name__)
 
 
-def load_configured_api_keys():
+def load_configured_api_keys() -> List[dict]:
     """Parse PDG_API_KEYS, a JSON array of records identifying each caller.
 
     Expected shape:
@@ -53,7 +58,7 @@ def load_configured_api_keys():
     return []
 
 
-def extract_bearer_token(auth_header):
+def extract_bearer_token(auth_header: Optional[str]) -> Optional[str]:
     """
     called in `pdg_api` using
 
@@ -71,7 +76,7 @@ def extract_bearer_token(auth_header):
     return parts[1].strip()
 
 
-def match_caller(supplied_token, configured_keys):
+def match_caller(supplied_token: str, configured_keys: List[dict]) -> Optional[dict]:
     """Constant-time-compare supplied_token against every configured token.
 
     Checks every record rather than stopping at the first mismatch so the
