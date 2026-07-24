@@ -1582,24 +1582,24 @@ def edit_node_property(
 #     return
 
 
-@trace_execution
-def disconnect_step_from_inference_rule(tx: Transaction, step_id: str) -> None:
-    """
-    called by "delete derivation"
+# @trace_execution
+# def disconnect_step_from_inference_rule(tx: Transaction, step_id: str) -> None:
+#     """
+#     called by "delete derivation"
 
-    https://stackoverflow.com/questions/57553886/neo4j-what-happens-to-a-directional-relationship-when-one-node-is-deleted
+#     https://stackoverflow.com/questions/57553886/neo4j-what-happens-to-a-directional-relationship-when-one-node-is-deleted
 
-    as part of this sequence:
-     1) for each step,
-           * disconnect step from inference rule (remove edge)
-           * disconnect step from expressions (remove edge)
-           * disconnect step from derivation (remove edge)
-           * delete step node
-     2) delete derivation node
-    """
-    # TODO
-    logger.info("not doing anything yet")
-    return
+#     as part of this sequence:
+#      1) for each step,
+#            * disconnect step from inference rule (remove edge)
+#            * disconnect step from expressions (remove edge)
+#            * disconnect step from derivation (remove edge)
+#            * delete step node
+#      2) delete derivation node
+#     """
+#     # TODO
+#     logger.info("not doing anything yet")
+#     return
 
 
 @trace_execution
