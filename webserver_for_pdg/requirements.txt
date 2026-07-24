@@ -28,6 +28,10 @@ secure==0.3.0
 #mypy==1.19.1 as of 2026-01-24 on arm64
 mypy
 
+# these are for mypy
+types-PySocks
+types-colorama
+
 # type hints for some packages are a separate package
 types-WTForms
 types-oauthlib
