@@ -273,9 +273,25 @@ class Config(object):
     if SECRET_KEY is None:
         raise ValueError("No SECRET_KEY set")
 
+    # ORDERING: this has to come before using the function wrapper
+    # ORDERING: this has to be after the class "Config" is specified
 
-# ORDERING: this has to come before using the function wrapper
-# ORDERING: this has to be after the class "Config" is specified
+    # Default for SESSION_COOKIE_SECURE is False, meaning Flask will happily send the session cookie (which now carries your oauth_state) over plain HTTP.
+    SESSION_COOKIE_SECURE = True  # never send the session cookie over plain HTTP
+
+    # Flask's default is True, so the following just makes that explicit
+    SESSION_COOKIE_HTTPONLY = (
+        True  # not readable via JS (defense against XSS token theft)
+    )
+
+    # Default is None, which in modern Flask/Werkzeug is not the same as SameSite=Lax; leaving it unset generally means the cookie has no SameSite attribute at all, so browsers will send it on cross-site requests including ones from an attacker's page. That's a real problem for a login CSRF fix, since it weakens the defense-in-depth the state parameter is supposed to have.
+    # `Lax` stops the cookie riding along on cross-site requests initiated by other sites, which directly reinforces the OAuth state fix. ('Lax' still permits it on top-level GET navigation, which is required for the Google redirect back to /login/callback to work — 'Strict' would break that flow.)
+    SESSION_COOKIE_SAMESITE = (
+        "Lax"  # cookie isn't sent on cross-site navigations from third-party pages
+    )
+    PERMANENT_SESSION_LIFETIME = datetime.timedelta(days=30)
+
+
 web_app = Flask(__name__, static_folder="static")
 web_app.config.from_object(
     Config
@@ -287,7 +303,10 @@ web_app.config["UPLOAD_FOLDER"] = (
 web_app.config["SEND_FILE_MAX_AGE_DEFAULT"] = (
     0  # https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
 )
-web_app.config["DEBUG"] = True
+# DEBUG must never be hardcoded True in a deployed app: the Werkzeug debugger
+# exposes an interactive shell and can leak SECRET_KEY / env vars on error
+# pages. Drive this from the environment and default to off.
+web_app.config["DEBUG"] = os.environ.get("FLASK_DEBUG", "0") == "1"
 
 
 # https://nickjanetakis.com/blog/fix-missing-csrf-token-issues-with-flask
@@ -408,10 +427,17 @@ def to_login():
 
     # Use library to construct the request for Google login and provide
     # scopes that let you retrieve user's profile from Google
+    # Generate a fresh, unguessable state token and bind it to this browser
+    # session. Google will echo it back on the callback so we can confirm
+    # the response we receive actually corresponds to a request we issued
+    # in this same session (CSRF / login-merging protection).
+    state = secrets.token_urlsafe(32)
+    session["oauth_state"] = state
     request_uri = client.prepare_request_uri(
         authorization_endpoint,
         redirect_uri=request.base_url + "/callback",
         scope=["openid", "email", "profile"],
+        state=state,
     )
     return redirect(request_uri)
 
@@ -424,6 +450,20 @@ def callback():
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     # Get authorization code Google sent back to you
+    # Validate the state parameter before doing anything else. It must be
+    # present, must match what we stored for this session in to_login, and
+    # is single-use (popped immediately so it cannot be replayed).
+    expected_state = session.pop("oauth_state", None)
+    returned_state = request.args.get("state")
+    if (
+        not expected_state
+        or not returned_state
+        or not secrets.compare_digest(expected_state, returned_state)
+    ):
+        logger.warning(
+            "[TRACE] OAuth state mismatch or missing; possible CSRF attempt " + trace_id
+        )
+        return ("Invalid or missing OAuth state parameter.", 400)
     code = request.args.get("code")
 
     # Find out what URL to hit to get tokens that allow you to ask for
