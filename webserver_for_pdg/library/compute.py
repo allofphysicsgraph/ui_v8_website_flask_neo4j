@@ -21,7 +21,16 @@ import subprocess
 
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
-from typing import NewType, Dict, List, Tuple, Any, Union, TypeAlias, Optional  # for type hinting
+from typing import (
+    NewType,
+    Dict,
+    List,
+    Tuple,
+    Any,
+    Union,
+    TypeAlias,
+    Optional,
+)  # for type hinting
 
 from . import neo4j_query
 from . import list_of_valid

@@ -255,9 +255,7 @@ def constrain_unique_id(tx: Transaction) -> None:
 
 
 @trace_execution
-def get_user_stats(
-    tx: Transaction, author: str
-) -> Tuple[
+def get_user_stats(tx: Transaction, author: str) -> Tuple[
     List[str],
     int,
     List[dict],
