@@ -150,16 +150,17 @@ def test_validate_operations_api(api_request_context: APIRequestContext):
 
     # Assert HAL links are present and correct
     assert "_links" in multiplication
-    links = multiplication["_links"]
-    assert "delete" in links
-    assert "edit" in links
-    assert "self" in links
+    assert "self" in multiplication["_links"]
+    assert multiplication["_links"]["self"]["href"]
 
-    assert links["delete"]["method"] == "DELETE"
-    assert links["edit"]["method"] == "POST"
-    # Method is the contract we care about; the href itself is an opaque
-    # implementation detail we shouldn't assert the content of.
-    assert links["delete"]["href"]
+    # Check 'delete' and 'edit' templates in _templates (HAL-FORMS specification)
+    assert "_templates" in multiplication
+    templates = multiplication["_templates"]
+    assert "delete" in templates
+    assert "edit" in templates
+    assert templates["delete"]["method"] == "DELETE"
+    assert templates["edit"]["method"] == "POST"
+    assert templates["delete"]["target"]
 
 
 def test_list_derivations_api(api_request_context: APIRequestContext):
