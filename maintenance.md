@@ -15,6 +15,18 @@ aistudio with Gemini Pro models may be limited to 25 requests per day
 
 Requests Per Day (RPD) which reset at midnight Pacific time.
 
+## Google's Antigravity CLI 
+
+```
+cd bhpayne/google-antigravity-in-container
+make
+cd ../../allofphysicsgraph/ui_v8_website_flask_neo4j
+docker run -it --rm -v `pwd`:/scratch -w /scratch/ antigravity_agent:latest-arm64 /bin/bash
+/root/.local/bin/agy
+```
+
+7 day reset window. (Chunk tasks into small parts so that termination isn't as disruptive!)
+
 ## Claude from Anthropic
 
 <https://platform.claude.com/usage>
