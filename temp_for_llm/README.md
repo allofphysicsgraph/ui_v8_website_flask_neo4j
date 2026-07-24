@@ -9,6 +9,9 @@ python3 ../introspection/remove_comments.py ../test_python/test_compute.py > tes
 
 python3 ../introspection/remove_comments.py ../webserver_for_pdg/library/neo4j_query.py > neo4j_query.py
 
+python3 ../introspection/remove_comments.py ../webserver_for_pdg/library/sympy_validate_expression.py > sympy_validate_expression.py
+python3 ../introspection/remove_comments.py ../test_python/test_sympy_validate_expression.py > test_sympy_validate_expression.py
+
 
 python3 ../introspection/remove_comments.py ../webserver_for_pdg/library/pdg_api.py > pdg_api.py
 python3 ../introspection/remove_comments.py ../test_web_interface/playwrightbased/test_pdg_api.py  > test_pdg_api.py
