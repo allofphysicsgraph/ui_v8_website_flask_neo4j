@@ -21,7 +21,7 @@ import subprocess
 
 # https://docs.python.org/3/library/typing.html
 # inspired by https://news.ycombinator.com/item?id=33844117
-from typing import NewType, Dict, List, Tuple, Any, Union, TypeAlias  # for type hinting
+from typing import NewType, Dict, List, Tuple, Any, Union, TypeAlias, Optional  # for type hinting
 
 from . import neo4j_query
 from . import list_of_valid
@@ -140,7 +140,11 @@ def get_placement_options(
     return options
 
 
-def guess_sympy_from_expression(graphDB_Driver, query_time_dict, expression_dict):
+def guess_sympy_from_expression(
+    graphDB_Driver,
+    query_time_dict: query_timing_result_type,
+    expression_dict: dict,
+) -> Tuple[query_timing_result_type, Optional[str], Optional[str]]:
     """
     guess the SymPy based on the Latex
     """
@@ -223,7 +227,11 @@ def guess_sympy_from_expression(graphDB_Driver, query_time_dict, expression_dict
     return query_time_dict, revised_expr_lhs_with_str, revised_expr_rhs_with_str
 
 
-def guess_operations_from_latex(graphDB_Driver, query_time_dict, expression_dict):
+def guess_operations_from_latex(
+    graphDB_Driver,
+    query_time_dict: query_timing_result_type,
+    expression_dict: dict,
+) -> Tuple[query_timing_result_type, List[dict]]:
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
@@ -270,7 +278,11 @@ def guess_operations_from_latex(graphDB_Driver, query_time_dict, expression_dict
     return query_time_dict, potential_operations_found_in_Latex_expression
 
 
-def guess_symbols_from_latex(graphDB_Driver, query_time_dict, expression_dict):
+def guess_symbols_from_latex(
+    graphDB_Driver,
+    query_time_dict: query_timing_result_type,
+    expression_dict: dict,
+) -> Tuple[query_timing_result_type, List[dict], List[dict]]:
     """
     after users enter latex, guess which symbols they want to associate with expression
 
@@ -698,7 +710,9 @@ def check_whether_inference_rule_exists(
     return False, "no message", query_time_dict
 
 
-def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
+def get_sympy_as_latex_per_feed_id(
+    list_of_feed_dicts: List[dict],
+) -> Dict[str, str]:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
@@ -732,7 +746,9 @@ def get_sympy_as_latex_per_feed_id(list_of_feed_dicts):
     return sympy_as_latex_per_feed_id
 
 
-def get_sympy_as_latex_per_expr_id(list_of_expression_dicts):
+def get_sympy_as_latex_per_expr_id(
+    list_of_expression_dicts: List[dict],
+) -> List[dict]:
     """
     This function edits the input argument, whereas the `feed` version does not.
 

@@ -33,7 +33,7 @@ import neo4j  # type: ignore
 
 from neo4j import Record, Transaction
 import random  # for trace IDs
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 
 import time
 import uuid
@@ -122,7 +122,7 @@ def get_list_IDs(tx: Transaction) -> List[str]:
 
 
 @trace_execution
-def apoc_metdata_schema(tx: Transaction):
+def apoc_metdata_schema(tx: Transaction) -> Optional[Record]:
     """
     https://neo4j.com/docs/apoc/current/overview/apoc.meta/apoc.meta.stats/
     """
@@ -150,7 +150,7 @@ def apoc_export_csv(tx: Transaction, output_filename: str) -> dict:
 
 
 @trace_execution
-def apoc_export_graphml(tx: Transaction, output_filename: str):
+def apoc_export_graphml(tx: Transaction, output_filename: str) -> Any:
     """
     https://neo4j.com/docs/apoc/current/overview/apoc.export/
 
@@ -173,7 +173,7 @@ def apoc_export_graphml(tx: Transaction, output_filename: str):
 
 
 @trace_execution
-def apoc_export_json(tx: Transaction, output_filename: str):
+def apoc_export_json(tx: Transaction, output_filename: str) -> Any:
     """
     https://neo4j.com/labs/apoc/4.4/overview/apoc.export/apoc.export.json.all/
 
@@ -193,7 +193,7 @@ def apoc_export_json(tx: Transaction, output_filename: str):
 
 
 @trace_execution
-def apoc_export_cypher(tx: Transaction, output_filename: str):
+def apoc_export_cypher(tx: Transaction, output_filename: str) -> Optional[Record]:
     """
     https://neo4j.com/labs/apoc/4.4/export/cypher/
 
@@ -255,7 +255,18 @@ def constrain_unique_id(tx: Transaction) -> None:
 
 
 @trace_execution
-def get_user_stats(tx: Transaction, author: str):
+def get_user_stats(
+    tx: Transaction, author: str
+) -> Tuple[
+    List[str],
+    int,
+    List[dict],
+    List[dict],
+    List[dict],
+    List[dict],
+    List[dict],
+    List[dict],
+]:
     """ """
 
     logger.info("author=" + author)
@@ -381,7 +392,9 @@ ORDER BY e.id
 
 
 @trace_execution
-def get_list_of_output_expressions_used_in_step(tx: Transaction, step_id) -> List[dict]:
+def get_list_of_output_expressions_used_in_step(
+    tx: Transaction, step_id: str
+) -> List[dict]:
     """ """
 
     logger.info("step_id= " + step_id)
@@ -404,7 +417,9 @@ def get_list_of_output_expressions_used_in_step(tx: Transaction, step_id) -> Lis
 
 
 @trace_execution
-def get_derivations_that_use_expression(tx: Transaction, expression_id: str):
+def get_derivations_that_use_expression(
+    tx: Transaction, expression_id: str
+) -> List[dict]:
     """ """
 
     logger.info("expression_id= " + expression_id)
@@ -431,7 +446,7 @@ def get_derivations_that_use_expression(tx: Transaction, expression_id: str):
 
 
 @trace_execution
-def get_relation_latex(tx: Transaction, relation_id: str):
+def get_relation_latex(tx: Transaction, relation_id: str) -> str:
     """ """
 
     # string concatenation is a security risk (Cypher injection)
@@ -456,7 +471,7 @@ def get_relation_latex(tx: Transaction, relation_id: str):
 @trace_execution
 def get_scalar_id_that_has_value_and_units_id(
     tx: Transaction, value_and_units_id: str
-) -> str | None:
+) -> Optional[str]:
     """Retrieves the scalar ID associated with a specific value_with_units ID."""
     query = """
     MATCH (s:scalar)-[:HAS_VALUE]->(v:value_with_units) 
@@ -477,7 +492,9 @@ def get_scalar_id_that_has_value_and_units_id(
 
 
 @trace_execution
-def get_symbols_for_every_feed(tx, list_of_feed_ids: List[str]):
+def get_symbols_for_every_feed(
+    tx: Transaction, list_of_feed_ids: List[str]
+) -> Dict[str, List[dict]]:
     """ """
 
     query = """
@@ -495,7 +512,9 @@ def get_symbols_for_every_feed(tx, list_of_feed_ids: List[str]):
 
 
 @trace_execution
-def get_symbols_for_every_expression(tx, list_of_expression_ids: List[str]):
+def get_symbols_for_every_expression(
+    tx: Transaction, list_of_expression_ids: List[str]
+) -> Dict[str, List[dict]]:
     """
     `get_symbols_for_expression` wasn't fast enough (25 seconds for 620 expressions)
     so Gemini 3 Pro suggested this batching approach
@@ -916,7 +935,9 @@ def get_derivations_that_use_inference_rule(
 
 
 @trace_execution
-def get_expressions_that_use_symbol(tx, symbol_id: str) -> List[Dict[str, Any]]:
+def get_expressions_that_use_symbol(
+    tx: Transaction, symbol_id: str
+) -> List[Dict[str, Any]]:
     """
     which expressions contain this symbol?
 
@@ -947,9 +968,9 @@ def get_expressions_that_use_symbol(tx, symbol_id: str) -> List[Dict[str, Any]]:
 
 @trace_execution
 def get_derivations_that_use_symbol(
-    tx,
+    tx: Transaction,
     symbol_id: str,
-) -> list:
+) -> List[dict]:
     """
     which derivations contain this symbol?
 
