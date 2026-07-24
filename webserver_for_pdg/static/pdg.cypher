@@ -29,7 +29,7 @@ CREATE (:a_node:derivation {abstract_latex:"from https://arxiv.org/pdf/2210.1215
 CREATE (:a_node:derivation {abstract_latex:"", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", id:"0000820976", name_latex:"Kepler's Third Law: period squared propto distance cubed", reference_latex:"https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion#Third_law"});
 CREATE (:a_node:derivation {abstract_latex:"subset of the frequency relation derivation. Intended for display on the homepage", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", id:"0000884319", name_latex:"frequency and period", reference_latex:""});
 CREATE (:a_node:derivation {abstract_latex:"", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", id:"0000909006", name_latex:"total electrical resistance for circuit with two resistors in series", reference_latex:"http://www.dfcd.net/articles/derivations/resistors.html"});
-CREATE (:a_node:derivation {abstract_latex:"Using the 2D equations of motion, show that projectile path is second order polynomial of the form \\$y = a x^2 + b x + c\\$", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", id:"0000918264", name_latex:"projectile path in 2D is parabolic", reference_latex:""});
+CREATE (:a_node:derivation {abstract_latex:"Using the 2D equations of motion, show that projectile path is second order polynomial of the form $y = a x^2 + b x + c$", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", id:"0000918264", name_latex:"projectile path in 2D is parabolic", reference_latex:""});
 CREATE (:a_node:derivation {abstract_latex:"", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", id:"0000920011", name_latex:"work and force and energy", reference_latex:""});
 CREATE (:a_node:derivation {abstract_latex:"", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", id:"0000000001", name_latex:"Euler equation proof", reference_latex:""});
 CREATE (:a_node:derivation {abstract_latex:"", author_name_latex:"a84c8294ad9547db4da22820fcaf8c7215485d84d522c45d981703b9995138ba", id:"0000000002", name_latex:"Euler equation: trig square root", reference_latex:""});
@@ -7916,6 +7916,7 @@ MATCH (n1:a_node:expression{id:"8617866819"}), (n2:a_node:scalar{id:"0000002530"
 MATCH (n1:a_node:expression{id:"8617866819"}), (n2:a_node:scalar{id:"0000004851"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:a_node:expression{id:"8617866819"}), (n2:a_node:scalar{id:"0000005022"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:a_node:expression{id:"8617866819"}), (n2:a_node:scalar{id:"4482727458"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
+MATCH (n1:a_node:expression{id:"4748157455"}), (n2:a_node:operation{id:"0002222427"}) CREATE (n1)-[r:IS_COMPRISED_OF]->(n2);
 MATCH (n1:a_node:step{id:"0006462728"}), (n2:a_node:feed{id:"0006563727"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
 MATCH (n1:a_node:step{id:"0006463728"}), (n2:a_node:feed{id:"0007636749"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
 MATCH (n1:a_node:step{id:"0006466378"}), (n2:a_node:feed{id:"0009877781"}) CREATE (n1)-[r:HAS_FEED {sequence_index:"0"}]->(n2);
