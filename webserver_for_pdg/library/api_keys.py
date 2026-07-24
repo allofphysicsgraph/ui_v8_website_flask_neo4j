@@ -82,6 +82,8 @@ def match_caller(supplied_token: str, configured_keys: List[dict]) -> Optional[d
     Checks every record rather than stopping at the first mismatch so the
     response time doesn't leak which position in the list (if any) is close
     to matching.
+
+    https://docs.python.org/3/library/secrets.html
     """
     matched = None
     for record in configured_keys:
