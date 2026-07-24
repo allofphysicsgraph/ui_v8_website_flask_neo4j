@@ -42,6 +42,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Base static directory resolution (supports environment variable override and dynamic path resolution)
+STATIC_DIR = os.environ.get(
+    "STATIC_DIR",
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "static")),
+)
 
 proc_timeout = 30
 
@@ -59,7 +64,7 @@ def hash_of_file(filename_with_full_path: str) -> str:
         hash as string
     Raises:
 
-    >>> hash_of_file('/code/static/name_of_file')
+    >>> hash_of_file('/path/to/name_of_file')
     d41d8cd98f00b204e9800998ecf8427e
     """
     trace_id = str(uuid.uuid4())
@@ -707,12 +712,12 @@ def create_tex_file_for_derivation(
 def create_pdf_for_derivation(
     all_steps,
     derivation_dict: dict,
-    path_to_pdf: str,
+    path_to_pdf: str = STATIC_DIR,
 ) -> str:
     """
 
     Args:
-        path_to_pdf = "/code/static/"  # must end with /
+        path_to_pdf: folder path containing static assets and output destination
     Returns:
         pdf_filename + ".pdf":
     Raises:
@@ -742,15 +747,14 @@ def create_pdf_for_derivation(
 
     # copy the current pdg_derivation_citations.bib from static to local for use with bibtex when compiling tex to PDF
     # https://docs.python.org/3/library/shutil.html
-    shutil.copy("/code/static/pdg_derivation_citations.bib", tmp_latex_folder_full_path)
-    # shutil.copy("/code/static/pdg_derivation_citations.bib", "/code/")
+    shutil.copy(
+        os.path.join(path_to_pdf, "pdg_derivation_citations.bib"),
+        tmp_latex_folder_full_path,
+    )
 
     # images need to be in the temporary folder to compile the .tex to PDF
     # https://docs.python.org/3/library/shutil.html#shutil.copytree
-    # shutil.copytree(
-    #        "/code/static/diagrams/", tmp_latex_folder_full_path
-    # )
-    for filename in glob.glob("/code/static/diagrams/*"):
+    for filename in glob.glob(os.path.join(path_to_pdf, "diagrams", "*")):
         # logger.info("copied "+filename+" from "+filename+" to "+tmp_latex_folder_full_path)
         shutil.copy(filename, tmp_latex_folder_full_path)
 
@@ -854,7 +858,9 @@ def create_pdf_for_derivation(
 
 
 def create_png_from_latex(
-    user_provided_latex: str, destination_folder: str, filename_no_extension: str
+    user_provided_latex: str,
+    destination_folder: str = STATIC_DIR,
+    filename_no_extension: str = "temp",
 ) -> None:
     """
     if "destination_folder + filename_no_extension" doesn't exist,
@@ -867,18 +873,17 @@ def create_png_from_latex(
 
     this function relies on latex  being available on the command line
     this function relies on dvipng being available on the command line
-    this function assumes generated PNG should be placed in /code/static/
 
     Args:
-        path_to_db: filename of the SQL database containing
-                    a JSON entry that returns a nested dictionary
+        user_provided_latex: LaTeX code string to render
+        destination_folder: folder path where generated PNG should be saved
+        filename_no_extension: output file name without extension
     Returns:
         None
 
     Raises:
 
-    >>> destination_folder = "/code/static"
-    >>> create_png_from_latex('a \dot b \\nabla', 'a_filename')
+    >>> create_png_from_latex('a \\dot b \\nabla', STATIC_DIR, 'a_filename')
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
@@ -886,7 +891,8 @@ def create_png_from_latex(
     logger.info("latex = " + str(user_provided_latex))
     logger.info("filename_no_extension:" + str(filename_no_extension))
 
-    if os.path.exists(destination_folder + filename_no_extension + ".png"):
+    dest_png_path = os.path.join(destination_folder, filename_no_extension + ".png")
+    if os.path.exists(dest_png_path):
         logger.info("PNG already exists; do not recreate")
         return
 
@@ -908,7 +914,7 @@ def create_png_from_latex(
 
     shutil.copy(
         tmp_folder_full_path + filename_with_tex_extension,
-        destination_folder + filename_with_tex_extension,
+        os.path.join(destination_folder, filename_with_tex_extension),
     )
 
     process = subprocess.run(
@@ -933,9 +939,12 @@ def create_png_from_latex(
             # logging.error("tex input contains invalid charcter")
             logger.error("tex input contains invalid charcter")
 
+        error_png_source = os.path.join(destination_folder, "error.png")
+        if not os.path.exists(error_png_source):
+            error_png_source = os.path.join(STATIC_DIR, "error.png")
         shutil.copy(
-            "/code/static/error.png",
-            destination_folder + filename_no_extension + ".png",
+            error_png_source,
+            os.path.join(destination_folder, filename_no_extension + ".png"),
         )
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return
@@ -974,9 +983,12 @@ def create_png_from_latex(
             # logger.debug("png std err %s", png_stderr)
             logger.info("png std err " + png_stderr)
 
+        error_png_source = os.path.join(destination_folder, "error.png")
+        if not os.path.exists(error_png_source):
+            error_png_source = os.path.join(STATIC_DIR, "error.png")
         shutil.copy(
-            "/code/static/error.png",
-            destination_folder + filename_no_extension + ".png",
+            error_png_source,
+            os.path.join(destination_folder, filename_no_extension + ".png"),
         )
         logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return
@@ -988,20 +1000,15 @@ def create_png_from_latex(
         # )
 
     shutil.move(
-        tmp_folder_full_path + filename_no_extension + ".png",
-        destination_folder + filename_no_extension + ".png",
+        os.path.join(tmp_folder_full_path, filename_no_extension + ".png"),
+        os.path.join(destination_folder, filename_no_extension + ".png"),
     )
 
     # logger.debug(destination_folder + filename_no_extension + ".png")
-    logger.info("destination=" + destination_folder + filename_no_extension + ".png")
-    # /code/static/addxtobothsides.png
+    logger.info("destination=" + os.path.join(destination_folder, filename_no_extension + ".png"))
 
     # os.chdir(original_dir)  # this smells bad!
     shutil.rmtree(tmp_folder_full_path)
-
-    #    if os.path.isfile(destination_folder + filename_no_extension):
-    # os.remove('/code/static/'+name_of_png)
-    #        logger.error("png already exists!")
 
     # return True, "success"
     logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
@@ -1021,7 +1028,7 @@ def create_tex_file_for_latex_string(
 
     Raises:
 
-    >>> create_tex_file_for_latex_string('/code/static/filename_without_extension', 'a \dot b \\nabla')
+    >>> create_tex_file_for_latex_string('/path/to/filename_without_extension', 'a \dot b \\nabla')
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))

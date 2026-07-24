@@ -7281,13 +7281,14 @@ def static_dir():
     logger.info("[TRACE] start " + trace_id)
     # https://stackoverflow.com/a/3207973/1164295
     # get a list of all filenames located inside a folder while ignoring subfolders
-    _, _, filenames = next(os.walk("static"))
+    static_path = web_app.static_folder if web_app.static_folder else "static"
+    _, _, filenames = next(os.walk(static_path))
     filenames.sort()
     logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/static_dir.html",
         list_of_files=filenames,
-        folder_name="static",
+        folder_name=static_path,
         title="directory listing",
     )
 

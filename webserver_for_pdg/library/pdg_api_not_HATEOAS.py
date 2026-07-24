@@ -79,7 +79,7 @@ def api_png_from_latex():
 
     user_input = request.args.get("tex")
 
-    path_to_png = "/code/static/temp_for_latex_validation/"
+    path_to_png = os.path.join(latex.STATIC_DIR, "temp_for_latex_validation") + "/"
 
     os.makedirs(path_to_png, exist_ok=True)
 
