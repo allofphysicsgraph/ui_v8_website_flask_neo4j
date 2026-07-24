@@ -101,46 +101,4 @@ def api_png_from_latex():
     return jsonify({"png_location": path_to_png_with_filename_no_prefix_directory})
 
 
-# @api_nohateoas_bp.route("/resources/cypher", methods=["GET"])
-# def api_cypher_query():
-#     r"""
-
-#     .. code-block:: bash
-
-#         curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\(n\)%20RETURN%20DISTINCT%20labels\(n\) | python3 -m json.tool
-
-#     """
-#     trace_id = str(uuid.uuid4())
-#     logger.info("[TRACE] start " + trace_id)
-#     # query_time_dict = {}  # type: query_timing_result_type
-
-#     user_query = request.args.get("query")
-
-#     logger.info("user_query: " + str(user_query))
-
-#     list_of_records = []  # type: List[str]
-#     if user_query:
-#         try:
-#             # https://neo4j.com/docs/python-manual/current/session-api/
-#             with graphDB_Driver.session() as session:
-#                 # query_start_time = time.time()
-#                 list_of_records = session.read_transaction(
-#                     neo4j_query.user_query, user_query
-#                 )
-#                 # query_time_dict["api_cypher_query: user_query"] = round(
-#                 #     time.time() - query_start_time, 3
-#                 # )
-#         except neo4j.exceptions.ClientError:
-#             list_of_records = ["WRITE OPERATIONS NOT ALLOWED (ClientError)"]
-#         except neo4j.exceptions.TransactionError:
-#             list_of_records = ["not a valid Cypher query (TransactionError)"]
-#     else:
-#         list_of_records = [
-#             "use: curl --silent --insecure https://localhost/api/v1/resources/cypher?query=MATCH\\(n\\)%20RETURN%20DISTINCT%20labels\\(n\\)"
-#         ]
-
-#     logger.info("[TRACE] end " + trace_id)
-#     return jsonify(list_of_records)
-
-
 # EOF
