@@ -17,6 +17,7 @@ from sympy.physics.units import (
     luminous_intensity,
     amount_of_substance,
 )
+from sympy.physics.units.systems.si import dimsys_SI
 
 from webserver_for_pdg.library.sympy_validate_expression import (
     convert_sympy_expr_to_pdg_symbols,
@@ -131,7 +132,8 @@ def test_build_symbol_dimension_map_compound_dimensions():
 
     pdg_sym = sympy.Symbol("pdg200")
     assert pdg_sym in result
-    assert sympy.simplify(result[pdg_sym] - (mass * length * (time**-2))) == 0
+    expected_dim = mass * length * (time**-2)
+    assert dimsys_SI.equivalent_dims(result[pdg_sym], expected_dim)
 
 
 def test_build_symbol_dimension_map_dimensionless():
@@ -142,11 +144,10 @@ def test_build_symbol_dimension_map_dimensionless():
 
     pdg_sym = sympy.Symbol("pdg300")
     assert pdg_sym in result
-    assert sympy.simplify(result[pdg_sym] - (mass / mass)) == 0
+    assert dimsys_SI.equivalent_dims(result[pdg_sym], mass / mass)
 
 
 def test_build_symbol_dimension_map_all_base_dimensions():
-    """Test building dimension map covering all seven base SI units."""
     symbols_in_expr = [
         make_symbol_dict(
             "400",
@@ -159,9 +160,7 @@ def test_build_symbol_dimension_map_all_base_dimensions():
             dimension_temperature=1,
         )
     ]
-
     result = build_symbol_dimension_map(symbols_in_expr)
-
     pdg_sym = sympy.Symbol("pdg400")
     expected_dim = (
         time
@@ -172,7 +171,9 @@ def test_build_symbol_dimension_map_all_base_dimensions():
         * mass
         * temperature
     )
-    assert sympy.simplify(result[pdg_sym] - expected_dim) == 0
+
+    # Replace sympy.simplify with dimsys_SI.equivalent_dims
+    assert dimsys_SI.equivalent_dims(result[pdg_sym], expected_dim)
 
 
 def test_build_symbol_dimension_map_empty_list():
