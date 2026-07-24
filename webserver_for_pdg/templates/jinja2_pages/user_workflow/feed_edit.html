@@ -95,6 +95,7 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
   <legend>
     <H2>Add Symbol used in Feed</h2>
   </legend>
+  {% if current_user.is_authenticated %}
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P>
@@ -105,6 +106,9 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     </select>
     <input type="submit" name="add symbol" value="add symbol to feed">
   </form>
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to add symbol in feed.</p>
+{% endif %}
 </fieldset>
 {% endif %}
 
@@ -116,6 +120,7 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
   <legend>
     <H2>Remove Symbol used in Feed</h2>
   </legend>
+  {% if current_user.is_authenticated %}
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
     <P>
@@ -126,6 +131,9 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     </select>
     <input type="submit" name="remove symbol" value="remove symbol from feed">
   </form>
+  {% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to remove symbol from feed.</p>
+{% endif %}
 </fieldset>
 {% endif %}
 
@@ -136,7 +144,7 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
     <legend>
       <H2>Edit Feed</h2>
     </legend>
-
+{% if current_user.is_authenticated %}
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_edit_feed.csrf_token }}
     <P>{{ form_edit_feed.feed_latex.label}} (<B>required</B>): 
@@ -169,18 +177,25 @@ or return to <a href="{{ url_for('to_list_feeds') }}?referrer=feed_edit">list of
       <P><input type="submit" name="edit" value="Edit feed">
     </P>
   </form>
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to edit feed.</p>
+{% endif %}
 </fieldset>
 
   <fieldset>
     <legend>
       <H2>Delete Feed</h2>
     </legend>
+    {% if current_user.is_authenticated %}
     <P color="red">WARNING: THERE IS NO UNDO</P>
     <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_no_options.csrf_token }}
 
     <input type="submit" name="delete" value="Delete feed">
     </form>
+    {% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to delete feed.</p>
+{% endif %}
 </fieldset>
 
 {% endblock %}

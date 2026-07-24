@@ -23,9 +23,15 @@
   {% for inference_rule_dict in list_of_inference_rules %}
   <tr>
     <td id="{{ inference_rule_dict['id'] }}">
+{# only hyperlink if the inference rule can be edited, 
+   which is when the inference rule does not appear in any derivation #}
+{% if item_count == 0 %}
       <a href="{{ url_for('to_edit_inference_rule', inference_rule_id=inference_rule_dict['id'] ) }}">
         {{ inference_rule_dict['name_latex'] }}
       </a>
+{% else %}
+    {{ inference_rule_dict['name_latex'] }}
+{% endif %}
     </td>
     <td><span class="mathjax_ignore">{{ inference_rule_dict['latex'].replace('\r','\\\\r') }}</span></td>
     <td>{{ inference_rule_dict['number_of_inputs'] }}</td>
