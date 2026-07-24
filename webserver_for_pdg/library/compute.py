@@ -524,7 +524,9 @@ def generate_lookup_for_shorten_url(shorten_url_file: str) -> str:
     return random_string
 
 
-def add_url_to_shortened_list(now_str: str, current_user_email: Optional[str], user_url: str) -> str:
+def add_url_to_shortened_list(
+    now_str: str, current_user_email: Optional[str], user_url: str
+) -> str:
     """
     User's email is part of the database in case someone decides to put something naughty in the database
 
@@ -676,7 +678,10 @@ def send_email_with_msmtp(
 
 
 def check_whether_inference_rule_exists(
-    graphDB_Driver: Any, query_time_dict: query_timing_result_type, inference_rule_name: str, inference_rule_latex: str
+    graphDB_Driver: Any,
+    query_time_dict: query_timing_result_type,
+    inference_rule_name: str,
+    inference_rule_latex: str,
 ) -> Tuple[bool, str, query_timing_result_type]:
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)

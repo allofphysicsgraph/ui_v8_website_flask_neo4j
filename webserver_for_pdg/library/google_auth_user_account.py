@@ -24,9 +24,7 @@ logger = logging.getLogger(__name__)
 class User(UserMixin):
     logger.debug("in user.py/class User")
 
-    def __init__(
-        self, id_: str, name: str, email: str, profile_pic: str
-    ) -> None:
+    def __init__(self, id_: str, name: str, email: str, profile_pic: str) -> None:
         self.id = id_
         self.name = name
         self.email = email

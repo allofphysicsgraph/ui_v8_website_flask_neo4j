@@ -1536,7 +1536,11 @@ def edit_expression(
 
 @trace_execution
 def edit_node_property(
-    tx: Transaction, node_type: str, node_id: str, property_key: str, property_value: Any
+    tx: Transaction,
+    node_type: str,
+    node_id: str,
+    property_key: str,
+    property_value: Any,
 ) -> bool:
     """
     property_value can be either str or int
@@ -1648,9 +1652,7 @@ def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
 
 
 @trace_execution
-def disconnect_symbol_from_feed(
-    tx: Transaction, symbol_id: str, feed_id: str
-) -> None:
+def disconnect_symbol_from_feed(tx: Transaction, symbol_id: str, feed_id: str) -> None:
     """
     called by "edit feed"
 
