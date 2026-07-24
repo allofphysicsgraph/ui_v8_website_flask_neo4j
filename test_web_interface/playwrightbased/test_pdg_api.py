@@ -76,25 +76,34 @@ def test_api_entry_point(api_request_context: APIRequestContext):
     assert "whoami" in links
 
 
-def test_sympy(page: Page):
-    """Verifies standard JSON output from the sympy validation endpoint."""
-    sympy_url = f"{URL}/resources/sympy_check"
+def test_sympy(entrypoint_links, api_request_context: APIRequestContext):
+    sympy_url = _resolve(entrypoint_links["sympy_check"]["href"])
     params = {"sympy": "x**2 + y"}
-    response = page.request.get(sympy_url, params=params)
+    response = api_request_context.get(sympy_url, params=params)
     assert response.ok, f"Request failed with status {response.status}"
-
-    # The non-HATEOAS endpoint uses standard Flask jsonify returning application/json
-    assert "application/json" in response.headers.get("content-type", "")
+    assert "application/prs.hal-forms+json" in response.headers.get("content-type", "")
     data = response.json()
+    assert "canonical" in data
+    assert "variables" in data
+    assert data["input"] == "x**2 + y"
+    assert set(data["variables"]) == {"x", "y"}
+    assert "_links" in data
+    assert "_templates" in data
 
-    # SymPy parser returns variables and a canonical form or INVALID
-    if "INVALID" in data:
-        print("SymPy check completed with error:", data["INVALID"])
-    else:
-        assert "canonical" in data
-        assert "variables" in data
-        print("Canonical Form:", data["canonical"])
-        print("Detected Variables:", data["variables"])
+
+def test_sympy_invalid_expression(
+    entrypoint_links, api_request_context: APIRequestContext
+):
+    sympy_url = _resolve(entrypoint_links["sympy_check"]["href"])
+    params = {"sympy": "((("}
+    response = api_request_context.get(sympy_url, params=params)
+    assert response.status == 400
+    assert "application/prs.hal-forms+json" in response.headers.get("content-type", "")
+    data = response.json()
+    assert data.get("title") == "Invalid Expression"
+    assert data.get("status") == 400
+    assert "detail" in data
+    assert "_links" in data
 
 
 def test_get_derivations(entrypoint_links, api_request_context: APIRequestContext):
