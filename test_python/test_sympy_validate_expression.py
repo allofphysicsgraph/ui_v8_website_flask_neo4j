@@ -124,9 +124,7 @@ def test_build_symbol_dimension_map_single_dimension():
 def test_build_symbol_dimension_map_compound_dimensions():
     """Test building a dimension map for a symbol with compound dimensions (Force = mass * length / time^2)."""
     symbols_in_expr = [
-        make_symbol_dict(
-            "200", dimension_mass=1, dimension_length=1, dimension_time=-2
-        )
+        make_symbol_dict("200", dimension_mass=1, dimension_length=1, dimension_time=-2)
     ]
 
     result = build_symbol_dimension_map(symbols_in_expr)
