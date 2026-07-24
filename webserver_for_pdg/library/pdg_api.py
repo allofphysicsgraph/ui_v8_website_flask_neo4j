@@ -113,7 +113,7 @@ import neo4j  # type: ignore
 import logging
 
 logger = logging.getLogger(__name__)
-import sympy
+import sympy  # type: ignore
 from sympy.parsing.sympy_parser import (
     parse_expr,
     standard_transformations,
@@ -2065,7 +2065,7 @@ def api_create_derivation():
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    query_time_dict = {}
+    query_time_dict = {}  # type: query_timing_result_type
     derivation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
 
     def _create_atomic(tx):
@@ -2214,7 +2214,7 @@ def api_create_inference_rule():
 
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    query_time_dict = {}
+    query_time_dict = {}  # type: query_timing_result_type
     inference_rule_id, query_time_dict = generate_random_id(
         graphDB_Driver, query_time_dict
     )
@@ -2374,7 +2374,7 @@ def api_create_expression():
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    query_time_dict = {}
+    query_time_dict = {}  # type: query_timing_result_type
     expression_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
 
     def _create_atomic(tx):
@@ -2506,7 +2506,7 @@ def api_create_operation_symbol():
         )
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    query_time_dict = {}
+    query_time_dict = {}  # type: query_timing_result_type
     operation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
 
     def _create_atomic(tx):
@@ -2615,7 +2615,7 @@ def api_create_relation_symbol():
         )
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    query_time_dict = {}
+    query_time_dict = {}  # type: query_timing_result_type
     relation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
 
     def _create_atomic(tx):
@@ -2766,7 +2766,7 @@ def api_create_scalar_symbol():
             )
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    query_time_dict = {}
+    query_time_dict = {}  # type: query_timing_result_type
     symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
 
     def _create_atomic(tx):
@@ -2947,7 +2947,7 @@ def api_create_vector_symbol():
         )
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    query_time_dict = {}
+    query_time_dict = {}  # type: query_timing_result_type
     symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
 
     def _create_atomic(tx):
@@ -3084,7 +3084,7 @@ def api_create_matrix_symbol():
         )
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
-    query_time_dict = {}
+    query_time_dict = {}  # type: query_timing_result_type
     symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
 
     def _create_atomic(tx):
@@ -4906,7 +4906,7 @@ def api_create_step(derivation_id: str):
 
     # Pre-generate IDs for inline feed creations outside transaction to prevent nested session loops
     list_of_feed_IDs_or_dicts = []
-    query_time_dict = {}
+    query_time_dict = {}  # type: query_timing_result_type
     for feed_item in list_of_feed_data:
         if isinstance(feed_item, dict):
             feed_latex = feed_item.get("feed_latex") or feed_item.get("latex")
@@ -5391,7 +5391,7 @@ def api_add_step_feed(derivation_id: str, step_id: str):
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    query_time_dict = {}
+    query_time_dict = {}  # type: query_timing_result_type
     feed_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
 
     def _add_feed_atomic(tx):
