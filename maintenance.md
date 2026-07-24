@@ -19,6 +19,19 @@ Requests Per Day (RPD) which reset at midnight Pacific time.
 
 <https://platform.claude.com/usage>
 
+## token count in Gemini per file as of 2026-07-23
+
+after removing comments,
+- pdg_app.py: 59k
+- pdg_api.py: 40k
+- sympy_validate_step.py: 35k
+- neo4j_query.py: 18k
+- compute.py: 10k
+- latex.py: 10k
+- sympy_validate_expression.py: 2k
+- latex_and_sympy.py: 1.3k
+- list_of_valid.py: 0.4k
+
 # multiple databases 
 
 There are three different copies of the database:
@@ -74,7 +87,6 @@ The following is unordered
 - CAPABILITY: checking of steps --  inference rules, dimensionality, lean; https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/21
 
 
-- FEATURE: revise https://allofphysics.com/navigation to have the (old) dependency graph visualization PNG
 
 
 
