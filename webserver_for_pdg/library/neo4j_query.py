@@ -991,7 +991,7 @@ def get_derivations_that_use_symbol(
 
 
 @trace_execution
-def get_values_for_constant(tx: Transaction, scalar_id: str) -> list:
+def get_values_for_constant(tx: Transaction, scalar_id: str) -> List[dict]:
     """ """
     logger.info("scalar_id=" + scalar_id)
 
@@ -1021,7 +1021,9 @@ def get_number_of_steps_per_derivation(tx: Transaction) -> dict:
 
 
 @trace_execution
-def get_list_of_steps_in_this_derivation(tx: Transaction, derivation_id: str) -> list:
+def get_list_of_steps_in_this_derivation(
+    tx: Transaction, derivation_id: str
+) -> List[dict]:
     """
     For a given derivation, what are all the associated step IDs?
 
@@ -1068,7 +1070,9 @@ def get_sequence_index_for_step(tx: Transaction, step_id: str) -> int | None:
 
 
 @trace_execution
-def get_inference_rule_connected_to_step_ID(tx: Transaction, step_id: str):
+def get_inference_rule_connected_to_step_ID(
+    tx: Transaction, step_id: str
+) -> Dict[str, Any] | list:
     """
     use case: when displaying a derivation, user wants to see inference rule per step
 
@@ -1112,8 +1116,8 @@ def get_derivation_id_from_step_id(tx: Transaction, step_id: str) -> Optional[st
 
 @trace_execution
 def get_expressions_from_step_id_and_expr_type(
-    tx, step_id: str, expression_type: str
-) -> list:
+    tx: Transaction, step_id: str, expression_type: str
+) -> List[dict]:
     """
     use case: when displaying a derivation,
     for each step the user wants to know the inputs, feeds, and outputs.
@@ -1217,7 +1221,7 @@ def feed_exists(tx: Transaction, feed_id: str) -> bool:
 
 @trace_execution
 def add_derivation(
-    tx,
+    tx: Transaction,
     derivation_id: str,
     now_str: str,
     derivation_name_latex: str,
@@ -1256,7 +1260,7 @@ def add_derivation(
 
 @trace_execution
 def add_inference_rule(
-    tx,
+    tx: Transaction,
     inference_rule_id: str,
     inference_rule_name: str,
     inference_rule_latex: str,
@@ -1481,7 +1485,7 @@ def edit_step_notes(
 
 @trace_execution
 def edit_expression(
-    tx,
+    tx: Transaction,
     expression_id: str,
     expression_latex_lhs: str,
     expression_latex_relation: str,
@@ -1532,7 +1536,7 @@ def edit_expression(
 
 @trace_execution
 def edit_node_property(
-    tx, node_type: str, node_id: str, property_key: str, property_value
+    tx: Transaction, node_type: str, node_id: str, property_key: str, property_value: Any
 ) -> bool:
     """
     property_value can be either str or int
@@ -1644,7 +1648,9 @@ def delete_node(tx: Transaction, node_id: str, node_type: str) -> None:
 
 
 @trace_execution
-def disconnect_symbol_from_feed(tx, symbol_id: str, feed_id: str) -> None:
+def disconnect_symbol_from_feed(
+    tx: Transaction, symbol_id: str, feed_id: str
+) -> None:
     """
     called by "edit feed"
 
@@ -1658,7 +1664,9 @@ def disconnect_symbol_from_feed(tx, symbol_id: str, feed_id: str) -> None:
 
 
 @trace_execution
-def disconnect_symbol_from_expression(tx, symbol_id: str, expression_id: str) -> None:
+def disconnect_symbol_from_expression(
+    tx: Transaction, symbol_id: str, expression_id: str
+) -> None:
     """
     called by "edit expression"
 
@@ -1672,7 +1680,7 @@ def disconnect_symbol_from_expression(tx, symbol_id: str, expression_id: str) ->
 
 
 @trace_execution
-def get_symbols(tx: Transaction):
+def get_symbols(tx: Transaction) -> List[Any]:
     """ """
 
     query = """
@@ -1684,7 +1692,7 @@ def get_symbols(tx: Transaction):
 
 
 @trace_execution
-def get_operations(tx: Transaction):
+def get_operations(tx: Transaction) -> List[Any]:
     """ """
 
     query = """
@@ -1696,7 +1704,7 @@ def get_operations(tx: Transaction):
 
 
 @trace_execution
-def get_relations(tx: Transaction):
+def get_relations(tx: Transaction) -> List[Any]:
     """ """
 
     query = """
@@ -1710,7 +1718,7 @@ def get_relations(tx: Transaction):
 @trace_execution
 def get_node_labels_from_property(
     tx: Transaction, property_key: str, property_value: str
-):
+) -> List[dict]:
     """ """
 
     # https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%22116092343D0xessOtQA9vha4u7SzIrLno%22%5D,%22action%22:%22open%22,%22userId%22:%22101193243042884231058%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing
@@ -1729,7 +1737,7 @@ def get_node_labels_from_property(
 
 
 @trace_execution
-def connect_symbol_to_feed(tx, symbol_id: str, feed_id: str) -> None:
+def connect_symbol_to_feed(tx: Transaction, symbol_id: str, feed_id: str) -> None:
     """ """
     logger.info("symbol_id=" + symbol_id + "; feed_id=" + feed_id)
 
@@ -1740,7 +1748,9 @@ def connect_symbol_to_feed(tx, symbol_id: str, feed_id: str) -> None:
 
 
 @trace_execution
-def connect_symbol_to_expression(tx, symbol_id: str, expression_id: str) -> None:
+def connect_symbol_to_expression(
+    tx: Transaction, symbol_id: str, expression_id: str
+) -> None:
     """ """
     logger.info("symbol_id=" + symbol_id + "; expression_id=" + expression_id)
 
@@ -1753,7 +1763,7 @@ def connect_symbol_to_expression(tx, symbol_id: str, expression_id: str) -> None
 @trace_execution
 def get_list_of_sequence_values_for_derivation_id(
     tx: Transaction, derivation_id: str
-) -> list:
+) -> List[int]:
     """
     sequence value is a positive integer for ordering the steps of a derivation
     """
@@ -1783,7 +1793,7 @@ def get_list_of_sequence_values_for_derivation_id(
 
 @trace_execution
 def connect_step_to_derivation(
-    tx,
+    tx: Transaction,
     step_id: str,
     derivation_id: str,
     inference_rule_id: str,
@@ -1858,7 +1868,7 @@ def connect_step_to_derivation(
 
 
 @trace_execution
-def search_symbols_by_latex(tx: Transaction, search_string: str) -> list:
+def search_symbols_by_latex(tx: Transaction, search_string: str) -> List[dict]:
     """
     Search the `latex` property of `:symbol` nodes server-side, replacing
     the previous pattern of fetching all symbols via get_nodes_of_type()
@@ -1893,12 +1903,12 @@ def search_symbols_by_latex(tx: Transaction, search_string: str) -> list:
 
 @trace_execution
 def connect_expressions_to_step(
-    tx,
+    tx: Transaction,
     step_id: str,
     now_str: str,
-    list_of_input_expression_IDs: list,
-    list_of_feed_IDs: list,
-    list_of_output_expression_IDs: list,
+    list_of_input_expression_IDs: List[str],
+    list_of_feed_IDs: List[str],
+    list_of_output_expression_IDs: List[str],
     author_name_latex: str,
 ) -> None:
     """
