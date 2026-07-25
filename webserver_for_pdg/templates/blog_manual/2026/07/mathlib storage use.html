@@ -1,0 +1,70 @@
+<P>First published 2026-07-25
+
+<P>On my laptop I have built a docker image that includes mathlib
+<pre>
+$ docker images
+REPOSITORY                           TAG                IMAGE ID       CREATED          SIZE
+ui_v8-flask-webserver                latest-arm64       c6582def02be   23 minutes ago   18GB
+ui_v8-nginx                          latest             95de67be28ab   2 weeks ago      49.7MB
+neo4j                                4.4.45-community   3531ea1808be   11 months ago    530MB
+</pre>
+
+<P>On my Hetzner VPS I have
+<pre>
+$ docker images
+IMAGE                                             ID             DISK USAGE   CONTENT SIZE   EXTRA
+neo4j:4.4.45-community                            4322925e2e86        892MB          330MB        
+ui_v8-flask-webserver:latest-amd64                24398b56a54c       6.08GB         1.58GB        
+ui_v8-nginx:latest                                f2038444665c       73.6MB           21MB        
+</pre>
+<P>and not much available storage capacity:
+<pre>
+$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           382M  900K  382M   1% /run
+/dev/sda1        38G   32G  4.6G  88% /
+tmpfs           1.9G     0  1.9G   0% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+/dev/sda15      253M  146K  252M   1% /boot/efi
+tmpfs           382M   12K  382M   1% /run/user/1000
+</pre>
+<P>I'm currently paying $6.50/month for CX23: 2 CPUs, 4GB of RAM, and 40GB of SSD.
+<P>The next step up (CX33 for $9/month with 4 CPUs, 8GB of RAM, and 80GB of SSD) isn't available, so I'd have to get CPX12 for $13.50/month to get 40GB of storage.
+
+<P>Whether the container is an 18GB monolith or is split into separate containers won't change the overall size. 
+
+On the VPS
+<pre>
+$ hostname
+ubuntu-4gb-hel1-4
+
+$ hostnamectl
+ Static hostname: ubuntu-4gb-hel1-4
+       Icon name: computer-vm
+         Chassis: vm 🖴
+      Machine ID: cdf884da1b9c41d6a20aa35665b485c4
+         Boot ID: b752e553d7874b1c91f9a8e8a6ff5cbd
+  Virtualization: kvm
+Operating System: Ubuntu 24.04.4 LTS              
+          Kernel: Linux 6.8.0-134-generic
+    Architecture: x86-64
+ Hardware Vendor: Hetzner
+  Hardware Model: vServer
+Firmware Version: 20171111
+   Firmware Date: Sat 2017-11-11
+    Firmware Age: 8y 8month 1w 6d                 
+
+pdg@ubuntu-4gb-hel1-4:~/ui_v8_website_flask_neo4j$ hostnamectl | grep -i vendor
+ Hardware Vendor: Hetzner
+</pre>
+
+On my laptop
+<pre>
+$ hostname
+Mac
+
+$ hostnamectl
+-bash: hostnamectl: command not found
+</pre>
+
+<P>So I could split <code>mathlib</code> and development infrastructure like <code>playwright</code> to separate containers and then only build them on my Mac (and not the VPS).
