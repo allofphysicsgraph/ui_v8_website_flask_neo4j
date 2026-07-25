@@ -15,7 +15,7 @@
   <legend>
     <H2>Edit matrix \( {{ matrix_dict['latex'] }} \)</h2>
   </legend>
-
+{% if current_user.is_authenticated %}
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_matrix_properties.csrf_token }}
     <P>
@@ -63,7 +63,9 @@
       <input type="submit" value="Edit matrix">
     </P>
   </form>
-
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to edit the matrix.</p>
+{% endif %}
 TODO: edit dimension
 
 </fieldset>
@@ -72,7 +74,7 @@ TODO: edit dimension
   <legend>
     <H2>Delete matrix \( {{ matrix_dict['latex'] }} \)</H2>
   </legend>
-
+{% if current_user.is_authenticated %}
 <form method="post" action="" onsubmit="return checkForm(this);">
   {{ form_no_options.csrf_token }}
   <P>
@@ -80,6 +82,9 @@ TODO: edit dimension
   <input type="submit" value="Delete matrix">
 
 </form>
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to delete the matrix.</p>
+{% endif %}
 </fieldset>
 
 

@@ -15,7 +15,7 @@
   <legend>
     <H2>Edit relation \( {{ relation_dict['latex'] }} \)</h2>
   </legend>
-
+{% if current_user.is_authenticated %}
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_new_symbol.csrf_token }}
     <P>
@@ -45,6 +45,9 @@
     </P>
   </form>
 
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to edit the relation.</p>
+{% endif %}
 TODO: edit dimension
 
 </fieldset>
@@ -53,7 +56,7 @@ TODO: edit dimension
   <legend>
     <H2>Delete relation  \( {{ relation_dict['latex'] }} \)</H2>
   </legend>
-
+{% if current_user.is_authenticated %}
 <form method="post" action="" onsubmit="return checkForm(this);">
   {{ form_no_options.csrf_token }}
   <P>
@@ -61,6 +64,10 @@ TODO: edit dimension
   <input type="submit" value="Delete relation">
 
 </form>
+
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to delete the relation.</p>
+{% endif %}
 </fieldset>
 
 {% if list_of_expression_dicts|length > 0 %}

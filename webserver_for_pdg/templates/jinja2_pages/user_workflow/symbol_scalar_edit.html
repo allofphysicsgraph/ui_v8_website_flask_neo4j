@@ -15,7 +15,7 @@
   <legend>
     <H2>Edit scalar \( {{ scalar_dict['latex'] }} \)</h2>
   </legend>
-
+{% if current_user.is_authenticated %}
   <form method="post" action="" onsubmit="return checkForm(this);">
     {{ form_symbol_properties.csrf_token }}
     <P>{{ form_symbol_properties.scalar_latex.label}}: 
@@ -41,7 +41,9 @@
     <P><input type="submit" name="edit scalar" value="Edit scalar">
     </P>
   </form>
-
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to edit the scalar.</p>
+{% endif %}
 TODO: edit dimension
 
 </fieldset>
@@ -50,7 +52,7 @@ TODO: edit dimension
   <legend>
     <H2>Delete scalar  \( {{ scalar_dict['latex']|e }} \)</H2>
   </legend>
-
+{% if current_user.is_authenticated %}
 <form method="post" action="" onsubmit="return checkForm(this);">
   {{ form_no_options.csrf_token }}
   <P>
@@ -58,6 +60,9 @@ TODO: edit dimension
   <input type="submit" name="delete scalar" value="Delete scalar">
 
 </form>
+{% else %}
+    <p>You must be <a href="{{ url_for('to_login') }}">logged in</a> to delete the scalar.</p>
+{% endif %}
 </fieldset>
 
 
