@@ -1118,7 +1118,7 @@ def create_derivation_png(
         file_handle.write(
             'label="derivation: '
             + derivation_name_latex
-            + '\nhttps://allofphysiscs.com";\n'
+            + '\nhttps://allofphysics.com";\n'
         )
         file_handle.write("fontsize=12;\n")
 
@@ -1257,7 +1257,7 @@ def create_step_graphviz_png(
             + step_dict["id"]
             # + " in "
             # + dat["derivations"][derivation_id]["name"]
-            + '\nhttps://allofphysiscs.com";\n'
+            + '\nhttps://allofphysics.com";\n'
         )
         file_handle.write("fontsize=12;\n")
 

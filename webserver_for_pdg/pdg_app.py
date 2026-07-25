@@ -1727,7 +1727,7 @@ def to_review_derivation(
     * edit step in derivation
     * delete derivation
 
-    https://allofphysiscs.com/static/property_graph_schema.png
+    https://allofphysics.com/static/property_graph_schema.png
 
     >>> to_review_derivation()
     """

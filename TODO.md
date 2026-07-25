@@ -196,9 +196,9 @@ https://lovettsoftware.com/NaturalNumbers/TutorialWorld/Level2.lean.html
 # Where to start with Lean in PDG 
 
 simple derivations, like the quadratic equation
-<https://allofphysiscs.com/review_derivation/000011/>
+<https://allofphysics.com/review_derivation/000011/>
 or the mass of the Earth
-<https://allofphysiscs.com/review_derivation/527822/>
+<https://allofphysics.com/review_derivation/527822/>
 are "just algebra"
 
 <https://atomslab.github.io/LeanChemicalTheories/adsorption/langmuir_kinetics.html>

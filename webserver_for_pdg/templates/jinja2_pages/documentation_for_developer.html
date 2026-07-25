@@ -430,7 +430,7 @@ The Physics Derivation Graph is a <a href="https://en.wikipedia.org/wiki/Create,
   When errors occur, there's a Flask function <code>flash</code> used to convey the error summary to the user (displayed at the bottom of the webpage).
 
 <P>
-  The website <a href="{{ url_for('to_index') }}">allofphysiscs.com</a> is run using docker-compose; see <code>ui_v8_website_flask_neo4j/compose.yaml</code>
+  The website <a href="{{ url_for('to_index') }}">allofphysics.com</a> is run using docker-compose; see <code>ui_v8_website_flask_neo4j/compose.yaml</code>
 
 <center>
 <P>
@@ -448,7 +448,7 @@ Figure 3. State diagram for the web interface.
 
 <P>
   When a web browser requests the page
-  <a href="{{ url_for('to_developer_documentation') }}?referrer=developer_documentation">https://allofphysiscs.com/developer_documentation</a>
+  <a href="{{ url_for('to_developer_documentation') }}?referrer=developer_documentation">https://allofphysics.com/developer_documentation</a>
   nginx calls gunicorn calls
   <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/blob/gh-pages/webserver_for_pdg/pdg_app.py">pdg_app.py</a>
   with the URL string. The Python flask package uses the URL information to

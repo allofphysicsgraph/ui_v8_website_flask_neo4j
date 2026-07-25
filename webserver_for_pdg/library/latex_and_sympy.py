@@ -296,7 +296,7 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str) -> str:
 #
 # def list_of_sympy_symbols_in_sympy_expression(sympy_expr) -> list:
 #     """
-#     Sometimes Sympy works as desired (for simple algebraic synatx)
+#     Sometimes Sympy works as desired (for simple algebraic syntax)
 #     >>> parse_latex(r'a + k = b + k').free_symbols
 #     {b, a, k}
 #

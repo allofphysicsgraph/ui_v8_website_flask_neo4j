@@ -11967,7 +11967,7 @@ ELSE
       <name>that one guy</name>
       <blogger:type>BLOGGER</blogger:type>
     </author>
-    <title>Latex math expressions that case Sympy's Latex parser to fail</title>
+    <title>Latex math expressions that cause Sympy's Latex parser to fail</title>
     <content type='html'>&lt;span style="font-family: Courier New, Courier, monospace;"&gt;$ git clone https://github.com/allofphysicsgraph/proofofconcept.git&lt;/span&gt;&lt;br /&gt;
 &lt;span style="font-family: Courier New, Courier, monospace;"&gt;$ cd proofofconcept/v7_pickle_web_interface/flask&lt;/span&gt;&lt;br /&gt;
 &lt;span style="font-family: Courier New, Courier, monospace;"&gt;$ make dockerlive&lt;/span&gt;&lt;br /&gt;
