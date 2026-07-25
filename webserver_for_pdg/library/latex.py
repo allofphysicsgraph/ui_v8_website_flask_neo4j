@@ -760,17 +760,20 @@ def create_pdf_for_derivation(
 
     # TODO: it would be good to check whether \cite appears in the .tex content
 
-    # first of the latex runs
-    process = subprocess.run(
-        ["latex", "-halt-on-error", tex_filename_without_extension + ".tex"],
-        cwd=tmp_latex_folder_full_path,
-        stdout=PIPE,
-        stderr=PIPE,
-        timeout=proc_timeout,
-    )
-    # https://stackoverflow.com/questions/41171791/how-to-suppress-or-capture-the-output-of-subprocess-run
-    latex_stdout = process.stdout.decode("utf-8")
-    latex_stderr = process.stderr.decode("utf-8")
+    try:
+        # first of the latex runs
+        process = subprocess.run(
+            ["latex", "-halt-on-error", tex_filename_without_extension + ".tex"],
+            cwd=tmp_latex_folder_full_path,
+            stdout=PIPE,
+            stderr=PIPE,
+            timeout=proc_timeout,
+        )
+        # https://stackoverflow.com/questions/41171791/how-to-suppress-or-capture-the-output-of-subprocess-run
+        latex_stdout = process.stdout.decode("utf-8")
+        latex_stderr = process.stderr.decode("utf-8")
+    except subprocess.TimeoutExpired as err:
+        raise Exception("time-out error")
 
     if "Text line contains an invalid character" in latex_stdout:
         logger.error("no PDF generated - tex contains invalid character")
