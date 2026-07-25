@@ -614,8 +614,6 @@ def api_whoami():
     )
 
 
-
-
 @api_bp.route("/resources/sympy_check", methods=["GET", "POST"])
 def api_sympy_check():
     """Parse a user-supplied math expression with sympy and report its
@@ -739,10 +737,10 @@ def api_sympy_check():
         },
     )
 
+
 @api_bp.route("/resources/lean_check", methods=["GET", "POST"])
 def api_lean_check():
-    """
-    """
+    """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] api_lean_check start " + trace_id)
     up_link = {
@@ -768,8 +766,43 @@ def api_lean_check():
             title="Invalid Field",
         )
 
-    lean_result_stdout, lean_result_stderr = lean.run_lean(user_input)
-
+    try:
+        lean_result_stdout, lean_result_stderr = lean.run_lean(user_input)
+    except Exception as err:
+        logger.warning("[TRACE] " + trace_id + " lean_check failed: " + str(err))
+        return hal_error(str(err), 502, links=up_link, title="Lean Check Failed")
+    passed = not lean_result_stderr.strip()
+    logger.info("[TRACE] api_lean_check end " + trace_id)
+    return hal_response(
+        data={
+            "input": user_input,
+            "passed": passed,
+            "stdout": lean_result_stdout,
+            "stderr": lean_result_stderr,
+        },
+        links={
+            "self": hal_link(
+                url_for(".api_lean_check", _external=True), "Lean expression check"
+            ),
+            "up": hal_link(
+                url_for(".api_start_here", _external=True), "API Entry Point"
+            ),
+        },
+        templates={
+            "default": hal_template(
+                "GET",
+                [
+                    hal_property(
+                        "lean",
+                        required=True,
+                        prompt="Expression (Lean syntax)",
+                        value=user_input,
+                    )
+                ],
+                title="Check another expression",
+            )
+        },
+    )
 
 
 @api_bp.route("/resources/cypher", methods=["GET", "POST"])
