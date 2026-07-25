@@ -1003,6 +1003,10 @@ def create_png_from_latex(
         os.path.join(tmp_folder_full_path, filename_no_extension + ".png"),
         os.path.join(destination_folder, filename_no_extension + ".png"),
     )
+    # validate that PNG exists
+    # logger.info(
+    #     os.path.exists(os.path.join(destination_folder, filename_no_extension + ".png"))
+    # )
 
     # logger.debug(destination_folder + filename_no_extension + ".png")
     logger.info(
