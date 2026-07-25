@@ -120,8 +120,7 @@ from sympy.parsing.sympy_parser import (  # type: ignore[import-untyped]
     implicit_multiplication_application,
 )
 from . import neo4j_query
-
-# from . import compute
+from . import lean
 from . import list_of_valid
 from . import api_keys
 
@@ -136,6 +135,10 @@ from .initialize_neo4j import graphDB_Driver
 # http://flask.palletsprojects.com/en/1.1.x/tutorial/views/
 api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 
+EXAMPLE_CYPHER_QUERY = "MATCH (n) RETURN DISTINCT labels(n)"
+
+MAX_LEAN_INPUT_LENGTH = 500
+
 # --- sympy_check configuration -------------------------------------------------
 # Maximum length (characters) accepted for a submitted expression. This endpoint
 # is unauthenticated, so an unbounded input length would be an easy resource-
@@ -143,7 +146,7 @@ api_bp = Blueprint("pdg_api", __name__, url_prefix="/api")
 MAX_SYMPY_INPUT_LENGTH = 500
 
 
-# sympy's parse_expr() parses by transforming the input into a Python expression
+# sympy's `parse_expr()` parses by transforming the input into a Python expression
 # and running it through eval(). That is safe-ish for trusted input, but this
 # route accepts arbitrary, unauthenticated user input, so eval() must not have
 # access to Python builtins (__import__, open, exec, etc.). We build one shared,
@@ -579,7 +582,10 @@ def api_start_here():
             url_for(".api_whoami", _external=True), "Identify the current API caller"
         ),
         "sympy_check": hal_link(
-            url_for(".api_sympy_check", _external=True), "Check a sympy expression"
+            url_for(".api_sympy_check", _external=True), "Check a SymPy expression"
+        ),
+        "lean_check": hal_link(
+            url_for(".api_lean_check", _external=True), "Check a Lean expression"
         ),
         "cypher_query": hal_link(
             url_for(".api_cypher_query", _external=True),
@@ -608,6 +614,8 @@ def api_whoami():
     )
 
 
+
+
 @api_bp.route("/resources/sympy_check", methods=["GET", "POST"])
 def api_sympy_check():
     """Parse a user-supplied math expression with sympy and report its
@@ -623,7 +631,7 @@ def api_sympy_check():
 
     """
     trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    logger.info("[TRACE] api_sympy_check start " + trace_id)
     up_link = {
         "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point")
     }
@@ -731,8 +739,37 @@ def api_sympy_check():
         },
     )
 
+@api_bp.route("/resources/lean_check", methods=["GET", "POST"])
+def api_lean_check():
+    """
+    """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] api_lean_check start " + trace_id)
+    up_link = {
+        "up": hal_link(url_for(".api_start_here", _external=True), "API Entry Point")
+    }
 
-EXAMPLE_CYPHER_QUERY = "MATCH (n) RETURN DISTINCT labels(n)"
+    if request.is_json:
+        data_from_user = request.get_json()
+        user_input = data_from_user.get("lean")
+    else:
+        user_input = request.args.get("lean")
+
+    if not user_input:
+        return hal_error(
+            "Missing required field: lean", 400, links=up_link, title="Missing Field"
+        )
+
+    if len(user_input) > MAX_LEAN_INPUT_LENGTH:
+        return hal_error(
+            f"Lean expression exceeds maximum length of {MAX_LEAN_INPUT_LENGTH} characters",
+            400,
+            links=up_link,
+            title="Invalid Field",
+        )
+
+    lean_result_stdout, lean_result_stderr = lean.run_lean(user_input)
+
 
 
 @api_bp.route("/resources/cypher", methods=["GET", "POST"])
