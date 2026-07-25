@@ -86,11 +86,16 @@ container: container_build container_live
 container_build:
 	cd webserver_for_pdg && $(DOCKER_OR_PODMAN) build -t $(WEBSERVER_IMAGE):$(CONTAINER_TAG) .
 
+# this is not the currently running webserver for flask
 container_live:
 	$(DOCKER_OR_PODMAN) run -it --rm \
                 -v `pwd`:/scratch -w /scratch/ \
                 --user $(id -u):$(id -g) \
                 $(WEBSERVER_IMAGE):$(CONTAINER_TAG) /bin/bash
+
+# assumes the webserver is already running
+container_web:
+	$(DOCKER_OR_PODMAN) exec -it $$(docker ps -qf "name=flask-webserver") /bin/bash
 
 black_out:
 	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch \
