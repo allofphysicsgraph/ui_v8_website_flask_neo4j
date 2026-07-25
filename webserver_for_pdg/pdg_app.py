@@ -2220,7 +2220,6 @@ def to_edit_expression(expression_id: unique_numeric_id_as_str) -> ResponseRetur
     web_form_expression_sympy = SpecifyNewExpressionSympyLeanForm()
     web_form_no_options = NoOptionsForm()
 
-    expression_dict = {}
     with graphDB_Driver.session() as session, track_time(
         query_time_dict, "pdg_app/to_edit_expression " + trace_id
     ):
@@ -4291,8 +4290,10 @@ def to_add_operation() -> ResponseReturnValue:
                 operation_reference_latex = str(
                     web_form_add_operation.operation_reference_latex.data
                 ).strip()
-                operation_argument_count = int(
-                    web_form_add_operation.operation_argument_count.data or -1
+                operation_argument_count = (
+                    int(web_form_add_operation.operation_argument_count.data)
+                    if web_form_add_operation.operation_argument_count.data is not None
+                    else -1
                 )
 
                 logger.info("operation_latex:" + str(operation_latex))
@@ -4702,7 +4703,7 @@ def to_add_symbols_and_operations_for_expression(
 
     # TODO:
     # query_time_dict, derivations_per_symbol = compute.derivations_per_symbol(potential_symbols_found_in_Latex_expression)
-    derivation_per_symbol_id = {}
+    derivation_per_symbol_id: Dict[str, Any] = {}
 
     # The checkboxes are determined dynamically,
     # so I don't see how a class-based form could be used.

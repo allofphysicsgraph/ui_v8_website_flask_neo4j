@@ -114,7 +114,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 import sympy  # type: ignore
-from sympy.parsing.sympy_parser import (
+from sympy.parsing.sympy_parser import (  # type: ignore[import-untyped]
     parse_expr,
     standard_transformations,
     implicit_multiplication_application,
@@ -158,7 +158,7 @@ MAX_SYMPY_INPUT_LENGTH = 500
 # additionally rejects any input containing '__' before parsing; the two
 # measures are both required, not redundant.
 def _build_safe_sympy_globals():
-    safe_globals = {}
+    safe_globals: Dict[str, Any] = {}
     exec("from sympy import *", safe_globals)
     safe_globals["__builtins__"] = {}
     return safe_globals
@@ -2374,7 +2374,6 @@ def api_create_expression():
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    query_time_dict = {}  # type: query_timing_result_type
     expression_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
 
     def _create_atomic(tx):
@@ -3504,7 +3503,9 @@ def api_edit_operation(operation_id: str):
             "operation_argument_count"
         ) not in (None, ""):
             try:
-                argument_count = int(data_from_user.get("operation_argument_count"))
+                argument_count = int(
+                    data_from_user.get("operation_argument_count") or 0
+                )
             except (TypeError, ValueError):
                 return "INVALID_ARGUMENT_COUNT"
             if argument_count <= 0:
@@ -4880,6 +4881,9 @@ def api_create_step(derivation_id: str):
     logger.info("[TRACE] start " + trace_id)
 
     data_from_user = request.get_json() if request.is_json else request.args
+
+    # TODO: what is the schema of the user-provided JSON? How is that schema validated prior to processing?
+
     inference_rule_id = data_from_user.get("inference_rule_id")
     if not inference_rule_id:
         return hal_error(
@@ -4888,9 +4892,10 @@ def api_create_step(derivation_id: str):
 
     note_before_step_latex = data_from_user.get("note_before_step_latex", "")
     note_after_step_latex = data_from_user.get("note_after_step_latex", "")
-    list_of_input_expression_IDs = data_from_user.get("inputs", [])
-    list_of_feed_data = data_from_user.get("feeds", [])
-    list_of_output_expression_IDs = data_from_user.get("outputs", [])
+    # TODO: are these list of dicts? str? (`Any` can be made more precise)
+    list_of_input_expression_IDs: List[Any] = data_from_user.get("inputs", [])
+    list_of_feed_data: List[Any] = data_from_user.get("feeds", [])
+    list_of_output_expression_IDs: List[Any] = data_from_user.get("outputs", [])
     sequence_index_req = data_from_user.get("sequence_index")
 
     if sequence_index_req is not None:
