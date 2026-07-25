@@ -17,7 +17,9 @@ ENV PIP_ROOT_USER_ACTION=ignore \
     FLASK_RUN_HOST=0.0.0.0 \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/root/.elan/bin:$PATH"
+    ELAN_HOME=/opt/lean_installation \
+    PATH="/opt/lean_installation/bin:$PATH" \
+    PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # PYTHONUNBUFFERED:
 # since I'm not using python:3.7, I have to install Python
@@ -43,10 +45,15 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get install -y --no-install-recommends \
 # text editing
                vim \
+# `make` is required for `black_out`
+               make \
+# `git` is required for Lean's mathlib installation 
                git \
+# `curl` to install mathlib for Lean
                curl \
 # use spider to find dead links
                wget \
+# send email
                msmtp \
                python3 \
                python3-pip \
@@ -117,6 +124,12 @@ RUN --mount=type=cache,target=/root/.elan lake exe cache get
 RUN echo "import Mathlib.Data.Real.Basic" > ProjectName/mathlib_test.v4.lean
 RUN --mount=type=cache,target=/root/.elan lake lean ProjectName/mathlib_test.v4.lean 
 
+# copy from cache to persistent folder available in image
+RUN --mount=type=cache,target=/root/.elan \
+    mkdir -p /opt/lean_installation && \
+    cp -r /root/.elan/* /opt/lean_installation/
+
+
 ################# end Lean 4; start npm #################################
 
 WORKDIR /code
@@ -143,8 +156,17 @@ RUN pip install -r requirements.txt --no-cache-dir -vvv --ignore-installed blink
 # CACHED PLAYWRIGHT BROWSERS
 # This caches Playwright's browser binaries (~/.cache/ms-playwright) 
 # Even if requirements.txt changes, Playwright won't re-download browsers!
+#RUN --mount=type=cache,target=/root/.cache/ms-playwright \
+#    playwright install && playwright install-deps
+# 2026-07-25: playwright was installed to a transient build layer so not available for use
+
+# Use the cache mount to speed up downloading, then copy files to the permanent path
 RUN --mount=type=cache,target=/root/.cache/ms-playwright \
-    playwright install && playwright install-deps
+    playwright install && \
+    mkdir -p /ms-playwright && \
+    cp -r /root/.cache/ms-playwright/* /ms-playwright/ && \
+    playwright install-deps
+
 
 # TODO: don't be root!
 
