@@ -204,6 +204,8 @@ def get_placement_options(
     list_of_sequence_values: List[str], selected_sequence_index: str
 ) -> List[str]:
     """
+    This function identifies where a step could be re-ordered to
+
     >>> list_of_str = ['a', 'c', 'f', 'm', 'p', 'u']
     >>> selected = 'f'
     >>> get_placement_options(list_of_str, selected)
