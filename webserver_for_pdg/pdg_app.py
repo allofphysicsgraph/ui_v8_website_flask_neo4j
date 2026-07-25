@@ -189,6 +189,7 @@ from library import neo4j_query
 from library import compute
 from library import latex_and_sympy
 from library import latex
+from library import lean
 from library import sympy_validate_step
 from library import sympy_validate_expression
 from library import list_of_valid
@@ -8199,7 +8200,29 @@ def to_validate_lean():
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] to_validate_lean start " + trace_id)
 
-    return render_template("jinja2_pages/validate_lean.html", title="validate Lean")
+    web_form_lean = NoOptionsForm()
+
+    user_lean_input = ""
+    lean_result_stdout = ""
+    lean_result_stderr = ""
+
+    if request.method == "POST":
+        logger.info("to_validate_lean: request.form = " + str(request.form))
+
+        user_lean_input = request.form["lean-input"]
+
+        logger.info(str(user_lean_input))
+
+        lean_result_stdout, lean_result_stderr = lean.run_lean(user_lean_input)
+
+    return render_template(
+        "jinja2_pages/validate_lean.html",
+        title="validate Lean",
+        lean_input=user_lean_input,
+        lean_result_stdout=lean_result_stdout,
+        lean_result_stderr=lean_result_stderr,
+        form_lean=web_form_lean,
+    )
 
 
 @web_app.route("/validate/json", methods=["GET", "POST"])
@@ -8212,15 +8235,19 @@ def to_validate_json():
 
     web_form_json = NoOptionsForm()
 
+    json_result = ""
+
     if request.method == "POST":
         logger.info("to_validate_json: request.form = " + str(request.form))
 
-        user_json_input = request.form["math-latex"]
+        # request.form = ImmutableMultiDict([('json-input', 'stuff'), ('json', 'Validate JSON')])
+
+        user_json_input = request.form["json-input"]
         try:
-            json.loads(user_json_input)
-            json_result = "valid"
+            parsed = json.loads(user_json_input)
+            json_result = json.dumps(parsed, indent=2)
         except ValueError as err:
-            json_result = str(err)
+            json_result = str(err) + "\n\n" + user_json_input
 
     return render_template(
         "jinja2_pages/validate_json.html",
