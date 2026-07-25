@@ -16,6 +16,7 @@ python3 ../introspection/remove_comments.py ../test_python/test_sympy_validate_e
 python3 ../introspection/remove_comments.py ../webserver_for_pdg/library/pdg_api.py > pdg_api.py
 python3 ../introspection/remove_comments.py ../test_web_interface/playwrightbased/test_pdg_api.py  > test_pdg_api.py
 
+python3 ../introspection/remove_comments.py ../webserver_for_pdg/library/lean.py > lean.py
 
 sed '/^#/d' ../webserver_for_pdg/Dockerfile > Dockerfile_no_comments
 
