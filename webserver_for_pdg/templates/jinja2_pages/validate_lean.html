@@ -2,7 +2,10 @@
 {% block content %}
 
 {% if lean_result_stdout or lean_result_stderr %}
-<H2>Result:</H2>
+<H2>Result for input</H2>
+<pre>
+{{ lean_input }}
+</pre>
 <HR>
 STDOUT:
 <Pre>
@@ -26,5 +29,20 @@ STDERR:
     </form>
   </fieldset>
 
+
+Example of valid input:
+<pre>
+import Mathlib.Data.Real.Basic
+
+theorem add_to_both_sides (a b c : Real) : a = b <-> a + c = b + c := by
+  exact (add_right_cancel_iff).symm
+
+#print axioms add_to_both_sides 
+</pre>
+which produces 
+<pre>
+'add_to_both_sides' depends on axioms: [propext, Classical.choice, Quot.sound]
+</pre>
+after about 30 seconds.
 
 {% endblock %}

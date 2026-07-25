@@ -2,6 +2,16 @@
 {% block content %}
 
 
-<P> placeholder; see latex
+
+  <fieldset>
+	<legend>SymPy validation</legend>
+	  <form method="post">
+      {{ form_sympy.csrf_token }}
+      <P><label for="sympy-input">SymPy:</label>
+      <input type="text" id="sympy-input" name="sympy-input" placeholder="x**2 = y">
+      <P><input type="submit" name="sympy-btn" value="Validate SymPy">
+    </form>
+  </fieldset>
+
 
 {% endblock %}

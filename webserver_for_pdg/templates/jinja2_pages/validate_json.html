@@ -4,7 +4,9 @@
 {% if json_result %}
 <H2>Result:</H2>
 <HR>
-json_result
+<Pre>
+{{ json_result }}
+</Pre>
 <HR>
 {% endif %}
 
@@ -13,9 +15,9 @@ json_result
 	<legend>JSON validation</legend>
 	  <form method="post">
       {{ form_json.csrf_token }}
-      <P><label for="json">JSON:</label>
-      <input type="text" id="json" name="json" placeholder="your JSON here">
-      <P><input type="submit" name="json" value="Validate JSON">
+      <P><label for="json-input">JSON:</label>
+      <textarea id="json-input" name="json-input" rows="10" cols="100" placeholder="Enter JSON here..."></textarea>
+      <P><input type="submit" name="json-btn" value="Validate JSON">
     </form>
   </fieldset>
 
