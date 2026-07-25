@@ -13,6 +13,7 @@
 
 User-agent: meta-externalagent
 User-agent: Amazonbot
+User-agent: Amzn-SearchBot
 User-agent: Baiduspider
 User-agent: Sogou
 User-agent: Bytespider
