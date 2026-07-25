@@ -65,6 +65,9 @@ COPY msmtp.config /root/.msmtprc
 
 ################## start Lean 4 #################################
 
+# For an isolated example of using Lean in Docker see
+# <https://github.com/allofphysicsgraph/lean-in-docker/blob/main/lean_v4/Dockerfile>
+
 # The following doesn't work 
 #RUN curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
 # because
@@ -90,7 +93,24 @@ ENV PATH="/root/.elan/bin:$PATH"
 # - https://github.com/allofphysicsgraph/lean-in-docker/blob/main/lean_v4/Dockerfile
 # - https://github.com/xubaiw/docker-lean/blob/main/Dockerfile
 
+RUN mkdir /opt/new_project
+WORKDIR /opt/new_project
+RUN lake +leanprover-community/mathlib4:lean-toolchain new project_name math
+RUN curl -L https://raw.githubusercontent.com/leanprover-community/mathlib4/master/lean-toolchain -o lean-toolchain
+
+RUN elan default "$(cat lean-toolchain)"
+
+
+WORKDIR /opt/new_project/project_name
+
+RUN lake exe cache get
+
+RUN echo "import Mathlib.Data.Real.Basic" > ProjectName/mathlib_test.v4.lean
+RUN lake lean ProjectName/mathlib_test.v4.lean 
+
 ################# end Lean 4; start npm #################################
+
+WORKDIR /code
 
 # https://www.npmjs.com/package/mathjax
 RUN npm install mathjax@3
