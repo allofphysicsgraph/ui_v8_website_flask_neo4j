@@ -3278,7 +3278,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> ResponseReturnValue:
 
 
 @web_app.route("/edit_operation/<operation_id>", methods=["GET", "POST"])
-#@login_required
+# @login_required
 def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit operation
@@ -3400,7 +3400,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnV
 
 
 @web_app.route("/edit_relation/<relation_id>", methods=["GET", "POST"])
-#@login_required
+# @login_required
 def to_edit_relation(relation_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit relation
@@ -3505,7 +3505,7 @@ def to_edit_relation(relation_id: unique_numeric_id_as_str) -> ResponseReturnVal
 
 
 @web_app.route("/edit_scalar/<scalar_id>", methods=["GET", "POST"])
-#@login_required
+# @login_required
 def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit symbol:
@@ -3625,7 +3625,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> ResponseReturnValue:
 
 
 @web_app.route("/edit_vector/<vector_id>", methods=["GET", "POST"])
-#@login_required
+# @login_required
 def to_edit_vector(vector_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit vector
@@ -3681,7 +3681,7 @@ def to_edit_vector(vector_id: unique_numeric_id_as_str) -> ResponseReturnValue:
 
 
 @web_app.route("/edit_matrix/<matrix_id>", methods=["GET", "POST"])
-#@login_required
+# @login_required
 def to_edit_matrix(matrix_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     """
     edit matrix
