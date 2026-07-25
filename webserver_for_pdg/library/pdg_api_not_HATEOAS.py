@@ -57,6 +57,14 @@ def api_png_from_latex():
     r"""
     `GET` method is necessary; otherwise user can't explore this endpoint from the browser.
 
+    Visiting https://localhost/api/resources/png_from_latex in a browser gets
+    {"error":"nothing passed in"}
+
+    Visiting https://localhost/api/resources/png_from_latex?tex=$x^2%2By$ in a browser gets
+    {"png_location":"/static/temp_for_latex_validation/4f8033d7c6767c8119993bbd1ddc785b663a10911851d57b93dc87f7986513c1.png"}
+    which can be viewed using
+    https://localhost/static/temp_for_latex_validation/4f8033d7c6767c8119993bbd1ddc785b663a10911851d57b93dc87f7986513c1.png
+
     Originally <string:user_input> was passed as an argument.
     Gemini 3.1 Pro says
 
@@ -77,7 +85,22 @@ def api_png_from_latex():
 
     """
 
-    user_input = request.args.get("tex")
+    if request.method == "GET":
+        user_input = request.args.get("tex")
+
+        if user_input is None:
+            return jsonify({"Error": "'tex' parameter is required!"}), 400
+
+    elif request.method == "POST":
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "Invalid or missing JSON"}), 400
+
+        if "tex" not in data:
+            return jsonify({"error": "Required 'tex' field is missing"}), 400
+
+        user_input = data.get("tex")
 
     path_to_png = os.path.join(latex.STATIC_DIR, "temp_for_latex_validation") + "/"
 
@@ -86,7 +109,7 @@ def api_png_from_latex():
     if user_input:
         hash_of_user_input = hash_of_string(user_input)
     else:
-        return jsonify({"error": "nothing passed in"})
+        return jsonify({"error": "nothing passed in"}), 400
 
     path_to_png_with_filename = path_to_png + hash_of_user_input + ".png"
 
@@ -98,7 +121,7 @@ def api_png_from_latex():
         len("/code") :
     ]
 
-    return jsonify({"png_location": path_to_png_with_filename_no_prefix_directory})
+    return jsonify({"png_location": path_to_png_with_filename_no_prefix_directory}), 400
 
 
 # EOF
