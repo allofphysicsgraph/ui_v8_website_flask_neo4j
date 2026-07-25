@@ -11,29 +11,39 @@
 FROM phusion/baseimage:jammy-1.0.4
 
 # Suppress pip warnings and version checks during build/runtime
-ENV PIP_ROOT_USER_ACTION=ignore
-ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PIP_ROOT_USER_ACTION=ignore \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    FLASK_APP=pdg_app.py \
+    FLASK_RUN_HOST=0.0.0.0 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH="/root/.elan/bin:$PATH"
 
-WORKDIR /code
-ENV FLASK_APP=pdg_app.py
-ENV FLASK_RUN_HOST=0.0.0.0
-
+# PYTHONUNBUFFERED:
 # since I'm not using python:3.7, I have to install Python
 # from https://github.com/Docker-Hub-frolvlad/docker-alpine-python3/blob/master/Dockerfile
 # This hack is widely applied to avoid python printing issues in docker containers.
 # See: https://github.com/Docker-Hub-frolvlad/docker-alpine-python3/pull/13
-ENV PYTHONUNBUFFERED=1
+
 
 # PYTHONDONTWRITEBYTECODE: Prevents Python from writing pyc files to disk (equivalent to python -B option)
-ENV PYTHONDONTWRITEBYTECODE=1
+
+
+WORKDIR /code
+
 
 ################# end variables; start apt packages #################################
 
 # https://docs.docker.com/engine/reference/builder/#run
-RUN apt-get update && \
-    apt-get install -y \
+
+# APT cache mount speeds up apt-get installs if packages change
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
 # text editing
                vim \
+               git \
                curl \
 # use spider to find dead links
                wget \
@@ -54,7 +64,7 @@ RUN apt-get update && \
 # LaTeX Error: File `letltxmacro.sty' not found. https://askubuntu.com/a/1253683
                texlive-latex-extra && \
     if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi && \
-    pip3 install --no-cache --upgrade pip setuptools wheel && \
+    pip3 install --no-cache-dir --upgrade pip setuptools wheel && \
     if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi
 
 
@@ -73,12 +83,12 @@ COPY msmtp.config /root/.msmtprc
 # because
 # elan: Unable to run interactively. Run with -y to accept defaults, --help for additional options                                                    
 # therefore, as per https://stackoverflow.com/a/53605439/1164295 
-RUN curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf |\
+RUN --mount=type=cache,target=/root/.elan \
+    curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf |\
        bash -s -- --default-toolchain leanprover/lean4:stable -y
 # -s = --silent;     Do not show progress meter or error messages. Makes Curl mute.
 # -S = --show-error; When used with -s, --silent, it makes curl show an error message if it fails.
 # -f = --fail;       (HTTP) Fail fast with no output at all on server errors. This is useful to enable scripts and users to better deal with failed attempts.
-
 
 
 # if "nightly" is desired, replace
@@ -87,7 +97,6 @@ RUN curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -
 # --default-toolchain leanprover/lean4:nightly
 # as per https://leanprover-community.github.io/archive/stream/270676-lean4/topic/elan.20update.html
 
-ENV PATH="/root/.elan/bin:$PATH"
 
 # References:
 # - https://github.com/allofphysicsgraph/lean-in-docker/blob/main/lean_v4/Dockerfile
@@ -95,34 +104,32 @@ ENV PATH="/root/.elan/bin:$PATH"
 
 RUN mkdir /opt/new_project
 WORKDIR /opt/new_project
-RUN lake +leanprover-community/mathlib4:lean-toolchain new project_name math
-RUN curl -L https://raw.githubusercontent.com/leanprover-community/mathlib4/master/lean-toolchain -o lean-toolchain
+RUN --mount=type=cache,target=/root/.elan lake +leanprover-community/mathlib4:lean-toolchain new project_name math
+RUN --mount=type=cache,target=/root/.elan curl -L https://raw.githubusercontent.com/leanprover-community/mathlib4/master/lean-toolchain -o lean-toolchain
 
-RUN elan default "$(cat lean-toolchain)"
+RUN --mount=type=cache,target=/root/.elan elan default "$(cat lean-toolchain)"
 
 
 WORKDIR /opt/new_project/project_name
 
-RUN lake exe cache get
+RUN --mount=type=cache,target=/root/.elan lake exe cache get
 
 RUN echo "import Mathlib.Data.Real.Basic" > ProjectName/mathlib_test.v4.lean
-RUN lake lean ProjectName/mathlib_test.v4.lean 
+RUN --mount=type=cache,target=/root/.elan lake lean ProjectName/mathlib_test.v4.lean 
 
 ################# end Lean 4; start npm #################################
 
 WORKDIR /code
 
 # https://www.npmjs.com/package/mathjax
-RUN npm install mathjax@3
-#RUN npm install mathjax
-
-RUN mkdir -p /code/static/mathjax
-RUN mv /code/node_modules/mathjax/es5 /code/static/mathjax
+RUN npm install mathjax@3 && \
+    mkdir -p /code/static/mathjax && \
+    mv /code/node_modules/mathjax/es5 /code/static/mathjax && \
+    npm install -g pyright
 
 
 # type checking for Python
 # https://microsoft.github.io/pyright/#/installation
-RUN npm install -g pyright
 
 # Install Playwright browsers and their system dependencies
 #RUN npx playwright install --with-deps
@@ -133,8 +140,11 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt --no-cache-dir -vvv --ignore-installed blinker
 
 
-RUN playwright install
-RUN playwright install-deps
+# CACHED PLAYWRIGHT BROWSERS
+# This caches Playwright's browser binaries (~/.cache/ms-playwright) 
+# Even if requirements.txt changes, Playwright won't re-download browsers!
+RUN --mount=type=cache,target=/root/.cache/ms-playwright \
+    playwright install && playwright install-deps
 
 # TODO: don't be root!
 
