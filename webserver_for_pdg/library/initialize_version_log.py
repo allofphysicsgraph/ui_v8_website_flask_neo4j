@@ -2,7 +2,7 @@ import sys
 
 # https://docs.python.org/3/library/importlib.html
 # for https://docs.python.org/3/library/importlib.metadata.html#module-importlib.metadata
-import importlib
+import importlib.metadata
 
 from subprocess import PIPE  # https://docs.python.org/3/library/subprocess.html
 import subprocess  # https://stackoverflow.com/questions/39187886/what-is-the-difference-between-subprocess-popen-and-subprocess-run/39187984
@@ -14,15 +14,16 @@ logger = logging.getLogger(__name__)
 
 proc_timeout = 5
 
+# OS
 process = subprocess.run(
     ["lsb_release", "-a"], stdout=PIPE, stderr=PIPE, timeout=proc_timeout
 )
 stdout = process.stdout.decode("utf-8")
 stderr = process.stderr.decode("utf-8")
-logger.info("lake: " + str(stdout))
+logger.info(str(stdout))
 
 
-logger.info("python" + str(sys.version))
+logger.info("python " + str(sys.version))
 logger.info(
     "neo4j "
     + str(importlib.metadata.version("neo4j"))
