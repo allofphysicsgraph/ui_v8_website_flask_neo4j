@@ -1,14 +1,27 @@
 {% extends "jinja2_pages/reusable_components/_base.html" %}
 {% block content %}
 
+{% if lean_result_stdout or lean_result_stderr %}
+<H2>Result:</H2>
+<HR>
+STDOUT:
+<Pre>
+{{ lean_result_stdout }}
+</Pre>
+STDERR:
+<Pre>
+{{ lean_result_stderr }}
+</Pre>
+<HR>
+{% endif %}
 
 
   <fieldset>
-	<legend>Math Latex validation</legend>
+	<legend>Validation of Lean</legend>
 	  <form method="post">
       {{ form_lean.csrf_token }}
-	   <label for="lean-input">Your Message:</label>
-	   <textarea id="lean-input" name="lean-input" rows="10" cols="200" placeholder="Enter Lean here..."></textarea>
+	   <label for="lean-input">Lean:</label>
+	   <textarea id="lean-input" name="lean-input" rows="10" cols="100" placeholder="Enter Lean here..."></textarea>
       <P><input type="submit" name="validate lean" value="Validate Lean">
     </form>
   </fieldset>
