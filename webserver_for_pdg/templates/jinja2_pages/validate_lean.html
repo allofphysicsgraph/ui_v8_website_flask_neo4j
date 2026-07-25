@@ -1,0 +1,17 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+
+
+  <fieldset>
+	<legend>Math Latex validation</legend>
+	  <form method="post">
+      {{ form_lean.csrf_token }}
+	   <label for="lean-input">Your Message:</label>
+	   <textarea id="lean-input" name="lean-input" rows="10" cols="200" placeholder="Enter Lean here..."></textarea>
+      <P><input type="submit" name="validate lean" value="Validate Lean">
+    </form>
+  </fieldset>
+
+
+{% endblock %}

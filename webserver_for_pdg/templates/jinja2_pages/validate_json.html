@@ -1,0 +1,22 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+{% if json_result %}
+<H2>Result:</H2>
+<HR>
+json_result
+<HR>
+{% endif %}
+
+
+  <fieldset>
+	<legend>JSON validation</legend>
+	  <form method="post">
+      {{ form_json.csrf_token }}
+      <P><label for="json">JSON:</label>
+      <input type="text" id="json" name="json" placeholder="your JSON here">
+      <P><input type="submit" name="json" value="Validate JSON">
+    </form>
+  </fieldset>
+
+{% endblock %}

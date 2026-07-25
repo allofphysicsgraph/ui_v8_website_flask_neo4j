@@ -1,0 +1,33 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+{% if image_name_math_latex %}
+<H2>Result:</H2>
+<HR>
+  <img src="{{ url_for('static', filename=image_name_math_latex) }}">
+<HR>
+{% endif %}
+
+
+  <fieldset>
+	<legend>Math Latex validation</legend>
+	  <form method="post">
+      {{ form_math_latex.csrf_token }}
+      <P><label for="math-latex">Math Latex (e.g., expressions, feeds):</label>
+      <input type="text" id="math-latex" name="math-latex" placeholder="math latex">
+      <P><input type="submit" name="validate math latex" value="Validate Math Latex">
+    </form>
+  </fieldset>
+
+
+  <fieldset>
+	<legend>non-Math Latex validation</legend>
+    <form method="post">
+      {{ form_nonmath_latex.csrf_token }}
+      <P><label for="non-math-latex">non-math Latex (e.g., abstract):</label>
+      <input type="text" id="non-math-latex" name="non-math-latex" placeholder="non-math latex">
+      <P><input type="submit" name="validate non-math latex" value="Validate non-math Latex">
+    </form>
+  </fieldset>
+
+{% endblock %}
