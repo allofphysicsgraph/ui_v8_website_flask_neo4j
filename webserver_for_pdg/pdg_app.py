@@ -194,7 +194,11 @@ from library import sympy_validate_expression
 from library import list_of_valid
 
 # ORDERING: this has to come before the functions that use this type
-from library.compute import unique_numeric_id_as_str, query_timing_result_type
+from library.compute import (
+    unique_numeric_id_as_str,
+    query_timing_result_type,
+    hash_of_string,
+)
 
 # https://docs.python.org/3/howto/logging.html
 import logging
@@ -8119,6 +8123,112 @@ def to_spectrum_of_precision_layer(which_layer):
 
 
 ###########################################################################
+
+
+@web_app.route("/validate/latex", methods=["GET", "POST"])
+def to_validate_latex():
+    """
+    See also `api_png_from_latex`
+
+    """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] to_validate_latex start " + trace_id)
+
+    web_form_math_latex = NoOptionsForm()
+    web_form_nonmath_latex = NoOptionsForm()
+
+    path_to_png_with_filename_no_prefix_directory = ""
+
+    if request.method == "POST":
+        logger.info("to_validate_latex: request.form = " + str(request.form))
+
+        # request.form = ImmutableMultiDict([('math-latex', 'x^2 = cos(y)'), ('validate math latex', 'Validate Math Latex')])
+        # xor
+        # request.form = ImmutableMultiDict([('non-math-latex', 'asdfasdfsdf'), ('validate non-math latex', 'Validate non-math Latex')])
+
+        if "validate math latex" in request.form.keys():
+            user_math_input = request.form["math-latex"]
+            user_input = "$" + user_math_input + "$"
+        elif "validate non-math latex" in request.form.keys():
+            user_input = request.form["non-math-latex"]
+
+        path_to_png = os.path.join(latex.STATIC_DIR, "temp_for_latex_validation") + "/"
+
+        os.makedirs(path_to_png, exist_ok=True)
+
+        if os.path.isdir(path_to_png):
+            logger.info("The folder " + str(path_to_png) + " exists!")
+        else:
+            logger.info("The folder " + str(path_to_png) + " does not exist.")
+
+        if user_input:
+            hash_of_user_input = hash_of_string(user_input)
+        else:
+            flash("need to provide input")
+
+        path_to_png_with_filename = path_to_png + hash_of_user_input + ".png"
+
+        logger.info("path_to_png_with_filename: " + str(path_to_png_with_filename))
+
+        if not os.path.exists(path_to_png_with_filename):
+            latex.create_png_from_latex(user_input, path_to_png, hash_of_user_input)
+
+        # trim "/code" prior to returning the path
+        path_to_png_with_filename_no_prefix_directory = path_to_png_with_filename[
+            len("/code/static/") :
+        ]
+
+        logger.info(str(path_to_png_with_filename_no_prefix_directory))
+
+    return render_template(
+        "jinja2_pages/validate_latex.html",
+        title="validate Latex",
+        form_math_latex=web_form_math_latex,
+        form_nonmath_latex=web_form_nonmath_latex,
+        image_name_math_latex=path_to_png_with_filename_no_prefix_directory,
+    )
+
+
+@web_app.route("/validate/sympy", methods=["GET", "POST"])
+def to_validate_sympy():
+    return render_template("jinja2_pages/validate_sympy.html", title="validate SymPy")
+
+
+@web_app.route("/validate/lean", methods=["GET", "POST"])
+def to_validate_lean():
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] to_validate_lean start " + trace_id)
+
+    return render_template("jinja2_pages/validate_lean.html", title="validate Lean")
+
+
+@web_app.route("/validate/json", methods=["GET", "POST"])
+def to_validate_json():
+    """
+    This is a precursor for checking the schema for JSON against specific schemas
+    """
+    trace_id = str(uuid.uuid4())
+    logger.info("[TRACE] to_validate_json start " + trace_id)
+
+    web_form_json = NoOptionsForm()
+
+    if request.method == "POST":
+        logger.info("to_validate_json: request.form = " + str(request.form))
+
+        user_json_input = request.form["math-latex"]
+        try:
+            json.loads(user_json_input)
+            json_result = "valid"
+        except ValueError as err:
+            json_result = str(err)
+
+    return render_template(
+        "jinja2_pages/validate_json.html",
+        title="validate JSON",
+        json_result=json_result,
+        form_json=web_form_json,
+    )
+
 
 ###########################################################################
 
