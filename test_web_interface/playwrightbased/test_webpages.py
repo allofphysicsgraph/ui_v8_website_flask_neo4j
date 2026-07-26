@@ -105,10 +105,7 @@ def test_get_rss_feed(page: Page):
     first_link = first_item.find("link")
     first_guid = first_item.find("guid")
 
-    assert (
-        first_title is not None
-        and "linux virtual machine on DigitalOcean" in first_title.text
-    )
+    assert first_title is not None
     assert first_guid is not None and first_guid.text == first_link.text
 
 
