@@ -1,0 +1,32 @@
+
+<P>First published 2026-07-26
+
+<H2>New-to-me routines</H2>
+
+<P>After every change,
+<UL>
+	<LI>run <code>make black_out</code>
+	<LI>run <code>make mypy_out</code>
+	<LI>run <code>make pytest_web</code>
+</UL>
+
+<H2>Perpetual TOOD</H2>
+<UL>
+	<LI>decrease number of <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues?q=is%3Aissue%20state%3Aopen%20type%3ABug">open bugs on github</a>
+	<LI>increase the coverage of tests
+	<LI>Sync the three pdg.cypher files: in version control, on local, on website.
+</UL>
+
+
+<H2>Priorities</H2>
+<UL>
+	<LI><a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/32">Lean integration</a> for checking steps.
+	<LI><a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/176">agentic workflow</a> for ingest of derivations.
+</UL>
+
+<P>The agentic workflow is a realistic path to accomplishing the <a href="https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/153">definition of done</a> for the Physics Derivation Graph. I did not imagine having a reasonable path to completion 5 years ago. Similarly, I didn't foresee having a way to practically use Lean because I didn't expect to become proficient at proofs. Using LLMs to debug and leverage tools has expanded what techniques I view as accessible for use in the Physics Derivation Graph. (Being constrained to StackOverflow was the bottleneck before having LLMs that could reason.)
+
+<P>Lean and SymPy provide feedback on whether the LLM's automated ingest is producing true statements. 
+
+<P>Claude Sonnet has been crucial for creating the HATEOAS-compliant API. In addition to allowing me to avoid the coding workload, I've been able to be less concerned about learning the details of HATEOAS requirements. 
+
