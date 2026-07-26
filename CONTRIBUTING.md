@@ -3,7 +3,6 @@
 
 Thanks for your interest in improving the project!
 
-
 To contribute, you can 
  * open a <a href="https://github.com/allofphysicsgraph/proofofconcept/issues/new?assignees=&labels=&template=bug_report.md&title=">bug report</a>
  * open a <a href="https://github.com/allofphysicsgraph/proofofconcept/issues/new?assignees=&labels=&template=feature_request.md&title=">feature request</a>
@@ -14,13 +13,19 @@ To contribute, you can
 
 Before submitting code via a pull request, please [open an issue](https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues) (whether to report a bug or ask for a feature) and describe your question or intent.
 
-Python code in this project is formatted using [Black](https://pypi.org/project/black/). 
+# Developers
 
-Development is done in [Docker containers](https://en.wikipedia.org/wiki/Docker_(software)). Changes to the code should be evaluated in a Docker container. Novel architecture suggestions should run in a container.  If you can create a minimal Dockerfile and Makefile that shows what your demo does, then I can reliably recreate the demo.
+See the [developer guide](https://allofphysics.com/documentation/developer?referrer=CONTRIBUTING.md). 
+
+Development is done in [Docker containers](https://en.wikipedia.org/wiki/Docker_(software)). Changes to the code should be evaluated in a Docker container. Novel architecture suggestions should run in a container.  If you can create a minimal <code>Dockerfile</code> and <code>Makefile</code> that shows what your demo does, then I can reliably recreate the demo.
 
 # Skills relevant for Contributors
 
 The Physics Derivation graph relies on a lot of different technologies: git, HTML, Javascript, Jinja2, Flask, Python, [SymPy](https://www.sympy.org/), Docker, Nginx, [Lean](https://en.wikipedia.org/wiki/Lean_(proof_assistant)), Neo4j. To contribute changes requires awareness of how each of these interact, in addition to having college-level familiarity with Physics and Math.
+
+# Agents, AI, LLMs
+
+See AGENTS.md
 
 # Logistics
 
@@ -42,6 +47,8 @@ workflow.
 
 # Design Philosophy for the Physics Derivation Graph
 
+* Everything in containers (specifically Docker) to enable portability and isolation.
+* calls to Neo4j should be isolated to `neo4j_query.py` 
 * Minimal reliance on external dependencies. Because this project should be durable, and because the primary author doesn't want to have to constantly be updating this project to keep it working, more investment in initial implementation is reasonable even at the risk of a bug or lacking a feature in another library. 
 * Easy to read the source code for the project. This project may not be completed (ever), so if it is to be durable the PDG will be read by other people.
 * Open source. Others should be able to leverage this investment. 
@@ -54,8 +61,8 @@ workflow.
 
 # Current Blockers that could benefit from attention
 
-* UI design, workflow: adding new content is a tedius process even before the content is ready to enter into the database
-* UI design, workflow: the website UI is a labourous process for adding content to the database
+* UI design, workflow: adding new content is a tedious process even before the content is ready to enter into the database
+* UI design, workflow: the website UI is a laborious process for adding content to the database
 * identifying which derivations are most relevant to invest in is tough
 * how to check math that SymPy doesn't support
 * high barrier to entry: domain expertise in Physics and Math is relevant, as is knowledge of Latex. 
