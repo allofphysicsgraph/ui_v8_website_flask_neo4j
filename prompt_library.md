@@ -27,6 +27,8 @@ The edges between `:derivation` and `:step` are `:HAS_STEP` and the edges betwee
 
 # Question
 
+What inconsistencies are there? Bad coding implementation, or naming conventions, or design flaws for example.
+
 There are inconsistencies in the function calls between these three files. 
 Some functions are missing, some function calls are not aligned. Identify these misalignments. 
 
