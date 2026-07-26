@@ -1,3 +1,18 @@
+# Context
+
+This file aggregates issues and ideas that have not yet made it onto github's issue tracker or moved to documentation.
+
+
+implementation agnostic tasks: <https://github.com/orgs/allofphysicsgraph/projects/2>
+
+issues from ui_v8: <https://github.com/orgs/allofphysicsgraph/projects/4>
+
+
+The following is unordered
+
+
+
+
 
 ---
 
@@ -87,10 +102,6 @@ https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/133
 
 ---
 
-pytest for logged in pages
-
----
-
 \propto means dimensional consistency does not apply 
 example: 
 F \propto m
@@ -112,9 +123,6 @@ Delete the manual `trace_id` and `query_time_dict`; replace it with Flask's `@ap
 in `sympy_validate_expression/dimensional_consistency`
 there's an `eval` to eliminate
 
----
-
-Playwright tests: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/107
 
 ---
 
@@ -126,11 +134,6 @@ to verify:
 
 Update symbols and operators
 https://en.wikipedia.org/wiki/List_of_common_physics_notations
-
----
-
-Prompt:
-What inconsistencies are there? Bad coding implementation, or naming conventions, or design flaws for example.
 
 ---
 
@@ -147,9 +150,6 @@ A significant use case is supplemental material for any paper that includes equa
 - Documenting the derivations within the paper such that the supplemental material is self-contained 
 - The second sub case is indicating the relation between the equations used in this paper and equations used in any other paper
 
----
-
-email alerts - https://github.com/allofphysicsgraph/task-tracker/issues/137
 
 ---
 
@@ -157,15 +157,7 @@ add column for status on other projects for categories like active, idle, unavai
 
 ---
 
-Move content out of "todo.md"
-
----
-
-(manually) eliminate all errors on webpages
-https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues?q=is%3Aissue%20state%3Aopen%20type%3ABug
-
-
-Use selenium to automate opening all pages from site map
+pytest: automate opening all pages from site map
 
 ---
 

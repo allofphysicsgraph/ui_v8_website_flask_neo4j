@@ -71,33 +71,6 @@ There's also a script for comparing PDG CSV dumps:
 `allofphysicsgraph/ui_v8_website_flask_neo4j/webserver_for_pdg/static/compare_pdg_CSV.py`
 
 
-# backlog, aka opportunities
-
-implementation agnostic tasks: <https://github.com/orgs/allofphysicsgraph/projects/2>
-
-highlights from ui_v8: <https://github.com/orgs/allofphysicsgraph/projects/4>
-
-
-The following is unordered
-
-- Lean: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/32
-
-- log file analysis: https://github.com/allofphysicsgraph/task-tracker/issues/41
-
-- GOAL: better coverage; see https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/138
-  - DEPENDS ON enact pytests per function on scripts in `library` to evaluate whether I've unintentionally made breaking changes
-
-
-- more content - scope
-  - DEPENDS ON automate ingest of papers; see https://allofphysics.com/llm_workflow_documentation
-    - DEPENDS ON API functionality. Is that complete?
-      - DEPENDS ON api auth: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/56
-        - DEPENDS ON enact API endpoints: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/141
-          - DEPENDS ON move all compute out of pdg_app to support API use https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/69
-
-
-- CAPABILITY: checking of steps --  inference rules, dimensionality, lean; https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/21
-
 
 
 
@@ -118,3 +91,6 @@ See also the "recurring" board on https://github.com/orgs/allofphysicsgraph/proj
 Documentation to be refreshed:
 - update https://allofphysics.com/documentation/api 
 - update https://allofphysics.com/workflow_documentation
+
+
+
