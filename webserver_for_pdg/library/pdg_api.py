@@ -127,7 +127,7 @@ from . import api_keys
 
 from .compute import query_timing_result_type
 from .compute import generate_random_id
-
+from .tracing import trace_execution, trace_id_var
 from .initialize_neo4j import get_graphdb_driver
 
 # this works because app.py loads this file first
@@ -177,6 +177,7 @@ PLAIN_JSON_MIMETYPE = "application/json"
 _SUPPORTED_MIMETYPES = [HAL_FORMS_MIMETYPE, PLAIN_JSON_MIMETYPE]
 
 
+@trace_execution
 def _negotiate_response_mimetype():
     """Pick a representation based on the client's Accept header.
 
@@ -191,6 +192,7 @@ def _negotiate_response_mimetype():
     )
 
 
+@trace_execution
 def _strip_templates(value):
     """Recursively remove '_templates' keys (the HAL-FORMS extension) from a
     payload. Some list endpoints attach '_templates' directly onto each
@@ -219,6 +221,7 @@ def _strip_templates(value):
 # https://claude.ai/share/4331b79a-6794-4c68-b95d-82b0c4e47e75
 
 
+@trace_execution
 def hal_link(href, title=None, name=None, method=None):
     link = {"href": href}
     if title:
@@ -230,6 +233,7 @@ def hal_link(href, title=None, name=None, method=None):
     return link
 
 
+@trace_execution
 def hal_property(
     name,
     type_="text",
@@ -257,6 +261,7 @@ def hal_property(
     return prop
 
 
+@trace_execution
 def hal_template(
     method, properties, title=None, content_type="application/json", target=None
 ):
@@ -268,6 +273,7 @@ def hal_template(
     return template
 
 
+@trace_execution
 def hal_response(data=None, links=None, embedded=None, templates=None, status=200):
     payload = {}
     if data:
@@ -291,6 +297,7 @@ def hal_response(data=None, links=None, embedded=None, templates=None, status=20
     return resp
 
 
+@trace_execution
 def hal_error(message, status, links=None, title="Error"):
     payload = {
         "title": title,
@@ -305,6 +312,7 @@ def hal_error(message, status, links=None, title="Error"):
     return resp
 
 
+@trace_execution
 def _stamp_last_modified(tx, node_type, node_id):
     """Record who last edited a node and when, using the same generic
     property-setter the editable_fields loops already rely on. Called only
@@ -326,6 +334,7 @@ def _stamp_last_modified(tx, node_type, node_id):
     )
 
 
+@trace_execution
 def _parse_bool(value, default=False):
     if value is None:
         return default
@@ -336,6 +345,7 @@ def _parse_bool(value, default=False):
     return bool(value)
 
 
+@trace_execution
 def require_auth(view_func):
     """Require a valid `Authorization: Bearer <token>` header.
 
@@ -514,6 +524,7 @@ def _handle_neo4j_query_error(err):
 
 
 @api_bp.route("/", methods=["GET"])
+@trace_execution
 def api_start_here():
     """
     Entry point for the API using HATEOAS (HAL format).
@@ -615,6 +626,7 @@ def api_whoami():
 
 
 @api_bp.route("/resources/sympy_check", methods=["GET", "POST"])
+@trace_execution
 def api_sympy_check():
     """Parse a user-supplied math expression with sympy and report its
     canonical form and free variables.

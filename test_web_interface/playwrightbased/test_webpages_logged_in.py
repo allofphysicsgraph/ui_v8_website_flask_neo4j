@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+
+# Ben Payne
+# Physics Derivation Graph
+# https://allofphysics.com
+# Creative Commons Attribution 4.0 International License
+# https://creativecommons.org/licenses/by/4.0/
+
 import pytest
 
 from playwright.sync_api import Page, expect
@@ -14,11 +22,6 @@ def logged_in_page(page: Page):
     page.goto(f"{URL}/login-test-user")
     # Verify we are logged in
     return page
-
-
-def test_get_edit_relation_RELATIONID(page: Page):
-    page.goto(f"{URL}/edit_relation/0001247576")
-    expect(page.get_by_role("heading", name="Edit relation")).to_be_visible()
 
 
 # EOF

@@ -25,6 +25,8 @@ from sympy.physics.units import (
 from sympy.physics.units.systems.si import dimsys_SI  # type: ignore
 from sympy.parsing.sympy_parser import parse_expr  # type: ignore
 
+from .tracing import trace_execution, trace_id_var
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,8 +44,8 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
     >>> convert_sympy_expr_to_pdg_symbols(sympy_expr, {'r': '99', 'x': 00})
     Eq(sympy.Symbol('pdg99'), sympy.Symbol('pdg00'))
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     logger.info("sympy_expr=" + str(sympy_expr))
     logger.info("symbol_id_dict=" + str(symbol_id_dict))
 
@@ -62,7 +64,7 @@ def convert_sympy_expr_to_pdg_symbols(sympy_expr, symbol_id_dict: dict):
             revised_expr = revised_expr.subs(this_symb, sympy.Symbol(pdg_id))
 
     logger.info("type(revised_expr)=" + str(type(revised_expr)))
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return revised_expr
 
 
@@ -124,8 +126,8 @@ def dimensional_consistency(
 
     The error handling here is similar to `compute/get_sympy_as_latex_per_expr_id`
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     if "sympy_lhs" not in expression_dict.keys():
         return "sympy_lhs not provided for expression"
@@ -265,7 +267,7 @@ def dimensional_consistency(
     else:
         return "inconsistent dimensions"
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return "unknown"
 
 

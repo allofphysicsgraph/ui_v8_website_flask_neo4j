@@ -96,16 +96,6 @@ def test_convert_sympy_expr_to_pdg_symbols_int_ids():
     assert result == expected
 
 
-def test_convert_sympy_expr_to_pdg_symbols_logging(caplog):
-    """Test logging trace output for convert_sympy_expr_to_pdg_symbols."""
-    x = sympy.Symbol("x")
-    with caplog.at_level(logging.INFO):
-        convert_sympy_expr_to_pdg_symbols(x, {"x": "1"})
-
-    assert any("[TRACE] start" in record.message for record in caplog.records)
-    assert any("[TRACE] end" in record.message for record in caplog.records)
-
-
 # ************************************************************************
 # Tests for build_symbol_dimension_map
 # ************************************************************************
@@ -299,12 +289,4 @@ def test_dimensional_consistency_undefined_symbol():
     assert result == "ERROR for dim with expr_999"
 
 
-def test_dimensional_consistency_logging(caplog):
-    """Test logging trace output for dimensional_consistency."""
-    expr_dict = {"id": "expr1", "sympy_lhs": "pdg1", "sympy_rhs": "pdg1"}
-    symbols = [make_symbol_dict("1", dimension_length=1)]
-
-    with caplog.at_level(logging.INFO):
-        dimensional_consistency(expr_dict, symbols)
-
-    assert any("[TRACE] start" in record.message for record in caplog.records)
+# EOF

@@ -15,6 +15,7 @@ import neo4j  # type: ignore[import-untyped]
 from neo4j import GraphDatabase
 
 from . import neo4j_query
+from .tracing import trace_execution, trace_id_var
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,7 @@ logger = logging.getLogger(__name__)
 _driver = None
 
 
+@trace_execution
 def get_graphdb_driver():
     """
     Lazily initializes and returns the Neo4j GraphDatabase driver.

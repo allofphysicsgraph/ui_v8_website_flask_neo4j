@@ -36,29 +36,9 @@ from . import neo4j_query
 from . import list_of_valid
 from . import sympy_validate_expression
 from . import latex_and_sympy
+from .tracing import trace_execution, trace_id_var
 
-# ORDERING: this has to come before the functions that use this type
-unique_numeric_id_as_str: TypeAlias = str
-query_timing_result_type: TypeAlias = dict[str, float]
-# originally these were
-# unique_numeric_id_as_str = NewType("unique_numeric_id_as_str", str)
-# query_timing_result_type = NewType("query_timing_result_type", Dict[str, float])
-# Gemini 3 flash says
-#    When you use NewType, you are creating a distinct subtype.
-#    Mypy treats `query_timing_result_type` as a "child" of `dict[str, float]`.
-#    However, a regular dictionary (like `{}`) is the "parent" type.
-#    In type theory, you cannot assign a parent type to a variable expecting a specific child type without an explicit conversion.
-#    so
-#       `query_timing_result_type` is a unique type that contains a dict.
-#       `{}` is a standard dict.
-#       Mypy sees this as trying to put a generic object into a specific "branded" container.
-#    If you want Mypy to complain if you accidentally mix this dict up with other dictionaries
-#    then keep the `NewType` declarations here, and elsewhere in the code initialize the variable using
-#       `query_time_dict = query_timing_result_type({})`
-#    An example of why NewType is relevant:
-#    if you have two different things that are both `Dict[str, float]`
-#    (e.g., `PriceMap` and `WeightMap`) and you want to make sure you
-#    never accidentally pass a `PriceMap` into a function that expects a `WeightMap`.
+from .custom_types import unique_numeric_id_as_str, query_timing_result_type
 
 
 import logging
@@ -70,6 +50,7 @@ shorten_url_file = "static/url_shorten_expand.csv"
 logger = logging.getLogger(__name__)
 
 
+@trace_execution
 def generate_random_id(
     graphDB_Driver: Any, query_time_dict: query_timing_result_type
 ) -> Tuple[unique_numeric_id_as_str, query_timing_result_type]:
@@ -91,8 +72,8 @@ def generate_random_id(
     function on a collision, rather than calling generate_random_id + a raw
     write_transaction directly.
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     list_of_existing_IDs = []
     with graphDB_Driver.session() as session:
@@ -109,10 +90,11 @@ def generate_random_id(
             found_new_ID = True
 
     logger.info("new_id=" + str(new_id))
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return str(new_id), query_time_dict
 
 
+@trace_execution
 def create_node_with_unique_id(
     graphDB_Driver: Any,
     query_time_dict: query_timing_result_type,
@@ -156,10 +138,10 @@ def create_node_with_unique_id(
         broken) rather than ordinary bad luck, so this is deliberately not
         swallowed - it should surface as a 500 rather than fail silently.
     """
-    trace_id = str(uuid.uuid4())
-    logger.info(
-        "[TRACE] start " + trace_id + " create_node_with_unique_id: " + trace_label
-    )
+    trace_id = trace_id_var.get()
+    # logger.info(
+    #     "[TRACE] start " + trace_id + " create_node_with_unique_id: " + trace_label
+    # )
     last_error: Optional[Exception] = None
     for attempt in range(1, max_attempts + 1):
         candidate_id, query_time_dict = generate_random_id(
@@ -192,14 +174,15 @@ def create_node_with_unique_id(
                 + "; retrying with a new id"
             )
             continue
-    logger.error(
-        "[TRACE] end " + trace_id + " - exhausted " + str(max_attempts) + " attempts"
-    )
+    # logger.error(
+    #     "[TRACE] end " + trace_id + " - exhausted " + str(max_attempts) + " attempts"
+    # )
     raise RuntimeError(
         f"create_node_with_unique_id: could not generate a unique id for {trace_label} after {max_attempts} attempts"
     ) from last_error
 
 
+@trace_execution
 def get_placement_options(
     list_of_sequence_values: List[str], selected_sequence_index: str
 ) -> List[str]:
@@ -248,6 +231,7 @@ def get_placement_options(
     return options
 
 
+@trace_execution
 def guess_sympy_from_expression(
     graphDB_Driver,
     query_time_dict: query_timing_result_type,
@@ -256,8 +240,8 @@ def guess_sympy_from_expression(
     """
     guess the SymPy based on the Latex
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     cleaned_latex_lhs_str = remove_latex_presention_markings(
         expression_dict["latex_lhs"]
@@ -331,17 +315,18 @@ def guess_sympy_from_expression(
     logger.info("revised_expr_lhs_with_str=" + str(revised_expr_lhs_with_str))
     logger.info("revised_expr_rhs_with_str=" + str(revised_expr_rhs_with_str))
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return query_time_dict, revised_expr_lhs_with_str, revised_expr_rhs_with_str
 
 
+@trace_execution
 def guess_operations_from_latex(
     graphDB_Driver,
     query_time_dict: query_timing_result_type,
     expression_dict: dict,
 ) -> Tuple[query_timing_result_type, List[dict]]:
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -382,10 +367,11 @@ def guess_operations_from_latex(
         + str(potential_operations_found_in_Latex_expression)
     )
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return query_time_dict, potential_operations_found_in_Latex_expression
 
 
+@trace_execution
 def guess_symbols_from_latex(
     graphDB_Driver,
     query_time_dict: query_timing_result_type,
@@ -413,8 +399,8 @@ def guess_symbols_from_latex(
     Order doesn't matter for the two tactics since they are independent.
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -554,10 +540,11 @@ def guess_symbols_from_latex(
         + str(potential_symbols_found_in_Latex_expression)
     )
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return query_time_dict, potential_symbols_found_in_Latex_expression
 
 
+@trace_execution
 def hash_of_string(str_to_hash: str) -> str:
     """
     convert string to bytes, then get hash
@@ -571,32 +558,34 @@ def hash_of_string(str_to_hash: str) -> str:
 
     >>> hash_of_string('a_string')
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     hashed_str = hashlib.sha256(str_to_hash.encode("utf-8")).hexdigest()
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return hashed_str
 
 
+@trace_execution
 def encode_user_identifier(user_identifier: str) -> str:
     """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     user_id = user_identifier.strip().lower()
     hash_object = hashlib.sha256(user_id.encode("utf-8"))
     hex_dig = hash_object.hexdigest()
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return hex_dig
 
 
+@trace_execution
 def generate_lookup_for_shorten_url(shorten_url_file: str) -> str:
     """
     TODO: if URL already exists in CSV, then just return existing lookup
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     data_list = []  # contents of file as list of dicts
 
@@ -619,10 +608,11 @@ def generate_lookup_for_shorten_url(shorten_url_file: str) -> str:
 
     logger.info("random_string=" + random_string)
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return random_string
 
 
+@trace_execution
 def add_url_to_shortened_list(
     now_str: str, current_user_email: Optional[str], user_url: str
 ) -> str:
@@ -631,8 +621,8 @@ def add_url_to_shortened_list(
 
     User's email is hashed because the database is exposed publicly on the website
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     if not os.path.exists(shorten_url_file):
         with open(shorten_url_file, "a") as file_handle:
@@ -656,7 +646,7 @@ def add_url_to_shortened_list(
             + "\n"
         )
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return lookup
 
 
@@ -666,8 +656,8 @@ def get_url_from_shortened_list(lookup: str) -> Tuple[str, str]:
 
     TODO: increment the "count" column
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     data_list = []  # contents of file as list of dicts
 
@@ -683,7 +673,7 @@ def get_url_from_shortened_list(lookup: str) -> Tuple[str, str]:
 
     logger.error("lookup " + lookup + " not found")
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return "ERROR: lookup " + lookup + " not found", None
 
 
@@ -705,8 +695,8 @@ def send_email_with_msmtp(
     Returns:
         bool: True for success, False for failure.
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     if isinstance(recipients, str):
         recipients_list = [recipients]
@@ -784,8 +774,8 @@ def check_whether_inference_rule_exists(
     inference_rule_name: str,
     inference_rule_latex: str,
 ) -> Tuple[bool, str, query_timing_result_type]:
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     # https://neo4j.com/docs/python-manual/current/session-api/
     list_of_inference_rule_dicts = []
@@ -829,8 +819,8 @@ def get_sympy_as_latex_per_feed_id(
     list_of_feed_dicts: List[dict],
 ) -> Dict[str, str]:
     """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     sympy_as_latex_per_feed_id = {}  # type: Dict[str, str]
     for this_feed_dict in list_of_feed_dicts:
@@ -869,8 +859,8 @@ def get_sympy_as_latex_per_expr_id(
 
     The error handling here is similar to `sympy_validate_expression/dimensional_consistency`
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     for index, this_expression_dict in enumerate(list_of_expression_dicts):
         if "sympy_lhs" in this_expression_dict.keys():
@@ -916,6 +906,7 @@ def get_sympy_as_latex_per_expr_id(
     return list_of_expression_dicts
 
 
+@trace_execution
 def get_dimensional_consistency_for_every_expression(
     graphDB_Driver: Any, query_time_dict: query_timing_result_type
 ) -> Tuple[Dict[str, str], query_timing_result_type]:
@@ -927,8 +918,8 @@ def get_dimensional_consistency_for_every_expression(
     - all expressions for a specific derivation
     - editing one expression
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     dimensional_consistency_per_expression_id = {}  # type: Dict[str, str]
 
@@ -972,18 +963,19 @@ def get_dimensional_consistency_for_every_expression(
         #         err
         #     )
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return dimensional_consistency_per_expression_id, query_time_dict
 
 
+@trace_execution
 def get_dict_of_node_type_for_every_id(
     graphDB_Driver: Any, query_time_dict: query_timing_result_type
 ) -> Tuple[Dict[str, str], query_timing_result_type]:
     """
     >>> get_node_type_from_id()
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     with graphDB_Driver.session() as session:
         query_start_time = time.time()
@@ -1025,10 +1017,11 @@ def get_dict_of_node_type_for_every_id(
                 labels[0] if labels else "unknown"
             )
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return dict_of_symbol_id_and_type, query_time_dict
 
 
+@trace_execution
 def remove_file_debris(
     list_of_paths_to_files: List[str],
     list_of_file_names: List[str],
@@ -1047,18 +1040,19 @@ def remove_file_debris(
 
     >>> remove_file_debris(['/path/to/file/'],['filename_without_extension'], ['ext1', 'ext2'])
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     for path_to_file in list_of_paths_to_files:
         for file_name in list_of_file_names:
             for file_ext in list_of_file_extensions:
                 if os.path.isfile(path_to_file + file_name + "." + file_ext):
                     os.remove(path_to_file + file_name + "." + file_ext)
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return
 
 
+@trace_execution
 def get_symbols_not_in_expression(
     expression_dict: dict,
     symbols_in_expression: List[dict],
@@ -1066,8 +1060,8 @@ def get_symbols_not_in_expression(
     query_time_dict: query_timing_result_type,
 ) -> Tuple[List[dict], query_timing_result_type]:
     """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     logger.info("symbols_in_expression=" + str(symbols_in_expression))
 
@@ -1118,10 +1112,11 @@ def get_symbols_not_in_expression(
         key=lambda x: x["latex"].lower(),
     )
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return symbols_not_in_expression_but_might_be_relevant, query_time_dict
 
 
+@trace_execution
 def get_operations_not_in_expression(
     expression_dict: dict,
     operations_in_expression: List[dict],
@@ -1129,8 +1124,8 @@ def get_operations_not_in_expression(
     query_time_dict: query_timing_result_type,
 ) -> Tuple[List[dict], query_timing_result_type]:
     """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     logger.info("operations_in_expression=" + str(operations_in_expression))
 
@@ -1171,10 +1166,11 @@ def get_operations_not_in_expression(
                     this_operation
                 )
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return operations_not_in_expression_but_might_be_relevant, query_time_dict
 
 
+@trace_execution
 def get_relations_not_in_expression(
     expression_dict: dict,
     relation_latex: str,
@@ -1182,8 +1178,8 @@ def get_relations_not_in_expression(
     query_time_dict: query_timing_result_type,
 ) -> Tuple[List[dict], query_timing_result_type]:
     """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     logger.info("expression_dict=" + str(expression_dict))
 
@@ -1202,18 +1198,19 @@ def get_relations_not_in_expression(
         if this_relation["latex"] != relation_latex:
             candidate_relations.append(this_relation)
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return candidate_relations, query_time_dict
 
 
+@trace_execution
 def get_dict_of_node_dicts(
     graphDB_Driver: Any, query_time_dict: query_timing_result_type, node_type: str
 ) -> Tuple[Dict[str, dict], query_timing_result_type]:
     """
     >>> get_dict_of_node_dicts()
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     assert node_type in list_of_valid.node_types
     # print("compute/get_dict_of_node_dicts: node type=", node_type)
@@ -1238,10 +1235,11 @@ def get_dict_of_node_dicts(
         dict_of_all_node_dicts[this_node_dict["id"]] = this_node_dict
     # print("dict_of_all_node_dicts=", dict_of_all_node_dicts)
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return dict_of_all_node_dicts, query_time_dict
 
 
+@trace_execution
 def get_dict_of_steps_in_derivation(
     graphDB_Driver: Any,
     derivation_id: unique_numeric_id_as_str,
@@ -1255,8 +1253,8 @@ def get_dict_of_steps_in_derivation(
     - list of feed dicts
     - list of output dicts
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     # list all steps in this derivation
 
@@ -1356,7 +1354,7 @@ def get_dict_of_steps_in_derivation(
         sorted(all_steps.items(), key=lambda item: item[1]["sequence index"])
     )
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return sorted_all_steps, query_time_dict
 
 
@@ -1380,6 +1378,7 @@ def get_dict_of_steps_in_derivation(
 #     )
 
 
+@trace_execution
 def remove_latex_presention_markings(latex_str: str) -> str:
     """
     clean the latex string
@@ -1391,8 +1390,8 @@ def remove_latex_presention_markings(latex_str: str) -> str:
     >>> remove_latex_presention_markings('a\\ b = c')
     'a b = c'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     logger.info("latex to be cleaned: " + latex_str)
 
@@ -1435,7 +1434,7 @@ def remove_latex_presention_markings(latex_str: str) -> str:
 
     logger.info("latex after cleaning: " + latex_str)
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return latex_str
 
 

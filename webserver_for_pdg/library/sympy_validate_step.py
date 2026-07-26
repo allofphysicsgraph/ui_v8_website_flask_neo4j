@@ -47,6 +47,8 @@ from typing import NewType, Dict, List, Tuple
 
 import logging
 
+from .tracing import trace_execution, trace_id_var
+
 logger = logging.getLogger(__name__)
 
 
@@ -54,6 +56,7 @@ logger = logging.getLogger(__name__)
 from .compute import query_timing_result_type
 
 
+@trace_execution
 def validate_step(
     inference_rule_dict: dict,
     list_of_input_dicts: List[dict],
@@ -69,8 +72,8 @@ def validate_step(
     - "diff is ..."
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     name_latex = inference_rule_dict["name_latex"]
 
@@ -82,7 +85,7 @@ def validate_step(
         "declare guess solution",
         "declare assumption",
     ]:
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "no validation is available for declarations"
 
     # CATEGORY: assumptions
@@ -92,7 +95,7 @@ def validate_step(
         "boundary condition",
         "boundary condition for expression",
     ]:
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "no validation is available for assumptions"
 
     # validate that the keys exist
@@ -113,251 +116,251 @@ def validate_step(
             return "missing SymPy for RHS of expression " + this_output["id"]
 
     if name_latex == "add X to both sides":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return add_X_to_both_sides(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
 
     elif name_latex == "divide both sides by":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return divide_both_sides_by(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
 
     elif name_latex == "multiply both sides by":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return multiply_both_sides_by(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
 
     elif name_latex == "subtract X from both sides":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return subtract_X_from_both_sides(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
 
     elif name_latex == "LHS of expr 1 equals LHS of expr 2":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return LHS_of_expr_1_eq_LHS_of_expr_2(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "RHS of expr 1 equals RHS of expr 2":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return RHS_of_expr_1_eq_RHS_of_expr_2(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "X cross both sides by":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return X_cross_both_sides_by(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "X dot both sides":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return X_dot_both_sides(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "add expr 1 to expr 2":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return add_expr_1_to_expr_2(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "add zero to LHS":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return add_zero_to_LHS(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "add zero to RHS":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return add_zero_to_RHS(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "apply divergence":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return apply_divergence(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "apply function to both sides of expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return apply_function_to_both_sides_of_expr(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "apply gradient to scalar function":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return apply_gradient_to_scalar_function(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "apply operator to bra":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return apply_operator_to_bra(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "apply operator to ket":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return apply_operator_to_ket(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "both sides cross X":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return both_sides_cross_X(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "both sides dot X":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return both_sides_dot_X(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "change variable X to Y":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return change_variable_X_to_Y(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "change two variables in expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return change_two_variables_in_expr(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "change three variables in expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return change_three_variables_in_expr(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "change four variables in expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return change_four_variables_in_expr(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "change five variables in expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return change_five_variables_in_expr(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "change six variables in expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return change_six_variables_in_expr(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "claim LHS equals RHS":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return claim_LHS_equals_RHS(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "claim expr 1 equals expr 2":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return claim_expr_1_equals_expr_2(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "combine like terms":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return combine_like_terms(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "conjugate both sides":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return conjugate_both_sides(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "conjugate function X":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return conjugate_function_X(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "conjugate transpose both sides":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return conjugate_transpose_both_sides(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "differentiate with respect to":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return differentiate_with_respect_to(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "distribute conjugate to factors":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return distribute_conjugate_to_factors(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "distribute conjugate transpose to factors":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return distribute_conjugate_transpose_to_factors(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "divide expr 1 by expr 2":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return divide_expr_by_expr(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "drop non-dominant term":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return drop_nondominant_term(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "evaluate definite integral":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return evaluate_definite_integral(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "expand LHS":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return expand_LHS(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     elif name_latex == "expand RHS":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return expand_RHS(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     elif name_latex == "expand integrand":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "expand magnitude to conjugate":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return expand_magnitude_to_conjugate(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "expr 1 is equivalent to expr 2 under the condition":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "expr 1 is true under condition expr 2":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "factor out X":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return factor_out_x(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "factor out X from LHS":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return factor_out_x_from_lhs(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "factor out X from RHS":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return factor_out_x_from_rhs(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "function is even":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return function_is_even(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "function is odd":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return function_is_odd(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "indefinite integral over":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return indefinite_integral_over(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "indefinite integrate LHS over":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return indefinite_integrate_LHS_over(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "indefinite integrate RHS over":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return indefinite_integrate_RHS_over(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "indefinite integration":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return indefinite_integration(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
@@ -365,148 +368,148 @@ def validate_step(
     # "integrate" might be DEPRECATED in favor of other integration infrules
     # TODO: investigate whether any steps reference this infrule. If not, delete
     elif name_latex == "integrate":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "integrate over from to":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return integrate_over_from_to(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "make expr power":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return make_expr_power(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "maximum of expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "multiply LHS by unity":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return multiply_LHS_by_unity(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "multiply RHS by unity":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return multiply_RHS_by_unity(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "multiply expr 1 by expr 2":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return mult_expr_1_by_expr_2(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "partially differentiate with respect to":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return partially_differentiate_with_respect_to(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "raise both sides to power":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return raise_both_sides_to_power(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "replace constant with value":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return replace_constant_with_value(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "replace curl with LeviCevita summation contravariant":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "replace scalar with vector":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return replace_scalar_with_vector(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "replace summation notation with vector notation":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "select imaginary parts":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return select_imag_parts(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "select real parts":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return select_real_parts(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "separate three vector components":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return separate_three_vector_components(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "separate two vector components":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return separate_two_vector_components(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "separate vector into two trigonometric ratios":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "simplify":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return simplify(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     elif name_latex == "solve for X":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "square root both sides":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return square_root_both_sides(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "substitute LHS of five expressions into expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "substitute LHS of four expressions into expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "substitute LHS of six expressions into expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "substitute LHS of three expressions into expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "substitute LHS of two expressions into expression":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return substitute_LHS_of_two_expressions_into_expr(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "substitute LHS of expr 1 into expr 2":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return substitute_LHS_of_expr_1_into_expr_2(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "substitute RHS of expr 1 into expr 2":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return substitute_RHS_of_expr_1_into_expr_2(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "subtract expr 1 from expr 2":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return subtract_expr_1_from_expr_2(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "sum exponents":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "recognized infrule but not yet supported"
     elif name_latex == "sum exponents LHS":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return sum_exponents_LHS(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "sum exponents RHS":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return sum_exponents_RHS(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "swap LHS with RHS":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return swap_LHS_with_RHS(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
     elif name_latex == "take curl of both sides":
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return take_curl_of_both_sides(
             list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
         )
@@ -518,13 +521,14 @@ def validate_step(
         #     "sympy_validate_step/validate_step Unexpected inf rule: "
         #     + name_latex
         # )
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "unrecognized inference rule: " + name_latex
 
-    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+    # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return "This message should not be seen"
 
 
+@trace_execution
 def validate_that_content_exists(
     number_of_inputs: int,
     number_of_feeds: int,
@@ -568,8 +572,8 @@ def parse_to_sympy(expr_str: str):
     """
     Helper function to replace eval() and handle empty strings
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     if not expr_str:  # gracefully handle empty strings like ''
         logger.error("Empty string instead of SymPy")
@@ -581,10 +585,11 @@ def parse_to_sympy(expr_str: str):
     #     logger.error(str(type(err).__name__) + ": " + str(err) + " : " + str(expr_str))
     #     return None
 
-    logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+    # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
     return res
 
 
+@trace_execution
 def add_X_to_both_sides(
     list_of_input_dicts: List[dict],
     list_of_feed_dicts: List[dict],
@@ -607,8 +612,8 @@ def add_X_to_both_sides(
     >>> add_X_to_both_sides(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # input and output should have same relation
     assert (
@@ -641,10 +646,10 @@ def add_X_to_both_sides(
             difference_str += "\n"
         difference_str += "RHS diff is " + str(delta_rhs)
     if (delta_lhs == 0) and (delta_rhs == 0):
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+        # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
         return difference_str
     return "ERROR: sympy_validate_step/add_X_to_both_sides should not reach here"
 
@@ -676,8 +681,8 @@ def subtract_X_from_both_sides(
 
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
     # input and output should have same relation
     assert (
@@ -708,10 +713,10 @@ def subtract_X_from_both_sides(
         - output_expr_sympy_rhs
     )
     if (delta_lhs == 0) and (delta_rhs == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
 
 
@@ -790,8 +795,8 @@ def multiply_both_sides_by(
     >>> multiply_both_sides_by([input_expr], [feed], [output_expr])
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     # BHP's original (inadequate) attempt:
     # delta_lhs = sympy.simplify(
@@ -801,10 +806,10 @@ def multiply_both_sides_by(
     #     sympy.Mul(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
     # )
     # if (delta_lhs == 0) and (delta_rhs == 0):
-    #     logger.info("[TRACE] end " + trace_id)
+    #     # logger.info("[TRACE] end " + trace_id)
     #     return "valid"
     # else:
-    #     logger.info("[TRACE] end " + trace_id)
+    #     # logger.info("[TRACE] end " + trace_id)
     #     return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
 
     res = validate_that_content_exists(
@@ -996,8 +1001,8 @@ def divide_both_sides_by(
     >>> divide_both_sides_by(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     # input and output should have same relation
     assert (
@@ -1027,10 +1032,10 @@ def divide_both_sides_by(
     #     - output_expr_sympy_rhs
     # )
     # if (delta_lhs == 0) and (delta_rhs == 0):
-    #     logger.info("[TRACE] end " + trace_id)
+    #     # logger.info("[TRACE] end " + trace_id)
     #     return "valid"
     # else:
-    #     logger.info("[TRACE] end " + trace_id)
+    #     # logger.info("[TRACE] end " + trace_id)
     #     return "LHS diff is " + str(delta_lhs) + "\n" + "RHS diff is " + str(delta_rhs)
 
     input_rel = list_of_input_dicts[0]["latex_relation"]
@@ -1038,7 +1043,7 @@ def divide_both_sides_by(
 
     # Check for Division by Zero
     if feed_sympy == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "Invalid derivation: Division by zero is undefined."
 
     # Check Algebraic Correctness (LHS and RHS values)
@@ -1051,7 +1056,7 @@ def divide_both_sides_by(
     )
 
     if delta_lhs != 0 or delta_rhs != 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return f"Algebraic error: LHS diff is {delta_lhs}, RHS diff is {delta_rhs}"
 
     # Check Relation Correctness (Inequalities and Sign Flipping)
@@ -1061,7 +1066,7 @@ def divide_both_sides_by(
     # Logic for Equalities (=, !=)
     if not is_inequality:
         if input_rel != output_rel:
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return f"Relation error: '{input_rel}' should remain '{input_rel}' upon division."
 
     # Logic for Inequalities
@@ -1076,7 +1081,7 @@ def divide_both_sides_by(
         if is_neg:
             # Case: Divisor is explicitly negative (e.g., -1, -5). Relation MUST flip.
             if output_rel != expected_flipped:
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return (
                     f"Inequality error: When dividing by a negative value ({feed_sympy}), "
                     f"the relation must flip from '{input_rel}' to '{expected_flipped}'."
@@ -1085,7 +1090,7 @@ def divide_both_sides_by(
         elif is_pos:
             # Case: Divisor is explicitly positive (e.g., 5, 10). Relation must NOT flip.
             if output_rel != input_rel:
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return (
                     f"Inequality error: When dividing by a positive value ({feed_sympy}), "
                     f"the relation '{input_rel}' must be preserved."
@@ -1097,13 +1102,13 @@ def divide_both_sides_by(
             # OR ASSUMED d < 0 (flipped relation).
             # It is invalid if they changed the relation to something unrelated (e.g., < to =).
             if output_rel not in [input_rel, expected_flipped]:
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return (
                     f"Relation error: The output relation '{output_rel}' is not consistent "
                     f"with the input '{input_rel}' regardless of the divisor's sign."
                 )
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return "valid"
 
 
@@ -1133,8 +1138,8 @@ def change_variable_X_to_Y(
     >>> change_variable_X_to_Y(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 2, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -1156,10 +1161,10 @@ def change_variable_X_to_Y(
         input_expr_sympy_rhs.subs(feed_sympy_0, feed_sympy_1) - output_expr_sympy_rhs
     )  # subs(old, new)
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -1189,8 +1194,8 @@ def multiply_LHS_by_unity(
     >>> multiply_LHS_by_unity(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -1210,10 +1215,10 @@ def multiply_LHS_by_unity(
     )
     d3 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
     if (d1 == 0) and (d2 == 0) and (d3 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return (
             "feed diff is "
             + str(d1)
@@ -1246,8 +1251,8 @@ def multiply_RHS_by_unity(
     >>> multiply_RHS_by_unity(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -1267,10 +1272,10 @@ def multiply_RHS_by_unity(
     )
     d3 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     if (d1 == 0) and (d2 == 0) and (d3 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return (
             "feed diff is "
             + str(d1)
@@ -1308,8 +1313,8 @@ def add_zero_to_LHS(
     >>> add_zero_to_LHS(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -1329,10 +1334,10 @@ def add_zero_to_LHS(
     )
     d3 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
     if (d1 == 0) and (d2 == 0) and (d3 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return (
             "feed diff is "
             + str(d1)
@@ -1368,8 +1373,8 @@ def add_zero_to_RHS(
     >>> add_zero_to_RHS(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -1389,10 +1394,10 @@ def add_zero_to_RHS(
     )
     d3 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     if (d1 == 0) and (d2 == 0) and (d3 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return (
             "feed diff is "
             + str(d1)
@@ -1530,8 +1535,8 @@ def partially_differentiate_with_respect_to(
 
     \frac{\partial}{\partial #1}
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
     )
@@ -1551,10 +1556,10 @@ def partially_differentiate_with_respect_to(
         sympy.diff(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
     )
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -1612,8 +1617,8 @@ def make_expr_power(
 
     ((out_lhs0 == (feed0)**(in_lhs0)) and (out_rhs0 == (feed0)**(in_rhs0)))
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -1642,10 +1647,10 @@ def make_expr_power(
         output_expr_sympy_rhs - sympy.Pow(feed_sympy, input_expr_sympy_rhs)
     )
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -1662,8 +1667,8 @@ def select_real_parts(
     Given a+i*b = c+i*d
     get a = c
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -1686,10 +1691,10 @@ def select_real_parts(
     d2 = sympy.simplify(sympy.re(input_expr_sympy_rhs) - output_expr_sympy_rhs)
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -1708,8 +1713,8 @@ def select_imag_parts(
     Given a+i*b = c+i*d
     get b = d
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -1732,10 +1737,10 @@ def select_imag_parts(
     d2 = sympy.simplify(sympy.im(input_expr_sympy_rhs) - output_expr_sympy_rhs)
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -1752,8 +1757,8 @@ def swap_LHS_with_RHS(
     given 'a + b = c'
     get   'c = a + b'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -1775,10 +1780,10 @@ def swap_LHS_with_RHS(
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_rhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_lhs)
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -1803,8 +1808,8 @@ def sum_exponents_LHS(
     see also sum_exponents_RHS
     (in_rhs0 == out_rhs0)
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
     )
@@ -1817,10 +1822,10 @@ def sum_exponents_LHS(
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -1840,8 +1845,8 @@ def sum_exponents_RHS(
     see also sum_exponents_LHS
     (in_lhs0 == out_lhs0)
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
     )
@@ -1854,10 +1859,10 @@ def sum_exponents_RHS(
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -1881,8 +1886,8 @@ def add_expr_1_to_expr_2(
         Add Eq.~\ref{eq:#1} to Eq.~\ref{eq:#2}.
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         2, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -1915,10 +1920,10 @@ def add_expr_1_to_expr_2(
         - output_expr_sympy_rhs_0
     )
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -1937,8 +1942,8 @@ def substitute_RHS_of_expr_1_into_expr_2(
         given "A*x=B" and "C*y=A*x", subRHSofEqXintoEqY yields "C*y=B"
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     logger.info(str(list_of_input_dicts))
     logger.info(str(list_of_feed_dicts))
@@ -1995,10 +2000,10 @@ def substitute_RHS_of_expr_1_into_expr_2(
         return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -2017,8 +2022,8 @@ def substitute_LHS_of_expr_1_into_expr_2(
         given "A*x=B" and "C*y=B", subLHSofEqXintoEqY yields "C*y=A*x"
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         2, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2056,10 +2061,10 @@ def substitute_LHS_of_expr_1_into_expr_2(
         return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -2077,8 +2082,8 @@ def mult_expr_1_by_expr_2(
 
     ((in_lhs0*in_lhs1 == out_lhs0) and (in_rhs0*in_rhs1 == out_rhs0))
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         2, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2117,10 +2122,10 @@ def mult_expr_1_by_expr_2(
         return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -2160,8 +2165,8 @@ def LHS_of_expr_1_eq_LHS_of_expr_2(
     'valid'
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         2, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2200,10 +2205,10 @@ def LHS_of_expr_1_eq_LHS_of_expr_2(
         return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
 
     if (d1 == 0) and (d2 == 0) and (d3 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return (
             "input diff is "
             + str(d1)
@@ -2233,8 +2238,8 @@ def RHS_of_expr_1_eq_RHS_of_expr_2(
         given "A*x=B" and "C=B", RHSofEqXeqRHSofEqY yields "A*x=C"
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         2, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2267,10 +2272,10 @@ def RHS_of_expr_1_eq_RHS_of_expr_2(
         return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
 
     if (d1 == 0) and (d2 == 0) and (d3 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return (
             "input diff is "
             + str(d1)
@@ -2293,8 +2298,8 @@ def raise_both_sides_to_power(
 
     ((out_lhs0 == (in_lhs0)**(feed0)) and (out_rhs0 == (in_rhs0)**(feed0)))
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
     )
@@ -2312,10 +2317,10 @@ def raise_both_sides_to_power(
         sympy.Pow(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
     )
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -2342,8 +2347,8 @@ def claim_expr_1_equals_expr_2(
 
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2370,10 +2375,10 @@ def claim_expr_1_equals_expr_2(
         return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -2394,8 +2399,8 @@ def claim_LHS_equals_RHS(
     If a user inputs a valid tautology (e.g., x = x) but asserts a completely unrelated output (e.g., y = z), the function will return 'valid', creating a break in the derivation chain.
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 0, 0, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2416,10 +2421,10 @@ def claim_LHS_equals_RHS(
         return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
 
     if d1 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "diff is " + str(d1)
 
 
@@ -2497,8 +2502,8 @@ def conjugate_both_sides(
 
     Apply ^*; replace $i$ with $-i$
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     assert len(list_of_feed_dicts) == 0
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2512,10 +2517,10 @@ def conjugate_both_sides(
     d1 = sympy.simplify(sympy.conjugate(input_expr_sympy_lhs) - output_expr_sympy_lhs)
     d2 = sympy.simplify(sympy.conjugate(input_expr_sympy_rhs) - output_expr_sympy_rhs)
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -2529,8 +2534,8 @@ def conjugate_transpose_both_sides(
 
     Apply ^+; replace $i$ with $-i$ and transpose matrices
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     assert len(list_of_feed_dicts) == 0
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2546,10 +2551,10 @@ def conjugate_transpose_both_sides(
     d1 = sympy.simplify(sympy.adjoint(input_expr_sympy_lhs) - output_expr_sympy_lhs)
     d2 = sympy.simplify(sympy.adjoint(input_expr_sympy_rhs) - output_expr_sympy_rhs)
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -2562,8 +2567,8 @@ def distribute_conjugate_transpose_to_factors(
     Apply ^+; replace $i$ with $-i$ and transpose matrices, rotate bra-ket.
     this is a combination of "distribute conjugate" and then "distribute transpose"
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     assert len(list_of_feed_dicts) == 0
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2579,10 +2584,10 @@ def distribute_conjugate_transpose_to_factors(
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -2594,8 +2599,8 @@ def distribute_conjugate_to_factors(
     """
     Apply ^*; replace $i$ with $-i$
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     assert len(list_of_feed_dicts) == 0
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2611,10 +2616,10 @@ def distribute_conjugate_to_factors(
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -2626,8 +2631,8 @@ def expand_magnitude_to_conjugate(
     """
     replace |f|^2 with ff^*
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     assert len(list_of_feed_dicts) == 0
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2646,10 +2651,10 @@ def expand_magnitude_to_conjugate(
         input_expr_sympy_rhs.rewrite(sympy.conjugate) - output_expr_sympy_rhs
     )
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -2671,8 +2676,8 @@ def simplify(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     logger.info(str(list_of_input_dicts))
     logger.info(str(list_of_feed_dicts))  # should be empty
@@ -2693,10 +2698,10 @@ def simplify(
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -2713,8 +2718,8 @@ def subtract_expr_1_from_expr_2(
     and    c = d
     get    a - c = b - d
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         2, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2737,10 +2742,10 @@ def subtract_expr_1_from_expr_2(
     )
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -2754,8 +2759,8 @@ def factor_out_x(
     factor out x
     Get x*(a + b) = (c + d)*x
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2773,10 +2778,10 @@ def factor_out_x(
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -2795,8 +2800,8 @@ def factor_out_x_from_lhs(
     Inconsistency: If the input is ax + bx = y and the user provides an output ax + bx = y (no change) or (a+b)x = y (factored), both will return "valid". The function ignores the inference rule's intent (to factor out feed_sympy). It effectively degrades to a generic simplify check.
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2814,10 +2819,10 @@ def factor_out_x_from_lhs(
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
     return "no check performed"
 
@@ -2837,8 +2842,8 @@ def factor_out_x_from_rhs(
     Inconsistency: If the input is ax + bx = y and the user provides an output ax + bx = y (no change) or (a+b)x = y (factored), both will return "valid". The function ignores the inference rule's intent (to factor out feed_sympy). It effectively degrades to a generic simplify check.
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -2856,10 +2861,10 @@ def factor_out_x_from_rhs(
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -2873,8 +2878,8 @@ def differentiate_with_respect_to(
     wrt t
     get \frac{d}{dt}a = \frac{d}{dt}b
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
     )
@@ -2892,10 +2897,10 @@ def differentiate_with_respect_to(
         sympy.diff(input_expr_sympy_rhs, feed_sympy) - output_expr_sympy_rhs
     )
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -2944,8 +2949,8 @@ def change_two_variables_in_expr(
     >>> change_two_variables_in_expr(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     # logger.info(str(list_of_input_dicts))
     # logger.info(str(list_of_feed_dicts))
@@ -2979,10 +2984,10 @@ def change_two_variables_in_expr(
         - output_expr_sympy_rhs
     )
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
     return "no check performed"
 
@@ -3010,8 +3015,8 @@ def change_three_variables_in_expr(
     >>> change_three_variables_in_expr(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     logger.info(str(list_of_input_dicts))
     logger.info(str(list_of_feed_dicts))
@@ -3057,10 +3062,10 @@ def change_three_variables_in_expr(
         - output_expr_sympy_rhs
     )
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
     return "no check performed"
 
@@ -3071,8 +3076,8 @@ def change_four_variables_in_expr(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 8, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -3118,10 +3123,10 @@ def change_four_variables_in_expr(
         - output_expr_sympy_rhs
     )
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
     return "no check performed"
 
@@ -3132,7 +3137,7 @@ def change_five_variables_in_expr(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(uuid.uuid4())
+    trace_id = trace_id_var.get()
     logger.info("[TRACE] " + trace_id)
 
     res = validate_that_content_exists(
@@ -3183,10 +3188,10 @@ def change_five_variables_in_expr(
         - output_expr_sympy_rhs
     )
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
     return "no check performed"
 
@@ -3197,8 +3202,8 @@ def change_six_variables_in_expr(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 12, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -3252,10 +3257,10 @@ def change_six_variables_in_expr(
         - output_expr_sympy_rhs
     )
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
     return "no check performed"
 
@@ -3279,8 +3284,8 @@ def square_root_both_sides(
     >>> square_root_both_sides(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
     )
@@ -3293,10 +3298,10 @@ def square_root_both_sides(
     d1 = sympy.simplify(sympy.sqrt(input_expr_sympy_lhs) - output_expr_sympy_lhs)
     d2 = sympy.simplify(sympy.sqrt(input_expr_sympy_rhs) - output_expr_sympy_rhs)
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -3317,8 +3322,8 @@ def divide_expr_by_expr(
     >>> divide_expr_by_expr(list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts)
     'valid'
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     res = validate_that_content_exists(
         2, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
     )
@@ -3331,7 +3336,7 @@ def divide_expr_by_expr(
     output_expr_sympy_lhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_lhs"])
     output_expr_sympy_rhs_0 = parse_to_sympy(list_of_output_dicts[0]["sympy_rhs"])
     if input_expr_sympy_lhs_1 == 0 or input_expr_sympy_rhs_1 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "Invalid derivation: Division by zero is undefined."
     try:
         d1 = sympy.simplify(
@@ -3344,10 +3349,10 @@ def divide_expr_by_expr(
         logger.error(str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy")
         return str(type(err).__name__) + ": " + str(err) + " : evaluating SymPy"
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 
@@ -3396,8 +3401,8 @@ def evaluate_definite_integral(
 
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -3414,10 +3419,10 @@ def evaluate_definite_integral(
     d2 = sympy.simplify(input_expr_sympy_rhs.doit() - output_expr_sympy_rhs)
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -3427,8 +3432,8 @@ def expand_LHS(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -3445,10 +3450,10 @@ def expand_LHS(
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
     return "no check performed"
 
@@ -3459,8 +3464,8 @@ def expand_RHS(
     list_of_output_dicts: List[dict],
 ) -> str:
     """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
@@ -3477,10 +3482,10 @@ def expand_RHS(
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
 
     if (d1 == 0) and (d2 == 0):
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
     return "no check performed"
 
@@ -3536,8 +3541,8 @@ def apply_function_to_both_sides_of_expr(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     res = validate_that_content_exists(
         1, 1, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
     )
@@ -3562,10 +3567,10 @@ def apply_function_to_both_sides_of_expr(
         )
         return "feed term is not a callable function: " + str(feed_sympy)
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -3597,8 +3602,8 @@ def combine_like_terms(
         - A string detailing the calculated algebraic differences of the LHS and RHS
           if they do not simplify to zero.
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     res = validate_that_content_exists(
         1, 0, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
     )
@@ -3611,10 +3616,10 @@ def combine_like_terms(
     d1 = sympy.simplify(input_expr_sympy_lhs - output_expr_sympy_lhs)
     d2 = sympy.simplify(input_expr_sympy_rhs - output_expr_sympy_rhs)
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\nRHS diff is " + str(d2)
 
 
@@ -3623,8 +3628,8 @@ def replace_constant_with_value(
     list_of_feed_dicts: List[dict],
     list_of_output_dicts: List[dict],
 ) -> str:
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     res = validate_that_content_exists(
         1, 2, 1, list_of_input_dicts, list_of_feed_dicts, list_of_output_dicts
     )
@@ -3643,10 +3648,10 @@ def replace_constant_with_value(
         input_expr_sympy_rhs.subs(feed_sympy_0, feed_sympy_1) - output_expr_sympy_rhs
     )
     if d1 == 0 and d2 == 0:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "valid"
     else:
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return "LHS diff is " + str(d1) + "\n" + "RHS diff is " + str(d2)
 
 

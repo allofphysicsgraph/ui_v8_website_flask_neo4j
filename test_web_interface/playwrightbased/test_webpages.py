@@ -28,6 +28,11 @@ def test_get_index_has_title(page: Page):
     # `.to_have_title` shows up in the HTML's <title> tag -- the browser tab
 
 
+def test_get_edit_relation_RELATIONID(page: Page):
+    page.goto(f"{URL}/edit_relation/0001247576")
+    expect(page.get_by_role("heading", name="Edit relation")).to_be_visible()
+
+
 def test_get_student_documentation(page: Page):
     page.goto(URL + "/documentation/student")
     expect(page).to_have_title(re.compile("Documentation for Students"))

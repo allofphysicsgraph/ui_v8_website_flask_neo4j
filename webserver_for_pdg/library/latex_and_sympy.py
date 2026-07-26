@@ -28,6 +28,8 @@ from sympy.parsing.sympy_parser import parse_expr  # type: ignore
 from subprocess import PIPE  # https://docs.python.org/3/library/subprocess.html
 import subprocess  # https://stackoverflow.com/questions/39187886/what-is-the-difference-between-subprocess-popen-and-subprocess-run/39187984
 
+from .tracing import trace_execution, trace_id_var
+
 from typing import Any, List
 
 import logging
@@ -37,6 +39,7 @@ logger = logging.getLogger(__name__)
 proc_timeout = 10
 
 
+@trace_execution
 def sympy_to_latex_str(sympy_expr: str) -> str:
     """Converts a string representation of a SymPy expression into a LaTeX string.
 
@@ -62,8 +65,8 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
         pdg_{1881666} = pdg_{3882725}
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     if sympy_expr == "":
         return "empty str sent to sympy_to_latex_str"
@@ -79,7 +82,7 @@ def sympy_to_latex_str(sympy_expr: str) -> str:
 
     logger.info("latex_str=" + latex_str)
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return latex_str
 
 
@@ -118,8 +121,8 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str) -> Any:
     Eq(a, b)
 
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     logger.info("latex to be converted to SymPy: " + expr_latex)
 
@@ -145,7 +148,7 @@ def cleaned_latex_str_to_sympy_expression(expr_latex: str) -> Any:
     # sympify(str(...)) rebuilds the tree with normal evaluation, fixing this.
     symp_expr = sympy.sympify(str(symp_expr))
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return symp_expr
     # >>> type(symp_expr)
     # <class 'sympy.core.relational.Equality'>
@@ -173,8 +176,8 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr: Any) -> List[Any]:
     >>> sympy_expr = parse_latex('a = b')
     >>> list_of_sympy_symbols_in_sympy_expression(sympy_expr)
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
     # list_of_symbols = []
     # for symb in sympy_expr.atoms(sympy.Symbol):
     #     list_of_symbols.append(str(symb))
@@ -191,7 +194,7 @@ def list_of_sympy_symbols_in_sympy_expression(sympy_expr: Any) -> List[Any]:
     # >>> type(list(list_of_sympy_symbols)[0])
     # <class 'sympy.core.symbol.Symbol'>
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return list(list_of_sympy_symbols)
 
 
@@ -199,8 +202,8 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str) -> str:
     """
     >>> create_AST_png_for_latex('Eq(Symbol('a'),Symbol('b'))','filename')
     """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] start " + trace_id)
 
     logger.info("output_filename = " + output_filename)
 
@@ -283,7 +286,7 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str) -> str:
         output_filename_with_extension, "/code/static/" + output_filename_with_extension
     )
 
-    logger.info("[TRACE] end " + trace_id)
+    # logger.info("[TRACE] end " + trace_id)
     return ""
 
 
@@ -304,7 +307,7 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str) -> str:
 #     #>>> parse_latex(r'\nabla \vec{x} = f(y)').free_symbols
 #     {x, nabla, y, vec}
 #     """
-#     trace_id = str(uuid.uuid4())
+#     trace_id = trace_id_var.get()
 #     logger.info("[TRACE] list_of_str_symbols_from_cleaned_latex_str start " + trace_id)
 #
 #     my_sym = list(sympy_expr.free_symbols)

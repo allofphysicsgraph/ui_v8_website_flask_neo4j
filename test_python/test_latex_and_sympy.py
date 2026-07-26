@@ -68,16 +68,6 @@ def test_sympy_to_latex_str_invalid_types(invalid_type_input):
         sympy_to_latex_str(invalid_type_input)
 
 
-# Optional: Test that the logs are being outputted correctly
-def test_sympy_to_latex_str_logging(caplog):
-    """Verifies that start/end trace IDs and expected logs are recorded."""
-    with caplog.at_level(logging.INFO):
-        sympy_to_latex_str("x + y")
-
-    assert any("[TRACE] start" in record.message for record in caplog.records)
-    assert any("[TRACE] end" in record.message for record in caplog.records)
-
-
 # ************************************************************************
 
 
@@ -173,16 +163,6 @@ def test_cleaned_latex_str_to_sympy_expression_exception_message_contains_origin
     assert bad_input in str(exc_info.value)
 
 
-def test_cleaned_latex_str_to_sympy_expression_logs_start_and_end_trace_markers(caplog):
-    """test logging"""
-    with caplog.at_level("INFO"):
-        cleaned_latex_str_to_sympy_expression("a = b")
-    start_logs = [r.message for r in caplog.records if "[TRACE] start" in r.message]
-    end_logs = [r.message for r in caplog.records if "[TRACE] end" in r.message]
-    assert len(start_logs) == 1
-    assert len(end_logs) == 1
-
-
 def test_cleaned_latex_str_to_sympy_expression_logs_error_on_malformed_input(caplog):
     """test logging"""
     with caplog.at_level("ERROR"):
@@ -264,15 +244,6 @@ def test_list_of_sympy_symbols_in_sympy_expression_attribute_error_is_logged(cap
         "has no attribute" in record.message or "atoms" in record.message
         for record in caplog.records
     )
-
-
-def test_list_of_sympy_symbols_in_sympy_expression_trace_logs_present(caplog):
-    x = Symbol("x")
-    with caplog.at_level(logging.INFO):
-        list_of_sympy_symbols_in_sympy_expression(x)
-    trace_messages = [r.message for r in caplog.records if "[TRACE]" in r.message]
-    assert any("start" in m for m in trace_messages)
-    assert any("end" in m for m in trace_messages)
 
 
 def test_list_of_sympy_symbols_in_sympy_expression_expression_with_negative_and_fractional_symbols():

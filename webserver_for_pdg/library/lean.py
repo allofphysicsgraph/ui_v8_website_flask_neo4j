@@ -6,6 +6,21 @@
 # Creative Commons Attribution 4.0 International License
 # https://creativecommons.org/licenses/by/4.0/
 
+"""
+# Lean education resources
+
+<https://leanprover.github.io/lean4/doc/dev/index.html>
+https://leanprover.github.io/lean4/doc/setup.html
+https://leanprover-community.github.io/install/project.html
+
+https://github.com/leanprover-community/mathlib4/wiki/Using-mathlib4-as-a-dependency
+
+https://lovettsoftware.com/NaturalNumbers/Tactics.lean.html
+https://lovettsoftware.com/NaturalNumbers/TutorialWorld/Level2.lean.html
+
+
+"""
+
 import os
 import random
 import uuid
@@ -17,6 +32,8 @@ logger = logging.getLogger(__name__)
 from subprocess import PIPE  # https://docs.python.org/3/library/subprocess.html
 import subprocess  # https://stackoverflow.com/questions/39187886/what-is-the-difference-between-subprocess-popen-and-subprocess-run/39187984
 
+from .tracing import trace_execution, trace_id_var
+
 proc_timeout = 120
 
 STATIC_DIR = os.environ.get(
@@ -25,10 +42,11 @@ STATIC_DIR = os.environ.get(
 )
 
 
+@trace_execution
 def run_lean(user_lean_input: str) -> str:
     """ """
-    trace_id = str(uuid.uuid4())
-    logger.info("[TRACE] run_lean start " + trace_id)
+    trace_id = trace_id_var.get()
+    # logger.info("[TRACE] run_lean start " + trace_id)
 
     logger.info("STATIC_DIR= " + str(STATIC_DIR))
 
@@ -60,5 +78,5 @@ def run_lean(user_lean_input: str) -> str:
     except subprocess.TimeoutExpired as err:
         raise Exception("time-out error after " + str(proc_timeout) + " seconds")
 
-    logger.info("[TRACE] run_lean end " + trace_id)
+    # logger.info("[TRACE] run_lean end " + trace_id)
     return lean_stdout, lean_stderr

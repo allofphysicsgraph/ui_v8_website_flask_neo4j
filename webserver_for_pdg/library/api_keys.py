@@ -15,9 +15,12 @@ import logging
 from datetime import datetime
 from typing import List, Optional, Dict, Any
 
+from .tracing import trace_execution
+
 logger = logging.getLogger(__name__)
 
 
+@trace_execution
 def load_configured_api_keys() -> List[dict]:
     """Parse PDG_API_KEYS, a JSON array of records identifying each caller.
 
@@ -59,6 +62,7 @@ def load_configured_api_keys() -> List[dict]:
     return []
 
 
+@trace_execution
 def extract_bearer_token(auth_header: Optional[str]) -> Optional[str]:
     """
     called in `pdg_api` using
@@ -77,6 +81,7 @@ def extract_bearer_token(auth_header: Optional[str]) -> Optional[str]:
     return parts[1].strip()
 
 
+@trace_execution
 def match_caller(supplied_token: str, configured_keys: List[dict]) -> Optional[dict]:
     """Constant-time-compare supplied_token against every configured token.
 
@@ -93,6 +98,7 @@ def match_caller(supplied_token: str, configured_keys: List[dict]) -> Optional[d
     return matched
 
 
+@trace_execution
 def generate_api_key(username: str, dt: datetime) -> str:
     """
     Generates a deterministic API key based on a username and datetime.
@@ -134,6 +140,7 @@ def generate_api_key(username: str, dt: datetime) -> str:
     return api_key
 
 
+@trace_execution
 def validate_api_key(api_key: str) -> bool:
     """
     Validates the structure and checksum integrity of a given API key.
@@ -157,3 +164,6 @@ def validate_api_key(api_key: str) -> bool:
     calculated_checksum = f"{calculated_val:08x}"
 
     return provided_checksum == calculated_checksum
+
+
+# EOF

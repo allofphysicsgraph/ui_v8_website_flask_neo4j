@@ -20,6 +20,7 @@ https://neo4j.com/developer/kb/viewing-schema-data-with-apoc/
 * <https://neo4j.com/docs/cypher-manual/current>
 * <https://neo4j.com/docs/cypher-refcard/current/>
 * https://gist.github.com/DaniSancas/1d5265fc159a95ff457b940fc5046887
+* <https://graphaware.com/blog/cypher-merge-explained/>
 
 In Cypher queries
 - parenthesis indicate a node
@@ -43,6 +44,7 @@ import logging
 import functools
 import re
 from . import list_of_valid
+from .tracing import trace_execution, trace_id_var
 
 logger = logging.getLogger(__name__)
 
@@ -108,6 +110,7 @@ class NodeIdCollisionError(Exception):
     pass
 
 
+@trace_execution
 def _create_or_raise_on_id_collision(tx: Transaction, query: str, params: dict) -> None:
     """Run a CREATE-based node-creation query, translating a unique-id constraint
     violation into NodeIdCollisionError. `query` must CREATE (not MERGE) the node that
@@ -118,25 +121,6 @@ def _create_or_raise_on_id_collision(tx: Transaction, query: str, params: dict) 
     except neo4j.exceptions.ConstraintError as err:
         raise NodeIdCollisionError(f"id already exists: {params.get('id')}") from err
     return
-
-
-def trace_execution(func):
-    """
-    rather than each function having boilerplate, use decorator to add to every function
-    """
-
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        trace_id = str(uuid.uuid4())
-
-        # the function name needs to be logged explicitly since `logger.info` just reports "wrapper"
-        logger.info(f"[TRACE] start {trace_id} - {func.__name__}")
-        try:
-            return func(*args, **kwargs)
-        finally:
-            logger.info(f"[TRACE] end {trace_id} - {func.__name__}")
-
-    return wrapper
 
 
 @trace_execution
