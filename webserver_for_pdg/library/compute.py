@@ -693,6 +693,8 @@ def send_email_with_msmtp(
     """
     Sends an email using the system's msmtp command.
 
+    https://github.com/allofphysicsgraph/task-tracker/issues/137
+
     Args:
         recipients: The email address of the recipient, or a list of emails.
         subject (str): The subject line of the email.
