@@ -2,38 +2,11 @@
 
 This file aggregates issues and ideas that have not yet made it onto github's issue tracker or moved to documentation.
 
-
 implementation agnostic tasks: <https://github.com/orgs/allofphysicsgraph/projects/2>
 
 issues from ui_v8: <https://github.com/orgs/allofphysicsgraph/projects/4>
 
-
-The following is unordered
-
-
-
-
-
----
-
-Schema specification for LLM inputs should be in the static folder so that it can be referenced by both the blog page and the script that checks the consistency of the JSON files
-
----
-
-Once the expressions have been identified with PDG ID, mechanically update the latex derivation before working on steps and inference rules
-
----
-
-Joining the symbols, operations, and expressions is mechanical, so a Python script can
-1) validate the schema of each file
-2) execute neo4j to add the data to the database
-
----
-
-Enact a review web page where the user is presented a random similarity question. For example, a latex expression and a sympy expression. Another example would be a lot of tech expression and a symbol. The user then provides a vote as to whether these are likely matched or mismatched.
-The vote tally could then be recorded as a property for the edge
-
-added a blog post exploring this
+The following is unordered. Most are associated with the web-based workflow.
 
 ---
 
@@ -47,18 +20,6 @@ there should be options to
 
 Entering sympy for expression is awkward 
 --> to try: https://pypi.org/project/latex2sympy2/
-
-On the Sympy-for-expression page it would be helpful to have a live conversion box where I put in a simplified latex and get back the Sympy version 
-
---> Create an API endpoint facilitate this
-
-https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/134
-
----
-
-When returning the list of potential variables in an expression, use the list of variables in the derivation to check those boxes by default
-
-https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/135
 
 ---
 
@@ -75,12 +36,10 @@ see `expression_create.html`
 ---
 
 Associating expressions with step is awkward - looking through the dropdown is tedious 
---> Need a fuzzy search: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/18
 
 ---
 
 Figuring out whether the expression (or symbol) already exists is difficult 
---> Need a fuzzy search: https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/18
 
 Once the latex has the list of variables and symbols and operations and expressions, the next step is to discover whether those already exist in the databaseIn a typical latex document each expression only appears once
 Need to figure out whether those unique list of expressions are already in the database
@@ -96,9 +55,6 @@ Getting from a detailed latex document to step input is awkward
 - Does "Latex to HTML table" help? See https://localhost/from_llm
 
 SHO - https://github.com/allofphysicsgraph/task-tracker/issues/2
-
-
-https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/133
 
 ---
 
@@ -120,12 +76,6 @@ Delete the manual `trace_id` and `query_time_dict`; replace it with Flask's `@ap
 
 ---
 
-in `sympy_validate_expression/dimensional_consistency`
-there's an `eval` to eliminate
-
-
----
-
 to verify:
 - BUG: SymPy-to-be-edited not displayed in edit_expression
 
@@ -137,27 +87,7 @@ https://en.wikipedia.org/wiki/List_of_common_physics_notations
 
 ---
 
-Given the existing HTML page for expression entry, I bet Gemini could figure out how to automate the live analysis of mathjax output rather than pushing the button manually
-
----
-
-validates lean capability using T, f
-https://github.com/allofphysicsgraph/task-tracker/issues/105
-
-In the lean repo, do I have examples of multiply both sides by and divide both sides by?
-
-A significant use case is supplemental material for any paper that includes equations. There are two sub cases 
-- Documenting the derivations within the paper such that the supplemental material is self-contained 
-- The second sub case is indicating the relation between the equations used in this paper and equations used in any other paper
-
-
----
-
-add column for status on other projects for categories like active, idle, unavailable
-
----
-
-pytest: automate opening all pages from site map
+Given the existing HTML page for expression entry, I bet Gemini could figure out how to automate the analysis latex by mathjax dynamically rather than the user pushing the button manually to check latex syntax
 
 ---
 
@@ -173,17 +103,6 @@ add to other projects
 Lean to C++
 https://proofassistants.stackexchange.com/questions/1388/how-to-run-the-main-function-in-lean-4
 
-# Lean education resources 
-
-<https://leanprover.github.io/lean4/doc/dev/index.html>
-https://leanprover.github.io/lean4/doc/setup.html
-https://leanprover-community.github.io/install/project.html
-
-https://github.com/leanprover-community/mathlib4/wiki/Using-mathlib4-as-a-dependency
-
-https://lovettsoftware.com/NaturalNumbers/Tactics.lean.html
-https://lovettsoftware.com/NaturalNumbers/TutorialWorld/Level2.lean.html
-
 
 # Where to start with Lean in PDG 
 
@@ -195,11 +114,6 @@ are "just algebra"
 
 <https://atomslab.github.io/LeanChemicalTheories/adsorption/langmuir_kinetics.html>
 
-
----
-
-=== cypher ===
-https://graphaware.com/neo4j/2014/07/31/cypher-merge-explained.html
 
 ---
 
@@ -224,21 +138,7 @@ Maybe the Mathematica team was inspired by Physics Derivation Graph?
 
 ---
 
-[PDG] kwarc notes
-slack-like channel for chat:https://mattermost.kwarc.info/kwarc/channels/sigmathling
-is linked from https://sigmathling.kwarc.info/seminar/
-
-Mailing list
-https://lists.informatik.uni-erlangen.de/mailman/listinfo/sigmathling
-
----
-
 Document how each inference rule operates on ASTs
-
----
-
-[graph query]
-Are there tuples or triples of inference rules that imply a larger inference rule?
 
 ---
 
@@ -258,34 +158,6 @@ https://www.researchgate.net/publication/216796984_Ontologies_and_Languages_for_
 
 possible collaboration for PDG on graph viz
 https://news.ycombinator.com/item?id=22177942
-
----
-
-http://bl.ocks.org/norrs/2883411
-http://stackoverflow.com/questions/10899725/d3-force-directed-graph-with-drag-and-drop-support-to-make-selected-node-positio
-
-https://jgraph.github.io/mxgraph/javascript/
-https://jgraph.github.io/mxgraph/javascript/examples/grapheditor/www/index.html
-
-http://biarri.com/adventures-with-javascript-graphing-libraries/
-
----
-
-to support: binomials
-
-<https://www.cs.cmu.edu/~adamchik/21-127/lectures/binomials_print.pdf>
-<https://en.wikipedia.org/wiki/Binomial_coefficient>
-<https://mathworld.wolfram.com/BinomialCoefficient.html>
-
-TODO: find a derivation that leverages binomials
-
----
-
-what errors does PDG address?
-
-Here's a list
-<https://math.vanderbilt.edu/schectex/commerrs/>
-<https://news.ycombinator.com/item?id=25135418>
 
 ---
 
