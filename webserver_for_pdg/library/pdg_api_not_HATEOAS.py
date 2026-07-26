@@ -24,7 +24,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .initialize_neo4j import graphDB_Driver
 from .compute import hash_of_string
 from . import neo4j_query
 from . import latex

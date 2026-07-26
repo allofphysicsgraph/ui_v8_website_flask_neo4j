@@ -279,7 +279,9 @@ def constrain_unique_id(tx: Transaction) -> None:
     that applies to every node in the database regardless of its label with a single command.
     """
 
-    tx.run("CREATE CONSTRAINT constrain_node_id FOR (n:a_node) REQUIRE n.id IS UNIQUE")
+    tx.run(
+        "CREATE CONSTRAINT constrain_node_id IF NOT EXISTS FOR (n:a_node) REQUIRE n.id IS UNIQUE"
+    )
 
     return
 

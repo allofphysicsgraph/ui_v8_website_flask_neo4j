@@ -128,7 +128,7 @@ from . import api_keys
 from .compute import query_timing_result_type
 from .compute import generate_random_id
 
-from .initialize_neo4j import graphDB_Driver
+from .initialize_neo4j import get_graphdb_driver
 
 # this works because app.py loads this file first
 
@@ -842,7 +842,7 @@ def api_cypher_query():
             title="Missing Field",
         )
     try:
-        with graphDB_Driver.session() as session:
+        with get_graphdb_driver().session() as session:
             list_of_records = session.read_transaction(
                 neo4j_query.user_query, user_query
             )
@@ -904,7 +904,7 @@ def api_list_derivations():
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "derivation"
         )
@@ -1024,7 +1024,7 @@ def api_list_inference_rules():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "inference_rule"
         )
@@ -1157,7 +1157,7 @@ def api_list_expressions():
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "expression"
         )
@@ -1310,7 +1310,7 @@ def api_list_operation_symbols():
     logger.info("[TRACE] start " + trace_id)
     # query_time_dict = {}  # type: query_timing_result_type
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "operation"
@@ -1446,7 +1446,7 @@ def api_list_relation_symbols():
     logger.info("[TRACE] start " + trace_id)
     # query_time_dict = {}  # type: query_timing_result_type
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "relation"
@@ -1575,7 +1575,7 @@ def api_list_scalar_symbols():
     logger.info("[TRACE] start " + trace_id)
     # query_time_dict = {}  # type: query_timing_result_type
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "scalar"
@@ -1816,7 +1816,7 @@ def api_list_vector_symbols():
     logger.info("[TRACE] start " + trace_id)
     # query_time_dict = {}  # type: query_timing_result_type
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "vector"
@@ -1971,7 +1971,7 @@ def api_list_matrix_symbols():
     logger.info("[TRACE] start " + trace_id)
     # query_time_dict = {}  # type: query_timing_result_type
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         # query_start_time = time.time()
         list_of_dicts = session.read_transaction(
             neo4j_query.get_nodes_of_type, "matrix"
@@ -2136,7 +2136,9 @@ def api_create_derivation():
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
     query_time_dict = {}  # type: query_timing_result_type
-    derivation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+    derivation_id, query_time_dict = generate_random_id(
+        get_graphdb_driver(), query_time_dict
+    )
 
     def _create_atomic(tx):
         return neo4j_query.add_derivation(
@@ -2149,7 +2151,7 @@ def api_create_derivation():
             author_name_latex,
         )
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         success = session.write_transaction(_create_atomic)
 
     if not success:
@@ -2286,7 +2288,7 @@ def api_create_inference_rule():
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
     query_time_dict = {}  # type: query_timing_result_type
     inference_rule_id, query_time_dict = generate_random_id(
-        graphDB_Driver, query_time_dict
+        get_graphdb_driver(), query_time_dict
     )
 
     def _create_atomic(tx):
@@ -2302,7 +2304,7 @@ def api_create_inference_rule():
             author_name_latex,
         )
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         success = session.write_transaction(_create_atomic)
 
     if not success:
@@ -2444,7 +2446,9 @@ def api_create_expression():
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
-    expression_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+    expression_id, query_time_dict = generate_random_id(
+        get_graphdb_driver(), query_time_dict
+    )
 
     def _create_atomic(tx):
         return neo4j_query.add_expression(
@@ -2461,7 +2465,7 @@ def api_create_expression():
             author_name_latex,
         )
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         success = session.write_transaction(_create_atomic)
 
     if not success:
@@ -2576,7 +2580,9 @@ def api_create_operation_symbol():
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
     query_time_dict = {}  # type: query_timing_result_type
-    operation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+    operation_id, query_time_dict = generate_random_id(
+        get_graphdb_driver(), query_time_dict
+    )
 
     def _create_atomic(tx):
         neo4j_query.add_operation_symbol(
@@ -2592,7 +2598,7 @@ def api_create_operation_symbol():
         )
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         session.write_transaction(_create_atomic)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
@@ -2685,7 +2691,9 @@ def api_create_relation_symbol():
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
     query_time_dict = {}  # type: query_timing_result_type
-    relation_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+    relation_id, query_time_dict = generate_random_id(
+        get_graphdb_driver(), query_time_dict
+    )
 
     def _create_atomic(tx):
         neo4j_query.add_relation_symbol(
@@ -2700,7 +2708,7 @@ def api_create_relation_symbol():
         )
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         session.write_transaction(_create_atomic)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
@@ -2836,7 +2844,9 @@ def api_create_scalar_symbol():
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
     query_time_dict = {}  # type: query_timing_result_type
-    symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+    symbol_id, query_time_dict = generate_random_id(
+        get_graphdb_driver(), query_time_dict
+    )
 
     def _create_atomic(tx):
         neo4j_query.add_scalar_symbol(
@@ -2861,7 +2871,7 @@ def api_create_scalar_symbol():
         )
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         session.write_transaction(_create_atomic)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
@@ -3017,7 +3027,9 @@ def api_create_vector_symbol():
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
     query_time_dict = {}  # type: query_timing_result_type
-    symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+    symbol_id, query_time_dict = generate_random_id(
+        get_graphdb_driver(), query_time_dict
+    )
 
     def _create_atomic(tx):
         neo4j_query.add_vector_symbol(
@@ -3036,7 +3048,7 @@ def api_create_vector_symbol():
         )
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         session.write_transaction(_create_atomic)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
@@ -3154,7 +3166,9 @@ def api_create_matrix_symbol():
     author_name_latex = g.current_author["author_name_latex"]
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
     query_time_dict = {}  # type: query_timing_result_type
-    symbol_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+    symbol_id, query_time_dict = generate_random_id(
+        get_graphdb_driver(), query_time_dict
+    )
 
     def _create_atomic(tx):
         neo4j_query.add_matrix_symbol(
@@ -3173,7 +3187,7 @@ def api_create_matrix_symbol():
         )
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         session.write_transaction(_create_atomic)
     logger.info("[TRACE] end " + trace_id)
     return hal_response(
@@ -3285,7 +3299,7 @@ def api_edit_derivation(derivation_id: str):
             _stamp_last_modified(tx, "derivation", derivation_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_edit_atomic)
 
     if not found:
@@ -3367,7 +3381,7 @@ def api_edit_inference_rule(infrule_id: str):
             _stamp_last_modified(tx, "inference_rule", infrule_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_edit_atomic)
 
     if not found:
@@ -3470,7 +3484,7 @@ def api_edit_expression(expression_id: str):
         _stamp_last_modified(tx, "expression", expression_id)
         return "SUCCESS"
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         status = session.write_transaction(_edit_atomic)
 
     if status == "NOT_FOUND":
@@ -3589,7 +3603,7 @@ def api_edit_operation(operation_id: str):
             _stamp_last_modified(tx, "operation", operation_id)
         return "SUCCESS"
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         status = session.write_transaction(_edit_atomic)
     if status == "NOT_FOUND":
         return hal_error(
@@ -3675,7 +3689,7 @@ def api_edit_relation(relation_id: str):
             _stamp_last_modified(tx, "relation", relation_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_edit_atomic)
     if not found:
         return hal_error(
@@ -3831,7 +3845,7 @@ def api_edit_scalar(symbol_id: str):
             _stamp_last_modified(tx, "scalar", symbol_id)
         return "SUCCESS"
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         status = session.write_transaction(_edit_atomic)
     if status == "NOT_FOUND":
         return hal_error(
@@ -3916,7 +3930,7 @@ def api_edit_vector(symbol_id: str):
             _stamp_last_modified(tx, "vector", symbol_id)
         return "SUCCESS"
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         status = session.write_transaction(_edit_atomic)
     if status == "NOT_FOUND":
         return hal_error(
@@ -3994,7 +4008,7 @@ def api_edit_matrix(symbol_id: str):
             _stamp_last_modified(tx, "matrix", symbol_id)
         return "SUCCESS"
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         status = session.write_transaction(_edit_atomic)
     if status == "NOT_FOUND":
         return hal_error(
@@ -4029,7 +4043,7 @@ def api_derivation_metadata(derivation_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     logger.info("derivation_id=" + derivation_id)
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         derivation_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "derivation", derivation_id
         )
@@ -4113,7 +4127,7 @@ def api_inference_rule_metadata(infrule_id: str):
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         inference_rule_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "inference_rule", infrule_id
         )
@@ -4205,7 +4219,7 @@ def api_expression_metadata(expression_id: str):
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         expression_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "expression", expression_id
         )
@@ -4320,7 +4334,7 @@ def api_scalar_metadata(symbol_id: str):
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         scalar_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "scalar", symbol_id
         )
@@ -4459,7 +4473,7 @@ def api_vector_metadata(symbol_id: str):
     """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         vector_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "vector", symbol_id
         )
@@ -4553,7 +4567,7 @@ def api_vector_metadata(symbol_id: str):
 def api_matrix_metadata(symbol_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         matrix_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "matrix", symbol_id
         )
@@ -4654,7 +4668,7 @@ def api_operation_metadata(operation_id: str):
     - list expressions that use this operation
     """
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         operation_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "operation", operation_id
         )
@@ -4746,7 +4760,7 @@ def api_relation_metadata(relation_id: str):
     - list expressions that use this relation
     """
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         relation_dict = session.read_transaction(
             neo4j_query.get_node_properties_from_id, "relation", relation_id
         )
@@ -4821,7 +4835,7 @@ def api_relation_metadata(relation_id: str):
 def api_derivation_steps(derivation_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         list_of_steps = session.read_transaction(
             neo4j_query.get_list_of_steps_in_this_derivation, derivation_id
         )
@@ -4990,13 +5004,13 @@ def api_create_step(derivation_id: str):
                     "feed object must contain feed_latex", 400, title="Invalid Field"
                 )
             feed_id, query_time_dict = generate_random_id(
-                graphDB_Driver, query_time_dict
+                get_graphdb_driver(), query_time_dict
             )
             list_of_feed_IDs_or_dicts.append({"id": feed_id, "latex": feed_latex})
         else:
             list_of_feed_IDs_or_dicts.append(str(feed_item))
 
-    step_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+    step_id, query_time_dict = generate_random_id(get_graphdb_driver(), query_time_dict)
 
     def _create_step_atomic(tx):
         # Transactionally connects step with write lock ensuring atomic sequence index calculations
@@ -5041,7 +5055,7 @@ def api_create_step(derivation_id: str):
 
         return result_data
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         step_res = session.write_transaction(_create_step_atomic)
 
     if step_res is None:
@@ -5115,7 +5129,7 @@ def api_get_step(derivation_id: str, step_id: str):
         )
         return step_dict
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         full_step_data = session.read_transaction(_read_step_details_atomic)
 
     if full_step_data is None:
@@ -5263,7 +5277,7 @@ def api_edit_step_notes(derivation_id: str, step_id: str):
         _stamp_last_modified(tx, "step", step_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_edit_notes_atomic)
 
     if not found:
@@ -5306,7 +5320,7 @@ def api_swap_step_input(derivation_id: str, step_id: str):
         _stamp_last_modified(tx, "step", step_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_swap_input_atomic)
 
     if not found:
@@ -5349,7 +5363,7 @@ def api_swap_step_feed(derivation_id: str, step_id: str):
         _stamp_last_modified(tx, "step", step_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_swap_feed_atomic)
 
     if not found:
@@ -5394,7 +5408,7 @@ def api_swap_step_output(derivation_id: str, step_id: str):
         _stamp_last_modified(tx, "step", step_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_swap_output_atomic)
 
     if not found:
@@ -5429,7 +5443,7 @@ def api_remove_step_feed(derivation_id: str, step_id: str, feed_id: str):
         _stamp_last_modified(tx, "step", step_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_remove_feed_atomic)
 
     if not found:
@@ -5467,7 +5481,7 @@ def api_add_step_feed(derivation_id: str, step_id: str):
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
     query_time_dict = {}  # type: query_timing_result_type
-    feed_id, query_time_dict = generate_random_id(graphDB_Driver, query_time_dict)
+    feed_id, query_time_dict = generate_random_id(get_graphdb_driver(), query_time_dict)
 
     def _add_feed_atomic(tx):
         step_dict = neo4j_query.get_node_properties_from_id(tx, "step", step_id)
@@ -5501,7 +5515,7 @@ def api_add_step_feed(derivation_id: str, step_id: str):
         _stamp_last_modified(tx, "step", step_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_add_feed_atomic)
 
     if not found:
@@ -5537,7 +5551,7 @@ def api_delete_step(derivation_id: str, step_id: str):
         _stamp_last_modified(tx, "derivation", derivation_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_delete_step_atomic)
 
     if not found:
@@ -5577,7 +5591,7 @@ def api_associate_symbol_with_expression(expression_id: str):
         _stamp_last_modified(tx, "expression", expression_id)
         return "SUCCESS"
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         status = session.write_transaction(_associate_symbol_atomic)
 
     if status == "EXPR_NOT_FOUND":
@@ -5620,7 +5634,7 @@ def api_dissociate_symbol_from_expression(expression_id: str, symbol_id: str):
         _stamp_last_modified(tx, "expression", expression_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_dissociate_symbol_atomic)
 
     if not found:
@@ -5667,7 +5681,7 @@ def api_associate_symbol_with_feed(derivation_id: str, step_id: str, feed_id: st
         _stamp_last_modified(tx, "step", step_id)
         return "SUCCESS"
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         status = session.write_transaction(_associate_feed_symbol_atomic)
 
     if status == "FEED_NOT_FOUND":
@@ -5709,7 +5723,7 @@ def api_dissociate_symbol_from_feed(
         _stamp_last_modified(tx, "step", step_id)
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_dissociate_feed_symbol_atomic)
 
     if not found:
@@ -5754,7 +5768,7 @@ def api_delete_derivation(derivation_id: str):
         neo4j_query.delete_node(tx, derivation_id, "derivation")
         return len(list_of_step_dicts)
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         deleted_steps_count = session.write_transaction(_delete_derivation_atomic)
 
     if deleted_steps_count is None:
@@ -5813,7 +5827,7 @@ def api_delete_inference_rule(infrule_id: str):
         neo4j_query.delete_node(tx, infrule_id, "inference_rule")
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_delete_infrule_atomic)
 
     if not found:
@@ -5868,7 +5882,7 @@ def api_delete_expression(expression_id: str):
         neo4j_query.delete_node(tx, expression_id, "expression")
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_delete_expression_atomic)
 
     if not found:
@@ -5932,7 +5946,7 @@ def api_delete_operation(operation_id: str):
         neo4j_query.delete_node(tx, operation_id, "operation")
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_delete_atomic)
     if not found:
         return hal_error(
@@ -5981,7 +5995,7 @@ def api_delete_relation(relation_id: str):
         neo4j_query.delete_node(tx, relation_id, "relation")
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_delete_atomic)
     if not found:
         return hal_error(
@@ -6028,7 +6042,7 @@ def api_delete_scalar(symbol_id: str):
         neo4j_query.delete_node(tx, symbol_id, "scalar")
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_delete_atomic)
     if not found:
         return hal_error(
@@ -6071,7 +6085,7 @@ def api_delete_vector(symbol_id: str):
         neo4j_query.delete_node(tx, symbol_id, "vector")
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_delete_atomic)
     if not found:
         return hal_error(
@@ -6114,7 +6128,7 @@ def api_delete_matrix(symbol_id: str):
         neo4j_query.delete_node(tx, symbol_id, "matrix")
         return True
 
-    with graphDB_Driver.session() as session:
+    with get_graphdb_driver().session() as session:
         found = session.write_transaction(_delete_atomic)
     if not found:
         return hal_error(
