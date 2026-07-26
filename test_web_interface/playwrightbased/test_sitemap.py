@@ -41,13 +41,17 @@ def test_local_sitemap(page: Page):
 
         # print(f"Testing reachability of {local_url}")
 
-        # Visit the transformed URL
-        response = page.goto(local_url)
+        try:
+            # Use page.request.get() to check HTTP status without triggering browser rendering or downloads
+            response = page.request.get(local_url)
 
-        # Validate reachability (checking for HTTP status < 400)
-        if response is None or response.status >= 400:
-            status = response.status if response else "No response"
-            failed_urls.append((local_url, status))
+            # Validate reachability (checking for HTTP status < 400)
+            if response.status >= 400:
+                failed_urls.append((local_url, response.status))
+        except Exception as e:
+            # Catch network errors (e.g., connection refused if the server is down)
+            failed_urls.append((local_url, f"Error: {e}"))
+            
 
     # Assert that all URLs passed (fails the test and lists all broken links at once)
     assert (
