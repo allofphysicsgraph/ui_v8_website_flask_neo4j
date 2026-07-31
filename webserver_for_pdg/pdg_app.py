@@ -163,14 +163,14 @@ from wtforms import (
 # https://flask-login.readthedocs.io/en/latest/_modules/flask_login/mixins.html
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
 # https://en.wikipedia.org/wiki/Mixin
-from flask_login import (
+from flask_login import (  # type: ignore[import-untyped]
     login_required,
     login_user,
     logout_user,
     current_user,
     LoginManager,
     UserMixin,
-)  # type: ignore
+)
 
 from flask.typing import ResponseReturnValue
 
@@ -501,8 +501,8 @@ def callback():
     # from Google that gives you the user's profile information,
     # including their Google profile image and email
     userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
-    uri, headers, body = client.add_token(userinfo_endpoint)
-    userinfo_response = requests.get(uri, headers=headers, data=body)
+    uri, userinfo_headers, userinfo_body = client.add_token(userinfo_endpoint)
+    userinfo_response = requests.get(uri, headers=userinfo_headers, data=userinfo_body)
 
     # You want to make sure their email is verified.
     # The user authenticated with Google, authorized your
@@ -3368,7 +3368,7 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnV
                     web_form_edit_operation.operation_reference_latex.data
                 ).strip()
                 operation_number_of_arguments = int(
-                    web_form_edit_operation.operation_argument_count.data
+                    web_form_edit_operation.operation_argument_count.data or 0
                 )
 
                 author_name_latex = compute.encode_user_identifier(current_user.email)
@@ -7638,6 +7638,9 @@ def to_expand(lookup: str):
     logger.info("[TRACE] ")
 
     status, url = compute.get_url_from_shortened_list(lookup)
+
+    if url is None:
+        return ("Shortened URL not found.", 404)
 
     return redirect(url)
 

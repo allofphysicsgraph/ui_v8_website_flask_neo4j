@@ -220,6 +220,13 @@ def create_d3js_json(
         # purpose of reading image is to determine width and height; both are needed for d3js JSON
         image = cv2.imread(destination_folder + png_name + ".png")
         logger.info("type for cv2 image is " + str(type(image)))
+        if image is None:
+            raise ValueError(
+                "cv2.imread failed to read PNG file: "
+                + destination_folder
+                + png_name
+                + ".png"
+            )
 
         # the relevance of "group" is to set node color
 
@@ -300,6 +307,13 @@ def create_d3js_json(
                 )
 
             image = cv2.imread(destination_folder + png_name + ".png")
+            if image is None:
+                raise ValueError(
+                    "cv2.imread failed to read PNG file: "
+                    + destination_folder
+                    + png_name
+                    + ".png"
+                )
 
             # construct the node JSON content
             list_of_nodes.append(
