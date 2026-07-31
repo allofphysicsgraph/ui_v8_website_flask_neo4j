@@ -39,7 +39,7 @@
            </a>
          </td>
          <td>
-           <form method="post" action="search">
+           <form method="post" action="{{ url_for('search_redirect_to_google') }}">
              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <!-- this "action" is not consistent with the MVC paradigm since control is not
           passed back to controller.py.
