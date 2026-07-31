@@ -142,7 +142,7 @@ def test_unauthorized_whoami(entrypoint_links, api_request_context: APIRequestCo
 
 def test_validate_operations_api(api_request_context: APIRequestContext):
     # Perform a GET request to the API endpoint
-    response = api_request_context.get(f"{URL}/resources/symbol/operations")
+    response = api_request_context.get(f"{URL}/resources/operation_symbols")
 
     # Validate that the response is successful
     assert response.ok

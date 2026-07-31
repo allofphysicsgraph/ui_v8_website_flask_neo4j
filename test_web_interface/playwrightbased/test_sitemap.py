@@ -51,7 +51,6 @@ def test_local_sitemap(page: Page):
         except Exception as e:
             # Catch network errors (e.g., connection refused if the server is down)
             failed_urls.append((local_url, f"Error: {e}"))
-            
 
     # Assert that all URLs passed (fails the test and lists all broken links at once)
     assert (

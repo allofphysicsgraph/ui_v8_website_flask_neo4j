@@ -9,6 +9,7 @@
 import time
 import logging
 import os
+from typing import Any
 
 # for the exceptions
 import neo4j  # type: ignore[import-untyped]
@@ -36,7 +37,7 @@ _driver = None
 
 
 @trace_execution
-def get_graphdb_driver():
+def get_graphdb_driver() -> Any:
     """
     Lazily initializes and returns the Neo4j GraphDatabase driver.
     Blocks and retries until Neo4j is available on first access.

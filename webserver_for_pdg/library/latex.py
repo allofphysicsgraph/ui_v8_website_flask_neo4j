@@ -716,7 +716,7 @@ def create_tex_file_for_derivation(
 
 @trace_execution
 def create_pdf_for_derivation(
-    all_steps,
+    all_steps: dict,
     derivation_dict: dict,
     path_to_pdf: str = STATIC_DIR,
 ) -> str:
@@ -1225,10 +1225,10 @@ def create_derivation_png(
 @trace_execution
 def create_step_graphviz_png(
     step_dict: dict,
-    inference_rule_dict,
-    list_of_input_dicts,
-    list_of_feed_dicts,
-    list_of_output_dicts,
+    inference_rule_dict: dict,
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
     destination_folder: str,
 ) -> str:
     """
@@ -1318,10 +1318,10 @@ def create_step_graphviz_png(
 @trace_execution
 def write_step_to_graphviz_file(
     step_id: str,
-    inference_rule_dict,
-    list_of_input_dicts,
-    list_of_feed_dicts,
-    list_of_output_dicts,
+    inference_rule_dict: dict,
+    list_of_input_dicts: List[dict],
+    list_of_feed_dicts: List[dict],
+    list_of_output_dicts: List[dict],
     file_handle: TextIO,
     path_to_output_png: str,
 ) -> None:

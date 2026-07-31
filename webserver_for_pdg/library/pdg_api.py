@@ -102,9 +102,10 @@ from flask import (
     jsonify,
     request,
     make_response,
+    Response,
 )
 from werkzeug.exceptions import BadRequest
-from typing import Dict, List
+from typing import Dict, List, Any, Optional, Union, Tuple, Callable
 import neo4j  # type: ignore
 
 # from flask_wtf.csrf import generate_csrf
@@ -160,7 +161,7 @@ MAX_SYMPY_INPUT_LENGTH = 500
 # needs no builtins, only dunder attribute access on literals. The route below
 # additionally rejects any input containing '__' before parsing; the two
 # measures are both required, not redundant.
-def _build_safe_sympy_globals():
+def _build_safe_sympy_globals() -> Dict[str, Any]:
     safe_globals: Dict[str, Any] = {}
     exec("from sympy import *", safe_globals)
     safe_globals["__builtins__"] = {}
@@ -178,7 +179,7 @@ _SUPPORTED_MIMETYPES = [HAL_FORMS_MIMETYPE, PLAIN_JSON_MIMETYPE]
 
 
 @trace_execution
-def _negotiate_response_mimetype():
+def _negotiate_response_mimetype() -> Optional[str]:
     """Pick a representation based on the client's Accept header.
 
     hal-forms+json remains the default representation (matches ties and
@@ -193,7 +194,7 @@ def _negotiate_response_mimetype():
 
 
 @trace_execution
-def _strip_templates(value):
+def _strip_templates(value: Any) -> Any:
     """Recursively remove '_templates' keys (the HAL-FORMS extension) from a
     payload. Some list endpoints attach '_templates' directly onto each
     embedded resource, not just at the top level, so a shallow strip isn't
@@ -222,7 +223,12 @@ def _strip_templates(value):
 
 
 @trace_execution
-def hal_link(href, title=None, name=None, method=None):
+def hal_link(
+    href: str,
+    title: Optional[str] = None,
+    name: Optional[str] = None,
+    method: Optional[str] = None,
+) -> Dict[str, str]:
     link = {"href": href}
     if title:
         link["title"] = title
@@ -235,15 +241,15 @@ def hal_link(href, title=None, name=None, method=None):
 
 @trace_execution
 def hal_property(
-    name,
-    type_="text",
-    required=False,
-    read_only=False,
-    options=None,
-    regex=None,
-    prompt=None,
-    value=None,
-):
+    name: str,
+    type_: str = "text",
+    required: bool = False,
+    read_only: bool = False,
+    options: Optional[List[dict]] = None,
+    regex: Optional[str] = None,
+    prompt: Optional[str] = None,
+    value: Any = None,
+) -> Dict[str, Any]:
     prop = {"name": name, "type": type_, "required": required, "readOnly": read_only}
     if prompt:
         prop["prompt"] = prompt
@@ -263,8 +269,12 @@ def hal_property(
 
 @trace_execution
 def hal_template(
-    method, properties, title=None, content_type="application/json", target=None
-):
+    method: str,
+    properties: List[dict],
+    title: Optional[str] = None,
+    content_type: str = "application/json",
+    target: Optional[str] = None,
+) -> Dict[str, Any]:
     template = {"method": method, "contentType": content_type, "properties": properties}
     if title:
         template["title"] = title
@@ -274,7 +284,13 @@ def hal_template(
 
 
 @trace_execution
-def hal_response(data=None, links=None, embedded=None, templates=None, status=200):
+def hal_response(
+    data: Optional[Dict[str, Any]] = None,
+    links: Optional[Dict[str, Any]] = None,
+    embedded: Optional[Dict[str, Any]] = None,
+    templates: Optional[Dict[str, Any]] = None,
+    status: int = 200,
+) -> Response:
     payload = {}
     if data:
         payload.update(data)
@@ -298,7 +314,12 @@ def hal_response(data=None, links=None, embedded=None, templates=None, status=20
 
 
 @trace_execution
-def hal_error(message, status, links=None, title="Error"):
+def hal_error(
+    message: str,
+    status: int,
+    links: Optional[Dict[str, Any]] = None,
+    title: str = "Error",
+) -> Response:
     payload = {
         "title": title,
         "status": status,
@@ -313,7 +334,7 @@ def hal_error(message, status, links=None, title="Error"):
 
 
 @trace_execution
-def _stamp_last_modified(tx, node_type, node_id):
+def _stamp_last_modified(tx: Any, node_type: str, node_id: str) -> None:
     """Record who last edited a node and when, using the same generic
     property-setter the editable_fields loops already rely on. Called only
     when an edit actually changed something, so untouched resources don't
@@ -335,7 +356,7 @@ def _stamp_last_modified(tx, node_type, node_id):
 
 
 @trace_execution
-def _parse_bool(value, default=False):
+def _parse_bool(value: Any, default: bool = False) -> bool:
     if value is None:
         return default
     if isinstance(value, bool):
@@ -346,7 +367,7 @@ def _parse_bool(value, default=False):
 
 
 @trace_execution
-def require_auth(view_func):
+def require_auth(view_func: Callable) -> Callable:
     """Require a valid `Authorization: Bearer <token>` header.
 
     Intended for routes that write to Neo4j (create/edit/delete). Read-only
@@ -354,7 +375,7 @@ def require_auth(view_func):
     """
 
     @functools.wraps(view_func)
-    def wrapped_view(*args, **kwargs):
+    def wrapped_view(*args: Any, **kwargs: Any) -> Any:
         configured_keys = api_keys.load_configured_api_keys()
         if not configured_keys:
             logger.critical(
@@ -390,7 +411,7 @@ def require_auth(view_func):
 
 
 @api_bp.before_request
-def _handle_options_request():
+def _handle_options_request() -> Optional[Response]:
     """Self-descriptive OPTIONS support for every resource in this blueprint.
 
     Rather than writing a bespoke OPTIONS handler per route, this hook fires
@@ -401,7 +422,11 @@ def _handle_options_request():
     applies. This runs before @require_auth, so discovering what's possible
     on a resource never requires authentication.
     """
-    if request.method != "OPTIONS" or request.url_rule is None:
+    if (
+        request.method != "OPTIONS"
+        or request.url_rule is None
+        or request.url_rule.methods is None
+    ):
         return None
     allowed_methods = sorted(request.url_rule.methods)
     transition_methods = sorted(
@@ -424,7 +449,7 @@ def _handle_options_request():
 
 
 @api_bp.errorhandler(BadRequest)
-def _handle_bad_request(err):
+def _handle_bad_request(err: Any) -> Response:
     logger.info("[TRACE] BadRequest on %s %s: %r", request.method, request.path, err)
     return hal_error(
         "The request body could not be parsed. Please ensure it is well-formed JSON.",
@@ -439,7 +464,7 @@ def _handle_bad_request(err):
 
 
 @api_bp.errorhandler(neo4j.exceptions.DriverError)
-def _handle_neo4j_driver_error(err):
+def _handle_neo4j_driver_error(err: Any) -> Response:
     """Centralized fallback for Neo4j driver-side failures that aren't caught
     locally by a view function.
 
@@ -477,7 +502,7 @@ def _handle_neo4j_driver_error(err):
 @api_bp.errorhandler(neo4j.exceptions.ClientError)
 @api_bp.errorhandler(neo4j.exceptions.TransientError)
 @api_bp.errorhandler(neo4j.exceptions.DatabaseError)
-def _handle_neo4j_query_error(err):
+def _handle_neo4j_query_error(err: Any) -> Response:
     """Centralized fallback for Neo4j server-reported errors (neo4j.exceptions.Neo4jError
     subclasses) that aren't caught locally by a view function.
 
@@ -525,7 +550,7 @@ def _handle_neo4j_query_error(err):
 
 @api_bp.route("/", methods=["GET"])
 @trace_execution
-def api_start_here():
+def api_start_here() -> Response:
     """
     Entry point for the API using HATEOAS (HAL format).
 
@@ -541,12 +566,12 @@ def api_start_here():
         {
           "_links": {
             "cypher_query": {
-              "href": "https://localhost/api/v1/resources/cypher/",
+              "href": "https://localhost/api/resources/cypher/",
               "title": "Cypher query",
               "type": "GET"
             },
             "derivations": {
-              "href": "https://localhost/api/v1/resources/derivations,
+              "href": "https://localhost/api/resources/derivations,
               "title": "List derivations",
               "type": "GET"
             }
@@ -608,7 +633,7 @@ def api_start_here():
 
 @api_bp.route("/whoami", methods=["GET"])
 @require_auth
-def api_whoami():
+def api_whoami() -> Response:
     return hal_response(
         data={
             "author_id": g.current_author["author_id"],
@@ -627,7 +652,7 @@ def api_whoami():
 
 @api_bp.route("/resources/sympy_check", methods=["GET", "POST"])
 @trace_execution
-def api_sympy_check():
+def api_sympy_check() -> Response:
     """Parse a user-supplied math expression with sympy and report its
     canonical form and free variables.
 
@@ -751,7 +776,7 @@ def api_sympy_check():
 
 
 @api_bp.route("/resources/lean_check", methods=["GET", "POST"])
-def api_lean_check():
+def api_lean_check() -> Response:
     """ """
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] api_lean_check start " + trace_id)
@@ -818,7 +843,7 @@ def api_lean_check():
 
 
 @api_bp.route("/resources/cypher", methods=["GET", "POST"])
-def api_cypher_query():
+def api_cypher_query() -> Response:
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
     up_link = {
@@ -895,13 +920,13 @@ def api_cypher_query():
 
 
 @api_bp.route("/resources/derivations", methods=["GET"])
-def api_list_derivations():
+def api_list_derivations() -> Response:
     """
 
     .. code-block:: bash
 
 
-        curl --silent --insecure https://localhost/api/v1/resources/derivation/list | python3 -m json.tool
+        curl --silent --insecure https://localhost/api/resources/derivation/list | python3 -m json.tool
         [
             {
                 "abstract_latex": "my summary",
@@ -1015,12 +1040,12 @@ def api_list_derivations():
 
 
 @api_bp.route("/resources/inference_rules", methods=["GET"])
-def api_list_inference_rules():
+def api_list_inference_rules() -> Response:
     """
 
     .. code-block:: bash
 
-        curl --silent --insecure https://localhost/api/v1/resources/inference_rule/list | python3 -m json.tool
+        curl --silent --insecure https://localhost/api/resources/inference_rule/list | python3 -m json.tool
         [
             {
                 "author_name_latex": "ben",
@@ -1148,12 +1173,12 @@ def api_list_inference_rules():
 
 
 @api_bp.route("/resources/expressions", methods=["GET"])
-def api_list_expressions():
+def api_list_expressions() -> Response:
     """
 
     .. code-block:: bash
 
-        curl --silent --insecure https://localhost/api/v1/resources/expressions | python3 -c "
+        curl --silent --insecure https://localhost/api/resources/expressions | python3 -c "
         import sys, json
 
         data = json.load(sys.stdin)
@@ -1298,13 +1323,13 @@ def api_list_expressions():
     )
 
 
-@api_bp.route("/resources/symbol/operations", methods=["GET"])
-def api_list_operation_symbols():
+@api_bp.route("/resources/operation_symbols", methods=["GET"])
+def api_list_operation_symbols() -> Response:
     """
 
     .. code-block:: bash
 
-        curl --silent --insecure https://localhost/api/v1/resources/operation/list | python3 -m json.tool
+        curl --silent --insecure https://localhost/api/resources/operation_symbols | python3 -m json.tool
         [
             {
                 "argument_count": 2,
@@ -1446,12 +1471,12 @@ def api_list_operation_symbols():
 
 
 @api_bp.route("/resources/symbol/relations", methods=["GET"])
-def api_list_relation_symbols():
+def api_list_relation_symbols() -> Response:
     """
 
     .. code-block:: bash
 
-        curl --silent --insecure https://localhost/api/v1/resources/symbol/relation/list | python3 -m json.tool
+        curl --silent --insecure https://localhost/api/resources/symbol/relation/list | python3 -m json.tool
 
     """
     trace_id = str(uuid.uuid4())
@@ -1562,14 +1587,14 @@ def api_list_relation_symbols():
 
 
 @api_bp.route("/resources/symbol/scalars", methods=["GET"])
-def api_list_scalar_symbols():
+def api_list_scalar_symbols() -> Response:
     """
 
 
     .. code-block:: bash
 
 
-        curl --silent --insecure https://localhost/api/v1/resources/symbol/scalars | python3 -c "
+        curl --silent --insecure https://localhost/api/resources/symbol/scalars | python3 -c "
         import sys, json
 
         data = json.load(sys.stdin)
@@ -1805,12 +1830,12 @@ def api_list_scalar_symbols():
 
 
 @api_bp.route("/resources/symbol/vectors", methods=["GET"])
-def api_list_vector_symbols():
+def api_list_vector_symbols() -> Response:
     """
 
     .. code-block:: bash
 
-        curl --silent --insecure https://localhost/api/v1/resources/vector/list | python3 -m json.tool
+        curl --silent --insecure https://localhost/api/resources/vector/list | python3 -m json.tool
         [
             {
                 "argument_count": 2,
@@ -1960,12 +1985,12 @@ def api_list_vector_symbols():
 
 
 @api_bp.route("/resources/symbol/matrices", methods=["GET"])
-def api_list_matrix_symbols():
+def api_list_matrix_symbols() -> Response:
     """
 
     .. code-block:: bash
 
-        curl --silent --insecure https://localhost/api/v1/resources/matrix/list | python3 -m json.tool
+        curl --silent --insecure https://localhost/api/resources/matrix/list | python3 -m json.tool
         [
             {
                 "argument_count": 2,
@@ -2116,7 +2141,7 @@ def api_list_matrix_symbols():
 
 @api_bp.route("/resources/derivation", methods=["POST"])
 @require_auth
-def api_create_derivation():
+def api_create_derivation() -> Response:
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
@@ -2152,7 +2177,7 @@ def api_create_derivation():
         get_graphdb_driver(), query_time_dict
     )
 
-    def _create_atomic(tx):
+    def _create_atomic(tx: Any) -> Any:
         return neo4j_query.add_derivation(
             tx,
             derivation_id,
@@ -2235,12 +2260,12 @@ def api_create_derivation():
 
 @api_bp.route("/resources/inference_rule", methods=["POST"])
 @require_auth
-def api_create_inference_rule():
+def api_create_inference_rule() -> Response:
     """
 
     .. code-block:: bash
 
-        curl --silent --insecure https://localhost/api/v1/resources/inference_rule/create
+        curl --silent --insecure https://localhost/api/resources/inference_rule/create
 
     """
     trace_id = str(uuid.uuid4())
@@ -2303,7 +2328,7 @@ def api_create_inference_rule():
         get_graphdb_driver(), query_time_dict
     )
 
-    def _create_atomic(tx):
+    def _create_atomic(tx: Any) -> Any:
         return neo4j_query.add_inference_rule(
             tx,
             inference_rule_id,
@@ -2394,7 +2419,7 @@ def api_create_expression():
         curl --request POST \
         --header "Content-Type: application/x-www-form-urlencoded" \
         --show-error --silent \
-        https://localhost/api/v1/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9 \
+        https://localhost/api/resources/expression/create?expression_latex_lhs=4*2\&expression_relation_latex==\&expression_latex_rhs=9 \
          | python3 -m json.tool
 
 
@@ -2402,7 +2427,7 @@ def api_create_expression():
         --header "Content-Type: application/json" \
         --show-error --silent \
         --data '{"expression_latex_lhs": "4^3", "expression_relation_latex": "=", "expression_latex_rhs": "k"}' \
-         https://localhost/api/v1/resources/expression/create | python3 -m json.tool
+         https://localhost/api/resources/expression/create | python3 -m json.tool
 
     user-provided dictionary is required to have latex and name
 
@@ -3845,7 +3870,7 @@ def api_edit_scalar(symbol_id: str):
                 "",
             ):
                 try:
-                    value = int(data_from_user.get(form_key))
+                    value = int(str(data_from_user.get(form_key)))
                 except (TypeError, ValueError):
                     return "INVALID_DIMENSION"
                 updated = neo4j_query.edit_node_property(
@@ -4976,7 +5001,11 @@ def api_create_step(derivation_id: str):
     trace_id = str(uuid.uuid4())
     logger.info("[TRACE] start " + trace_id)
 
-    data_from_user = request.get_json() if request.is_json else request.args
+    if not request.is_json:
+        return hal_error(
+            "This endpoint requires a JSON request body", 400, title="Invalid Request"
+        )
+    data_from_user = request.get_json()
 
     # TODO: what is the schema of the user-provided JSON? How is that schema validated prior to processing?
 
@@ -5006,7 +5035,7 @@ def api_create_step(derivation_id: str):
     now_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f"))
 
     # Pre-generate IDs for inline feed creations outside transaction to prevent nested session loops
-    list_of_feed_IDs_or_dicts = []
+    list_of_feed_IDs_or_dicts: List[Union[str, Dict[str, Any]]] = []
     query_time_dict = {}  # type: query_timing_result_type
     for feed_item in list_of_feed_data:
         if isinstance(feed_item, dict):

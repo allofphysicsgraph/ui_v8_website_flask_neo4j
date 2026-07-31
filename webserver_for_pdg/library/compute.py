@@ -233,7 +233,7 @@ def get_placement_options(
 
 @trace_execution
 def guess_sympy_from_expression(
-    graphDB_Driver,
+    graphDB_Driver: Any,
     query_time_dict: query_timing_result_type,
     expression_dict: dict,
 ) -> Tuple[query_timing_result_type, Optional[str], Optional[str]]:
@@ -321,7 +321,7 @@ def guess_sympy_from_expression(
 
 @trace_execution
 def guess_operations_from_latex(
-    graphDB_Driver,
+    graphDB_Driver: Any,
     query_time_dict: query_timing_result_type,
     expression_dict: dict,
 ) -> Tuple[query_timing_result_type, List[dict]]:
@@ -373,10 +373,10 @@ def guess_operations_from_latex(
 
 @trace_execution
 def guess_symbols_from_latex(
-    graphDB_Driver,
+    graphDB_Driver: Any,
     query_time_dict: query_timing_result_type,
     expression_dict: dict,
-) -> Tuple[query_timing_result_type, List[dict], List[dict]]:
+) -> Tuple[query_timing_result_type, List[dict]]:
     """
     after users enter latex, guess which symbols they want to associate with expression
 
@@ -514,7 +514,7 @@ def guess_symbols_from_latex(
     # provide the user with the list of guessed symbols
     # There may be multiple matching symbol IDs for a given latex symbol, e.g., "x"
 
-    potential_symbols_found_in_Latex_expression = []  # type: List[str]
+    potential_symbols_found_in_Latex_expression = []  # type: List[dict]
     # symbol_id_dict = {}
 
     for this_symbol_dict in list_of_symbol_dicts:
@@ -628,6 +628,11 @@ def add_url_to_shortened_list(
         with open(shorten_url_file, "a") as file_handle:
             file_handle.write("timestamp|email|count|lookup|url\n")
 
+    if current_user_email is None:
+        raise ValueError(
+            "current_user_email is required to compute the stored email hash"
+        )
+
     lookup = generate_lookup_for_shorten_url(shorten_url_file)
 
     stable_user_email_hash = hashlib.sha256(
@@ -650,7 +655,7 @@ def add_url_to_shortened_list(
     return lookup
 
 
-def get_url_from_shortened_list(lookup: str) -> Tuple[str, str]:
+def get_url_from_shortened_list(lookup: str) -> Tuple[str, Optional[str]]:
     """
     Given the `lookup`, what is the URL?
 
@@ -679,7 +684,7 @@ def get_url_from_shortened_list(lookup: str) -> Tuple[str, str]:
 
 def send_email_with_msmtp(
     recipients: Union[str, List[str]], subject: str, body: str, from_address: str
-) -> Tuple[bool, str]:
+) -> bool:
     """
     Sends an email using the system's msmtp command.
 
@@ -763,9 +768,6 @@ def send_email_with_msmtp(
         logger.error("\n--- msmtp STDERR ---")
         logger.error(err.stderr.decode())
         return False
-
-    logger.info("[TRACE] end " + trace_id)
-    return
 
 
 def check_whether_inference_rule_exists(
