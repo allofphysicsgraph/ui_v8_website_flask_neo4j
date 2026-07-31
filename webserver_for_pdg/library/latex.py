@@ -1268,20 +1268,17 @@ def create_step_graphviz_png(
 
     """
     trace_id = trace_id_var.get()
-    # logger.info("[TRACE] start " + trace_id + " " + str(time.time()))
-
-    dot_filename = destination_folder + "graphviz.dot"
-    compute.remove_file_debris([destination_folder], ["graphviz"], ["dot"])
-
+    # Use a per-call unique basename (rather than the fixed 'graphviz' name) so that
+    # concurrent calls to this function never read/write/delete each other's
+    # in-flight .dot/.png working files.
+    unique_basename = "graphviz_" + step_dict["id"] + "_" + uuid.uuid4().hex
+    dot_filename = destination_folder + unique_basename + ".dot"
+    compute.remove_file_debris([destination_folder], [unique_basename], ["dot"])
     with open(dot_filename, "w") as file_handle:
         file_handle.write("digraph physicsDerivation { \n")
         file_handle.write("overlap = false;\n")
         file_handle.write(
-            'label="step '
-            + step_dict["id"]
-            # + " in "
-            # + dat["derivations"][derivation_id]["name"]
-            + '\nhttps://allofphysics.com";\n'
+            'label="step ' + step_dict["id"] + '\nhttps://allofphysics.com";\n'
         )
         file_handle.write("fontsize=12;\n")
 
@@ -1301,31 +1298,36 @@ def create_step_graphviz_png(
     #       logger.debug(file_handle.read())
 
     output_filename = step_dict["id"] + ".png"
-    # logger.debug("output_filename = %s", output_filename)
-    logger.info("output_filename = " + output_filename)
-    compute.remove_file_debris([destination_folder], ["graphviz"], ["png"])
-
     # neato -Tpng graphviz.dot > /code/static/graphviz.png
     #    process = Popen(['neato','-Tpng','graphviz.dot','>','/code/static/graphviz.png'], stdout=PIPE, stderr=PIPE)
-    if not os.path.exists(destination_folder + output_filename):
-        process = subprocess.run(
-            ["neato", "-Tpng", dot_filename, "-o" + output_filename],
-            stdout=PIPE,
-            stderr=PIPE,
-            timeout=proc_timeout,
-        )
-        neato_stdout = process.stdout.decode("utf-8")
-        if len(neato_stdout) > 0:
-            # logger.debug(neato_stdout)
-            logger.info(neato_stdout)
-        neato_stderr = process.stderr.decode("utf-8")
-        if len(neato_stderr) > 0:
-            # logger.debug(neato_stderr)
-            logger.info(neato_stdout)
-
-        shutil.move(output_filename, destination_folder + output_filename)
-    # return True, "no invalid latex", output_filename
-    # logger.info("[TRACE] end " + trace_id + " " + str(time.time()))
+    logger.info("output_filename = " + output_filename)
+    tmp_output_filename = unique_basename + ".png"
+    compute.remove_file_debris([destination_folder], [unique_basename], ["png"])
+    try:
+        if not os.path.exists(destination_folder + output_filename):
+            process = subprocess.run(
+                ["neato", "-Tpng", dot_filename, "-o" + tmp_output_filename],
+                stdout=PIPE,
+                stderr=PIPE,
+                timeout=proc_timeout,
+            )
+            neato_stdout = process.stdout.decode("utf-8")
+            if len(neato_stdout) > 0:
+                logger.info(neato_stdout)
+            neato_stderr = process.stderr.decode("utf-8")
+            if len(neato_stderr) > 0:
+                logger.info(neato_stdout)
+            if os.path.exists(destination_folder + output_filename):
+                # A concurrent call for the same step already produced the final
+                # file while we were rendering ours; discard our copy instead of
+                # clobbering theirs.
+                compute.remove_file_debris(["."], [unique_basename], ["png"])
+            else:
+                shutil.move(tmp_output_filename, destination_folder + output_filename)
+    finally:
+        # Clean up this call's own temporary .dot working file, scoped to its
+        # unique basename so we never touch another concurrent call's files.
+        compute.remove_file_debris([destination_folder], [unique_basename], ["dot"])
     return output_filename
 
 

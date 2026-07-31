@@ -7,6 +7,8 @@ python3 ../introspection/remove_comments.py ../test_web_interface/playwrightbase
 python3 ../introspection/remove_comments.py ../webserver_for_pdg/library/compute.py > compute.py
 python3 ../introspection/remove_comments.py ../test_python/test_compute.py > test_compute.py
 
+python3 ../introspection/remove_comments.py ../webserver_for_pdg/library/latex.py > latex.py
+
 python3 ../introspection/remove_comments.py ../webserver_for_pdg/library/neo4j_query.py > neo4j_query.py
 
 python3 ../introspection/remove_comments.py ../webserver_for_pdg/library/sympy_validate_expression.py > sympy_validate_expression.py

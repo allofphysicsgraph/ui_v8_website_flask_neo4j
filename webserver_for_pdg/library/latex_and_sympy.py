@@ -259,7 +259,9 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str) -> str:
         )
 
     graphviz_of_AST_for_expr = sympy.printing.dot.dotprint(expr)
-    dot_filename = "tmp.dot"
+    # Use a per-request UUID-based filename so concurrent calls to this function
+    # never read/write the same .dot file on disk.
+    dot_filename = "tmp_" + uuid.uuid4().hex + ".dot"
     with open(dot_filename, "w") as fil:
         fil.write(graphviz_of_AST_for_expr)
 
@@ -281,12 +283,19 @@ def create_AST_png_for_latex(sympy_expr: str, output_filename: str) -> str:
     neato_stderr = process.stderr.decode("utf-8")
     if len(neato_stderr) > 0:
         logger.debug("neato_stderr = " + str(neato_stderr))
-
+    if process.returncode != 0:
+        logger.error(
+            "dot command failed (returncode="
+            + str(process.returncode)
+            + ") for "
+            + dot_filename
+            + "; leaving file in place for debugging"
+        )
+        return "Error: dot command failed to render AST PNG; stderr=" + neato_stderr
     shutil.move(
         output_filename_with_extension, "/code/static/" + output_filename_with_extension
     )
-
-    # logger.info("[TRACE] end " + trace_id)
+    os.remove(dot_filename)
     return ""
 
 
