@@ -1,0 +1,65 @@
+digraph G {
+
+rankdir=LR;
+
+create_derivation_tex [label="create derivation.tex\nstage 1; LLM" shape="rectangle"]
+create_derivation_tex -> create_symbols_json
+create_symbols_json [label="create symbols.json\nwith local ID\nstage 2; LLM" shape="rectangle"]
+
+compare_to_symbols_in_PDG [label="compare to symbols in PDG\nstage 3; API" shape="rectangle"]
+create_symbols_json -> compare_to_symbols_in_PDG [label="for each symbol" shape="rectangle"]
+
+if_symbol_in_PDG_update_temp_ID [label="if symbol in PDG update temp ID" shape="rectangle"]
+compare_to_symbols_in_PDG -> if_symbol_in_PDG_update_temp_ID
+if_symbol_in_PDG_update_temp_ID -> create_symbols_json [label="update ID"]
+
+if_symbol_not_in_PDG_create_ID [label="if symbol not in PDG create ID" shape="rectangle"]
+compare_to_symbols_in_PDG -> if_symbol_not_in_PDG_create_ID
+if_symbol_not_in_PDG_create_ID -> create_symbols_json [label="update ID"]
+
+create_operations_json [label="create operations.json\nwith local ID\nstage 5; LLM" shape="rectangle"]
+create_derivation_tex -> create_operations_json
+
+compare_to_operations_in_PDG [label="compare to operations in PDG\nstage 6; API" shape="rectangle"]
+create_operations_json -> compare_to_operations_in_PDG [label="for each operation"]
+
+if_operation_in_PDG_update_temp_ID [label="if oper in PDG update temp ID" shape="rectangle"]
+compare_to_operations_in_PDG -> if_operation_in_PDG_update_temp_ID
+if_operation_in_PDG_update_temp_ID -> create_operations_json [label="update ID"]
+
+if_operation_not_in_PDG_create_ID [label="if oper not in PDG create ID" shape="rectangle"]
+compare_to_operations_in_PDG -> if_operation_not_in_PDG_create_ID
+if_operation_not_in_PDG_create_ID -> create_operations_json [label="update ID"]
+
+create_expressions_json [label="create expressions.json\nwith local ID\nstage 8; LLM" shape="rectangle"]
+create_derivation_tex -> create_expressions_json
+
+compare_to_expressions_in_PDG [label="compare to expressions in PDG\nstage 9; API" shape="rectangle"]
+create_expressions_json -> compare_to_expressions_in_PDG [label="for each expression"]
+
+if_expression_in_PDG_update_temp_ID [label="if expression in PDG update temp ID" shape="rectangle"]
+compare_to_expressions_in_PDG -> if_expression_in_PDG_update_temp_ID
+if_expression_in_PDG_update_temp_ID -> create_expressions_json [label="update ID"]
+
+if_expression_not_in_PDG_create_ID [label="if expression not in PDG create ID" shape="rectangle"]
+compare_to_expressions_in_PDG -> if_expression_not_in_PDG_create_ID
+if_expression_not_in_PDG_create_ID -> create_expressions_json [label="update ID"]
+
+create_steps_json [label="create steps.json\nwith local ID\nstage 12; LLM" shape="rectangle"]
+create_derivation_tex -> create_steps_json
+
+compare_to_infrule_in_PDG [label="compare to inference rule in PDG\nstage 13; API" shape="rectangle"]
+create_steps_json -> compare_to_infrule_in_PDG [label="for each step"]
+
+if_infrule_in_PDG [label="if infrule in PDG" shape="rectangle"]
+compare_to_infrule_in_PDG -> if_infrule_in_PDG
+if_infrule_in_PDG -> create_steps_json
+
+if_infrule_not_in_PDG [label="if infrule not in PDG" shape="rectangle"]
+compare_to_infrule_in_PDG -> if_infrule_not_in_PDG
+if_infrule_not_in_PDG -> create_steps_json
+
+create_derivation [label="create derivation\nusing symbols.json,\nusing operations.json\nusing expressions.json\nusing steps.json\nstage 15; API" shape="rectangle"]
+create_derivation_tex -> create_derivation
+
+}
