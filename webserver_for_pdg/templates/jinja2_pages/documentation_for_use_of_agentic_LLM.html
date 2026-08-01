@@ -1,0 +1,36 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
+<a href="{{ url_for('to_navigation') }}?referrer=faq">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=faq">documentation overview</a> / 
+   Agentic LLM Documentation
+
+<H1>Agentic LLM Use of the Physics Derivation Graph</H1>
+
+<P>The Physics Derivation Graph does not have a local LLM nor does the project call remotely-hosted LLMs. 
+   Use of an LLM or agentic LLM is the responsibility of the user and is client-side.
+   The Physics Derivation Graph provides <a href="{{ url_for('to_api_documentation') }}?referrer=agentic_LLM_documentation">API documentation</a> intended to enable agents.
+
+<P>The workflow for a generic derivation is
+<img src="{{ url_for('static', filename='agentic_workflow.svg') }}">
+<!-- see static/agentic_workflow.dot -->
+
+<P>The order of the stages is due to the constraint that SYMBOLS.json and OPERATIONS.json have to be determined before EXPRESSIONS.json, and EXPRESSIONS.json have to be determined before STEPS.json.
+
+
+
+<P>Stage 1, creation of DERIVATION.tex: see <a href="{{ url_for('to_llm_workflow_documenation') }}#derivation as tex">prompt</a>
+
+<P>Stage 2, creation of SYMBOLS.json: see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to symbols">prompt</a>
+
+
+<P>Stage 5, creation of OPERATIONS.json: see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to operations">prompt</a>
+
+<P>Stage 8, creation of EXPRESSIONS.json: see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to expr">prompt</a>
+
+
+<P>Stage 12, creation of STEPS.json: see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to steps">prompt</a>
+
+{% endblock %}

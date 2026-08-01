@@ -3,9 +3,10 @@
 
 {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
 
+<a href="{{ url_for('to_navigation') }}">navigation</a> / documentation overview
+
 <h1>Documentation for the Physics Derivation Graph</h1>
 
-<P><a href="{{ url_for('to_navigation') }}">navigation</a> / documentation overview
 
 <H3>By audience</H3>
 <UL>
@@ -14,6 +15,7 @@
 <LI><a href="{{ url_for('to_researcher_documentation') }}?referrer=documentation_overview">researcher</a></LI>
 <LI><a href="{{ url_for('to_user_documentation') }}?referrer=documentation_overview">user</a> (concepts overview)</LI>
 <LI><a href="{{ url_for('to_developer_documentation') }}?referrer=documentation_overview">developer</a></LI>
+<LI><a href="{{ url_for('to_agentic_LLM_documentation') }}?referrer=documentation_overview">users of agentic LLMs</a></LI>
 <LI><a href="{{ url_for('to_blog_list') }}?referrer=documentation_overview">blog reader</a></LI>
 </UL>
 
