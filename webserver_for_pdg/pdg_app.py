@@ -378,7 +378,7 @@ def get_google_provider_cfg():
     """
     https://realpython.com/flask-google-login/
     """
-    logger.info("[TRACE] ")
+    # logger.info("[TRACE] ")
     url_json = requests.get(GOOGLE_DISCOVERY_URL).json()
     logger.debug(url_json)
     return url_json
@@ -390,7 +390,7 @@ def unauthorized():
     https://flask-login.readthedocs.io/en/latest/
     >>>
     """
-    logger.info("[TRACE]")
+    # logger.info("[TRACE]")
     # return redirect(url_for("to_login", referrer="unauthorized"))
     # Tell Flask-Login to append the originally requested page to the login URL as a next query parameter.
     return redirect(url_for("to_login", next=request.url))
@@ -403,7 +403,7 @@ def load_user(user_id):
     also https://realpython.com/using-flask-login-for-user-management-with-flask/
     https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
     """
-    logger.info("[TRACE]")
+    # logger.info("[TRACE]")
     logger.debug(user_id)
     # return USERS.get(int(user_id))
 
@@ -417,7 +417,7 @@ def to_login():
     """
     https://realpython.com/flask-google-login/
     """
-    logger.info("[TRACE]")
+    # logger.info("[TRACE]")
 
     next_url = request.args.get("next")
     if next_url:
@@ -559,7 +559,7 @@ def to_logout():
     https://flask-login.readthedocs.io/en/latest/#login-example
     >>>
     """
-    logger.info("[TRACE] pdg_login/to_logout")
+    # logger.info("[TRACE] pdg_login/to_logout")
     #        flash("username not available")
     logout_user()
     return redirect(url_for("to_index", referrer="logout"))
@@ -1280,7 +1280,7 @@ def before_request():
     """
     g.start = time.time()
     g.request_start_time = time.time()
-    logger.info("[TRACE] created elapsed_time function")
+    # logger.info("[TRACE] created elapsed_time function")
     elapsed_time = lambda: round(time.time() - g.request_start_time, 3)
     g.request_time = elapsed_time
     return
@@ -1294,7 +1294,7 @@ def to_index():
     placeholder for landing page that provides context before user goes to_navigation
     """
     trace_id = trace_id_var.get()
-    # logger.info("[TRACE] start " + trace_id)
+    canonical_url = url_for("to_index").lstrip("/")
 
     query_time_dict = {}  # type: query_timing_result_type
     T_and_f_derivation_ID: unique_numeric_id_as_str = "0000884319"
@@ -1314,7 +1314,11 @@ def to_index():
         d3js_json_filename = ""
 
     # logger.info("[TRACE] end " + trace_id)
-    return render_template("jinja2_pages/index.html", json_for_d3js=d3js_json_filename)
+    return render_template(
+        "jinja2_pages/index.html",
+        json_for_d3js=d3js_json_filename,
+        canonical_url=canonical_url,
+    )
 
 
 #    return redirect(url_for("to_navigation"))
@@ -1340,7 +1344,7 @@ def to_navigation():
     >>> to_navigation()
     """
     trace_id = trace_id_var.get()
-    logger.info("[TRACE] main start " + trace_id)
+    canonical_url = url_for("to_navigation").lstrip("/")
     query_time_dict = {}  # type: query_timing_result_type
 
     logger.info("Is user anonymous?")
@@ -1362,7 +1366,7 @@ def to_navigation():
         if "file" not in request.files:
             error_message_for_user = "ERROR: file not in request files"
             logger.error("file not in request files")
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(request.url)
         file_obj = request.files["file"]
 
@@ -1372,12 +1376,12 @@ def to_navigation():
         if file_obj.filename == "":
             error_message_for_user = "WARN: no selected file"
             logger.info("to_navigation: WARN: no selected file")
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(request.url)
         if "upload_cypher" in request.form.keys():
             allowed_bool = True
         else:
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             raise Exception("unrecognized button")
 
         if file_obj and allowed_bool:
@@ -1512,13 +1516,11 @@ def to_navigation():
             neo4j_query.get_count_nodes_of_type, "feed"
         )
 
-    # logger.info("[TRACE] end " + trace_id)
-
     # TODO: leverage content from navigation_OLD.html
     return render_template(
         "jinja2_pages/navigation.html",
         title="site map",
-        canonical_URL="navigation",
+        canonical_url=canonical_url,
         query_time_dict=query_time_dict,
         number_of_derivations=number_of_derivations,
         number_of_inference_rules=number_of_inference_rules,
@@ -1544,7 +1546,7 @@ def to_add_derivation() -> ResponseReturnValue:
     http://localhost:5000/new_derivation?derivation_name=asdf123&derivation_abstract=4924858miminginasf
     """
     trace_id = trace_id_var.get()
-    # logger.info("[TRACE] start " + trace_id)
+    canonical_url = url_for("to_add_derivation").lstrip("/")
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_new_derivation = SpecifyNewDerivationForm()
@@ -1618,7 +1620,7 @@ def to_add_derivation() -> ResponseReturnValue:
                 #         "pdg_app/to_add_expression: Input must be ASCII only: "
                 #         + str(derivation_reference_latex)
                 #     )
-                #     logger.info("[TRACE] end " + trace_id)
+                #     # logger.info("[TRACE] end " + trace_id)
                 #     return redirect(url_for("to_add_expression"))
 
                 # this preserves the LaTeX backslashes exactly as the user typed them.
@@ -1696,7 +1698,7 @@ def to_add_derivation() -> ResponseReturnValue:
                         + derivation_name_latex
                     )
                     return redirect(url_for("to_add_derivation"))
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return redirect(
                     url_for(
                         "to_add_step_select_inference_rule", derivation_id=derivation_id
@@ -1718,6 +1720,7 @@ def to_add_derivation() -> ResponseReturnValue:
     return render_template(
         "jinja2_pages/user_workflow/derivation_create.html",
         title="Create Derivation",
+        canonical_url=canonical_url,
         query_time_dict=query_time_dict,
         form=web_form_new_derivation,
         list_of_derivations=list_of_derivations,
@@ -1742,7 +1745,9 @@ def to_review_derivation(
     >>> to_review_derivation()
     """
     trace_id = trace_id_var.get()
-    # logger.info("[TRACE] start " + trace_id)
+    #    canonical_url = "review_derivation/" + str(derivation_id)
+    canonical_url = url_for("to_review_derivation").lstrip("/") + str(derivation_id)
+
     query_time_dict = {}  # type: query_timing_result_type
 
     web_form_delete = NoOptionsForm()
@@ -1798,7 +1803,7 @@ def to_review_derivation(
                 logger.error(str(type(err).__name__) + ": " + str(err))
                 pdf_filename = "error.pdf"
 
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(
                 url_for(
                     "static",
@@ -1829,10 +1834,10 @@ def to_review_derivation(
                     + str(err)
                 )
                 logger.error(str(type(err).__name__) + ": " + str(err))
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("select_from_existing_derivations"))
 
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(
                 url_for(
                     "static",
@@ -1868,7 +1873,7 @@ def to_review_derivation(
                     neo4j_query.delete_node, derivation_id, "derivation"
                 )
 
-            logger.info("[TRACE]  end " + trace_id)
+            # logger.info("[TRACE]  end " + trace_id)
             return redirect(url_for("to_list_derivations"))
         else:
             flash(
@@ -1940,12 +1945,11 @@ def to_review_derivation(
             )
             logger.error(str(type(err).__name__) + ": " + str(err))
 
-    canonical_URL = "review_derivation/" + str(derivation_id)
     # logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/derivation_review.html",
         title="Review Derivation",
-        canonical_URL=canonical_URL,
+        canonical_url=canonical_url,
         query_time_dict=query_time_dict,
         derivation_dict=derivation_dict,
         symbols_in_derivation=symbols_in_derivation,
@@ -2113,7 +2117,7 @@ def to_edit_derivation_metadata(
                             derivation_name_latex,
                         )
 
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return redirect(
                     url_for("to_review_derivation", derivation_id=derivation_id)
                 )
@@ -2647,7 +2651,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
                 + " does not exist in database"
             )
             logger.info("Feed ID " + str(feed_id) + " does not exist in database")
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_list_feeds"))
 
         # editing the feed includes modifying the symbols present.
@@ -2704,7 +2708,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
                     "feed",
                 )
 
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_list_feeds"))
         elif "add symbol" in request.form.keys():
 
@@ -2722,7 +2726,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
                     feed_id,
                 )
 
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_edit_feed", feed_id=feed_id))
         elif "remove symbol" in request.form.keys():
 
@@ -2746,7 +2750,7 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
                     feed_id,
                 )
 
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_edit_feed", feed_id=feed_id))
         elif "edit" in request.form.keys():
 
@@ -2801,12 +2805,12 @@ def to_edit_feed(feed_id: unique_numeric_id_as_str) -> ResponseReturnValue:
                 flash("pdg_app/to_edit_feed: " + str(web_form_edit_feed.errors))
                 logger.error(str(web_form_edit_feed.errors))
 
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_edit_feed", feed_id=feed_id))
 
         else:
             flash("unrecognized form POSTed: " + str(request.form))
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_edit_feed", feed_id=feed_id))
 
     # sympy_as_latex_per_feed_id = compute.get_sympy_as_latex_per_feed_id(list_of_feeds)
@@ -2926,7 +2930,7 @@ def to_add_expression() -> ResponseReturnValue:
                 #         "pdg_app/to_add_expression: Input must be ASCII only: "
                 #         + str(expression_latex_rhs)
                 #     )
-                #     logger.info("[TRACE] end " + trace_id)
+                #     # logger.info("[TRACE] end " + trace_id)
                 #     return redirect(url_for("to_add_expression"))
 
                 expression_latex_condition = str(
@@ -2941,7 +2945,7 @@ def to_add_expression() -> ResponseReturnValue:
                 #         "pdg_app/to_add_expression: Input must be ASCII only: "
                 #         + str(expression_latex_condition)
                 #     )
-                #     logger.info("[TRACE] end " + trace_id)
+                #     # logger.info("[TRACE] end " + trace_id)
                 #     return redirect(url_for("to_add_expression"))
 
                 expression_name_latex = str(
@@ -2955,7 +2959,7 @@ def to_add_expression() -> ResponseReturnValue:
                 #         "pdg_app/to_add_expression: Input must be ASCII only: "
                 #         + str(expression_name_latex)
                 #     )
-                #     logger.info("[TRACE] end " + trace_id)
+                #     # logger.info("[TRACE] end " + trace_id)
                 #     return redirect(url_for("to_add_expression"))
 
                 expression_reference_latex = str(
@@ -2970,7 +2974,7 @@ def to_add_expression() -> ResponseReturnValue:
                 #         "pdg_app/to_add_expression: Input must be ASCII only: "
                 #         + str(expression_reference_latex)
                 #     )
-                #     logger.info("[TRACE] end " + trace_id)
+                #     # logger.info("[TRACE] end " + trace_id)
                 #     return redirect(url_for("to_add_expression"))
 
                 expression_description_latex = str(
@@ -2985,7 +2989,7 @@ def to_add_expression() -> ResponseReturnValue:
                 #         "pdg_app/to_add_expression: Input must be ASCII only: "
                 #         + str(expression_description_latex)
                 #     )
-                #     logger.info("[TRACE] end " + trace_id)
+                #     # logger.info("[TRACE] end " + trace_id)
                 #     return redirect(url_for("to_add_expression"))
 
                 logger.info("expression_latex_lhs:" + str(expression_latex_lhs))
@@ -3034,7 +3038,7 @@ def to_add_expression() -> ResponseReturnValue:
                         + expression_latex_rhs
                     )
                     return redirect(url_for("to_add_expression"))
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return redirect(
                     url_for(
                         "to_add_symbols_and_operations_for_expression",
@@ -3125,7 +3129,7 @@ def to_add_feed() -> ResponseReturnValue:
                     lambda new_id: (new_id, feed_latex, now_str, author_name_latex),
                     trace_label="add_feed",
                 )
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 if is_numeric:
                     return redirect(url_for("to_list_feeds"))
                 else:
@@ -3211,7 +3215,7 @@ def to_add_feed() -> ResponseReturnValue:
                 + str(request.form.keys())
             )
             logger.error(str(request.form.keys()))
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_add_feed"))
 
     # logger.info("[TRACE] end " + trace_id)
@@ -3249,7 +3253,7 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> ResponseReturnValue:
     logger.info("dict_of_symbol_id_and_type=" + str(dict_of_symbol_id_and_type))
 
     if dict_of_symbol_id_and_type[node_id] == "derivation":
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_review_derivation", derivation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "step":
         # which derivation is this step in?
@@ -3262,37 +3266,37 @@ def to_edit_node(node_id: unique_numeric_id_as_str) -> ResponseReturnValue:
                 neo4j_query.get_derivation_id_from_step_id, node_id
             )
 
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(
             url_for("to_edit_step", derivation_id=derivation_id, step_id=node_id)
         )
     elif dict_of_symbol_id_and_type[node_id] == "inference_rule":
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_inference_rule", inference_rule_id=node_id))
 
     elif dict_of_symbol_id_and_type[node_id] == "expression":
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_expression", expression_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "feed":
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_feed", feed_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "operation":
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_operation", operation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "relation":
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_relation", relation_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "scalar":
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_scalar", scalar_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "vector":
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_vector", vector_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "matrix":
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_edit_matrix", matrix_id=node_id))
     elif dict_of_symbol_id_and_type[node_id] == "value_with_units":
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(
             url_for("to_edit_constant_value_and_units", value_with_units_id=node_id)
         )
@@ -3636,7 +3640,7 @@ def to_edit_scalar(scalar_id: unique_numeric_id_as_str) -> ResponseReturnValue:
 
             # TODO: delete symbol
 
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_list_scalars"))
         else:
             flash("pdg_app/to_edit_scalar: unrecognized button")
@@ -3872,7 +3876,7 @@ def to_add_value_and_units(scalar_id: unique_numeric_id_as_str) -> ResponseRetur
                         trace_label="add_constant_value_with_units",
                     )
                 )
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("to_list_scalars"))
 
             else:
@@ -4258,7 +4262,7 @@ def to_add_symbol_matrix() -> ResponseReturnValue:
                     ),
                     trace_label="add_matrix_symbol",
                 )
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("to_list_matrices"))
 
             else:
@@ -4291,7 +4295,7 @@ def to_add_symbol() -> ResponseReturnValue:
     """
     return render_template(
         "jinja2_pages/user_workflow/symbol_create_pick_type.html",
-        canonical_URL="new_symbol",
+        canonical_url="new_symbol",
     )
 
 
@@ -4360,7 +4364,7 @@ def to_add_operation() -> ResponseReturnValue:
                     ),
                     trace_label="add_operation_symbol",
                 )
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("to_list_operations"))
             else:
                 flash("pdg_app/to_add_operation: " + str(web_form_add_operation.errors))
@@ -4458,7 +4462,7 @@ def to_add_relation() -> ResponseReturnValue:
                     ),
                     trace_label="add_relation_symbol",
                 )
-                logger.info("[trace] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("to_list_relations"))
 
             else:
@@ -4501,6 +4505,7 @@ def to_add_relation() -> ResponseReturnValue:
 @web_app.route(
     "/new_step_expressions/<derivation_id>/<inference_rule_id>", methods=["GET", "POST"]
 )
+@trace_execution
 def to_add_step_select_expressions(
     derivation_id: unique_numeric_id_as_str, inference_rule_id: unique_numeric_id_as_str
 ) -> ResponseReturnValue:
@@ -4694,7 +4699,7 @@ def to_add_step_select_expressions(
 
     logger.info("inference_rule_dict is " + str(inference_rule_dict))
 
-    canonical_URL = (
+    canonical_url = (
         "new_step_expressions/" + str(derivation_id) + "/" + str(inference_rule_id)
     )
     # first visit to this page
@@ -4702,7 +4707,7 @@ def to_add_step_select_expressions(
     return render_template(
         "jinja2_pages/user_workflow/new_step_select_expressions_for_inference_rule.html",
         title="Add Step: Select Expressions",
-        canonical_URL=canonical_URL,
+        canonical_url=canonical_url,
         query_time_dict=query_time_dict,
         form_new_step=web_form_new_step,
         list_of_expression_IDs=list_of_expression_IDs,
@@ -4718,6 +4723,7 @@ def to_add_step_select_expressions(
     "/symbols_and_operations_for_expression/<expression_id>",
     methods=["GET", "POST"],
 )
+@trace_execution
 def to_add_symbols_and_operations_for_expression(
     expression_id: unique_numeric_id_as_str,
 ) -> ResponseReturnValue:
@@ -4803,7 +4809,7 @@ def to_add_symbols_and_operations_for_expression(
                     )
 
         if next_page_enter_SymPy_and_Lean:
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(
                 url_for(
                     "to_add_sympy_and_lean_for_expression",
@@ -4811,7 +4817,7 @@ def to_add_symbols_and_operations_for_expression(
                 )
             )
         else:
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(url_for("to_list_expressions", _anchor=f"{expression_id}"))
 
     # get the Latex for this expression_id
@@ -4843,12 +4849,12 @@ def to_add_symbols_and_operations_for_expression(
         )
     )
 
-    canonical_URL = "symbols_and_operations_for_expression/" + str(expression_id)
+    canonical_url = "symbols_and_operations_for_expression/" + str(expression_id)
     # logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/expression_create_symbols_and_operations.html",
         title="Create Expression: Add Symbols",
-        canonical_URL=canonical_URL,
+        canonical_url=canonical_url,
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
         expression_dict=expression_dict,
@@ -4861,6 +4867,7 @@ def to_add_symbols_and_operations_for_expression(
     "/sympy_and_lean_for_expression/<expression_id>",
     methods=["GET", "POST"],
 )
+@trace_execution
 def to_add_sympy_and_lean_for_expression(
     expression_id: unique_numeric_id_as_str,
 ) -> ResponseReturnValue:
@@ -4945,7 +4952,7 @@ def to_add_sympy_and_lean_for_expression(
                 )
             )
 
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_list_expressions"))
 
     with get_graphdb_driver().session() as session, track_time(
@@ -4975,11 +4982,11 @@ def to_add_sympy_and_lean_for_expression(
 
     symbol_id_dict = {"latex symbol": "symbol ID"}
 
-    canonical_URL = "sympy_and_lean_for_expression/" + str(expression_id)
+    canonical_url = "sympy_and_lean_for_expression/" + str(expression_id)
     return render_template(
         "jinja2_pages/user_workflow/expression_create_sympy_and_lean.html",
         title="Create SymPy and Lean for new expression",
-        canonical_URL=canonical_URL,
+        canonical_url=canonical_url,
         query_time_dict=query_time_dict,
         # sympy_expr_lhs=sympy_expr_lhs,
         # sympy_expr_rhs=sympy_expr_rhs,
@@ -4995,6 +5002,7 @@ def to_add_sympy_and_lean_for_expression(
     "/symbols_and_operations_for_feed/<feed_id>",
     methods=["GET", "POST"],
 )
+@trace_execution
 def to_add_symbols_and_operations_for_feed(
     feed_id: unique_numeric_id_as_str,
 ) -> ResponseReturnValue:
@@ -5154,7 +5162,7 @@ def to_add_symbols_and_operations_for_feed(
                         feed_id,
                     )
 
-        logger.info("[trace] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(
             url_for(
                 "to_add_sympy_and_lean_for_feed",
@@ -5164,11 +5172,11 @@ def to_add_symbols_and_operations_for_feed(
 
     # logger.info("[TRACE] end " + trace_id)
 
-    canonical_URL = "symbols_and_operations_for_feed/" + str(feed_id)
+    canonical_url = "symbols_and_operations_for_feed/" + str(feed_id)
     return render_template(
         "jinja2_pages/user_workflow/feed_create_symbols_and_operations.html",
         title="Create Feed: Add Symbols",
-        canonical_URL=canonical_URL,
+        canonical_url=canonical_url,
         query_time_dict=query_time_dict,
         form_no_options=web_form_no_options,
         form_new_feed=web_form_new_feed,
@@ -5183,6 +5191,7 @@ def to_add_symbols_and_operations_for_feed(
     "/sympy_and_latex_for_feed/<feed_id>",
     methods=["GET", "POST"],
 )
+@trace_execution
 def to_add_sympy_and_lean_for_feed(
     feed_id: unique_numeric_id_as_str,
 ) -> ResponseReturnValue:
@@ -5276,7 +5285,7 @@ def to_add_sympy_and_lean_for_feed(
         except neo4j.exceptions.CypherSyntaxError as err:
             flash("pdg_app/to_add_sympy_and_lean_for_feed ERROR:" + str(err))
             logger.error(str(err))
-            logger.info("[TRACE] end " + trace_id)
+            # logger.info("[TRACE] end " + trace_id)
             return redirect(
                 url_for(
                     "to_add_symbols_and_operations_for_feed",
@@ -5284,7 +5293,7 @@ def to_add_sympy_and_lean_for_feed(
                 )
             )
 
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return redirect(url_for("to_list_feeds"))
 
     web_form_new_feed_sympy.sympy_str.data = revised_feed_with_str
@@ -5446,7 +5455,7 @@ def to_add_inference_rule() -> ResponseReturnValue:
                         + inference_rule_name
                     )
                     return redirect(url_for("to_add_inference_rule"))
-                logger.info("[TRACE] end " + trace_id)
+                # logger.info("[TRACE] end " + trace_id)
                 return redirect(url_for("to_list_inference_rules"))
             else:
                 flash(
@@ -5917,7 +5926,7 @@ def to_edit_inference_rule(
                             "pdg_app/to_edit_inference_rule INVALID INPUT: inference rule with that name already exists"
                         )
 
-                        logger.info("[TRACE] end " + trace_id)
+                        # logger.info("[TRACE] end " + trace_id)
                         return redirect(
                             url_for(
                                 "to_edit_inference_rule",
@@ -5933,7 +5942,7 @@ def to_edit_inference_rule(
                             "pdg_app/to_edit_inference_ruleINVALID INPUT: inference rule with that latex already exists"
                         )
 
-                        logger.info("[TRACE] end " + trace_id)
+                        # logger.info("[TRACE] end " + trace_id)
                         return redirect(
                             url_for(
                                 "to_edit_inference_rule",
@@ -6802,7 +6811,7 @@ def to_list_derivations() -> ResponseReturnValue:
     #     # TODO: this derivation_id should come from request.form; I just don't know the field yet
     #     derivation_id = "5389624"
     #
-    #     logger.info("[TRACE] end " + trace_id)
+    #     # logger.info("[TRACE] end " + trace_id)
     #     return redirect(url_for(to_review_derivation, derivation_id))
 
     # https://neo4j.com/docs/python-manual/current/session-api/
@@ -6838,6 +6847,7 @@ def to_list_derivations() -> ResponseReturnValue:
 
 
 @web_app.route("/list_inference_rules")
+@trace_execution
 def to_list_inference_rules() -> ResponseReturnValue:
     trace_id = trace_id_var.get()
     # logger.info("[TRACE] start " + trace_id)
@@ -6904,6 +6914,7 @@ def to_delete_graph_content() -> ResponseReturnValue:
 
 
 @web_app.route("/export_to_json")
+@trace_execution
 def to_export_json() -> ResponseReturnValue:
     """
     Produces JSON Lines (.jsonl) rather than JSON (JavaScript Object Notation)
@@ -6934,6 +6945,7 @@ def to_export_json() -> ResponseReturnValue:
 
 
 @web_app.route("/export_metadata_schema")
+@trace_execution
 def to_export_metadata_schema():
     """ """
     trace_id = trace_id_var.get()
@@ -6968,6 +6980,7 @@ def to_export_metadata_schema():
 
 
 @web_app.route("/export_to_csv")
+@trace_execution
 def to_export_csv() -> ResponseReturnValue:
     """ """
     trace_id = trace_id_var.get()
@@ -6987,6 +7000,7 @@ def to_export_csv() -> ResponseReturnValue:
 
 
 @web_app.route("/export_to_graphml")
+@trace_execution
 def to_export_graphml() -> ResponseReturnValue:
     """ """
     trace_id = trace_id_var.get()
@@ -7006,6 +7020,7 @@ def to_export_graphml() -> ResponseReturnValue:
 
 
 @web_app.route("/export_to_cypher")
+@trace_execution
 def to_export_cypher() -> ResponseReturnValue:
     """
 
@@ -7041,6 +7056,7 @@ def to_export_cypher() -> ResponseReturnValue:
 
 
 @web_app.route("/api_json_to_console")
+@trace_execution
 def to_api_json_console() -> ResponseReturnValue:
     """
     HTML page created with help from Google's Gemini 2.0 LLM (free!) 2025-01-xx
@@ -7049,6 +7065,7 @@ def to_api_json_console() -> ResponseReturnValue:
 
 
 @web_app.route("/api_json_to_page")
+@trace_execution
 def to_api_json_page() -> ResponseReturnValue:
     """
     HTML page created with help from Google's Gemini 2.0 LLM (free!) 2025-01-xx
@@ -7057,6 +7074,7 @@ def to_api_json_page() -> ResponseReturnValue:
 
 
 @web_app.route("/api_display_png")
+@trace_execution
 def to_api_display_png() -> ResponseReturnValue:
     """
     HTML page created with help from Google's Gemini 2.0 LLM (free!) 2025-01-xx
@@ -7065,6 +7083,7 @@ def to_api_display_png() -> ResponseReturnValue:
 
 
 @web_app.route("/api_png_dynamic")
+@trace_execution
 def to_api_png_dynamic() -> ResponseReturnValue:
     """
     HTML page created with help from Google's Gemini 2.0 LLM (free!) 2025-01-xx
@@ -7073,6 +7092,7 @@ def to_api_png_dynamic() -> ResponseReturnValue:
 
 
 @web_app.route("/api_png_dynamic_multiple")
+@trace_execution
 def to_api_png_dynamic_multiple_input() -> ResponseReturnValue:
     """
     HTML page created with help from Google's Gemini 2.0 LLM (free!) 2025-01-xx
@@ -7085,16 +7105,22 @@ def to_api_png_dynamic_multiple_input() -> ResponseReturnValue:
 
 @web_app.route("/api_documentation")
 @web_app.route("/documentation/api")
+@trace_execution
 def to_api_documentation() -> ResponseReturnValue:
     """
     HTML page generated by Google's Gemini 2.0 LLM (free!) 2025-01-xx
     """
+    canonical_url = url_for("to_api_documentation").lstrip("/")
+
     return render_template(
-        "jinja2_pages/documentation_of_api.html", title="API Documentation"
+        "jinja2_pages/documentation_of_api.html",
+        title="API Documentation",
+        canonical_url=canonical_url,
     )
 
 
 @web_app.route("/workflow_documentation")
+@trace_execution
 def to_workflow_documenation() -> ResponseReturnValue:
     """
     HTML page that was initially generated by Google's Gemini 2.0 LLM (free!) 2025-01-xx
@@ -7104,15 +7130,20 @@ def to_workflow_documenation() -> ResponseReturnValue:
     $ cat pdg_app.py | grep "^@web_app\.route\|^def" -A1 > routes_and_defs.log
     ```
     """
+    canonical_url = url_for("to_workflow_documenation").lstrip("/")
     return render_template(
         "jinja2_pages/documentation_of_webpage_routes.html",
         title="Webpage documentation",
+        canonical_url=canonical_url,
     )
 
 
 @web_app.route("/llm_workflow_documentation")
+@web_app.route("/documentation/llm_workflow")
+@trace_execution
 def to_llm_workflow_documenation() -> ResponseReturnValue:
     """ """
+    canonical_url = url_for("to_llm_workflow_documenation").lstrip("/")
 
     with open("static/schema_for_llm_symbols.json", "r") as file_handle:
         schema_for_llm_symbols = json.load(file_handle)
@@ -7171,6 +7202,7 @@ def to_llm_workflow_documenation() -> ResponseReturnValue:
 
     return render_template(
         "jinja2_pages/documentation_of_LLM_workflow.html",
+        canonical_url=canonical_url,
         schema_for_llm_symbols=pretty_schema_for_llm_symbols,
         schema_for_llm_symbol_matches=pretty_schema_for_llm_symbol_matches,
         schema_for_llm_symbol_missing=pretty_schema_for_llm_symbol_missing,
@@ -7188,6 +7220,7 @@ def to_llm_workflow_documenation() -> ResponseReturnValue:
 
 
 @web_app.route("/rss.xml")
+@trace_execution
 def to_rss():
     """
     TODO: also publish updates to derivations (not just blog posts)
@@ -7196,7 +7229,7 @@ def to_rss():
 
     See https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/43
     """
-    logger.info("[TRACE]")
+    # logger.info("[TRACE]")
 
     base_dir = Path("templates/blog_manual")
     list_of_files = base_dir.rglob("*.html")
@@ -7242,7 +7275,7 @@ def my_profile():
     https://github.com/allofphysicsgraph/task-tracker/issues/124
     """
     trace_id = trace_id_var.get()
-    # logger.info("[TRACE] start " + trace_id)
+    canonical_url = url_for("my_profile").lstrip("/")
     query_time_dict = {}  # type: query_timing_result_type
 
     author = current_user.email
@@ -7282,6 +7315,7 @@ def my_profile():
 
     return render_template(
         "jinja2_pages/profile.html",
+        canonical_url=canonical_url,
         user_name=author,
         user_hash=author_hash,
         number_of_contributions=number_of_contributions,
@@ -7402,8 +7436,11 @@ def static_dir():
 @trace_execution
 def to_evaluation_of_LLM_prompts():
     """ """
-    logger.info("[TRACE] to_evaluation_of_LLM_prompts")
-    return render_template("jinja2_pages/documentation_evaluation_of_LLM_prompts.html")
+    canonical_url = url_for("to_evaluation_of_LLM_prompts").lstrip("/")
+    return render_template(
+        "jinja2_pages/documentation_evaluation_of_LLM_prompts.html",
+        canonical_url=canonical_url,
+    )
 
 
 ###########################################################################
@@ -7422,8 +7459,25 @@ def to_documentation_overview():
     - API
     - workflow
     """
+    canonical_url = url_for("to_documentation_overview").lstrip("/")
     return render_template(
-        "jinja2_pages/documentation_overview.html", title="Overview of Documentation"
+        "jinja2_pages/documentation_overview.html",
+        title="Overview of Documentation",
+        canonical_url=canonical_url,
+    )
+
+
+@web_app.route("/documentation/agentic_LLMs", methods=["GET", "POST"])
+@trace_execution
+def to_agentic_LLM_documentation():
+    """
+    a static page with documentation on use of agentic LLMs
+    """
+    canonical_url = url_for("to_agentic_LLM_documentation").lstrip("/")
+    return render_template(
+        "jinja2_pages/documentation_for_use_of_agentic_LLM.html",
+        title="Documentation for Agentic LLMs",
+        canonical_url=canonical_url,
     )
 
 
@@ -7433,10 +7487,11 @@ def to_student_documentation():
     """
     a static page with documentation aimed at students
     """
-    logger.info("[TRACE] to_student_documentation ")
+    canonical_url = url_for("to_student_documentation").lstrip("/")
     return render_template(
         "jinja2_pages/documentation_for_student.html",
         title="Documentation for Students",
+        canonical_url=canonical_url,
     )
 
 
@@ -7446,10 +7501,11 @@ def to_instructor_documentation():
     """
     a static page with documentation aimed at instructors
     """
-    logger.info("[TRACE] to_instructor_documentation ")
+    canonical_url = url_for("to_instructor_documentation").lstrip("/")
     return render_template(
         "jinja2_pages/documentation_for_instructor.html",
         title="Documentation for instructors",
+        canonical_url=canonical_url,
     )
 
 
@@ -7459,10 +7515,11 @@ def to_researcher_documentation():
     """
     a static page with documentation aimed at researchers
     """
-    logger.info("[TRACE] to_researcher_documentation ")
+    canonical_url = url_for("to_researcher_documentation").lstrip("/")
     return render_template(
         "jinja2_pages/documentation_for_researcher.html",
         title="Documentation for researchers",
+        canonical_url=canonical_url,
     )
 
 
@@ -7473,12 +7530,12 @@ def to_researcher_documentation():
 def to_user_documentation():
     """
     a static page with documentation aimed at users (not developers)
-
-    >>> user_documentation()
     """
-    logger.info("[TRACE] to_user_documentation ")
+    canonical_url = url_for("to_user_documentation").lstrip("/")
     return render_template(
-        "jinja2_pages/documentation_for_user.html", title="User Documentation"
+        "jinja2_pages/documentation_for_user.html",
+        title="User Documentation",
+        canonical_url=canonical_url,
     )
 
 
@@ -7489,12 +7546,12 @@ def to_user_documentation():
 def to_developer_documentation():
     """
     a static page aimed at people interested in contributed code changes
-
-    >>> developer_documentation()
     """
-    logger.info("[TRACE] to_developer_documentation")
+    canonical_url = url_for("to_developer_documentation").lstrip("/")
     return render_template(
-        "jinja2_pages/documentation_for_developer.html", title="Developer Documentation"
+        "jinja2_pages/documentation_for_developer.html",
+        title="Developer Documentation",
+        canonical_url=canonical_url,
     )
 
 
@@ -7505,13 +7562,12 @@ def to_conventions_documentation():
     """
     a static page aimed at people interested in understanding
     design decisions
-
-    >>> to_conventions_documentation()
     """
-    logger.info("[TRACE] to_conventions_documentation")
+    canonical_url = url_for("to_conventions_documentation").lstrip("/")
     return render_template(
         "jinja2_pages/documentation_of_conventions.html",
         title="Conventions Documentation",
+        canonical_url=canonical_url,
     )
 
 
@@ -7522,13 +7578,12 @@ def to_design_documentation():
     """
     a static page aimed at people interested in understanding
     design decisions
-
-    >>> design_documentation()
     """
-    logger.info("[TRACE] to_design_documentation")
+    canonical_url = url_for("to_design_documentation").lstrip("/")
     return render_template(
         "jinja2_pages/documentation_of_design_choices.html",
         title="Design Decisions Documentation",
+        canonical_url=canonical_url,
     )
 
 
@@ -7536,9 +7591,11 @@ def to_design_documentation():
 @trace_execution
 def to_document_dimensionality():
     """ """
-    logger.info("[TRACE] ")
+    canonical_url = url_for("to_document_dimensionality").lstrip("/")
     return render_template(
-        "jinja2_pages/documentation_dimensionality.html", title="Dimensionality"
+        "jinja2_pages/documentation_dimensionality.html",
+        title="Dimensionality",
+        canonical_url=canonical_url,
     )
 
 
@@ -7546,7 +7603,6 @@ def to_document_dimensionality():
 @trace_execution
 def to_document_goals_roadmap():
     """ """
-    logger.info("[TRACE] ")
     return render_template(
         "jinja2_pages/documentation_goals_roadmap.html",
         title="Goals and Roadmap for Physics Derivation Graph",
@@ -7557,7 +7613,6 @@ def to_document_goals_roadmap():
 @trace_execution
 def to_document_hilbert_sixth():
     """ """
-    logger.info("[TRACE] ")
     return render_template(
         "jinja2_pages/documentation_hilberts_sixth_problem.html",
         title="Hilbert's Sixth Problem and the Physics Derivation Graph",
@@ -7570,12 +7625,12 @@ def to_document_hilbert_sixth():
 def to_faq():
     """
     "frequently asked questions" is a static page
-
-    >>> faq()
     """
-    logger.info("[TRACE] ")
+    canonical_url = url_for("to_faq").lstrip("/")
     return render_template(
-        "jinja2_pages/documentation_faq.html", title="Frequently Asked Questions"
+        "jinja2_pages/documentation_faq.html",
+        title="Frequently Asked Questions",
+        canonical_url=canonical_url,
     )
 
 
@@ -7585,12 +7640,12 @@ def to_faq():
 def to_other_projects():
     """
     "other projects" is a static page
-
-    >>> other_projects()
     """
-    logger.info("[TRACE] ")
+    canonical_url = url_for("to_other_projects").lstrip("/")
     return render_template(
-        "jinja2_pages/documentation_other_projects.html", title="Other projects"
+        "jinja2_pages/documentation_other_projects.html",
+        title="Other projects",
+        canonical_url=canonical_url,
     )
 
 
@@ -7601,8 +7656,6 @@ def to_shorten():
     """
     user provides a URL to be shortened and gets back a lookup for the shortened URL
     """
-    logger.info("[TRACE] ")
-
     if not request.args:
         return (
             "<H1>Shorten a URL</H1>\n"
@@ -7635,8 +7688,6 @@ def to_expand(lookup: str):
     """
     take the shortened URL and redirects the user to the expanded URL
     """
-    logger.info("[TRACE] ")
-
     status, url = compute.get_url_from_shortened_list(lookup)
 
     if url is None:
@@ -7649,7 +7700,7 @@ def to_expand(lookup: str):
 @web_app.route("/expand", methods=["GET", "POST"])
 @trace_execution
 def to_expand_instructions():
-    logger.info("[TRACE] ")
+    """ """
     return (
         "<H1>Need a lookup to expand</H1>"
         + '<P>For example, <a href="/shorten?url=https://google.com">allofphysics.com/shorten?url=https://google.com</a>\n'
@@ -7661,10 +7712,7 @@ def to_expand_instructions():
 def scrape_arxiv():
     """
     allofphysics.com/arxiv_scraper?title=state
-
     """
-    logger.info("[TRACE] ")
-
     ARXIV_URL = "https://export.arxiv.org/rss/quant-ph"
 
     if not request.args:
@@ -7727,7 +7775,6 @@ def scrape_arxiv():
     ) -> List[str]:
         """
         Finds matches in arXiv entries based on a set of keyword and author rules.
-
         """
         results = []
 
@@ -7829,7 +7876,6 @@ def common_errors_in_college_math():
     """
     From https://math.vanderbilt.edu/schectex/commerrs/
     """
-    logger.info("[TRACE] ")
     return render_template(
         "webpage_snapshots/common_errors_in_college_math.html",
         title="Errors",
@@ -7847,12 +7893,13 @@ def common_errors_in_college_math():
 def to_literature_review():
     """
     "literature_review" is a static page
-
-    >>> literature_review()
     """
-    logger.info("[TRACE] ")
+    canonical_url = url_for("to_literature_review").lstrip("/")
+
     return render_template(
-        "jinja2_pages/documentation_literature_review.html", title="Literature Review"
+        "jinja2_pages/documentation_literature_review.html",
+        title="Literature Review",
+        canonical_url=canonical_url,
     )
 
 
@@ -7862,28 +7909,32 @@ def to_literature_review():
 @web_app.route(
     "/documentation/comparison_of_design_options/cas", methods=["GET", "POST"]
 )
+@trace_execution
 def to_comparison_of_design_options_cas():
     """
     a static page
     """
-    logger.info("[TRACE] ")
+    canonical_url = url_for("to_comparison_of_design_options_cas").lstrip("/")
     return render_template(
         "jinja2_pages/comparison_of_design_options_cas.html",
         title="Comparison of Design Options: Computer Algebra System (CAS)",
+        canonical_url=canonical_url,
     )
 
 
 @web_app.route(
     "/documentation/comparison_of_design_options/graph_drawing", methods=["GET", "POST"]
 )
+@trace_execution
 def to_comparison_of_design_options_graph_drawing():
     """
     a static page
     """
-    logger.info("[TRACE] ")
+    canonical_url = url_for("to_comparison_of_design_options_graph_drawing").lstrip("/")
     return render_template(
         "jinja2_pages/comparison_of_design_options_graph_drawing.html",
         title="Comparison of Design Options: Graph Drawing",
+        canonical_url=canonical_url,
     )
 
 
@@ -7891,14 +7942,16 @@ def to_comparison_of_design_options_graph_drawing():
     "/documentation/comparison_of_design_options/proofs",
     methods=["GET", "POST"],
 )
+@trace_execution
 def to_comparison_of_design_options_proofs():
     """
     a static page
     """
-    logger.info("[TRACE] ")
+    canonical_url = url_for("to_comparison_of_design_options_proofs").lstrip("/")
     return render_template(
         "jinja2_pages/comparison_of_design_options_proofs.html",
         title="Comparison of Design Options: Proofs",
+        canonical_url=canonical_url,
     )
 
 
@@ -7906,14 +7959,16 @@ def to_comparison_of_design_options_proofs():
     "/documentation/comparison_of_design_options/syntax",
     methods=["GET", "POST"],
 )
+@trace_execution
 def to_comparison_of_design_options_syntax():
     """
     a static page
     """
-    logger.info("[TRACE] ")
+    canonical_url = url_for("to_comparison_of_design_options_syntax").lstrip("/")
     return render_template(
         "jinja2_pages/comparison_of_design_options_syntax.html",
         title="Comparison of Design Options: Syntax",
+        canonical_url=canonical_url,
     )
 
 
@@ -7921,14 +7976,16 @@ def to_comparison_of_design_options_syntax():
     "/documentation/comparison_of_design_options/database",
     methods=["GET", "POST"],
 )
+@trace_execution
 def to_comparison_of_design_options_database():
     """
     a static page
     """
-    logger.info("[TRACE] ")
+    canonical_url = url_for("to_comparison_of_design_options_database").lstrip("/")
     return render_template(
         "jinja2_pages/comparison_of_design_options_database.html",
         title="Comparison of Design Options: Database",
+        canonical_url=canonical_url,
     )
 
 
@@ -7946,12 +8003,12 @@ def to_list_named_expressions():
     ```
     MATCH (n) WHERE exists(n.name_latex) AND n.name_latex <> '' RETURN n
     ```
-
-    >>> to_list_named_expressions()
     """
-    logger.info("[TRACE] to_list_named_expressions")
+    canonical_url = url_for("to_list_named_expressions").lstrip("/")
     return render_template(
-        "jinja2_pages/named_expressions_list.html", title="central expressions"
+        "jinja2_pages/named_expressions_list.html",
+        title="central expressions",
+        canonical_url=canonical_url,
     )
 
 
@@ -7960,12 +8017,12 @@ def to_list_named_expressions():
 def to_survey_of_named_expressions():
     """
     This is a static page; content that hasn't been integrated into the PDG
-
-    >>> to_survey_of_named_expressions()
     """
-    logger.info("[TRACE] to_survey_of_named_expressions")
+    canonical_url = url_for("to_survey_of_named_expressions").lstrip("/")
     return render_template(
-        "jinja2_pages/named_expressions_survey.html", title="central expressions"
+        "jinja2_pages/named_expressions_survey.html",
+        title="central expressions",
+        canonical_url=canonical_url,
     )
 
 
@@ -7978,7 +8035,6 @@ def to_llm_page():
     """
     https://github.com/allofphysicsgraph/task-tracker/issues/2
     """
-    logger.info("[TRACE] ")
     return render_template("from_LLM/SHO_from_Gemini_3_flash.html")
 
 
@@ -7992,7 +8048,7 @@ def to_llm_page():
 @trace_execution
 def to_blog_list():
     """ """
-    logger.info("[TRACE] ")
+    canonical_url = url_for("to_blog_list").lstrip("/")
     # logger.info(str(os.getcwd())) # /code
 
     base_dir = Path("templates/blog_manual")
@@ -8027,6 +8083,7 @@ def to_blog_list():
         "blog_from_blogger/blog_list.html",
         title="Blog for Physics Derivation Graph",
         blog_links=list_of_formated_links,
+        canonical_url=canonical_url,
     )
 
 
@@ -8035,10 +8092,7 @@ def to_blog_list():
 def to_blog(YYYY: str, MM: str, blog_title: str):
     """
     exported pages from blogger.com's https://physicsderivationgraph.blogspot.com/
-
-    blog()
     """
-    logger.info("[TRACE] ")
     return render_template(
         "blog_from_blogger/" + YYYY + "/" + MM + "/" + blog_title, title=blog_title
     )
@@ -8068,7 +8122,6 @@ def to_blog_manual_page(YYYY: str, MM: str, blog_title: str):
 @trace_execution
 def to_clickable_layers():
     """ """
-    logger.info("[TRACE] clickable_layers")
     return render_template(
         "jinja2_pages/clickable_layers.html", title="clickable_layers"
     )
@@ -8078,6 +8131,7 @@ def to_clickable_layers():
 
 
 @web_app.route("/api_hal_explorer")
+@trace_execution
 def to_api_explorer():
     """
     Renders the custom HAL API Explorer page.
@@ -8096,7 +8150,7 @@ def to_class_notes_overview():
     """
     class notes from school
     """
-    logger.info("[TRACE] class_notes]")
+    # logger.info("[TRACE] class_notes]")
     return render_template("class_notes/overview.html", title="class notes overview")
 
 
@@ -8107,15 +8161,15 @@ def to_class_notes_subpage(which_class: str):
     class notes from school
     """
     trace_id = trace_id_var.get()
-    logger.info("[TRACE] start " + trace_id + "] ")
+    # logger.info("[TRACE] start " + trace_id + "] ")
 
     if which_class == "overview":
         logger.info("URL is overview")
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return render_template("class_notes/overview.html", title="overview")
     elif which_class == "math402_mathematical_physics_hale":
         logger.info("URL is 402")
-        logger.info("[TRACE] end " + trace_id)
+        # logger.info("[TRACE] end " + trace_id)
         return render_template(
             "class_notes/math402_mathematical_physics_hale.html", title="Math 402"
         )
@@ -8134,8 +8188,11 @@ def to_spectrum_of_precision():
     """
     exploration of layering formalization
     """
+    canonical_url = url_for("to_spectrum_of_precision").lstrip("/")
     return render_template(
-        "jinja2_pages/layers_overview.html", title="Spectrum of Precision: Overview"
+        "jinja2_pages/layers_overview.html",
+        title="Spectrum of Precision: Overview",
+        canonical_url=canonical_url,
     )
 
 
@@ -8222,7 +8279,7 @@ def to_validate_latex():
 
     """
     trace_id = trace_id_var.get()
-    logger.info("[TRACE] to_validate_latex start " + trace_id)
+    # logger.info("[TRACE] to_validate_latex start " + trace_id)
 
     web_form_math_latex = NoOptionsForm()
     web_form_nonmath_latex = NoOptionsForm()
@@ -8289,7 +8346,7 @@ def to_validate_sympy():
 @trace_execution
 def to_validate_lean():
     trace_id = trace_id_var.get()
-    logger.info("[TRACE] to_validate_lean start " + trace_id)
+    # logger.info("[TRACE] to_validate_lean start " + trace_id)
 
     web_form_lean = NoOptionsForm()
 
@@ -8323,7 +8380,7 @@ def to_validate_json():
     This is a precursor for checking the schema for JSON against specific schemas
     """
     trace_id = trace_id_var.get()
-    logger.info("[TRACE] to_validate_json start " + trace_id)
+    # logger.info("[TRACE] to_validate_json start " + trace_id)
 
     web_form_json = NoOptionsForm()
 
