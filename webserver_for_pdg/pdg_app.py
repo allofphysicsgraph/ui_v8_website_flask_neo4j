@@ -8486,11 +8486,13 @@ def to_validate_SYMBOLS_json():
         if json_is_valid:  # then add local ID
             revised_SYMBOLS_with_local_ID = []
             for symbol_dict in parsed:
-                symbol_dict["symbol ID"] = "local-id-"+str(uuid.uuid4())
+                symbol_dict["symbol ID"] = "local-id-" + str(uuid.uuid4())
                 revised_SYMBOLS_with_local_ID.append(symbol_dict)
 
-            revised_filename= "revised_SYMBOLS_with_local_ID_"+str(uuid.uuid4())+".json"
-            with open("static/"+revised_filename, "w") as file_handle:
+            revised_filename = (
+                "revised_SYMBOLS_with_local_ID_" + str(uuid.uuid4()) + ".json"
+            )
+            with open("static/" + revised_filename, "w") as file_handle:
                 json.dump(revised_SYMBOLS_with_local_ID, file_handle, indent=2)
 
     return render_template(
@@ -8563,11 +8565,13 @@ def to_validate_OPERATIONS_json():
         if json_is_valid:  # then add local ID
             revised_OPERATIONS_with_local_ID = []
             for operation_dict in parsed:
-                operation_dict["operation ID"] = "local-id-"+str(uuid.uuid4())
+                operation_dict["operation ID"] = "local-id-" + str(uuid.uuid4())
                 revised_OPERATIONS_with_local_ID.append(operation_dict)
 
-            revised_filename= "revised_OPERATIONS_with_local_ID_"+str(uuid.uuid4())+".json"
-            with open("static/"+revised_filename, "w") as file_handle:
+            revised_filename = (
+                "revised_OPERATIONS_with_local_ID_" + str(uuid.uuid4()) + ".json"
+            )
+            with open("static/" + revised_filename, "w") as file_handle:
                 json.dump(revised_OPERATIONS_with_local_ID, file_handle, indent=2)
 
     return render_template(
@@ -8579,7 +8583,6 @@ def to_validate_OPERATIONS_json():
         form_json=web_form_json,
         path_to_revised_OPERATIONS_json=revised_filename,
     )
-
 
 
 @web_app.route("/validate/EXPRESSIONS_json", methods=["GET", "POST"])
@@ -8641,11 +8644,13 @@ def to_validate_EXPRESSIONS_json():
         if json_is_valid:  # then add local ID
             revised_EXPRESSIONS_with_local_ID = []
             for expression_dict in parsed:
-                expression_dict["expression ID"] = "local-id-"+str(uuid.uuid4())
+                expression_dict["expression ID"] = "local-id-" + str(uuid.uuid4())
                 revised_EXPRESSIONS_with_local_ID.append(expression_dict)
 
-            revised_filename= "revised_EXPRESSIONS_with_local_ID_"+str(uuid.uuid4())+".json"
-            with open("static/"+revised_filename, "w") as file_handle:
+            revised_filename = (
+                "revised_EXPRESSIONS_with_local_ID_" + str(uuid.uuid4()) + ".json"
+            )
+            with open("static/" + revised_filename, "w") as file_handle:
                 json.dump(revised_EXPRESSIONS_with_local_ID, file_handle, indent=2)
 
     return render_template(
@@ -8718,11 +8723,13 @@ def to_validate_STEPS_json():
         if json_is_valid:  # then add local ID
             revised_STEPS_with_local_ID = []
             for step_dict in parsed:
-                step_dict["step ID"] = "local-id-"+str(uuid.uuid4())
+                step_dict["step ID"] = "local-id-" + str(uuid.uuid4())
                 revised_STEPS_with_local_ID.append(step_dict)
 
-            revised_filename= "revised_STEPS_with_local_ID_"+str(uuid.uuid4())+".json"
-            with open("static/"+revised_filename, "w") as file_handle:
+            revised_filename = (
+                "revised_STEPS_with_local_ID_" + str(uuid.uuid4()) + ".json"
+            )
+            with open("static/" + revised_filename, "w") as file_handle:
                 json.dump(revised_STEPS_with_local_ID, file_handle, indent=2)
 
     return render_template(
@@ -8789,7 +8796,6 @@ def to_validate_DERIVATION_json():
             # Catch JSON parsing errors if any slipped through, or other value errors
             json_result = str(err) + "\n\n" + user_json_input
             json_is_valid = False
-
 
     return render_template(
         "jinja2_pages/user_workflow/validate_DERIVATION_json.html",
