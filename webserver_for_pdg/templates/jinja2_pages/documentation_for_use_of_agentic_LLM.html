@@ -3,15 +3,15 @@
 
 {% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
 
-<a href="{{ url_for('to_navigation') }}?referrer=faq">navigation</a> / 
-   <a href="{{ url_for('to_documentation_overview')}}?referrer=faq">documentation overview</a> / 
+<a href="{{ url_for('to_navigation') }}?referrer=agentic_llm_documentation">navigation</a> / 
+   <a href="{{ url_for('to_documentation_overview')}}?referrer=agentic_llm_documentation">documentation overview</a> / 
    Agentic LLM Documentation
 
 <H1>Agentic LLM Use of the Physics Derivation Graph</H1>
 
 <P>The Physics Derivation Graph does not have a local LLM nor does the project call remotely-hosted LLMs. 
    Use of an LLM or agentic LLM is the responsibility of the user and is client-side.
-   The Physics Derivation Graph provides <a href="{{ url_for('to_api_documentation') }}?referrer=agentic_LLM_documentation">API documentation</a> intended to enable agents.
+   The Physics Derivation Graph provides <a href="{{ url_for('to_api_documentation') }}?referrer=agentic_llm_documentation">API documentation</a> intended to enable agents.
 
 <P>The workflow for a generic derivation is
 <img src="{{ url_for('static', filename='agentic_workflow.svg') }}">
@@ -21,16 +21,43 @@
 
 
 
-<P>Stage 1, creation of DERIVATION.tex: see <a href="{{ url_for('to_llm_workflow_documenation') }}#derivation as tex">prompt</a>
+<P>Stage 1: to create DERIVATION.tex  
+   see <a href="{{ url_for('to_llm_workflow_documenation') }}#derivation as tex?referrer=agentic_llm_documentation">prompt</a>
 
-<P>Stage 2, creation of SYMBOLS.json: see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to symbols">prompt</a>
-
-
-<P>Stage 5, creation of OPERATIONS.json: see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to operations">prompt</a>
-
-<P>Stage 8, creation of EXPRESSIONS.json: see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to expr">prompt</a>
+<P>Stage 2: to create SYMBOLS.json  
+   see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to symbols?referrer=agentic_llm_documentation">prompt</a>
+   and then <a href="{{ url_for('to_validate_SYMBOLS_json') }}?referrer=agentic_llm_documentation">validate SYMBOLS.json</a> to create SYMBOLS_with_local_IDs.json
 
 
-<P>Stage 12, creation of STEPS.json: see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to steps">prompt</a>
+<P>Stage 5: to create OPERATIONS.json  
+   see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to operations?referrer=agentic_llm_documentation">prompt</a>
+   and then <a href="{{ url_for('to_validate_OPERATIONS_json') }}?referrer=agentic_llm_documentation">validate OPERATIONS.json</a> to create OPERATIONS_with_local_IDs.json
+
+<P>Stage 8, to create EXPRESSIONS.json  
+   see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to expr?referrer=agentic_llm_documentation">prompt</a>
+   and then <a href="{{ url_for('to_validate_EXPRESSIONS_json') }}?referrer=agentic_llm_documentation">validate EXPRESSIONS.json</a>
+
+<P>TODO: create EXPRESSIONS_with_SYMBOLS_and_OPERATIONS.json from EXPRESSIONS.json + DERIVATION.tex + SYMBOLS_with_local_IDs.json + OPERATIONS_with_local_IDs.json  
+
+<P>Stage 12: to create STEPS.json 
+   see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to steps?referrer=agentic_llm_documentation">prompt</a>
+   and then <a href="{{ url_for('to_validate_STEPS_json') }}?referrer=agentic_llm_documentation">validate STEPS.json</a>
+
+<P>TODO: what happens if a new inference rule is needed?
+
+<P>TODO: create STEPS_with_EXPRESSIONS.json from DERIVATION.tex + STEPS.json + EXPRESSIONS.json
+
+<P>Stage 15: to create DERIVATION.json
+   see <a href="{{ url_for('to_validate_DERIVATION_json') }}?referrer=agentic_llm_documentation">validate DERIVATION.json</a>
+
+<P>DERIVATION.json is 
+   <UL>
+      <LI>SYMBOLS.json     with just symbols     to be added to PDG
+      <LI>OPERATIONS.json  with just operations  to be added to PDG
+      <LI>EXPRESSIONS.json with just expressions to be added to PDG
+      <LI>INFERENCE_RULES.json
+      <LI>STEPS.json
+   </UL>
+
 
 {% endblock %}
