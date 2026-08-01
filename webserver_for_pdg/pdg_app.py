@@ -7975,6 +7975,9 @@ def to_survey_of_named_expressions():
 @web_app.route("/from_llm", methods=["GET"])
 @trace_execution
 def to_llm_page():
+    """
+    https://github.com/allofphysicsgraph/task-tracker/issues/2
+    """
     logger.info("[TRACE] ")
     return render_template("from_LLM/SHO_from_Gemini_3_flash.html")
 
