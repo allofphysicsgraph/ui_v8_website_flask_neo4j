@@ -10,6 +10,8 @@ Flask-Login
 # native driver; see https://neo4j.com/docs/api/python-driver/current/api.html
 neo4j<5.0.0
 
+jsonschema
+
 # https://pypi.org/project/requests/
 #requests==2.34.2 as of 2026-07-25 on arm64
 requests

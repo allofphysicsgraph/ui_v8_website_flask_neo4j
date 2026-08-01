@@ -1,0 +1,60 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+
+{% if json_result %}
+
+{% if json_is_valid %}
+<H2>Result: EXPRESSIONS.json is valid</H2>
+
+<P>(optional) Want the revised content that includes local IDs? See <a href="{{ url_for('static', filename=path_to_revised_EXPRESSIONS_json)}}">revised_EXPRESSIONS.json</a>
+
+
+{% else %}
+<H2>Result: EXPRESSIONS.json is not valid</H2>
+{% endif %}
+
+<HR>
+<Pre>
+{{ json_result }}
+</Pre>
+<HR>
+{% endif %}
+
+
+  <fieldset>
+	<legend>validate EXPRESSIONS.json against schema</legend>
+	  <form method="post">
+      {{ form_json.csrf_token }}
+      <P><label for="json-input">JSON:</label>
+      <textarea id="json-input" name="json-input" rows="20" cols="100" placeholder="Enter EXPRESSIONS.json here..."></textarea>
+      <P><input type="submit" name="json-btn" value="Validate EXPRESSIONS.json">
+    </form>
+  </fieldset>
+
+
+<P>See also <a href="{{ url_for('to_validate_json') }}?referrer=SYMOLS_json_validate">validate JSON</a>
+
+
+<!-- untested: upload EXPRESSIONS.json file
+  <fieldset>
+    <legend>
+      <H3 id="upload data">Upload EXPRESSIONS.json to validate schema</H3>
+    </legend>
+
+    Upload database file (.json only):
+    <form method="post" enctype="multipart/form-data" id="upload_form">
+      <input type="hidden" name="csrf_token" value="{ { csrf_token() }}" />
+      <input type="file" name="file" accept=".json">
+      <br>
+
+      <label for="validate_json">Overwrite existing data</label>
+      <br>
+
+      <input type="submit" name="validate_json" value="Upload Cypher">
+    </form>
+
+  </fieldset>
+-->
+
+{% endblock %}

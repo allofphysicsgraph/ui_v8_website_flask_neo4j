@@ -2,7 +2,12 @@
 {% block content %}
 
 {% if json_result %}
-<H2>Result:</H2>
+
+{% if json_is_valid %}
+<H2>Result: JSON is valid</H2>
+{% else %}
+<H2>Result: JSON is not valid</H2>
+{% endif %}
 <HR>
 <Pre>
 {{ json_result }}
@@ -20,5 +25,8 @@
       <P><input type="submit" name="json-btn" value="Validate JSON">
     </form>
   </fieldset>
+
+
+<P>See also <a href="{{ url_for('to_validate_SYMBMOLS_json') }}">validate SYMBOLS.json</a>
 
 {% endblock %}
