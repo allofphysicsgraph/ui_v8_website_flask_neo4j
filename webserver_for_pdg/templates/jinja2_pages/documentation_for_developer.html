@@ -282,7 +282,9 @@ The Physics Derivation Graph is a <a href="https://en.wikipedia.org/wiki/Create,
         <LI>authorization required</LI>
         <LI>deletes all associated steps and feeds</LI>
         <LI>does not alter expressions or inference rules</LI>
-        </UL></td>
+        </UL>
+api:resources/derivation/ID/delete
+      </td>
   </tr>
   <tr>
     <td>step</td>
@@ -309,7 +311,10 @@ The Physics Derivation Graph is a <a href="https://en.wikipedia.org/wiki/Create,
         <LI>authorization required</LI>
         <LI>user provides number of arguments, latex description</LI>
         </UL></td>
-    <td></td>
+    <td>
+      <a href="{{ url_for('to_list_inference_rules') }}">table of inference rules</a>
+
+    </td>
     <td><UL>
         <LI>authorization required</LI>
         <LI>latex description</LI>
@@ -319,7 +324,9 @@ The Physics Derivation Graph is a <a href="https://en.wikipedia.org/wiki/Create,
     <td><UL>
         <LI>authorization required</LI>
         <LI>delete only if not in use by step</LI>
-        </UL></td>
+        </UL>
+api:resources/inference_rule/ID/delete
+      </td>
   </tr>
   <tr>
     <td>expression</td>
@@ -338,7 +345,9 @@ The Physics Derivation Graph is a <a href="https://en.wikipedia.org/wiki/Create,
         <LI>authorization required</LI>
         <LI>delete only if not connected to step</LI>
         <LI>does not alter symbols and relations</LI>
-        </UL></td>
+        </UL>
+api:resources/expression/ID/delete
+      </td>
   </tr>
   <tr>
     <td>symbol</td>
@@ -347,7 +356,11 @@ The Physics Derivation Graph is a <a href="https://en.wikipedia.org/wiki/Create,
         <LI>user provides latex, description</LI>
         <LI>optional: name, reference</LI>
         </UL></td>
-    <td></td>
+    <td>
+      <a href="{{ url_for('to_list_scalars') }}">table of scalar symbols</a>
+      <a href="{{ url_for('to_list_vectors') }}">table of vector symbols</a>
+
+    </td>
     <td><UL>
         <LI>authorization required</LI>
         </UL></td>
@@ -375,15 +388,26 @@ The Physics Derivation Graph is a <a href="https://en.wikipedia.org/wiki/Create,
     <td>operator</td>
     <td><UL>
         <LI>authorization required</LI>
-        </UL></td>
-    <td></td>
+        </UL>
+api:<a href="{{ url_for('api_create_operation_symbol') }}">resources/symbol/operation</a>
+      </td>
+    <td>
+      <P>api:<a href="{{ url_for('api_list_operation_symbols') }}">resources/symbol/operations</a><BR>
+
+<a href="{{ url_for('to_list_operations') }}">table of operations</a>
+    </td>
     <td><UL>
         <LI>authorization required</LI>
-        </UL></td>
+        </UL>
+
+api:<a href="{{ url_for('api_edit_operation') }}">resources/symbol/operation/ID/edit</a>
+      </td>
     <td><UL>
         <LI>authorization required</LI>
         <LI>delete only if not in use in expression</LI>
-        </UL></td>
+        </UL>
+api:<a href="{{ url_for('api_delete_operation', operation_id=1234) }}">resources/symbol/operation/ID/delete</a>
+      </td>
   </tr>
   <tr>
     <td>feed</td>
