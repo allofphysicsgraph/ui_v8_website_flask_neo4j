@@ -28,14 +28,37 @@
    see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to symbols?referrer=agentic_llm_documentation">prompt</a>
    and then <a href="{{ url_for('to_validate_SYMBOLS_json') }}?referrer=agentic_llm_documentation">validate SYMBOLS.json</a> to create SYMBOLS_with_local_IDs.json
 
+<pre>
+curl --silent --insecure https://localhost/api/resources/symbol/scalars | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+
+curl --silent --insecure https://localhost/api/resources/symbol/vectors | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+
+curl --silent --insecure https://localhost/api/resources/symbol/matrices | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+</pre>
 
 <P>Stage 5: to create OPERATIONS.json  
    see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to operations?referrer=agentic_llm_documentation">prompt</a>
    and then <a href="{{ url_for('to_validate_OPERATIONS_json') }}?referrer=agentic_llm_documentation">validate OPERATIONS.json</a> to create OPERATIONS_with_local_IDs.json
 
+<pre>
+curl --silent --insecure https://localhost/api/resources/symbol/operations | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+</pre>
+
+<P>Stage ?: to create RELATIONS.json see 
+
+
+<pre>
+curl --silent --insecure https://localhost/api/resources/symbol/relations | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+</pre>
+
+
 <P>Stage 8, to create EXPRESSIONS.json  
    see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to expr?referrer=agentic_llm_documentation">prompt</a>
    and then <a href="{{ url_for('to_validate_EXPRESSIONS_json') }}?referrer=agentic_llm_documentation">validate EXPRESSIONS.json</a>
+
+<pre>
+curl --silent --insecure https://localhost/api/resources/expressions | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+</pre> 
 
 <P>TODO: create EXPRESSIONS_with_SYMBOLS_and_OPERATIONS.json from EXPRESSIONS.json + DERIVATION.tex + SYMBOLS_with_local_IDs.json + OPERATIONS_with_local_IDs.json  
 
