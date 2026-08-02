@@ -8406,13 +8406,17 @@ def to_validate_json():
         # request.form = ImmutableMultiDict([('json-input', 'stuff'), ('json', 'Validate JSON')])
 
         user_json_input = request.form["json-input"]
-        try:
-            parsed = json.loads(user_json_input)
-            json_result = json.dumps(parsed, indent=2)
-            json_is_valid = True
-        except ValueError as err:
-            json_result = str(err) + "\n\n" + user_json_input
-            json_is_valid = False
+        if user_json_input == "":
+            flash("Nothing submitted")
+        else:
+
+            try:
+                parsed = json.loads(user_json_input)
+                json_result = json.dumps(parsed, indent=2)
+                json_is_valid = True
+            except ValueError as err:
+                json_result = str(err) + "\n\n" + user_json_input
+                json_is_valid = False
 
     return render_template(
         "jinja2_pages/validate_json.html",
@@ -8442,7 +8446,7 @@ def to_validate_SYMBOLS_json():
 
     json_is_valid = None
 
-    path_to_revised_SYMBOLS_json = None
+    revised_filename = None
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -8450,50 +8454,54 @@ def to_validate_SYMBOLS_json():
         # request.form = ImmutableMultiDict([('json-input', 'stuff'), ('json', 'Validate JSON')])
 
         user_json_input = request.form["json-input"]
-        try:
-            parsed = json.loads(user_json_input)
-            json_result = json.dumps(parsed, indent=2)
-            json_is_valid = True
-        except ValueError as err:
-            json_result = str(err) + "\n\n" + user_json_input
+        if user_json_input == "":
+            flash("Nothing submitted")
+        else:
 
-            json_is_valid = False
+            try:
+                parsed = json.loads(user_json_input)
+                json_result = json.dumps(parsed, indent=2)
+                json_is_valid = True
+            except ValueError as err:
+                json_result = str(err) + "\n\n" + user_json_input
 
-        with open("static/schema_for_llm_symbols.json", "r") as file_handle:
-            schema_for_llm_symbols = json.load(file_handle)
+                json_is_valid = False
 
-        try:
-            validate(instance=parsed, schema=schema_for_llm_symbols)
+            with open("static/schema_for_llm_symbols.json", "r") as file_handle:
+                schema_for_llm_symbols = json.load(file_handle)
 
-            json_result = (
-                "JSON is consistent with the SYMBOLS.json schema\n\n"
-                + json.dumps(parsed, indent=2)
-            )
-            json_is_valid = True
+            try:
+                validate(instance=parsed, schema=schema_for_llm_symbols)
 
-        except ValidationError as err:
-            # Catch schema validation errors specifically
-            json_result = (
-                f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
-                + user_json_input
-            )
-            json_is_valid = False
-        except ValueError as err:
-            # Catch JSON parsing errors if any slipped through, or other value errors
-            json_result = str(err) + "\n\n" + user_json_input
-            json_is_valid = False
+                json_result = (
+                    "JSON is consistent with the SYMBOLS.json schema\n\n"
+                    + json.dumps(parsed, indent=2)
+                )
+                json_is_valid = True
 
-        if json_is_valid:  # then add local ID
-            revised_SYMBOLS_with_local_ID = []
-            for symbol_dict in parsed:
-                symbol_dict["symbol ID"] = "local-id-" + str(uuid.uuid4())
-                revised_SYMBOLS_with_local_ID.append(symbol_dict)
+            except ValidationError as err:
+                # Catch schema validation errors specifically
+                json_result = (
+                    f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
+                    + user_json_input
+                )
+                json_is_valid = False
+            except ValueError as err:
+                # Catch JSON parsing errors if any slipped through, or other value errors
+                json_result = str(err) + "\n\n" + user_json_input
+                json_is_valid = False
 
-            revised_filename = (
-                "revised_SYMBOLS_with_local_ID_" + str(uuid.uuid4()) + ".json"
-            )
-            with open("static/" + revised_filename, "w") as file_handle:
-                json.dump(revised_SYMBOLS_with_local_ID, file_handle, indent=2)
+            if json_is_valid:  # then add local ID
+                revised_SYMBOLS_with_local_ID = []
+                for symbol_dict in parsed:
+                    symbol_dict["symbol ID"] = "local-id-" + str(uuid.uuid4())
+                    revised_SYMBOLS_with_local_ID.append(symbol_dict)
+
+                revised_filename = (
+                    "revised_SYMBOLS_with_local_ID_" + str(uuid.uuid4()) + ".json"
+                )
+                with open("static/" + revised_filename, "w") as file_handle:
+                    json.dump(revised_SYMBOLS_with_local_ID, file_handle, indent=2)
 
     return render_template(
         "jinja2_pages/user_workflow/validate_SYMBOLS_json.html",
@@ -8521,7 +8529,7 @@ def to_validate_OPERATIONS_json():
 
     json_is_valid = None
 
-    path_to_revised_OPERATIONS_json = None
+    revised_filename = None
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -8529,50 +8537,54 @@ def to_validate_OPERATIONS_json():
         # request.form = ImmutableMultiDict([('json-input', 'stuff'), ('json', 'Validate JSON')])
 
         user_json_input = request.form["json-input"]
-        try:
-            parsed = json.loads(user_json_input)
-            json_result = json.dumps(parsed, indent=2)
-            json_is_valid = True
-        except ValueError as err:
-            json_result = str(err) + "\n\n" + user_json_input
+        if user_json_input == "":
+            flash("Nothing submitted")
+        else:
 
-            json_is_valid = False
+            try:
+                parsed = json.loads(user_json_input)
+                json_result = json.dumps(parsed, indent=2)
+                json_is_valid = True
+            except ValueError as err:
+                json_result = str(err) + "\n\n" + user_json_input
 
-        with open("static/schema_for_llm_operations.json", "r") as file_handle:
-            schema_for_llm_operations = json.load(file_handle)
+                json_is_valid = False
 
-        try:
-            validate(instance=parsed, schema=schema_for_llm_operations)
+            with open("static/schema_for_llm_operations.json", "r") as file_handle:
+                schema_for_llm_operations = json.load(file_handle)
 
-            json_result = (
-                "JSON is consistent with the OPERATIONS.json schema\n\n"
-                + json.dumps(parsed, indent=2)
-            )
-            json_is_valid = True
+            try:
+                validate(instance=parsed, schema=schema_for_llm_operations)
 
-        except ValidationError as err:
-            # Catch schema validation errors specifically
-            json_result = (
-                f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
-                + user_json_input
-            )
-            json_is_valid = False
-        except ValueError as err:
-            # Catch JSON parsing errors if any slipped through, or other value errors
-            json_result = str(err) + "\n\n" + user_json_input
-            json_is_valid = False
+                json_result = (
+                    "JSON is consistent with the OPERATIONS.json schema\n\n"
+                    + json.dumps(parsed, indent=2)
+                )
+                json_is_valid = True
 
-        if json_is_valid:  # then add local ID
-            revised_OPERATIONS_with_local_ID = []
-            for operation_dict in parsed:
-                operation_dict["operation ID"] = "local-id-" + str(uuid.uuid4())
-                revised_OPERATIONS_with_local_ID.append(operation_dict)
+            except ValidationError as err:
+                # Catch schema validation errors specifically
+                json_result = (
+                    f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
+                    + user_json_input
+                )
+                json_is_valid = False
+            except ValueError as err:
+                # Catch JSON parsing errors if any slipped through, or other value errors
+                json_result = str(err) + "\n\n" + user_json_input
+                json_is_valid = False
 
-            revised_filename = (
-                "revised_OPERATIONS_with_local_ID_" + str(uuid.uuid4()) + ".json"
-            )
-            with open("static/" + revised_filename, "w") as file_handle:
-                json.dump(revised_OPERATIONS_with_local_ID, file_handle, indent=2)
+            if json_is_valid:  # then add local ID
+                revised_OPERATIONS_with_local_ID = []
+                for operation_dict in parsed:
+                    operation_dict["operation ID"] = "local-id-" + str(uuid.uuid4())
+                    revised_OPERATIONS_with_local_ID.append(operation_dict)
+
+                revised_filename = (
+                    "revised_OPERATIONS_with_local_ID_" + str(uuid.uuid4()) + ".json"
+                )
+                with open("static/" + revised_filename, "w") as file_handle:
+                    json.dump(revised_OPERATIONS_with_local_ID, file_handle, indent=2)
 
     return render_template(
         "jinja2_pages/user_workflow/validate_OPERATIONS_json.html",
@@ -8600,7 +8612,7 @@ def to_validate_EXPRESSIONS_json():
 
     json_is_valid = None
 
-    path_to_revised_EXPRESSIONS_json = None
+    revised_filename = None
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -8608,50 +8620,54 @@ def to_validate_EXPRESSIONS_json():
         # request.form = ImmutableMultiDict([('json-input', 'stuff'), ('json', 'Validate JSON')])
 
         user_json_input = request.form["json-input"]
-        try:
-            parsed = json.loads(user_json_input)
-            json_result = json.dumps(parsed, indent=2)
-            json_is_valid = True
-        except ValueError as err:
-            json_result = str(err) + "\n\n" + user_json_input
+        if user_json_input == "":
+            flash("Nothing submitted")
+        else:
 
-            json_is_valid = False
+            try:
+                parsed = json.loads(user_json_input)
+                json_result = json.dumps(parsed, indent=2)
+                json_is_valid = True
+            except ValueError as err:
+                json_result = str(err) + "\n\n" + user_json_input
 
-        with open("static/schema_for_llm_expressions.json", "r") as file_handle:
-            schema_for_llm_expressions = json.load(file_handle)
+                json_is_valid = False
 
-        try:
-            validate(instance=parsed, schema=schema_for_llm_expressions)
+            with open("static/schema_for_llm_expressions.json", "r") as file_handle:
+                schema_for_llm_expressions = json.load(file_handle)
 
-            json_result = (
-                "JSON is consistent with the EXPRESSIONS.json schema\n\n"
-                + json.dumps(parsed, indent=2)
-            )
-            json_is_valid = True
+            try:
+                validate(instance=parsed, schema=schema_for_llm_expressions)
 
-        except ValidationError as err:
-            # Catch schema validation errors specifically
-            json_result = (
-                f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
-                + user_json_input
-            )
-            json_is_valid = False
-        except ValueError as err:
-            # Catch JSON parsing errors if any slipped through, or other value errors
-            json_result = str(err) + "\n\n" + user_json_input
-            json_is_valid = False
+                json_result = (
+                    "JSON is consistent with the EXPRESSIONS.json schema\n\n"
+                    + json.dumps(parsed, indent=2)
+                )
+                json_is_valid = True
 
-        if json_is_valid:  # then add local ID
-            revised_EXPRESSIONS_with_local_ID = []
-            for expression_dict in parsed:
-                expression_dict["expression ID"] = "local-id-" + str(uuid.uuid4())
-                revised_EXPRESSIONS_with_local_ID.append(expression_dict)
+            except ValidationError as err:
+                # Catch schema validation errors specifically
+                json_result = (
+                    f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
+                    + user_json_input
+                )
+                json_is_valid = False
+            except ValueError as err:
+                # Catch JSON parsing errors if any slipped through, or other value errors
+                json_result = str(err) + "\n\n" + user_json_input
+                json_is_valid = False
 
-            revised_filename = (
-                "revised_EXPRESSIONS_with_local_ID_" + str(uuid.uuid4()) + ".json"
-            )
-            with open("static/" + revised_filename, "w") as file_handle:
-                json.dump(revised_EXPRESSIONS_with_local_ID, file_handle, indent=2)
+            if json_is_valid:  # then add local ID
+                revised_EXPRESSIONS_with_local_ID = []
+                for expression_dict in parsed:
+                    expression_dict["expression ID"] = "local-id-" + str(uuid.uuid4())
+                    revised_EXPRESSIONS_with_local_ID.append(expression_dict)
+
+                revised_filename = (
+                    "revised_EXPRESSIONS_with_local_ID_" + str(uuid.uuid4()) + ".json"
+                )
+                with open("static/" + revised_filename, "w") as file_handle:
+                    json.dump(revised_EXPRESSIONS_with_local_ID, file_handle, indent=2)
 
     return render_template(
         "jinja2_pages/user_workflow/validate_EXPRESSIONS_json.html",
@@ -8679,7 +8695,7 @@ def to_validate_STEPS_json():
 
     json_is_valid = None
 
-    path_to_revised_STEPS_json = None
+    revised_filename = None
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -8687,50 +8703,54 @@ def to_validate_STEPS_json():
         # request.form = ImmutableMultiDict([('json-input', 'stuff'), ('json', 'Validate JSON')])
 
         user_json_input = request.form["json-input"]
-        try:
-            parsed = json.loads(user_json_input)
-            json_result = json.dumps(parsed, indent=2)
-            json_is_valid = True
-        except ValueError as err:
-            json_result = str(err) + "\n\n" + user_json_input
+        if user_json_input == "":
+            flash("Nothing submitted")
+        else:
 
-            json_is_valid = False
+            try:
+                parsed = json.loads(user_json_input)
+                json_result = json.dumps(parsed, indent=2)
+                json_is_valid = True
+            except ValueError as err:
+                json_result = str(err) + "\n\n" + user_json_input
 
-        with open("static/schema_for_llm_steps.json", "r") as file_handle:
-            schema_for_llm_steps = json.load(file_handle)
+                json_is_valid = False
 
-        try:
-            validate(instance=parsed, schema=schema_for_llm_steps)
+            with open("static/schema_for_llm_steps.json", "r") as file_handle:
+                schema_for_llm_steps = json.load(file_handle)
 
-            json_result = (
-                "JSON is consistent with the STEPS.json schema\n\n"
-                + json.dumps(parsed, indent=2)
-            )
-            json_is_valid = True
+            try:
+                validate(instance=parsed, schema=schema_for_llm_steps)
 
-        except ValidationError as err:
-            # Catch schema validation errors specifically
-            json_result = (
-                f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
-                + user_json_input
-            )
-            json_is_valid = False
-        except ValueError as err:
-            # Catch JSON parsing errors if any slipped through, or other value errors
-            json_result = str(err) + "\n\n" + user_json_input
-            json_is_valid = False
+                json_result = (
+                    "JSON is consistent with the STEPS.json schema\n\n"
+                    + json.dumps(parsed, indent=2)
+                )
+                json_is_valid = True
 
-        if json_is_valid:  # then add local ID
-            revised_STEPS_with_local_ID = []
-            for step_dict in parsed:
-                step_dict["step ID"] = "local-id-" + str(uuid.uuid4())
-                revised_STEPS_with_local_ID.append(step_dict)
+            except ValidationError as err:
+                # Catch schema validation errors specifically
+                json_result = (
+                    f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
+                    + user_json_input
+                )
+                json_is_valid = False
+            except ValueError as err:
+                # Catch JSON parsing errors if any slipped through, or other value errors
+                json_result = str(err) + "\n\n" + user_json_input
+                json_is_valid = False
 
-            revised_filename = (
-                "revised_STEPS_with_local_ID_" + str(uuid.uuid4()) + ".json"
-            )
-            with open("static/" + revised_filename, "w") as file_handle:
-                json.dump(revised_STEPS_with_local_ID, file_handle, indent=2)
+            if json_is_valid:  # then add local ID
+                revised_STEPS_with_local_ID = []
+                for step_dict in parsed:
+                    step_dict["step ID"] = "local-id-" + str(uuid.uuid4())
+                    revised_STEPS_with_local_ID.append(step_dict)
+
+                revised_filename = (
+                    "revised_STEPS_with_local_ID_" + str(uuid.uuid4()) + ".json"
+                )
+                with open("static/" + revised_filename, "w") as file_handle:
+                    json.dump(revised_STEPS_with_local_ID, file_handle, indent=2)
 
     return render_template(
         "jinja2_pages/user_workflow/validate_STEPS_json.html",
@@ -8764,38 +8784,42 @@ def to_validate_DERIVATION_json():
         # request.form = ImmutableMultiDict([('json-input', 'stuff'), ('json', 'Validate JSON')])
 
         user_json_input = request.form["json-input"]
-        try:
-            parsed = json.loads(user_json_input)
-            json_result = json.dumps(parsed, indent=2)
-            json_is_valid = True
-        except ValueError as err:
-            json_result = str(err) + "\n\n" + user_json_input
+        if user_json_input == "":
+            flash("Nothing submitted")
+        else:
 
-            json_is_valid = False
+            try:
+                parsed = json.loads(user_json_input)
+                json_result = json.dumps(parsed, indent=2)
+                json_is_valid = True
+            except ValueError as err:
+                json_result = str(err) + "\n\n" + user_json_input
 
-        with open("static/schema_for_llm_derivations.json", "r") as file_handle:
-            schema_for_llm_derivations = json.load(file_handle)
+                json_is_valid = False
 
-        try:
-            validate(instance=parsed, schema=schema_for_llm_derivations)
+            with open("static/schema_for_llm_derivations.json", "r") as file_handle:
+                schema_for_llm_derivations = json.load(file_handle)
 
-            json_result = (
-                "JSON is consistent with the DERIVATION.json schema\n\n"
-                + json.dumps(parsed, indent=2)
-            )
-            json_is_valid = True
+            try:
+                validate(instance=parsed, schema=schema_for_llm_derivations)
 
-        except ValidationError as err:
-            # Catch schema validation errors specifically
-            json_result = (
-                f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
-                + user_json_input
-            )
-            json_is_valid = False
-        except ValueError as err:
-            # Catch JSON parsing errors if any slipped through, or other value errors
-            json_result = str(err) + "\n\n" + user_json_input
-            json_is_valid = False
+                json_result = (
+                    "JSON is consistent with the DERIVATION.json schema\n\n"
+                    + json.dumps(parsed, indent=2)
+                )
+                json_is_valid = True
+
+            except ValidationError as err:
+                # Catch schema validation errors specifically
+                json_result = (
+                    f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
+                    + user_json_input
+                )
+                json_is_valid = False
+            except ValueError as err:
+                # Catch JSON parsing errors if any slipped through, or other value errors
+                json_result = str(err) + "\n\n" + user_json_input
+                json_is_valid = False
 
     return render_template(
         "jinja2_pages/user_workflow/validate_DERIVATION_json.html",
