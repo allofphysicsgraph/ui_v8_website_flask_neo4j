@@ -277,7 +277,10 @@ The Physics Derivation Graph is a <a href="https://en.wikipedia.org/wiki/Create,
     <td><UL>
         <LI>authorization required</LI>
         <LI>metadata fields</LI>
-        </UL></td>
+        </UL>
+<a href="{{ url_for('to_edit_derivation_metadata',derivation_id=1234) }}">/edit_derivation_metadata/ID</a>
+
+    </td>
     <td><UL>
         <LI>authorization required</LI>
         <LI>deletes all associated steps and feeds</LI>
@@ -340,7 +343,9 @@ api:resources/inference_rule/ID/delete
     <td><UL>
         <LI>authorization required</LI>
         <LI>metadata fields</LI>
-        </UL></td>
+        </UL>
+<a href="{{ url_for('to_edit_expression', expression_id=1234) }}">edit_expression/ID</a>
+    </td>
     <td><UL>
         <LI>authorization required</LI>
         <LI>delete only if not connected to step</LI>
@@ -357,8 +362,8 @@ api:resources/expression/ID/delete
         <LI>optional: name, reference</LI>
         </UL></td>
     <td>
-      <a href="{{ url_for('to_list_scalars') }}">table of scalar symbols</a>
-      <a href="{{ url_for('to_list_vectors') }}">table of vector symbols</a>
+      <P><a href="{{ url_for('to_list_scalars') }}">table of scalar symbols</a>
+      <P><a href="{{ url_for('to_list_vectors') }}">table of vector symbols</a>
 
     </td>
     <td><UL>
@@ -389,24 +394,24 @@ api:resources/expression/ID/delete
     <td><UL>
         <LI>authorization required</LI>
         </UL>
-api:<a href="{{ url_for('api_create_operation_symbol') }}">resources/symbol/operation</a>
+api:<a href="{{ url_for('pdg_api.api_create_operation_symbol') }}">resources/symbol/operation</a>
       </td>
     <td>
-      <P>api:<a href="{{ url_for('api_list_operation_symbols') }}">resources/symbol/operations</a><BR>
+      <P>api:<a href="{{ url_for('pdg_api.api_list_operation_symbols') }}">resources/symbol/operations</a><BR>
 
-<a href="{{ url_for('to_list_operations') }}">table of operations</a>
+<P><a href="{{ url_for('to_list_operations') }}">table of operations</a>
     </td>
     <td><UL>
         <LI>authorization required</LI>
         </UL>
 
-api:<a href="{{ url_for('api_edit_operation') }}">resources/symbol/operation/ID/edit</a>
+api:<a href="{{ url_for('pdg_api.api_edit_operation', operation_id=1234) }}">resources/symbol/operation/ID/edit</a>
       </td>
     <td><UL>
         <LI>authorization required</LI>
         <LI>delete only if not in use in expression</LI>
         </UL>
-api:<a href="{{ url_for('api_delete_operation', operation_id=1234) }}">resources/symbol/operation/ID/delete</a>
+<P>api:<a href="{{ url_for('pdg_api.api_delete_operation', operation_id=1234) }}">resources/symbol/operation/ID/delete</a>
       </td>
   </tr>
   <tr>
@@ -424,6 +429,8 @@ api:<a href="{{ url_for('api_delete_operation', operation_id=1234) }}">resources
         </UL></td>
   </tr>
 </tbody></table>
+
+<P>In addition to the CRUD webpages and API endpoint there pages that enforce data entry constraints like <a href="{{ url_for('to_add_step_select_inference_rule',derivation_id=1234) }}">new_step_select_inference_rule/ID</a>
 
 <P>&nbsp;</P>
 <HR/>
