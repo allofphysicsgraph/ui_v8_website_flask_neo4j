@@ -1323,13 +1323,13 @@ def api_list_expressions() -> Response:
     )
 
 
-@api_bp.route("/resources/operation_symbols", methods=["GET"])
+@api_bp.route("/resources/symbol/operations", methods=["GET"])
 def api_list_operation_symbols() -> Response:
     """
 
     .. code-block:: bash
 
-        curl --silent --insecure https://localhost/api/resources/operation_symbols | python3 -m json.tool
+        curl --silent --insecure https://localhost/api/resources/symbol/operations | python3 -m json.tool
         [
             {
                 "argument_count": 2,
