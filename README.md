@@ -4,6 +4,8 @@ In mathematical physics there are phrases that have specific meanings:
 - *Non-trivial*: The instructor doesn't know the answer.
 - *Left as an exercise to the reader*: The instructor doesn't know how to solve it.
 
+If you've read a scientific paper or textbook and wondered how the author jumped from one mathematical observation to another, this project is for you.
+
 # The Physics Derivation Graph project makes the "trivial" explicit
 
 The Physics Derivation Graph provides a web server for building, managing, and exploring mathematical derivations in physics (and potentially other fields). 
