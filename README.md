@@ -78,7 +78,9 @@ make down
 
 ## Project contents
 
-Two containers are managed using [docker compose](https://docs.docker.com/compose/): [Neo4j](https://hub.docker.com/_/neo4j) (port 7474) and a Flask-based Python web server (port 5000).
+Three containers are managed using [docker compose](https://docs.docker.com/compose/): [Neo4j](https://hub.docker.com/_/neo4j) (port 7474), nginx, and a Flask-based Python web server (port 5000).
+
+For more guidance on where various project files are and the relations among dependencies see [https://allofphysics.com/documentation/developer](https://allofphysics.com/documentation/developer?referrer=README.md).
 
 ## Neo4j for newbies
 
