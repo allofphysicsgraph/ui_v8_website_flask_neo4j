@@ -154,10 +154,6 @@ Stuck? Contact the author for help! (See the bottom of <https://allofphysics.com
 See CONTRIBUTING.md in this repo for guidance.
 
 
-# Licensing
-
-Unless otherwise noted, all source code is covered by the [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/)
-
 # Why
 
 The "why" for this project of documenting mathematical physics is merely intellectual curiosity. 
