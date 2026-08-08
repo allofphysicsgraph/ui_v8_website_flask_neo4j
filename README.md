@@ -34,6 +34,8 @@ Machine-parsable representations of mathematical physics can be checked by a Com
 
 This repo is an evolution from previous attempts to investigate the above questions. This repo (which is  the code used for <https://allofphysics.com/>) contains a new web interface, new APIs, and a new backend: Neo4j property graph. The previous version of PDG is <https://github.com/allofphysicsgraph/ui_v7_website_flask_json>.
 
+In the context of the Physics Derivation Graph, "contributor" can refer to a few different aspects. Contributing derivations or accessing existing derivations is being user; see [allofphysics.com/documentation/user](https://allofphysics.com/documentation/user?referrer=README) and use the web interface or API for [allofphysics.com](https://allofphysics.com). Another from of being a contributor can refer to modifying the backend source code and evaluating the changes; this requires running a local instance of the project. The rest of this README is aimed at folks interested in running a local instance of the project. 
+
 # Status
 
 The website and back-end work. Some [APIs](https://allofphysics.com/documentation/api?referrer=github-allofphysicsgraph-ui_v8_website_flask_neo4j-README) are operational. The Docker images in this repo are used for <https://allofphysics.com/>.
@@ -80,7 +82,7 @@ make down
 
 Three containers are managed using [docker compose](https://docs.docker.com/compose/): [Neo4j](https://hub.docker.com/_/neo4j) (port 7474), nginx, and a Flask-based Python web server (port 5000).
 
-For more guidance on where various project files are and the relations among dependencies see [https://allofphysics.com/documentation/developer](https://allofphysics.com/documentation/developer?referrer=README.md).
+For more guidance on where various project files are and the relations among dependencies see [allofphysics.com/documentation/developer](https://allofphysics.com/documentation/developer?referrer=README.md).
 
 ## Neo4j for newbies
 
