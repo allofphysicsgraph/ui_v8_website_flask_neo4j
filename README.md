@@ -1,4 +1,4 @@
-In mathematical physics there are words and phrases that have specific meanings:
+In mathematical physics there are phrases that have specific meanings:
 - *Trivial*: The instructor knows the answer and assumes you should too.
 - *Obvious*: The instructor has seen the proof before, but can't remember it right now.
 - *Non-trivial*: The instructor doesn't know the answer.
