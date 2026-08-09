@@ -58,7 +58,6 @@ jobs:
           # Enable GitHub Actions cache backend for BuildKit mounts & layers
           cache-from: type=gha
           cache-to: type=gha,mode=max
-	  
 
 # check syntax using https://www.yamllint.com/
 
