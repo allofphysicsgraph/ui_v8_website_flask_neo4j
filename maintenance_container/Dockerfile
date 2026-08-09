@@ -1,4 +1,14 @@
-FROM python:3.11-slim
+# Physics Derivation Graph
+# Ben Payne, 2026
+# https://creativecommons.org/licenses/by/4.0/
+# Attribution 4.0 International (CC BY 4.0)
+
+# https://docs.docker.com/build/building/best-practices/
+
+# https://docs.docker.com/engine/reference/builder/#from
+# https://github.com/phusion/baseimage-docker
+# https://hub.docker.com/r/phusion/baseimage/tags
+FROM phusion/baseimage:jammy-1.0.4
 
 # Set environment variables
 # Prevents Python from writing .pyc files to disk
@@ -9,6 +19,13 @@ ENV PYTHONUNBUFFERED=1
 # Set the working directory inside the container
 WORKDIR /app
 
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt \
+    apt-get update && apt-get install -y --no-install-recommends \
+        python3 python3-pip python3-dev npm
+
+
+
 # Upgrade pip and copy requirements file FIRST to leverage Docker layer caching
 COPY requirements.txt /app/
 
@@ -16,3 +33,10 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 
+# a high-performance static type checker for Python built and maintained by Microsoft.
+RUN npm install -g pyright
+
+RUN pip install --target=/export/python_env/lib/python3.10/site-packages playwright && \
+    python3 -m playwright install && \
+    python3 -m playwright install-deps && \
+    rm -rf /root/.cache
