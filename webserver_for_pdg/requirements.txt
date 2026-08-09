@@ -18,7 +18,7 @@ requests
 
 # image size
 #opencv-python==5.0.0.93 as of 2026-07-25 on arm64
-opencv-python
+opencv-python-headless
 
 #gunicorn==26.0.0 as of 2026-07-25 on arm64
 gunicorn
