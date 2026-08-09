@@ -1,0 +1,42 @@
+
+# code formatting and consistency checking
+#mypy==2.3.0 as of 2026-07-25 on arm64
+mypy
+
+# type hints for some packages are a separate package for mypy
+#types-PySocks==1.7.1.20260518 as of 2026-07-25 on arm64
+types-PySocks
+#types-colorama==0.4.15.20260508 as of 2026-07-25 on arm64
+types-colorama
+# types-WTForms==3.2.1.20260518 as of 2026-07-25 on arm64
+types-WTForms
+# types-oauthlib==3.3.0.20260724 as of 2026-07-25 on arm64
+types-oauthlib
+# types-requests==2.33.0.20260712 as of 2026-07-25 on arm64
+types-requests
+# types-xmltodict==1.0.1.20260518 as of 2026-07-25 on arm64
+types-xmltodict
+
+#black==26.5.1 as of 2026-07-25 on arm64
+black
+#flake8==7.3.0 as of 2026-07-25 on arm64
+flake8
+#pylint==4.0.6 as of 2026-07-25 on arm64
+pylint
+
+# coverage==7.15.2 as of 2026-07-25 on arm64
+coverage
+
+# browser tests
+# pytest-playwright==0.8.0 as of 2026-07-25 on arm64
+pytest-playwright
+# pytest==9.1.1   as of 2026-07-25 on arm64
+pytest
+# pytest-flask==1.3.0 as of 2026-07-25 on arm64
+pytest-flask
+# pytest-html==4.2.0 as of 2026-07-25 on arm64
+pytest-html
+# pytest-cov==7.1.0 as of 2026-07-25 on arm64
+pytest-cov
+
+
