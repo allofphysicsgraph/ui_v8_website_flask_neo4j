@@ -13,7 +13,7 @@ on:
 permissions:
   packages: write
   contents: read
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,6 +21,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Set up BuildKit (Required for --mount=type=cache & GHA Caching)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -28,6 +33,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Format architecture tag
       - name: Set Architecture Tag
         id: vars
         run: |
@@ -39,17 +45,20 @@ jobs:
           else
             echo "arch=$(echo $RAW_ARCH | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
           fi
-      - name: Build and Push the Docker image
-        working-directory: webserver_for_pdg
-        run: |
-          # Use the lowercase repository name as the image name
-          IMAGE_NAME=ghcr.io/${{ github.repository }}/ui_v8_flask_webserver
-          IMAGE_NAME=$(echo $IMAGE_NAME | tr '[:upper:]' '[:lower:]')
-          TAG=latest-${{ steps.vars.outputs.arch }}
 
-          docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG
-          docker push $IMAGE_NAME:$TAG
-
+      # Build & Push using buildx + GitHub Actions Caching
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: webserver_for_pdg
+          file: webserver_for_pdg/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/ui_v8_flask_webserver:latest-${{ steps.vars.outputs.arch }}
+          # Enable GitHub Actions cache backend for BuildKit mounts & layers
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+	  
 
 # check syntax using https://www.yamllint.com/
 
