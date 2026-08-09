@@ -21,6 +21,8 @@ endif
 # should be same as the `compose.yaml` fields `name: ui_v8` and `services:  flask-webserver`
 WEBSERVER_IMAGE=ui_v8-flask-webserver
 
+MAINTANENCE_IMAGE=maintenance_py
+
 CONTAINER_TAG=latest-$(this_arch)
 
 DOCKER_OR_PODMAN=docker
@@ -66,7 +68,7 @@ launch_webserver:
 	$(DOCKER_OR_PODMAN) run --rm -t -e PYTHONUNBUFFERED=1 -w /scratch \
 	        --entrypoint python3 -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) /scratch/validate_jinja2.py
 	$(DOCKER_OR_PODMAN) run --rm -t -e PYTHONUNBUFFERED=1 -w /scratch \
-	        --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) \
+	        --entrypoint /bin/bash -v `pwd`:/scratch $(MAINTANENCE_IMAGE):$(CONTAINER_TAG) \
 	        -c 'black -v --workers 1 /scratch/webserver_for_pdg/*.py /scratch/test_web_interface/playwrightbased/*.py /scratch/webserver_for_pdg/library/*.py /scratch/test_python/*.py validate_jinja2.py'
 	# https://docs.docker.com/compose/reference/up/
 	WEBSERVER_IMAGE_NAME=$(WEBSERVER_IMAGE) TAG_WITH_ARCH=$(CONTAINER_TAG)  $(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans $(COMPOSE_FLAGS)
@@ -76,26 +78,32 @@ down:
 	# https://docs.docker.com/compose/reference/down/
 	$(DOCKER_OR_PODMAN) compose down --volumes --remove-orphans
 
+buildx_prune:
+	docker buildx prune -a
+
 prune:
 	$(DOCKER_OR_PODMAN) system prune -f
 
 
-container: container_build container_live
+container: web_container_build web_container_live
 
 # https://docs.docker.com/build/building/multi-platform/
-container_build:
+web_container_build:
 	cd webserver_for_pdg && $(DOCKER_OR_PODMAN) build -t $(WEBSERVER_IMAGE):$(CONTAINER_TAG) .
 
 # this is not the currently running webserver for flask
-container_live:
+web_container_live:
 	$(DOCKER_OR_PODMAN) run -it --rm \
                 -v `pwd`:/scratch -w /scratch/ \
                 --user $(id -u):$(id -g) \
                 $(WEBSERVER_IMAGE):$(CONTAINER_TAG) /bin/bash
 
 # assumes the webserver is already running
-container_web:
+web_container_shell:
 	$(DOCKER_OR_PODMAN) exec -it $$(docker ps -qf "name=flask-webserver") /bin/bash
+
+maintenance_container_build:
+	cd maintenance_container && $(DOCKER_OR_PODMAN) build -t $(MAINTANENCE_IMAGE):$(CONTAINER_TAG) .
 
 black_out:
 	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch \
