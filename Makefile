@@ -21,7 +21,7 @@ endif
 # should be same as the `compose.yaml` fields `name: ui_v8` and `services:  flask-webserver`
 WEBSERVER_IMAGE=ui_v8-flask-webserver
 
-MAINTANENCE_IMAGE=maintenance_py
+EXTERNAL_TOOLS_IMAGE=external_tools
 
 CONTAINER_TAG=latest-$(this_arch)
 
@@ -68,7 +68,7 @@ launch_webserver:
 	$(DOCKER_OR_PODMAN) run --rm -t -e PYTHONUNBUFFERED=1 -w /scratch \
 	        --entrypoint python3 -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) /scratch/validate_jinja2.py
 	$(DOCKER_OR_PODMAN) run --rm -t -e PYTHONUNBUFFERED=1 -w /scratch \
-	        --entrypoint /bin/bash -v `pwd`:/scratch $(MAINTANENCE_IMAGE):$(CONTAINER_TAG) \
+	        --entrypoint /bin/bash -v `pwd`:/scratch $(EXTERNAL_TOOLS_IMAGE):$(CONTAINER_TAG) \
 	        -c 'black -v --workers 1 /scratch/webserver_for_pdg/*.py /scratch/test_web_interface/playwrightbased/*.py /scratch/webserver_for_pdg/library/*.py /scratch/test_python/*.py validate_jinja2.py'
 	# https://docs.docker.com/compose/reference/up/
 	WEBSERVER_IMAGE_NAME=$(WEBSERVER_IMAGE) TAG_WITH_ARCH=$(CONTAINER_TAG)  $(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans $(COMPOSE_FLAGS)
@@ -77,6 +77,8 @@ launch_webserver:
 down:
 	# https://docs.docker.com/compose/reference/down/
 	$(DOCKER_OR_PODMAN) compose down --volumes --remove-orphans
+
+########################################################
 
 container: web_container_build web_container_live
 
@@ -95,9 +97,11 @@ web_container_live:
 web_container_shell:
 	$(DOCKER_OR_PODMAN) exec -it $$(docker ps -qf "name=flask-webserver") /bin/bash
 
-maintenance_container_build:
-	cd maintenance_container && $(DOCKER_OR_PODMAN) build -t $(MAINTANENCE_IMAGE):$(CONTAINER_TAG) .
+external_tools_container_build:
+	cd container_for_external_tools && $(DOCKER_OR_PODMAN) build -t $(EXTERNAL_TOOLS_IMAGE):$(CONTAINER_TAG) .
 
+
+########################################################
 black_out:
 	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch \
 	--entrypoint='' --workdir /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) make black_in
@@ -133,7 +137,7 @@ pytest_out_create_html:
 #coverage:
 #	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ $$(docker ps -qf "name=flask-webserver") pytest --cov=. --cov-report=html
 
-
+########################################################
 
 # keep the conf folder since that has the configuration
 # keep plugin folder since that has apocalypse
@@ -141,7 +145,7 @@ delete_neo4j_file:
 	rm -rf neo4j_pdg/data/
 	rm -rf neo4j_pdg/logs/
 
-
+########################################################
 
 # This will remove:
 #  - all stopped containers
@@ -151,12 +155,16 @@ delete_neo4j_file:
 clear_containers:
 	$(DOCKER_OR_PODMAN) system prune
 
+# unlike `system prune` which only removes dangling images, the following deletes all unused images
+system_prune:
+	$(DOCKER_OR_PODMAN) system prune --all
 
+
+# `docker buildx prune` Removes unused build cache entries from the BuildKit builder instance.
+# `--all` removes all cached build layers, not just the unused/orphaned ones.
 buildx_prune:
-	$(DOCKER_OR_PODMAN) buildx prune -a
+	$(DOCKER_OR_PODMAN) buildx prune --all
 
-prune:
-	$(DOCKER_OR_PODMAN) system prune -f
 
 
 
