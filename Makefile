@@ -78,13 +78,6 @@ down:
 	# https://docs.docker.com/compose/reference/down/
 	$(DOCKER_OR_PODMAN) compose down --volumes --remove-orphans
 
-buildx_prune:
-	docker buildx prune -a
-
-prune:
-	$(DOCKER_OR_PODMAN) system prune -f
-
-
 container: web_container_build web_container_live
 
 # https://docs.docker.com/build/building/multi-platform/
@@ -126,6 +119,7 @@ pytest_out_web: pytest_out_py
 	rm -rf test_web_interface/playwrightbased/.pytest_cache
 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ -it $$(docker ps -qf "name=flask-webserver") pytest
 	date
+
 # 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ -it $$(docker ps -qf "name=flask-webserver") pytest --exitfirst
 # can't use 
 #       $(DOCKER_OR_PODMAN) run -v`pwd`:/scratch --workdir /scratch/test_web_interface/playwrightbased/ -it $(WEBSERVER_IMAGE):$(CONTAINER_TAG) pytest --exitfirst
@@ -139,11 +133,15 @@ pytest_out_create_html:
 #coverage:
 #	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ $$(docker ps -qf "name=flask-webserver") pytest --cov=. --cov-report=html
 
+
+
 # keep the conf folder since that has the configuration
 # keep plugin folder since that has apocalypse
 delete_neo4j_file:
 	rm -rf neo4j_pdg/data/
 	rm -rf neo4j_pdg/logs/
+
+
 
 # This will remove:
 #  - all stopped containers
@@ -151,7 +149,15 @@ delete_neo4j_file:
 #  - all dangling images
 #  - unused build cache
 clear_containers:
-	docker system prune
+	$(DOCKER_OR_PODMAN) system prune
+
+
+buildx_prune:
+	$(DOCKER_OR_PODMAN) buildx prune -a
+
+prune:
+	$(DOCKER_OR_PODMAN) system prune -f
+
 
 
 # EOF
