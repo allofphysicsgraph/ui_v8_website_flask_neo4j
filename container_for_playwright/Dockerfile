@@ -33,10 +33,7 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-# a high-performance static type checker for Python built and maintained by Microsoft.
-RUN npm install -g pyright
-
-RUN pip install --target=/export/python_env/lib/python3.10/site-packages playwright && \
+RUN pip install playwright && \
     python3 -m playwright install && \
     python3 -m playwright install-deps && \
-    rm -rf /root/.cache
+

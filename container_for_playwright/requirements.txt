@@ -4,6 +4,8 @@
 flake8
 #pylint==4.0.6 as of 2026-07-25 on arm64
 pylint
+#black==26.5.1 as of 2026-07-25 on arm64
+black
 
 
 #EOF

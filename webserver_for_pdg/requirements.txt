@@ -91,8 +91,5 @@ pytest-html
 pytest-cov
 
 
-#black==26.5.1 as of 2026-07-25 on arm64
-black
-
 
 #EOF
