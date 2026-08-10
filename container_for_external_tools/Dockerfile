@@ -22,8 +22,7 @@ WORKDIR /app
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/var/lib/apt \
     apt-get update && apt-get install -y --no-install-recommends \
-        python3 python3-pip python3-dev npm
-
+        python3 python3-pip python3-dev
 
 
 # Upgrade pip and copy requirements file FIRST to leverage Docker layer caching
@@ -32,8 +31,8 @@ COPY requirements.txt /app/
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-
 RUN pip install playwright && \
     python3 -m playwright install && \
-    python3 -m playwright install-deps && \
+    python3 -m playwright install-deps
 
+#EOF
