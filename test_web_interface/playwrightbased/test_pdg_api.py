@@ -14,7 +14,12 @@ from playwright.sync_api import Playwright, APIRequestContext
 
 # The HATEOAS blueprint is registered under url_prefix='/api'
 # this is what is exposed inside the Docker container
-URL = "http://localhost:5000/api"
+# URL = "https://localhost/api"
+# URL = "https://nginx/api"
+# URL = "https://127.0.0.1/api"
+# outside the container
+URL = "https://host.docker.internal/api"
+
 
 # Gemini 3.5 Flash suggested
 # URL = "https://host.docker.internal/api/"
@@ -42,7 +47,7 @@ def _resolve(href: str) -> str:
 @pytest.fixture
 def entrypoint_links(api_request_context: APIRequestContext):
     """Hits the API root once and hands back its _links for dependent tests."""
-    response = api_request_context.get(f"{URL}/")
+    response = api_request_context.get(f"{URL}/", ignore_https_errors=True)
 
     assert response.ok
     return response.json()["_links"]
@@ -51,7 +56,7 @@ def entrypoint_links(api_request_context: APIRequestContext):
 def test_api_entry_point(api_request_context: APIRequestContext):
     """Verifies that the API entry point returns the expected HATEOAS response structure."""
 
-    response = api_request_context.get(f"{URL}/")
+    response = api_request_context.get(f"{URL}/", ignore_https_errors=True)
     assert response.ok
     assert response.status == 200
 
@@ -79,7 +84,9 @@ def test_api_entry_point(api_request_context: APIRequestContext):
 def test_sympy(entrypoint_links, api_request_context: APIRequestContext):
     sympy_url = _resolve(entrypoint_links["sympy_check"]["href"])
     params = {"sympy": "x**2 + y"}
-    response = api_request_context.get(sympy_url, params=params)
+    response = api_request_context.get(
+        sympy_url, params=params, ignore_https_errors=True
+    )
     assert response.ok, f"Request failed with status {response.status}"
     assert "application/prs.hal-forms+json" in response.headers.get("content-type", "")
     data = response.json()
@@ -96,7 +103,9 @@ def test_sympy_invalid_expression(
 ):
     sympy_url = _resolve(entrypoint_links["sympy_check"]["href"])
     params = {"sympy": "((("}
-    response = api_request_context.get(sympy_url, params=params)
+    response = api_request_context.get(
+        sympy_url, params=params, ignore_https_errors=True
+    )
     assert response.status == 400
     assert "application/prs.hal-forms+json" in response.headers.get("content-type", "")
     data = response.json()
@@ -111,7 +120,7 @@ def test_get_derivations(entrypoint_links, api_request_context: APIRequestContex
 
     derivations_url = _resolve(entrypoint_links["derivations"]["href"])
 
-    response = api_request_context.get(derivations_url)
+    response = api_request_context.get(derivations_url, ignore_https_errors=True)
     assert response.ok
 
     assert "application/prs.hal-forms+json" in response.headers.get("content-type", "")
@@ -128,7 +137,7 @@ def test_unauthorized_whoami(entrypoint_links, api_request_context: APIRequestCo
 
     whoami_url = _resolve(entrypoint_links["whoami"]["href"])
 
-    response = api_request_context.get(whoami_url)
+    response = api_request_context.get(whoami_url, ignore_https_errors=True)
 
     # The require_auth decorator returns a 500 status code
     assert response.status == 500, f"Expected status code 401, got {response.status}"
@@ -142,7 +151,9 @@ def test_unauthorized_whoami(entrypoint_links, api_request_context: APIRequestCo
 
 def test_validate_operations_api(api_request_context: APIRequestContext):
     # Perform a GET request to the API endpoint
-    response = api_request_context.get(f"{URL}/resources/operation_symbols")
+    response = api_request_context.get(
+        f"{URL}/resources/symbol/operations", ignore_https_errors=True
+    )
 
     # Validate that the response is successful
     assert response.ok
@@ -194,7 +205,9 @@ def test_validate_operations_api(api_request_context: APIRequestContext):
 
 
 def test_list_derivations_api(api_request_context: APIRequestContext):
-    response = api_request_context.get(f"{URL}/resources/derivations")
+    response = api_request_context.get(
+        f"{URL}/resources/derivations", ignore_https_errors=True
+    )
     assert response.ok
     assert response.status == 200
     assert "application/prs.hal-forms+json" in response.headers.get("content-type", "")
@@ -211,7 +224,9 @@ def test_list_derivations_api(api_request_context: APIRequestContext):
 
 
 def test_list_expressions_api(api_request_context: APIRequestContext):
-    response = api_request_context.get(f"{URL}/resources/expressions")
+    response = api_request_context.get(
+        f"{URL}/resources/expressions", ignore_https_errors=True
+    )
     assert response.ok
     assert response.status == 200
     assert "application/prs.hal-forms+json" in response.headers.get("content-type", "")
@@ -223,7 +238,9 @@ def test_list_expressions_api(api_request_context: APIRequestContext):
 
 
 def test_list_scalars_api(api_request_context: APIRequestContext):
-    response = api_request_context.get(f"{URL}/resources/symbol/scalars")
+    response = api_request_context.get(
+        f"{URL}/resources/symbol/scalars", ignore_https_errors=True
+    )
     assert response.ok
     assert response.status == 200
     assert "application/prs.hal-forms+json" in response.headers.get("content-type", "")
@@ -235,7 +252,9 @@ def test_list_scalars_api(api_request_context: APIRequestContext):
 
 
 def test_list_relations_api(api_request_context: APIRequestContext):
-    response = api_request_context.get(f"{URL}/resources/symbol/relations")
+    response = api_request_context.get(
+        f"{URL}/resources/symbol/relations", ignore_https_errors=True
+    )
     assert response.ok
     assert response.status == 200
     assert "application/prs.hal-forms+json" in response.headers.get("content-type", "")
@@ -247,7 +266,9 @@ def test_list_relations_api(api_request_context: APIRequestContext):
 
 
 def test_derivation_metadata_and_steps_api(api_request_context: APIRequestContext):
-    list_response = api_request_context.get(f"{URL}/resources/derivations")
+    list_response = api_request_context.get(
+        f"{URL}/resources/derivations", ignore_https_errors=True
+    )
     assert list_response.ok
     derivations = list_response.json().get("_embedded", {}).get("derivations", [])
 
@@ -256,7 +277,7 @@ def test_derivation_metadata_and_steps_api(api_request_context: APIRequestContex
 
     target_id = derivations[0]["id"]
     meta_response = api_request_context.get(
-        f"{URL}/resources/derivation/{target_id}/metadata"
+        f"{URL}/resources/derivation/{target_id}/metadata", ignore_https_errors=True
     )
     assert meta_response.ok
     assert meta_response.status == 200
@@ -265,7 +286,7 @@ def test_derivation_metadata_and_steps_api(api_request_context: APIRequestContex
     assert "metadata" in meta_data
     assert meta_data["metadata"]["id"] == target_id
     steps_response = api_request_context.get(
-        f"{URL}/resources/derivation/{target_id}/steps"
+        f"{URL}/resources/derivation/{target_id}/steps", ignore_https_errors=True
     )
     assert steps_response.ok
     assert steps_response.status == 200

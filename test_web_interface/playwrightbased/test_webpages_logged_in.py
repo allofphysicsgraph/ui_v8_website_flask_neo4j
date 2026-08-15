@@ -10,7 +10,8 @@ import pytest
 
 from playwright.sync_api import Page, expect
 
-URL = "http://localhost:5000"
+URL = "https://host.docker.internal"
+# URL = "https://localhost"
 
 # See https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/107
 

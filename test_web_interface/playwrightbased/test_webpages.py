@@ -16,7 +16,10 @@ import time
 import xml.etree.ElementTree as ET
 
 # this is what is exposed inside the Docker container
-URL = "http://localhost:5000"
+# URL = "https://localhost"
+# URL = "https://nginx"
+# URL = "https://127.0.0.1"
+URL = "https://host.docker.internal"
 
 
 def test_get_index_has_title(page: Page):

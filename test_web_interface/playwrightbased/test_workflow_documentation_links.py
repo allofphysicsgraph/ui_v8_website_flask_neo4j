@@ -7,7 +7,8 @@
 # https://creativecommons.org/licenses/by/4.0/
 
 # this is what is exposed inside the Docker container
-URL = "http://localhost:5000"
+# URL = "https://localhost"
+URL = "https://host.docker.internal"
 
 from playwright.sync_api import Page
 
@@ -39,7 +40,7 @@ def test_workflow_documentation_links(page: Page):
 
         try:
             # Use a timeout so the test doesn't hang indefinitely on a dead server
-            response = requests.head(url, timeout=5, allow_redirects=True)
+            response = requests.head(url, timeout=5, allow_redirects=True, verify=False)
 
             # Some servers don't support HEAD requests, fall back to GET if 405 Method Not Allowed
             if response.status_code == 405:

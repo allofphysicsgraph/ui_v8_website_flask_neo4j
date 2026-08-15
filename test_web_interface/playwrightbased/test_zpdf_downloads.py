@@ -9,7 +9,8 @@
 import re
 from playwright.sync_api import Page, expect
 
-URL = "http://localhost:5000"
+# URL = "https://localhost"
+URL = "https://host.docker.internal"
 
 
 def test_get_review_derivation_instance(page: Page):

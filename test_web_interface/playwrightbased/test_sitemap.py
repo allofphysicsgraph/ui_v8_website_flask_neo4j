@@ -7,7 +7,9 @@
 # https://creativecommons.org/licenses/by/4.0/
 
 # this is what is exposed inside the Docker container
-URL = "http://localhost:5000"
+# URL = "https://localhost"
+# outside the container
+URL = "https://host.docker.internal"
 
 from playwright.sync_api import Page
 from urllib.parse import urlparse, urlunparse
@@ -30,8 +32,9 @@ def test_local_sitemap(page: Page):
         parsed = urlparse(raw_url)
         local_url = urlunparse(
             (
-                "http",  # force http (or keep parsed.scheme if needed)
-                "localhost:5000",  # replace domain/port
+                "https",  # force http (or keep parsed.scheme if needed)
+                # "localhost:5000",  # replace domain/port
+                "host.docker.internal",
                 parsed.path,
                 parsed.params,
                 parsed.query,

@@ -12,6 +12,10 @@
 
 import pytest
 
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 
 @pytest.fixture(scope="session")
 def browser_context_args(browser_context_args):
