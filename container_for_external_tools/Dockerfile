@@ -22,7 +22,7 @@ WORKDIR /app
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/var/lib/apt \
     apt-get update && apt-get install -y --no-install-recommends \
-        python3 python3-pip python3-dev
+        python3 python3-pip python3-dev make
 
 
 # Upgrade pip and copy requirements file FIRST to leverage Docker layer caching
