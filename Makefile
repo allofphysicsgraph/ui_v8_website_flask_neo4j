@@ -68,7 +68,7 @@ launch_webserver:
 	$(DOCKER_OR_PODMAN) run --rm -t -e PYTHONUNBUFFERED=1 -w /scratch \
 	        --entrypoint python3 -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) /scratch/validate_jinja2.py
 	$(DOCKER_OR_PODMAN) run --rm -t -e PYTHONUNBUFFERED=1 -w /scratch \
-	        --entrypoint /bin/bash -v `pwd`:/scratch $(EXTERNAL_TOOLS_IMAGE):$(CONTAINER_TAG) \
+	        --entrypoint /bin/bash -v `pwd`:/scratch $(WEBSERVER_IMAGE):$(CONTAINER_TAG) \
 	        -c 'black -v --workers 1 /scratch/webserver_for_pdg/*.py /scratch/test_web_interface/playwrightbased/*.py /scratch/webserver_for_pdg/library/*.py /scratch/test_python/*.py validate_jinja2.py'
 	# https://docs.docker.com/compose/reference/up/
 	WEBSERVER_IMAGE_NAME=$(WEBSERVER_IMAGE) TAG_WITH_ARCH=$(CONTAINER_TAG)  $(DOCKER_OR_PODMAN) compose up --build --force-recreate --remove-orphans $(COMPOSE_FLAGS)
