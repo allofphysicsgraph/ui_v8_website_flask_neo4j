@@ -1,0 +1,612 @@
+[
+  {
+    "variable": "F",
+    "description": "Net force acting on the object.",
+    "references": [
+      "eq_newton_second_law",
+      "eq_force_ma_derivative",
+      "eq_hookes_law",
+      "eq_force_equality"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "variable",
+    "value_type": "real",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 1,
+      "time": -2,
+      "length": 1,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-2b1c8a7f-ea5c-46ba-8a75-822ec7e0368a"
+  },
+  {
+    "variable": "m",
+    "description": "Mass of the oscillator.",
+    "references": [
+      "eq_newton_second_law",
+      "eq_force_ma_derivative",
+      "eq_force_equality",
+      "eq_normalized_ode",
+      "eq_omega_squared_def",
+      "eq_omega_definition",
+      "eq_specific_solution",
+      "eq_freq_derivation_step",
+      "eq_frequency_formula",
+      "eq_period_formula"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "positive",
+    "dimensionality": {
+      "mass": 1,
+      "time": 0,
+      "length": 0,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-472a2a07-e045-4bd0-9801-3413c6c8ce34"
+  },
+  {
+    "variable": "a",
+    "description": "Acceleration of the object.",
+    "references": [
+      "eq_newton_second_law",
+      "eq_a_derivative_op",
+      "eq_accel_cos",
+      "eq_acceleration_pos_form",
+      "eq_a_max"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "variable",
+    "value_type": "real",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 0,
+      "time": -2,
+      "length": 1,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-37747774-aeb2-4f7e-a2da-3bad5b96f6d4"
+  },
+  {
+    "variable": "x",
+    "description": "Displacement from the equilibrium position.",
+    "references": [
+      "eq_force_ma_derivative",
+      "eq_hookes_law",
+      "eq_force_equality",
+      "eq_normalized_ode",
+      "eq_ode_with_omega",
+      "eq_general_solution",
+      "eq_eval_pos_zero",
+      "eq_c1_is_x0",
+      "eq_specific_solution",
+      "eq_amplitude_phase_form",
+      "eq_trig_expansion",
+      "x_squared",
+      "eq_v_squared_final",
+      "eq_speed_pos_form",
+      "eq_acceleration_pos_form"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "variable",
+    "value_type": "real",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 0,
+      "time": 0,
+      "length": 1,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-36bd81d8-a223-41d8-9897-bbe60d07d972"
+  },
+  {
+    "variable": "t",
+    "description": "Time.",
+    "references": [
+      "eq_force_ma_derivative",
+      "eq_normalized_ode",
+      "eq_ode_with_omega",
+      "eq_general_solution",
+      "eq_velocity_def",
+      "eq_velocity_derivation",
+      "eq_specific_solution",
+      "eq_amplitude_phase_form",
+      "eq_trig_expansion",
+      "eq_velocity_time_form",
+      "eq_v_squared",
+      "eq_v_squared_trig",
+      "x_squared",
+      "eq_accel_cos"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "variable",
+    "value_type": "real",
+    "sign_type": "non-negative",
+    "dimensionality": {
+      "mass": 0,
+      "time": 1,
+      "length": 0,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-6ba8abfc-a2b6-42de-bfa3-feb0a7ea807f"
+  },
+  {
+    "variable": "k",
+    "description": "Spring constant (restoring force constant).",
+    "references": [
+      "eq_hookes_law",
+      "eq_force_equality",
+      "eq_normalized_ode",
+      "eq_omega_squared_def",
+      "eq_omega_definition",
+      "eq_specific_solution",
+      "eq_freq_derivation_step",
+      "eq_frequency_formula",
+      "eq_period_formula"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "positive",
+    "dimensionality": {
+      "mass": 1,
+      "time": -2,
+      "length": 0,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-33386c99-1c45-4150-8ca1-e9dd5b155f37"
+  },
+  {
+    "variable": "\\omega",
+    "description": "Angular frequency.",
+    "references": [
+      "eq_omega_squared_def",
+      "eq_omega_definition",
+      "eq_ode_with_omega",
+      "eq_general_solution",
+      "eq_velocity_derivation",
+      "eq_eval_vel_zero",
+      "eq_vel_c2_relation",
+      "eq_c2_is_v0_omega",
+      "eq_amplitude_phase_form",
+      "eq_trig_expansion",
+      "eq_velocity_time_form",
+      "eq_v_max",
+      "eq_v_squared",
+      "eq_v_squared_trig",
+      "eq_v_squared_final",
+      "eq_speed_pos_form",
+      "eq_accel_cos",
+      "eq_acceleration_pos_form",
+      "eq_a_max",
+      "eq_omega_frequency_relation",
+      "eq_freq_derivation_step"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "positive",
+    "dimensionality": {
+      "mass": 0,
+      "time": -1,
+      "length": 0,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-d44d3b33-1ad0-42f5-b057-34d6a7320b82"
+  },
+  {
+    "variable": "c_1",
+    "description": "First constant of integration, representing initial position.",
+    "references": [
+      "eq_general_solution",
+      "eq_eval_pos_zero",
+      "eq_c1_is_x0",
+      "eq_velocity_derivation",
+      "eq_eval_vel_zero",
+      "eq_coeff_c1",
+      "eq_pythagorean_sum",
+      "eq_pythagorean_factor",
+      "eq_amplitude_def",
+      "eq_tangent_ratio",
+      "eq_phase_def",
+      "eq_complex_magnitude",
+      "eq_complex_argument"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 0,
+      "time": 0,
+      "length": 1,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-9a77cca8-3330-46c1-87bb-287a96c3abf5"
+  },
+  {
+    "variable": "c_2",
+    "description": "Second constant of integration, related to initial velocity.",
+    "references": [
+      "eq_general_solution",
+      "eq_eval_pos_zero",
+      "eq_velocity_derivation",
+      "eq_eval_vel_zero",
+      "eq_vel_c2_relation",
+      "eq_c2_is_v0_omega",
+      "eq_coeff_c2",
+      "eq_pythagorean_sum",
+      "eq_pythagorean_factor",
+      "eq_amplitude_def",
+      "eq_tangent_ratio",
+      "eq_phase_def",
+      "eq_complex_magnitude",
+      "eq_complex_argument"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 0,
+      "time": 0,
+      "length": 1,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-e55014c2-f6d4-44c7-8f7c-e8da3e1dbba4"
+  },
+  {
+    "variable": "x_0",
+    "description": "Initial position at t=0.",
+    "references": [
+      "eq_c1_is_x0",
+      "eq_specific_solution"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 0,
+      "time": 0,
+      "length": 1,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-98c268e5-2634-49ec-a8bb-e46598665143"
+  },
+  {
+    "variable": "v",
+    "description": "Velocity of the object.",
+    "references": [
+      "eq_velocity_def",
+      "eq_velocity_derivation",
+      "eq_eval_vel_zero",
+      "eq_vel_c2_relation",
+      "eq_v_derivative_op",
+      "eq_velocity_time_form",
+      "eq_v_squared",
+      "eq_v_squared_trig",
+      "eq_v_squared_final",
+      "eq_speed_pos_form",
+      "eq_a_derivative_op"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "variable",
+    "value_type": "real",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 0,
+      "time": -1,
+      "length": 1,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-c8d2a4e9-e699-4fa3-8be1-1440114fca2a"
+  },
+  {
+    "variable": "v_0",
+    "description": "Initial velocity at t=0.",
+    "references": [
+      "eq_c2_is_v0_omega",
+      "eq_specific_solution"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 0,
+      "time": -1,
+      "length": 1,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-8ad94a3e-bd38-4e6f-a538-623cdcfac9db"
+  },
+  {
+    "variable": "A",
+    "description": "Amplitude of the oscillation.",
+    "references": [
+      "eq_amplitude_phase_form",
+      "eq_trig_expansion",
+      "eq_coeff_c1",
+      "eq_coeff_c2",
+      "eq_pythagorean_sum",
+      "eq_pythagorean_factor",
+      "eq_amplitude_def",
+      "eq_tangent_ratio",
+      "eq_complex_magnitude",
+      "eq_velocity_time_form",
+      "eq_v_max",
+      "eq_v_squared",
+      "eq_v_squared_trig",
+      "x_squared",
+      "eq_v_squared_final",
+      "eq_speed_pos_form",
+      "eq_accel_cos",
+      "eq_a_max"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "non-negative",
+    "dimensionality": {
+      "mass": 0,
+      "time": 0,
+      "length": 1,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-c1ff3c90-e078-4826-a2b9-e8999fd45bea"
+  },
+  {
+    "variable": "\\phi",
+    "description": "Phase shift constant.",
+    "references": [
+      "eq_amplitude_phase_form",
+      "eq_trig_expansion",
+      "eq_coeff_c1",
+      "eq_coeff_c2",
+      "eq_pythagorean_sum",
+      "eq_pythagorean_factor",
+      "euler_eq",
+      "eq_tangent_ratio",
+      "eq_phase_def",
+      "eq_complex_argument",
+      "eq_velocity_time_form",
+      "eq_v_squared",
+      "eq_v_squared_trig",
+      "x_squared",
+      "eq_accel_cos"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 0,
+      "time": 0,
+      "length": 0,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-de618ec0-a793-4551-b588-cb9a024749a5"
+  },
+  {
+    "variable": "\\alpha",
+    "description": "Arbitrary variable used in trigonometric identity.",
+    "references": [
+      "cos_difference"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "variable",
+    "value_type": "real",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 0,
+      "time": 0,
+      "length": 0,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-a1860e4a-f630-4088-b246-042a72f27be3"
+  },
+  {
+    "variable": "\\beta",
+    "description": "Arbitrary variable used in trigonometric identity.",
+    "references": [
+      "cos_difference",
+      "sin_squared"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "variable",
+    "value_type": "real",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 0,
+      "time": 0,
+      "length": 0,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-6d3be11b-315d-454a-b3cf-3c88d04b7fea"
+  },
+  {
+    "variable": "i",
+    "description": "The imaginary unit.",
+    "references": [
+      "eq_complex_magnitude",
+      "eq_complex_argument"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "complex",
+    "sign_type": "any",
+    "dimensionality": {
+      "mass": 0,
+      "time": 0,
+      "length": 0,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-51ce99e4-4bcc-419a-a583-079ba394147a"
+  },
+  {
+    "variable": "v_{\\rm max}",
+    "description": "Maximum speed of the oscillator.",
+    "references": [
+      "eq_v_max"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "positive",
+    "dimensionality": {
+      "mass": 0,
+      "time": -1,
+      "length": 1,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-bb982154-bb9f-4b8d-8623-2b8bd72667a2"
+  },
+  {
+    "variable": "a_{\\rm max}",
+    "description": "Maximum acceleration of the oscillator.",
+    "references": [
+      "eq_a_max"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "positive",
+    "dimensionality": {
+      "mass": 0,
+      "time": -2,
+      "length": 1,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-015f9ef2-98ef-46a8-9424-55cc5fabc162"
+  },
+  {
+    "variable": "f",
+    "description": "Frequency of oscillation.",
+    "references": [
+      "eq_omega_frequency_relation",
+      "eq_freq_derivation_step",
+      "eq_frequency_formula",
+      "eq_period_def"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "positive",
+    "dimensionality": {
+      "mass": 0,
+      "time": -1,
+      "length": 0,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-46c39247-18cc-46c8-aa41-6322955f2fa3"
+  },
+  {
+    "variable": "T",
+    "description": "Period of oscillation.",
+    "references": [
+      "eq_period_def",
+      "eq_period_formula"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "positive",
+    "dimensionality": {
+      "mass": 0,
+      "time": 1,
+      "length": 0,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-ae075e6a-5cd8-44fd-b4e3-526a41204180"
+  },
+  {
+    "variable": "\\pi",
+    "description": "Mathematical constant pi.",
+    "references": [
+      "eq_omega_frequency_relation",
+      "eq_freq_derivation_step",
+      "eq_frequency_formula",
+      "eq_period_formula"
+    ],
+    "category_type": "scalar",
+    "scalar_type": "constant",
+    "value_type": "real",
+    "sign_type": "positive",
+    "dimensionality": {
+      "mass": 0,
+      "time": 0,
+      "length": 0,
+      "temperature": 0,
+      "electric_charge": 0,
+      "amount_of_substance": 0,
+      "luminous_intensity": 0
+    },
+    "symbol ID": "local-id-49ce3fc9-4cb4-46f2-b458-3442efe2715f"
+  }
+]

@@ -1,0 +1,502 @@
+[
+  {
+    "LHS": "F",
+    "relation": "=",
+    "RHS": "m a",
+    "condition": null,
+    "label": "eq_newton_second_law",
+    "sympy_LHS": "F",
+    "sympy_RHS": "m*a",
+    "expression ID": "local-id-517adca0-86d8-40c3-9f5b-700d77237168"
+  },
+  {
+    "LHS": "F",
+    "relation": "=",
+    "RHS": "m \\frac{d^2 x}{d t^2}",
+    "condition": null,
+    "label": "eq_force_ma_derivative",
+    "sympy_LHS": "F",
+    "sympy_RHS": "m*diff(x(t), t, 2)",
+    "expression ID": "local-id-8cd8b29c-cfd7-48f2-b837-7622fd3b586b"
+  },
+  {
+    "LHS": "F_{spring}",
+    "relation": "=",
+    "RHS": "-k x",
+    "condition": null,
+    "label": "eq_hookes_law",
+    "sympy_LHS": "F_spring",
+    "sympy_RHS": "-k*x",
+    "expression ID": "local-id-273f8f37-6cd2-4115-b25a-dd85695efdd9"
+  },
+  {
+    "LHS": "m \\frac{d^2 x}{d t^2}",
+    "relation": "=",
+    "RHS": "-k x",
+    "condition": null,
+    "label": "eq_force_equality",
+    "sympy_LHS": "m*diff(x(t), t, 2)",
+    "sympy_RHS": "-k*x",
+    "expression ID": "local-id-d81ecc05-088a-4b80-b1d9-755396dba44c"
+  },
+  {
+    "LHS": "\\frac{d^2 x}{d t^2}",
+    "relation": "=",
+    "RHS": "-\\frac{k}{m} x",
+    "condition": null,
+    "label": "eq_normalized_ode",
+    "sympy_LHS": "diff(x(t), t, 2)",
+    "sympy_RHS": "-(k/m)*x",
+    "expression ID": "local-id-65f6ec26-286c-482b-beed-cb1981ff310f"
+  },
+  {
+    "LHS": "\\omega^2",
+    "relation": "=",
+    "RHS": "\\frac{k}{m}",
+    "condition": null,
+    "label": "eq_omega_squared_def",
+    "sympy_LHS": "omega**2",
+    "sympy_RHS": "k/m",
+    "expression ID": "local-id-6a1d4e6a-9d15-4ea4-8137-da339deb0cc0"
+  },
+  {
+    "LHS": "\\omega",
+    "relation": "=",
+    "RHS": "\\sqrt{\\frac{k}{m}}",
+    "condition": null,
+    "label": "eq_omega_definition",
+    "sympy_LHS": "omega",
+    "sympy_RHS": "sqrt(k/m)",
+    "expression ID": "local-id-0faf0a0b-6156-4fa6-b773-0d44c20021f7"
+  },
+  {
+    "LHS": "\\frac{d^2 x}{d t^2}",
+    "relation": "=",
+    "RHS": "-\\omega^2 x",
+    "condition": null,
+    "label": "eq_ode_with_omega",
+    "sympy_LHS": "diff(x(t), t, 2)",
+    "sympy_RHS": "-omega**2*x",
+    "expression ID": "local-id-6e2c411c-e886-4a6e-81ea-159323c4dcb9"
+  },
+  {
+    "LHS": "x(t)",
+    "relation": "=",
+    "RHS": "c_1 \\cos(\\omega t) + c_2 \\sin(\\omega t)",
+    "condition": null,
+    "label": "eq_general_solution",
+    "sympy_LHS": "x(t)",
+    "sympy_RHS": "c_1*cos(omega*t) + c_2*sin(omega*t)",
+    "expression ID": "local-id-83100eb7-93e3-488d-8cd7-393670222aba"
+  },
+  {
+    "LHS": "x(0)",
+    "relation": "=",
+    "RHS": "c_1 \\cos(0) + c_2 \\sin(0)",
+    "condition": "t=0",
+    "label": "eq_eval_pos_zero",
+    "sympy_LHS": "x(0)",
+    "sympy_RHS": "c_1*cos(0) + c_2*sin(0)",
+    "expression ID": "local-id-4caba221-8004-424b-9787-5671be0cd6b4"
+  },
+  {
+    "LHS": "\\cos(0)",
+    "relation": "=",
+    "RHS": "1",
+    "condition": null,
+    "label": "cos_zero",
+    "sympy_LHS": "cos(0)",
+    "sympy_RHS": "1",
+    "expression ID": "local-id-5d6a7461-1cd4-434d-afe0-6340174d731f"
+  },
+  {
+    "LHS": "\\sin(0)",
+    "relation": "=",
+    "RHS": "0",
+    "condition": null,
+    "label": "sin_zero",
+    "sympy_LHS": "sin(0)",
+    "sympy_RHS": "0",
+    "expression ID": "local-id-15dc36a8-42b9-4801-9d13-769324727dd6"
+  },
+  {
+    "LHS": "x(0)",
+    "relation": "=",
+    "RHS": "c_1",
+    "condition": "t=0",
+    "label": "eq_c1_is_x0",
+    "sympy_LHS": "x(0)",
+    "sympy_RHS": "c_1",
+    "expression ID": "local-id-5bffa075-8ea8-4be7-a6e3-c609f965510d"
+  },
+  {
+    "LHS": "v(t)",
+    "relation": "=",
+    "RHS": "\\frac{dx}{dt}",
+    "condition": null,
+    "label": "eq_velocity_def",
+    "sympy_LHS": "v(t)",
+    "sympy_RHS": "diff(x(t), t)",
+    "expression ID": "local-id-866575b2-e72e-4921-a6de-8a812f3b3d8c"
+  },
+  {
+    "LHS": "\\frac{d}{dt} [c_1 \\cos(\\omega t) + c_2 \\sin(\\omega t)]",
+    "relation": "=",
+    "RHS": "-c_1 \\omega \\sin(\\omega t) + c_2 \\omega \\cos(\\omega t)",
+    "condition": null,
+    "label": "eq_velocity_derivation",
+    "sympy_LHS": "diff(c_1*cos(omega*t) + c_2*sin(omega*t), t)",
+    "sympy_RHS": "-c_1*omega*sin(omega*t) + c_2*omega*cos(omega*t)",
+    "expression ID": "local-id-5a26ad2a-2d3f-4a2c-9562-c291959dedd5"
+  },
+  {
+    "LHS": "v(0)",
+    "relation": "=",
+    "RHS": "-c_1 \\omega \\sin(0) + c_2 \\omega \\cos(0)",
+    "condition": "t=0",
+    "label": "eq_eval_vel_zero",
+    "sympy_LHS": "v(0)",
+    "sympy_RHS": "-c_1*omega*sin(0) + c_2*omega*cos(0)",
+    "expression ID": "local-id-fb788470-8486-415f-a8d5-990356fe2799"
+  },
+  {
+    "LHS": "v(0)",
+    "relation": "=",
+    "RHS": "c_2 \\omega",
+    "condition": "t=0",
+    "label": "eq_vel_c2_relation",
+    "sympy_LHS": "v(0)",
+    "sympy_RHS": "c_2*omega",
+    "expression ID": "local-id-4710b5ef-2024-4dfa-9651-7726fa2eef9c"
+  },
+  {
+    "LHS": "c_2",
+    "relation": "=",
+    "RHS": "\\frac{v_0}{\\omega}",
+    "condition": null,
+    "label": "eq_c2_is_v0_omega",
+    "sympy_LHS": "c_2",
+    "sympy_RHS": "v_0/omega",
+    "expression ID": "local-id-f73e797a-9f40-40a5-8daa-94336c096797"
+  },
+  {
+    "LHS": "x(t)",
+    "relation": "=",
+    "RHS": "x_0 \\cos\\left(\\sqrt{\\frac{k}{m}} t\\right) + \\frac{v_0}{\\sqrt{\\frac{k}{m}}}\\sin\\left(\\sqrt{\\frac{k}{m}} t\\right)",
+    "condition": null,
+    "label": "eq_specific_solution",
+    "sympy_LHS": "x(t)",
+    "sympy_RHS": "x_0*cos(sqrt(k/m)*t) + (v_0/sqrt(k/m))*sin(sqrt(k/m)*t)",
+    "expression ID": "local-id-34065798-a5e4-406b-b602-1631f37013e4"
+  },
+  {
+    "LHS": "x(t)",
+    "relation": "=",
+    "RHS": "A \\cos(\\omega t - \\phi)",
+    "condition": null,
+    "label": "eq_amplitude_phase_form",
+    "sympy_LHS": "x(t)",
+    "sympy_RHS": "A*cos(omega*t - phi)",
+    "expression ID": "local-id-5c92f53f-8918-4f28-bd98-01599dc78074"
+  },
+  {
+    "LHS": "\\cos(\\alpha - \\beta)",
+    "relation": "=",
+    "RHS": "\\cos \\alpha \\cos \\beta + \\sin \\alpha \\sin \\beta",
+    "condition": null,
+    "label": "cos_difference",
+    "sympy_LHS": "cos(alpha - beta)",
+    "sympy_RHS": "cos(alpha)*cos(beta) + sin(alpha)*sin(beta)",
+    "expression ID": "local-id-cf03af99-c2ab-4118-a4d0-ca9ce4351c4c"
+  },
+  {
+    "LHS": "x(t)",
+    "relation": "=",
+    "RHS": "A \\cos(\\omega t) \\cos \\phi + A \\sin(\\omega t) \\sin \\phi",
+    "condition": null,
+    "label": "eq_trig_expansion",
+    "sympy_LHS": "x(t)",
+    "sympy_RHS": "A*cos(omega*t)*cos(phi) + A*sin(omega*t)*sin(phi)",
+    "expression ID": "local-id-03002ef1-4984-4226-8e31-ac9ae00df328"
+  },
+  {
+    "LHS": "c_1",
+    "relation": "=",
+    "RHS": "A \\cos \\phi",
+    "condition": null,
+    "label": "eq_coeff_c1",
+    "sympy_LHS": "c_1",
+    "sympy_RHS": "A*cos(phi)",
+    "expression ID": "local-id-1fd1442f-947f-4682-859e-70f948874efd"
+  },
+  {
+    "LHS": "c_2",
+    "relation": "=",
+    "RHS": "A \\sin \\phi",
+    "condition": null,
+    "label": "eq_coeff_c2",
+    "sympy_LHS": "c_2",
+    "sympy_RHS": "A*sin(phi)",
+    "expression ID": "local-id-bf44a39c-da7c-420d-8b00-6881a70ee150"
+  },
+  {
+    "LHS": "c_1^2 + c_2^2",
+    "relation": "=",
+    "RHS": "A^2 \\cos^2 \\phi + A^2 \\sin^2 \\phi",
+    "condition": null,
+    "label": "eq_pythagorean_sum",
+    "sympy_LHS": "c_1**2 + c_2**2",
+    "sympy_RHS": "A**2*cos(phi)**2 + A**2*sin(phi)**2",
+    "expression ID": "local-id-3c4c2104-dd40-4096-b244-4771836382fc"
+  },
+  {
+    "LHS": "c_1^2 + c_2^2",
+    "relation": "=",
+    "RHS": "A^2 (\\cos^2 \\phi + \\sin^2 \\phi)",
+    "condition": null,
+    "label": "eq_pythagorean_factor",
+    "sympy_LHS": "c_1**2 + c_2**2",
+    "sympy_RHS": "A**2*(cos(phi)**2 + sin(phi)**2)",
+    "expression ID": "local-id-8105403c-f334-475a-a582-79d1b316f551"
+  },
+  {
+    "LHS": "\\cos^2 \\phi + \\sin^2 \\phi",
+    "relation": "=",
+    "RHS": "1",
+    "condition": null,
+    "label": "euler_eq",
+    "sympy_LHS": "cos(phi)**2 + sin(phi)**2",
+    "sympy_RHS": "1",
+    "expression ID": "local-id-dac41c5f-aedf-4643-9f4a-72ae95e51de4"
+  },
+  {
+    "LHS": "A",
+    "relation": "=",
+    "RHS": "\\sqrt{c_1^2 + c_2^2}",
+    "condition": null,
+    "label": "eq_amplitude_def",
+    "sympy_LHS": "A",
+    "sympy_RHS": "sqrt(c_1**2 + c_2**2)",
+    "expression ID": "local-id-cda65d28-fa1f-4233-b2e4-21b8253fdd20"
+  },
+  {
+    "LHS": "\\frac{c_2}{c_1}",
+    "relation": "=",
+    "RHS": "\\frac{A \\sin \\phi}{A \\cos \\phi}",
+    "condition": null,
+    "label": "eq_tangent_ratio",
+    "sympy_LHS": "c_2/c_1",
+    "sympy_RHS": "(A*sin(phi))/(A*cos(phi))",
+    "expression ID": "local-id-059c80c4-45d1-4061-b084-e7b122b95a6c"
+  },
+  {
+    "LHS": "\\tan \\phi",
+    "relation": "=",
+    "RHS": "\\frac{c_2}{c_1}",
+    "condition": null,
+    "label": "eq_phase_def",
+    "sympy_LHS": "tan(phi)",
+    "sympy_RHS": "c_2/c_1",
+    "expression ID": "local-id-71de0939-c8da-4e17-a2d2-e1f78c267aa1"
+  },
+  {
+    "LHS": "A",
+    "relation": "=",
+    "RHS": "|c_1 + c_2 i|",
+    "condition": null,
+    "label": "eq_complex_magnitude",
+    "sympy_LHS": "A",
+    "sympy_RHS": "Abs(c_1 + c_2*I)",
+    "expression ID": "local-id-a2ac558e-e2ee-429c-a3f9-0cd83f9f67ea"
+  },
+  {
+    "LHS": "\\phi",
+    "relation": "=",
+    "RHS": "\\text{arg}(c_1 + c_2 i)",
+    "condition": null,
+    "label": "eq_complex_argument",
+    "sympy_LHS": "phi",
+    "sympy_RHS": "arg(c_1 + c_2*I)",
+    "expression ID": "local-id-ac7163ed-0bb0-42bd-9ebe-60a20f2e64da"
+  },
+  {
+    "LHS": "v(t)",
+    "relation": "=",
+    "RHS": "\\frac{dx}{dt}",
+    "condition": null,
+    "label": "eq_v_derivative_op",
+    "sympy_LHS": "v(t)",
+    "sympy_RHS": "diff(x(t), t)",
+    "expression ID": "local-id-47f22410-07da-4e28-a666-0706c3ada714"
+  },
+  {
+    "LHS": "v(t)",
+    "relation": "=",
+    "RHS": "-A \\omega \\sin(\\omega t - \\phi)",
+    "condition": null,
+    "label": "eq_velocity_time_form",
+    "sympy_LHS": "v(t)",
+    "sympy_RHS": "-A*omega*sin(omega*t - phi)",
+    "expression ID": "local-id-f229982a-f926-47d8-a004-c22235e5c651"
+  },
+  {
+    "LHS": "v_{\\rm max}",
+    "relation": "=",
+    "RHS": "\\omega A",
+    "condition": "sin(omega*t - phi) = +/- 1",
+    "label": "eq_v_max",
+    "sympy_LHS": "v_max",
+    "sympy_RHS": "omega*A",
+    "expression ID": "local-id-a2a3cad7-414a-45c2-bddd-4b9ef78802dc"
+  },
+  {
+    "LHS": "\\sin^2 \\beta",
+    "relation": "=",
+    "RHS": "1 - \\cos^2 \\beta",
+    "condition": null,
+    "label": "sin_squared",
+    "sympy_LHS": "sin(beta)**2",
+    "sympy_RHS": "1 - cos(beta)**2",
+    "expression ID": "local-id-a481d989-48e3-4617-8e5d-d79b8df416a2"
+  },
+  {
+    "LHS": "v^2",
+    "relation": "=",
+    "RHS": "A^2 \\omega^2 \\sin^2(\\omega t - \\phi)",
+    "condition": null,
+    "label": "eq_v_squared",
+    "sympy_LHS": "v**2",
+    "sympy_RHS": "A**2*omega**2*sin(omega*t - phi)**2",
+    "expression ID": "local-id-9c1ea665-a287-4013-acd4-06be0ff477a6"
+  },
+  {
+    "LHS": "v^2",
+    "relation": "=",
+    "RHS": "\\omega^2 A^2 [1 - \\cos^2(\\omega t - \\phi)]",
+    "condition": null,
+    "label": "eq_v_squared_trig",
+    "sympy_LHS": "v**2",
+    "sympy_RHS": "omega**2*A**2*(1 - cos(omega*t - phi)**2)",
+    "expression ID": "local-id-dfcdd6e8-2541-4406-a650-c8a09a7d0f32"
+  },
+  {
+    "LHS": "x^2",
+    "relation": "=",
+    "RHS": "A^2 \\cos^2(\\omega t - \\phi)",
+    "condition": null,
+    "label": "x_squared",
+    "sympy_LHS": "x**2",
+    "sympy_RHS": "A**2*cos(omega*t - phi)**2",
+    "expression ID": "local-id-4cc5f3aa-bdb1-49aa-8a2c-3930946024d3"
+  },
+  {
+    "LHS": "v^2",
+    "relation": "=",
+    "RHS": "\\omega^2 (A^2 - x^2)",
+    "condition": null,
+    "label": "eq_v_squared_final",
+    "sympy_LHS": "v**2",
+    "sympy_RHS": "omega**2*(A**2 - x**2)",
+    "expression ID": "local-id-5c6b8f37-1d20-4942-ac0f-bbb3acfc25cd"
+  },
+  {
+    "LHS": "v",
+    "relation": "=",
+    "RHS": "\\omega \\sqrt{A^2 - x^2}",
+    "condition": null,
+    "label": "eq_speed_pos_form",
+    "sympy_LHS": "v",
+    "sympy_RHS": "omega*sqrt(A**2 - x**2)",
+    "expression ID": "local-id-5ace4c86-8ad2-44d2-b7bb-ad9296c9610f"
+  },
+  {
+    "LHS": "a(t)",
+    "relation": "=",
+    "RHS": "\\frac{dv}{dt}",
+    "condition": null,
+    "label": "eq_a_derivative_op",
+    "sympy_LHS": "a(t)",
+    "sympy_RHS": "diff(v(t), t)",
+    "expression ID": "local-id-a8ed16a0-191a-42d5-b7e9-7ebc441a3308"
+  },
+  {
+    "LHS": "a(t)",
+    "relation": "=",
+    "RHS": "-A \\omega^2 \\cos(\\omega t - \\phi)",
+    "condition": null,
+    "label": "eq_accel_cos",
+    "sympy_LHS": "a(t)",
+    "sympy_RHS": "-A*omega**2*cos(omega*t - phi)",
+    "expression ID": "local-id-8a99817a-22bd-4d78-b975-504f5b13eda8"
+  },
+  {
+    "LHS": "a(x)",
+    "relation": "=",
+    "RHS": "-\\omega^2 x",
+    "condition": null,
+    "label": "eq_acceleration_pos_form",
+    "sympy_LHS": "a(x)",
+    "sympy_RHS": "-omega**2*x",
+    "expression ID": "local-id-24ec8857-bd7e-43f3-95e6-cdcace92c164"
+  },
+  {
+    "LHS": "a_{\\rm max}",
+    "relation": "=",
+    "RHS": "A \\omega^2",
+    "condition": "x = +/- A",
+    "label": "eq_a_max",
+    "sympy_LHS": "a_max",
+    "sympy_RHS": "A*omega**2",
+    "expression ID": "local-id-8e8ab38d-3fae-4139-8178-bb736eaa21c1"
+  },
+  {
+    "LHS": "\\omega",
+    "relation": "=",
+    "RHS": "2 \\pi f",
+    "condition": null,
+    "label": "eq_omega_frequency_relation",
+    "sympy_LHS": "omega",
+    "sympy_RHS": "2*pi*f",
+    "expression ID": "local-id-5a754668-c8a4-4ce4-a670-740c6705be50"
+  },
+  {
+    "LHS": "2 \\pi f",
+    "relation": "=",
+    "RHS": "\\sqrt{\\frac{k}{m}}",
+    "condition": null,
+    "label": "eq_freq_derivation_step",
+    "sympy_LHS": "2*pi*f",
+    "sympy_RHS": "sqrt(k/m)",
+    "expression ID": "local-id-985cafc7-324d-4f6c-8959-18c65a3f3435"
+  },
+  {
+    "LHS": "f",
+    "relation": "=",
+    "RHS": "\\frac{1}{2 \\pi} \\sqrt{\\frac{k}{m}}",
+    "condition": null,
+    "label": "eq_frequency_formula",
+    "sympy_LHS": "f",
+    "sympy_RHS": "(1/(2*pi))*sqrt(k/m)",
+    "expression ID": "local-id-0b32236d-75d7-4483-ab8c-022a7cd6f986"
+  },
+  {
+    "LHS": "T",
+    "relation": "=",
+    "RHS": "\\frac{1}{f}",
+    "condition": null,
+    "label": "eq_period_def",
+    "sympy_LHS": "T",
+    "sympy_RHS": "1/f",
+    "expression ID": "local-id-1c0c6619-0e13-4a81-9129-154f05f6d3ad"
+  },
+  {
+    "LHS": "T",
+    "relation": "=",
+    "RHS": "2 \\pi \\sqrt{\\frac{m}{k}}",
+    "condition": null,
+    "label": "eq_period_formula",
+    "sympy_LHS": "T",
+    "sympy_RHS": "2*pi*sqrt(m/k)",
+    "expression ID": "local-id-db70f7fe-e8cc-4c6c-b6ce-afeaea2c2c42"
+  }
+]

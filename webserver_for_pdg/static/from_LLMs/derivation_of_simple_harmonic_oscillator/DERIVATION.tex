@@ -1,0 +1,352 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% https://github.com/allofphysicsgraph/task-tracker/issues/167#issuecomment-4120165817
+
+% margins of 1 inch:
+\setlength{\topmargin}{-.5in}
+\setlength{\textheight}{9in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\textwidth}{6.5in}
+
+\usepackage[pdftex]{hyperref} % hyperlink equation and bibliographic citations
+\author{Ben Payne, with Gemini 1.5 Pro}
+\title{4120165817: Derivation of the Dynamics of Simple Harmonic Motion}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+4120165817: This document provides a rigorous, step-by-step derivation of the equations governing simple harmonic motion (SHM) for a mass-spring system. Starting from Newton's Second Law and Hooke's Law,  the second-order ordinary differential equation of motion is derived, solving for the displacement as a function of time, and determining the physical constants associated with the motion, including amplitude, frequency, and period.
+\end{abstract}
+
+\section{The Equation of Motion}
+
+In Newtonian mechanics, the behavior of a one-dimensional simple harmonic oscillator, such as a mass attached to a spring, is governed by the relationship between force, mass, and acceleration. According to Newton's Second Law, the net force acting on an object is equal to the product of its mass and its acceleration.
+
+\begin{equation}
+F = m a
+\label{eq_newton_second_law}
+\end{equation}
+
+Acceleration is defined as the second derivative of position $x$ with respect to time $t$. Substituting this definition into Equation~\ref{eq_newton_second_law} yields:
+
+\begin{equation}
+F = m \frac{d^2 x}{d t^2}
+\label{eq_force_ma_derivative}
+\end{equation}
+
+For a mass on a spring, the restoring force is described by Hooke's Law, which states that the force is proportional to the displacement from the equilibrium position but acts in the opposite direction.
+
+\begin{equation}
+F_{spring} = -k x
+\label{eq_hookes_law}
+\end{equation}
+
+Assuming the spring force is the only force acting on the mass (the net force),  equate Equation~\ref{eq_force_ma_derivative} and Equation~\ref{eq_hookes_law}:
+
+\begin{equation}
+m \frac{d^2 x}{d t^2} = -k x
+\label{eq_force_equality}
+\end{equation}
+
+To isolate the acceleration term,  divide both sides of Equation~\ref{eq_force_equality} by the mass $m$:
+
+\begin{equation}
+\frac{d^2 x}{d t^2} = -\frac{k}{m} x
+\label{eq_normalized_ode}
+\end{equation}
+
+\section{Solving the Differential Equation}
+
+Equation~\ref{eq_normalized_ode} is a linear second-order ordinary differential equation. Define a constant $\omega$ (the angular frequency) to simplify the notation. Let:
+
+\begin{equation}
+\omega^2 = \frac{k}{m}
+\label{eq_omega_squared_def}
+\end{equation}
+
+By taking the square root of Equation~\ref{eq_omega_squared_def},  define $\omega$:
+
+\begin{equation}
+\omega = \sqrt{\frac{k}{m}}
+\label{eq_omega_definition}
+\end{equation}
+
+Substituting Equation~\ref{eq_omega_squared_def} into Equation~\ref{eq_normalized_ode} gives:
+
+\begin{equation}
+\frac{d^2 x}{d t^2} = -\omega^2 x
+\label{eq_ode_with_omega}
+\end{equation}
+
+The general solution to this differential equation is a linear combination of sine and cosine functions:
+
+\begin{equation}
+x(t) = c_1 \cos(\omega t) + c_2 \sin(\omega t)
+\label{eq_general_solution}
+\end{equation}
+
+\section{Determining Constants from Initial Conditions}
+
+The constants $c_1$ and $c_2$ are determined by the initial state of the system at time $t=0$. To find $c_1$,  evaluate Equation~\ref{eq_general_solution} at $t=0$:
+
+\begin{equation}
+x(0) = c_1 \cos(0) + c_2 \sin(0)
+\label{eq_eval_pos_zero}
+\end{equation}
+
+Since 
+\begin{equation}
+\cos(0) = 1    
+\label{cos_zero}
+\end{equation}
+and 
+\begin{equation}
+    \sin(0) = 0
+    \label{sin_zero}
+\end{equation}
+then Equation~\ref{eq_eval_pos_zero} simplifies to:
+
+\begin{equation}
+x(0) = c_1
+\label{eq_c1_is_x0}
+\end{equation}
+
+Thus, $c_1$ represents the initial position, which is denoted as $x_0$. To find $c_2$,  first differentiate Equation~\ref{eq_general_solution} with respect to time to find the velocity $v(t)$:
+
+\begin{equation}
+v(t) = \frac{dx}{dt}
+\label{eq_velocity_def}
+\end{equation}
+
+\begin{equation}
+\frac{d}{dt} [c_1 \cos(\omega t) + c_2 \sin(\omega t)] = -c_1 \omega \sin(\omega t) + c_2 \omega \cos(\omega t)
+\label{eq_velocity_derivation}
+\end{equation}
+
+Evaluating the velocity at $t=0$:
+
+\begin{equation}
+v(0) = -c_1 \omega \sin(0) + c_2 \omega \cos(0)
+\label{eq_eval_vel_zero}
+\end{equation}
+
+\begin{equation}
+v(0) = c_2 \omega
+\label{eq_vel_c2_relation}
+\end{equation}
+
+Solving Equation~\ref{eq_vel_c2_relation} for $c_2$, where $v_0$ is the initial velocity:
+
+\begin{equation}
+c_2 = \frac{v_0}{\omega}
+\label{eq_c2_is_v0_omega}
+\end{equation}
+
+Substituting the values of $c_1$ and $c_2$ back into the general solution (Equation~\ref{eq_general_solution}) and using the definition of $\omega$ from Equation~\ref{eq_omega_definition} yields the specific solution:
+
+\begin{equation}
+x(t) = x_0 \cos\left(\sqrt{\frac{k}{m}} t\right) + \frac{v_0}{\sqrt{\frac{k}{m}}}\sin\left(\sqrt{\frac{k}{m}} t\right)
+\label{eq_specific_solution}
+\end{equation}
+
+\section{Amplitude-Phase Form}
+
+The displacement can also be written in a more compact form using an amplitude $A$ and a phase shift $\phi$:
+
+\begin{equation}
+x(t) = A \cos(\omega t - \phi)
+\label{eq_amplitude_phase_form}
+\end{equation}
+
+To relate this to our previous constants, use the trigonometric identity 
+\begin{equation}
+\cos(\alpha - \beta) = \cos \alpha \cos \beta + \sin \alpha \sin \beta
+\label{cos_difference}
+\end{equation}
+
+
+\begin{equation}
+x(t) = A \cos(\omega t) \cos \phi + A \sin(\omega t) \sin \phi
+\label{eq_trig_expansion}
+\end{equation}
+
+Comparing Equation~\ref{eq_trig_expansion} to Equation~\ref{eq_general_solution},  equate the coefficients of $\cos(\omega t)$ and $\sin(\omega t)$:
+
+\begin{equation}
+c_1 = A \cos \phi
+\label{eq_coeff_c1}
+\end{equation}
+
+\begin{equation}
+c_2 = A \sin \phi
+\label{eq_coeff_c2}
+\end{equation}
+
+Squaring and adding Equation~\ref{eq_coeff_c1} and Equation~\ref{eq_coeff_c2} allows us to solve for $A$:
+
+\begin{equation}
+c_1^2 + c_2^2 = A^2 \cos^2 \phi + A^2 \sin^2 \phi
+\label{eq_pythagorean_sum}
+\end{equation}
+
+\begin{equation}
+c_1^2 + c_2^2 = A^2 (\cos^2 \phi + \sin^2 \phi)
+\label{eq_pythagorean_factor}
+\end{equation}
+
+Since 
+\begin{equation}
+\cos^2 \phi + \sin^2 \phi = 1
+\label{euler_eq}
+\end{equation}
+then
+\begin{equation}
+A = \sqrt{c_1^2 + c_2^2}
+\label{eq_amplitude_def}
+\end{equation}
+
+Dividing Equation~\ref{eq_coeff_c2} by Equation~\ref{eq_coeff_c1} allows us to find the phase $\phi$:
+
+\begin{equation}
+\frac{c_2}{c_1} = \frac{A \sin \phi}{A \cos \phi}
+\label{eq_tangent_ratio}
+\end{equation}
+
+\begin{equation}
+\tan \phi = \frac{c_2}{c_1}
+\label{eq_phase_def}
+\end{equation}
+
+Alternatively, these can be viewed in the complex plane as the magnitude and argument of a complex number:
+
+\begin{equation}
+A = |c_1 + c_2 i|
+\label{eq_complex_magnitude}
+\end{equation}
+
+\begin{equation}
+\phi = \text{arg}(c_1 + c_2 i)
+\label{eq_complex_argument}
+\end{equation}
+
+\section{Velocity and Acceleration}
+
+Starting from Equation~\ref{eq_amplitude_phase_form}, differentiate with respect to time to find velocity $v(t)$:
+
+\begin{equation}
+v(t) = \frac{dx}{dt}
+\label{eq_v_derivative_op}
+\end{equation}
+
+\begin{equation}
+v(t) = -A \omega \sin(\omega t - \phi)
+\label{eq_velocity_time_form}
+\end{equation}
+
+The maximum speed occurs when the sine term is $\pm 1$:
+
+\begin{equation}
+v_{\rm max} = \omega A
+\label{eq_v_max}
+\end{equation}
+
+To find the speed in terms of position $x$, note that 
+\begin{equation}
+\sin^2 \beta = 1 - \cos^2 \beta 
+\label{sin_squared}
+\end{equation}
+
+\begin{equation}
+v^2 = A^2 \omega^2 \sin^2(\omega t - \phi)
+\label{eq_v_squared}
+\end{equation}
+
+\begin{equation}
+v^2 = \omega^2 A^2 [1 - \cos^2(\omega t - \phi)]
+\label{eq_v_squared_trig}
+\end{equation}
+
+Substituting 
+\begin{equation}
+    x^2 = A^2 \cos^2(\omega t - \phi)
+    \label{x_squared}
+\end{equation}
+
+from Equation~\ref{eq_amplitude_phase_form}:
+
+\begin{equation}
+v^2 = \omega^2 (A^2 - x^2)
+\label{eq_v_squared_final}
+\end{equation}
+
+\begin{equation}
+v = \omega \sqrt{A^2 - x^2}
+\label{eq_speed_pos_form}
+\end{equation}
+
+Differentiating velocity (Equation~\ref{eq_velocity_time_form}) with respect to time gives acceleration $a(t)$:
+
+\begin{equation}
+a(t) = \frac{dv}{dt}
+\label{eq_a_derivative_op}
+\end{equation}
+
+\begin{equation}
+a(t) = -A \omega^2 \cos(\omega t - \phi)
+\label{eq_accel_cos}
+\end{equation}
+
+Comparing Equation~\ref{eq_accel_cos} to Equation~\ref{eq_amplitude_phase_form}, see:
+
+\begin{equation}
+a(x) = -\omega^2 x
+\label{eq_acceleration_pos_form}
+\end{equation}
+
+The maximum acceleration occurs at the extreme points (where $x = \pm A$):
+
+\begin{equation}
+a_{\rm max} = A \omega^2
+\label{eq_a_max}
+\end{equation}
+
+\section{Frequency and Period}
+
+The angular frequency $\omega$ is related to the ordinary frequency $f$ (number of cycles per second) by:
+
+\begin{equation}
+\omega = 2 \pi f
+\label{eq_omega_frequency_relation}
+\end{equation}
+
+Substituting Equation~\ref{eq_omega_definition} into Equation~\ref{eq_omega_frequency_relation}:
+
+\begin{equation}
+2 \pi f = \sqrt{\frac{k}{m}}
+\label{eq_freq_derivation_step}
+\end{equation}
+
+\begin{equation}
+f = \frac{1}{2 \pi} \sqrt{\frac{k}{m}}
+\label{eq_frequency_formula}
+\end{equation}
+
+The period $T$ is the time taken for one complete cycle, which is the reciprocal of the frequency:
+
+\begin{equation}
+T = \frac{1}{f}
+\label{eq_period_def}
+\end{equation}
+
+Substituting Equation~\ref{eq_frequency_formula} into Equation~\ref{eq_period_def}:
+
+\begin{equation}
+T = 2 \pi \sqrt{\frac{m}{k}}
+\label{eq_period_formula}
+\end{equation}
+
+Equations~\ref{eq_frequency_formula} and \ref{eq_period_formula} show that for simple harmonic motion, the period and frequency depend only on the mass and the spring constant, and are independent of the amplitude $A$ and phase $\phi$.
+
+\end{document}

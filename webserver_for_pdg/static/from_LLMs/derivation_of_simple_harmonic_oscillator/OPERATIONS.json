@@ -1,0 +1,238 @@
+[
+  {
+    "latex": "+",
+    "name": "addition",
+    "number_of_arguments": 2,
+    "labels": [
+      "eq_general_solution",
+      "eq_eval_pos_zero",
+      "eq_velocity_derivation",
+      "eq_eval_vel_zero",
+      "eq_specific_solution",
+      "eq_trig_expansion",
+      "eq_pythagorean_sum",
+      "eq_pythagorean_factor",
+      "euler_eq",
+      "eq_amplitude_def",
+      "eq_complex_magnitude",
+      "eq_complex_argument"
+    ]
+  },
+  {
+    "latex": "-",
+    "name": "subtraction",
+    "number_of_arguments": 2,
+    "labels": [
+      "eq_amplitude_phase_form",
+      "cos_difference",
+      "sin_squared",
+      "eq_velocity_time_form",
+      "eq_v_squared",
+      "eq_v_squared_trig",
+      "x_squared",
+      "eq_v_squared_final",
+      "eq_speed_pos_form",
+      "eq_accel_cos"
+    ]
+  },
+  {
+    "latex": "-",
+    "name": "negation",
+    "number_of_arguments": 1,
+    "labels": [
+      "eq_hookes_law",
+      "eq_force_equality",
+      "eq_normalized_ode",
+      "eq_ode_with_omega",
+      "eq_velocity_derivation",
+      "eq_eval_vel_zero",
+      "eq_velocity_time_form",
+      "eq_accel_cos",
+      "eq_acceleration_pos_form"
+    ]
+  },
+  {
+    "latex": null,
+    "name": "multiplication",
+    "number_of_arguments": 2,
+    "labels": [
+      "eq_newton_second_law",
+      "eq_force_ma_derivative",
+      "eq_hookes_law",
+      "eq_force_equality",
+      "eq_normalized_ode",
+      "eq_ode_with_omega",
+      "eq_general_solution",
+      "eq_eval_pos_zero",
+      "eq_velocity_derivation",
+      "eq_eval_vel_zero",
+      "eq_vel_c2_relation",
+      "eq_specific_solution",
+      "eq_amplitude_phase_form",
+      "cos_difference",
+      "eq_trig_expansion",
+      "eq_coeff_c1",
+      "eq_coeff_c2",
+      "eq_pythagorean_sum",
+      "eq_pythagorean_factor",
+      "eq_tangent_ratio",
+      "eq_complex_magnitude",
+      "eq_complex_argument",
+      "eq_velocity_time_form",
+      "eq_v_max",
+      "eq_v_squared",
+      "eq_v_squared_trig",
+      "x_squared",
+      "eq_v_squared_final",
+      "eq_speed_pos_form",
+      "eq_accel_cos",
+      "eq_acceleration_pos_form",
+      "eq_a_max",
+      "eq_omega_frequency_relation",
+      "eq_freq_derivation_step",
+      "eq_frequency_formula",
+      "eq_period_formula"
+    ]
+  },
+  {
+    "latex": "\\frac{}{}",
+    "name": "division",
+    "number_of_arguments": 2,
+    "labels": [
+      "eq_normalized_ode",
+      "eq_omega_squared_def",
+      "eq_omega_definition",
+      "eq_c2_is_v0_omega",
+      "eq_specific_solution",
+      "eq_tangent_ratio",
+      "eq_phase_def",
+      "eq_frequency_formula",
+      "eq_period_def",
+      "eq_period_formula",
+      "eq_freq_derivation_step"
+    ]
+  },
+  {
+    "latex": "^",
+    "name": "exponentiation",
+    "number_of_arguments": 2,
+    "labels": [
+      "eq_omega_squared_def",
+      "eq_ode_with_omega",
+      "eq_pythagorean_sum",
+      "eq_pythagorean_factor",
+      "euler_eq",
+      "eq_amplitude_def",
+      "sin_squared",
+      "eq_v_squared",
+      "eq_v_squared_trig",
+      "x_squared",
+      "eq_v_squared_final",
+      "eq_speed_pos_form",
+      "eq_accel_cos",
+      "eq_acceleration_pos_form",
+      "eq_a_max"
+    ]
+  },
+  {
+    "latex": "\\sqrt{}",
+    "name": "square root",
+    "number_of_arguments": 1,
+    "labels": [
+      "eq_omega_definition",
+      "eq_specific_solution",
+      "eq_amplitude_def",
+      "eq_speed_pos_form",
+      "eq_freq_derivation_step",
+      "eq_frequency_formula",
+      "eq_period_formula"
+    ]
+  },
+  {
+    "latex": "\\frac{d}{d}",
+    "name": "differentiation",
+    "number_of_arguments": 2,
+    "labels": [
+      "eq_force_ma_derivative",
+      "eq_force_equality",
+      "eq_normalized_ode",
+      "eq_ode_with_omega",
+      "eq_velocity_def",
+      "eq_velocity_derivation",
+      "eq_v_derivative_op",
+      "eq_a_derivative_op"
+    ]
+  },
+  {
+    "latex": "\\cos",
+    "name": "cosine",
+    "number_of_arguments": 1,
+    "labels": [
+      "eq_general_solution",
+      "eq_eval_pos_zero",
+      "cos_zero",
+      "eq_velocity_derivation",
+      "eq_eval_vel_zero",
+      "eq_specific_solution",
+      "eq_amplitude_phase_form",
+      "cos_difference",
+      "eq_trig_expansion",
+      "eq_coeff_c1",
+      "eq_pythagorean_sum",
+      "eq_pythagorean_factor",
+      "euler_eq",
+      "eq_tangent_ratio",
+      "sin_squared",
+      "eq_v_squared_trig",
+      "x_squared",
+      "eq_accel_cos"
+    ]
+  },
+  {
+    "latex": "\\sin",
+    "name": "sine",
+    "number_of_arguments": 1,
+    "labels": [
+      "eq_general_solution",
+      "eq_eval_pos_zero",
+      "sin_zero",
+      "eq_velocity_derivation",
+      "eq_eval_vel_zero",
+      "eq_specific_solution",
+      "cos_difference",
+      "eq_trig_expansion",
+      "eq_coeff_c2",
+      "eq_pythagorean_sum",
+      "eq_pythagorean_factor",
+      "euler_eq",
+      "eq_tangent_ratio",
+      "eq_velocity_time_form",
+      "sin_squared",
+      "eq_v_squared"
+    ]
+  },
+  {
+    "latex": "\\tan",
+    "name": "tangent",
+    "number_of_arguments": 1,
+    "labels": [
+      "eq_phase_def"
+    ]
+  },
+  {
+    "latex": "| |",
+    "name": "absolute value",
+    "number_of_arguments": 1,
+    "labels": [
+      "eq_complex_magnitude"
+    ]
+  },
+  {
+    "latex": "\\text{arg}",
+    "name": "complex argument",
+    "number_of_arguments": 1,
+    "labels": [
+      "eq_complex_argument"
+    ]
+  }
+]
