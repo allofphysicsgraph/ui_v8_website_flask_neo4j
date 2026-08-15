@@ -11,19 +11,23 @@
 
 <p>First I had populated the "certs" directory
 </p><pre>/Users/username/version_controlled/allofphysicsgraph/proofofconcept/v7_pickle_web_interface/certs</pre>
-on my laptop from the remote VPS.&nbsp;
+<P>on my laptop from the remote VPS.&nbsp;
 
 <p><br /></p><p>Then I had to create&nbsp;
 </p><pre>/Users/username/version_controlled/allofphysicsgraph/proofofconcept/v7_pickle_web_interface/.env</pre>
-with the Google variables for login authentication.&nbsp;
+<P>with the Google variables for login authentication.&nbsp;
 
-<p><br /></p><p>In the directory on my laptop
+<p><br /></p>
+
+<p>In the directory on my laptop
 </p><pre>/Users/username/version_controlled/allofphysicsgraph/proofofconcept/v7_pickle_web_interface</pre>
 running the command&nbsp;<code>docker-compose up --build&nbsp;</code>failed. Specifically, the nginx and flask containers would start, but nginx would fail because the flask container wasn't responding. I added
 <pre>restart: on-failure</pre>
-to the nginx section in docker-compose.yaml
+<P>to the nginx section in docker-compose.yaml
 
-<P>That didn't solve the flask issue, but it allowed the containers to persist while I inspected the logs. Even though I couldn't enter the flask container, I could review the logs produced by gunicorn by running the command<div><div><pre>tail -f flask/logs/gunicorn_error.log</pre>which showed the causal issue
+<P>That didn't solve the flask issue, but it allowed the containers to persist while I inspected the logs. Even though I couldn't enter the flask container, I could review the logs produced by gunicorn by running the command
+  <pre>tail -f flask/logs/gunicorn_error.log</pre>
+  <P>which showed the causal issue:
 
 <pre>  File "&lt;frozen importlib._bootstrap&gt;", line 219, in _call_with_frames_removed
   File "/home/appuser/app/wsgi.py", line 15, in &lt;module&gt;
@@ -35,6 +39,10 @@ ImportError: cannot import name 'SecureHeaders'
 [2021-08-08 19:56:37 +0000] [1] [WARNING] Worker with pid 11 was terminated due to signal 15
 [2021-08-08 19:56:37 +0000] [1] [INFO] Shutting down: Master
 [2021-08-08 19:56:37 +0000] [1] [INFO] Reason: Worker failed to boot.
-</pre><i>Root case</i>: In my requirements.txt I hadn't pinned the version of the Python library <code>secure</code>. According to <a href="https://github.com/smicallef/spiderfoot/issues/1166">this issue</a> there was <a href="https://pypi.org/project/secure/#history">a recent update</a>&nbsp;. I ended up pinning secure==0.2.1 in requirements.txt<p>Now I am able to run <code>docker-compose up</code> and get a web page at&nbsp;https://localhost/</p></div></div></div>
+</pre>
+
+<P><i>Root case</i>: In my requirements.txt I hadn't pinned the version of the Python library <code>secure</code>. According to <a href="https://github.com/smicallef/spiderfoot/issues/1166">this issue</a> there was <a href="https://pypi.org/project/secure/#history">a recent update</a>&nbsp;. I ended up pinning secure==0.2.1 in requirements.txt<p>Now I am able to run <code>docker-compose up</code> and get a web page at&nbsp;https://localhost/</p>
+
+
 
 {% endblock %}
