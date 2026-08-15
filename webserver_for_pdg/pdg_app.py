@@ -1750,7 +1750,9 @@ def to_review_derivation(
     """
     trace_id = trace_id_var.get()
     #    canonical_url = "review_derivation/" + str(derivation_id)
-    canonical_url = url_for("to_review_derivation").lstrip("/") + str(derivation_id)
+    canonical_url = url_for("to_review_derivation", derivation_id=derivation_id).lstrip(
+        "/"
+    )
 
     query_time_dict = {}  # type: query_timing_result_type
 
