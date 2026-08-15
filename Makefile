@@ -104,7 +104,7 @@ external_tools_container_build:
 ########################################################
 black_out:
 	$(DOCKER_OR_PODMAN) run --rm -v`pwd`:/scratch \
-	--entrypoint='' --workdir /scratch/ $(WEBSERVER_IMAGE):$(CONTAINER_TAG) make black_in
+	--entrypoint='' --workdir /scratch/ $(EXTERNAL_TOOLS_IMAGE):$(CONTAINER_TAG) make black_in
 
 black_in:
 	black -v --workers 1 webserver_for_pdg/*.py webserver_for_pdg/library/*.py test_web_interface/playwrightbased/*.py /scratch/test_python/*.py validate_jinja2.py
@@ -120,8 +120,10 @@ pytest_out_py:
 
 pytest_out_web: pytest_out_py
 	date
+	rm -rf .pytest_cache/
 	rm -rf test_web_interface/playwrightbased/.pytest_cache
-	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ -it $$(docker ps -qf "name=flask-webserver") pytest
+	#$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ -it $$(docker ps -qf "name=flask-webserver") pytest
+	$(DOCKER_OR_PODMAN) run -v`pwd`:/scratch --workdir /scratch/test_web_interface/playwrightbased/ -it $(EXTERNAL_TOOLS_IMAGE):$(CONTAINER_TAG) pytest
 	date
 
 # 	$(DOCKER_OR_PODMAN) exec --workdir /scratch/test_web_interface/playwrightbased/ -it $$(docker ps -qf "name=flask-webserver") pytest --exitfirst
@@ -146,6 +148,10 @@ delete_neo4j_file:
 	rm -rf neo4j_pdg/logs/
 
 ########################################################
+
+# unlike `docker ps`, using `docker compose ps` shows the ports being mapped
+list_ports:
+	docker compose ps
 
 # This will remove:
 #  - all stopped containers
