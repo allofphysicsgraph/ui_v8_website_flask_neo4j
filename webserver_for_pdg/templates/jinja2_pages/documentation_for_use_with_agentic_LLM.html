@@ -10,19 +10,21 @@
 <H1>Agentic LLM Use of the Physics Derivation Graph</H1>
 
 <P>The Physics Derivation Graph does not have a local LLM nor does the project call remotely-hosted LLMs. 
-   Use of an LLM or agentic LLM is the responsibility of the user and is client-side.
-   The Physics Derivation Graph provides <a href="{{ url_for('to_api_documentation') }}?referrer=agentic_llm_documentation">API documentation</a> intended to enable agents.
+   Use of an LLM or agentic LLM is the responsibility of the user and is to be run client-side.
+   The Physics Derivation Graph provides <a href="{{ url_for('to_api_documentation') }}?referrer=agentic_llm_documentation">API documentation</a> relevant to agents.
 
 <P>The workflow for a generic derivation is
+   <a href="{{ url_for('static', filename='agentic_workflow.svg') }}">
 <img src="{{ url_for('static', filename='agentic_workflow.svg') }}">
+</a>
 <!-- see static/agentic_workflow.dot -->
 
-<P>The order of the stages is due to the constraint that SYMBOLS.json and OPERATIONS.json have to be determined before EXPRESSIONS.json, and EXPRESSIONS.json have to be determined before STEPS.json.
+<P>The order of the stages is due to the constraint that SYMBOLS.json and OPERATIONS.json have to be determined before EXPRESSIONS.json, and EXPRESSIONS.json has to be determined before STEPS.json.
 
 
 
 <P>Stage 1: to create DERIVATION.tex  
-   see <a href="{{ url_for('to_llm_workflow_documenation') }}#derivation as tex?referrer=agentic_llm_documentation">prompt</a>
+   using this <a href="{{ url_for('to_llm_workflow_documenation') }}#derivation as tex?referrer=agentic_llm_documentation">prompt</a>.
 
 <P>Stage 2: to create SYMBOLS.json  
    see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to symbols?referrer=agentic_llm_documentation">prompt</a>.
@@ -36,7 +38,7 @@ curl --silent --insecure https://localhost/api/resources/symbol/vectors | jq 'wa
 
 curl --silent --insecure https://localhost/api/resources/symbol/matrices | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
 </pre>
-create <code>matched_SYMBOLS.json</code> and <code>missing_SYMBOLS.json</code> using 
+<P>create <code>matched_SYMBOLS.json</code> and <code>missing_SYMBOLS.json</code> using 
 <a href="{{ url_for('to_llm_workflow_documenation') }}#symbol comparison?referrer=agentic_llm_documentation">this prompt</a>.
 
 <P>Given <code>SYMBOLS_with_local_IDs.json</code> and the list of matches from the LLM, the rewrite of symbols JSON is mechanical.<BR>
