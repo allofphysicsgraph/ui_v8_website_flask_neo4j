@@ -23,7 +23,7 @@ WORKDIR /build
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/var/lib/apt \
     apt-get update && apt-get install -y --no-install-recommends \
-        curl git make python3 python3-pip python3-dev python3.10-venv npm
+        curl git make python3 python3-pip python3-dev python3.10-venv npm ca-certificates
 
 RUN --mount=type=cache,target=/root/.elan \
     curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | \
@@ -93,6 +93,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/* /usr/share/doc/* /usr/share/man/* && \
     if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi && \
     if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi
+
+RUN pip install playwright && \
+    python3 -m playwright install && \
+    python3 -m playwright install-deps
+
 
 COPY --from=builder /opt/lean_installation /opt/lean_installation
 COPY --from=builder /export/python_env /export/python_env
