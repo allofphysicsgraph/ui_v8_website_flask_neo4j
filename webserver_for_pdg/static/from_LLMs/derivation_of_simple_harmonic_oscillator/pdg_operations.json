@@ -1,0 +1,459 @@
+{
+  "_embedded": {
+    "operation_symbols": [
+      {
+        "argument_count": 2,
+        "description_latex": "multiply two terms",
+        "id": "0001094924",
+        "latex": "\\cdot",
+        "name_latex": "multiplication",
+        "reference_latex": ""
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0001130211",
+        "latex": "\\arctan",
+        "name_latex": "arc tangent",
+        "reference_latex": "https://en.wikipedia.org/wiki/Inverse_trigonometric_functions"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0001299288",
+        "latex": "\\det",
+        "name_latex": "determinant",
+        "reference_latex": "https://en.wikipedia.org/wiki/Determinant"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0002090103",
+        "latex": "\\coth",
+        "name_latex": "hyperbolic cotangent",
+        "reference_latex": "https://en.wikipedia.org/wiki/Hyperbolic_function"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0002222105",
+        "latex": "\\vec{\\nabla}",
+        "latex_macro_list": [
+          "\\nabla[1]{ \\nabla #1}"
+        ],
+        "name_latex": "gradient",
+        "reference_latex": "",
+        "scope": [
+          "real"
+        ]
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0002222144",
+        "latex": "\\sin",
+        "latex_macro_list": [
+          "\\sine[1]{ \\sin #1}"
+        ],
+        "name_latex": "sine",
+        "reference_latex": "",
+        "scope": [
+          "real"
+        ]
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "",
+        "id": "0002222278",
+        "latex": "\\times",
+        "latex_macro_list": [
+          "\\times[2]{ #1 \\times #2}"
+        ],
+        "name_latex": "cross product",
+        "reference_latex": "",
+        "scope": [
+          "vector"
+        ]
+      },
+      {
+        "argument_count": 4,
+        "description_latex": "",
+        "id": "0002222280",
+        "latex": "\\int",
+        "latex_macro_list": [
+          "\\integralDefinite[4]{ \\int_{#1}^{#2} #3 #4}"
+        ],
+        "name_latex": "definite integral",
+        "reference_latex": "",
+        "scope": [
+          "real",
+          "vector",
+          "matrix",
+          "complex"
+        ]
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0002222329",
+        "latex": "f",
+        "latex_macro_list": [
+          "\\function[1]{ f #1}"
+        ],
+        "name_latex": "function",
+        "reference_latex": "",
+        "scope": [
+          "list"
+        ]
+      },
+      {
+        "argument_count": 4,
+        "description_latex": "",
+        "id": "0002222348",
+        "latex": "\\sum",
+        "latex_macro_list": [
+          "\\summation[4]{ \\sum_{#1}^{#2} #3}"
+        ],
+        "name_latex": "summation",
+        "reference_latex": "",
+        "scope": [
+          "real",
+          "vector",
+          "matrix",
+          "complex"
+        ]
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "",
+        "id": "0002222427",
+        "latex": "-",
+        "latex_macro_list": [
+          "\\subtraction[2]{ #1 - #2}"
+        ],
+        "name_latex": "subtraction",
+        "reference_latex": "",
+        "scope": [
+          "real",
+          "vector",
+          "matrix",
+          "complex"
+        ]
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "",
+        "id": "0002222435",
+        "latex": "+",
+        "latex_macro_list": [
+          "\\elementwiseAddition[2]{ #1 + #2}"
+        ],
+        "name_latex": "element-wise addition",
+        "reference_latex": "",
+        "scope": [
+          "vector",
+          "matrix"
+        ]
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "",
+        "id": "0002222439",
+        "latex": "\\vec{\\nabla}",
+        "latex_macro_list": [
+          "\\spatialVectorDifferential[1]{ \\vec{ \\nabla} #1}"
+        ],
+        "name_latex": "spatial vector differential",
+        "reference_latex": "",
+        "scope": [
+          "real"
+        ]
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "",
+        "id": "0002222455",
+        "latex": "\\circ",
+        "latex_macro_list": [
+          "\\dotproduct[2]{ #1 \\dot #2}"
+        ],
+        "name_latex": "dot product",
+        "reference_latex": "",
+        "scope": [
+          "vector"
+        ]
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0002222591",
+        "latex": "\\vec{\\nabla} \\cdot",
+        "latex_macro_list": [
+          "\\nabla[1]{ \\nabla \\cdot #1}"
+        ],
+        "name_latex": "divergence",
+        "reference_latex": "",
+        "scope": [
+          "real"
+        ]
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "",
+        "id": "0002222657",
+        "latex": "\\int",
+        "latex_macro_list": [
+          "\\integralIndefinite[2]{ \\int #1 #2}"
+        ],
+        "name_latex": "indefinite intergral",
+        "reference_latex": "",
+        "scope": [
+          "real",
+          "vector",
+          "matrix",
+          "complex"
+        ]
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "",
+        "id": "0002222764",
+        "latex": "+",
+        "latex_macro_list": [
+          "\\addition[2]{ #1 + #2}"
+        ],
+        "name_latex": "addition",
+        "reference_latex": "",
+        "scope": [
+          "real",
+          "vector",
+          "matrix",
+          "complex"
+        ]
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "",
+        "id": "0002222829",
+        "latex": "*",
+        "latex_macro_list": [
+          "\\multiplication[2]{ #1 #2}"
+        ],
+        "name_latex": "multiplication",
+        "reference_latex": "",
+        "scope": [
+          "real",
+          "vector",
+          "matrix",
+          "complex"
+        ]
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "",
+        "id": "0002222891",
+        "latex": "/",
+        "latex_macro_list": [
+          "\\divisionOneLine[2]{ #1 / #2}",
+          "\\divisionFrac[2]{ \\frac{#1}{#2}"
+        ],
+        "name_latex": "division",
+        "reference_latex": "",
+        "scope": [
+          "real",
+          "vector",
+          "matrix",
+          "complex"
+        ]
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0002222896",
+        "latex": "\\vec{\\nabla} \\times",
+        "latex_macro_list": [
+          "\\curl[1]{ \\nabla \\times #1}"
+        ],
+        "name_latex": "curl",
+        "reference_latex": "",
+        "scope": [
+          "real"
+        ]
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0002222940",
+        "latex": "\\cos",
+        "latex_macro_list": [
+          "\\cosine[1]{\\cos #1}"
+        ],
+        "name_latex": "cosine",
+        "reference_latex": "",
+        "scope": [
+          "real"
+        ]
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0002495151",
+        "latex": "!",
+        "name_latex": "factorial",
+        "reference_latex": "https://en.wikipedia.org/wiki/Factorial"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0002532789",
+        "latex": "\\tan",
+        "name_latex": "tangent",
+        "reference_latex": "https://en.wikipedia.org/wiki/Trigonometric_functions"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0002841881",
+        "latex": "\\sinh",
+        "name_latex": "hyperbolic sine",
+        "reference_latex": "https://en.wikipedia.org/wiki/Hyperbolic_function"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0003382639",
+        "latex": "\\cot",
+        "name_latex": "cotangent",
+        "reference_latex": "https://en.wikipedia.org/wiki/Trigonometric_functions"
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "default base 10",
+        "id": "0003403771",
+        "latex": "\\log",
+        "name_latex": "log, arbitrary base",
+        "reference_latex": ""
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "",
+        "id": "0003530844",
+        "latex": "\\mod{}",
+        "name_latex": "modulo",
+        "reference_latex": ""
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0004352752",
+        "latex": "\\tanh",
+        "name_latex": "hyperbolic tangent",
+        "reference_latex": "https://en.wikipedia.org/wiki/Hyperbolic_function"
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "division",
+        "id": "0004426238",
+        "latex": "\\div",
+        "name_latex": "divide",
+        "reference_latex": ""
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0004958131",
+        "latex": "\\max",
+        "name_latex": "maximum",
+        "reference_latex": ""
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0005560743",
+        "latex": "\\arcsin",
+        "name_latex": "arc sine",
+        "reference_latex": "https://en.wikipedia.org/wiki/Inverse_trigonometric_functions"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0005818852",
+        "latex": "\\cosh",
+        "name_latex": "hyperbolic cosine",
+        "reference_latex": "https://en.wikipedia.org/wiki/Hyperbolic_function"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0006151818",
+        "latex": "\\arccos",
+        "name_latex": "arc cosine",
+        "reference_latex": "https://en.wikipedia.org/wiki/Inverse_trigonometric_functions"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0006521282",
+        "latex": "\\ln",
+        "name_latex": "natural logarithm",
+        "reference_latex": ""
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0006739965",
+        "latex": "\\sec",
+        "name_latex": "secant",
+        "reference_latex": "https://en.wikipedia.org/wiki/Trigonometric_functions"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0007843744",
+        "latex": "\\sqrt{}",
+        "name_latex": "square root",
+        "reference_latex": "https://en.wikipedia.org/wiki/Square_root"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0008632687",
+        "latex": "\\exp",
+        "name_latex": "exponential function",
+        "reference_latex": "https://en.wikipedia.org/wiki/Exponential_function"
+      },
+      {
+        "argument_count": 2,
+        "description_latex": "",
+        "id": "0008940007",
+        "latex": "\\oint",
+        "name_latex": "indefinite surface integral",
+        "reference_latex": ""
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0009780858",
+        "latex": "\\csc",
+        "name_latex": "cosecant",
+        "reference_latex": "https://en.wikipedia.org/wiki/Trigonometric_functions"
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "",
+        "id": "0009993766",
+        "latex": "\\min",
+        "name_latex": "minimum",
+        "reference_latex": ""
+      },
+      {
+        "argument_count": 1,
+        "description_latex": "determine the phase of a complex value",
+        "id": "2288488773",
+        "latex": "\\arg",
+        "name_latex": "Complex argument",
+        "reference_latex": "https://en.wikipedia.org/wiki/Argument_(complex_analysis)"
+      }
+    ]
+  }
+}
