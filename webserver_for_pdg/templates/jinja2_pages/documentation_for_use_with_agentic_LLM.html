@@ -27,6 +27,8 @@
 <P><a name="create_derivation_tex">Stage 1: Create DERIVATION.tex</a>
    using this <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#derivation as tex">prompt</a>.
 
+<HR>
+
 <P><a name="create_symbols_json">Stage 2: Create SYMBOLS.json</a>  
    using this <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to symbols">prompt</a>.
 
@@ -47,39 +49,46 @@ curl --silent --insecure https://localhost/api/resources/symbol/matrices |\
 <P>Stage 5: Create <code>matched_SYMBOLS.json</code> and <code>missing_SYMBOLS.json</code> using 
 <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#symbol comparison">this prompt</a>.
 
-<P>Stage 6: Given <code>SYMBOLS_with_local_IDs.json</code> and <code>SYMBOLS_matched.json</code> from the LLM, rewrite using
-   <a href="{{ url_for('rewrite_SYMBOLS_json_using_matched_IDs') }}">this page</a>.
+<P>Stage 6: Given <code>SYMBOLS_with_local_IDs.json</code> and <code>SYMBOLS_matched.json</code> from the LLM, use
+   <a href="{{ url_for('rewrite_SYMBOLS_json_using_matched_IDs') }}">this page</a> to create <code>SYMBOLS_with_local_IDs_and_PDG_IDs.json</code>.
 
-<P>Stage 7: Given <code>SYMBOLS_with_IDs.json</code> and <code>SYMBOLS_missing.json</code>, a human reviewer should confirm lack of existence. Once the human reviewer confirms then creation of symbols should be mechanical. <BR>
+<P>Stage 7: Given <code>SYMBOLS_with_local_IDs.json</code> and <code>SYMBOLS_missing.json</code>, a human reviewer should confirm lack of existence. Once the human reviewer confirms then creation of symbols should be mechanical. <BR>
    TODO: Create the API and, separately, a web page that takes in the missing JSON list to create symbols in PDG.
 
-<P>Once the missing symbols have been created in PDG database, rerun the assessment and confirm symbols until missing is empty.
+<P>Once the missing symbols have been created in PDG database, rerun the assessment (from Step 4) and confirm symbols until missing is empty.
 
-<P>Stage 8: to create <code>OPERATIONS.json</code>
+<HR>
+
+<P>Stage 8: Create <code>OPERATIONS.json</code>
    using <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to operations">this prompt</a>
    
 <P>Stage 9: <a href="{{ url_for('to_validate_OPERATIONS_json') }}?referrer=agentic_llm_documentation">validate OPERATIONS.json</a> to create OPERATIONS_with_local_IDs.json
 
 <P>Stage 10: extract operations from PDG using
 <pre>
-curl --silent --insecure https://localhost/api/resources/symbol/operations | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+curl --silent --insecure https://localhost/api/resources/symbol/operations |\ 
+ jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)' &gt; pdg_operations.json
 </pre>
 
-<P>Stage 11: <code>OPERATIONS_matched.json</code>
+<P>Stage 11: Create <code>OPERATIONS_matched.json</code> and <code>OPERATIONS_missing.json</code> using <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#compare%20operations">this prompt</a>.
 
-<P>Stage 12: <code>OPERATIONS_missing.json</code>
+<P>Stage 12: Given <code>OPERATIONS_with_local_IDs.json</code> and <code>OPERATIONS_matched.json</code> 
 
-<P>Once the missing operations have been created in PDG database, rerun the assessment and confirm operations until missing is empty.
+<P>Stage 13: Given <code>OPERATIONS_with_local_IDs.json</code> and <code>OPERATIONS_missing.json</code>
 
+<P>Once the missing operations have been created in PDG database, rerun the assessment (from Step 10) and confirm operations until missing is empty.
 
-<P>Stage 13, to create EXPRESSIONS.json  
+<HR>
+
+<P>Stage 14, to create EXPRESSIONS.json  
    using <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to expr">prompt</a>
 
-<P>Stage 14: <a href="{{ url_for('to_validate_EXPRESSIONS_json') }}?referrer=agentic_llm_documentation">validate EXPRESSIONS.json</a> to create <code>EXPRESSIONS_with_local_IDs.json</code>
+<P>Stage 15: <a href="{{ url_for('to_validate_EXPRESSIONS_json') }}?referrer=agentic_llm_documentation">validate EXPRESSIONS.json</a> to create <code>EXPRESSIONS_with_local_IDs.json</code>
 
-<P>Stage 15: To get the current expressions from PDG database as JSON use
+<P>Stage 16: To get the current expressions from PDG database as JSON use
 <pre>
-curl --silent --insecure https://localhost/api/resources/expressions | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+curl --silent --insecure https://localhost/api/resources/expressions |\
+ jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
 </pre> 
 
 <P>TODO: from EXPRESSIONS.json extract RELATIONS.json since "relation" is one of the keys and "=" is typical.
@@ -87,8 +96,11 @@ curl --silent --insecure https://localhost/api/resources/expressions | jq 'walk(
 <P>Then compare "=" or other relation with
 
 <pre>
-curl --silent --insecure https://localhost/api/resources/symbol/relations | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+curl --silent --insecure https://localhost/api/resources/symbol/relations |\
+ jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
 </pre>
+
+<HR>
 
 <P>Once all symbols and operations in relations exist in the database, and those database IDs have been updated in the respective JSONs, then the LLM can figure out what symbols, operations, and relations are associated with each expression. The LLM will produce a new JSON file with all the respective edges. Will need a new JSON schema for the edge list to validate against.
 
