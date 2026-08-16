@@ -9,7 +9,7 @@
       "relation",
       "RHS",
       "condition",
-      "label",
+      "local_label",
       "sympy_LHS",
       "sympy_RHS"
     ],
@@ -33,7 +33,7 @@
         "type": ["string", "null"],
         "description": "Specific constraints or values (e.g., t=0) under which the equation holds."
       },
-      "label": {
+      "local_label": {
         "type": "string", 
         "minLength": 1,
         "description": "A unique identifier or name for the physics/math law."
