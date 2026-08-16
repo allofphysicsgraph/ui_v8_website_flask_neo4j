@@ -10,10 +10,10 @@ Download the <a href="{{ url_for('static', filename=path_to_revised_SYMBOLS_json
 	<legend>add matched PDG IDs to SYMBOLS_with_local_IDs.json</legend>
 	  <form method="post">
       {{ form_json.csrf_token }}
-      <P><label for="symbols-json-input">SYMBOLS.json:</label>
+      <P><label for="symbols-json-input">SYMBOLS_with_local_IDs.json:</label>
       <textarea id="symbols-json-input" name="symbols-json-input" rows="20" cols="100" placeholder="Enter SYMBOLS_with_local_IDs.json here..."></textarea>
 
-      <P><label for="matches-json-input">SYMBOLS.json:</label>
+      <P><label for="matches-json-input">SYMBOLS_matched.json:</label>
       <textarea id="matches-json-input" name="matches-json-input" rows="20" cols="100" placeholder="Enter SYMBOLS_matched.json here..."></textarea>
       <P><input type="submit" name="json-btn" value="marge into SYMBOLS_with_local_IDs.json">
     </form>
