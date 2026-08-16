@@ -1,7 +1,8 @@
 [
   {
     "symbol_latex": "F",
-    "db_id": "0000004202",
+    "pdg_id": "0000004202",
+    "local_id_in_derivation": "local-id-2b1c8a7f-ea5c-46ba-8a75-822ec7e0368a",
     "equation_labels": [
       "eq_newton_second_law",
       "eq_force_ma_derivative",
@@ -9,12 +10,13 @@
       "eq_force_equality"
     ],
     "description": "Net force acting on the object.",
-    "explanation": "Matches the database entry for general force, used here to define Newton's Second Law and Hooke's Law.",
+    "explanation": "Matches the scalar force entry in the database with identical physical dimensions (M^1 L^1 T^-2).",
     "confidence": "high"
   },
   {
     "symbol_latex": "m",
-    "db_id": "0000005156",
+    "pdg_id": "0000005156",
+    "local_id_in_derivation": "local-id-472a2a07-e045-4bd0-9801-3413c6c8ce34",
     "equation_labels": [
       "eq_newton_second_law",
       "eq_force_ma_derivative",
@@ -28,12 +30,13 @@
       "eq_period_formula"
     ],
     "description": "Mass of the oscillator.",
-    "explanation": "Matches the database entry for mass (m), which is the inertia component of the oscillator.",
+    "explanation": "Matches the standard mass scalar symbol in the database with dimension M^1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "a",
-    "db_id": "0000009140",
+    "pdg_id": "0000009140",
+    "local_id_in_derivation": "local-id-37747774-aeb2-4f7e-a2da-3bad5b96f6d4",
     "equation_labels": [
       "eq_newton_second_law",
       "eq_a_derivative_op",
@@ -42,12 +45,13 @@
       "eq_a_max"
     ],
     "description": "Acceleration of the object.",
-    "explanation": "Matches the database entry for acceleration, used as the second time derivative of position.",
+    "explanation": "Matches the scalar acceleration entry in the database with dimensions L^1 T^-2.",
     "confidence": "high"
   },
   {
     "symbol_latex": "x",
-    "db_id": "0000004037",
+    "pdg_id": "0000004037",
+    "local_id_in_derivation": "local-id-36bd81d8-a223-41d8-9897-bbe60d07d972",
     "equation_labels": [
       "eq_force_ma_derivative",
       "eq_hookes_law",
@@ -66,12 +70,13 @@
       "eq_acceleration_pos_form"
     ],
     "description": "Displacement from the equilibrium position.",
-    "explanation": "Matches the database entry for position (x). In the derivation, this represents the displacement of the mass.",
+    "explanation": "Matches the position/displacement scalar coordinate with length dimension L^1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "t",
-    "db_id": "0000001467",
+    "pdg_id": "0000001467",
+    "local_id_in_derivation": "local-id-6ba8abfc-a2b6-42de-bfa3-feb0a7ea807f",
     "equation_labels": [
       "eq_force_ma_derivative",
       "eq_normalized_ode",
@@ -89,12 +94,13 @@
       "eq_accel_cos"
     ],
     "description": "Time.",
-    "explanation": "Matches the database entry for time, the independent variable for the oscillator's dynamics.",
+    "explanation": "Matches the standard scalar time variable with dimension T^1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "k",
-    "db_id": "0000001356",
+    "pdg_id": "0000001356",
+    "local_id_in_derivation": "local-id-33386c99-1c45-4150-8ca1-e9dd5b155f37",
     "equation_labels": [
       "eq_hookes_law",
       "eq_force_equality",
@@ -107,12 +113,13 @@
       "eq_period_formula"
     ],
     "description": "Spring constant (restoring force constant).",
-    "explanation": "Matches the database entry for linear stiffness/spring constant, the proportionality constant in Hooke's Law.",
+    "explanation": "Matches linear stiffness / spring constant in the database with dimensions M^1 T^-2.",
     "confidence": "high"
   },
   {
     "symbol_latex": "\\omega",
-    "db_id": "0000002321",
+    "pdg_id": "0000002321",
+    "local_id_in_derivation": "local-id-d44d3b33-1ad0-42f5-b057-34d6a7320b82",
     "equation_labels": [
       "eq_omega_squared_def",
       "eq_omega_definition",
@@ -137,12 +144,13 @@
       "eq_freq_derivation_step"
     ],
     "description": "Angular frequency.",
-    "explanation": "Direct match for angular frequency, defined here as the square root of k/m.",
+    "explanation": "Matches angular frequency with dimension T^-1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "c_1",
-    "db_id": "4133185897",
+    "pdg_id": "4133185897",
+    "local_id_in_derivation": "local-id-9a77cca8-3330-46c1-87bb-287a96c3abf5",
     "equation_labels": [
       "eq_general_solution",
       "eq_eval_pos_zero",
@@ -159,12 +167,13 @@
       "eq_complex_argument"
     ],
     "description": "First constant of integration, representing initial position.",
-    "explanation": "Matches the entry for a mathematical constant (c1) used in differential equations.",
+    "explanation": "Matches constant of solution to differential equation c_1 with length dimension L^1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "c_2",
-    "db_id": "1777778008",
+    "pdg_id": "1777778008",
+    "local_id_in_derivation": "local-id-e55014c2-f6d4-44c7-8f7c-e8da3e1dbba4",
     "equation_labels": [
       "eq_general_solution",
       "eq_eval_pos_zero",
@@ -182,23 +191,25 @@
       "eq_complex_argument"
     ],
     "description": "Second constant of integration, related to initial velocity.",
-    "explanation": "Matches the entry for a mathematical constant (c2) used in differential equations.",
+    "explanation": "Matches constant of solution to differential equation c_2 with length dimension L^1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "x_0",
-    "db_id": "0000001572",
+    "pdg_id": "0000001572",
+    "local_id_in_derivation": "local-id-98c268e5-2634-49ec-a8bb-e46598665143",
     "equation_labels": [
       "eq_c1_is_x0",
       "eq_specific_solution"
     ],
     "description": "Initial position at t=0.",
-    "explanation": "Direct match for initial position (x0).",
+    "explanation": "Matches initial position x_0 with length dimension L^1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "v",
-    "db_id": "0000001357",
+    "pdg_id": "0000001357",
+    "local_id_in_derivation": "local-id-c8d2a4e9-e699-4fa3-8be1-1440114fca2a",
     "equation_labels": [
       "eq_velocity_def",
       "eq_velocity_derivation",
@@ -213,23 +224,25 @@
       "eq_a_derivative_op"
     ],
     "description": "Velocity of the object.",
-    "explanation": "Direct match for linear velocity (v).",
+    "explanation": "Matches the scalar velocity variable with dimensions L^1 T^-1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "v_0",
-    "db_id": "0000005153",
+    "pdg_id": "0000005153",
+    "local_id_in_derivation": "local-id-8ad94a3e-bd38-4e6f-a538-623cdcfac9db",
     "equation_labels": [
       "eq_c2_is_v0_omega",
       "eq_specific_solution"
     ],
     "description": "Initial velocity at t=0.",
-    "explanation": "Direct match for initial velocity (v0).",
+    "explanation": "Matches the scalar initial velocity v_0 with dimensions L^1 T^-1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "A",
-    "db_id": "0000009885",
+    "pdg_id": "0000009885",
+    "local_id_in_derivation": "local-id-c1ff3c90-e078-4826-a2b9-e8999fd45bea",
     "equation_labels": [
       "eq_amplitude_phase_form",
       "eq_trig_expansion",
@@ -251,12 +264,13 @@
       "eq_a_max"
     ],
     "description": "Amplitude of the oscillation.",
-    "explanation": "Matches the entry for oscillation/wave amplitude (A).",
+    "explanation": "Matches the amplitude symbol A in the database.",
     "confidence": "high"
   },
   {
     "symbol_latex": "\\phi",
-    "db_id": "0000008586",
+    "pdg_id": "0000008586",
+    "local_id_in_derivation": "local-id-de618ec0-a793-4551-b588-cb9a024749a5",
     "equation_labels": [
       "eq_amplitude_phase_form",
       "eq_trig_expansion",
@@ -275,64 +289,70 @@
       "eq_accel_cos"
     ],
     "description": "Phase shift constant.",
-    "explanation": "Matches the general angle entry (phi), used here as the phase constant in a harmonic function.",
+    "explanation": "Matches the angular quantity \\phi representing the phase shift / phase angle.",
     "confidence": "high"
   },
   {
     "symbol_latex": "\\alpha",
-    "db_id": "2357809348",
+    "pdg_id": "2357809348",
+    "local_id_in_derivation": "local-id-a1860e4a-f630-4088-b246-042a72f27be3",
     "equation_labels": [
       "cos_difference"
     ],
     "description": "Arbitrary variable used in trigonometric identity.",
-    "explanation": "Matches the angle variable (alpha) used in the derivation for trigonometric proofs.",
+    "explanation": "Matches the generic angle / variable \\alpha in the database.",
     "confidence": "high"
   },
   {
     "symbol_latex": "\\beta",
-    "db_id": "3923126873",
+    "pdg_id": "3923126873",
+    "local_id_in_derivation": "local-id-6d3be11b-315d-454a-b3cf-3c88d04b7fea",
     "equation_labels": [
       "cos_difference",
       "sin_squared"
     ],
     "description": "Arbitrary variable used in trigonometric identity.",
-    "explanation": "Matches the angle variable (beta) used in the derivation for trigonometric proofs.",
+    "explanation": "Matches the generic angle / variable \\beta in the database.",
     "confidence": "high"
   },
   {
     "symbol_latex": "i",
-    "db_id": "0000004621",
+    "pdg_id": "0000004621",
+    "local_id_in_derivation": "local-id-51ce99e4-4bcc-419a-a583-079ba394147a",
     "equation_labels": [
       "eq_complex_magnitude",
       "eq_complex_argument"
     ],
     "description": "The imaginary unit.",
-    "explanation": "Direct match for the mathematical imaginary unit constant.",
+    "explanation": "Matches the imaginary unit i in the database.",
     "confidence": "high"
   },
   {
     "symbol_latex": "v_{\\rm max}",
-    "db_id": "2507344057",
+    "pdg_id": "2507344057",
+    "local_id_in_derivation": "local-id-bb982154-bb9f-4b8d-8623-2b8bd72667a2",
     "equation_labels": [
       "eq_v_max"
     ],
     "description": "Maximum speed of the oscillator.",
-    "explanation": "Matches the specific entry for maximum velocity.",
+    "explanation": "Matches maximum velocity / speed v_{\\rm max} with dimensions L^1 T^-1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "a_{\\rm max}",
-    "db_id": "6047582651",
+    "pdg_id": "6047582651",
+    "local_id_in_derivation": "local-id-015f9ef2-98ef-46a8-9424-55cc5fabc162",
     "equation_labels": [
       "eq_a_max"
     ],
     "description": "Maximum acceleration of the oscillator.",
-    "explanation": "Matches the specific entry for maximum acceleration.",
+    "explanation": "Matches maximum acceleration a_{\\rm max} with dimensions L^1 T^-2.",
     "confidence": "high"
   },
   {
     "symbol_latex": "f",
-    "db_id": "0000004201",
+    "pdg_id": "0000004201",
+    "local_id_in_derivation": "local-id-46c39247-18cc-46c8-aa41-6322955f2fa3",
     "equation_labels": [
       "eq_omega_frequency_relation",
       "eq_freq_derivation_step",
@@ -340,23 +360,25 @@
       "eq_period_def"
     ],
     "description": "Frequency of oscillation.",
-    "explanation": "Direct match for frequency (f).",
+    "explanation": "Matches frequency f with dimension T^-1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "T",
-    "db_id": "0000009491",
+    "pdg_id": "0000009491",
+    "local_id_in_derivation": "local-id-ae075e6a-5cd8-44fd-b4e3-526a41204180",
     "equation_labels": [
       "eq_period_def",
       "eq_period_formula"
     ],
     "description": "Period of oscillation.",
-    "explanation": "Matches the entry for period (T), representing the time for one complete cycle.",
+    "explanation": "Matches oscillation period T with dimension T^1.",
     "confidence": "high"
   },
   {
     "symbol_latex": "\\pi",
-    "db_id": "0000003141",
+    "pdg_id": "0000003141",
+    "local_id_in_derivation": "local-id-49ce3fc9-4cb4-46f2-b458-3442efe2715f",
     "equation_labels": [
       "eq_omega_frequency_relation",
       "eq_freq_derivation_step",
@@ -364,7 +386,7 @@
       "eq_period_formula"
     ],
     "description": "Mathematical constant pi.",
-    "explanation": "Direct match for the mathematical constant pi.",
+    "explanation": "Matches mathematical constant \\pi in the database.",
     "confidence": "high"
   }
 ]
