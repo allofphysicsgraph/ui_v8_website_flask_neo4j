@@ -1,0 +1,22 @@
+[
+  {
+    "operation_latex": "-",
+    "description": "Unary arithmetic negation.",
+    "comments": "The database contains binary subtraction (ID 0002222427 with 2 arguments), but lacks a dedicated 1-argument unary negation operator."
+  },
+  {
+    "operation_latex": "^",
+    "description": "Exponentiation / raising a base to a power.",
+    "comments": "The database contains the exponential function \\exp (ID 0008632687) and multiplication (ID 0002222829), but does not have a general power/exponentiation operator (^)."
+  },
+  {
+    "operation_latex": "\\frac{d}{d}",
+    "description": "Total/ordinary derivative with respect to a single independent variable.",
+    "comments": "The database contains vector differentials and vector calculus operators (spatial vector differential 0002222439, gradient 0002222105, divergence 0002222591, curl 0002222896) as well as integrals (0002222657, 0002222280), but lacks a standard ordinary differentiation operator."
+  },
+  {
+    "operation_latex": "| |",
+    "description": "Absolute value / magnitude of a scalar or complex value.",
+    "comments": "The database includes determinant (ID 0001299288) and complex argument (ID 2288488773), but lacks a general unary absolute value / modulus operator."
+  }
+]
