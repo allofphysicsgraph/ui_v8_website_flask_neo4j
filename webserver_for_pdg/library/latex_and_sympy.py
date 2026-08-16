@@ -13,6 +13,7 @@ For example, two different Computer Algebra Systems could be used with the Physi
 In the situation where another CAS like Sage is used, a separate "latex_and_sage.py" module would be created.
 """
 
+import os
 import random
 import time
 import tokenize
