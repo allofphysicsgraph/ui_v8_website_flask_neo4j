@@ -62,9 +62,9 @@ curl --silent --insecure https://localhost/api/resources/symbol/matrices |\
 <P>Stage 8: Create <code>OPERATIONS.json</code>
    using <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to operations">this prompt</a>
    
-<P>Stage 9: <a href="{{ url_for('to_validate_OPERATIONS_json') }}?referrer=agentic_llm_documentation">validate OPERATIONS.json</a> to create OPERATIONS_with_local_IDs.json
+<P>Stage 9: <a href="{{ url_for('to_validate_OPERATIONS_json') }}?referrer=agentic_llm_documentation">validate OPERATIONS.json</a> to create <code>OPERATIONS_with_local_IDs.json</code>
 
-<P>Stage 10: extract operations from PDG using
+<P>Stage 10: Extract operations from PDG using
 <pre>
 curl --silent --insecure https://localhost/api/resources/symbol/operations |\ 
  jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)' &gt; pdg_operations.json
@@ -72,7 +72,7 @@ curl --silent --insecure https://localhost/api/resources/symbol/operations |\
 
 <P>Stage 11: Create <code>OPERATIONS_matched.json</code> and <code>OPERATIONS_missing.json</code> using <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#compare%20operations">this prompt</a>.
 
-<P>Stage 12: Given <code>OPERATIONS_with_local_IDs.json</code> and <code>OPERATIONS_matched.json</code> 
+<P>Stage 12: Given <code>OPERATIONS_with_local_IDs.json</code> and <code>OPERATIONS_matched.json</code> use <a href="{{ url_for('rewrite_OPERATIONS_json_using_matched_IDs') }}?referrer=agentic_llm_documentation">this page</a> to create <code>OPERATIONS_with_local_IDs_and_PDG_IDs.json</code>
 
 <P>Stage 13: Given <code>OPERATIONS_with_local_IDs.json</code> and <code>OPERATIONS_missing.json</code>
 
@@ -80,7 +80,7 @@ curl --silent --insecure https://localhost/api/resources/symbol/operations |\
 
 <HR>
 
-<P>Stage 14, to create EXPRESSIONS.json  
+<P>Stage 14: Create EXPRESSIONS.json  
    using <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to expr">prompt</a>
 
 <P>Stage 15: <a href="{{ url_for('to_validate_EXPRESSIONS_json') }}?referrer=agentic_llm_documentation">validate EXPRESSIONS.json</a> to create <code>EXPRESSIONS_with_local_IDs.json</code>
@@ -88,7 +88,7 @@ curl --silent --insecure https://localhost/api/resources/symbol/operations |\
 <P>Stage 16: To get the current expressions from PDG database as JSON use
 <pre>
 curl --silent --insecure https://localhost/api/resources/expressions |\
- jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+ jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)' &gt; pdg_expressions.json
 </pre> 
 
 <P>TODO: from EXPRESSIONS.json extract RELATIONS.json since "relation" is one of the keys and "=" is typical.
@@ -97,7 +97,7 @@ curl --silent --insecure https://localhost/api/resources/expressions |\
 
 <pre>
 curl --silent --insecure https://localhost/api/resources/symbol/relations |\
- jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+ jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)' &gt; pdg_relations.json
 </pre>
 
 <HR>
