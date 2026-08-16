@@ -259,23 +259,25 @@ print(json.dumps(data, indent=2))
 -->
 
 <fieldset>
-  <legend id="symbol comparison"><H2>Prompt for scalar symbol comparison: missing and matching 
+  <legend id="symbol comparison"><H2>Prompt for symbol comparison: missing and matching 
    (<a href="#symbol comparison">#</a>)</H2></legend>
   <div class="snippet-container">
   <button class="copy-btn">Copy</button>
   <div class="code-snippet">
 
-<P>I have two input data sets: <BR>
-- a set of symbols found in the derivation of the DERIVATION_NAME_HERE.<BR>
-- a set of symbols in a database for physics derivations. Each symbol has a unique ID number.
+<P>Two data sets for input: <BR>
+- a set of symbols found in a specific derivation; file name `SYMBOLS_with_local_ID`.<BR>
+- a set of symbols in a database for physics derivations; three files: `pdg_scalars`, `pdg_vectors`, `pdg_matrices`. <BR>
+Each symbol in each file has a unique ID number.
 
-<P>The task is to create two JSON files: one for matches where symbols are in both inputs, and another JSON file for symbols in the DERIVATION_NAME_HERE derivation that are not in the physics derivations database. All symbols in the DERIVATION_NAME_HERE derivation should end up in one of the two JSON output files.
+<P>The task is to create two new JSON files: one for matches where symbols are in both inputs, and another JSON file for symbols in the specific derivation that are not in the physics derivations database. All symbols in `SYMBOLS_with_local_ID` should end up in one of the two JSON output files.
 
-<P>For the JSON that captures the matches (`matches.json`), for each match indicate<BR>
+<P>For the JSON that captures the matches (`SYMBOL_matches.json`), for each match indicate<BR>
 - the symbol Latex<BR>
-- the ID from the database<BR>
+- the ID from the database (`pdg_id`)<BR>
+- local_id_in_derivation (`local_id_in_derivation`)<BR>
 - the list of equation labels from the derivation<BR>
-- the description<BR>
+- the description of the symbol<BR>
 - explanation of why the symbol is a match<BR>
 - confidence level of the match
 
@@ -304,13 +306,7 @@ print(json.dumps(data, indent=2))
 
 <P>(Manually) input symbols that didn't match using web UI to generate new IDs; then re-run search for matches.
 
-<P>TODO: Vectors - extract from derivation
 
-<P>TODO: Vectors: compare extracted to PDG DB
-
-<P>TODO: matrices - extract from derivation
-
-<P>TODO: matrices: compare extracted to PDG DB
 
 <H3 id="tex to operations">Convert <code>DERIVATION_FILE.tex</code> to <code>operations.json</code></H3>
 
