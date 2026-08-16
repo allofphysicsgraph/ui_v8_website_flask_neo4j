@@ -1,0 +1,25 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+
+{% if revised_EXPRESSIONS_with_local_ID_created %}
+Download the <a href="{{ url_for('static', filename=path_to_revised_EXPRESSIONS_json)}}">revised_EXPRESSIONS.json</a>
+{% endif %}
+
+  <fieldset>
+    <legend>add matched PDG IDs to EXPRESSIONS_with_local_IDs.json</legend>
+      <form method="post">
+      {{ form_json.csrf_token }}
+      <P><label for="expressions-json-input">EXPRESSIONS_with_local_IDs.json:</label>
+      <textarea id="expressions-json-input" name="expressions-json-input" rows="20" cols="100" placeholder="Enter EXPRESSIONS_with_local_IDs.json here..."></textarea>
+
+      <P><label for="matches-json-input">EXPRESSIONS_matched.json:</label>
+      <textarea id="matches-json-input" name="matches-json-input" rows="20" cols="100" placeholder="Enter EXPRESSIONS_matched.json here..."></textarea>
+      <P><input type="submit" name="json-btn" value="marge into EXPRESSIONS_with_local_IDs.json">
+    </form>
+  </fieldset>
+
+
+<P>TODO: upload file
+
+{% endblock %}
