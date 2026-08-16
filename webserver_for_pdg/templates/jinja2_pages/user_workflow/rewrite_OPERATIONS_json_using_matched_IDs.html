@@ -1,0 +1,25 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+
+{% if revised_OPERATIONS_with_local_ID_created %}
+Download the <a href="{{ url_for('static', filename=path_to_revised_OPERATIONS_json)}}">revised_OPERATIONS.json</a>
+{% endif %}
+
+  <fieldset>
+    <legend>add matched PDG IDs to OPERATIONS_with_local_IDs.json</legend>
+      <form method="post">
+      {{ form_json.csrf_token }}
+      <P><label for="operations-json-input">OPERATIONS_with_local_IDs.json:</label>
+      <textarea id="operations-json-input" name="operations-json-input" rows="20" cols="100" placeholder="Enter OPERATIONS_with_local_IDs.json here..."></textarea>
+
+      <P><label for="matches-json-input">OPERATIONS_matched.json:</label>
+      <textarea id="matches-json-input" name="matches-json-input" rows="20" cols="100" placeholder="Enter OPERATIONS_matched.json here..."></textarea>
+      <P><input type="submit" name="json-btn" value="marge into OPERATIONS_with_local_IDs.json">
+    </form>
+  </fieldset>
+
+
+<P>TODO: upload file
+
+{% endblock %}

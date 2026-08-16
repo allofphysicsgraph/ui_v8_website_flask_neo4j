@@ -8962,6 +8962,142 @@ def rewrite_SYMBOLS_json_using_matched_IDs():
     )
 
 
+@web_app.route(
+    "/rewrite_OPERATIONS_with_local_IDs_json_with_matched_OPERATIONS_json",
+    methods=["GET", "POST"],
+)
+@trace_execution
+def rewrite_OPERATIONS_json_using_matched_IDs():
+    """
+    See https://allofphysics.com/documentation/agentic_LLMs
+    """
+    trace_id = trace_id_var.get()
+    canonical_url = url_for("rewrite_OPERATIONS_json_using_matched_IDs").lstrip("/")
+
+    operations_json_is_valid = True
+    matches_json_is_valid = True
+    revised_OPERATIONS_with_local_ID_created = False
+    web_form_json = NoOptionsForm()
+    revised_filename = ""
+
+    if request.method == "POST":
+        logger.info("request.form = " + str(request.form))
+
+        user_operations_json_input = request.form["operations-json-input"]
+
+        user_matches_json_input = request.form["matches-json-input"]
+
+        if user_operations_json_input == "":
+            flash("Nothing submitted for OPERATIONS_with_local_IDs.json")
+        elif user_matches_json_input == "":
+            flash("Nothing submitted for OPERATIONS_matched.json")
+        else:
+            try:
+                parsed_operations_json_input = json.loads(user_operations_json_input)
+                operations_json_is_valid = True
+            except ValueError as err:
+                # json_result = str(err) + "\n\n" + user_json_input
+                operations_json_is_valid = False
+
+            try:
+                parsed_matches_json_input = json.loads(user_matches_json_input)
+                matches_json_is_valid = True
+            except ValueError as err:
+                # json_result = str(err) + "\n\n" + user_json_input
+                matches_json_is_valid = False
+
+            with open("static/schema_for_llm_operations.json", "r") as file_handle:
+                schema_for_llm_operations = json.load(file_handle)
+
+            with open(
+                "static/schema_for_llm_operation_matches.json", "r"
+            ) as file_handle:
+                schema_for_llm_operation_matches = json.load(file_handle)
+
+            try:
+                validate(
+                    instance=parsed_operations_json_input,
+                    schema=schema_for_llm_operations,
+                )
+                operations_json_is_valid = True
+
+            except ValidationError as err:
+                # Catch schema validation errors specifically
+                # json_result = (
+                #     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
+                #     + user_json_input
+                # )
+                operations_json_is_valid = False
+            except ValueError as err:
+                # Catch JSON parsing errors if any slipped through, or other value errors
+                # json_result = str(err) + "\n\n" + user_json_input
+                operations_json_is_valid = False
+
+            try:
+                validate(
+                    instance=parsed_matches_json_input,
+                    schema=schema_for_llm_operation_matches,
+                )
+
+                # json_result = (
+                #     "JSON is consistent with the DERIVATION.json schema\n\n"
+                #     + json.dumps(parsed, indent=2)
+                # )
+                matches_json_is_valid = True
+
+            except ValidationError as err:
+                # Catch schema validation errors specifically
+                # json_result = (
+                #     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
+                #     + user_json_input
+                # )
+                matches_json_is_valid = False
+            except ValueError as err:
+                # Catch JSON parsing errors if any slipped through, or other value errors
+                # json_result = str(err) + "\n\n" + user_json_input
+                matches_json_is_valid = False
+
+            revised_OPERATIONS_with_local_ID_created = False
+
+            if matches_json_is_valid and operations_json_is_valid:
+                # at this point both files have valid schemas
+                # merge the two files
+                for match_index, matched_operation in enumerate(
+                    parsed_matches_json_input
+                ):
+                    for local_index, this_local_operation in enumerate(
+                        parsed_operations_json_input
+                    ):
+                        if (
+                            matched_operation["local_id_in_derivation"]
+                            == this_local_operation["operation ID"]
+                        ):
+                            parsed_operations_json_input[local_index]["pdg_id"] = (
+                                matched_operation["pdg_id"]
+                            )
+
+                # produce the merged file with a unique filename
+                revised_filename = (
+                    "OPERATIONS_with_local_IDs_and_PDG_IDs_"
+                    + str(uuid.uuid4())
+                    + ".json"
+                )
+                logger.info(revised_filename)
+                with open("static/" + revised_filename, "w") as file_handle:
+                    json.dump(parsed_operations_json_input, file_handle, indent=2)
+
+                revised_OPERATIONS_with_local_ID_created = True
+
+    return render_template(
+        "jinja2_pages/user_workflow/rewrite_OPERATIONS_json_using_matched_IDs.html",
+        title="rewrite OPERATIONS.json using matched ID",
+        canonical_url=canonical_url,
+        form_json=web_form_json,
+        revised_OPERATIONS_with_local_ID_created=revised_OPERATIONS_with_local_ID_created,
+        path_to_revised_OPERATIONS_json=revised_filename,
+    )
+
+
 ###########################################################################
 
 
