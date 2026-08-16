@@ -8847,7 +8847,9 @@ def rewrite_SYMBOLS_json_using_matched_IDs():
 
     symbols_json_is_valid = True
     matches_json_is_valid = True
+    revised_SYMBOLS_with_local_ID_created = False
     web_form_json = NoOptionsForm()
+    revised_filename = ""
 
     if request.method == "POST":
         logger.info("request.form = " + str(request.form))
@@ -8923,16 +8925,40 @@ def rewrite_SYMBOLS_json_using_matched_IDs():
                 # json_result = str(err) + "\n\n" + user_json_input
                 matches_json_is_valid = False
 
-            # at this point both files have valid schemas
-            # TODO: merge the two files
+            revised_SYMBOLS_with_local_ID_created = False
 
-            # TODO: produce the merged file with a unique filename
+            if matches_json_is_valid and symbols_json_is_valid:
+                # at this point both files have valid schemas
+                # merge the two files
+                for match_index, matched_symbol in enumerate(parsed_matches_json_input):
+                    for local_index, this_local_symbol in enumerate(
+                        parsed_symbols_json_input
+                    ):
+                        if (
+                            matched_symbol["local_id_in_derivation"]
+                            == this_local_symbol["symbol ID"]
+                        ):
+                            parsed_symbols_json_input[local_index]["pdg_id"] = (
+                                matched_symbol["pdg_id"]
+                            )
+
+                # produce the merged file with a unique filename
+                revised_filename = (
+                    "SYMBOLS_with_local_IDs_and_PDG_IDs_" + str(uuid.uuid4()) + ".json"
+                )
+                logger.info(revised_filename)
+                with open("static/" + revised_filename, "w") as file_handle:
+                    json.dump(parsed_symbols_json_input, file_handle, indent=2)
+
+                revised_SYMBOLS_with_local_ID_created = True
 
     return render_template(
         "jinja2_pages/user_workflow/rewrite_SYMBOLS_json_using_matched_IDs.html",
         title="rewrite SYMBOLS.json using matched ID",
         canonical_url=canonical_url,
         form_json=web_form_json,
+        revised_SYMBOLS_with_local_ID_created=revised_SYMBOLS_with_local_ID_created,
+        path_to_revised_SYMBOLS_json=revised_filename,
     )
 
 
