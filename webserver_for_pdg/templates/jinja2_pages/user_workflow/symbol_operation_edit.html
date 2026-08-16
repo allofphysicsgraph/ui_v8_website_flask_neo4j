@@ -20,29 +20,40 @@
     {{ form_edit_operation.csrf_token }}
     <P>
       {{ form_edit_operation.operation_latex.label}} <B>(required)</B>: 
-          {{ form_edit_operation.operation_latex(size=50, 
-                                                 maxlength=1000, 
-                                                 value=operation_dict['latex']) }} <BR/>
+      {{ form_edit_operation.operation_latex(size=50, 
+            maxlength=1000, 
+            id="input_latex",
+            oninput="validateASCII(this); livePreview('input_latex', null, null, 'operation_input_latex', true);", 
+            value=operation_dict['latex']) }} <BR/>
+<div id="operation_input_latex"></div>
       &nbsp;<BR/>
       {{ form_edit_operation.operation_name_latex.label }} <B>(required)</B>: 
-          {{ form_edit_operation.operation_name_latex(size=50, 
-                                                      maxlength=1000, 
-                                                      value=operation_dict['name_latex']) }}<BR/>
+      {{ form_edit_operation.operation_name_latex(size=50, 
+            maxlength=1000, 
+            id="input_name",
+            oninput="validateASCII(this); livePreview('input_name', null, null, 'operation_name_latex', false);", 
+            value=operation_dict['name_latex']) }}<BR/>
+<div id="operation_name_latex"></div>
       &nbsp;<BR/>
       {{form_edit_operation.operation_description_latex.label }} <small><em>(optional)</em></small>: 
-          {{ form_edit_operation.operation_description_latex(size=50, 
-                                                             maxlength=1000, 
-                                                             value=operation_dict['description_latex']) }}<BR/>
+      {{ form_edit_operation.operation_description_latex(size=50, 
+            maxlength=1000, 
+            id="input_description",
+            oninput="validateASCII(this); livePreview('input_description', null, null, 'operation_description_latex', false);", 
+            value=operation_dict['description_latex']) }}<BR/>
+<div id="operation_description_latex"></div>
       &nbsp;<BR/>
-
       {{form_edit_operation.operation_argument_count.label }} <B>(required)</B>: 
-           {{ form_edit_operation.operation_argument_count(
-                                      value=operation_dict['argument_count']) }}<BR>
+      {{ form_edit_operation.operation_argument_count(
+            value=operation_dict['argument_count']) }}<BR>
       &nbsp;<BR/>
 
       {{form_edit_operation.operation_reference_latex.label }} <small><em>(optional)</em></small>: {{form_edit_operation.operation_reference_latex(size=50, 
-                                                  maxlength=1000, 
-                                                   value=operation_dict['reference_latex']) }}<BR/>
+            maxlength=1000, 
+            id="input_reference",
+            oninput="validateASCII(this); livePreview('input_reference', null, null, 'operation_reference_latex', false);", 
+            value=operation_dict['reference_latex']) }}<BR/>
+<div id="operation_reference_latex"></div>
       &nbsp;<BR/>
 
       <input type="submit" name="name field for edit" id="id field for edit button" value="Edit operation">

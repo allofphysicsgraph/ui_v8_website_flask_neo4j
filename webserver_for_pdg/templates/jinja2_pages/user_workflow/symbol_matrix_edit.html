@@ -20,44 +20,49 @@
     {{ form_matrix_properties.csrf_token }}
     <P>
       {{ form_matrix_properties.matrix_latex.label}}: 
-           {{ form_matrix_properties.matrix_latex(size=50, 
-                                pattern="^[\x20-\x7F]+$", 
-                                id="input_latex",
-                                oninput="validateASCII(this)", 
-                                maxlength=1000, 
-                                oninput="validateASCII(this); livePreview('input_latex', null, null, 'render_input_latex');", 
-                                value=matrix_dict['latex']|e) }} <BR/>
+      {{ form_matrix_properties.matrix_latex(size=50, 
+             pattern="^[\x20-\x7F]+$", 
+             id="input_latex",
+             oninput="validateASCII(this)", 
+             maxlength=1000, 
+             oninput="validateASCII(this); livePreview('input_latex', null, null, 'render_input_latex', true);", 
+             value=matrix_dict['latex']|e) }} <BR/>
 <div id="render_input_latex"></div>
       &nbsp;<BR/>
-      {{form_matrix_properties.matrix_name_latex.label }}: 
-           {{ form_matrix_properties.matrix_name_latex(size=50,
-                                    class_="latex-input", 
-                                    data_target="matrix_name_latex_image",
-                                    pattern="^[\x20-\x7F]+$", 
-                                    oninput="validateASCII(this)",  
-                                    maxlength=1000, 
-                                    value=matrix_dict['name_latex']|e) }}<BR/>
+      {{ form_matrix_properties.matrix_name_latex.label }}: 
+      {{ form_matrix_properties.matrix_name_latex(size=50,
+             class_="latex-input", 
+             data_target="matrix_name_latex_image",
+             pattern="^[\x20-\x7F]+$", 
+             id="name_latex",
+             oninput="validateASCII(this); livePreview('name_latex', null, null, 'render_name_latex', false);",  
+             maxlength=1000, 
+             value=matrix_dict['name_latex']|e) }}<BR/>
+<div id="render_name_latex"></div>
 <P><img id="matrix_name_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
-      {{form_matrix_properties.matrix_description_latex.label }}: 
-           {{ form_matrix_properties.matrix_description_latex(size=50, 
-                                    class_="latex-input", 
-                                    data_target="matrix_description_latex_image",
-                                    pattern="^[\x20-\x7F]+$", 
-                                    oninput="validateASCII(this)", 
-                                    maxlength=1000, 
-                                    value=matrix_dict['description_latex']|e) }}<BR/>
+      {{ form_matrix_properties.matrix_description_latex.label }}: 
+      {{ form_matrix_properties.matrix_description_latex(size=50, 
+             class_="latex-input", 
+             data_target="matrix_description_latex_image",
+             pattern="^[\x20-\x7F]+$", 
+             id="description_latex",
+             oninput="validateASCII(this); livePreview('description_latex', null, null, 'render_description_latex', false);", 
+             maxlength=1000, 
+             value=matrix_dict['description_latex']|e) }}<BR/>
+<div id="render_description_latex"></div>
 <P><img id="matrix_description_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
-      {{form_matrix_properties.matrix_reference_latex.label }}: 
-           {{ form_matrix_properties.matrix_reference_latex(size=50, 
-                                    class_="latex-input", 
-                                    data_target="matrix_reference_latex_image",
-                                    pattern="^[\x20-\x7F]+$", 
-                                    oninput="validateASCII(this)", 
-
-                                                              maxlength=1000, 
-                                                              value=matrix_dict['reference_latex']|e) }}<BR/>
+      {{ form_matrix_properties.matrix_reference_latex.label }}: 
+      {{ form_matrix_properties.matrix_reference_latex(size=50, 
+             class_="latex-input", 
+             data_target="matrix_reference_latex_image",
+             pattern="^[\x20-\x7F]+$", 
+             id="reference_latex",
+             oninput="validateASCII(this); livePreview('reference_latex', null, null, 'render_reference_latex', false);", 
+             maxlength=1000, 
+             value=matrix_dict['reference_latex']|e) }}<BR/>
+<div id="render_reference_latex"></div>
 <P><img id="matrix_reference_latex_image" src="" alt="Latex input" style="display: none;">
       &nbsp;<BR/>
       <input type="submit" value="Edit matrix">

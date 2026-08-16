@@ -20,12 +20,12 @@
 
     <P>{{ form_operation_properties.operation_latex.label}} (<B>required</B>): 
        {{ form_operation_properties.operation_latex(size=50, 
-                      minlength=1, 
-                      maxlength=1000,
-                      id="input_latex", 
-                      oninput="validateASCII(this); livePreview('input_latex', null, null, 'operation_input_latex');",
-                      type="text",
-                      pattern="^[\x20-\x7F]+$") }}</P>
+            minlength=1, 
+            maxlength=1000,
+            id="input_latex", 
+            oninput="validateASCII(this); livePreview('input_latex', null, null, 'operation_input_latex', true);",
+            type="text",
+            pattern="^[\x20-\x7F]+$") }}</P>
     
         <div id="operation_input_latex"></div>
 
@@ -34,34 +34,34 @@
 
     <P>{{ form_operation_properties.operation_name_latex.label }} (<B>required</B>): 
        {{ form_operation_properties.operation_name_latex(size=50, 
-                                    class_="latex-input", 
-                                    data_target="operation_name_latex_image",
-                                    pattern="^[\x20-\x7F]+$", 
-                                    id="input_name",
-                                    oninput="validateASCII(this); livePreview('input_name', null, null, 'operation_name_latex');", 
-                                                        maxlength=1000) }}</p>
+            class_="latex-input", 
+            data_target="operation_name_latex_image",
+            pattern="^[\x20-\x7F]+$", 
+            id="input_name",
+            oninput="validateASCII(this); livePreview('input_name', null, null, 'operation_name_latex', false);", 
+            maxlength=1000) }}</p>
         <div id="operation_name_latex"></div>
 <P><img id="operation_name_latex_image" src="" alt="Latex input" style="display: none;">
     
     <P>{{form_operation_properties.operation_description_latex.label }} (<small><em>optional</em></small>):  
        {{ form_operation_properties.operation_description_latex(size=50, 
-                                    class_="latex-input", 
-                                    data_target="operation_description_latex_image",
-                                    pattern="^[\x20-\x7F]+$", 
-                                    id="input_description",
-                                    oninput="validateASCII(this); livePreview('input_description', null, null, 'operation_description_latex');", 
-                                                                maxlength=1000) }}</p>
+            class_="latex-input", 
+            data_target="operation_description_latex_image",
+            pattern="^[\x20-\x7F]+$", 
+            id="input_description",
+            oninput="validateASCII(this); livePreview('input_description', null, null, 'operation_description_latex', false);", 
+            maxlength=1000) }}</p>
         <div id="operation_description_latex"></div>
 <P><img id="operation_description_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form_operation_properties.operation_reference_latex.label }} (<small><em>optional</em></small>): 
        {{ form_operation_properties.operation_reference_latex(size=100,
-                                    class_="latex-input", 
-                                    data_target="operation_reference_latex_image",
-                                    pattern="^[\x20-\x7F]+$", 
-                                    id="input_reference",
-                                    oninput="validateASCII(this); livePreview('input_reference', null, null, 'operation_reference_latex');", 
-                                                              maxlength=1000) }}</p>
+            class_="latex-input", 
+            data_target="operation_reference_latex_image",
+            pattern="^[\x20-\x7F]+$", 
+            id="input_reference",
+            oninput="validateASCII(this); livePreview('input_reference', null, null, 'operation_reference_latex', false);", 
+            maxlength=1000) }}</p>
         <div id="operation_reference_latex"></div>
 <P><img id="operation_reference_latex_image" src="" alt="Latex input" style="display: none;">
 

@@ -19,42 +19,40 @@
     {{ form_scalar_properties.csrf_token }}
 
     <P>{{ form_scalar_properties.scalar_latex.label}} (<B>required</B>): 
-    {{ form_scalar_properties.scalar_latex(size=50, 
-                                           minlength=1, 
-                                           maxlength=1000,
-                                           id="inputID_symbol_latex",
-                                type="text",
-                                pattern="^[\x20-\x7F]+$", 
-                                oninput="validateASCII(this); livePreview('inputID_symbol_latex', null, null, 'outputID_symbol_latex');") }}</P>
-    
+       {{ form_scalar_properties.scalar_latex(size=50, 
+               minlength=1, 
+               maxlength=1000,
+               id="inputID_symbol_latex",
+               type="text",
+               pattern="^[\x20-\x7F]+$", 
+               oninput="validateASCII(this); livePreview('inputID_symbol_latex', null, null, 'outputID_symbol_latex', true);") }}</P>
         <div id="outputID_symbol_latex"></div>
-
 
     <P>{{ form_scalar_properties.scalar_name_latex.label }} (<small><em>optional</em></small>): 
        {{ form_scalar_properties.scalar_name_latex(size=50, 
-                                                   maxlength=1000,
-                                                   oninput="validateASCII(this)",
-                                                   pattern="^[\x20-\x7F]+$", 
-                                                 class_="latex-input", 
-                                               data_target="scalar_name_latex_image",) }}</p>
+               maxlength=1000,
+               oninput="validateASCII(this)",
+               pattern="^[\x20-\x7F]+$", 
+               class_="latex-input", 
+               data_target="scalar_name_latex_image",) }}</p>
 <P><img id="scalar_name_latex_image" src="" alt="Latex input" style="display: none;">
     
     <P>{{ form_scalar_properties.scalar_description_latex.label }} (<small><em>optional</em></small>): 
        {{ form_scalar_properties.scalar_description_latex(size=50, 
-                                                          maxlength=1000,
-                                                          oninput="validateASCII(this)",
-                                                          pattern="^[\x20-\x7F]+$", 
-                                                        class_="latex-input", 
-                                                      data_target="scalar_description_latex_image",) }}</p>
+               maxlength=1000,
+               oninput="validateASCII(this)",
+               pattern="^[\x20-\x7F]+$", 
+               class_="latex-input", 
+               data_target="scalar_description_latex_image",) }}</p>
 <P><img id="scalar_description_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form_scalar_properties.scalar_reference_latex.label }} (<small><em>optional</em></small>): 
        {{ form_scalar_properties.scalar_reference_latex(size=50, 
-                                                        maxlength=1000,
-                                                        oninput="validateASCII(this)",
-                                                        pattern="^[\x20-\x7F]+$", 
-                                                      class_="latex-input", 
-                                                    data_target="scalar_reference_latex_image",) }}</p>
+               maxlength=1000,
+               oninput="validateASCII(this)",
+               pattern="^[\x20-\x7F]+$", 
+               class_="latex-input", 
+               data_target="scalar_reference_latex_image",) }}</p>
 <P><img id="scalar_reference_latex_image" src="" alt="Latex input" style="display: none;">
 
 <table border="0" id="scope_table">
