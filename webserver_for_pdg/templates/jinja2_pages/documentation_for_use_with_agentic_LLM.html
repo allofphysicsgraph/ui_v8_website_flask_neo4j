@@ -53,6 +53,9 @@ curl --silent --insecure https://localhost/api/resources/symbol/matrices |\
    <a href="{{ url_for('rewrite_SYMBOLS_json_using_matched_IDs') }}">this page</a> to create <code>SYMBOLS_with_local_IDs_and_PDG_IDs.json</code>.
 
 <P>Stage 7: Given <code>SYMBOLS_with_local_IDs.json</code> and <code>SYMBOLS_missing.json</code>, a human reviewer should confirm lack of existence. Once the human reviewer confirms then creation of symbols should be mechanical. <BR>
+   See <a href="{{ url_for('to_list_scalars') }}">list of scalars</a> and<BR>
+    <a href="{{ url_for('to_list_vectors') }}">list of vectors</a><BR>
+    <a href="{{ url_for('to_list_matrices') }}">list of matrices</a><BR>
    TODO: Create the API and, separately, a web page that takes in the missing JSON list to create symbols in PDG.
 
 <P>Once the missing symbols have been created in PDG database, rerun the assessment (from Step 4) and confirm symbols until missing is empty.
@@ -74,7 +77,8 @@ curl --silent --insecure https://localhost/api/resources/symbol/operations |\
 
 <P>Stage 12: Given <code>OPERATIONS_with_local_IDs.json</code> and <code>OPERATIONS_matched.json</code> use <a href="{{ url_for('rewrite_OPERATIONS_json_using_matched_IDs') }}?referrer=agentic_llm_documentation">this page</a> to create <code>OPERATIONS_with_local_IDs_and_PDG_IDs.json</code>
 
-<P>Stage 13: Given <code>OPERATIONS_with_local_IDs.json</code> and <code>OPERATIONS_missing.json</code>
+<P>Stage 13: Given <code>OPERATIONS_with_local_IDs.json</code> and <code>OPERATIONS_missing.json</code><BR>
+   See <a href="{{ url_for('to_list_operations') }}">list of operations</a> and<BR>
 
 <P>Once the missing operations have been created in PDG database, rerun the assessment (from Step 10) and confirm operations until missing is empty.
 
@@ -98,7 +102,8 @@ curl --silent --insecure https://localhost/api/resources/expressions |\
 
 <P>Stage 18: Merge <code>EXPRESSIONS_with_local_IDs.json</code> with <code>EXPRESSIONS_matches.json</code> using <a href="{{ url_for('rewrite_EXPRESSIONS_json_using_matched_IDs') }}?referrer=agentic_llm_documentation">this page</a> to get <code>EXPRESSIONS_with_local_IDs_and_PDG_IDs.json</code>
 
-<P>Stage 19: Add expressions in <code>EXPRESSIONS_missing.json</code> to PDG using web or API.
+<P>Stage 19: Add expressions in <code>EXPRESSIONS_missing.json</code> to PDG using web or API.<BR
+   See <a href="{{ url_for('to_list_expressions') }}">list of expressions</a> 
 
 <HR>
 
@@ -109,6 +114,8 @@ curl --silent --insecure https://localhost/api/resources/expressions |\
 curl --silent --insecure https://localhost/api/resources/symbol/relations |\
  jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)' &gt; pdg_relations.json
 </pre>
+
+<P>See <a href="{{ url_for('to_list_relations') }}">list of relations</a> 
 
 <HR>
 
