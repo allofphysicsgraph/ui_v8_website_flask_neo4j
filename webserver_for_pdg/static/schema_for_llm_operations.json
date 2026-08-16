@@ -4,7 +4,7 @@
   "type": "array",
   "items": {
     "type": "object",
-    "required": ["latex", "name", "number_of_arguments", "labels"],
+    "required": ["latex", "name", "number_of_arguments", "labels", "operation ID"],
     "properties": {
       "latex": {
         "description": "The LaTeX representation of the operator. Can be null for implicit operations.",
@@ -25,8 +25,12 @@
         "items": {
           "type": "string"
         }
+      },
+      "operation ID": {
+        "description": "local ID",
+        "type": "string",
+        "minLength": 10
       }
-    },
-    "additionalProperties": false
+    }
   }
 }
