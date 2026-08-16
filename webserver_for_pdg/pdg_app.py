@@ -3346,14 +3346,10 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnV
             )
             return redirect(url_for("to_list_operations"))
 
-        # with get_graphdb_driver().session() as session, track_time(query_time_dict, "pdg_app/ " + trace_id):
-
         list_of_expressions = session.read_transaction(
             neo4j_query.get_expressions_that_use_symbol, operation_id
         )
 
-        #     + operation_id
-        #     + " "
 
     logger.info("request.method =" + str(request.method))
 
@@ -3363,7 +3359,14 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnV
 
         logger.info("request.form = " + str(request.form))
 
-        if "add symbol to expr" in request.form:
+        # request.form = ('operation_latex', '^\\wedge'),
+        #                ('operation_name_latex', 'exponentiation'),
+        #                ('operation_description_latex', 'normally an invisible symbol implied by superscripts'),
+        #                ('operation_argument_count', '2'),
+        #                ('operation_reference_latex', 'https://en.wikipedia.org/wiki/Exponentiation'),
+        #                ('name field for edit', 'Edit operation')])
+
+        if "name field for edit" in request.form.keys():
             if web_form_edit_operation.validate():
                 operation_latex = str(
                     web_form_edit_operation.operation_latex.data
@@ -3413,19 +3416,39 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnV
                 )
                 logger.error(str(web_form_edit_operation.errors))
                 return redirect(url_for("to_edit_operation"))
-        elif "remove symbol from expr" in request.form:
-            # TODO
-            flash("pdg_app/to_edit_operation: NOT YET ENACTED")
-            logger.error("NOT YET ENACTED")
-            return redirect(url_for("to_edit_operation"))
+        elif "name field for delete" in request.form:
+            if list_of_expressions:
+                flash(
+                    "pdg_app/to_edit_operation: cannot delete operation ID "
+                    + str(operation_id)
+                    + " because it is still used by "
+                    + str(len(list_of_expressions))
+                    + " expression(s)."
+                )
+                logger.error(
+                    "pdg_app/to_edit_operation: refused to delete operation "
+                    + str(operation_id)
+                    + " still referenced by expressions"
+                )
+                return redirect(url_for("to_edit_operation", operation_id=operation_id))
+
+            with get_graphdb_driver().session() as session, track_time(
+                query_time_dict, "pdg_app/ " + trace_id
+            ):
+                session.write_transaction(
+                    neo4j_query.delete_node, operation_id, "operation"
+                )
+            flash(
+                "pdg_app/to_edit_operation: operation ID "
+                + str(operation_id)
+                + " deleted."
+            )
+            return redirect(url_for("to_list_operations"))
         else:
             flash("pdg_app/to_edit_operation: unrecognized button")
             logger.error("unrecognized button")
-            return redirect(url_for("to_edit_operation"))
+            return redirect(url_for("to_edit_operation", operation_id=operation_id))
 
-    # logger.info("operation_dict:", operation_dict)
-
-    # logger.info("[TRACE] end " + trace_id)
     return render_template(
         "jinja2_pages/user_workflow/symbol_operation_edit.html",
         title="Edit Operation",
@@ -7179,7 +7202,7 @@ def to_llm_workflow_documenation() -> ResponseReturnValue:
         schema_for_llm_operations_matched = json.load(file_handle)
 
     pretty_schema_for_llm_operations_matched = json.dumps(
-        schema_for_llm_operations_matches, indent=2
+        schema_for_llm_operations_matched, indent=2
     )
 
     with open("static/schema_for_llm_operations_missing.json", "r") as file_handle:
@@ -7207,7 +7230,6 @@ def to_llm_workflow_documenation() -> ResponseReturnValue:
     pretty_schema_for_llm_expressions_missing = json.dumps(
         schema_for_llm_expressions_missing, indent=2
     )
-
 
     with open("static/schema_for_llm_steps.json", "r") as file_handle:
         schema_for_llm_steps = json.load(file_handle)

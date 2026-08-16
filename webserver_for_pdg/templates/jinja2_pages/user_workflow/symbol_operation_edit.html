@@ -45,7 +45,7 @@
                                                    value=operation_dict['reference_latex']) }}<BR/>
       &nbsp;<BR/>
 
-      <input type="submit" value="Edit operation">
+      <input type="submit" name="name field for edit" id="id field for edit button" value="Edit operation">
     </P>
   </form>
 {% else %}
@@ -64,7 +64,7 @@ TODO: edit dimension
   {{ form_no_options.csrf_token }}
   <P>
 
-  <input type="submit" value="Delete operation">
+  <input type="submit" name="name field for delete" id="id field for delete" value="Delete operation">
 
 </form>
 {% else %}

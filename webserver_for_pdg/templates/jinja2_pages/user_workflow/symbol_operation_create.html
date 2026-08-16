@@ -37,8 +37,10 @@
                                     class_="latex-input", 
                                     data_target="operation_name_latex_image",
                                     pattern="^[\x20-\x7F]+$", 
-                                    oninput="validateASCII(this)", 
+                                    id="input_name",
+                                    oninput="validateASCII(this); livePreview('input_name', null, null, 'operation_name_latex');", 
                                                         maxlength=1000) }}</p>
+        <div id="operation_name_latex"></div>
 <P><img id="operation_name_latex_image" src="" alt="Latex input" style="display: none;">
     
     <P>{{form_operation_properties.operation_description_latex.label }} (<small><em>optional</em></small>):  
@@ -46,8 +48,10 @@
                                     class_="latex-input", 
                                     data_target="operation_description_latex_image",
                                     pattern="^[\x20-\x7F]+$", 
-                                    oninput="validateASCII(this)", 
+                                    id="input_description",
+                                    oninput="validateASCII(this); livePreview('input_description', null, null, 'operation_description_latex');", 
                                                                 maxlength=1000) }}</p>
+        <div id="operation_description_latex"></div>
 <P><img id="operation_description_latex_image" src="" alt="Latex input" style="display: none;">
 
     <P>{{ form_operation_properties.operation_reference_latex.label }} (<small><em>optional</em></small>): 
@@ -55,8 +59,10 @@
                                     class_="latex-input", 
                                     data_target="operation_reference_latex_image",
                                     pattern="^[\x20-\x7F]+$", 
-                                    oninput="validateASCII(this)", 
+                                    id="input_reference",
+                                    oninput="validateASCII(this); livePreview('input_reference', null, null, 'operation_reference_latex');", 
                                                               maxlength=1000) }}</p>
+        <div id="operation_reference_latex"></div>
 <P><img id="operation_reference_latex_image" src="" alt="Latex input" style="display: none;">
 
       <input type="submit" name="new operation" value="add operation">
