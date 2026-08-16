@@ -7156,18 +7156,18 @@ def to_llm_workflow_documenation() -> ResponseReturnValue:
 
     pretty_schema_for_llm_symbols = json.dumps(schema_for_llm_symbols, indent=2)
 
-    with open("static/schema_for_llm_symbol_matches.json", "r") as file_handle:
-        schema_for_llm_symbol_matches = json.load(file_handle)
+    with open("static/schema_for_llm_symbols_matched.json", "r") as file_handle:
+        schema_for_llm_symbols_matched = json.load(file_handle)
 
-    pretty_schema_for_llm_symbol_matches = json.dumps(
-        schema_for_llm_symbol_matches, indent=2
+    pretty_schema_for_llm_symbols_matched = json.dumps(
+        schema_for_llm_symbols_matched, indent=2
     )
 
-    with open("static/schema_for_llm_symbol_missing.json", "r") as file_handle:
-        schema_for_llm_symbol_missing = json.load(file_handle)
+    with open("static/schema_for_llm_symbols_missing.json", "r") as file_handle:
+        schema_for_llm_symbols_missing = json.load(file_handle)
 
-    pretty_schema_for_llm_symbol_missing = json.dumps(
-        schema_for_llm_symbol_missing, indent=2
+    pretty_schema_for_llm_symbols_missing = json.dumps(
+        schema_for_llm_symbols_missing, indent=2
     )
 
     with open("static/schema_for_llm_operations.json", "r") as file_handle:
@@ -7175,11 +7175,11 @@ def to_llm_workflow_documenation() -> ResponseReturnValue:
 
     pretty_schema_for_llm_operations = json.dumps(schema_for_llm_operations, indent=2)
 
-    with open("static/schema_for_llm_operation_matches.json", "r") as file_handle:
-        schema_for_llm_operation_matches = json.load(file_handle)
+    with open("static/schema_for_llm_operations_matched.json", "r") as file_handle:
+        schema_for_llm_operations_matched = json.load(file_handle)
 
-    pretty_schema_for_llm_operation_matches = json.dumps(
-        schema_for_llm_operation_matches, indent=2
+    pretty_schema_for_llm_operations_matched = json.dumps(
+        schema_for_llm_operations_matches, indent=2
     )
 
     with open("static/schema_for_llm_operations_missing.json", "r") as file_handle:
@@ -7194,12 +7194,20 @@ def to_llm_workflow_documenation() -> ResponseReturnValue:
 
     pretty_schema_for_llm_expressions = json.dumps(schema_for_llm_expressions, indent=2)
 
-    with open("static/schema_for_llm_expression_matches.json", "r") as file_handle:
-        schema_for_llm_expression_matches = json.load(file_handle)
+    with open("static/schema_for_llm_expressions_matched.json", "r") as file_handle:
+        schema_for_llm_expressions_matched = json.load(file_handle)
 
-    pretty_schema_for_llm_expression_matches = json.dumps(
-        schema_for_llm_expression_matches, indent=2
+    pretty_schema_for_llm_expressions_matched = json.dumps(
+        schema_for_llm_expressions_matched, indent=2
     )
+
+    with open("static/schema_for_llm_expressions_missing.json", "r") as file_handle:
+        schema_for_llm_expressions_missing = json.load(file_handle)
+
+    pretty_schema_for_llm_expressions_missing = json.dumps(
+        schema_for_llm_expressions_missing, indent=2
+    )
+
 
     with open("static/schema_for_llm_steps.json", "r") as file_handle:
         schema_for_llm_steps = json.load(file_handle)
@@ -7210,13 +7218,14 @@ def to_llm_workflow_documenation() -> ResponseReturnValue:
         "jinja2_pages/documentation_of_LLM_workflow.html",
         canonical_url=canonical_url,
         schema_for_llm_symbols=pretty_schema_for_llm_symbols,
-        schema_for_llm_symbol_matches=pretty_schema_for_llm_symbol_matches,
-        schema_for_llm_symbol_missing=pretty_schema_for_llm_symbol_missing,
+        schema_for_llm_symbols_matched=pretty_schema_for_llm_symbol_matches,
+        schema_for_llm_symbols_missing=pretty_schema_for_llm_symbol_missing,
         schema_for_llm_operations=pretty_schema_for_llm_operations,
-        schema_for_llm_operation_matches=pretty_schema_for_llm_operation_matches,
+        schema_for_llm_operations_matched=pretty_schema_for_llm_operation_matches,
         schema_for_llm_operations_missing=pretty_schema_for_llm_operations_missing,
         schema_for_llm_expressions=pretty_schema_for_llm_expressions,
-        schema_for_llm_expression_matches=pretty_schema_for_llm_expression_matches,
+        schema_for_llm_expressions_matched=pretty_schema_for_llm_expression_matches,
+        schema_for_llm_expressions_missing=pretty_schema_for_llm_expressions_missing,
         schema_for_llm_steps=pretty_schema_for_llm_steps,
         title="LLM Workflow documentation",
     )

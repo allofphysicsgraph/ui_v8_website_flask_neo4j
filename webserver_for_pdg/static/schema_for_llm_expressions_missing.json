@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Missing Physics expressions Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "expression latex",
+      "local ID",
+      "comments"
+    ],
+    "properties": {
+      "expression latex": {
+        "type": "string",
+        "minLength": 1,
+        "description": "The LaTeX representation of the operation used in the derivation."
+      },
+      "local ID": {
+        "type": "string",
+        "minLength": 1,
+        "description": "ID local to the derivation."
+      },
+      "comments": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Notes regarding nearby operations in the database or why a match was omitted."
+      }
+    }
+  }
+}

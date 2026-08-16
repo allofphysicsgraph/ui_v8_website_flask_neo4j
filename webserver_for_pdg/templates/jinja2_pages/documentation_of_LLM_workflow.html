@@ -284,7 +284,7 @@ Each symbol in each file has a unique ID number.
 <P>Here is the schema for `matches.json`:
 <pre>
 ```
-{{ schema_for_llm_symbol_matches }}
+{{ schema_for_llm_symbols_matched }}
 ```
 </pre>
 
@@ -296,7 +296,7 @@ Each symbol in each file has a unique ID number.
 <P>Here is the schema for `missing.json`:
 <pre>
 ```
-{{ schema_for_llm_symbol_missing }}
+{{ schema_for_llm_symbols_missing }}
 ```
 </pre>
 </div>
@@ -304,16 +304,13 @@ Each symbol in each file has a unique ID number.
 </fieldset>
 
 
-<P>(Manually) input symbols that didn't match using web UI to generate new IDs; then re-run search for matches.
-
 
 
 <H3 id="tex to operations">Convert <code>DERIVATION_FILE.tex</code> to <code>operations.json</code></H3>
 
-<P>Example: <a href="">operations in Simple Harmonic Oscillator</a></P>
 
 <fieldset>
-  <legend id="list operations"><H2>Prompt for tex to <code>operations.json</code>
+  <legend id="list operations"><H2>Prompt for <code>DERIVATION.tex</code> to <code>operations.json</code>
    (<a href="#list operations">#</a>)</H2> </legend>
   <div class="snippet-container">
   <button class="copy-btn">Copy</button>
@@ -387,7 +384,7 @@ Each operation in each file has a unique ID number.
 <P>Here is the schema for `matches.json`:
 <pre>
 ```
-{{ schema_for_llm_operation_matches }}
+{{ schema_for_llm_operations_matched }}
 ```
 </pre>
 
@@ -407,56 +404,12 @@ Each operation in each file has a unique ID number.
 </div>
 </fieldset>
 
+<!--
 <H3 id="tex to expr">Convert <code>DERIVATION_FILE.tex</code> to <code>expressions.json</code></H3>
 
 <P>Example: <a href="https://github.com/allofphysicsgraph/task-tracker/issues/170">expressions in Simple Harmonic Oscillator</a>
-
-<!--
-<fieldset>
-	<legend>Prompt for tex to <code>expressions.json</code></legend>
-    <div class="snippet-container">
-  <button class="copy-btn">Copy</button>
-  <div class="code-snippet">
-  <P>Identify each expression in this document. 
-
-  <P>For each expression, identify the left-hand site (LHS), right-hand size (RHS), and the relation (e.g., =). 
-
-  <P>Sometime expressions have conditional applicability, like `v << c`. If there is a condition on the expression, determine what that is.
-
-  <P>Write out the LHS, relation, RHS, a condition if applicable, and the expression's label as JSON.
-
-  <P>The output should comply with this schema:
-  <pre>
-```
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Physics Expressions List",
-  "type": "array",
-  "items": {
-    "type": "object",
-    "required": ["expression", "label"],
-    "additionalProperties": false,
-    "properties": {
-      "expression": {
-        "type": "string",
-        "description": "The LaTeX representation of the mathematical formula.",
-        "minLength": 1
-      },
-      "label": {
-        "type": "string",
-        "minLength": 1,
-        "description": "A unique identifier or name for the expression.",
-        "pattern": "^[a-zA-Z0-9_]+$" 
-      }
-    }
-  }
-}
-```
-  </pre>
-</div>
-</div>
-</fieldset>
 -->
+
 
 
 
@@ -526,12 +479,13 @@ print(json.dumps(data, indent=2))
   <button class="copy-btn">Copy</button>
   <div class="code-snippet">
 <P>I have two input data sets: <BR>
-- a set of expressions used in the derivation of the DERIVATION_NAME_HERE. Each expression has a unique label.<BR>
-- a set of expressions in a database for physics derivations. Each expression has a unique ID number.
+- a set of expressions used in a specific derivation; file name `EXPRESSIONS_with_local_IDs.json`. <BR>
+- a set of expressions in from a database of physics derivations; file name `pdg_expressions.json`.<BR>
+Each expression in each file has a unique label.
 
-<P>The task is to create two JSON files: one for matches where expressions are in both input JSON files, and another JSON file for expressions in the DERIVATION_NAME_HERE derivation that are not in the physics derivations database. All expressions in the DERIVATION_NAME_HERE derivation should end up in one of the two JSON output files.
+<P>Create two JSON files: one for matches where expressions are in both input JSON files, and another JSON file for expressions in that only appear in `EXPRESSIONS_with_local_IDs.json` and are not in the physics derivations database. All expressions in `EXPRESSIONS_with_local_IDs.json` should end up in one of the two JSON output files.
 
-<P>For the JSON that captures the matches (`matches.json`), for each matching expression indicate<BR>
+<P>For the JSON that captures the matches (`EXPRESSIONS_matched.json`), for each matching expression indicate<BR>
   - label for Latex expression from derivation<BR>
   - Latex expression from derivation<BR>
   - Latex expression from database<BR>
@@ -542,7 +496,7 @@ print(json.dumps(data, indent=2))
   <P>The `matches.json` should comply with this schema:
   <pre>
 ```
-{{ schema_for_llm_expression_matches }}
+{{ schema_for_llm_expressions_matched }}
 ```
   </pre>
 
@@ -553,7 +507,7 @@ print(json.dumps(data, indent=2))
   <P>The `missing.json` should comply with this schema:
   <pre>
 ```
-TODO
+{{ schema_for_llm_expressions_missing }}
 ```
 </pre>
 </div>
