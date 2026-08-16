@@ -8833,6 +8833,109 @@ def to_validate_DERIVATION_json():
     )
 
 
+@web_app.route(
+    "/rewrite_SYMBOLS_with_local_IDs_json_with_matched_SYMBOLS_json",
+    methods=["GET", "POST"],
+)
+@trace_execution
+def rewrite_SYMBOLS_json_using_matched_IDs():
+    """
+    See https://allofphysics.com/documentation/agentic_LLMs
+    """
+    trace_id = trace_id_var.get()
+    canonical_url = url_for("rewrite_SYMBOLS_json_using_matched_IDs").lstrip("/")
+
+    symbols_json_is_valid = True
+    matches_json_is_valid = True
+    web_form_json = NoOptionsForm()
+
+    if request.method == "POST":
+        logger.info("request.form = " + str(request.form))
+
+        user_symbols_json_input = request.form["symbols-json-input"]
+
+        user_matches_json_input = request.form["matches-json-input"]
+
+        if user_symbols_json_input == "":
+            flash("Nothing submitted for SYMBOLS_with_local_IDs.json")
+        elif user_matches_json_input == "":
+            flash("Nothing submitted for SYMBOLS_matched.json")
+        else:
+            try:
+                parsed_symbols_json_input = json.loads(user_symbols_json_input)
+                symbols_json_is_valid = True
+            except ValueError as err:
+                # json_result = str(err) + "\n\n" + user_json_input
+                symbols_json_is_valid = False
+
+            try:
+                parsed_matches_json_input = json.loads(user_matches_json_input)
+                matches_json_is_valid = True
+            except ValueError as err:
+                # json_result = str(err) + "\n\n" + user_json_input
+                matches_json_is_valid = False
+
+            with open("static/schema_for_llm_symbols.json", "r") as file_handle:
+                schema_for_llm_symbols = json.load(file_handle)
+
+            with open("static/schema_for_llm_symbol_matches.json", "r") as file_handle:
+                schema_for_llm_symbol_matches = json.load(file_handle)
+
+            try:
+                validate(
+                    instance=parsed_symbols_json_input, schema=schema_for_llm_symbols
+                )
+                symbols_json_is_valid = True
+
+            except ValidationError as err:
+                # Catch schema validation errors specifically
+                # json_result = (
+                #     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
+                #     + user_json_input
+                # )
+                symbols_json_is_valid = False
+            except ValueError as err:
+                # Catch JSON parsing errors if any slipped through, or other value errors
+                # json_result = str(err) + "\n\n" + user_json_input
+                symbols_json_is_valid = False
+
+            try:
+                validate(
+                    instance=parsed_matches_json_input,
+                    schema=schema_for_llm_symbol_matches,
+                )
+
+                # json_result = (
+                #     "JSON is consistent with the DERIVATION.json schema\n\n"
+                #     + json.dumps(parsed, indent=2)
+                # )
+                matches_json_is_valid = True
+
+            except ValidationError as err:
+                # Catch schema validation errors specifically
+                # json_result = (
+                #     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
+                #     + user_json_input
+                # )
+                matches_json_is_valid = False
+            except ValueError as err:
+                # Catch JSON parsing errors if any slipped through, or other value errors
+                # json_result = str(err) + "\n\n" + user_json_input
+                matches_json_is_valid = False
+
+            # at this point both files have valid schemas
+            # TODO: merge the two files
+
+            # TODO: produce the merged file with a unique filename
+
+    return render_template(
+        "jinja2_pages/user_workflow/rewrite_SYMBOLS_json_using_matched_IDs.html",
+        title="rewrite SYMBOLS.json using matched ID",
+        canonical_url=canonical_url,
+        form_json=web_form_json,
+    )
+
+
 ###########################################################################
 
 
