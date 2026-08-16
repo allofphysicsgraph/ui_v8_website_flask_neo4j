@@ -5,18 +5,18 @@
 var typingTimers = {};
 var doneTypingInterval = 300; 
 
-function livePreview(input_id, display_checkbox_id, preview_id, output_id) {
+function livePreview(input_id, display_checkbox_id, preview_id, output_id, is_math_only = true) {
 
     // Clear the previous timer if the user is still typing
     clearTimeout(typingTimers[input_id]);
 
     // Set a new timer
     typingTimers[input_id] = setTimeout(function () {
-        convert(input_id, display_checkbox_id, preview_id, output_id);
+        convert(input_id, display_checkbox_id, preview_id, output_id, is_math_only);
     }, doneTypingInterval);
 }
 
-function convert(input_id, display_checkbox_id, preview_id, output_id) {
+function convert(input_id, display_checkbox_id, preview_id, output_id, is_math_only = true) {
 
     //  Get the TeX input
     var input = document.getElementById(input_id).value.trim();
@@ -40,6 +40,8 @@ function convert(input_id, display_checkbox_id, preview_id, output_id) {
     //  Convert the input to CommonHTML output and use a promise to wait for it to be ready
     //    (in case an extension needs to be loaded dynamically).
     MathJax.texReset();
+    if (is_math_only) {
+        // PURE MATH MODE: Used for symbol/formula inputs (e.g., \frac{d}{d})
     var options = MathJax.getMetricsFor(output);
     
     // Logic change: If there is no checkbox, default to 'true' (Display Mode)
@@ -59,6 +61,18 @@ function convert(input_id, display_checkbox_id, preview_id, output_id) {
         //  If there was an error, put the message into the output instead
         output.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
     }).then(function () {
+            if (previewButton) previewButton.disabled = false;
+            if (displayCheckbox) displayCheckbox.disabled = false;
+        });
+
+    } else {
+        // TEXT MODE: Used for name, description, etc.
+        // Uses textContent to safely escape HTML tags, then typesets any inline math like \( ... \)
+        output.textContent = input;
+        
+        MathJax.typesetPromise([output]).catch(function (err) {
+            console.error('MathJax typeset error:', err);
+        }).then(function () {
         // Re-enable elements only if they exist
         if (previewButton) previewButton.disabled = false;
         if (displayCheckbox) displayCheckbox.disabled = false;
