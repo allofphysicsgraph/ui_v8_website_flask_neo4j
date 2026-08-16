@@ -1,3 +1,13 @@
+
+```
+cat pdg.cypher | sort > pdg.cypher_SORTED
+cat pdg_website.cypher | sort > pdg_website.cypher_SORTED
+
+diff pdg.cypher_SORTED pdg_website.cypher_SORTED
+```
+
+<HR>
+
 Order matters in Neo4j files. A Cypher export file created by the APOC library (specifically `apoc.export.cypher`) follows 3 stages:
 
 - At the top, The Setup: Creates Constraints and Indexes. This ensures that as data flows in, the database can find nodes quickly and prevent duplicates.
