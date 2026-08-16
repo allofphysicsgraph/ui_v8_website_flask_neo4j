@@ -6,8 +6,10 @@
 <P><small>Published 2023-06-07T03:05:00Z by Physics Derivation Graph</small></P>
 
 JSON-like output
+{% raw %}
 <pre>git log --date=format-local:'%Y-%m-%d %H:%M:%S' \
 --pretty=format:'{%n  "commit": "%H",%n  "author": "%aN &lt;%aE&gt;",%n  "date": "%ad",%n  "message": "%f"%n},' &gt; all_logs.dat</pre>
+{% endraw %}
 
 <p>as per <a href="https://stackoverflow.com/a/34778736/1164295">https://stackoverflow.com/a/34778736/1164295</a> and&nbsp;<a href="https://gist.github.com/textarcana/1306223">https://gist.github.com/textarcana/1306223</a> which points to&nbsp;<a href="https://gist.github.com/textarcana/1306223">https://gist.github.com/textarcana/1306223</a></p>
 
