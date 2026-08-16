@@ -7,7 +7,7 @@
       "label",
       "original_latex",
       "latex_from_database",
-      "id",
+      "pdg_id",
       "comments",
       "confidence_level"
     ],
@@ -27,7 +27,7 @@
         "minLength": 1,
         "description": "The LaTeX representation retrieved from the database."
       },
-      "id": {
+      "pdg_id": {
         "type": "string",
         "pattern": "^[0-9]+$",
         "minLength": 8,
