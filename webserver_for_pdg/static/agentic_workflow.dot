@@ -1,52 +1,134 @@
 digraph G {
 
-rankdir=LR;
+//rankdir=LR;
 
-create_derivation_tex [label="create derivation.tex\nstage 1; LLM" shape="rectangle"]
-create_derivation_tex -> create_symbols_json
-create_symbols_json [label="create symbols.json\nwith local ID\nstage 2; LLM" shape="rectangle"]
+prompt_create_derivation_tex [label="prompt" style=filled fillcolor="lightblue"]
 
-compare_to_symbols_in_PDG [label="compare to symbols in PDG\nstage 3; API" shape="rectangle"]
-create_symbols_json -> compare_to_symbols_in_PDG [label="for each symbol" shape="rectangle"]
+create_derivation_tex [label="DERIVATION.tex" shape="rectangle"]
 
-if_symbol_in_PDG_update_temp_ID [label="if symbol in PDG update temp ID" shape="rectangle"]
-compare_to_symbols_in_PDG -> if_symbol_in_PDG_update_temp_ID
-if_symbol_in_PDG_update_temp_ID -> create_symbols_json [label="update ID"]
+prompt_create_derivation_tex -> create_derivation_tex [label="1:creates"]
 
-if_symbol_not_in_PDG_create_ID [label="if symbol not in PDG create ID" shape="rectangle"]
-compare_to_symbols_in_PDG -> if_symbol_not_in_PDG_create_ID
-if_symbol_not_in_PDG_create_ID -> create_symbols_json [label="update ID"]
+create_symbols_json [label="SYMBOLS.json" shape="rectangle"]
 
-create_operations_json [label="create operations.json\nwith local ID\nstage 5; LLM" shape="rectangle"]
-create_derivation_tex -> create_operations_json
+prompt_symbols_from_derivation [label="prompt" style=filled fillcolor="lightblue"]
 
-compare_to_operations_in_PDG [label="compare to operations in PDG\nstage 6; API" shape="rectangle"]
-create_operations_json -> compare_to_operations_in_PDG [label="for each operation"]
+create_derivation_tex -> prompt_symbols_from_derivation [label="2"]
+prompt_symbols_from_derivation -> create_symbols_json [label="3: creates"]
 
-if_operation_in_PDG_update_temp_ID [label="if oper in PDG update temp ID" shape="rectangle"]
-compare_to_operations_in_PDG -> if_operation_in_PDG_update_temp_ID
-if_operation_in_PDG_update_temp_ID -> create_operations_json [label="update ID"]
 
-if_operation_not_in_PDG_create_ID [label="if oper not in PDG create ID" shape="rectangle"]
-compare_to_operations_in_PDG -> if_operation_not_in_PDG_create_ID
-if_operation_not_in_PDG_create_ID -> create_operations_json [label="update ID"]
+create_symbols_json_with_local_ID [label="creates SYMBOLS_with_local_ID.json" shape="rectangle"]
 
-create_expressions_json [label="create expressions.json\nwith local ID\nstage 8; LLM" shape="rectangle"]
-create_derivation_tex -> create_expressions_json
+validate_symbols  [label="validate SYMBOLS.json" style=filled fillcolor="pink" shape=hexagon]
 
-compare_to_expressions_in_PDG [label="compare to expressions in PDG\nstage 9; API" shape="rectangle"]
-create_expressions_json -> compare_to_expressions_in_PDG [label="for each expression"]
+create_symbols_json -> validate_symbols [label="4"]
+validate_symbols -> create_symbols_json_with_local_ID [label="5: creates"]
 
-if_expression_in_PDG_update_temp_ID [label="if expression in PDG update temp ID" shape="rectangle"]
-compare_to_expressions_in_PDG -> if_expression_in_PDG_update_temp_ID
-if_expression_in_PDG_update_temp_ID -> create_expressions_json [label="update ID"]
+get_pdg_symbols [label="get PDG scalars,\nvectors, matrices\nas .json using curl" style=filled fillcolor="pink" shape=hexagon]
+pdg_scalars [label="pdg_scalars.json" shape="rectangle"]
+pdg_vectors [label="pdg_vectors.json" shape="rectangle"]
+pdg_matrices [label="pdg_matrices.json" shape="rectangle"]
 
-if_expression_not_in_PDG_create_ID [label="if expression not in PDG create ID" shape="rectangle"]
-compare_to_expressions_in_PDG -> if_expression_not_in_PDG_create_ID
-if_expression_not_in_PDG_create_ID -> create_expressions_json [label="update ID"]
+get_pdg_symbols -> pdg_scalars [label="6: creates"]
+get_pdg_symbols -> pdg_vectors [label="7: creates"]
+get_pdg_symbols -> pdg_matrices [label="8: creates"]
 
-create_steps_json [label="create steps.json\nwith local ID\nstage 12; LLM" shape="rectangle"]
-create_derivation_tex -> create_steps_json
+compare_to_symbols_in_PDG [label="compare to symbols in PDG" style=filled fillcolor="lightblue"]
+create_symbols_json_with_local_ID -> compare_to_symbols_in_PDG [label="10"]
+
+pdg_scalars -> compare_to_symbols_in_PDG [label="10"]
+pdg_vectors -> compare_to_symbols_in_PDG [label="10"]
+pdg_matrices -> compare_to_symbols_in_PDG [label="10"]
+
+missing_SYMBOLS [label="missing_SYMBOLS.json" shape="rectangle"]
+matched_SYMBOLS [label="matched_SYMBOLS.json" shape="rectangle"]
+
+compare_to_symbols_in_PDG -> missing_SYMBOLS [label="11: creates"]
+compare_to_symbols_in_PDG -> matched_SYMBOLS [label="11: creates"]
+
+if_symbol_in_PDG_update_temp_ID [label="if symbol in PDG update temp ID" style=filled fillcolor="pink" shape=hexagon]
+matched_SYMBOLS -> if_symbol_in_PDG_update_temp_ID [label="12"]
+if_symbol_in_PDG_update_temp_ID -> create_symbols_json_with_local_ID [label="13: update ID"]
+
+if_symbol_not_in_PDG_create_ID [label="if symbol not in PDG create ID" style=filled fillcolor="pink" shape=hexagon]
+missing_SYMBOLS -> if_symbol_not_in_PDG_create_ID [label="14"]
+if_symbol_not_in_PDG_create_ID -> create_symbols_json_with_local_ID [label="15: update ID"]
+
+
+
+prompt_operations_from_derivation [label="prompt" style=filled fillcolor="lightblue"]
+
+create_operations_json [label="OPERATIONS.json" shape="rectangle"]
+create_derivation_tex -> prompt_operations_from_derivation [label="16"]
+prompt_operations_from_derivation -> create_operations_json [label="17: creates"]
+
+create_operations_json_with_local_ID [label="OPERATIONS_with_local_ID.json" shape="rectangle"]
+
+compare_to_operations_in_PDG [label="compare to operations in PDG" style=filled fillcolor="lightblue"]
+
+validate_operations  [label="validate OPERATIONS.json" style=filled fillcolor="pink" shape=hexagon]
+create_operations_json -> validate_operations [label="18"]
+validate_operations -> create_operations_json_with_local_ID [label="19: creates"]
+create_operations_json_with_local_ID -> compare_to_operations_in_PDG [label="21"]
+
+get_pdg_operations [label="get PDG operations\nas .json using curl" style=filled fillcolor="pink" shape=hexagon]
+pdg_operations_json [label="pdg_operations.json" shape="rectangle"]
+get_pdg_operations -> pdg_operations_json [label="20: creates"]
+
+pdg_operations_json -> compare_to_operations_in_PDG [label="21"]
+
+if_operation_in_PDG_update_temp_ID [label="if oper in PDG update temp ID" style=filled fillcolor="pink" shape=hexagon]
+missing_operations [label="missing_OPERATIONS.json" shape="rectangle"]
+matched_operations [label="matched_OPERATIONS.json" shape="rectangle"]
+compare_to_operations_in_PDG -> matched_operations [label="22: creates"]
+matched_operations -> if_operation_in_PDG_update_temp_ID [label="25"]
+if_operation_in_PDG_update_temp_ID -> create_operations_json_with_local_ID [label="26: update ID"]
+
+if_operation_not_in_PDG_create_ID [label="if oper not in PDG create ID" style=filled fillcolor="pink" shape=hexagon]
+compare_to_operations_in_PDG -> missing_operations [label="22: creates"]
+missing_operations -> if_operation_not_in_PDG_create_ID [label="23"]
+if_operation_not_in_PDG_create_ID -> create_operations_json_with_local_ID [label="24: update ID"]
+
+
+prompt_expressions_from_derivation [label="prompt" style=filled fillcolor="lightblue"]
+
+create_expressions_json [label="create EXPRESSIONS.json" shape="rectangle"]
+
+validate_expressions  [label="validate EXPRESSIONS.json" style=filled fillcolor="pink" shape=hexagon]
+create_derivation_tex -> prompt_expressions_from_derivation [label="27"]
+prompt_expressions_from_derivation -> create_expressions_json
+
+create_expressions_json_with_local_IDs [label="create EXPRESSIONS_with local ID.json" shape="rectangle"]
+
+missing_expressions [label="missing_EXPRESSIONS.json" shape="rectangle"]
+matched_expressions [label="matched_EXPRESSIONS.json" shape="rectangle"]
+
+get_pdg_expressions [label="get PDG expressions\nas .json using curl" style=filled fillcolor="pink" shape=hexagon]
+pdg_expressions_json [label="pdg_expressions.json" shape="rectangle"]
+get_pdg_expressions -> pdg_expressions_json
+
+pdg_expressions_json -> compare_to_expressions_in_PDG
+
+compare_to_expressions_in_PDG [label="compare to expressions in PDG" style=filled fillcolor="lightblue"]
+create_expressions_json -> validate_expressions
+validate_expressions -> create_expressions_json_with_local_IDs
+create_expressions_json_with_local_IDs -> compare_to_expressions_in_PDG [label="for each expression"]
+
+if_expression_in_PDG_update_temp_ID [label="if expression in PDG update temp ID" style=filled fillcolor="pink" shape=hexagon]
+compare_to_expressions_in_PDG -> matched_expressions
+matched_expressions -> if_expression_in_PDG_update_temp_ID
+if_expression_in_PDG_update_temp_ID -> create_expressions_json_with_local_IDs [label="update ID"]
+
+if_expression_not_in_PDG_create_ID [label="if expression not in PDG create ID" style=filled fillcolor="pink" shape=hexagon]
+compare_to_expressions_in_PDG -> missing_expressions
+missing_expressions -> if_expression_not_in_PDG_create_ID
+if_expression_not_in_PDG_create_ID -> create_expressions_json_with_local_IDs [label="update ID"]
+
+
+prompt_steps_from_derivation [label="prompt" style=filled fillcolor="lightblue"]
+
+create_steps_json [label="create STEPS.json\nwith local ID" shape="rectangle"]
+create_derivation_tex -> prompt_steps_from_derivation
+prompt_steps_from_derivation -> create_steps_json
 
 compare_to_infrule_in_PDG [label="compare to inference rule in PDG\nstage 13; API" shape="rectangle"]
 create_steps_json -> compare_to_infrule_in_PDG [label="for each step"]
