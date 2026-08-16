@@ -11,9 +11,10 @@
 
 <P>The Physics Derivation Graph does not have a local LLM nor does the project call remotely-hosted LLMs. 
    Use of an LLM or agentic LLM is the responsibility of the user and is to be run client-side.
-   The Physics Derivation Graph provides <a href="{{ url_for('to_api_documentation') }}?referrer=agentic_llm_documentation">API documentation</a> relevant to agents.
+   The Physics Derivation Graph provides 
+   <a href="{{ url_for('to_api_documentation') }}?referrer=agentic_llm_documentation">API documentation</a> relevant to agents.
 
-<P>The workflow for a generic derivation is
+<P>The workflow for a generic derivation is</P>
    <a href="{{ url_for('static', filename='agentic_workflow.svg') }}">
 <img src="{{ url_for('static', filename='agentic_workflow.svg') }}">
 </a>
@@ -23,26 +24,31 @@
 
 
 
-<P>Stage 1: to create DERIVATION.tex  
-   using this <a href="{{ url_for('to_llm_workflow_documenation') }}#derivation as tex?referrer=agentic_llm_documentation">prompt</a>.
+<P><a name="create_derivation_tex">Stage 1: Create DERIVATION.tex</a>
+   using this <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#derivation as tex">prompt</a>.
 
-<P>Stage 2: to create SYMBOLS.json  
-   see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to symbols?referrer=agentic_llm_documentation">prompt</a>.
-    Then <a href="{{ url_for('to_validate_SYMBOLS_json') }}?referrer=agentic_llm_documentation">validate SYMBOLS.json</a> to create <code>SYMBOLS_with_local_IDs.json</code>.
+<P><a name="create_symbols_json">Stage 2: Create SYMBOLS.json</a>  
+   using this <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to symbols">prompt</a>.
 
-<P>Extract the current symbols from the PDG database using
+<P>Stage 3: Use <a href="{{ url_for('to_validate_SYMBOLS_json') }}?referrer=agentic_llm_documentation">validate SYMBOLS.json</a> to create <code>SYMBOLS_with_local_IDs.json</code>.
+
+<P>Stage 4: Extract the current symbols from the PDG database using
 <pre>
-curl --silent --insecure https://localhost/api/resources/symbol/scalars | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+curl --silent --insecure https://localhost/api/resources/symbol/scalars |\
+ jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)' &gt; pdg_scalars.json
 
-curl --silent --insecure https://localhost/api/resources/symbol/vectors | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+curl --silent --insecure https://localhost/api/resources/symbol/vectors |\
+ jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)' &gt; pdg_vectors.json
 
-curl --silent --insecure https://localhost/api/resources/symbol/matrices | jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)'
+curl --silent --insecure https://localhost/api/resources/symbol/matrices |\
+ jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)' &gt; pdg_matrices.json
 </pre>
-<P>create <code>matched_SYMBOLS.json</code> and <code>missing_SYMBOLS.json</code> using 
-<a href="{{ url_for('to_llm_workflow_documenation') }}#symbol comparison?referrer=agentic_llm_documentation">this prompt</a>.
 
-<P>Given <code>SYMBOLS_with_local_IDs.json</code> and the list of matches from the LLM, the rewrite of symbols JSON is mechanical.<BR>
-   TODO: create a page that ingests <code>SYMBOLS_with_local_IDs.json</code> and <code>matched_SYMBOLS.json</code> and rewrites  <code>SYMBOLS_with_IDs.json</code>
+<P>Stage 5: Create <code>matched_SYMBOLS.json</code> and <code>missing_SYMBOLS.json</code> using 
+<a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#symbol comparison">this prompt</a>.
+
+<P>Stage 6: Given <code>SYMBOLS_with_local_IDs.json</code> and the list of matches from the LLM, the rewrite of symbols JSON is mechanical.<BR>
+   <a href="{{ url_for('rewrite_SYMBOLS_json_using_matched_IDs') }}">this</a> page ingests <code>SYMBOLS_with_local_IDs.json</code> and <code>matched_SYMBOLS.json</code> and rewrites  <code>SYMBOLS_with_IDs.json</code>
 
 <P>Given <code>SYMBOLS_with_IDs.json</code> and the list of missing, a human reviewer should confirm lack of existence. Once the human reviewer confirms then creation of symbols should be mechanical. <BR>
    TODO: Create the API and, separately, a web page that takes in the missing JSON list to create symbols in PDG.
@@ -50,7 +56,7 @@ curl --silent --insecure https://localhost/api/resources/symbol/matrices | jq 'w
 <P>Once the missing symbols have been created in PDG database, rerun the assessment and confirm symbols until missing is empty.
 
 <P>Stage 5: to create OPERATIONS.json  
-   see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to operations?referrer=agentic_llm_documentation">prompt</a>
+   see <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to operations">prompt</a>
    and then <a href="{{ url_for('to_validate_OPERATIONS_json') }}?referrer=agentic_llm_documentation">validate OPERATIONS.json</a> to create OPERATIONS_with_local_IDs.json
 
 <pre>
@@ -59,7 +65,7 @@ curl --silent --insecure https://localhost/api/resources/symbol/operations | jq 
 
 
 <P>Stage 8, to create EXPRESSIONS.json  
-   see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to expr?referrer=agentic_llm_documentation">prompt</a>
+   see <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to expr">prompt</a>
    and then <a href="{{ url_for('to_validate_EXPRESSIONS_json') }}?referrer=agentic_llm_documentation">validate EXPRESSIONS.json</a>
 
 <P>To get the current expressions from PDG database as JSON use
@@ -81,7 +87,7 @@ curl --silent --insecure https://localhost/api/resources/symbol/relations | jq '
 <P>TODO: create EXPRESSIONS_with_SYMBOLS_and_OPERATIONS.json from EXPRESSIONS.json + DERIVATION.tex + SYMBOLS_with_local_IDs.json + OPERATIONS_with_local_IDs.json  + RELATIONS.json
 
 <P>Stage 12: to create STEPS.json 
-   see <a href="{{ url_for('to_llm_workflow_documenation') }}#tex to steps?referrer=agentic_llm_documentation">prompt</a>
+   see <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to steps">prompt</a>
    and then <a href="{{ url_for('to_validate_STEPS_json') }}?referrer=agentic_llm_documentation">validate STEPS.json</a>
 
 <P>TODO: what happens if a new inference rule is needed?
