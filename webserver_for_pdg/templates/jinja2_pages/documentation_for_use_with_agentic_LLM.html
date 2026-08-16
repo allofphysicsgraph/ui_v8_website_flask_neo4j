@@ -60,7 +60,7 @@ curl --silent --insecure https://localhost/api/resources/symbol/matrices |\
 <HR>
 
 <P>Stage 8: Create <code>OPERATIONS.json</code>
-   using <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to operations">this prompt</a>
+   using <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to operations">this prompt</a>.
    
 <P>Stage 9: <a href="{{ url_for('to_validate_OPERATIONS_json') }}?referrer=agentic_llm_documentation">validate OPERATIONS.json</a> to create <code>OPERATIONS_with_local_IDs.json</code>
 
@@ -81,20 +81,30 @@ curl --silent --insecure https://localhost/api/resources/symbol/operations |\
 <HR>
 
 <P>Stage 14: Create EXPRESSIONS.json  
-   using <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to expr">prompt</a>
+   using <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#expressions%20list%20split%20and%20sympy">this prompt</a>.
 
 <P>Stage 15: <a href="{{ url_for('to_validate_EXPRESSIONS_json') }}?referrer=agentic_llm_documentation">validate EXPRESSIONS.json</a> to create <code>EXPRESSIONS_with_local_IDs.json</code>
 
-<P>Stage 16: To get the current expressions from PDG database as JSON use
+<P>Stage 16: Get the current expressions from PDG database as JSON using
 <pre>
 curl --silent --insecure https://localhost/api/resources/expressions |\
  jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)' &gt; pdg_expressions.json
 </pre> 
 
-<P>TODO: from EXPRESSIONS.json extract RELATIONS.json since "relation" is one of the keys and "=" is typical.
+<P>TODO: Rather than compare the expressions in a derivation to every expression in the PDG database, only compare expressions that have corresponding symbols and operations
 
-<P>Then compare "=" or other relation with
+<P>Stage 17: compare <code>EXPRESSIONS_with_local_IDs.json</code> to <code>pdg_expressions.json</code> using 
+   <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#compare%20expressions">this prompt</a>; creates <code>EXPRESSIONS_matches.json</code> and <code>EXPRESSIONS_missing.json</code>
 
+<P>Stage 18: Merge <code>EXPRESSIONS_with_local_IDs.json</code> with <code>EXPRESSIONS_matches.json</code> using <a href="{{ url_for('rewrite_EXPRESSIONS_json_using_matched_IDs') }}?referrer=agentic_llm_documentation">this page</a> to get <code>EXPRESSIONS_with_local_IDs_and_PDG_IDs.json</code>
+
+<P>Stage 19: Add expressions in <code>EXPRESSIONS_missing.json</code> to PDG using web or API.
+
+<HR>
+
+<P>Stage 20: (Mechanical): Extract </code>RELATIONS.json</code> from <code>EXPRESSIONS_with_local_IDs_and_PDG_IDs.json</code> since "relation" is one of the keys and "=" is typical.
+
+<P>Stage 21: compare "=" and other relations with
 <pre>
 curl --silent --insecure https://localhost/api/resources/symbol/relations |\
  jq 'walk(if type == "object" then del(._links, ._templates, .count, .author_name_latex, .created_datetime) else . end)' &gt; pdg_relations.json
@@ -105,7 +115,7 @@ curl --silent --insecure https://localhost/api/resources/symbol/relations |\
 <P>Once all symbols and operations in relations exist in the database, and those database IDs have been updated in the respective JSONs, then the LLM can figure out what symbols, operations, and relations are associated with each expression. The LLM will produce a new JSON file with all the respective edges. Will need a new JSON schema for the edge list to validate against.
 
 
-<P>TODO: create EXPRESSIONS_with_SYMBOLS_and_OPERATIONS.json from EXPRESSIONS.json + DERIVATION.tex + SYMBOLS_with_local_IDs.json + OPERATIONS_with_local_IDs.json  + RELATIONS.json
+<P>Stage ??: create EXPRESSIONS_with_SYMBOLS_and_OPERATIONS.json from EXPRESSIONS.json + DERIVATION.tex + SYMBOLS_with_local_IDs.json + OPERATIONS_with_local_IDs.json  + RELATIONS.json
 
 <P>Stage ??: to create STEPS.json 
    see <a href="{{ url_for('to_llm_workflow_documenation') }}?referrer=agentic_llm_documentation#tex to steps">prompt</a>
