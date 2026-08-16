@@ -21,6 +21,13 @@ DEPRECATED: https://github.com/allofphysicsgraph/task-tracker/issues/174
 
 OPERATIONS.json is from
 https://github.com/allofphysicsgraph/task-tracker/issues/172
+OPERATIONS_matched and OPERATIONS_missing are from
+https://localhost/documentation/llm_workflow?referrer=agentic_llm_documentation#compare%20operations
+using Gemini 3.7 Flash 'medium'. Input is 7500 tokens for 2 inputs:
+- `OPERATIONS_with_local_ID`: 2600 tokens
+- `pdg_operations`: 4000 tokens
+With output `OPERATIONS_matched` the context window is 15,000 tokens.
+https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%2215W0fP9Q_IvCjiW2Xmp8azA5kmvGlk-d1%22%5D,%22action%22:%22open%22,%22userId%22:%22101193243042884231058%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing, https://drive.google.com/file/d/1LIWKtFj0Y6UlJTR1wHkL4lN0JnGoPxrq/view?usp=sharing, https://drive.google.com/file/d/1zujEDJZiPgW3O8pLYSfQEbWhEUUrpTOf/view?usp=sharing
 
 
 EXPRESSIONS.json is from 
