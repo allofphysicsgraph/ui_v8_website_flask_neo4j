@@ -108,8 +108,8 @@ from logging.handlers import RotatingFileHandler
 
 import neo4j  # type: ignore
 
-from jsonschema import validate
-from jsonschema.exceptions import ValidationError
+from jsonschema import validate as jsonschema_validate
+from jsonschema.exceptions import ValidationError as jsonschema_ValidationError
 
 # https://hplgit.github.io/web4sciapps/doc/pub/._web4sa_flask004.html
 from flask import (
@@ -3349,7 +3349,6 @@ def to_edit_operation(operation_id: unique_numeric_id_as_str) -> ResponseReturnV
         list_of_expressions = session.read_transaction(
             neo4j_query.get_expressions_that_use_symbol, operation_id
         )
-
 
     logger.info("request.method =" + str(request.method))
 
@@ -7240,13 +7239,13 @@ def to_llm_workflow_documenation() -> ResponseReturnValue:
         "jinja2_pages/documentation_of_LLM_workflow.html",
         canonical_url=canonical_url,
         schema_for_llm_symbols=pretty_schema_for_llm_symbols,
-        schema_for_llm_symbols_matched=pretty_schema_for_llm_symbol_matches,
-        schema_for_llm_symbols_missing=pretty_schema_for_llm_symbol_missing,
+        schema_for_llm_symbols_matched=pretty_schema_for_llm_symbols_matched,
+        schema_for_llm_symbols_missing=pretty_schema_for_llm_symbols_missing,
         schema_for_llm_operations=pretty_schema_for_llm_operations,
-        schema_for_llm_operations_matched=pretty_schema_for_llm_operation_matches,
+        schema_for_llm_operations_matched=pretty_schema_for_llm_operations_matched,
         schema_for_llm_operations_missing=pretty_schema_for_llm_operations_missing,
         schema_for_llm_expressions=pretty_schema_for_llm_expressions,
-        schema_for_llm_expressions_matched=pretty_schema_for_llm_expression_matches,
+        schema_for_llm_expressions_matched=pretty_schema_for_llm_expressions_matched,
         schema_for_llm_expressions_missing=pretty_schema_for_llm_expressions_missing,
         schema_for_llm_steps=pretty_schema_for_llm_steps,
         title="LLM Workflow documentation",
@@ -8504,7 +8503,7 @@ def to_validate_SYMBOLS_json():
                 schema_for_llm_symbols = json.load(file_handle)
 
             try:
-                validate(instance=parsed, schema=schema_for_llm_symbols)
+                jsonschema_validate(instance=parsed, schema=schema_for_llm_symbols)
 
                 json_result = (
                     "JSON is consistent with the SYMBOLS.json schema\n\n"
@@ -8512,7 +8511,7 @@ def to_validate_SYMBOLS_json():
                 )
                 json_is_valid = True
 
-            except ValidationError as err:
+            except jsonschema_ValidationError as err:
                 # Catch schema validation errors specifically
                 json_result = (
                     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
@@ -8587,7 +8586,7 @@ def to_validate_OPERATIONS_json():
                 schema_for_llm_operations = json.load(file_handle)
 
             try:
-                validate(instance=parsed, schema=schema_for_llm_operations)
+                jsonschema_validate(instance=parsed, schema=schema_for_llm_operations)
 
                 json_result = (
                     "JSON is consistent with the OPERATIONS.json schema\n\n"
@@ -8595,7 +8594,7 @@ def to_validate_OPERATIONS_json():
                 )
                 json_is_valid = True
 
-            except ValidationError as err:
+            except jsonschema_ValidationError as err:
                 # Catch schema validation errors specifically
                 json_result = (
                     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
@@ -8670,7 +8669,7 @@ def to_validate_EXPRESSIONS_json():
                 schema_for_llm_expressions = json.load(file_handle)
 
             try:
-                validate(instance=parsed, schema=schema_for_llm_expressions)
+                jsonschema_validate(instance=parsed, schema=schema_for_llm_expressions)
 
                 json_result = (
                     "JSON is consistent with the EXPRESSIONS.json schema\n\n"
@@ -8678,7 +8677,7 @@ def to_validate_EXPRESSIONS_json():
                 )
                 json_is_valid = True
 
-            except ValidationError as err:
+            except jsonschema_ValidationError as err:
                 # Catch schema validation errors specifically
                 json_result = (
                     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
@@ -8753,7 +8752,7 @@ def to_validate_STEPS_json():
                 schema_for_llm_steps = json.load(file_handle)
 
             try:
-                validate(instance=parsed, schema=schema_for_llm_steps)
+                jsonschema_validate(instance=parsed, schema=schema_for_llm_steps)
 
                 json_result = (
                     "JSON is consistent with the STEPS.json schema\n\n"
@@ -8761,7 +8760,7 @@ def to_validate_STEPS_json():
                 )
                 json_is_valid = True
 
-            except ValidationError as err:
+            except jsonschema_ValidationError as err:
                 # Catch schema validation errors specifically
                 json_result = (
                     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
@@ -8834,7 +8833,7 @@ def to_validate_DERIVATION_json():
                 schema_for_llm_derivations = json.load(file_handle)
 
             try:
-                validate(instance=parsed, schema=schema_for_llm_derivations)
+                jsonschema_validate(instance=parsed, schema=schema_for_llm_derivations)
 
                 json_result = (
                     "JSON is consistent with the DERIVATION.json schema\n\n"
@@ -8842,7 +8841,7 @@ def to_validate_DERIVATION_json():
                 )
                 json_is_valid = True
 
-            except ValidationError as err:
+            except jsonschema_ValidationError as err:
                 # Catch schema validation errors specifically
                 json_result = (
                     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
@@ -8911,16 +8910,16 @@ def rewrite_SYMBOLS_json_using_matched_IDs():
             with open("static/schema_for_llm_symbols.json", "r") as file_handle:
                 schema_for_llm_symbols = json.load(file_handle)
 
-            with open("static/schema_for_llm_symbol_matches.json", "r") as file_handle:
-                schema_for_llm_symbol_matches = json.load(file_handle)
+            with open("static/schema_for_llm_symbols_matched.json", "r") as file_handle:
+                schema_for_llm_symbols_matched = json.load(file_handle)
 
             try:
-                validate(
+                jsonschema_validate(
                     instance=parsed_symbols_json_input, schema=schema_for_llm_symbols
                 )
                 symbols_json_is_valid = True
 
-            except ValidationError as err:
+            except jsonschema_ValidationError as err:
                 # Catch schema validation errors specifically
                 # json_result = (
                 #     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
@@ -8933,9 +8932,9 @@ def rewrite_SYMBOLS_json_using_matched_IDs():
                 symbols_json_is_valid = False
 
             try:
-                validate(
+                jsonschema_validate(
                     instance=parsed_matches_json_input,
-                    schema=schema_for_llm_symbol_matches,
+                    schema=schema_for_llm_symbols_matched,
                 )
 
                 # json_result = (
@@ -8944,7 +8943,7 @@ def rewrite_SYMBOLS_json_using_matched_IDs():
                 # )
                 matches_json_is_valid = True
 
-            except ValidationError as err:
+            except jsonschema_ValidationError as err:
                 # Catch schema validation errors specifically
                 # json_result = (
                 #     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
@@ -9041,18 +9040,18 @@ def rewrite_OPERATIONS_json_using_matched_IDs():
                 schema_for_llm_operations = json.load(file_handle)
 
             with open(
-                "static/schema_for_llm_operation_matches.json", "r"
+                "static/schema_for_llm_operations_matched.json", "r"
             ) as file_handle:
-                schema_for_llm_operation_matches = json.load(file_handle)
+                schema_for_llm_operations_matched = json.load(file_handle)
 
             try:
-                validate(
+                jsonschema_validate(
                     instance=parsed_operations_json_input,
                     schema=schema_for_llm_operations,
                 )
                 operations_json_is_valid = True
 
-            except ValidationError as err:
+            except jsonschema_ValidationError as err:
                 # Catch schema validation errors specifically
                 # json_result = (
                 #     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
@@ -9065,9 +9064,9 @@ def rewrite_OPERATIONS_json_using_matched_IDs():
                 operations_json_is_valid = False
 
             try:
-                validate(
+                jsonschema_validate(
                     instance=parsed_matches_json_input,
-                    schema=schema_for_llm_operation_matches,
+                    schema=schema_for_llm_operations_matched,
                 )
 
                 # json_result = (
@@ -9076,7 +9075,7 @@ def rewrite_OPERATIONS_json_using_matched_IDs():
                 # )
                 matches_json_is_valid = True
 
-            except ValidationError as err:
+            except jsonschema_ValidationError as err:
                 # Catch schema validation errors specifically
                 # json_result = (
                 #     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
@@ -9177,18 +9176,18 @@ def rewrite_EXPRESSIONS_json_using_matched_IDs():
                 schema_for_llm_expressions = json.load(file_handle)
 
             with open(
-                "static/schema_for_llm_expression_matches.json", "r"
+                "static/schema_for_llm_expressions_matched.json", "r"
             ) as file_handle:
-                schema_for_llm_expression_matches = json.load(file_handle)
+                schema_for_llm_expressions_matched = json.load(file_handle)
 
             try:
-                validate(
+                jsonschema_validate(
                     instance=parsed_expressions_json_input,
                     schema=schema_for_llm_expressions,
                 )
                 expressions_json_is_valid = True
 
-            except ValidationError as err:
+            except jsonschema_ValidationError as err:
                 # Catch schema validation errors specifically
                 # json_result = (
                 #     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
@@ -9201,9 +9200,9 @@ def rewrite_EXPRESSIONS_json_using_matched_IDs():
                 expressions_json_is_valid = False
 
             try:
-                validate(
+                jsonschema_validate(
                     instance=parsed_matches_json_input,
-                    schema=schema_for_llm_expression_matches,
+                    schema=schema_for_llm_expressions_matched,
                 )
 
                 # json_result = (
@@ -9212,7 +9211,7 @@ def rewrite_EXPRESSIONS_json_using_matched_IDs():
                 # )
                 matches_json_is_valid = True
 
-            except ValidationError as err:
+            except jsonschema_ValidationError as err:
                 # Catch schema validation errors specifically
                 # json_result = (
                 #     f"Schema Validation Error:\n{err.message}\n\nFailed at path: {' -> '.join(str(p) for p in err.path)}\n\n"
