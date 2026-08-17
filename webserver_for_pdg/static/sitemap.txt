@@ -548,3 +548,15 @@ https://allofphysics.com/static/validated_steps.png
 https://allofphysics.com/static/Youtube_icon.png
 https://allofphysics.com/survey_of_named_expressions
 https://allofphysics.com/workflow_documentation
+https://allofphysics.com/validate/latex
+https://allofphysics.com/validate/sympy
+https://allofphysics.com/validate/lean
+https://allofphysics.com/validate/json
+https://allofphysics.com/validate/SYMBOLS_json
+https://allofphysics.com/validate/OPERATIONS_json
+https://allofphysics.com/validate/EXPRESSIONS_json
+https://allofphysics.com/validate/STEPS_json
+https://allofphysics.com/validate/DERIVATION_json
+https://allofphysics.com/rewrite_SYMBOLS_with_local_IDs_json_with_matched_SYMBOLS_json
+https://allofphysics.com/rewrite_OPERATIONS_with_local_IDs_json_with_matched_OPERATIONS_json
+https://allofphysics.com/rewrite_EXPRESSIONS_with_local_IDs_json_with_matched_EXPRESSIONS_json
