@@ -10,6 +10,7 @@ test_web_interface/playwrightbased/.pytest_cache
 documentation_generated_sphinx/_build/
 documentation_generated_sphinx/logs/
 analysis_of_log_files/*.log
+webserver_for_pdg/.msmtp-gmail.gpg
 .coverage*
 .env
 .env.google
