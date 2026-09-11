@@ -654,7 +654,7 @@ def add_url_to_shortened_list(
     # logger.info("[TRACE] end " + trace_id)
     return lookup
 
-
+@trace_execution
 def get_url_from_shortened_list(lookup: str) -> Tuple[str, Optional[str]]:
     """
     Given the `lookup`, what is the URL?
@@ -681,7 +681,7 @@ def get_url_from_shortened_list(lookup: str) -> Tuple[str, Optional[str]]:
     # logger.info("[TRACE] end " + trace_id)
     return "ERROR: lookup " + lookup + " not found", None
 
-
+@trace_execution
 def send_email_with_msmtp(
     recipients: Union[str, List[str]], subject: str, body: str, from_address: str
 ) -> bool:
@@ -769,7 +769,7 @@ def send_email_with_msmtp(
         logger.error(err.stderr.decode())
         return False
 
-
+@trace_execution
 def check_whether_inference_rule_exists(
     graphDB_Driver: Any,
     query_time_dict: query_timing_result_type,
@@ -816,7 +816,7 @@ def check_whether_inference_rule_exists(
     logger.info("[TRACE] end " + trace_id)
     return False, "no message", query_time_dict
 
-
+@trace_execution
 def get_sympy_as_latex_per_feed_id(
     list_of_feed_dicts: List[dict],
 ) -> Dict[str, str]:
@@ -852,7 +852,7 @@ def get_sympy_as_latex_per_feed_id(
     logger.info("[TRACE] end " + trace_id)
     return sympy_as_latex_per_feed_id
 
-
+@trace_execution
 def get_sympy_as_latex_per_expr_id(
     list_of_expression_dicts: List[dict],
 ) -> List[dict]:
