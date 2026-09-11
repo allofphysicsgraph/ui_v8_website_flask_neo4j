@@ -539,6 +539,11 @@ def callback():
     logger.debug(str(current_user.email))
     flash("logged in")
 
+    # https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/120
+    body_of_email = str(current_user.name) + " <" + str(current_user.email) + "> logged into allofphysics.com"
+    compute.send_email_with_msmtp("ben.is.located@gmail.com", 
+        "logged into allofphysics.com", body_of_email, "ben.is.located@gmail.com")
+
     # Send user back to homepage
     # return redirect(url_for("to_navigation", referrer="login"))
     # TODO: rather than return the user to navigation, put them back on the original page they came from
