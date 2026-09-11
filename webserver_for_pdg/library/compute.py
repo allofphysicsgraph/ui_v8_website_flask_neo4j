@@ -688,7 +688,7 @@ def send_email_with_msmtp(
     """
     Sends an email using the system's msmtp command.
 
-    https://github.com/allofphysicsgraph/task-tracker/issues/137
+    https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/120
 
     Args:
         recipients: The email address of the recipient, or a list of emails.
