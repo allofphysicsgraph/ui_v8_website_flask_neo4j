@@ -36,7 +36,7 @@ help:
 	@echo "      this message"
 	@echo "==== Targets outside container ===="
 	@echo ""
-	@echo "make up"
+	@echo "make launch_webserver"
 	@echo "      build and run container"
 	@echo ""
 	@echo "make mypy_out"
