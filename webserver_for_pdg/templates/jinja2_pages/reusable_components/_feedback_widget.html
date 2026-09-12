@@ -1,27 +1,26 @@
 <!-- Feedback Widget Container -->
-<div id="page-feedback-widget" style="margin: 2rem 0; font-family: sans-serif;">
+<div id="page-feedback-widget" style="margin: 2rem 0;">
   <!-- Initial link/button -->
-  <a href="#" id="feedback-toggle-link" style="color: #0066cc; text-decoration: underline; cursor: pointer;">
-    Provide feedback about this page
-  </a>
+  <a href="#" id="feedback-toggle-link">Provide feedback about this page</a>
 
   <!-- In-page form (hidden by default) -->
-  <form id="feedback-form" style="display: none; max-width: 500px; margin-top: 0.75rem;">
+  <form id="feedback-form" style="display: none; max-width: 600px; margin-top: 0.75rem;">
     <input type="hidden" id="feedback-csrf-token" value="{{ csrf_token() }}">
 
-    <label for="feedback-text" style="display: block; margin-bottom: 0.25rem; font-weight: bold;">
+    <label for="feedback-text" style="display: block; margin-bottom: 0.25rem;">
       Your feedback:
     </label>
-    <textarea id="feedback-text" rows="4" style="width: 100%; box-sizing: border-box; padding: 0.5rem;" placeholder="What can we improve on this page?&#10;(feedback is anonymous by default; you can provide your email if you'd like)" required></textarea>
+    <textarea id="feedback-text" rows="4" style="width: 100%; box-sizing: border-box; padding: 0.5rem;" placeholder="What can we improve on this page?&#10;What causes confusion?" required></textarea>
     
     <div style="margin-top: 0.5rem;">
+      Feedback is anonymous by default; you can provide your email if you'd like.<BR>
       <button type="submit" id="feedback-submit-btn">Send Feedback</button>
       <button type="button" id="feedback-cancel-btn" style="margin-left: 0.5rem;">Cancel</button>
     </div>
   </form>
 
   <!-- Optional transient status message -->
-  <div id="feedback-status" style="display: none; margin-top: 0.5rem; color: green;"></div>
+  <div id="feedback-status" style="display: none; margin-top: 0.5rem; "></div>
 </div>
 
 <script>
