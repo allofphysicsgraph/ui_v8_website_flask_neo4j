@@ -1,0 +1,105 @@
+<!-- Feedback Widget Container -->
+<div id="page-feedback-widget" style="margin: 2rem 0; font-family: sans-serif;">
+  <!-- Initial link/button -->
+  <a href="#" id="feedback-toggle-link" style="color: #0066cc; text-decoration: underline; cursor: pointer;">
+    Provide feedback about this page
+  </a>
+
+  <!-- In-page form (hidden by default) -->
+  <form id="feedback-form" style="display: none; max-width: 500px; margin-top: 0.75rem;">
+    <input type="hidden" id="feedback-csrf-token" value="{{ csrf_token() }}">
+
+    <label for="feedback-text" style="display: block; margin-bottom: 0.25rem; font-weight: bold;">
+      Your feedback:
+    </label>
+    <textarea id="feedback-text" rows="4" style="width: 100%; box-sizing: border-box; padding: 0.5rem;" placeholder="What can we improve on this page?&#10;(feedback is anonymous by default; you can provide your email if you'd like)" required></textarea>
+    
+    <div style="margin-top: 0.5rem;">
+      <button type="submit" id="feedback-submit-btn">Send Feedback</button>
+      <button type="button" id="feedback-cancel-btn" style="margin-left: 0.5rem;">Cancel</button>
+    </div>
+  </form>
+
+  <!-- Optional transient status message -->
+  <div id="feedback-status" style="display: none; margin-top: 0.5rem; color: green;"></div>
+</div>
+
+<script>
+(function() {
+  const toggleLink = document.getElementById('feedback-toggle-link');
+  const form = document.getElementById('feedback-form');
+  const cancelBtn = document.getElementById('feedback-cancel-btn');
+  const submitBtn = document.getElementById('feedback-submit-btn');
+  const textarea = document.getElementById('feedback-text');
+  const statusDiv = document.getElementById('feedback-status');
+
+  // Open form
+  toggleLink.addEventListener('click', function(e) {
+    e.preventDefault();
+    toggleLink.style.display = 'none';
+    form.style.display = 'block';
+    textarea.focus();
+  });
+
+  // Cancel & reset form
+  cancelBtn.addEventListener('click', function() {
+    form.reset();
+    form.style.display = 'none';
+    toggleLink.style.display = 'inline';
+  });
+
+  // Submit via AJAX (page URL stays unchanged)
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // 1. Extract canonical URL from the <link> tag (fallback to window.location.href)
+    const canonicalLink = document.querySelector('link[rel="canonical"]');
+    const canonicalUrl = canonicalLink ? canonicalLink.href : window.location.href;
+    const feedbackText = textarea.value.trim();
+
+    const csrfToken = document.getElementById('feedback-csrf-token').value;
+
+    if (!feedbackText) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+
+    // 2. Send to Flask backend
+    fetch('/submit-feedback', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
+      },
+      body: JSON.stringify({
+        canonical_url: canonicalUrl,
+        feedback: feedbackText
+      })
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Submission failed');
+      return response.json();
+    })
+    .then(data => {
+      // 3. Reset and restore normal page state
+      form.reset();
+      form.style.display = 'none';
+      toggleLink.style.display = 'inline';
+
+      // Brief confirmation message
+      statusDiv.textContent = 'Thank you for your feedback!';
+      statusDiv.style.display = 'block';
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+      }, 4000);
+    })
+    .catch(err => {
+      alert('Could not send feedback. Please try again later.');
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Feedback';
+    });
+  });
+})();
+</script>

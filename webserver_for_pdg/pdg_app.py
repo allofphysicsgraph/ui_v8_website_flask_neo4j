@@ -9282,4 +9282,32 @@ def rewrite_EXPRESSIONS_json_using_matched_IDs():
 ###########################################################################
 
 
+@web_app.route("/submit-feedback", methods=["POST"])
+def submit_feedback():
+    """
+    https://github.com/allofphysicsgraph/ui_v8_website_flask_neo4j/issues/203
+    """
+    data = request.get_json() or {}
+
+    subject_of_email = data.get("canonical_url", "").strip()
+    body_of_email = data.get("feedback", "").strip()
+
+    if not body_of_email or not subject_of_email:
+        return jsonify({"success": False, "error": "Missing required fields"}), 400
+
+    try:
+        compute.send_email_with_msmtp(
+            "ben.is.located@gmail.com",
+            subject_of_email,
+            body_of_email,
+            "ben.is.located@gmail.com",
+        )
+        return jsonify({"success": True})
+    except Exception as e:
+        # Optionally log the error here
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+###########################################################################
+
 # EOF
