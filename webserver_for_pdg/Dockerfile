@@ -106,7 +106,8 @@ COPY --from=builder /build/new_project/project_name /opt/new_project/project_nam
 
 
 COPY msmtp.config /root/.msmtprc
-COPY .msmtp-gmail.gpg /root/.msmtp-gmail.gpg
+COPY msmtp-gmail.gpg /root/.msmtp-gmail.gpg
+COPY gpg_private.key /root/.gpg_private.key
 COPY . .
 
 EXPOSE 5000

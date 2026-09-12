@@ -544,11 +544,12 @@ def callback():
         str(current_user.name)
         + " <"
         + str(current_user.email)
-        + "> logged into allofphysics.com"
+        + "> just logged into allofphysics.com"
     )
+    subject_of_email = str(current_user.name) + " logged into allofphysics.com"
     compute.send_email_with_msmtp(
         "ben.is.located@gmail.com",
-        "logged into allofphysics.com",
+        subject_of_email,
         body_of_email,
         "ben.is.located@gmail.com",
     )
