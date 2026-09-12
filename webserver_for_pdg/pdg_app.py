@@ -7385,6 +7385,24 @@ def my_profile():
 ###########################################################################
 
 
+def send_email(subject: str, body: str) -> None:
+
+    if current_user.is_anonymous:
+        user_name = "anonymous user"
+    else:
+        user_name = str(current_user.name) + " <" + str(current_user.email) + ">"
+
+    subject_of_email = user_name + subject
+    body_of_email = user_name + body
+    compute.send_email_with_msmtp(
+        "ben.is.located@gmail.com",
+        subject_of_email,
+        body_of_email,
+        "ben.is.located@gmail.com",
+    )
+    return
+
+
 # user shouldn't go directly to this page; the purpose of this route is to get to Google
 @web_app.route("/search", methods=["GET", "POST"])
 @trace_execution
@@ -7407,10 +7425,16 @@ def search_redirect_to_google():
         logger.info("request.form =" + str(request.form))
         logger.info("request.form.keys() =" + str(request.form.keys()))
 
+        send_email(
+            " searched allofphysics.com",
+            " searched for <" + str(request.form.get("search")) + ">",
+        )
+
         return redirect(
             "https://www.google.com/search?&q=site%3Aallofphysics.com+"
             + str(request.form.get("search"))
         )
+
     elif len(request.args.keys()) > 0:
 
         # request.args are embedded in the URL
@@ -7418,6 +7442,11 @@ def search_redirect_to_google():
         # request.args=ImmutableMultiDict([('hello', 'bye')])
 
         logger.info("search term is " + str(request.args.get("q")))
+
+        send_email(
+            " searched allofphysics.com",
+            " searched for <" + str(request.args.get("q")) + ">",
+        )
 
         return redirect(
             "https://www.google.com/search?&q=site%3Aallofphysics.com+"
