@@ -1,0 +1,128 @@
+<P>First published 2026-09-15</P>
+
+
+<p>tl;dr: no libraries that I tried convert images to text well, much less to Latex. I didn't try every library listed below.</p><h2>Tesseract</h2><div><a href="https://pypi.org/project/pytesseract/">https://pypi.org/project/pytesseract/</a></div>
+
+<p>Tesseract cannot natively produce LaTeX code from math equations or text.
+
+</p><p>citations:
+</p><ul>
+  <li><a href="https://github.com/tesseract-ocr/tesseract/issues/4092">https://github.com/tesseract-ocr/tesseract/issues/4092
+  </a></li><li><a href="https://github.com/tesseract-ocr/tesseract/issues/3028">https://github.com/tesseract-ocr/tesseract/issues/3028
+</a></li></ul>
+
+<p>How does Tesseract do with hand-written text?
+</p><pre>sudo apt install tesseract-ocr
+sudo apt install python3-pip
+sudo apt install python3-pil
+sudo apt install python3.14-venv
+python3 -m venv .venv
+pip3 install pytesseract
+</pre>
+<p>The script
+</p><pre>from PIL import Image
+import pytesseract
+text = pytesseract.image_to_string(Image.open('20260628_090059.jpg'))
+print(text)
+</pre>
+<p>produces
+</p><pre>$ python3 convert.py  20260628_090059.jpg 
+coatravarient vector
+a= traa storm
+Com poasn +5
+ke dx (by A' ;)
+covarient vec tof Componsr tS
+ror storm )
+A stor like et (by B, se
+de; ar of de! describe the same
+physceal thing (di tlre ntal elerrnt of
+— leagth or oli tener thal element oF angle )
+</pre>
+
+<h2>LaTeX-OCR</h2><div>Requires providing the trimmed image of just the expression.</div>
+<p><a href="https://github.com/lukas-blecher/LaTeX-OCR">https://github.com/lukas-blecher/LaTeX-OCR</a> aka <a href="https://lukas-blecher.github.io/LaTeX-OCR/">https://lukas-blecher.github.io/LaTeX-OCR/</a>
+
+Developer is the lead author on the paper "Nougat: Neural Optical Understanding for Academic Documents" (<a href="https://arxiv.org/abs/2308.13418">https://arxiv.org/abs/2308.13418</a>)</p>
+
+<h2>Nougat: Neural Optical Understanding for Academic Documents</h2>
+<p><a href="https://arxiv.org/abs/2308.13418">https://arxiv.org/abs/2308.13418</a></p>
+
+<p>From Facebook Research:<br /><a href="https://github.com/facebookresearch/nougat">
+
+https://github.com/facebookresearch/nougat</a> aka 
+<a href="https://facebookresearch.github.io/nougat/">https://facebookresearch.github.io/nougat/
+
+</a></p>
+
+<h2>im2latex.py</h2><a href="https://github.com/UW-COSMOS/latex-ocr">
+https://github.com/UW-COSMOS/latex-ocr
+</a>
+
+<h2>pix2tex</h2>
+
+<p><a href="https://pix2tex.readthedocs.io/en/latest/">
+https://pix2tex.readthedocs.io/en/latest/</a>
+
+</p><p>deprecated: <a href="https://github.com/blaisewang/img2latex-mathpix">https://github.com/blaisewang/img2latex-mathpix</a>
+
+</p><h2>Local LLM</h2>
+
+<p>Serve the LLM using
+</p><pre>python3 -m llama_cpp.server --model ./models/gemma-4-E4B-it-qat-UD-Q4_K_XL.gguf --n_gpu_layers -1
+</pre>
+then send the image for conversion using
+<pre>curl -X POST "http://localhost:8000/v1/chat/completions" \
+-H "Content-Type: application/json" \
+-d '{
+  "model": "gemma-4-E4B-it-qat-UD-Q4_K_XL.gguf",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Perform OCR on this image. Extract and output all text visible in it precisely."
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "data:image/jpeg;base64,'$(base64  image.jpg)'"
+          }
+        }
+      ]
+    }
+  ]
+}'
+</pre>
+<p>The output does feature Latex, but nothing related to what's in the image.</p><p><br /></p><p></p>
+
+
+
+<h2>Appendix: a script that converts HEIC to JPG</h2>
+<p>  <code>convert_heic_to_jpg.py</code> contains
+</p><pre>import argparse
+from pathlib import Path
+from PIL import Image
+import pillow_heif
+
+# Register HEIF decoder with Pillow
+pillow_heif.register_heif_opener()
+
+# Set up command-line argument parsing
+parser = argparse.ArgumentParser(description="Convert a HEIC image to JPEG.")
+parser.add_argument("input_image", type=str, help="Path to the input HEIC image")
+args = parser.parse_args()
+
+# Handle input and output paths using pathlib
+input_path = Path(args.input_image)
+output_path = input_path.with_suffix(".jpg")
+
+# Open and convert the image
+try:
+    image = Image.open(input_path)
+    image.save(output_path, "JPEG")
+    print(f"Successfully converted '{input_path}' to '{output_path}'")
+except Exception as e:
+    print(f"Error converting image: {e}")
+</pre><p></p>
+
