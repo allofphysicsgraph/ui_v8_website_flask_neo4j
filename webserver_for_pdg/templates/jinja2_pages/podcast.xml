@@ -18,7 +18,7 @@
     {% for item in audio_file_list %}
     <item>
       <!-- Clean up the filename for the episode title (optional: replace underscores/extensions) -->
-      <title>{{ item.filename | replace('_', ' ') |splitext | first | title }}</title>
+      <title>{{ item.filename | replace('_', ' ') | first | title }}</title>
       <link>{{ item.url }}</link>
       <guid isPermaLink="true">{{ item.url }}</guid>
       <description>Episode description or show notes for {{ item.filename }}.</description>

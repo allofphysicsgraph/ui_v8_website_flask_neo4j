@@ -9340,6 +9340,7 @@ def submit_feedback():
 
 ###########################################################################
 
+
 @web_app.route("/alpha", methods=["GET"])
 @web_app.route("/alphabetize", methods=["GET"])
 @web_app.route("/alphabetizer", methods=["GET"])
@@ -9347,38 +9348,38 @@ def submit_feedback():
 @trace_execution
 def sort():
     """
-Prompt for Gemini 3.5 Flash Lite 'high'
+    Prompt for Gemini 3.5 Flash Lite 'high'
 
-I have the following Flask
-```
-@web_app.route("/alpha", methods=["GET"])
-@web_app.route("/alphabetize", methods=["GET"])
-@web_app.route("/alphabetizer", methods=["GET"])
-@web_app.route("/sort", methods=["GET"])
-def sort():
-    canonical_url = url_for("sort").lstrip("/")
+    I have the following Flask
+    ```
+    @web_app.route("/alpha", methods=["GET"])
+    @web_app.route("/alphabetize", methods=["GET"])
+    @web_app.route("/alphabetizer", methods=["GET"])
+    @web_app.route("/sort", methods=["GET"])
+    def sort():
+        canonical_url = url_for("sort").lstrip("/")
 
-    return render_template(
-        "jinja2_pages/sort.html",
-        title="sort and alphabetize text",
-        canonical_url=canonical_url)
-```
-and currently `sort.html` is empty.
+        return render_template(
+            "jinja2_pages/sort.html",
+            title="sort and alphabetize text",
+            canonical_url=canonical_url)
+    ```
+    and currently `sort.html` is empty.
 
-I'd like the page to take user-provided text in a text box and sort the content alphabetically when the user clicks a button labeled "sort".  There should also be a button "reverse sort" and another button "randomize"
+    I'd like the page to take user-provided text in a text box and sort the content alphabetically when the user clicks a button labeled "sort".  There should also be a button "reverse sort" and another button "randomize"
 
-There should be checkboxes for
-- Make All Lowercase
-- Capitalize First Word
-- Remove Duplicates
+    There should be checkboxes for
+    - Make All Lowercase
+    - Capitalize First Word
+    - Remove Duplicates
 
-and each is unchecked by default.
+    and each is unchecked by default.
 
-There should be a checkbox for "ignore case" and that should be checked by default.
+    There should be a checkbox for "ignore case" and that should be checked by default.
 
-There should be a set of radio buttons that toggles between "split entries with newline" and "split entries with delimiter" where the user can provide a delimiter
+    There should be a set of radio buttons that toggles between "split entries with newline" and "split entries with delimiter" where the user can provide a delimiter
 
-Enact all of these features client-side in plain javascript
+    Enact all of these features client-side in plain javascript
     """
     trace_id = trace_id_var.get()
     canonical_url = url_for("sort").lstrip("/")
@@ -9386,52 +9387,55 @@ Enact all of these features client-side in plain javascript
     return render_template(
         "jinja2_pages/sort.html",
         title="sort and alphabetize text",
-        canonical_url=canonical_url)
+        canonical_url=canonical_url,
+    )
+
 
 ###########################################################################
+
 
 @web_app.route("/podcast", methods=["GET"])
 @trace_execution
 def podcast_rss():
-    """
-    """
+    """ """
     trace_id = trace_id_var.get()
     canonical_url = url_for("podcast_rss").lstrip("/")
 
     audio_dir = os.path.join(web_app.static_folder, "podcast_audio")
     os.makedirs(audio_dir, exist_ok=True)
 
-
     audio_files = []
     for filepath in glob.glob(os.path.join(audio_dir, "*")):
         filename = os.path.basename(filepath)
         # Skip hidden files
-        if filename.startswith('.'):
+        if filename.startswith("."):
             continue
-            
-        file_stat = os.stat(filepath)
-        
-        audio_files.append({
-            "filename": filename,
-            # url_for generates a full public URL for the static file
-            "url": url_for('static', filename=f'podcast_audio/{filename}', _external=True),
-            "length": file_stat.st_size, # Size in bytes (required for podcasts)
-            "pub_date": file_stat.st_mtime # Optional: file modification time
-        })
 
+        file_stat = os.stat(filepath)
+
+        audio_files.append(
+            {
+                "filename": filename,
+                # url_for generates a full public URL for the static file
+                "url": url_for(
+                    "static", filename=f"podcast_audio/{filename}", _external=True
+                ),
+                "length": file_stat.st_size,  # Size in bytes (required for podcasts)
+                "pub_date": file_stat.st_mtime,  # Optional: file modification time
+            }
+        )
 
     rendered_template = render_template(
         "jinja2_pages/podcast.xml",
         title="Podcast Feed",
-        canonical_url=canonical_url, 
-        audio_file_list=audio_files
+        canonical_url=canonical_url,
+        audio_file_list=audio_files,
     )
-    
+
     # Return with the correct RSS/XML mimetype
     response = make_response(rendered_template)
-    response.headers['Content-Type'] = 'application/rss+xml; charset=utf-8'
+    response.headers["Content-Type"] = "application/rss+xml; charset=utf-8"
     return response
-
 
 
 # EOF
