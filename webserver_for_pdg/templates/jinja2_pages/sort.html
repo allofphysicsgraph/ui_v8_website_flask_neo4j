@@ -1,0 +1,230 @@
+{% extends "jinja2_pages/reusable_components/_base.html" %}
+{% block content %}
+
+{% include "jinja2_pages/reusable_components/_narrower_text_css.html" %}
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #333;
+            line-height: 1.5;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .textarea-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .controls {
+            background: #f8f9fa;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        button {
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.15s ease-in-out;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input[type="text"] {
+            padding: 4px 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 80px;
+        }
+        label {
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+        }
+    </style>
+
+    <div class="container">
+        <h1>{{ title | title }}</h1>
+        
+        <div class="textarea-group">
+            <label for="inputText"><strong>Input Text:</strong></label>
+            <textarea id="inputText" placeholder="Paste or type your text here..."></textarea>
+        </div>
+
+        <div class="controls">
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="ignoreCase" checked> Ignore Case</label>
+                <label><input type="checkbox" id="makeLowercase"> Make All Lowercase</label>
+                <label><input type="checkbox" id="capitalizeFirst"> Capitalize First Word</label>
+                <label><input type="checkbox" id="removeDuplicates"> Remove Duplicates</label>
+            </div>
+
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="splitMethod" id="splitNewline" value="newline" checked> 
+                    Split entries with newline
+                </label>
+                <label>
+                    <input type="radio" name="splitMethod" id="splitDelimiter" value="delimiter"> 
+                    Split entries with delimiter: 
+                    <input type="text" id="delimiterValue" value="," />
+                </label>
+            </div>
+
+            <div class="buttons">
+                <button id="sortBtn">Sort</button>
+                <button id="reverseSortBtn">Reverse Sort</button>
+                <button id="randomizeBtn">Randomize</button>
+            </div>
+        </div>
+
+        <div class="textarea-group">
+            <label for="outputText"><strong>Result:</strong></label>
+            <textarea id="outputText" placeholder="Processed text will appear here..." readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            
+            // Checkboxes
+            const ignoreCase = document.getElementById('ignoreCase');
+            const makeLowercase = document.getElementById('makeLowercase');
+            const capitalizeFirst = document.getElementById('capitalizeFirst');
+            const removeDuplicates = document.getElementById('removeDuplicates');
+            
+            // Radio options & delimiter input
+            const splitNewline = document.getElementById('splitNewline');
+            const delimiterValue = document.getElementById('delimiterValue');
+            
+            // Action Buttons
+            const sortBtn = document.getElementById('sortBtn');
+            const reverseSortBtn = document.getElementById('reverseSortBtn');
+            const randomizeBtn = document.getElementById('randomizeBtn');
+
+            function processText(action) {
+                let text = inputText.value;
+                if (!text) {
+                    outputText.value = '';
+                    return;
+                }
+
+                // 1. Split content based on method
+                let entries = [];
+                let joinString = '\n';
+                
+                if (splitNewline.checked) {
+                    entries = text.split(/\r?\n/);
+                    joinString = '\n';
+                } else {
+                    let delim = delimiterValue.value;
+                    if (delim === '') delim = ','; // Fallback if empty
+                    entries = text.split(delim);
+                    joinString = delim;
+                }
+
+                // 2. Apply modifications per entry
+                entries = entries.map(entry => {
+                    let item = entry;
+                    if (makeLowercase.checked) {
+                        item = item.toLowerCase();
+                    }
+                    if (capitalizeFirst.checked && item.length > 0) {
+                        item = item.charAt(0).toUpperCase() + item.slice(1);
+                    }
+                    return item;
+                });
+
+                // 3. Filter duplicates if checked
+                if (removeDuplicates.checked) {
+                    let seen = new Set();
+                    entries = entries.filter(item => {
+                        let checkKey = ignoreCase.checked ? item.toLowerCase() : item;
+                        if (seen.has(checkKey)) {
+                            return false;
+                        }
+                        seen.add(checkKey);
+                        return true;
+                    });
+                }
+
+                // 4. Perform Sorting or Randomization
+                if (action === 'sort' || action === 'reverse') {
+                    entries.sort((a, b) => {
+                        let valA = ignoreCase.checked ? a.toLowerCase() : a;
+                        let valB = ignoreCase.checked ? b.toLowerCase() : b;
+                        let comparison = valA.localeCompare(valB);
+                        return action === 'sort' ? comparison : -comparison;
+                    });
+                } else if (action === 'randomize') {
+                    // Fisher-Yates shuffle algorithm
+                    for (let i = entries.length - 1; i > 0; i--) {
+                        let j = Math.floor(Math.random() * (i + 1));
+                        [entries[i], entries[j]] = [entries[j], entries[i]];
+                    }
+                }
+
+                // 5. Output processed text
+                outputText.value = entries.join(joinString);
+            }
+
+            // Event Listeners for buttons
+            sortBtn.addEventListener('click', () => processText('sort'));
+            reverseSortBtn.addEventListener('click', () => processText('reverse'));
+            randomizeBtn.addEventListener('click', () => processText('randomize'));
+        });
+    </script>
+
+
+
+{% endblock %}

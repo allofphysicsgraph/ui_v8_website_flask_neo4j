@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>{{ title }}</title>
+    <link>{{ url_for('podcast_rss', _external=True) }}</link>
+    <language>en-us</language>
+    <copyright>Copyright 2026</copyright>
+    <itunes:author>Your Name or Show Name</itunes:author>
+    <description>A short description of your podcast show.</description>
+    <itunes:type>episodic</itunes:type>
+    <itunes:owner>
+      <itunes:name>Your Name</itunes:name>
+      <itunes:email>your.email@example.com</itunes:email>
+    </itunes:owner>
+    <itunes:image href="{{ url_for('static', filename='images/podcast_cover.jpg', _external=True) }}" />
+    <itunes:category text="Technology"/>
+
+    {% for item in audio_file_list %}
+    <item>
+      <!-- Clean up the filename for the episode title (optional: replace underscores/extensions) -->
+      <title>{{ item.filename | replace('_', ' ') |splitext | first | title }}</title>
+      <link>{{ item.url }}</link>
+      <guid isPermaLink="true">{{ item.url }}</guid>
+      <description>Episode description or show notes for {{ item.filename }}.</description>
+      
+      <!-- THE ENCLOSURE TAG IS MANDATORY FOR PODCASTS -->
+      <!-- url: direct link to mp3, length: file size in bytes, type: audio/mpeg -->
+      <enclosure url="{{ item.url }}" length="{{ item.length }}" type="audio/mpeg"/>
+      
+      <!-- Optional iTunes specific tags -->
+      <itunes:author>Name Here</itunes:author>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:episodeType>full</itunes:episodeType>
+    </item>
+    {% endfor %}
+
+  </channel>
+</rss>
