@@ -159,7 +159,7 @@
                     return;
                 }
 
-                // 1. Split content based on method
+                // Split content based on method
                 let entries = [];
                 let joinString = '\n';
                 
@@ -173,7 +173,7 @@
                     joinString = delim;
                 }
 
-                // 2. Apply modifications per entry
+                // Apply modifications per entry
                 entries = entries.map(entry => {
                     let item = entry;
                     if (makeLowercase.checked) {
@@ -185,7 +185,7 @@
                     return item;
                 });
 
-                // 3. Filter duplicates if checked
+                // Filter duplicates if checked
                 if (removeDuplicates.checked) {
                     let seen = new Set();
                     entries = entries.filter(item => {
@@ -198,7 +198,7 @@
                     });
                 }
 
-                // 4. Perform Sorting or Randomization
+                // Perform Sorting or Randomization
                 if (action === 'sort' || action === 'reverse') {
                     entries.sort((a, b) => {
                         let valA = ignoreCase.checked ? a.toLowerCase() : a;
@@ -214,7 +214,7 @@
                     }
                 }
 
-                // 5. Output processed text
+                // Output processed text
                 outputText.value = entries.join(joinString);
             }
 
