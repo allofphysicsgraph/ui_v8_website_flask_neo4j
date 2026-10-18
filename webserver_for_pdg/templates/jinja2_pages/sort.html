@@ -116,6 +116,10 @@
                     <input type="radio" name="splitMethod" id="splitDelimiter" value="delimiter"> 
                     Split entries with delimiter: 
                     <input type="text" id="delimiterValue" value="," />
+                    <span style="margin-left: 12px; font-weight: normal;">
+                        <input type="checkbox" id="replaceWithNewline"> 
+                        <label for="replaceWithNewline" style="font-weight: normal;">Replace delimiter with newline</label>
+                    </span>
                 </label>
             </div>
 
@@ -143,9 +147,10 @@
             const capitalizeFirst = document.getElementById('capitalizeFirst');
             const removeDuplicates = document.getElementById('removeDuplicates');
             
-            // Radio options & delimiter input
+            // Radio options, delimiter input, & replace checkbox
             const splitNewline = document.getElementById('splitNewline');
             const delimiterValue = document.getElementById('delimiterValue');
+            const replaceWithNewline = document.getElementById('replaceWithNewline');
             
             // Action Buttons
             const sortBtn = document.getElementById('sortBtn');
@@ -159,7 +164,7 @@
                     return;
                 }
 
-                // 1. Split content based on method
+                // Split content based on method
                 let entries = [];
                 let joinString = '\n';
                 
@@ -170,10 +175,11 @@
                     let delim = delimiterValue.value;
                     if (delim === '') delim = ','; // Fallback if empty
                     entries = text.split(delim);
-                    joinString = delim;
+                    // If checked, replace delimiter with newline on output; otherwise keep original delimiter
+                    joinString = replaceWithNewline.checked ? '\n' : delim;
                 }
 
-                // 2. Apply modifications per entry
+                // Apply modifications per entry
                 entries = entries.map(entry => {
                     let item = entry;
                     if (makeLowercase.checked) {
@@ -185,7 +191,7 @@
                     return item;
                 });
 
-                // 3. Filter duplicates if checked
+                // Filter duplicates if checked
                 if (removeDuplicates.checked) {
                     let seen = new Set();
                     entries = entries.filter(item => {
@@ -198,7 +204,7 @@
                     });
                 }
 
-                // 4. Perform Sorting or Randomization
+                // Perform Sorting or Randomization
                 if (action === 'sort' || action === 'reverse') {
                     entries.sort((a, b) => {
                         let valA = ignoreCase.checked ? a.toLowerCase() : a;
@@ -214,7 +220,7 @@
                     }
                 }
 
-                // 5. Output processed text
+                // Output processed text
                 outputText.value = entries.join(joinString);
             }
 
@@ -224,7 +230,5 @@
             randomizeBtn.addEventListener('click', () => processText('randomize'));
         });
     </script>
-
-
 
 {% endblock %}
