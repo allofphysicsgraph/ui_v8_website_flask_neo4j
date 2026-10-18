@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Text Diff Tool</title>
+<style>
+:root{
+  --bg:#f5f6f8;--panel:#fff;--border:#ddd;--text:#222;--muted:#666;
+  --changed-bg:#dceeff;--missing-bg:#dff5df;--accent:#1450c9;--accent-hover:#0d3ba3;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1b1d21;--panel:#25272c;--border:#3a3d43;--text:#e8e8e8;--muted:#9aa0aa;
+    --changed-bg:#123a5e;--missing-bg:#12401f;--accent:#5b9dff;--accent-hover:#7cb0ff;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1b1d21;--panel:#25272c;--border:#3a3d43;--text:#e8e8e8;--muted:#9aa0aa;
+  --changed-bg:#123a5e;--missing-bg:#12401f;--accent:#5b9dff;--accent-hover:#7cb0ff;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,"Segoe UI",Arial,sans-serif;margin:0;padding:20px;background:var(--bg);color:var(--text);}
+h1{font-size:1.3rem;margin:0 0 16px;}
+.input-row{display:flex;gap:12px;flex-wrap:wrap;}
+.input-col{flex:1 1 45%;min-width:260px;display:flex;flex-direction:column;}
+.input-col label{font-weight:600;margin-bottom:4px;font-size:.85rem;color:var(--muted);}
+textarea{width:100%;height:220px;background:var(--panel);color:var(--text);font-family:Consolas,Menlo,monospace;font-size:.85rem;padding:8px;border:1px solid var(--border);border-radius:4px;resize:vertical;}
+.btn-row{text-align:center;margin:16px 0;}
+button{background:var(--accent);color:#fff;border:none;padding:10px 28px;font-size:.95rem;border-radius:4px;cursor:pointer;}
+button:hover{background:var(--accent-hover);}
+.results{margin-top:8px;}
+.summary{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:12px 16px;margin-bottom:12px;font-size:.9rem;line-height:1.6;}
+.summary.identical{color:#1a7a1a;font-weight:600;}
+.output-row{display:flex;gap:12px;flex-wrap:wrap;}
+.output-pane{flex:1 1 45%;min-width:260px;max-width:100%;overflow-x:auto;background:var(--panel);border:1px solid var(--border);border-radius:4px;font-family:Consolas,Menlo,monospace;font-size:.82rem;}
+.pane-title{padding:6px 10px;font-weight:600;font-size:.78rem;color:var(--muted);border-bottom:1px solid var(--border);position:sticky;left:0;}
+.line-row{display:flex;white-space:pre;line-height:20px;}
+.line-num{flex:0 0 auto;width:44px;padding:0 6px;text-align:right;color:var(--muted);background:rgba(128,128,128,.08);border-right:1px solid var(--border);user-select:none;position:sticky;left:0;}
+.line-content{padding:0 10px;}
+.line-row.changed{background:var(--changed-bg);}
+.line-row.missing{background:var(--missing-bg);}
+.chg{color:var(--accent);font-weight:700;}
+</style>
+</head>
+<body>
+<h1>Text Diff Tool</h1>
+<div class="input-row">
+  <div class="input-col">
+    <label for="leftInput">Text A (Left)</label>
+    <textarea id="leftInput" spellcheck="false" placeholder="Paste first text here"></textarea>
+  </div>
+  <div class="input-col">
+    <label for="rightInput">Text B (Right)</label>
+    <textarea id="rightInput" spellcheck="false" placeholder="Paste second text here"></textarea>
+  </div>
+</div>
+<div class="btn-row"><button id="compareBtn">Compare</button></div>
+<div id="results" class="results" style="display:none;">
+  <div id="summary" class="summary"></div>
+  <div class="output-row">
+    <div id="leftPane" class="output-pane"><div class="pane-title">Text A</div></div>
+    <div id="rightPane" class="output-pane"><div class="pane-title">Text B</div></div>
+  </div>
+</div>
+<script>
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function diffArrays(a,b){
+  const N=a.length,M=b.length,MAX=N+M;
+  if(MAX===0) return [];
+  const OFFSET=MAX,size=2*MAX+1;
+  const v=new Array(size).fill(0);
+  const trace=[];
+  let done=false;
+  for(let d=0;d<=MAX && !done;d++){
+    trace.push(v.slice());
+    for(let k=-d;k<=d;k+=2){
+      let x;
+      if(k===-d||(k!==d && v[k-1+OFFSET]<v[k+1+OFFSET])){ x=v[k+1+OFFSET]; }
+      else{ x=v[k-1+OFFSET]+1; }
+      let y=x-k;
+      while(x<N && y<M && a[x]===b[y]){x++;y++;}
+      v[k+OFFSET]=x;
+      if(x>=N && y>=M){done=true;break;}
+    }
+  }
+  let x=N,y=M;
+  const ops=[];
+  for(let d=trace.length-1;d>=0;d--){
+    const vv=trace[d];
+    const OFF=(vv.length-1)/2;
+    const k=x-y;
+    let prevK;
+    if(k===-d||(k!==d && vv[k-1+OFF]<vv[k+1+OFF])){ prevK=k+1; }
+    else{ prevK=k-1; }
+    const prevX=vv[prevK+OFF];
+    const prevY=prevX-prevK;
+    while(x>prevX && y>prevY){ ops.push({type:'equal',a:x-1,b:y-1}); x--; y--; }
+    if(d>0){
+      if(x===prevX){ ops.push({type:'insert',b:y-1}); y--; }
+      else{ ops.push({type:'delete',a:x-1}); x--; }
+    }
+  }
+  ops.reverse();
+  return ops;
+}
+
+function similarity(a,b){
+  if(a===b) return 1;
+  const wa=a.split(/\s+/).filter(Boolean), wb=b.split(/\s+/).filter(Boolean);
+  if(!wa.length && !wb.length) return 1;
+  const setA=new Map();
+  for(const w of wa) setA.set(w,(setA.get(w)||0)+1);
+  let common=0;
+  for(const w of wb){ const c=setA.get(w)||0; if(c>0){ common++; setA.set(w,c-1);} }
+  return (2*common)/((wa.length+wb.length)||1);
+}
+
+function processHunk(dIdx,insIdx,leftLines,rightLines){
+  const THRESH=0.3;
+  const pairs=[];
+  for(const i of dIdx) for(const j of insIdx) pairs.push([i,j,similarity(leftLines[i],rightLines[j])]);
+  pairs.sort((p1,p2)=>p2[2]-p1[2]);
+  const usedL=new Set(),usedR=new Set(),matchOf=new Map();
+  for(const [i,j,s] of pairs){
+    if(usedL.has(i)||usedR.has(j)||s<THRESH) continue;
+    usedL.add(i);usedR.add(j);matchOf.set(i,j);
+  }
+  const rows=[];
+  for(const i of dIdx){
+    if(matchOf.has(i)) rows.push({type:'changed',leftIdx:i,rightIdx:matchOf.get(i)});
+    else rows.push({type:'delete',leftIdx:i});
+  }
+  for(const j of insIdx){ if(!usedR.has(j)) rows.push({type:'insert',rightIdx:j}); }
+  return rows;
+}
+
+function computeDiff(leftLines,rightLines){
+  const ops=diffArrays(leftLines,rightLines);
+  const rows=[];
+  let i=0;
+  while(i<ops.length){
+    if(ops[i].type==='equal'){ rows.push({type:'equal',leftIdx:ops[i].a,rightIdx:ops[i].b}); i++; }
+    else{
+      const dIdx=[],insIdx=[];
+      while(i<ops.length && ops[i].type!=='equal'){
+        if(ops[i].type==='delete') dIdx.push(ops[i].a); else insIdx.push(ops[i].b);
+        i++;
+      }
+      rows.push(...processHunk(dIdx,insIdx,leftLines,rightLines));
+    }
+  }
+  return rows;
+}
+
+function tokenize(line){ return line.match(/\S+|\s+/g) || ['']; }
+
+function wordDiff(a,b){
+  const ta=tokenize(a),tb=tokenize(b);
+  const ops=diffArrays(ta,tb);
+  let lh='',rh='';
+  for(const op of ops){
+    if(op.type==='equal'){ lh+=esc(ta[op.a]); rh+=esc(tb[op.b]); }
+    else if(op.type==='delete'){ lh+='<span class="chg">'+esc(ta[op.a])+'</span>'; }
+    else if(op.type==='insert'){ rh+='<span class="chg">'+esc(tb[op.b])+'</span>'; }
+  }
+  return {leftHtml:lh||'&nbsp;', rightHtml:rh||'&nbsp;'};
+}
+
+function splitLines(text){
+  let t=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  if(t.endsWith('\n')) t=t.slice(0,-1);
+  return t.length===0 ? [''] : t.split('\n');
+}
+
+function renderPane(paneEl,rows,title){
+  paneEl.innerHTML='<div class="pane-title">'+title+'</div>';
+  const frag=document.createDocumentFragment();
+  for(const r of rows){
+    const div=document.createElement('div');
+    div.className='line-row'+(r.cls?(' '+r.cls):'');
+    const num=document.createElement('span'); num.className='line-num'; num.textContent=r.num!=null?r.num:'';
+    const content=document.createElement('span'); content.className='line-content'; content.innerHTML=r.html!=null?r.html:'&nbsp;';
+    div.appendChild(num); div.appendChild(content);
+    frag.appendChild(div);
+  }
+  paneEl.appendChild(frag);
+  const w=paneEl.scrollWidth;
+  paneEl.querySelectorAll('.line-row').forEach(d=>{ d.style.minWidth=w+'px'; });
+}
+
+document.getElementById('compareBtn').addEventListener('click',function(){
+  const leftText=document.getElementById('leftInput').value;
+  const rightText=document.getElementById('rightInput').value;
+  const leftLines=splitLines(leftText);
+  const rightLines=splitLines(rightText);
+  const rows=computeDiff(leftLines,rightLines);
+
+  const leftRender=[],rightRender=[];
+  let ln=0,rn=0,changedCount=0,leftOnly=0,rightOnly=0;
+  for(const r of rows){
+    if(r.type==='equal'){
+      ln++;rn++;
+      leftRender.push({num:ln,html:esc(leftLines[r.leftIdx])||'&nbsp;',cls:''});
+      rightRender.push({num:rn,html:esc(rightLines[r.rightIdx])||'&nbsp;',cls:''});
+    } else if(r.type==='changed'){
+      ln++;rn++;changedCount++;
+      const wd=wordDiff(leftLines[r.leftIdx],rightLines[r.rightIdx]);
+      leftRender.push({num:ln,html:wd.leftHtml,cls:'changed'});
+      rightRender.push({num:rn,html:wd.rightHtml,cls:'changed'});
+    } else if(r.type==='delete'){
+      ln++;leftOnly++;
+      leftRender.push({num:ln,html:esc(leftLines[r.leftIdx])||'&nbsp;',cls:''});
+      rightRender.push({num:null,html:'&nbsp;',cls:'missing'});
+    } else if(r.type==='insert'){
+      rn++;rightOnly++;
+      leftRender.push({num:null,html:'&nbsp;',cls:'missing'});
+      rightRender.push({num:rn,html:esc(rightLines[r.rightIdx])||'&nbsp;',cls:''});
+    }
+  }
+
+  const summaryEl=document.getElementById('summary');
+  if(leftText===rightText){
+    summaryEl.className='summary identical';
+    summaryEl.innerHTML='&#10003; The two texts are identical &mdash; no differences found.';
+  } else {
+    summaryEl.className='summary';
+    summaryEl.innerHTML='<strong>Differences found</strong><br>'+
+      'Changed lines: '+changedCount+'<br>'+
+      'Lines only in Text A: '+leftOnly+' (missing from Text B)<br>'+
+      'Lines only in Text B: '+rightOnly+' (missing from Text A)';
+  }
+
+  renderPane(document.getElementById('leftPane'),leftRender,'Text A');
+  renderPane(document.getElementById('rightPane'),rightRender,'Text B');
+  const results=document.getElementById('results');
+  results.style.display='block';
+  results.scrollIntoView({behavior:'smooth',block:'start'});
+});
+</script>
+</body>
+</html>

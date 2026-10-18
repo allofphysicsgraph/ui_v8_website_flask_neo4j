@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BINGO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --paper: #f6f4ee;
+    --ink: #1d2230;
+    --line: #c9c4b6;
+    --cell: #ffffff;
+    --red: #c62828;
+    --red-ink: #ffffff;
+    --green: #1b6e3c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 16px 64px;
+    background: var(--paper); color: var(--ink);
+    font: 16px/1.4 "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  }
+  main { max-width: 860px; margin: 0 auto; }
+  h1 { font: 700 40px/1 Georgia, "Times New Roman", serif; letter-spacing: .12em; margin: 0 0 24px; text-align: center; }
+  .hidden { display: none !important; }
+
+  /* Entry form */
+  #setup { max-width: 640px; margin: 0 auto; }
+  #setup p { margin: 0 0 8px; }
+  #setup code { background: #e9e5d8; padding: 1px 5px; border-radius: 3px; }
+  textarea {
+    width: 100%; height: 160px; padding: 10px; resize: vertical;
+    font: 14px/1.4 Consolas, Menlo, monospace; color: var(--ink);
+    background: #fff; border: 1px solid var(--line); border-radius: 4px;
+  }
+  button {
+    font: inherit; font-weight: 600; padding: 9px 18px; cursor: pointer;
+    color: #fff; background: var(--ink); border: 0; border-radius: 4px;
+  }
+  button:hover { background: #343c52; }
+  button.secondary { color: var(--ink); background: transparent; border: 1px solid var(--ink); }
+  button.secondary:hover { background: #e9e5d8; }
+  button:focus-visible, input:focus-visible + span, textarea:focus-visible { outline: 3px solid #2b6cb0; outline-offset: 2px; }
+  #error {
+    margin: 0 0 16px; padding: 10px 14px; color: #7f1d1d;
+    background: #fde8e8; border-left: 4px solid var(--red);
+  }
+
+  /* Board */
+  table { border-collapse: collapse; margin: 0 auto; table-layout: fixed; }
+  th { font: 700 28px/1 Georgia, "Times New Roman", serif; padding: 8px 0 10px; width: 150px; }
+  td { padding: 0; width: 150px; height: 120px; border: 2px solid var(--ink); background: var(--cell); }
+  td label {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; height: 100%; padding: 8px; text-align: center; cursor: pointer;
+    overflow-wrap: anywhere; font-size: 15px;
+  }
+  td input { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: var(--ink); }
+  td.checked, td.free { background: var(--red); color: var(--red-ink); }
+  td.checked input { accent-color: #fff; }
+  td.free { cursor: default; }
+  td.free div {
+    display: flex; align-items: center; justify-content: center; height: 100%;
+    padding: 8px; font-weight: 700; text-transform: lowercase; letter-spacing: .04em;
+  }
+
+  .toolbar { display: flex; justify-content: center; margin-top: 24px; }
+  #notice {
+    max-width: 750px; margin: 0 auto 20px; padding: 16px 20px; text-align: center;
+    color: #fff; background: var(--green); border-radius: 4px;
+  }
+  #notice strong { display: block; font: 700 32px/1.1 Georgia, serif; letter-spacing: .1em; margin-bottom: 4px; }
+  #notice button { margin-top: 12px; color: var(--green); background: #fff; }
+  #notice button:hover { background: #e4f1e9; }
+</style>
+</head>
+<body>
+<main>
+  <h1>BINGO</h1>
+
+  <div id="error" class="hidden" role="alert"></div>
+
+  <section id="setup" class="hidden">
+    <p>Enter exactly 24 items. Wrap each one in double quotes and separate them with commas:</p>
+    <p><code>"first item","second item","third item", ...</code></p>
+    <textarea id="entryBox" spellcheck="false" aria-label="24 bingo entries"></textarea>
+    <p style="margin-top:12px"><button id="createBtn" type="button">Create board</button></p>
+  </section>
+
+  <section id="game" class="hidden">
+    <div id="notice" class="hidden" role="status">
+      <strong>BINGO!</strong>
+      You completed a line.
+      <br><button id="noticeResetBtn" type="button">Reset Board</button>
+    </div>
+    <table aria-label="Bingo card">
+      <thead><tr><th>B</th><th>I</th><th>N</th><th>G</th><th>O</th></tr></thead>
+      <tbody id="grid"></tbody>
+    </table>
+    <div class="toolbar"><button id="resetBtn" class="secondary" type="button">Reset</button></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "bingo.board.v1";
+  var COUNT = 24, SIZE = 5, FREE = 12;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var state = null; // { cells: [25 strings, FREE is null], checked: [25 booleans] }
+
+  /* ---------- storage (wrapped: may be unavailable) ---------- */
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      var s = JSON.parse(raw);
+      if (s && Array.isArray(s.cells) && s.cells.length === 25 &&
+          Array.isArray(s.checked) && s.checked.length === 25) return s;
+    } catch (e) {}
+    return null;
+  }
+  function saveState() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  function clearState() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  }
+
+  /* ---------- parsing ---------- */
+  // Returns { entries: [...], formatOk: bool }
+  function parseEntries(text) {
+    var entries = [], m, re = /"([^"]*)"/g;
+    while ((m = re.exec(text)) !== null) entries.push(m[1].trim());
+    var formatOk = /^\s*"[^"]*"(\s*,\s*"[^"]*")*\s*$/.test(text);
+    return { entries: entries, formatOk: formatOk };
+  }
+
+  // Returns an error string, or null if valid.
+  function validate(text) {
+    var r = parseEntries(text);
+    if (!r.formatOk) {
+      return "Entries must each be wrapped in double quotes and separated by commas. " +
+             "Found " + r.entries.length + " quoted " + (r.entries.length === 1 ? "entry" : "entries") +
+             "; exactly " + COUNT + " are required.";
+    }
+    if (r.entries.length !== COUNT) {
+      return "Found " + r.entries.length + " " + (r.entries.length === 1 ? "entry" : "entries") +
+             "; exactly " + COUNT + " are required.";
+    }
+    if (r.entries.some(function (e) { return e === ""; })) {
+      return "Found " + COUNT + " entries, but one or more are empty. Every entry needs text.";
+    }
+    return null;
+  }
+
+  /* ---------- board ---------- */
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function newBoard(entries) {
+    var shuffled = shuffle(entries), cells = [], k = 0;
+    for (var i = 0; i < 25; i++) cells.push(i === FREE ? null : shuffled[k++]);
+    state = { cells: cells, checked: new Array(25).fill(false) };
+    saveState();
+  }
+
+  function completedLine() {
+    var lines = [], i, j, c = function (i) { return i === FREE || state.checked[i]; };
+    for (i = 0; i < SIZE; i++) {
+      var row = [], col = [];
+      for (j = 0; j < SIZE; j++) { row.push(i * SIZE + j); col.push(j * SIZE + i); }
+      lines.push(row, col);
+    }
+    lines.push([0, 6, 12, 18, 24], [4, 8, 12, 16, 20]);
+    return lines.some(function (l) { return l.every(c); });
+  }
+
+  function renderBoard() {
+    var grid = $("grid");
+    grid.textContent = "";
+    for (var r = 0; r < SIZE; r++) {
+      var tr = document.createElement("tr");
+      for (var c = 0; c < SIZE; c++) {
+        var idx = r * SIZE + c, td = document.createElement("td");
+        if (idx === FREE) {
+          td.className = "free";
+          var d = document.createElement("div");
+          d.textContent = "free space";
+          td.appendChild(d);
+        } else {
+          td.className = state.checked[idx] ? "checked" : "";
+          var label = document.createElement("label");
+          var cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.checked = state.checked[idx];
+          cb.setAttribute("data-idx", idx);
+          var span = document.createElement("span");
+          span.textContent = state.cells[idx];
+          label.appendChild(span);
+          label.appendChild(cb);
+          td.appendChild(label);
+        }
+        tr.appendChild(td);
+      }
+      grid.appendChild(tr);
+    }
+    updateNotice();
+  }
+
+  function updateNotice() {
+    $("notice").classList.toggle("hidden", !completedLine());
+  }
+
+  /* ---------- views ---------- */
+  function showError(msg) {
+    var e = $("error");
+    e.textContent = msg || "";
+    e.classList.toggle("hidden", !msg);
+  }
+  function showSetup() {
+    state = null;
+    $("game").classList.add("hidden");
+    $("setup").classList.remove("hidden");
+  }
+  function showGame() {
+    $("setup").classList.add("hidden");
+    $("game").classList.remove("hidden");
+    renderBoard();
+  }
+
+  function resetAll() {
+    clearState();
+    state = null;
+    showError("");
+    $("entryBox").value = "";
+    // Drop URL entries so the reset really starts clean.
+    try { history.replaceState(null, "", location.pathname); } catch (e) {}
+    showSetup();
+  }
+
+  /* ---------- events ---------- */
+  $("createBtn").addEventListener("click", function () {
+    var text = $("entryBox").value, err = validate(text);
+    showError(err);
+    if (err) return;
+    newBoard(parseEntries(text).entries);
+    showGame();
+  });
+
+  $("grid").addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (!t || t.type !== "checkbox") return;
+    var idx = +t.getAttribute("data-idx");
+    state.checked[idx] = t.checked;
+    t.closest("td").classList.toggle("checked", t.checked);
+    saveState();
+    updateNotice();
+  });
+
+  $("resetBtn").addEventListener("click", resetAll);
+  $("noticeResetBtn").addEventListener("click", resetAll);
+
+  /* ---------- startup ---------- */
+  // Saved board wins; URL entries are only used when there is no saved board.
+  var saved = loadState();
+  if (saved) {
+    state = saved;
+    showGame();
+    return;
+  }
+
+  var params = new URLSearchParams(location.search);
+  if (params.has("entries")) {
+    var text = params.get("entries"), err = validate(text);
+    if (!err) {
+      newBoard(parseEntries(text).entries);
+      showGame();
+      return;
+    }
+    // Invalid URL entries: explain, and let the user enter them manually instead.
+    showError("The entries in the URL are invalid. " + err);
+  }
+  showSetup();
+})();
+</script>
+</body>
+</html>

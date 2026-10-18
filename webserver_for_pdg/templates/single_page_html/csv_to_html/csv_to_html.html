@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CSV Table Viewer</title>
+<style>
+  :root {
+    --bg: #EEF1EE;
+    --surface: #FFFFFF;
+    --border: #C9D2CC;
+    --border-strong: #9FADA5;
+    --ink: #16211B;
+    --muted: #5B6B62;
+    --accent: #3F6659;
+    --accent-dark: #2C4B41;
+    --mark-bg: #FCE79A;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  header h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 2.1rem;
+    letter-spacing: 0.2px;
+    margin: 0 0 6px;
+  }
+
+  header p.subtitle {
+    margin: 0 0 28px;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  header::after {
+    content: "";
+    display: block;
+    height: 1px;
+    background: var(--border-strong);
+    margin-bottom: 32px;
+  }
+
+  /* Dropzone */
+  .dropzone {
+    border: 1px dashed var(--border-strong);
+    border-radius: 4px;
+    padding: 56px 24px;
+    text-align: center;
+    background: var(--surface);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .dropzone.drag-over {
+    border-color: var(--accent);
+    background: #F3F7F4;
+  }
+
+  .dropzone .hint {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin: 14px 0 0;
+  }
+
+  .btn {
+    font: inherit;
+    font-size: 0.92rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .btn:hover { background: var(--accent-dark); }
+  .btn:focus-visible,
+  input:focus-visible,
+  .link-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .link-btn {
+    font: inherit;
+    font-size: 0.85rem;
+    background: none;
+    border: none;
+    color: var(--accent-dark);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  /* Workspace */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 18px;
+  }
+
+  .file-info {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 0.9rem;
+  }
+
+  #fileName {
+    font-weight: 600;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.88rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  #searchBox {
+    flex: 1 1 220px;
+    min-width: 180px;
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 8px 2px;
+    border: none;
+    border-bottom: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--ink);
+  }
+  #searchBox::placeholder { color: var(--muted); }
+
+  .table-scroll {
+    overflow-x: auto;
+    border-top: 1px solid var(--border-strong);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.87rem;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    text-align: left;
+    font-weight: 600;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--border-strong);
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  tbody tr:hover { background: #F5F7F4; }
+
+  th.col-numeric, td.col-numeric { text-align: right; }
+
+  mark {
+    background: var(--mark-bg);
+    color: inherit;
+    padding: 0 1px;
+    border-radius: 2px;
+  }
+
+  .status {
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .empty-state {
+    margin-top: 14px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>CSV Table Viewer</h1>
+    <p class="subtitle">Open a CSV file to view it as a table. Nothing leaves your browser.</p>
+  </header>
+
+  <section id="dropzone" class="dropzone">
+    <input type="file" id="fileInput" accept=".csv,text/csv" hidden />
+    <button type="button" id="browseBtn" class="btn">Choose a CSV file</button>
+    <p class="hint">or drag and drop it here</p>
+  </section>
+
+  <section id="workspace" hidden>
+    <div class="toolbar">
+      <div class="file-info">
+        <span id="fileName"></span>
+        <button type="button" id="changeFileBtn" class="link-btn">Change file</button>
+      </div>
+      <label class="checkbox-label">
+        <input type="checkbox" id="headerToggle" checked />
+        First row is headers
+      </label>
+      <input type="search" id="searchBox" placeholder="Search all columns…" />
+    </div>
+
+    <div class="table-scroll">
+      <table id="dataTable">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <p id="status" class="status"></p>
+    <p id="emptyState" class="empty-state" hidden>No rows match your search.</p>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- CSV parsing ----------
+  // Supports fields quoted with either " or ', doubled-quote escaping
+  // inside a quoted field, and trims leading/trailing whitespace from
+  // unquoted fields (quoted fields are kept exactly as written).
+  function parseCSV(text) {
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1); // strip BOM
+    const rows = [];
+    let row = [];
+    let i = 0;
+    const len = text.length;
+
+    while (i <= len) {
+      while (i < len && (text[i] === " " || text[i] === "\t")) i++;
+
+      let value = "";
+      if (i < len && (text[i] === '"' || text[i] === "'")) {
+        const q = text[i];
+        i++;
+        while (i < len) {
+          if (text[i] === q) {
+            if (text[i + 1] === q) { value += q; i += 2; }
+            else { i++; break; }
+          } else { value += text[i]; i++; }
+        }
+        // any stray characters between the closing quote and the next
+        // delimiter are appended as-is (malformed-CSV fallback)
+        let start = i;
+        while (i < len && text[i] !== "," && text[i] !== "\n" && text[i] !== "\r") i++;
+        value += text.slice(start, i);
+      } else {
+        const start = i;
+        while (i < len && text[i] !== "," && text[i] !== "\n" && text[i] !== "\r") i++;
+        value = text.slice(start, i).trim();
+      }
+
+      row.push(value);
+
+      if (i < len && text[i] === ",") { i++; continue; }
+
+      rows.push(row);
+      row = [];
+      if (i < len && text[i] === "\r") { i++; if (text[i] === "\n") i++; }
+      else if (i < len && text[i] === "\n") { i++; }
+      if (i >= len) break;
+    }
+
+    // drop a single trailing blank row caused by a final newline
+    if (rows.length && rows[rows.length - 1].length === 1 && rows[rows.length - 1][0] === "") {
+      rows.pop();
+    }
+    return rows;
+  }
+
+  // ---------- State ----------
+  let allRows = [];
+  let searchDebounce = null;
+
+  // ---------- Elements ----------
+  const dropzone = document.getElementById("dropzone");
+  const workspace = document.getElementById("workspace");
+  const fileInput = document.getElementById("fileInput");
+  const browseBtn = document.getElementById("browseBtn");
+  const changeFileBtn = document.getElementById("changeFileBtn");
+  const fileNameEl = document.getElementById("fileName");
+  const headerToggle = document.getElementById("headerToggle");
+  const searchBox = document.getElementById("searchBox");
+  const tableHead = document.getElementById("tableHead");
+  const tableBody = document.getElementById("tableBody");
+  const statusEl = document.getElementById("status");
+  const emptyStateEl = document.getElementById("emptyState");
+
+  const NUMERIC_RE = /^-?\d+(\.\d+)?$/;
+
+  function highlightedFragment(text, term) {
+    const frag = document.createDocumentFragment();
+    if (!term) { frag.appendChild(document.createTextNode(text)); return frag; }
+    const lowerText = text.toLowerCase();
+    let start = 0, idx;
+    while ((idx = lowerText.indexOf(term, start)) !== -1) {
+      if (idx > start) frag.appendChild(document.createTextNode(text.slice(start, idx)));
+      const mark = document.createElement("mark");
+      mark.textContent = text.slice(idx, idx + term.length);
+      frag.appendChild(mark);
+      start = idx + term.length;
+    }
+    if (start < text.length) frag.appendChild(document.createTextNode(text.slice(start)));
+    return frag;
+  }
+
+  function render() {
+    if (!allRows.length) return;
+
+    const headerEnabled = headerToggle.checked;
+    const columnCount = allRows.reduce((max, r) => Math.max(max, r.length), 0);
+    const headerRow = headerEnabled ? allRows[0] : null;
+    const dataRows = headerEnabled ? allRows.slice(1) : allRows;
+
+    const headers = [];
+    for (let c = 0; c < columnCount; c++) {
+      headers.push(headerRow && headerRow[c] !== undefined && headerRow[c] !== "" ? headerRow[c] : "Column " + (c + 1));
+    }
+
+    // decide which columns are entirely numeric, for right-alignment
+    const numericCol = new Array(columnCount).fill(true);
+    const sawValue = new Array(columnCount).fill(false);
+    dataRows.forEach(r => {
+      for (let c = 0; c < columnCount; c++) {
+        const v = r[c];
+        if (v === undefined || v === "") continue;
+        sawValue[c] = true;
+        if (!NUMERIC_RE.test(v)) numericCol[c] = false;
+      }
+    });
+    for (let c = 0; c < columnCount; c++) if (!sawValue[c]) numericCol[c] = false;
+
+    const term = searchBox.value.trim().toLowerCase();
+    const filteredRows = term
+      ? dataRows.filter(r => r.some(cell => (cell || "").toLowerCase().includes(term)))
+      : dataRows;
+
+    // --- head ---
+    tableHead.textContent = "";
+    const headTr = document.createElement("tr");
+    headers.forEach((h, c) => {
+      const th = document.createElement("th");
+      th.textContent = h;
+      if (numericCol[c]) th.classList.add("col-numeric");
+      headTr.appendChild(th);
+    });
+    tableHead.appendChild(headTr);
+
+    // --- body ---
+    tableBody.textContent = "";
+    const bodyFrag = document.createDocumentFragment();
+    filteredRows.forEach(r => {
+      const tr = document.createElement("tr");
+      for (let c = 0; c < columnCount; c++) {
+        const td = document.createElement("td");
+        if (numericCol[c]) td.classList.add("col-numeric");
+        td.appendChild(highlightedFragment(r[c] || "", term));
+        tr.appendChild(td);
+      }
+      bodyFrag.appendChild(tr);
+    });
+    tableBody.appendChild(bodyFrag);
+
+    // --- status ---
+    const total = dataRows.length;
+    if (term) {
+      statusEl.textContent = filteredRows.length + " of " + total + " row" + (total === 1 ? "" : "s") + " match \u201c" + searchBox.value.trim() + "\u201d";
+    } else {
+      statusEl.textContent = total + " row" + (total === 1 ? "" : "s") + " \u00b7 " + columnCount + " column" + (columnCount === 1 ? "" : "s");
+    }
+    emptyStateEl.hidden = filteredRows.length !== 0;
+  }
+
+  function loadFile(file) {
+    fileNameEl.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = e => {
+      allRows = parseCSV(String(e.target.result));
+      dropzone.hidden = true;
+      workspace.hidden = false;
+      searchBox.value = "";
+      render();
+    };
+    reader.onerror = () => { alert("Sorry, that file couldn't be read."); };
+    reader.readAsText(file);
+  }
+
+  browseBtn.addEventListener("click", () => fileInput.click());
+  changeFileBtn.addEventListener("click", () => { fileInput.value = ""; fileInput.click(); });
+  fileInput.addEventListener("change", e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
+
+  ["dragenter", "dragover"].forEach(evt =>
+    dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.add("drag-over"); })
+  );
+  ["dragleave", "drop"].forEach(evt =>
+    dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.remove("drag-over"); })
+  );
+  dropzone.addEventListener("drop", e => {
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) loadFile(file);
+  });
+
+  headerToggle.addEventListener("change", render);
+  searchBox.addEventListener("input", () => {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(render, 100);
+  });
+})();
+</script>
+</body>
+</html>

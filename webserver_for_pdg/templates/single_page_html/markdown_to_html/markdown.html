@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markdown → HTML</title>
+<style>
+  :root{
+    --paper:#FAF8F3; --panel:#FFFFFF; --ink:#22201C; --ink-soft:#6B655A;
+    --rule:#DAD4C6; --red:#A6392C; --red-bg:#FBEDE9; --teal:#2F6459; --teal-bg:#EAF1EE;
+    --serif:'Iowan Old Style','Palatino Linotype','Book Antiqua',Georgia,serif;
+    --mono:'SF Mono','Cascadia Code',Consolas,'Liberation Mono',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);display:flex;flex-direction:column;}
+  header{padding:22px 28px 14px;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;}
+  h1{font-family:var(--serif);font-weight:600;font-size:26px;margin:0;letter-spacing:.2px;}
+  .tagline{font-size:12.5px;color:var(--ink-soft);margin-top:4px;}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  button{font-family:var(--sans);font-size:13px;padding:7px 13px;border-radius:5px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);cursor:pointer;}
+  button:hover{border-color:var(--ink-soft);}
+  button.primary{background:var(--teal);color:#fff;border-color:var(--teal);}
+  button.primary:hover{opacity:.9;}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);display:inline-block;margin-right:6px;transition:transform .15s;}
+  .live-dot.pulse{transform:scale(1.7);}
+  .status{font-size:12px;color:var(--ink-soft);display:flex;align-items:center;margin-right:6px;}
+  main{flex:1;display:flex;min-height:0;}
+  .col{flex:1;display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--rule);}
+  .col:last-child{border-right:none;}
+  .col-head{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--ink-soft);padding:9px 14px;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;}
+  .editor-wrap{flex:1;display:flex;min-height:0;background:var(--panel);}
+  #gutter{font-family:var(--mono);font-size:13px;line-height:1.6;color:#B7AF9D;text-align:right;padding:14px 8px 14px 0;user-select:none;overflow:hidden;background:#F5F2EB;border-right:1px solid var(--rule);white-space:pre;}
+  #editor{flex:1;border:none;resize:none;outline:none;font-family:var(--mono);font-size:13px;line-height:1.6;padding:14px;background:var(--panel);color:var(--ink);}
+  #preview, #sourceView{flex:1;overflow:auto;padding:18px 22px;background:var(--panel);}
+  #preview{font-family:var(--serif);font-size:15.5px;line-height:1.65;}
+  #preview h1,#preview h2,#preview h3{line-height:1.25;}
+  #preview pre{background:#F5F2EB;padding:10px 12px;border-radius:4px;overflow:auto;font-family:var(--mono);font-size:13px;}
+  #preview code{font-family:var(--mono);font-size:.9em;background:#F5F2EB;padding:1px 4px;border-radius:3px;}
+  #preview pre code{background:none;padding:0;}
+  #preview table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:14px;}
+  #preview th,#preview td{border:1px solid var(--rule);padding:6px 10px;text-align:left;}
+  #preview blockquote{border-left:3px solid var(--rule);margin:0;padding-left:14px;color:var(--ink-soft);}
+  #sourceView{display:none;white-space:pre-wrap;font-family:var(--mono);font-size:12.5px;line-height:1.55;}
+  #warnings{border-top:1px solid var(--rule);background:var(--red-bg);max-height:160px;overflow:auto;display:none;}
+  #warnings.show{display:block;}
+  #warnings h2{font-family:var(--sans);font-size:12px;color:var(--red);margin:0;padding:8px 16px;border-bottom:1px solid #EBD3CD;}
+  .warn-item{padding:6px 16px;font-size:12.5px;color:#5c2c22;border-bottom:1px solid #EBD3CD;cursor:pointer;font-family:var(--mono);}
+  .warn-item:hover{background:#F6DED8;}
+  .warn-item b{color:var(--red);}
+  @media(max-width:760px){main{flex-direction:column;}.col{border-right:none;border-bottom:1px solid var(--rule);}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Markdown → HTML</h1>
+    <div class="tagline">Type on the left, read on the right. Nothing leaves your browser.</div>
+  </div>
+  <div class="toolbar">
+    <span class="status"><span class="live-dot" id="liveDot"></span>Live</span>
+    <button id="exampleBtn">Load example</button>
+    <button id="clearBtn">Clear</button>
+    <button id="toggleBtn">View HTML source</button>
+    <button id="copyBtn" class="primary">Copy HTML</button>
+  </div>
+</header>
+<main>
+  <div class="col">
+    <div class="col-head"><span>MARKDOWN</span></div>
+    <div class="editor-wrap">
+      <div id="gutter">1</div>
+      <textarea id="editor" spellcheck="false" placeholder="# Start typing…"></textarea>
+    </div>
+  </div>
+  <div class="col">
+    <div class="col-head"><span id="paneLabel">RENDERED PREVIEW</span></div>
+    <div id="preview"></div>
+    <pre id="sourceView"></pre>
+  </div>
+</main>
+<div id="warnings"><h2 id="warnTitle"></h2><div id="warnList"></div></div>
+
+<script>
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escAttr(s){return esc(s).replace(/"/g,'&quot;');}
+
+function isWordChar(c){return c!==undefined && /[A-Za-z0-9_]/.test(c);}
+
+function parseLinkOrImage(line,bracketIdx,lineNo,errors,isImage){
+  const n=line.length; let depth=1,j=bracketIdx+1;
+  while(j<n&&depth>0){ if(line[j]==='[')depth++; else if(line[j]===']')depth--; j++; }
+  if(depth>0){
+    errors.push({line:lineNo,message:(isImage?'Image':'Link')+' text starting at column '+(bracketIdx+1)+' is missing its closing \']\'.'});
+    return {html:esc(line[bracketIdx]),nextIndex:bracketIdx+1};
+  }
+  const closeB=j-1, linkText=line.slice(bracketIdx+1,closeB);
+  const nested=/\[[^\[\]]*\]\([^()]*\)/.test(linkText);
+  if(line[j]!=='('){
+    if(nested) errors.push({line:lineNo,message:'Malformed nested link near column '+(bracketIdx+1)+' — looks like "[[text](url)]"; remove the outer brackets.'});
+    return {html:esc(line[bracketIdx])+inlineParse(linkText,lineNo,[])+esc(']'),nextIndex:j};
+  }
+  let pd=1,k=j+1;
+  while(k<n&&pd>0){ if(line[k]==='(')pd++; else if(line[k]===')')pd--; k++; }
+  if(pd>0){
+    errors.push({line:lineNo,message:(isImage?'Image':'Link')+' "'+linkText+'" is missing its closing \')\' for the URL.'});
+    return {html:esc(line[bracketIdx])+inlineParse(linkText,lineNo,[])+esc(']'),nextIndex:j};
+  }
+  const closeP=k-1; let url=line.slice(j+1,closeP).trim(),title='';
+  const tm=url.match(/^(\S+)\s+"([^"]*)"$/)||url.match(/^(\S+)\s+'([^']*)'$/);
+  if(tm){url=tm[1];title=tm[2];}
+  if(nested) errors.push({line:lineNo,message:'Malformed nested link near column '+(bracketIdx+1)+' — link text contains its own "[text](url)".'});
+  const safeUrl=escAttr(url);
+  if(isImage) return {html:'<img src="'+safeUrl+'" alt="'+escAttr(linkText)+'"'+(title?' title="'+escAttr(title)+'"':'')+'>',nextIndex:k};
+  return {html:'<a href="'+safeUrl+'"'+(title?' title="'+escAttr(title)+'"':'')+'>'+inlineParse(linkText,lineNo,[])+'</a>',nextIndex:k};
+}
+
+function inlineParse(line,lineNo,errors){
+  let html='',i=0; const n=line.length;
+  while(i<n){
+    const ch=line[i];
+    if(ch==='\\'&&i+1<n&&/[\\`*_{}\[\]()#+\-.!>~]/.test(line[i+1])){ html+=esc(line[i+1]); i+=2; continue; }
+    if(ch==='`'){
+      let tl=1; while(line[i+tl]==='`')tl++;
+      const delim='`'.repeat(tl), close=line.indexOf(delim,i+tl);
+      if(close===-1){ errors.push({line:lineNo,message:'Inline code opened with '+delim+' has no closing backtick'+(tl>1?'s':'')+'.'}); html+=esc(delim); i+=tl; continue; }
+      html+='<code>'+esc(line.slice(i+tl,close).trim())+'</code>'; i=close+tl; continue;
+    }
+    if(ch==='!'&&line[i+1]==='['){ const r=parseLinkOrImage(line,i+1,lineNo,errors,true); html+=r.html; i=r.nextIndex; continue; }
+    if(ch==='['){ const r=parseLinkOrImage(line,i,lineNo,errors,false); html+=r.html; i=r.nextIndex; continue; }
+    if(ch==='*'&&line[i+1]==='*'){
+      const close=line.indexOf('**',i+2);
+      if(close===-1){ errors.push({line:lineNo,message:"Bold text opened with '**' has no matching closing '**'."}); html+=esc('**'); i+=2; continue; }
+      html+='<strong>'+inlineParse(line.slice(i+2,close),lineNo,[])+'</strong>'; i=close+2; continue;
+    }
+    if(ch==='_'&&line[i+1]==='_'&&!isWordChar(line[i-1])){
+      const close=line.indexOf('__',i+2);
+      if(close===-1){ errors.push({line:lineNo,message:"Bold text opened with '__' has no matching closing '__'."}); html+=esc('__'); i+=2; continue; }
+      html+='<strong>'+inlineParse(line.slice(i+2,close),lineNo,[])+'</strong>'; i=close+2; continue;
+    }
+    if(ch==='~'&&line[i+1]==='~'){
+      const close=line.indexOf('~~',i+2);
+      if(close===-1){ errors.push({line:lineNo,message:"Strikethrough opened with '~~' has no matching closing '~~'."}); html+='~~'; i+=2; continue; }
+      html+='<del>'+esc(line.slice(i+2,close))+'</del>'; i=close+2; continue;
+    }
+    if(ch==='*'||ch==='_'){
+      if(ch==='_'&&isWordChar(line[i-1])){ html+=esc(ch); i++; continue; }
+      let j=i+1,close=-1;
+      while(j<n){ if(line[j]===ch&&line[j-1]!=='\\'){ if(ch==='_'&&isWordChar(line[j+1])){j++;continue;} close=j; break; } j++; }
+      if(close===-1||line.slice(i+1,close).trim()===''){ html+=esc(ch); i++; continue; }
+      html+='<em>'+esc(line.slice(i+1,close))+'</em>'; i=close+1; continue;
+    }
+    html+=esc(ch); i++;
+  }
+  return html;
+}
+
+function isBlockStart(line){
+  return /^\s{0,3}#{1,6}\s/.test(line)||/^\s{0,3}(```|~~~)/.test(line)||/^\s{0,3}>/.test(line)||
+    /^\s{0,3}([-*+])\s+/.test(line)||/^\s{0,3}\d{1,9}[.)]\s+/.test(line)||
+    /^\s{0,3}([-*_])\s*(\1\s*){2,}$/.test(line)||line.includes('|');
+}
+function isTableDelim(line){
+  const t=line.trim(); if(!t.includes('-')||!t.includes('|'))return false;
+  let c=t; if(c.startsWith('|'))c=c.slice(1); if(c.endsWith('|'))c=c.slice(0,-1);
+  const cells=c.split('|');
+  return cells.length>0&&cells.every(x=>/^:?-+:?$/.test(x.trim()));
+}
+function splitRow(line){
+  let t=line.trim(); if(t.startsWith('|'))t=t.slice(1); if(t.endsWith('|'))t=t.slice(0,-1);
+  return t.split('|').map(c=>c.trim());
+}
+function align(cell){ const c=cell.trim(); const l=c.startsWith(':'),r=c.endsWith(':'); if(l&&r)return'center'; if(r)return'right'; if(l)return'left'; return ''; }
+
+function parseMarkdown(source){
+  const lines=source.replace(/\r\n?/g,'\n').split('\n');
+  const errors=[], blocks=[]; let i=0;
+  while(i<lines.length){
+    const line=lines[i];
+    if(line.trim()===''){ i++; continue; }
+    const fence=line.match(/^\s{0,3}(```+|~~~+)\s*([^\s`~]*)\s*$/);
+    if(fence){
+      const fc=fence[1][0], flen=fence[1].length, lang=fence[2]||'', start=i+1;
+      let j=i+1, closed=false, content=[];
+      while(j<lines.length){
+        const cm=lines[j].match(/^\s{0,3}(`{3,}|~{3,})\s*$/);
+        if(cm&&cm[1][0]===fc&&cm[1].length>=flen){ closed=true; break; }
+        content.push(lines[j]); j++;
+      }
+      if(!closed) errors.push({line:start,message:'Fenced code block opened with '+fence[1]+' is never closed (reached end of document).'});
+      blocks.push({type:'code',lang,content:content.join('\n')});
+      i=closed?j+1:lines.length; continue;
+    }
+    const heading=line.match(/^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$/);
+    if(heading){ blocks.push({type:'heading',level:heading[1].length,text:heading[2],line:i+1}); i++; continue; }
+    if(/^\s{0,3}([-*_])\s*(\1\s*){2,}$/.test(line)&&!line.includes('|')){ blocks.push({type:'hr'}); i++; continue; }
+    if(line.includes('|')&&i+1<lines.length&&isTableDelim(lines[i+1])){
+      const header=splitRow(line), delims=splitRow(lines[i+1]).map(align), headerLine=i+1;
+      let j=i+2; const rows=[];
+      while(j<lines.length&&lines[j].trim()!==''&&lines[j].includes('|')){
+        const cells=splitRow(lines[j]);
+        if(cells.length!==header.length) errors.push({line:j+1,message:'Table row has '+cells.length+' column'+(cells.length===1?'':'s')+', but the header row (line '+headerLine+') defines '+header.length+' column'+(header.length===1?'':'s')+'.'});
+        rows.push({cells,line:j+1}); j++;
+      }
+      blocks.push({type:'table',header,delims,rows,headerLine}); i=j; continue;
+    }
+    if(/^\s{0,3}>/.test(line)){
+      const start=i+1, cl=[]; let j=i;
+      while(j<lines.length&&/^\s{0,3}>/.test(lines[j])){ cl.push({text:lines[j].replace(/^\s{0,3}>\s?/,''),line:j+1}); j++; }
+      blocks.push({type:'blockquote',lines:cl}); i=j; continue;
+    }
+    const um=line.match(/^\s{0,3}([-*+])\s+(.*)$/), om=line.match(/^\s{0,3}(\d{1,9})[.)]\s+(.*)$/);
+    if(um||om){
+      const ordered=!!om, items=[]; let j=i;
+      while(j<lines.length){
+        const u=lines[j].match(/^\s{0,3}([-*+])\s+(.*)$/), o=lines[j].match(/^\s{0,3}(\d{1,9})[.)]\s+(.*)$/);
+        if(ordered&&o){ items.push({text:o[2],line:j+1}); j++; }
+        else if(!ordered&&u){ items.push({text:u[2],line:j+1}); j++; }
+        else break;
+      }
+      blocks.push({type:ordered?'ol':'ul',items}); i=j; continue;
+    }
+    { const start=i+1, raw=[line]; let j=i+1;
+      while(j<lines.length&&lines[j].trim()!==''&&!isBlockStart(lines[j])){ raw.push(lines[j]); j++; }
+      blocks.push({type:'paragraph',raw,start}); i=j; continue; }
+  }
+  return {blocks,errors};
+}
+
+function renderLines(rawLines,startLine,errors){
+  const parts=rawLines.map((ln,idx)=>inlineParse(ln.trim(),startLine+idx,errors));
+  let out='';
+  for(let idx=0;idx<parts.length;idx++){ out+=parts[idx]; if(idx<parts.length-1) out+=/[ ]{2,}$/.test(rawLines[idx])?'<br>\n':' '; }
+  return out;
+}
+
+function renderBlocks(blocks,errors){
+  return blocks.map(b=>{
+    if(b.type==='heading') return '<h'+b.level+'>'+inlineParse(b.text,b.line,errors)+'</h'+b.level+'>';
+    if(b.type==='hr') return '<hr>';
+    if(b.type==='code') return '<pre><code'+(b.lang?' class="language-'+esc(b.lang)+'"':'')+'>'+esc(b.content)+'</code></pre>';
+    if(b.type==='blockquote') return '<blockquote><p>'+renderLines(b.lines.map(l=>l.text),b.lines[0].line,errors)+'</p></blockquote>';
+    if(b.type==='ul') return '<ul>'+b.items.map(it=>'<li>'+inlineParse(it.text,it.line,errors)+'</li>').join('')+'</ul>';
+    if(b.type==='ol') return '<ol>'+b.items.map(it=>'<li>'+inlineParse(it.text,it.line,errors)+'</li>').join('')+'</ol>';
+    if(b.type==='table'){
+      const th='<tr>'+b.header.map((c,idx)=>'<th'+(b.delims[idx]?' style="text-align:'+b.delims[idx]+'"':'')+'>'+inlineParse(c,b.headerLine,errors)+'</th>').join('')+'</tr>';
+      const trs=b.rows.map(r=>{
+        const cells=b.header.map((_,idx)=>r.cells[idx]!==undefined?r.cells[idx]:'');
+        return '<tr>'+cells.map((c,idx)=>'<td'+(b.delims[idx]?' style="text-align:'+b.delims[idx]+'"':'')+'>'+inlineParse(c,r.line,errors)+'</td>').join('')+'</tr>';
+      }).join('');
+      return '<table><thead>'+th+'</thead><tbody>'+trs+'</tbody></table>';
+    }
+    if(b.type==='paragraph') return '<p>'+renderLines(b.raw,b.start,errors)+'</p>';
+    return '';
+  }).join('\n');
+}
+
+// --- UI wiring ---
+const editor=document.getElementById('editor'), gutter=document.getElementById('gutter');
+const preview=document.getElementById('preview'), sourceView=document.getElementById('sourceView');
+const warnings=document.getElementById('warnings'), warnList=document.getElementById('warnList'), warnTitle=document.getElementById('warnTitle');
+const toggleBtn=document.getElementById('toggleBtn'), copyBtn=document.getElementById('copyBtn'), paneLabel=document.getElementById('paneLabel');
+const liveDot=document.getElementById('liveDot');
+let showingSource=false, lastHtml='';
+
+function updateGutter(){
+  const count=editor.value.split('\n').length;
+  let s=''; for(let n=1;n<=count;n++) s+=n+'\n';
+  gutter.textContent=s;
+}
+editor.addEventListener('scroll',()=>{ gutter.scrollTop=editor.scrollTop; });
+
+function jumpToLine(lineNo){
+  const lines=editor.value.split('\n');
+  let offset=0; for(let k=0;k<lineNo-1;k++) offset+=lines[k].length+1;
+  editor.focus();
+  editor.setSelectionRange(offset,offset+(lines[lineNo-1]||'').length);
+  const lh=parseFloat(getComputedStyle(editor).lineHeight)||20;
+  editor.scrollTop=Math.max(0,(lineNo-1)*lh-editor.clientHeight/2);
+  gutter.scrollTop=editor.scrollTop;
+}
+
+function render(){
+  const {blocks,errors}=parseMarkdown(editor.value);
+  lastHtml=editor.value.trim()===''?'':renderBlocks(blocks,errors);
+  preview.innerHTML=lastHtml;
+  sourceView.textContent=lastHtml;
+  if(errors.length){
+    errors.sort((a,b)=>a.line-b.line);
+    warnTitle.textContent=errors.length+' issue'+(errors.length===1?'':'s')+' found — best-effort preview shown below';
+    warnList.innerHTML=errors.map(e=>'<div class="warn-item" data-line="'+e.line+'"><b>Line '+e.line+':</b> '+esc(e.message)+'</div>').join('');
+    warnings.classList.add('show');
+  } else {
+    warnings.classList.remove('show');
+  }
+  liveDot.classList.add('pulse');
+  setTimeout(()=>liveDot.classList.remove('pulse'),180);
+  updateGutter();
+}
+warnList.addEventListener('click',e=>{
+  const item=e.target.closest('.warn-item'); if(item) jumpToLine(parseInt(item.dataset.line,10));
+});
+
+let debounceTimer;
+editor.addEventListener('input',()=>{ clearTimeout(debounceTimer); debounceTimer=setTimeout(render,220); });
+
+toggleBtn.addEventListener('click',()=>{
+  showingSource=!showingSource;
+  preview.style.display=showingSource?'none':'block';
+  sourceView.style.display=showingSource?'block':'none';
+  paneLabel.textContent=showingSource?'HTML SOURCE':'RENDERED PREVIEW';
+  toggleBtn.textContent=showingSource?'View rendered preview':'View HTML source';
+});
+
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.left='-9999px';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
+copyBtn.addEventListener('click',()=>{
+  const original=copyBtn.textContent;
+  const done=()=>{ copyBtn.textContent='Copied!'; setTimeout(()=>copyBtn.textContent=original,1200); };
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(lastHtml).then(done).catch(()=>{ fallbackCopy(lastHtml); done(); });
+  } else { fallbackCopy(lastHtml); done(); }
+});
+
+document.getElementById('clearBtn').addEventListener('click',()=>{ editor.value=''; render(); });
+document.getElementById('exampleBtn').addEventListener('click',()=>{
+  editor.value=[
+'# Field Notes','',
+'A short demo of **bold**, *italic*, and `inline code`, plus a [link](https://example.com).','',
+'## Table','',
+'| Name | Role |','| --- | --- |','| Ada | Engineer |','| Grace | Admiral |','',
+'## Broken on purpose','',
+'This line has **unclosed bold and a [bad link](https://example.com'
+  ].join('\n');
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
+

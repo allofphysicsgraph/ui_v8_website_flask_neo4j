@@ -9341,59 +9341,6 @@ def submit_feedback():
 ###########################################################################
 
 
-@web_app.route("/alpha", methods=["GET"])
-@web_app.route("/alphabetize", methods=["GET"])
-@web_app.route("/alphabetizer", methods=["GET"])
-@web_app.route("/sort", methods=["GET"])
-@trace_execution
-def sort():
-    """
-    Prompt for Gemini 3.5 Flash Lite 'high'
-
-    I have the following Flask
-    ```
-    @web_app.route("/alpha", methods=["GET"])
-    @web_app.route("/alphabetize", methods=["GET"])
-    @web_app.route("/alphabetizer", methods=["GET"])
-    @web_app.route("/sort", methods=["GET"])
-    def sort():
-        canonical_url = url_for("sort").lstrip("/")
-
-        return render_template(
-            "jinja2_pages/sort.html",
-            title="sort and alphabetize text",
-            canonical_url=canonical_url)
-    ```
-    and currently `sort.html` is empty.
-
-    I'd like the page to take user-provided text in a text box and sort the content alphabetically when the user clicks a button labeled "sort".  There should also be a button "reverse sort" and another button "randomize"
-
-    There should be checkboxes for
-    - Make All Lowercase
-    - Capitalize First Word
-    - Remove Duplicates
-
-    and each is unchecked by default.
-
-    There should be a checkbox for "ignore case" and that should be checked by default.
-
-    There should be a set of radio buttons that toggles between "split entries with newline" and "split entries with delimiter" where the user can provide a delimiter
-
-    Enact all of these features client-side in plain javascript
-    """
-    trace_id = trace_id_var.get()
-    canonical_url = url_for("sort").lstrip("/")
-
-    return render_template(
-        "jinja2_pages/sort.html",
-        title="sort and alphabetize text",
-        canonical_url=canonical_url,
-    )
-
-
-###########################################################################
-
-
 @web_app.route("/podcast", methods=["GET"])
 @trace_execution
 def podcast_rss():
@@ -9436,6 +9383,140 @@ def podcast_rss():
     response = make_response(rendered_template)
     response.headers["Content-Type"] = "application/rss+xml; charset=utf-8"
     return response
+
+###########################################################################
+
+
+
+@web_app.route("/alpha", methods=["GET"])
+@web_app.route("/alphabetize", methods=["GET"])
+@web_app.route("/alphabetizer", methods=["GET"])
+@web_app.route("/sort", methods=["GET"])
+@trace_execution
+def single_page_sort():
+    """
+    Prompt for Gemini 3.5 Flash Lite 'high'
+
+    I have the following Flask
+    ```
+    @web_app.route("/alpha", methods=["GET"])
+    @web_app.route("/alphabetize", methods=["GET"])
+    @web_app.route("/alphabetizer", methods=["GET"])
+    @web_app.route("/sort", methods=["GET"])
+    def sort():
+        canonical_url = url_for("sort").lstrip("/")
+
+        return render_template(
+            "jinja2_pages/sort.html",
+            title="sort and alphabetize text",
+            canonical_url=canonical_url)
+    ```
+    and currently `sort.html` is empty.
+
+    I'd like the page to take user-provided text in a text box and sort the content alphabetically when the user clicks a button labeled "sort".  There should also be a button "reverse sort" and another button "randomize"
+
+    There should be checkboxes for
+    - Make All Lowercase
+    - Capitalize First Word
+    - Remove Duplicates
+
+    and each is unchecked by default.
+
+    There should be a checkbox for "ignore case" and that should be checked by default.
+
+    There should be a set of radio buttons that toggles between "split entries with newline" and "split entries with delimiter" where the user can provide a delimiter
+
+    Enact all of these features client-side in plain javascript
+    """
+    trace_id = trace_id_var.get()
+    canonical_url = url_for("single_page_sort").lstrip("/")
+
+    return render_template(
+        "jinja2_pages/sort.html",
+        title="sort and alphabetize text",
+        canonical_url=canonical_url,
+    )
+
+
+@web_app.route("/bingo_card", methods=["GET"])
+@trace_execution
+def single_page_bingo_card():
+    """ """
+    trace_id = trace_id_var.get()
+    canonical_url = url_for("single_page_bingo_card").lstrip("/")
+
+    return render_template(
+            "single_page_html/bingo_card/bingo.html",
+            title="bingo_card",
+            canonical_url=canonical_url,
+        )
+
+
+@web_app.route("/markdown_to_html", methods=["GET"])
+@trace_execution
+def single_page_markdown_to_html():
+    """ """
+    trace_id = trace_id_var.get()
+    canonical_url = url_for("single_page_markdown_to_html").lstrip("/")
+
+    return render_template(
+            "single_page_html/markdown_to_html/markdown.html",
+            title="markdown_to_html",
+            canonical_url=canonical_url,
+        )
+
+
+@web_app.route("/text_diff", methods=["GET"])
+@trace_execution
+def single_page_text_diff():
+    """ """
+    trace_id = trace_id_var.get()
+    canonical_url = url_for("single_page_text_diff").lstrip("/")
+
+    return render_template(
+            "single_page_html/text_diff/text_diff.html",
+            title="text_diff",
+            canonical_url=canonical_url,
+        )
+
+@web_app.route("/ascii_editor", methods=["GET"])
+@trace_execution
+def single_page_ascii_editor():
+    """ """
+    trace_id = trace_id_var.get()
+    canonical_url = url_for("single_page_ascii_editor").lstrip("/")
+
+    return render_template(
+            "single_page_html/ascii_editor/editor.html",
+            title="ascii_editor",
+            canonical_url=canonical_url,
+        )
+
+@web_app.route("/csv_to_html", methods=["GET"])
+@trace_execution
+def single_page_csv_to_html():
+    """ """
+    trace_id = trace_id_var.get()
+    canonical_url = url_for("single_page_csv_to_html").lstrip("/")
+
+    return render_template(
+            "single_page_html/csv_to_html/csv_to_html.html",
+            title="csv_to_html",
+            canonical_url=canonical_url,
+        )
+
+@web_app.route("/mspaint", methods=["GET"])
+@trace_execution
+def single_page_mspaint():
+    """ """
+    trace_id = trace_id_var.get()
+    canonical_url = url_for("single_page_mspaint").lstrip("/")
+
+    return render_template(
+            "single_page_html/mspaint/paint.html",
+            title="mspaint",
+            canonical_url=canonical_url,
+        )
 
 
 # EOF
