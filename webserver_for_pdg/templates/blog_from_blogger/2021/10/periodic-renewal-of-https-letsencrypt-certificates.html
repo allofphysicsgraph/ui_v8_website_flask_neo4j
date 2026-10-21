@@ -7,7 +7,7 @@
 
 <P>Confirm expiration date of current certificates
 <pre>openssl x509 -dates -noout &lt; \
-/home/pdg/allofphysics.com/certs/fullchain.pem</pre><div><br /></div>
+/home/pdg/ui_v8_website_flask_neo4j/certs/fullchain.pem</pre><div><br /></div>
 
 <P>Delete existing certs
 <pre>sudo rm -rf /etc/letsencrypt/live/derivationmap.net
@@ -27,7 +27,7 @@ sudo ls -hal /etc/letsencrypt/archive/
 
 <P>To use multiple domains and a single cert, use
 <pre>sudo certbot certonly --webroot \
--w /home/pdg/allofphysics.com/certs \
+-w /home/pdg/ui_v8_website_flask_neo4j/certs \
 --server https://acme-v02.api.letsencrypt.org/directory \
 -d derivationmap.net -d www.derivationmap.net \
 -d allofphysics.com -d www.allofphysics.com
@@ -48,7 +48,7 @@ IMPORTANT NOTES:
    "certbot renew"
 </pre><div><br /></div>
 <P>Copy new certs to directory that nginx mounts in Docker-compose
-<pre>cd /home/pdg/allofphysics.com/certs
+<pre>cd /home/pdg/ui_v8_website_flask_neo4j/certs
 
 mv dhparam.pem dhparam.pem_OLD
 mv fullchain.pem fullchain.pem_OLD
@@ -61,7 +61,7 @@ sudo openssl dhparam -out dhparam.pem 2048
 </pre><div><br /></div>
 
 <P>Restart Docker-compose
-<pre>cd /home/pdg/allofphysics.com/
+<pre>cd /home/pdg/ui_v8_website_flask_neo4j/
 docker compose up --build --force-recreate --remove-orphans --detach
 </pre>
 If the docker containers are not restarted, the changes made to the file on the host won't take effect.<div><br /></div><div>Verify in a browser that <a href="https://derivationmap.net/">https://derivationmap.net/</a> has the updated certificate.&nbsp;</div><div><br /></div><div>Set a calendar reminder to renew the certificate.</div>
