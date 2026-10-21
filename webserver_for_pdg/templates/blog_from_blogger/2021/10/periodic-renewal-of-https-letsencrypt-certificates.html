@@ -5,11 +5,11 @@
 
 <P><small>Published 2021-10-09T19:34:00.005Z by Physics Derivation Graph</small></P>
 
-Confirm expiration date of current certificates
+<P>Confirm expiration date of current certificates
 <pre>openssl x509 -dates -noout &lt; \
 /home/pdg/allofphysics.com/certs/fullchain.pem</pre><div><br /></div>
 
-Delete existing certs
+<P>Delete existing certs
 <pre>sudo rm -rf /etc/letsencrypt/live/derivationmap.net
 sudo rm -rf /etc/letsencrypt/renewal/derivationmap.net
 sudo rm -rf /etc/letsencrypt/archive/derivationmap.net
@@ -18,21 +18,21 @@ sudo ls -hal /etc/letsencrypt/renewal/
 sudo ls -hal /etc/letsencrypt/archive/
 </pre>
 <div><br /></div>
-Request new certs
+<P>Request new certs
 <pre><strike>sudo certbot certonly --webroot \
 -w /home/pdg/allofphysics.com/certs \
 --server https://acme-v02.api.letsencrypt.org/directory \
 -d derivationmap.net -d www.derivationmap.net</strike>
 </pre>
 
-To use multiple domains and a single cert, use
+<P>To use multiple domains and a single cert, use
 <pre>sudo certbot certonly --webroot \
 -w /home/pdg/allofphysics.com/certs \
 --server https://acme-v02.api.letsencrypt.org/directory \
 -d derivationmap.net -d www.derivationmap.net \
 -d allofphysics.com -d www.allofphysics.com
 </pre>
-Output should be something like
+<P>Output should be something like
 <pre>Saving debug log to /var/log/letsencrypt/letsencrypt.log
 Plugins selected: Authenticator webroot, Installer None
 Obtaining a new certificate
@@ -47,7 +47,7 @@ IMPORTANT NOTES:
    again. To non-interactively renew *all* of your certificates, run
    "certbot renew"
 </pre><div><br /></div>
-Copy new certs to directory that nginx mounts in Docker-compose
+<P>Copy new certs to directory that nginx mounts in Docker-compose
 <pre>cd /home/pdg/allofphysics.com/certs
 
 mv dhparam.pem dhparam.pem_OLD
@@ -60,7 +60,7 @@ sudo chown pdg:pdg privkey.pem
 sudo openssl dhparam -out dhparam.pem 2048
 </pre><div><br /></div>
 
-Restart Docker-compose
+<P>Restart Docker-compose
 <pre>cd /home/pdg/allofphysics.com/
 docker compose up --build --force-recreate --remove-orphans --detach
 </pre>
