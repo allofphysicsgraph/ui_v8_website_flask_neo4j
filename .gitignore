@@ -21,4 +21,5 @@ neo4j_graph_datascience_library
 neo4j_pdg/plugins/
 neo4j_pdg/logs
 neo4j_pdg/data
+webserver_for_pdg/static/podcast_audio/*.mp3
 webserver_for_pdg/static/from_LLMs/derivation_of_simple_harmonic_oscillator/pdg_*.json

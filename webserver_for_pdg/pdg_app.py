@@ -9384,8 +9384,8 @@ def podcast_rss():
     response.headers["Content-Type"] = "application/rss+xml; charset=utf-8"
     return response
 
-###########################################################################
 
+###########################################################################
 
 
 @web_app.route("/alpha", methods=["GET"])
@@ -9446,10 +9446,10 @@ def single_page_bingo_card():
     canonical_url = url_for("single_page_bingo_card").lstrip("/")
 
     return render_template(
-            "single_page_html/bingo_card/bingo.html",
-            title="bingo_card",
-            canonical_url=canonical_url,
-        )
+        "single_page_html/bingo_card/bingo.html",
+        title="bingo_card",
+        canonical_url=canonical_url,
+    )
 
 
 @web_app.route("/markdown_to_html", methods=["GET"])
@@ -9460,10 +9460,10 @@ def single_page_markdown_to_html():
     canonical_url = url_for("single_page_markdown_to_html").lstrip("/")
 
     return render_template(
-            "single_page_html/markdown_to_html/markdown.html",
-            title="markdown_to_html",
-            canonical_url=canonical_url,
-        )
+        "single_page_html/markdown_to_html/markdown.html",
+        title="markdown_to_html",
+        canonical_url=canonical_url,
+    )
 
 
 @web_app.route("/text_diff", methods=["GET"])
@@ -9474,10 +9474,11 @@ def single_page_text_diff():
     canonical_url = url_for("single_page_text_diff").lstrip("/")
 
     return render_template(
-            "single_page_html/text_diff/text_diff.html",
-            title="text_diff",
-            canonical_url=canonical_url,
-        )
+        "single_page_html/text_diff/text_diff.html",
+        title="text_diff",
+        canonical_url=canonical_url,
+    )
+
 
 @web_app.route("/ascii_editor", methods=["GET"])
 @trace_execution
@@ -9487,10 +9488,11 @@ def single_page_ascii_editor():
     canonical_url = url_for("single_page_ascii_editor").lstrip("/")
 
     return render_template(
-            "single_page_html/ascii_editor/editor.html",
-            title="ascii_editor",
-            canonical_url=canonical_url,
-        )
+        "single_page_html/ascii_editor/editor.html",
+        title="ascii_editor",
+        canonical_url=canonical_url,
+    )
+
 
 @web_app.route("/csv_to_html", methods=["GET"])
 @trace_execution
@@ -9500,10 +9502,11 @@ def single_page_csv_to_html():
     canonical_url = url_for("single_page_csv_to_html").lstrip("/")
 
     return render_template(
-            "single_page_html/csv_to_html/csv_to_html.html",
-            title="csv_to_html",
-            canonical_url=canonical_url,
-        )
+        "single_page_html/csv_to_html/csv_to_html.html",
+        title="csv_to_html",
+        canonical_url=canonical_url,
+    )
+
 
 @web_app.route("/mspaint", methods=["GET"])
 @trace_execution
@@ -9513,10 +9516,10 @@ def single_page_mspaint():
     canonical_url = url_for("single_page_mspaint").lstrip("/")
 
     return render_template(
-            "single_page_html/mspaint/paint.html",
-            title="mspaint",
-            canonical_url=canonical_url,
-        )
+        "single_page_html/mspaint/paint.html",
+        title="mspaint",
+        canonical_url=canonical_url,
+    )
 
 
 # EOF
