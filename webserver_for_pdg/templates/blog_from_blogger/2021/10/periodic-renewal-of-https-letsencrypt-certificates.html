@@ -62,8 +62,11 @@ sudo openssl dhparam -out dhparam.pem 2048
 
 <P>Restart Docker-compose
 <pre>cd /home/pdg/ui_v8_website_flask_neo4j/
-docker compose up --build --force-recreate --remove-orphans --detach
+make down
+make launch_webserver COMPOSE_FLAGS=--detach
 </pre>
+<!-- docker compose up --build --force-recreate --remove-orphans --detach -->
+
 If the docker containers are not restarted, the changes made to the file on the host won't take effect.<div><br /></div><div>Verify in a browser that <a href="https://derivationmap.net/">https://derivationmap.net/</a> has the updated certificate.&nbsp;</div><div><br /></div><div>Set a calendar reminder to renew the certificate.</div>
 
 {% endblock %}
